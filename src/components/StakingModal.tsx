@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { X, Coins, TrendingUp, Lock, Unlock } from 'lucide-react'
 import { useJourneyStore } from '../store/journeyStore'
+import { stakeMFAI } from '../utils/blockchain'
 
 interface StakingModalProps {
   onClose: () => void
@@ -18,6 +19,8 @@ const StakingModal: React.FC<StakingModalProps> = ({
 }) => {
   const [stakeAmount, setStakeAmount] = useState('')
   const [isStaking, setIsStaking] = useState(false)
+  const [txSig, setTxSig] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const { updateStaking } = useJourneyStore()
 
   const handleStake = async () => {
@@ -25,18 +28,24 @@ const StakingModal: React.FC<StakingModalProps> = ({
     if (amount <= 0 || amount > availableAmount) return
 
     setIsStaking(true)
-    
-    // Simulate staking transaction
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    if (onStake) {
-      onStake(amount)
-    } else {
-      updateStaking(amount)
-      onClose()
+    setError(null)
+    try {
+      const result = await stakeMFAI(amount)
+      if (result.success) {
+        setTxSig(result.signature || null)
+        if (onStake) {
+          onStake(amount)
+        } else {
+          updateStaking(amount)
+        }
+      } else {
+        setError(result.error || 'Transaction failed')
+      }
+    } catch (e: any) {
+      setError(e.message)
+    } finally {
+      setIsStaking(false)
     }
-    
-    setIsStaking(false)
   }
 
   const calculateRewards = (amount: number) => {
@@ -189,9 +198,18 @@ const StakingModal: React.FC<StakingModalProps> = ({
             </>
           )}
         </motion.button>
+        {txSig && (
+          <div className="mt-4 text-xs break-all">
+            Transaction: <a href={`https://etherscan.io/tx/${txSig}`} target="_blank" rel="noopener noreferrer" className="text-primary-400 underline">{txSig}</a>
+          </div>
+        )}
+        {error && (
+          <div className="mt-4 text-red-400 text-sm">{error}</div>
+        )}
       </motion.div>
     </motion.div>
   )
 }
 
 export default StakingModal
+

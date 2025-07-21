@@ -599,6 +599,15 @@ Provides utility functions for blockchain operations:
 - `submitDAOVote()`: Submit governance vote
 - `verifyTransaction()`: Verify transaction status
 
+### Staking Contract
+
+The repository now includes an example ERC20 staking contract located at
+`contracts/CognitiveLock.sol`. You can deploy it locally using Hardhat:
+
+```bash
+npm run deploy
+```
+
 ### Future Blockchain Integration
 
 See `docs/blockchain_integration_plan.md` for detailed implementation roadmap including:

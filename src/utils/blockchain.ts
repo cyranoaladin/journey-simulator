@@ -1,12 +1,13 @@
-import { 
-  Connection, 
-  PublicKey, 
-  Transaction, 
-  SystemProgram, 
+import {
+  Connection,
+  PublicKey,
+  Transaction,
+  SystemProgram,
   LAMPORTS_PER_SOL,
   Keypair,
   sendAndConfirmTransaction
 } from '@solana/web3.js';
+import { BrowserProvider, Contract, parseUnits } from 'ethers';
 import { 
   Token, 
   TOKEN_PROGRAM_ID, 
@@ -19,6 +20,14 @@ import {
 const SOLANA_CLUSTER = 'devnet';
 const SOLANA_ENDPOINT = `https://api.${SOLANA_CLUSTER}.solana.com`;
 const MINT_SIZE = MintLayout.span;
+
+// CognitiveLock staking contract (EVM)
+const COGNITIVE_LOCK_ADDRESS = import.meta.env.VITE_COGNITIVE_LOCK_ADDRESS || '';
+const COGNITIVE_LOCK_ABI = [
+  'function stake(uint256 amount) external',
+  'function withdraw(uint256 amount) external',
+  'function claimRewards() external'
+];
 
 // Initialize connection
 export const getConnection = () => {
@@ -110,26 +119,26 @@ export const mintProofOfSkill = async (
 
 // Stake $MFAI tokens
 export const stakeMFAI = async (
-  wallet: any,
   amount: number
 ): Promise<{success: boolean, signature?: string, error?: string}> => {
   try {
-    const { publicKey, signTransaction } = wallet;
-    
-    if (!publicKey || !signTransaction) {
-      throw new Error('Wallet not connected');
+    if (!(window as any).ethereum) {
+      throw new Error('MetaMask not available');
     }
-    
-    // In a real implementation, we would:
-    // 1. Create a transaction to transfer tokens to a staking contract
-    // 2. Sign and send the transaction
-    
-    // For simulation purposes, we'll just return a success response
+
+    const provider = new BrowserProvider((window as any).ethereum);
+    await provider.send('eth_requestAccounts', []);
+    const signer = await provider.getSigner();
+    const contract = new Contract(COGNITIVE_LOCK_ADDRESS, COGNITIVE_LOCK_ABI, signer);
+
+    const tx = await contract.stake(parseUnits(amount.toString(), 18));
+    await tx.wait();
+
     return {
       success: true,
-      signature: 'simulated_stake_' + Date.now()
+      signature: tx.hash
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error staking MFAI:', error);
     return {
       success: false,
