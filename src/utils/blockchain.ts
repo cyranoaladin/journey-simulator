@@ -1,24 +1,17 @@
-import { 
-  Connection, 
-  PublicKey, 
-  Transaction, 
-  SystemProgram, 
+import {
+  Connection,
+  PublicKey,
   LAMPORTS_PER_SOL,
-  Keypair,
-  sendAndConfirmTransaction
 } from '@solana/web3.js';
-import { 
-  Token, 
-  TOKEN_PROGRAM_ID, 
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  MintLayout,
-  AccountLayout
-} from '@solana/spl-token';
+import {
+  Metaplex,
+  walletAdapterIdentity,
+  irysStorage,
+} from '@metaplex-foundation/js';
 
 // Constants
 const SOLANA_CLUSTER = 'devnet';
 const SOLANA_ENDPOINT = `https://api.${SOLANA_CLUSTER}.solana.com`;
-const MINT_SIZE = MintLayout.span;
 
 // Initialize connection
 export const getConnection = () => {
@@ -68,36 +61,21 @@ export const mintProofOfSkill = async (
       throw new Error('Wallet not connected');
     }
     
-    // Create mint account
-    const mintKeypair = Keypair.generate();
-    
-    // Calculate token account rent
-    const lamports = await connection.getMinimumBalanceForRentExemption(MINT_SIZE);
-    
-    // Create transaction for token creation
-    const transaction = new Transaction().add(
-      SystemProgram.createAccount({
-        fromPubkey: publicKey,
-        newAccountPubkey: mintKeypair.publicKey,
-        space: MINT_SIZE,
-        lamports,
-        programId: TOKEN_PROGRAM_ID,
-      })
-    );
-    
-    // Note: In a real implementation, we would:
-    // 1. Add instructions to initialize the mint
-    // 2. Create associated token account
-    // 3. Mint to the token account
-    // 4. Add metadata using Metaplex
-    
-    // For simulation purposes, we'll just return the mint address
-    // In production, we would sign and send the transaction
-    
+    const metaplex = Metaplex.make(connection)
+      .use(walletAdapterIdentity({ publicKey, signTransaction } as any))
+      .use(irysStorage());
+
+    const { uri } = await metaplex.nfts().uploadMetadata(metadata);
+    const { nft, response } = await metaplex.nfts().create({
+      uri,
+      name: metadata.name,
+      sellerFeeBasisPoints: 0,
+    });
+
     return {
       success: true,
-      signature: 'simulated_signature_' + Date.now(),
-      mintAddress: mintKeypair.publicKey.toString()
+      signature: response.signature,
+      mintAddress: nft.address.toString(),
     };
   } catch (error) {
     console.error('Error minting NFT:', error);

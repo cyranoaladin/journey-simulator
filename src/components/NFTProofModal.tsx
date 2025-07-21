@@ -50,7 +50,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
   onClose,
   onViewSkillchain
 }) => {
-  const { publicKey, connected, connecting } = useWallet();
+  const { publicKey, signTransaction, connected, connecting } = useWallet();
   const { connection } = useConnection();
   const { selectedPersona, mintNFT } = useJourneyStore();
   const [isMinting, setIsMinting] = useState(false);
@@ -259,11 +259,11 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
       }
       
       // Call actual mint function
-      const mintAddress = await mintNFT(title);
-      setMintedAddress(mintAddress);
-      
+      const result = await mintNFT(title, { publicKey, signTransaction });
+      setMintedAddress(result.mintAddress);
+
       // Set explorer URL
-      const url = `https://explorer.solana.com/address/${mintAddress}?cluster=testnet`;
+      const url = `https://explorer.solana.com/address/${result.mintAddress}?cluster=testnet`;
       setExplorerUrl(url);
       
     } catch (err: any) {
