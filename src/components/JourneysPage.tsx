@@ -18,6 +18,8 @@ import StakingModal from './StakingModal';
 import DAOVoteModal from './DAOVoteModal';
 import ResetProgressButton from './ResetProgressButton';
 
+const GOVERNANCE_PROPOSAL_PUBKEY = '11111111111111111111111111111111';
+
 const JourneysPage: React.FC = () => {
   const { 
     selectedPersona, 
@@ -196,6 +198,7 @@ const JourneysPage: React.FC = () => {
             onClose={() => setShowDAOVoteModal(false)}
             phase={selectedPersona.phases[currentPhaseIndex]}
             votingPower={userProgress.votingPower}
+            proposalId={GOVERNANCE_PROPOSAL_PUBKEY}
             onVote={handleDAOVoteComplete}
           />
         </div>

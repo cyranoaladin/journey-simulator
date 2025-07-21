@@ -7,6 +7,8 @@ import StakingModal from './StakingModal'
 import DAOVoteModal from './DAOVoteModal'
 import SkillchainCard from './SkillchainCard'
 
+const GOVERNANCE_PROPOSAL_PUBKEY = '11111111111111111111111111111111'
+
 const JourneyModal = () => {
   const { isModalOpen, modalContent, closeModal, updateProgress, completePhase } = useJourneyStore()
 
@@ -309,10 +311,11 @@ const JourneyModal = () => {
           onClose={closeModal} 
         />
       case 'daoVote':
-        return <DAOVoteModal 
-          phase={modalContent.phase} 
-          votingPower={modalContent.votingPower || 0} 
-          onClose={closeModal} 
+        return <DAOVoteModal
+          phase={modalContent.phase}
+          votingPower={modalContent.votingPower || 0}
+          proposalId={GOVERNANCE_PROPOSAL_PUBKEY}
+          onClose={closeModal}
         />
       default:
         return null

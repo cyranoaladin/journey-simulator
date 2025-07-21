@@ -1,13 +1,16 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { X, Vote, Users, TrendingUp, CheckCircle, XCircle, Clock } from 'lucide-react'
 import { JourneyPhase } from '../types/journey'
 import { useJourneyStore } from '../store/journeyStore'
+import { useWallet } from '@solana/wallet-adapter-react'
+import { submitDAOVote, getProposalVotes } from '../utils/blockchain'
 
 interface DAOVoteModalProps {
   onClose: () => void
   phase: JourneyPhase
   votingPower: number
+  proposalId: string
   onVote?: (vote: 'approve' | 'reject') => void
 }
 
@@ -15,12 +18,19 @@ const DAOVoteModal: React.FC<DAOVoteModalProps> = ({
   onClose,
   phase,
   votingPower,
+  proposalId,
   onVote
 }) => {
+  const { publicKey, signTransaction } = useWallet()
   const [selectedVote, setSelectedVote] = useState<'approve' | 'reject' | null>(null)
   const [isVoting, setIsVoting] = useState(false)
   const [hasVoted, setHasVoted] = useState(false)
+  const [voteResults, setVoteResults] = useState({ approve: 0, reject: 0 })
   const { updateVotingPower } = useJourneyStore()
+
+  useEffect(() => {
+    getProposalVotes(proposalId).then(setVoteResults).catch(() => {})
+  }, [proposalId])
 
   // Mock proposal data based on phase type
   const getProposalData = () => {
@@ -30,7 +40,6 @@ const DAOVoteModal: React.FC<DAOVoteModalProps> = ({
         description: "Validation of your project for incubation in the MFAI ecosystem",
         type: "Incubation",
         requiredVotes: 100,
-        currentVotes: { approve: 67, reject: 23 },
         timeLeft: "2 days 14h",
         quorum: 80
       }
@@ -40,7 +49,6 @@ const DAOVoteModal: React.FC<DAOVoteModalProps> = ({
         description: "Authorization to launch your project on the official Launchpad",
         type: "Launchpad",
         requiredVotes: 200,
-        currentVotes: { approve: 145, reject: 34 },
         timeLeft: "1 day 8h",
         quorum: 150
       }
@@ -50,7 +58,6 @@ const DAOVoteModal: React.FC<DAOVoteModalProps> = ({
         description: "Community validation of your progression in this phase",
         type: "Phase",
         requiredVotes: 50,
-        currentVotes: { approve: 32, reject: 8 },
         timeLeft: "3 days 2h",
         quorum: 40
       }
@@ -58,24 +65,29 @@ const DAOVoteModal: React.FC<DAOVoteModalProps> = ({
   }
 
   const proposal = getProposalData()
-  const totalVotes = proposal.currentVotes.approve + proposal.currentVotes.reject
-  const approvePercentage = (proposal.currentVotes.approve / totalVotes) * 100
-  const rejectPercentage = (proposal.currentVotes.reject / totalVotes) * 100
+  const totalVotes = voteResults.approve + voteResults.reject
+  const approvePercentage = totalVotes ? (voteResults.approve / totalVotes) * 100 : 0
+  const rejectPercentage = totalVotes ? (voteResults.reject / totalVotes) * 100 : 0
 
   const handleVote = async (vote: 'approve' | 'reject') => {
     setSelectedVote(vote)
     setIsVoting(true)
     
-    // Simulate voting transaction
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    // Update voting power and DAO participation
-    updateVotingPower(votingPower + 10)
-    setHasVoted(true)
-    setIsVoting(false)
-    
-    if (onVote) {
-      onVote(vote)
+    try {
+      if (publicKey && signTransaction) {
+        await submitDAOVote({ publicKey, signTransaction }, proposalId, vote)
+        const results = await getProposalVotes(proposalId)
+        setVoteResults(results)
+      } else {
+        await new Promise(resolve => setTimeout(resolve, 2000))
+      }
+      updateVotingPower(votingPower + 10)
+      setHasVoted(true)
+    } catch (err) {
+      console.error('Vote failed', err)
+    } finally {
+      setIsVoting(false)
+      if (onVote) onVote(vote)
     }
   }
 
@@ -155,7 +167,7 @@ const DAOVoteModal: React.FC<DAOVoteModalProps> = ({
                   <CheckCircle size={14} className="mr-1 text-green-400" />
                   Approve
                 </span>
-                <span>{proposal.currentVotes.approve} votes ({approvePercentage.toFixed(1)}%)</span>
+                <span>{voteResults.approve} votes ({approvePercentage.toFixed(1)}%)</span>
               </div>
               <div className="w-full bg-white/10 rounded-full h-2">
                 <div 
@@ -171,7 +183,7 @@ const DAOVoteModal: React.FC<DAOVoteModalProps> = ({
                   <XCircle size={14} className="mr-1 text-red-400" />
                   Reject
                 </span>
-                <span>{proposal.currentVotes.reject} votes ({rejectPercentage.toFixed(1)}%)</span>
+                <span>{voteResults.reject} votes ({rejectPercentage.toFixed(1)}%)</span>
               </div>
               <div className="w-full bg-white/10 rounded-full h-2">
                 <div 

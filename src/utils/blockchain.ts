@@ -5,7 +5,8 @@ import {
   SystemProgram, 
   LAMPORTS_PER_SOL,
   Keypair,
-  sendAndConfirmTransaction
+  sendAndConfirmTransaction,
+  TransactionInstruction
 } from '@solana/web3.js';
 import { 
   Token, 
@@ -19,6 +20,10 @@ import {
 const SOLANA_CLUSTER = 'devnet';
 const SOLANA_ENDPOINT = `https://api.${SOLANA_CLUSTER}.solana.com`;
 const MINT_SIZE = MintLayout.span;
+const GOVERNANCE_PROGRAM_ID = new PublicKey(
+  process.env.VITE_GOVERNANCE_PROGRAM_ID ||
+    'Governance11111111111111111111111111111111'
+);
 
 // Initialize connection
 export const getConnection = () => {
@@ -143,31 +148,59 @@ export const submitDAOVote = async (
   wallet: any,
   proposalId: string,
   vote: 'approve' | 'reject'
-): Promise<{success: boolean, signature?: string, error?: string}> => {
+): Promise<{ success: boolean; signature?: string; error?: string }> => {
   try {
     const { publicKey, signTransaction } = wallet;
-    
+
     if (!publicKey || !signTransaction) {
       throw new Error('Wallet not connected');
     }
-    
-    // In a real implementation, we would:
-    // 1. Create a transaction to submit a vote to the governance program
-    // 2. Sign and send the transaction
-    
-    // For simulation purposes, we'll just return a success response
-    return {
-      success: true,
-      signature: 'simulated_vote_' + Date.now(),
-      proposalId,
-      vote
-    };
+
+    const connection = getConnection();
+    const proposalPubkey = new PublicKey(proposalId);
+
+    const instruction = new TransactionInstruction({
+      programId: GOVERNANCE_PROGRAM_ID,
+      keys: [
+        { pubkey: proposalPubkey, isSigner: false, isWritable: true },
+        { pubkey: publicKey, isSigner: true, isWritable: false }
+      ],
+      data: Buffer.from([vote === 'approve' ? 1 : 0])
+    });
+
+    const transaction = new Transaction().add(instruction);
+    transaction.feePayer = publicKey;
+    const { blockhash } = await connection.getLatestBlockhash();
+    transaction.recentBlockhash = blockhash;
+
+    const signed = await signTransaction(transaction);
+    const signature = await connection.sendRawTransaction(signed.serialize());
+    await connection.confirmTransaction(signature);
+
+    return { success: true, signature };
   } catch (error) {
     console.error('Error submitting DAO vote:', error);
+    return { success: false, error: (error as Error).message };
+  }
+};
+
+// Fetch vote results for a proposal
+export const getProposalVotes = async (
+  proposalId: string
+): Promise<{ approve: number; reject: number }> => {
+  try {
+    const connection = getConnection();
+    const proposalPubkey = new PublicKey(proposalId);
+    const info = await connection.getAccountInfo(proposalPubkey);
+    if (!info) throw new Error('Proposal not found');
+    const data = info.data;
     return {
-      success: false,
-      error: error.message
+      approve: data[0] ?? 0,
+      reject: data[1] ?? 0
     };
+  } catch (error) {
+    console.error('Error fetching vote results:', error);
+    return { approve: 0, reject: 0 };
   }
 };
 

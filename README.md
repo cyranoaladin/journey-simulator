@@ -597,11 +597,13 @@ Provides utility functions for blockchain operations:
 - `mintProofOfSkill()`: Mint NFT certification
 - `stakeMFAI()`: Stake tokens
 - `submitDAOVote()`: Submit governance vote
+- `getProposalVotes()`: Fetch vote totals from the governance program
 - `verifyTransaction()`: Verify transaction status
 
 ### Future Blockchain Integration
 
 See `docs/blockchain_integration_plan.md` for detailed implementation roadmap including:
+- Additional steps for deploying SPL Governance are documented in `docs/spl_governance_setup.md`.
 - Smart contract deployment
 - Real NFT minting with Metaplex
 - Token staking contracts
