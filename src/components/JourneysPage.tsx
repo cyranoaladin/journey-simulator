@@ -18,7 +18,7 @@ import StakingModal from './StakingModal';
 import DAOVoteModal from './DAOVoteModal';
 import ResetProgressButton from './ResetProgressButton';
 
-const GOVERNANCE_PROPOSAL_PUBKEY = '11111111111111111111111111111111';
+const GOVERNANCE_PROPOSAL_PUBKEY = process.env.REACT_APP_GOVERNANCE_PROPOSAL_PUBKEY || 'default_pubkey_value';
 
 const JourneysPage: React.FC = () => {
   const { 
