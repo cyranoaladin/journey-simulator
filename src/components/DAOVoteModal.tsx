@@ -29,7 +29,12 @@ const DAOVoteModal: React.FC<DAOVoteModalProps> = ({
   const { updateVotingPower } = useJourneyStore()
 
   useEffect(() => {
-    getProposalVotes(proposalId).then(setVoteResults).catch(() => {})
+    getProposalVotes(proposalId)
+      .then(setVoteResults)
+      .catch((error) => {
+        console.error("Failed to fetch proposal votes:", error);
+        // Optionally, you can add user feedback here, e.g., set an error state or display a message.
+      });
   }, [proposalId])
 
   // Mock proposal data based on phase type
