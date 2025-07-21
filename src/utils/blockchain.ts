@@ -171,10 +171,11 @@ export const submitDAOVote = async (
       ])
     });
 
-    const transaction = new Transaction().add(instruction);
-    transaction.feePayer = publicKey;
     const { blockhash } = await connection.getLatestBlockhash();
-    transaction.recentBlockhash = blockhash;
+    const transaction = new Transaction({
+      feePayer: publicKey,
+      blockhash
+    }).add(instruction);
 
     const signed = await signTransaction(transaction);
     const signature = await connection.sendRawTransaction(signed.serialize());
