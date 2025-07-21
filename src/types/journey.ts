@@ -44,6 +44,7 @@ export interface PhaseModule {
 export interface UserProgress {
   totalXP: number;
   nfts: string[];
+  nftMints?: { name: string; address: string; signature: string }[];
   passLevel: 'Free' | 'Gold' | 'Platinum' | 'Diamond';
   mfaiTokens: number;
   stakedMfai: number;
