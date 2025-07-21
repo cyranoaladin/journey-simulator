@@ -16,8 +16,13 @@ import {
 } from '@solana/spl-token';
 
 // Constants
-const SOLANA_CLUSTER = 'devnet';
+const SOLANA_CLUSTER = 'testnet';
 const SOLANA_ENDPOINT = `https://api.${SOLANA_CLUSTER}.solana.com`;
+const MFAI_MINT = new PublicKey(
+  import.meta.env.VITE_MFAI_MINT || 'MFAI_MINT_PLACEHOLDER'
+);
+const FAUCET_ENDPOINT =
+  import.meta.env.VITE_FAUCET_ENDPOINT || 'http://localhost:3001/request';
 const MINT_SIZE = MintLayout.span;
 
 // Initialize connection
@@ -46,6 +51,43 @@ export const getWalletBalance = async (publicKey: PublicKey): Promise<number> =>
     return balance / LAMPORTS_PER_SOL;
   } catch (error) {
     console.error('Error getting wallet balance:', error);
+    throw error;
+  }
+};
+
+// Request MFAI tokens from faucet
+export const requestMFAIAirdrop = async (
+  publicKey: PublicKey
+): Promise<boolean> => {
+  try {
+    const response = await fetch(FAUCET_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address: publicKey.toString() }),
+    });
+    const data = await response.json();
+    return data.success;
+  } catch (error) {
+    console.error('Error requesting MFAI tokens:', error);
+    return false;
+  }
+};
+
+// Get MFAI token balance
+export const getMFAIBalance = async (
+  publicKey: PublicKey
+): Promise<number> => {
+  try {
+    const connection = getConnection();
+    const accounts = await connection.getTokenAccountsByOwner(publicKey, {
+      mint: MFAI_MINT,
+    });
+    if (accounts.value.length === 0) return 0;
+    const accountInfo = AccountLayout.decode(accounts.value[0].account.data);
+    const amount = Number(accountInfo.amount);
+    return amount / 1_000_000_000;
+  } catch (error) {
+    console.error('Error getting MFAI balance:', error);
     throw error;
   }
 };
