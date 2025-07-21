@@ -43,19 +43,16 @@ describe('NFTMintingModal', () => {
     render(<NFTMintingModal certification={certification} onClose={() => {}} onMinted={onMinted} />);
     const mintButton = screen.getByRole('button', { name: /mint proof-of-skill/i });
     fireEvent.click(mintButton);
-    await act(async () => {
-      jest.advanceTimersByTime(1000);
-    });
-    await act(async () => {
-      jest.advanceTimersByTime(1000);
-    });
-    await act(async () => {
-      jest.advanceTimersByTime(1000);
-    });
-    await act(async () => {
-      jest.advanceTimersByTime(1000);
-    });
+    const advanceTimersByTime = async (time: number) => {
+      await act(async () => {
+        jest.advanceTimersByTime(time);
+      });
+    };
 
+    await advanceTimersByTime(1000);
+    await advanceTimersByTime(1000);
+    await advanceTimersByTime(1000);
+    await advanceTimersByTime(1000);
     expect(await screen.findByText(/Proof-of-Skill™ Minted/i)).toBeInTheDocument();
     jest.useRealTimers();
   });
