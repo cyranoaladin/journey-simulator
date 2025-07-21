@@ -21,8 +21,9 @@ const certification: Certification = {
 describe('NFTMintingModal', () => {
   beforeEach(() => {
     jest.resetAllMocks();
+    jest.restoreAllMocks();
     (useJourneyStore as jest.Mock).mockReturnValue({ selectedPersona: null });
-    (PublicKey as any).unique = () => Keypair.generate().publicKey;
+    jest.spyOn(PublicKey, 'unique').mockImplementation(() => Keypair.generate().publicKey);
   });
 
   it('shows wallet warning when not connected', () => {
