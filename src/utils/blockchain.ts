@@ -165,7 +165,10 @@ export const submitDAOVote = async (
         { pubkey: proposalPubkey, isSigner: false, isWritable: true },
         { pubkey: publicKey, isSigner: true, isWritable: false }
       ],
-      data: Buffer.from([vote === 'approve' ? 1 : 0])
+      data: Buffer.concat([
+        Buffer.from([1]), // Instruction discriminator for "vote"
+        Buffer.from([vote === 'approve' ? 1 : 0]) // Vote choice: 1 for approve, 0 for reject
+      ])
     });
 
     const transaction = new Transaction().add(instruction);
