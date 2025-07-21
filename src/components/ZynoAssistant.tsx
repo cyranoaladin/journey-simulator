@@ -27,10 +27,9 @@ const ZynoAssistant = () => {
     "You don't vote, you co-create the future. Each decision shapes the ecosystem you own.",
   ]
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!inputValue.trim()) return
 
-    // Add user message
     const userMessage = {
       id: messages.length + 1,
       text: inputValue,
@@ -41,16 +40,29 @@ const ZynoAssistant = () => {
     setMessages(prev => [...prev, userMessage])
     setInputValue('')
 
-    // Simulate Zyno response after a delay
-    setTimeout(() => {
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: inputValue })
+      })
+      const data = await res.json()
       const zynoMessage = {
-        id: messages.length + 2,
-        text: zynoResponses[Math.floor(Math.random() * zynoResponses.length)],
+        id: userMessage.id + 1,
+        text: data.reply || 'Sorry, something went wrong.',
         isZyno: true,
         timestamp: new Date()
       }
       setMessages(prev => [...prev, zynoMessage])
-    }, 1000)
+    } catch (err) {
+      const zynoMessage = {
+        id: userMessage.id + 1,
+        text: 'Error contacting the assistant.',
+        isZyno: true,
+        timestamp: new Date()
+      }
+      setMessages(prev => [...prev, zynoMessage])
+    }
   }
 
   return (
