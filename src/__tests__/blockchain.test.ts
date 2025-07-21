@@ -9,7 +9,7 @@ describe('blockchain integration', () => {
     try {
       const signature = await requestAirdrop(keypair.publicKey);
       expect(typeof signature).toBe('string');
-      await new Promise(r => setTimeout(r, 5000));
+      await new Promise(r => setTimeout(r, AIRDROP_CONFIRMATION_DELAY_MS));
       const balance = await getWalletBalance(keypair.publicKey);
       expect(balance).toBeGreaterThan(0);
     } catch (err) {
