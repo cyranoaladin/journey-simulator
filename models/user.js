@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const { subscription } = require('../controllers/user-controller');
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -80,6 +81,16 @@ const userSchema = new mongoose.Schema({
             type: Date,
             default: Date.now,
         },
+    },
+
+    subscription:{
+        type: String,
+        enum: ['gold', 'platinum', 'diamond'],
+        default : false, 
+    },
+    subscription_date:{
+        type: Date,
+        default: null,
     },
 
     preferences: {
