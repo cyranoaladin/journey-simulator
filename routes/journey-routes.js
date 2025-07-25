@@ -6,3 +6,5 @@ router.get('/all-journey',journeyController.getAllJourney)
 router.post('/add-journey', journeyController.createJourney)
 router.put('/update-journey',journeyController.updateJourney)
 router.delete('/delete/:id', journeyController.deleteJourney)
+
+module.exports = router;

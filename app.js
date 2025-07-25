@@ -1,13 +1,14 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var mongoose = require('mongoose');
-var indexRouter = require('./routes/index');
-var userRouter = require('./routes/user-routes');
-
-var app = express();
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const mongoose = require('mongoose');
+const indexRouter = require('./routes/index');
+const userRouter = require('./routes/user-routes');
+const coursRoutes = require('./routes/cours-routes');
+const journey = require('./routes/journey-routes')
+const app = express();
 
 mongoose.connect('mongodb+srv://adambhedj13:mfaiapp@mfai.jj66vbt.mongodb.net/', {
   useNewUrlParser: true,
@@ -30,8 +31,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
 app.use('/user', userRouter);
+app.use('/cours', coursRoutes);
+app.use('/journey', journey);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
