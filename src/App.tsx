@@ -1,11 +1,15 @@
-import React, { useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { useEffect } from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { useJourneyStore } from './store/journeyStore'
 import { useThemeStore } from './store/themeStore'
 import { WalletContextProvider } from './contexts/WalletContext'
+import { AuthProvider } from './contexts/AuthContext'
+import ProtectedRoute from './components/ProtectedRoute'
 import Header from './components/Header'
 import HeroSection from './components/HeroSection'
 import JourneysPage from './components/JourneysPage'
+import LoginPage from './components/LoginPage'
+import RegisterPage from './components/RegisterPage'
 import SkillchainBanner from './components/SkillchainBanner'
 import AccessPassHolders from './components/AccessPassHolders'
 import Footer from './components/Footer'
@@ -34,30 +38,71 @@ function App() {
   }, [isDark])
 
   return (
-    <WalletContextProvider>
-      <div className={`min-h-screen transition-colors duration-300 ${
-        isDark 
-          ? 'bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 text-white' 
-          : 'bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 text-gray-900'
-      }`}>
-        <Header />
-        <WalletConnectionBanner />
-        <SkillchainBanner />
-        
-        <main className="relative">
-          {!selectedPersona && <HeroSection />}
-          
-          <JourneysPage />
-          
-          {!selectedPersona && <AccessPassHolders />}
-        </main>
+    <AuthProvider>
+      <WalletContextProvider>
+        <div className={`min-h-screen transition-colors duration-300 ${
+          isDark 
+            ? 'bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 text-white' 
+            : 'bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 text-gray-900'
+        }`}>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            
+            {/* Protected Routes */}
+            <Route path="/" element={
+              <ProtectedRoute>
+                <div>
+                  <Header />
+                  <WalletConnectionBanner />
+                  <SkillchainBanner />
+                  
+                  <main className="relative">
+                    {!selectedPersona && <HeroSection />}
+                    
+                    <JourneysPage />
+                    
+                    {!selectedPersona && <AccessPassHolders />}
+                  </main>
 
-        <Footer />
-        <JourneyModal />
-        <ZynoAssistant />
-        <BackToTopButton />
-      </div>
-    </WalletContextProvider>
+                  <Footer />
+                  <JourneyModal />
+                  <ZynoAssistant />
+                  <BackToTopButton />
+                </div>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/journeys" element={
+              <ProtectedRoute>
+                <div>
+                  <Header />
+                  <WalletConnectionBanner />
+                  <SkillchainBanner />
+                  
+                  <main className="relative">
+                    {!selectedPersona && <HeroSection />}
+                    
+                    <JourneysPage />
+                    
+                    {!selectedPersona && <AccessPassHolders />}
+                  </main>
+
+                  <Footer />
+                  <JourneyModal />
+                  <ZynoAssistant />
+                  <BackToTopButton />
+                </div>
+              </ProtectedRoute>
+            } />
+            
+            {/* Catch all route - redirect to home */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </div>
+      </WalletContextProvider>
+    </AuthProvider>
   )
 }
 

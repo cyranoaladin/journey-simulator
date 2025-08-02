@@ -1,12 +1,14 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Moon, Sun, Menu, X, ChevronDown } from 'lucide-react'
+import { Moon, Sun, Menu, X, ChevronDown, LogOut } from 'lucide-react'
 import { useThemeStore } from '../store/themeStore'
+import { useAuth } from '../contexts/AuthContext'
 import { useState } from 'react'
 import WalletButton from './WalletButton'
 
 const Header = () => {
   const { isDark, toggleTheme } = useThemeStore()
+  const { logout, user } = useAuth()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
 
@@ -76,6 +78,22 @@ const Header = () => {
             {/* Wallet Button */}
             <WalletButton />
 
+            {/* User Info and Logout */}
+            {user && (
+              <div className="hidden md:flex items-center space-x-2">
+                <span className="text-sm text-gray-300">{user.email}</span>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={logout}
+                  className="p-2 rounded-lg glass-effect text-red-400 hover:text-red-300 transition-colors"
+                  aria-label="Logout"
+                >
+                  <LogOut size={20} />
+                </motion.button>
+              </div>
+            )}
+
             {/* Theme Toggle */}
             <motion.button
               whileHover={{ scale: 1.1 }}
@@ -118,6 +136,24 @@ const Header = () => {
                 {item.label}
               </motion.button>
             ))}
+            
+            {/* Mobile Logout */}
+            {user && (
+              <div className="border-t border-gray-600/30 mt-4 pt-4">
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-sm text-gray-300">{user.email}</span>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={logout}
+                    className="flex items-center space-x-2 text-red-400 hover:text-red-300 transition-colors"
+                  >
+                    <LogOut size={16} />
+                    <span>Logout</span>
+                  </motion.button>
+                </div>
+              </div>
+            )}
           </motion.nav>
         )}
       </div>

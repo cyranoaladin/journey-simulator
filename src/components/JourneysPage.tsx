@@ -17,13 +17,12 @@ import WalletStatusDisplay from './WalletStatusDisplay';
 import StakingModal from './StakingModal';
 import DAOVoteModal from './DAOVoteModal';
 import ResetProgressButton from './ResetProgressButton';
-
 const JourneysPage: React.FC = () => {
-  const { 
-    selectedPersona, 
-    setSelectedPersona, 
-    userProgress, 
-    completePhase, 
+  const {
+    selectedPersona,
+    setSelectedPersona,
+    userProgress,
+    completePhase,
     updateProgress,
     openModal,
     updateStaking,
@@ -41,8 +40,8 @@ const JourneysPage: React.FC = () => {
   const handlePhaseChange = (index: number) => {
     if (selectedPersona) {
       setCurrentPhaseIndex(index);
-      openModal({ 
-        type: 'phase', 
+      openModal({
+        type: 'phase',
         phase: selectedPersona.phases[index],
         phaseIndex: index,
         persona: selectedPersona
@@ -54,13 +53,13 @@ const JourneysPage: React.FC = () => {
     if (selectedPersona) {
       const phase = selectedPersona.phases[phaseIndex];
       updateProgress(
-        phase.xpReward, 
-        phase.nftReward ? [phase.nftReward] : [], 
+        phase.xpReward,
+        phase.nftReward ? [phase.nftReward] : [],
         phase.mfaiReward || 0
       );
       completePhase(phaseIndex);
       setCurrentPhaseIndex(phaseIndex);
-      
+
       // If there's an NFT reward, open the NFT proof modal
       if (phase.nftReward) {
         const proofType = getProofType(selectedPersona.id, phase.id);
@@ -73,25 +72,25 @@ const JourneysPage: React.FC = () => {
           phase: phase.title,
           phaseNumber: phaseIndex + 1,
           completionDate: new Date().toLocaleDateString(),
-          rarity: phaseIndex === 4 ? 'legendary' : 
-                 phaseIndex === 3 ? 'epic' : 
-                 phaseIndex === 2 ? 'rare' : 'common'
+          rarity: phaseIndex === 4 ? 'legendary' :
+            phaseIndex === 3 ? 'epic' :
+              phaseIndex === 2 ? 'rare' : 'common'
         });
         setShowProofModal(true);
-        
+
         // Show minting tutorial for first-time users
         if (userProgress.nfts.length === 0) {
           setShowMintingTutorial(true);
         }
       }
-      
+
       // If staking is required, open the staking modal
       if (phase.stakingRequired && userProgress.mfaiTokens >= phase.stakingRequired) {
         setTimeout(() => {
           setShowStakingModal(true);
         }, 1000);
       }
-      
+
       // If DAO vote is required, open the DAO vote modal
       if (phase.daoVoteRequired) {
         setTimeout(() => {
@@ -105,7 +104,7 @@ const JourneysPage: React.FC = () => {
     if (selectedPersona) {
       const phase = selectedPersona.phases[phaseIndex];
       const proofType = getProofType(selectedPersona.id, phase.id);
-      
+
       setCurrentProofData({
         proofType,
         title: phase.nftReward || `Proof-of-${proofType}™`,
@@ -115,11 +114,11 @@ const JourneysPage: React.FC = () => {
         phase: phase.title,
         phaseNumber: phaseIndex + 1,
         completionDate: new Date().toLocaleDateString(),
-        rarity: phaseIndex === 4 ? 'legendary' : 
-               phaseIndex === 3 ? 'epic' : 
-               phaseIndex === 2 ? 'rare' : 'common'
+        rarity: phaseIndex === 4 ? 'legendary' :
+          phaseIndex === 3 ? 'epic' :
+            phaseIndex === 2 ? 'rare' : 'common'
       });
-      
+
       setShowProofModal(true);
     }
   };
@@ -217,10 +216,10 @@ const JourneysPage: React.FC = () => {
             </span>
           </h2>
           <p className="text-lg opacity-80 max-w-3xl mx-auto mb-6">
-            Discover how the <span className="font-semibold text-accent-cyan">Cognitive Activation Protocol™</span> 
+            Discover how the <span className="font-semibold text-accent-cyan">Cognitive Activation Protocol™</span>
             transforms your skills into capital based on your unique profile
           </p>
-          
+
           {/* Reset Progress Button */}
           <ResetProgressButton className="mx-auto mt-4" />
         </motion.div>
@@ -229,9 +228,9 @@ const JourneysPage: React.FC = () => {
         {!selectedPersona && (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {personas.map((persona, index) => (
-              <JourneyCard 
-                key={persona.id} 
-                persona={persona} 
+              <JourneyCard
+                key={persona.id}
+                persona={persona}
               />
             ))}
           </div>
@@ -267,7 +266,7 @@ const JourneysPage: React.FC = () => {
             <JourneyDashboard />
 
             {/* Timeline */}
-            <JourneyTimeline 
+            <JourneyTimeline
               phases={selectedPersona.phases}
               currentPhase={userProgress.completedPhases.length}
               onPhaseChange={handlePhaseChange}
@@ -277,7 +276,7 @@ const JourneysPage: React.FC = () => {
             {userProgress.completedPhases.length < selectedPersona.phases.length && (
               <div className="grid md:grid-cols-3 gap-6 mb-8">
                 <div className="md:col-span-2">
-                  <PhaseSection 
+                  <PhaseSection
                     phase={selectedPersona.phases[userProgress.completedPhases.length]}
                     isCompleted={false}
                     isCurrent={true}
@@ -289,18 +288,18 @@ const JourneysPage: React.FC = () => {
                   />
                 </div>
                 <div className="space-y-6">
-                  <XPTracker 
+                  <XPTracker
                     currentXP={userProgress.totalXP}
                     phaseXP={selectedPersona.phases[userProgress.completedPhases.length]?.xpReward || 0}
                     nextRewardAt={(Math.floor(userProgress.totalXP / 200) + 1) * 200}
                   />
-                  
+
                   {/* Proof Certifications Board */}
                   <ProofCertificationsBoard />
-                  
+
                   {/* Wallet Status */}
                   <WalletStatusDisplay />
-                  
+
                   {showMintingTutorial && (
                     <div className="mt-6">
                       <NFTMintingTutorial />
@@ -322,7 +321,7 @@ const JourneysPage: React.FC = () => {
                       isCompleted={true}
                       isCurrent={false}
                       isLocked={false}
-                      onComplete={() => {}}
+                      onComplete={() => { }}
                       onMintNFT={() => handleViewNFT(phaseIndex)}
                       onStake={handleStaking}
                       onVote={handleDAOVote}
@@ -380,9 +379,9 @@ const JourneysPage: React.FC = () => {
           </div>
         )}
       </div>
-      
+
       {/* Zyno Assistant */}
-      <ZynoBox 
+      <ZynoBox
         context={`persona:${selectedPersona?.id || 'none'};phase:${userProgress.completedPhases.length}`}
         tips={selectedPersona?.phases[userProgress.completedPhases.length]?.zynoTips || []}
         onPrompt={(msg) => console.log("User asked Zyno:", msg)}
@@ -412,7 +411,7 @@ const JourneysPage: React.FC = () => {
           />
         )}
       </AnimatePresence>
-      
+
       {/* Share Modal */}
       <AnimatePresence>
         {showShareModal && currentProofData && (
