@@ -4,6 +4,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
+const cors = require('cors');
 const indexRouter = require('./routes/index');
 const userRouter = require('./routes/user-routes');
 const coursRoutes = require('./routes/cours-routes');
@@ -24,6 +25,14 @@ mongoose.connect('mongodb+srv://adambhedj13:mfaiapp@mfai.jj66vbt.mongodb.net/', 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+
+// CORS middleware
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:3000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
 
 app.use(logger('dev'));
 app.use(express.json());

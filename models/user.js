@@ -85,8 +85,8 @@ const userSchema = new mongoose.Schema({
 
     subscription:{
         type: String,
-        enum: ['gold', 'platinum', 'diamond'],
-        default : false, 
+        enum: ['free plan','gold', 'platinum', 'diamond'],
+        default : 'free plan', 
     },
     subscription_date:{
         type: Date,

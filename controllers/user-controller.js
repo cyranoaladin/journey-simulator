@@ -39,6 +39,8 @@ const generateRefreshToken = (user) => {
       const { name, email, password, wallet_address, persona } = req.body;
   
       // Check if user already exists
+      console.log(req.body);
+      
       const userExists = await User.findOne({ email });
       if (userExists) {
         return res.status(400).json({ success: false, message: 'User with this email already exists' });
@@ -326,3 +328,42 @@ const generateRefreshToken = (user) => {
       });
     }
   };
+
+  exports.subscription = async (res, req) => {
+    try{
+      const { subscription } = req.body;
+      if (!subscription || !['gold', 'platinum', 'diamond'].includes(subscription)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid subscription specified'
+        });
+      }
+
+      const user = await User.findById(req.params.id)
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+      }
+
+      user.subscription = subscription;
+      user.subscription_date = Date.now();
+      await user.save();
+  
+      res.status(200).json({
+        success: true,
+        message: `User subscription updated to ${subscription}`,
+        user: {
+          id: user._id,
+          email: user.email,
+          role: user.role,
+          subscription: user.subscription
+        }
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Failed to subscribe user',
+        error: error.message
+      });
+    }
+
+  }
