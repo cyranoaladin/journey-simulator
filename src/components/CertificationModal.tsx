@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Award, Download, Share2, ExternalLink, Zap } from 'lucide-react'
+import { X, Award, Download, Share2, ExternalLink, Zap, AlertCircle } from 'lucide-react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { Certification } from '../types/journey'
 import NFTMintingModal from './NFTMintingModal'
 import { useJourneyStore } from '../store/journeyStore'
 import NFTProofModal from './NFTProofModal'
 import { getProofType } from '../data/proofsData'
+// import { api } from '../utils/api' // Will be used when backend is ready
 
 interface CertificationModalProps {
   certification: Certification
@@ -18,10 +19,12 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
   onClose
 }) => {
   const { connected } = useWallet()
-  const { selectedPersona } = useJourneyStore()
+  const { selectedPersona, loadUserProgress } = useJourneyStore()
   const [showMinting, setShowMinting] = useState(false)
   const [mintedAddress, setMintedAddress] = useState<string | null>(null)
   const [showProofModal, setShowProofModal] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // Extract phase number from certification ID
   const getPhaseNumber = () => {
@@ -44,6 +47,83 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
   };
 
   const phaseNumber = getPhaseNumber();
+
+  // Handle certification download with backend tracking
+  const handleDownload = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      
+      // Track download in backend (simulated for now)
+      console.log('Tracking certification download:', {
+        certification_id: certification.id,
+        phase: phaseNumber,
+        user_persona: selectedPersona?.id,
+        download_timestamp: new Date().toISOString()
+      })
+      
+      // Simulate download
+      const link = document.createElement('a')
+      link.href = certification.imageUrl || '#'
+      link.download = `${certification.name}_certification.png`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+    } catch (err) {
+      console.error('Failed to track download:', err)
+      setError('Failed to track download. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Handle certification sharing with backend tracking
+  const handleShare = async (platform: string) => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      
+      // Track share in backend (simulated for now)
+      console.log('Tracking certification share:', {
+        certification_id: certification.id,
+        platform: platform,
+        phase: phaseNumber,
+        user_persona: selectedPersona?.id,
+        share_timestamp: new Date().toISOString()
+      })
+      
+      // Simulate sharing
+      const shareUrl = `https://mfai.app/certification/${certification.id}`
+      const shareText = `I just earned my ${certification.name} certification! 🎉 #MFAI #ProofOfSkill`
+      
+      if (platform === 'twitter') {
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank')
+      } else if (platform === 'linkedin') {
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank')
+      }
+      
+    } catch (err) {
+      console.error('Failed to track share:', err)
+      setError('Failed to track share. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Handle NFT minting completion
+  const handleMintedNFT = async (mintAddress: string) => {
+    try {
+      setMintedAddress(mintAddress)
+      setShowMinting(false)
+      
+      // Reload user progress to get updated NFT count
+      await loadUserProgress()
+      
+    } catch (err) {
+      console.error('Failed to reload progress after minting:', err)
+    }
+  }
 
   // Get proof type based on persona and certification
   const getProofTypeForCert = () => {
@@ -225,24 +305,38 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
                 </div>
               )}
 
+              {/* Error Display */}
+              {error && (
+                <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <AlertCircle className="text-red-400" size={16} />
+                    <span className="text-red-300 text-sm">{error}</span>
+                  </div>
+                </div>
+              )}
+
               {/* Actions */}
               <div className="grid grid-cols-3 gap-3 mb-4">
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="flex flex-col items-center space-y-1 p-3 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+                  whileHover={{ scale: isLoading ? 1 : 1.02 }}
+                  whileTap={{ scale: isLoading ? 1 : 0.98 }}
+                  onClick={handleDownload}
+                  disabled={isLoading}
+                  className="flex flex-col items-center space-y-1 p-3 rounded-lg bg-white/10 hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Download size={20} />
-                  <span className="text-xs">Download</span>
+                  <span className="text-xs">{isLoading ? 'Downloading...' : 'Download'}</span>
                 </motion.button>
 
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="flex flex-col items-center space-y-1 p-3 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+                  whileHover={{ scale: isLoading ? 1 : 1.02 }}
+                  whileTap={{ scale: isLoading ? 1 : 0.98 }}
+                  onClick={() => handleShare('twitter')}
+                  disabled={isLoading}
+                  className="flex flex-col items-center space-y-1 p-3 rounded-lg bg-white/10 hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Share2 size={20} />
-                  <span className="text-xs">Share</span>
+                  <span className="text-xs">{isLoading ? 'Sharing...' : 'Share'}</span>
                 </motion.button>
 
                 <motion.button
@@ -303,7 +397,7 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
           <NFTMintingModal
             certification={certification}
             onClose={() => setShowMinting(false)}
-            onMinted={handleMinted}
+            onMinted={handleMintedNFT}
           />
         )}
       </AnimatePresence>

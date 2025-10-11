@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { JourneyPhase } from '../../types/journey';
-import { CheckCircle, Trophy, Coins, Zap, Play, Lock, ArrowRight, Rocket, Vote, Award, Palette, MessageSquare, Target, BarChart3, DollarSign } from 'lucide-react';
+import { CheckCircle, Trophy, Coins, Zap, Play, Lock, ArrowRight, Rocket, Vote, Award, Palette, MessageSquare, Target, BarChart3, DollarSign, Loader2 } from 'lucide-react';
 import { getProofType } from '../../data/proofsData';
 import { useJourneyStore } from '../../store/journeyStore';
+import { api } from '../../utils/api';
 
 interface PhaseSectionProps {
   phase: JourneyPhase;
@@ -26,13 +27,15 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
   onStake,
   onVote
 }) => {
-  const { selectedPersona } = useJourneyStore();
+  const { selectedPersona, updateProgress, loadUserProgress } = useJourneyStore();
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   // Highlight keywords in text
   const highlightText = (text: string) => {
     return text.replace(
       /("([^"]+)")|(\*([^*]+)\*)/g,
-      (match, p1, p2, p3, p4) => {
+      (match, _p1, p2, _p3, p4) => {
         if (p2) return `<span class="text-accent-cyan">"${p2}"</span>`;
         if (p4) return `<span class="font-semibold text-accent-gold">${p4}</span>`;
         return match;
@@ -48,6 +51,41 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
   };
 
   const buttonState = getButtonState();
+
+  // Handle phase completion with backend sync
+  const handlePhaseCompletion = async () => {
+    if (isCompleting || isCompleted || isLocked) return;
+    
+    try {
+      setIsCompleting(true);
+      setError(null);
+      
+      // Calculate phase number (assuming phases are indexed from 0)
+      const phaseNumber = selectedPersona?.phases.findIndex(p => p.id === phase.id) ?? 0;
+      
+      // Complete phase in backend
+      await api.completePhase({
+        phase_number: phaseNumber + 1, // Backend expects 1-based indexing
+        score: phase.xpReward,
+        nft_address: phase.nftReward ? `phase-${phaseNumber + 1}-nft` : undefined
+      });
+      
+      // Update local progress
+      await updateProgress(phase.xpReward, [], phase.mfaiReward ?? 0);
+      
+      // Reload user progress to get latest data
+      await loadUserProgress();
+      
+      // Call the original onComplete callback
+      onComplete();
+      
+    } catch (error) {
+      console.error('Failed to complete phase:', error);
+      setError('Failed to complete phase. Please try again.');
+    } finally {
+      setIsCompleting(false);
+    }
+  };
 
   const getPhaseIcon = () => {
     if (phase.isIncubation) return <Rocket size={20} />;
@@ -236,20 +274,39 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
         </div>
       </div>
 
+      {/* Error Display */}
+      {error && (
+        <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
+          <div className="flex items-center space-x-2">
+            <div className="text-red-400">⚠️</div>
+            <span className="text-red-300 text-sm">{error}</span>
+          </div>
+        </div>
+      )}
+
       {/* Action Button */}
       <motion.button
-        whileHover={{ scale: buttonState.disabled ? 1 : 1.02 }}
-        whileTap={{ scale: buttonState.disabled ? 1 : 0.98 }}
-        onClick={onComplete}
-        disabled={buttonState.disabled}
+        whileHover={{ scale: (buttonState.disabled || isCompleting) ? 1 : 1.02 }}
+        whileTap={{ scale: (buttonState.disabled || isCompleting) ? 1 : 0.98 }}
+        onClick={handlePhaseCompletion}
+        disabled={buttonState.disabled || isCompleting}
         className={`w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 ${
-          buttonState.disabled
+          (buttonState.disabled || isCompleting)
             ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
             : 'bg-gradient-primary text-white hover:shadow-lg'
         }`}
       >
-        {buttonState.icon}
-        <span>{buttonState.text}</span>
+        {isCompleting ? (
+          <>
+            <Loader2 size={16} className="animate-spin" />
+            <span>Completing...</span>
+          </>
+        ) : (
+          <>
+            {buttonState.icon}
+            <span>{buttonState.text}</span>
+          </>
+        )}
       </motion.button>
 
       {/* Additional Action Buttons for Specialized Journeys */}

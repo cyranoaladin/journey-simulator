@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Star, TrendingUp } from 'lucide-react';
+import { Trophy, Star, TrendingUp, RefreshCw, AlertCircle } from 'lucide-react';
 import { useJourneyStore } from '../../store/journeyStore';
 
 interface XPTrackerProps {
@@ -14,7 +14,40 @@ const XPTracker: React.FC<XPTrackerProps> = ({
   phaseXP = 0, 
   nextRewardAt = 0 
 }) => {
-  const { userProgress } = useJourneyStore();
+  const { userProgress, loadUserProgress } = useJourneyStore();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [lastSync, setLastSync] = useState<Date | null>(null);
+
+  // Auto-sync XP every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        await loadUserProgress();
+        setLastSync(new Date());
+      } catch (error) {
+        console.error('Failed to sync XP:', error);
+        setError('Failed to sync XP data');
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [loadUserProgress]);
+
+  // Manual refresh function
+  const handleRefresh = async () => {
+    try {
+      setIsRefreshing(true);
+      setError(null);
+      await loadUserProgress();
+      setLastSync(new Date());
+    } catch (error) {
+      console.error('Failed to refresh XP:', error);
+      setError('Failed to refresh XP data');
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
   
   // Calculate level based on XP
   const level = Math.floor(currentXP / 200) + 1;
@@ -42,10 +75,42 @@ const XPTracker: React.FC<XPTrackerProps> = ({
           <Trophy className="text-accent-gold" size={24} />
           <h3 className="font-space font-semibold text-lg">XP Tracker</h3>
         </div>
-        <div className="text-sm bg-white/10 px-2 py-1 rounded">
-          Level {level}
+        <div className="flex items-center space-x-2">
+          <div className="text-sm bg-white/10 px-2 py-1 rounded">
+            Level {level}
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="p-1 hover:bg-white/10 rounded transition-all disabled:opacity-50"
+            title="Refresh XP data"
+          >
+            <RefreshCw 
+              size={14} 
+              className={isRefreshing ? 'animate-spin' : ''} 
+            />
+          </motion.button>
         </div>
       </div>
+
+      {/* Error Display */}
+      {error && (
+        <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
+          <div className="flex items-center space-x-2">
+            <AlertCircle size={16} className="text-red-400" />
+            <span className="text-red-300 text-sm">{error}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Last Sync Info */}
+      {lastSync && (
+        <div className="mb-4 text-xs opacity-60 text-center">
+          Last synced: {lastSync.toLocaleTimeString()}
+        </div>
+      )}
 
       {/* XP Progress Bar */}
       <div className="mb-4">

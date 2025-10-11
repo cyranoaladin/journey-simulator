@@ -1,10 +1,39 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Coins, Users, TrendingUp, Award, Rocket, Vote } from 'lucide-react';
+import { Trophy, Coins, Award, Rocket, Vote, RefreshCw } from 'lucide-react';
 import { useJourneyStore } from '../../store/journeyStore';
 
 const JourneyDashboard: React.FC = () => {
-  const { userProgress, selectedPersona } = useJourneyStore();
+  const { userProgress, selectedPersona, loadUserProgress } = useJourneyStore();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  // Auto-refresh progress every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        await loadUserProgress();
+        setLastUpdated(new Date());
+      } catch (error) {
+        console.error('Failed to auto-refresh progress:', error);
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [loadUserProgress]);
+
+  // Manual refresh function
+  const handleRefresh = async () => {
+    try {
+      setIsRefreshing(true);
+      await loadUserProgress();
+      setLastUpdated(new Date());
+    } catch (error) {
+      console.error('Failed to refresh progress:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const getPassGradient = (level: string) => {
     switch (level) {
@@ -22,36 +51,35 @@ const JourneyDashboard: React.FC = () => {
     return 'text-gray-400';
   };
 
-  // Get persona icon based on ID
-  const getPersonaIcon = () => {
-    if (!selectedPersona) return '💎';
-    
-    switch (selectedPersona.id) {
-      case 'curious-student':
-        return '🎓';
-      case 'web2-entrepreneur':
-        return '💼';
-      case 'web3-developer':
-        return '⚡';
-      case 'content-creator':
-        return '🎨';
-      case 'community-communicator':
-        return '🗣️';
-      case 'project-manager':
-        return '🎯';
-      case 'defi-explorer':
-        return '📊';
-      case 'nft-creator':
-        return '🖼️';
-      case 'investor':
-        return '💰';
-      default:
-        return selectedPersona.icon;
-    }
-  };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div className="space-y-6">
+      {/* Dashboard Header with Refresh Button */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-semibold">Journey Dashboard</h2>
+        <div className="flex items-center space-x-4">
+          {lastUpdated && (
+            <span className="text-sm opacity-60">
+              Last updated: {lastUpdated.toLocaleTimeString()}
+            </span>
+          )}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="flex items-center space-x-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all disabled:opacity-50"
+          >
+            <RefreshCw 
+              size={16} 
+              className={isRefreshing ? 'animate-spin' : ''} 
+            />
+            <span className="text-sm">Refresh</span>
+          </motion.button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {/* XP & Level */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -166,7 +194,6 @@ const JourneyDashboard: React.FC = () => {
             {selectedPersona.phases.map((phase, index) => {
               const isCompleted = userProgress.completedPhases.includes(index);
               const isCurrent = index === userProgress.completedPhases.length;
-              const isLocked = index > userProgress.completedPhases.length;
               
               return (
                 <div key={phase.id} className="text-center">
@@ -185,6 +212,7 @@ const JourneyDashboard: React.FC = () => {
           </div>
         </motion.div>
       )}
+      </div>
     </div>
   );
 };

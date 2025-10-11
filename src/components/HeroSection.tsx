@@ -1,14 +1,39 @@
-import React, { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { ChevronDown, Sparkles } from 'lucide-react'
-import { useJourneyStore } from '../store/journeyStore'
+import { ChevronDown, Sparkles, TrendingUp, Users, Award } from 'lucide-react'
+// import { useJourneyStore } from '../store/journeyStore' // Will be used when needed
 import SkillchainCard from './SkillchainCard'
 import WalletConnectionGuide from './WalletConnectionGuide'
 import { useWallet } from '@solana/wallet-adapter-react'
+// import { api } from '../utils/api' // Will be used when backend is ready
 
 const HeroSection = () => {
-  const { userProgress } = useJourneyStore()
   const { connected } = useWallet()
+  const [platformStats, setPlatformStats] = useState({
+    totalUsers: 0,
+    totalNFTs: 0,
+    totalXP: 0,
+    activeJourneys: 0
+  })
+
+  // Load platform stats from backend
+  const loadPlatformStats = async () => {
+    try {
+      // Simulate platform stats (for now)
+      console.log('Fetching platform stats from backend...');
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Set mock data for now
+      setPlatformStats({
+        totalUsers: 1250,
+        totalNFTs: 3400,
+        totalXP: 125000,
+        activeJourneys: 89
+      });
+    } catch (err) {
+      console.error('Failed to load platform stats:', err)
+    }
+  }
 
   useEffect(() => {
     // Create particles container
@@ -20,6 +45,9 @@ const HeroSection = () => {
     if (heroElement && !document.getElementById('particles-js')) {
       heroElement.appendChild(particlesContainer)
     }
+
+    // Load platform stats
+    loadPlatformStats()
   }, [])
 
   const scrollToPersonas = () => {
@@ -90,10 +118,50 @@ const HeroSection = () => {
               </motion.button>
             </motion.div>
 
+            {/* Platform Stats */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.8 }}
+              className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6"
+            >
+              <div className="bg-white/10 rounded-lg p-3 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <Users className="text-accent-cyan" size={20} />
+                </div>
+                <div className="text-lg font-bold">{platformStats.totalUsers.toLocaleString()}</div>
+                <div className="text-xs opacity-70">Active Users</div>
+              </div>
+              
+              <div className="bg-white/10 rounded-lg p-3 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <Award className="text-accent-gold" size={20} />
+                </div>
+                <div className="text-lg font-bold">{platformStats.totalNFTs.toLocaleString()}</div>
+                <div className="text-xs opacity-70">NFTs Minted</div>
+              </div>
+              
+              <div className="bg-white/10 rounded-lg p-3 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <TrendingUp className="text-accent-purple" size={20} />
+                </div>
+                <div className="text-lg font-bold">{platformStats.totalXP.toLocaleString()}</div>
+                <div className="text-xs opacity-70">Total XP</div>
+              </div>
+              
+              <div className="bg-white/10 rounded-lg p-3 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <Sparkles className="text-accent-cyan" size={20} />
+                </div>
+                <div className="text-lg font-bold">{platformStats.activeJourneys}</div>
+                <div className="text-xs opacity-70">Active Journeys</div>
+              </div>
+            </motion.div>
+
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.8, duration: 0.8 }}
+              transition={{ delay: 1.0, duration: 0.8 }}
               className="text-sm italic opacity-70 font-space"
             >
               "You don't pitch. You prove. And your proof becomes capital."

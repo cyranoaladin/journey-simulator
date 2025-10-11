@@ -134,7 +134,7 @@ export const api = {
   },
 
   verifyToken: async (): Promise<{ user: LoginResponse['user'] }> => {
-    const response = await fetch(`${API_BASE_URL}/auth/verify`, {
+    const response = await fetch(`${API_BASE_URL}/user/profile`, {
       method: 'GET',
       headers: getAuthHeaders(),
     });
@@ -165,12 +165,35 @@ export const api = {
     current_level?: number;
     completed_phases?: number;
   }): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/cours/user-progress/progress`, {
+    const response = await fetch(`${API_BASE_URL}/journey/user-progress`, {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(progressData),
     });
     return handleResponse<void>(response);
+  },
+
+  // Get user progress
+  getUserProgress: async (): Promise<any> => {
+    const response = await fetch(`${API_BASE_URL}/journey/user-progress`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse<any>(response);
+  },
+
+  // Complete phase
+  completePhase: async (phaseData: {
+    phase_number: number;
+    score?: number;
+    nft_address?: string;
+  }): Promise<any> => {
+    const response = await fetch(`${API_BASE_URL}/journey/complete-phase`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(phaseData),
+    });
+    return handleResponse<any>(response);
   },
 
   // NFT certificates
@@ -197,6 +220,87 @@ export const api = {
       body: JSON.stringify(tokenData),
     });
     return handleResponse<void>(response);
+  },
+
+  // Enhanced NFT certificate endpoint
+  addNFTCertificateEnhanced: async (certificateData: {
+    phase: number;
+    title: string;
+    description: string;
+    image_url: string;
+    mint_address: string;
+    rarity: string;
+    xp_earned: number;
+  }): Promise<any> => {
+    const response = await fetch(`${API_BASE_URL}/user/nft-certificates`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(certificateData),
+    });
+    return handleResponse<any>(response);
+  },
+
+  // Track certification downloads
+  trackCertificationDownload: async (downloadData: {
+    certification_id: string;
+    phase: number;
+    user_persona?: string;
+    download_timestamp: string;
+  }): Promise<any> => {
+    const response = await fetch(`${API_BASE_URL}/analytics/certification-download`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(downloadData),
+    });
+    return handleResponse<any>(response);
+  },
+
+  // Track certification shares
+  trackCertificationShare: async (shareData: {
+    certification_id: string;
+    platform: string;
+    phase: number;
+    user_persona?: string;
+    share_timestamp: string;
+  }): Promise<any> => {
+    const response = await fetch(`${API_BASE_URL}/analytics/certification-share`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(shareData),
+    });
+    return handleResponse<any>(response);
+  },
+
+  // Get access pass holders
+  getAccessPassHolders: async (): Promise<any> => {
+    const response = await fetch(`${API_BASE_URL}/analytics/access-pass-holders`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse<any>(response);
+  },
+
+  // Track holder interactions
+  trackHolderInteraction: async (interactionData: {
+    holder_id: string;
+    interaction_type: string;
+    timestamp: string;
+  }): Promise<any> => {
+    const response = await fetch(`${API_BASE_URL}/analytics/holder-interaction`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(interactionData),
+    });
+    return handleResponse<any>(response);
+  },
+
+  // Get platform statistics
+  getPlatformStats: async (): Promise<any> => {
+    const response = await fetch(`${API_BASE_URL}/analytics/platform-stats`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse<any>(response);
   },
 };
 

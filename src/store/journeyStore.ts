@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { Persona, JourneyPhase, UserProgress, TestnetFeatures } from '../types/journey'
+import api from '../utils/api'
 
 interface JourneyState {
   selectedPersona: Persona | null
@@ -25,6 +26,7 @@ interface JourneyState {
   downloadNFT: (nftName: string) => Promise<boolean>
   viewNFTOnExplorer: (tokenId: string) => string
   completeMission: () => void
+  loadUserProgress: () => Promise<void>
 }
 
 const initialUserProgress: UserProgress = {
@@ -73,7 +75,8 @@ export const useJourneyStore = create<JourneyState>()(
       
       setCurrentPhase: (phase) => set({ currentPhase: phase }),
       
-      updateProgress: (xp, nfts = [], mfai = 0) => set((state) => {
+      updateProgress: async (xp, nfts = [], mfai = 0) => {
+        const state = get()
         const newTotalXP = state.userProgress.totalXP + xp
         const newMfaiTokens = state.userProgress.mfaiTokens + mfai
         
@@ -89,35 +92,66 @@ export const useJourneyStore = create<JourneyState>()(
           newPassLevel = 'Gold'
         }
         
-        return {
-          userProgress: {
-            ...state.userProgress,
-            totalXP: newTotalXP,
-            nfts: [...state.userProgress.nfts, ...nfts],
-            mfaiTokens: newMfaiTokens,
-            passLevel: newPassLevel,
-            votingPower: state.userProgress.votingPower + Math.floor(xp / 10), // 1 voting power per 10 XP
-          }
+        const updatedProgress = {
+          ...state.userProgress,
+          totalXP: newTotalXP,
+          nfts: [...state.userProgress.nfts, ...nfts],
+          mfaiTokens: newMfaiTokens,
+          passLevel: newPassLevel,
+          votingPower: state.userProgress.votingPower + Math.floor(xp / 10), // 1 voting power per 10 XP
         }
-      }),
+
+        // Update local state
+        set({ userProgress: updatedProgress })
+
+        // Sync with backend
+        try {
+          await api.updateProgress({
+            total_xp: newTotalXP,
+            current_level: Math.floor(newTotalXP / 200), // Level based on XP
+            completed_phases: updatedProgress.completedPhases.length
+          })
+
+          // Update token balance
+          await api.updateTokenBalance({ mfai_tokens: newMfaiTokens })
+        } catch (error) {
+          console.error('Failed to sync progress with backend:', error)
+        }
+      },
       
       openModal: (content) => set({ isModalOpen: true, modalContent: content }),
       
       closeModal: () => set({ isModalOpen: false, modalContent: null }),
       
-      completePhase: (phaseIndex) => set((state) => {
+      completePhase: async (phaseIndex) => {
+        const state = get()
+        
         // Check if phase is already completed to avoid duplicates
         if (state.userProgress.completedPhases.includes(phaseIndex)) {
-          return state;
+          return;
         }
         
-        return {
+        const updatedPhases = [...state.userProgress.completedPhases, phaseIndex]
+        
+        // Update local state
+        set({
           userProgress: {
             ...state.userProgress,
-            completedPhases: [...state.userProgress.completedPhases, phaseIndex],
+            completedPhases: updatedPhases,
           }
-        };
-      }),
+        });
+
+        // Sync with backend
+        try {
+          await api.completePhase({
+            phase_number: phaseIndex + 1, // Backend expects 1-based indexing
+            score: 100, // Default score for completion
+            nft_address: '' // Will be filled when NFT is minted
+          })
+        } catch (error) {
+          console.error('Failed to sync phase completion with backend:', error)
+        }
+      },
       
       updateStaking: (amount) => set((state) => ({
         userProgress: {
@@ -220,7 +254,39 @@ export const useJourneyStore = create<JourneyState>()(
             votingPower: state.userProgress.votingPower + Math.floor(xpReward / 10),
           }
         };
-      })
+      }),
+
+      loadUserProgress: async () => {
+        try {
+          const response = await api.getUserProgress();
+          if (response.success) {
+            const progress = response.progress;
+            
+            // Map backend progress to frontend format
+            const mappedProgress: UserProgress = {
+              totalXP: progress.total_xp || 0,
+              nfts: progress.nft_certificates?.map((cert: any) => `Phase ${cert.phase} NFT`) || [],
+              passLevel: progress.subscription === 'free plan' ? 'Free' : 
+                        progress.subscription === 'gold' ? 'Gold' :
+                        progress.subscription === 'platinum' ? 'Platinum' : 'Diamond',
+              mfaiTokens: progress.token_transactions?.mfai_tokens || 0,
+              stakedMfai: 0, // Not tracked in backend yet
+              walletConnected: false, // Will be updated by wallet connection
+              walletAddress: undefined,
+              completedPhases: Array.from({ length: progress.completed_phases || 0 }, (_, i) => i),
+              currentPersona: undefined,
+              votingPower: Math.floor((progress.total_xp || 0) / 10),
+              daoProposals: 0,
+              testnetAirdropClaimed: false,
+              socialShareCount: 0,
+            };
+
+            set({ userProgress: mappedProgress });
+          }
+        } catch (error) {
+          console.error('Failed to load user progress from backend:', error);
+        }
+      }
     }),
     {
       name: 'mfai-journey-storage',

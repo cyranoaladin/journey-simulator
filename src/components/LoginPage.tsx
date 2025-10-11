@@ -30,10 +30,10 @@ const LoginPage: React.FC = () => {
     try {
       const success = await login(email, password);
       if (!success) {
-        setError('Please enter both email and password');
+        setError('Invalid email or password. Please try again.');
       }
     } catch (err) {
-      setError('Login failed. Please try again.');
+      setError('Login failed. Please check your connection and try again.');
     } finally {
       setIsSubmitting(false);
     }

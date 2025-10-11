@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api, { LoginResponse, RegisterResponse } from '../utils/api';
+import { useJourneyStore } from '../store/journeyStore';
 
 // User interface matching your backend schema
 type User = LoginResponse['user'];
@@ -36,6 +37,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const { loadUserProgress } = useJourneyStore();
 
   // Check authentication status on app load
   useEffect(() => {
@@ -50,6 +52,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Verify token with backend
         const data = await api.verifyToken();
         setUser(data.user);
+        // Load user progress from backend
+        await loadUserProgress();
       } catch (error) {
         console.error('Auth check failed:', error);
         // Token is invalid, try to refresh
@@ -75,6 +79,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       // Set user
       setUser(data.user);
+      // Load user progress from backend
+      await loadUserProgress();
       return true;
     } catch (error) {
       console.error('Login error:', error);
@@ -98,6 +104,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       // Set user
       setUser(data.user);
+      // Load user progress from backend
+      await loadUserProgress();
       return true;
     } catch (error) {
       console.error('Registration error:', error);

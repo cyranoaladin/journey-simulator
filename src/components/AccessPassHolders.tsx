@@ -1,16 +1,69 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { holders } from '../data/holders';
 import { useJourneyStore } from '../store/journeyStore';
-import { Trophy, TrendingUp, Zap, Users, ExternalLink } from 'lucide-react';
+import { Trophy, TrendingUp, Zap, ExternalLink, RefreshCw, AlertCircle } from 'lucide-react';
+// import { api } from '../utils/api'; // Will be used when backend is ready
 
 const AccessPassHolders: React.FC = () => {
   const { openModal } = useJourneyStore();
   const [hoveredHolder, setHoveredHolder] = useState<string | null>(null);
+  const [holdersData, setHoldersData] = useState(holders);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  // Load holders data from backend
+  const loadHoldersData = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Try to fetch holders from backend (simulated for now)
+      console.log('Fetching access pass holders from backend...');
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      // For now, use local data
+      setHoldersData(holders);
+      
+      setLastUpdated(new Date());
+    } catch (err) {
+      console.error('Failed to load holders data:', err);
+      setError('Failed to load holders data. Using cached data.');
+      setHoldersData(holders); // Use local data as fallback
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Auto-refresh holders data every 5 minutes
+  useEffect(() => {
+    loadHoldersData();
+    
+    const interval = setInterval(loadHoldersData, 5 * 60 * 1000); // 5 minutes
+    return () => clearInterval(interval);
+  }, []);
+
+  // Handle holder interaction tracking
+  const trackHolderInteraction = async (holderId: string, interactionType: string) => {
+    try {
+      // Simulate tracking (for now)
+      console.log('Tracking holder interaction:', {
+        holder_id: holderId,
+        interaction_type: interactionType,
+        timestamp: new Date().toISOString()
+      });
+    } catch (err) {
+      console.error('Failed to track holder interaction:', err);
+    }
+  };
 
   const openHolderModal = (holderId: string) => {
-    const holder = holders.find(h => h.id === holderId);
+    const holder = holdersData.find(h => h.id === holderId);
     if (holder) {
+      // Track interaction
+      trackHolderInteraction(holderId, 'modal_open');
+      
       openModal({
         type: 'holder',
         holder
@@ -28,18 +81,53 @@ const AccessPassHolders: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-5xl font-space font-bold mb-6">
-            <span className="gradient-text">
-              MFAI Access Pass Holders
-            </span>
-          </h2>
-          <p className="text-lg opacity-80 max-w-3xl mx-auto">
-            Meet the pioneers who transformed their skills into digital sovereignty through the <span className="font-semibold text-accent-cyan">Cognitive Activation Protocol™</span>
-          </p>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex-1">
+              <h2 className="text-3xl md:text-5xl font-space font-bold mb-6">
+                <span className="gradient-text">
+                  MFAI Access Pass Holders
+                </span>
+              </h2>
+              <p className="text-lg opacity-80 max-w-3xl mx-auto">
+                Meet the pioneers who transformed their skills into digital sovereignty through the <span className="font-semibold text-accent-cyan">Cognitive Activation Protocol™</span>
+              </p>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              {lastUpdated && (
+                <span className="text-sm opacity-60">
+                  Last updated: {lastUpdated.toLocaleTimeString()}
+                </span>
+              )}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={loadHoldersData}
+                disabled={isLoading}
+                className="flex items-center space-x-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all disabled:opacity-50"
+              >
+                <RefreshCw 
+                  size={16} 
+                  className={isLoading ? 'animate-spin' : ''} 
+                />
+                <span className="text-sm">Refresh</span>
+              </motion.button>
+            </div>
+          </div>
+
+          {/* Error Display */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg max-w-2xl mx-auto">
+              <div className="flex items-center space-x-2">
+                <AlertCircle className="text-red-400" size={16} />
+                <span className="text-red-300 text-sm">{error}</span>
+              </div>
+            </div>
+          )}
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {holders.map((holder, index) => (
+          {holdersData.map((holder, index) => (
             <motion.div
               key={holder.id}
               initial={{ opacity: 0, y: 50 }}
