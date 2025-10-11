@@ -8,7 +8,8 @@ const cors = require('cors');
 const indexRouter = require('./routes/index');
 const userRouter = require('./routes/user-routes');
 const coursRoutes = require('./routes/cours-routes');
-const journey = require('./routes/journey-routes')
+const journey = require('./routes/journey-routes');
+const analyticsRoutes = require('./routes/analytics-routes');
 const app = express();
 
 mongoose.connect('mongodb+srv://adambhedj13:mfaiapp@mfai.jj66vbt.mongodb.net/', {
@@ -43,6 +44,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/user', userRouter);
 app.use('/cours', coursRoutes);
 app.use('/journey', journey);
+app.use('/analytics', analyticsRoutes);
+
+// Auth verification route
+app.get('/auth/verify', (req, res) => {
+  res.status(200).json({ message: 'Auth verification endpoint' });
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

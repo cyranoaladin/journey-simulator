@@ -329,7 +329,7 @@ const generateRefreshToken = (user) => {
     }
   };
 
-  exports.subscription = async (res, req) => {
+  exports.subscription = async (req, res) => {
     try{
       const { subscription } = req.body;
       if (!subscription || !['gold', 'platinum', 'diamond'].includes(subscription)) {
@@ -365,5 +365,158 @@ const generateRefreshToken = (user) => {
         error: error.message
       });
     }
+  };
 
-  }
+  exports.logoutUser = async (req, res) => {
+    try {
+      const { refreshToken } = req.body;
+      
+      if (!refreshToken) {
+        return res.status(400).json({
+          success: false,
+          message: 'Refresh token is required'
+        });
+      }
+
+      // Find user by refresh token and clear it
+      const user = await User.findOne({ refreshToken });
+      if (user) {
+        user.refreshToken = undefined;
+        user.refreshTokenExpiry = undefined;
+        await user.save();
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Logged out successfully'
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Failed to logout',
+        error: error.message
+      });
+    }
+  };
+
+  exports.refreshToken = async (req, res) => {
+    try {
+      const { refreshToken } = req.body;
+      
+      if (!refreshToken) {
+        return res.status(400).json({
+          success: false,
+          message: 'Refresh token is required'
+        });
+      }
+
+      // Find user by refresh token
+      const user = await User.findOne({ 
+        refreshToken,
+        refreshTokenExpiry: { $gt: new Date() }
+      });
+
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid or expired refresh token'
+        });
+      }
+
+      // Generate new access token
+      const accessToken = generateAccessToken(user);
+
+      res.status(200).json({
+        success: true,
+        accessToken
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Failed to refresh token',
+        error: error.message
+      });
+    }
+  };
+
+  exports.updateTokenBalance = async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const { mfai_tokens } = req.body;
+
+      const user = await User.findByIdAndUpdate(
+        userId,
+        { 
+          'token_transactions.mfai_tokens': mfai_tokens,
+          'token_transactions.last_updated': new Date()
+        },
+        { new: true }
+      ).select('-password');
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Token balance updated successfully',
+        user: {
+          id: user._id,
+          token_transactions: user.token_transactions
+        }
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Failed to update token balance',
+        error: error.message
+      });
+    }
+  };
+
+  exports.addNFTCertificate = async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const { phase, nft_address, score } = req.body;
+
+      const user = await User.findByIdAndUpdate(
+        userId,
+        {
+          $push: {
+            nft_certificates: {
+              phase,
+              nft_address,
+              score: score || 0,
+              mint_date: new Date()
+            }
+          }
+        },
+        { new: true }
+      ).select('-password');
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'NFT certificate added successfully',
+        user: {
+          id: user._id,
+          nft_certificates: user.nft_certificates
+        }
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Failed to add NFT certificate',
+        error: error.message
+      });
+    }
+  };

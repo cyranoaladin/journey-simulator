@@ -107,6 +107,48 @@ const userSchema = new mongoose.Schema({
         },
     },
 
+    // JWT refresh token fields
+    refreshToken: {
+        type: String,
+        default: null,
+    },
+    refreshTokenExpiry: {
+        type: Date,
+        default: null,
+    },
+    
+    // Analytics fields
+    analytics: {
+        certification_downloads: {
+            type: Number,
+            default: 0,
+        },
+        certification_shares: {
+            type: Number,
+            default: 0,
+        },
+        holder_interactions: {
+            type: Number,
+            default: 0,
+        },
+        download_history: [{
+            certification_id: String,
+            phase: Number,
+            timestamp: Date,
+        }],
+        share_history: [{
+            certification_id: String,
+            platform: String,
+            phase: Number,
+            timestamp: Date,
+        }],
+        interaction_history: [{
+            holder_id: String,
+            interaction_type: String,
+            timestamp: Date,
+        }],
+    },
+
 });
 
 // Hash password before saving
