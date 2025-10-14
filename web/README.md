@@ -83,6 +83,10 @@ Notes:
 
 ## Déploiement & CI
 - CI GitHub Actions: .github/workflows/ci.yml (Node 20, cache npm, Playwright E2E)
+- CD par tags SemVer: .github/workflows/release.yml (push sur vX.Y.Z)
+  - Étapes: lint, build, unit, E2E, artifacts (coverage + Playwright)
+  - Optionnel: upload des sourcemaps Sentry si SENTRY_AUTH_TOKEN/SENTRY_ORG/SENTRY_PROJECT sont configurés
+  - Optionnel: build & push image Docker si DOCKER_REGISTRY/DOCKER_USERNAME/DOCKER_PASSWORD/DOCKER_IMAGE sont définis
 
 ## Déploiement
 - Docker (prod):
@@ -92,6 +96,16 @@ docker run --env-file .env -p 3000:3000 journey-web:latest
 ```
 - Nginx (reverse proxy): voir deploy/nginx/next.conf.sample
 - systemd: voir deploy/systemd/journey-web.service
+
+### Publication (tag SemVer)
+- Créez un tag versionné pour déclencher la release CI/CD:
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+- Secrets optionnels à renseigner dans GitHub Actions (Repository Settings → Secrets and variables → Actions):
+  - SENTRY_AUTH_TOKEN, SENTRY_ORG, SENTRY_PROJECT (upload sourcemaps)
+  - DOCKER_REGISTRY, DOCKER_USERNAME, DOCKER_PASSWORD, DOCKER_IMAGE (push image)
 
 ## Conformité et qualité
 - ESLint + Prettier (warnings non bloquants, script format fourni)
