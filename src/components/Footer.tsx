@@ -1,27 +1,27 @@
-import React from 'react'
-import { motion } from 'framer-motion'
-import { Github, Twitter, MessageCircle, FileText, Users } from 'lucide-react'
+import React from "react";
+import { motion } from "framer-motion";
+import { Github, Twitter, MessageCircle, FileText, Users } from "lucide-react";
 
 const Footer = () => {
   const footerLinks = {
     journeys: [
-      { label: 'Personas', href: '#personas' },
-      { label: 'Activation Journey', href: '#journey' },
-      { label: 'Skillchain Mining™', href: '#skillchain' },
+      { label: "Personas", href: "#personas" },
+      { label: "Activation Journey", href: "#journey" },
+      { label: "Skillchain Mining™", href: "#skillchain" },
     ],
     community: [
-      { label: 'Discord', href: '#', icon: MessageCircle },
-      { label: 'Twitter', href: '#', icon: Twitter },
-      { label: 'GitHub', href: '#', icon: Github },
-      { label: 'Forum', href: '#', icon: Users },
+      { label: "Discord", href: "#", icon: MessageCircle },
+      { label: "Twitter", href: "#", icon: Twitter },
+      { label: "GitHub", href: "#", icon: Github },
+      { label: "Forum", href: "#", icon: Users },
     ],
     resources: [
-      { label: 'Whitepaper', href: '#', icon: FileText },
-      { label: 'Litepaper', href: '#', icon: FileText },
-      { label: 'Protocol Paper', href: '#', icon: FileText },
-      { label: 'FAQ', href: '#', icon: FileText },
-    ]
-  }
+      { label: "Whitepaper", href: "#", icon: FileText },
+      { label: "Litepaper", href: "#", icon: FileText },
+      { label: "Protocol Paper", href: "#", icon: FileText },
+      { label: "FAQ", href: "#", icon: FileText },
+    ],
+  };
 
   return (
     <footer className="py-20 border-t border-white/10">
@@ -36,14 +36,19 @@ const Footer = () => {
           >
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-                <img src="/images/logo_mfai.png" alt="MFAI Logo" className="w-6 h-6" />
+                <img
+                  src="/images/logo_mfai.png"
+                  alt="MFAI Logo"
+                  className="w-6 h-6"
+                />
               </div>
               <span className="font-space font-bold text-xl gradient-text">
                 Money Factory AI
               </span>
             </div>
             <p className="text-sm opacity-80 max-w-xs">
-              Transform your skills into capital in the Proof Economy through the Cognitive Activation Protocol™
+              Transform your skills into capital in the Proof Economy through
+              the Cognitive Activation Protocol™
             </p>
           </motion.div>
 
@@ -79,7 +84,7 @@ const Footer = () => {
             <h3 className="font-space font-semibold text-lg mb-4">Community</h3>
             <ul className="space-y-2">
               {footerLinks.community.map((link) => {
-                const Icon = link.icon
+                const Icon = link.icon;
                 return (
                   <li key={link.label}>
                     <a
@@ -90,7 +95,7 @@ const Footer = () => {
                       <span>{link.label}</span>
                     </a>
                   </li>
-                )
+                );
               })}
             </ul>
           </motion.div>
@@ -123,7 +128,7 @@ const Footer = () => {
         </motion.div>
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

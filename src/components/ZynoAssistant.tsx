@@ -1,18 +1,18 @@
-import React, { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { MessageCircle, X, Send, Sparkles } from 'lucide-react'
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { MessageCircle, X, Send, Sparkles } from "lucide-react";
 
 const ZynoAssistant = () => {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
       id: 1,
       text: "Hi! I'm Zyno, your AI Co-Founder™. I'm here to guide you through your cognitive activation journey. How can I help you?",
       isZyno: true,
-      timestamp: new Date()
-    }
-  ])
-  const [inputValue, setInputValue] = useState('')
+      timestamp: new Date(),
+    },
+  ]);
+  const [inputValue, setInputValue] = useState("");
 
   const zynoResponses = [
     "Excellent question! The Cognitive Activation Protocol™ transforms your skills into tokenized assets. Each step proves your evolution.",
@@ -25,21 +25,21 @@ const ZynoAssistant = () => {
     "You don't just assign tasks. You activate systems that deliver real outcomes.",
     "Your code isn't just a function, it's your identity. Each line written proves your expertise.",
     "You don't vote, you co-create the future. Each decision shapes the ecosystem you own.",
-  ]
+  ];
 
   const handleSendMessage = () => {
-    if (!inputValue.trim()) return
+    if (!inputValue.trim()) return;
 
     // Add user message
     const userMessage = {
       id: messages.length + 1,
       text: inputValue,
       isZyno: false,
-      timestamp: new Date()
-    }
+      timestamp: new Date(),
+    };
 
-    setMessages(prev => [...prev, userMessage])
-    setInputValue('')
+    setMessages((prev) => [...prev, userMessage]);
+    setInputValue("");
 
     // Simulate Zyno response after a delay
     setTimeout(() => {
@@ -47,11 +47,11 @@ const ZynoAssistant = () => {
         id: messages.length + 2,
         text: zynoResponses[Math.floor(Math.random() * zynoResponses.length)],
         isZyno: true,
-        timestamp: new Date()
-      }
-      setMessages(prev => [...prev, zynoMessage])
-    }, 1000)
-  }
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, zynoMessage]);
+    }, 1000);
+  };
 
   return (
     <>
@@ -110,13 +110,15 @@ const ZynoAssistant = () => {
                   key={message.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`flex ${message.isZyno ? 'justify-start' : 'justify-end'}`}
+                  className={`flex ${message.isZyno ? "justify-start" : "justify-end"}`}
                 >
-                  <div className={`max-w-[80%] p-3 rounded-lg text-sm ${
-                    message.isZyno 
-                      ? 'bg-white/10 text-white' 
-                      : 'bg-gradient-primary text-white'
-                  }`}>
+                  <div
+                    className={`max-w-[80%] p-3 rounded-lg text-sm ${
+                      message.isZyno
+                        ? "bg-white/10 text-white"
+                        : "bg-gradient-primary text-white"
+                    }`}
+                  >
                     {message.isZyno && (
                       <div className="flex items-center space-x-1 mb-1">
                         <Sparkles size={12} />
@@ -136,7 +138,7 @@ const ZynoAssistant = () => {
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
                   placeholder="Ask Zyno a question..."
                   className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-white/60 focus:outline-none focus:border-primary-400"
                 />
@@ -154,7 +156,7 @@ const ZynoAssistant = () => {
         )}
       </AnimatePresence>
     </>
-  )
-}
+  );
+};
 
-export default ZynoAssistant
+export default ZynoAssistant;

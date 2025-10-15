@@ -50,7 +50,6 @@ Build serious products, earn recognition, and evolve from **solo hacker** to **o
 #### 🧭 **Level 3: Launch Authority**
 
 - Staking via **Cognitive Lock™** allows him to:
-
   - Co-lead Launchpad missions
   - Propose protocol upgrades
   - Draft DAO-impacting proposals

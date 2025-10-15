@@ -53,6 +53,7 @@ La structure HTML respecte les meilleures pratiques de développement web modern
 ### 2.2 Métadonnées et ressources externes
 
 #### Métadonnées
+
 - **Encodage UTF-8** : Garantit le support des caractères spéciaux et accentués
 - **Viewport configuré** : `width=device-width, initial-scale=1.0` pour une expérience responsive optimale
 - **Titre** : "Money Factory AI - Parcours d'Activation Cognitive™" - concis et descriptif
@@ -60,6 +61,7 @@ La structure HTML respecte les meilleures pratiques de développement web modern
 - **Absence de balises Open Graph** : Pourrait être ajoutées pour optimiser le partage sur les réseaux sociaux
 
 #### Polices
+
 - **Chargement optimisé via Google Fonts** :
   - Utilisation de `preconnect` pour améliorer les performances de chargement
   - **Space Grotesk** : Police principale pour les titres et éléments de marque
@@ -71,6 +73,7 @@ La structure HTML respecte les meilleures pratiques de développement web modern
     - Optimisée pour les écrans avec une haute densité de pixels
 
 #### Icônes
+
 - **Font Awesome 6.4.0** :
   - Chargement via CDN pour des performances optimales
   - Version complète (`all.min.css`) incluant tous les styles d'icônes
@@ -78,6 +81,7 @@ La structure HTML respecte les meilleures pratiques de développement web modern
   - Combinaison d'icônes solides et régulières selon le contexte d'utilisation
 
 #### Feuilles de style CSS
+
 - **Architecture CSS modulaire** :
   - `assets/css/styles.css` : Styles généraux, variables globales, règles de base et composants communs
     - Définition des couleurs, typographie, grilles et utilitaires
@@ -88,6 +92,7 @@ La structure HTML respecte les meilleures pratiques de développement web modern
 - **Approche non-minifiée** : Les fichiers CSS ne semblent pas être minifiés, ce qui pourrait être optimisé pour la production
 
 #### Scripts JavaScript
+
 - **Bibliothèques externes** :
   - **Particles.js** (via CDN) : Crée l'effet de particules connectées en arrière-plan
     - Animation légère et configurable qui renforce l'esthétique technologique
@@ -169,14 +174,14 @@ Cette organisation structurée permet une progression logique de l'information, 
 
 #### Structure et éléments du header
 
-- **Logo Money Factory AI** : 
+- **Logo Money Factory AI** :
   - Placé à gauche pour une visibilité immédiate (convention de design web standard)
   - Lien vers la page d'accueil pour faciliter la navigation
   - Composé du texte "Money Factory AI" et d'un symbole distinctif
   - Rendu en SVG pour une qualité optimale sur tous les écrans
   - Animation subtile au survol renforçant l'interactivité
 
-- **Menu principal** : 
+- **Menu principal** :
   - Navigation horizontale vers les sections clés de la page
   - Items de menu clairement espacés avec padding généreux
   - Indicateur visuel de la section active (soulignement ou highlight)
@@ -187,7 +192,7 @@ Cette organisation structurée permet une progression logique de l'information, 
     - **Parcours** : Détail des étapes d'activation cognitive
     - **Access Pass Holders** : Témoignages et profils d'utilisateurs actifs
 
-- **Bouton de thème** : 
+- **Bouton de thème** :
   - Positionné à droite du menu pour une accessibilité facile
   - Icône de lune/soleil indiquant clairement la fonction
   - Bascule entre mode clair et sombre avec animation de transition
@@ -226,6 +231,7 @@ Cette organisation structurée permet une progression logique de l'information, 
   - Contraste suffisant entre texte et fond dans les deux modes (clair/sombre)
 
 La navigation est simple et intuitive, permettant d'accéder rapidement aux sections principales :
+
 - Accueil
 - Personas
 - Parcours
@@ -258,7 +264,6 @@ La section hero est conçue pour capter immédiatement l'attention et communique
     - Padding généreux (16px 32px) pour une zone de clic optimale
     - Animation de pulsation subtile (scale: 1.05) au survol
     - Ancrage vers la section Parcours avec défilement fluide
-  
   - **CTA secondaire** : "Débloquez votre souveraineté numérique"
     - Bouton avec bordure et fond transparent (ghost button)
     - Bordure de 2px avec la couleur primaire
@@ -410,7 +415,6 @@ La section Personas constitue un élément central de la page, permettant une pe
     - Taille responsive (2.5rem sur desktop, 1.8rem sur mobile)
     - Dégradé de couleur bleu-violet identique au titre principal
     - Alignement centré pour renforcer son importance
-  
   - Sous-titre explicatif du concept d'Activation Cognitive™ :
     - Police Inter Regular (400)
     - Largeur limitée (max-width: 70%) et centrée pour améliorer la lisibilité
@@ -452,31 +456,26 @@ La section Personas constitue un élément central de la page, permettant une pe
        - Cible : Jeunes en formation ou en reconversion
        - Description : "Découvrez comment transformer votre curiosité en compétences valorisables"
        - Parcours adapté : Accent sur la découverte et l'apprentissage initial
-    
     2. **Entrepreneur Web2** :
        - Icône : Briefcase / Building
        - Cible : Professionnels ayant déjà une activité numérique
        - Description : "Transformez votre entreprise traditionnelle pour l'Économie de la Preuve"
        - Parcours adapté : Focus sur la transition et la tokenisation de valeur existante
-    
     3. **Développeur Autodidacte** :
        - Icône : Code brackets / Terminal
        - Cible : Personnes techniques cherchant à évoluer vers Web3
        - Description : "Exploitez vos compétences techniques dans l'Économie de la Preuve"
        - Parcours adapté : Accent sur les aspects techniques et la création de valeur par le code
-    
     4. **Freelancer Web2/Web3** :
        - Icône : Paintbrush / Globe
        - Cible : Indépendants cherchant à valoriser leurs services
        - Description : "Tokenisez vos compétences et services pour une nouvelle forme de valeur"
        - Parcours adapté : Focus sur la valorisation du travail indépendant
-    
     5. **Votant DAO & Contributeur** :
        - Icône : Users / Network
        - Cible : Personnes déjà impliquées dans l'écosystème Web3
        - Description : "Participez activement à la gouvernance et à l'évolution de l'écosystème"
        - Parcours adapté : Accent sur les mécanismes de gouvernance et contribution
-    
     6. **Investisseur Web2** :
        - Icône : Chart / Coins
        - Cible : Personnes disposant de capital pour investissement
@@ -495,17 +494,14 @@ La section Personas constitue un élément central de la page, permettant une pe
     - Taille importante (3rem) pour impact visuel
     - Couleur primaire ou dégradé distinctif selon le persona
     - Animation subtile au survol (rotation ou pulsation)
-  
   - **Titre du persona** :
     - Police Space Grotesk Medium (500)
     - Taille optimale (1.5rem) pour hiérarchie visuelle
     - Utilisation inclusive du langage (ex: "Curieux.se")
-  
   - **Description courte** :
     - Police Inter Light (300)
     - 2-3 lignes maximum pour une lecture rapide
     - Ton engageant et personnel (utilisation du "vous")
-  
   - **Bouton d'action** :
     - Libellé "Découvrir mon parcours"
     - Style ghost button avec bordure fine
@@ -558,7 +554,6 @@ La section Parcours constitue le cœur fonctionnel de la page, présentant en d�
     - Taille responsive (2.5rem sur desktop, 1.8rem sur mobile)
     - Dégradé de couleur bleu-violet identique aux autres titres de section
     - Marque déposée (TM) soulignant la propriété intellectuelle du concept
-  
   - Description détaillée du concept d'activation cognitive :
     - Police Inter Regular (400)
     - Largeur optimisée (max-width: 800px) et centrée
@@ -573,7 +568,6 @@ La section Parcours constitue le cœur fonctionnel de la page, présentant en d�
     - **Activation Standard (Web2)** : Pour débutants et utilisateurs Web2
     - **Activation Accélérée** : Pour utilisateurs avec expérience préalable
     - **Activation Avancée** : Pour utilisateurs expérimentés en Web3
-  
   - Conception des boutons de filtre :
     - Style pill-button avec coins fortement arrondis (border-radius: 20px)
     - État actif/inactif clairement différencié (couleur de fond, bordure)
@@ -622,25 +616,21 @@ Conçu pour les utilisateurs débutants ou issus du Web2 traditionnel, ce parcou
      - Ressources pédagogiques accessibles (articles, vidéos)
      - Quiz d'évaluation des connaissances initiales
      - Durée estimée : 1-2 semaines
-  
   2. **Apprentissage** :
      - Formation aux fondamentaux (blockchain, tokens, smart contracts)
      - Ateliers pratiques guidés
      - Exercices d'application concrets
      - Durée estimée : 3-4 semaines
-  
   3. **Preuve** :
      - Création d'un premier projet démonstratif
      - Validation par la communauté
      - Certification des compétences acquises
      - Durée estimée : 2-3 semaines
-  
   4. **Activation** :
      - Tokenisation des compétences validées
      - Intégration à l'écosystème Money Factory AI
      - Premières récompenses en tokens $MFAI
      - Durée estimée : 1 semaine
-  
   5. **Gouvernance** :
      - Participation aux votes de la communauté
      - Contribution aux décisions collectives
@@ -662,22 +652,18 @@ Destiné aux utilisateurs ayant déjà une expérience dans le domaine numériqu
      - Évaluation rapide des connaissances préalables
      - Mise à niveau ciblée sur les concepts spécifiques
      - Durée estimée : 3-5 jours
-  
   2. **Apprentissage intensif** :
      - Modules avancés sur la tokenomics et l'Économie de la Preuve
      - Workshops collaboratifs
      - Durée estimée : 1-2 semaines
-  
   3. **Preuve avancée** :
      - Développement d'un projet substantiel
      - Validation par des experts
      - Durée estimée : 1-2 semaines
-  
   4. **Activation optimisée** :
      - Tokenisation avancée avec bonus
      - Intégration prioritaire à l'écosystème
      - Durée estimée : 2-3 jours
-  
   5. **Gouvernance active** :
      - Accès à des rôles de modération
      - Possibilité de proposer des améliorations
@@ -698,22 +684,18 @@ Conçu pour les utilisateurs expérimentés en Web3 et blockchain :
      - Validation des compétences existantes
      - Accès immédiat aux ressources avancées
      - Durée estimée : 1-2 jours
-  
   2. **Spécialisation** :
      - Choix d'un domaine d'expertise
      - Formation pointue sur des sujets de pointe
      - Durée estimée : 1 semaine
-  
   3. **Innovation** :
      - Développement d'une contribution originale à l'écosystème
      - Collaboration avec l'équipe core
      - Durée estimée : 1-2 semaines
-  
   4. **Activation premium** :
      - Tokenisation privilégiée
      - Accès à des pools de récompenses exclusifs
      - Durée estimée : Immédiate
-  
   5. **Leadership** :
      - Possibilité de devenir mentor
      - Participation aux décisions stratégiques
@@ -743,6 +725,7 @@ Conçu pour les utilisateurs expérimentés en Web3 et blockchain :
 #### 3.5.1 Parcours Standard (Web2)
 
 Six étapes détaillées :
+
 1. Découverte (Web2) : point d'entrée, profil, action et accès
 2. Formation et Coaching : utilisation des ressources, assistance IA, première mission
 3. Activation Web3 : création de wallet, airdrop, formation interactive
@@ -753,6 +736,7 @@ Six étapes détaillées :
 #### 3.5.2 Parcours Accéléré
 
 Quatre étapes pour utilisateurs déjà familiers avec Web3 :
+
 1. Connexion Web3 & Activation de Pass : connexion via wallet, achat direct d'Access Pass
 2. Coaching IA Personnalisé : analyse de profil, parcours sur mesure
 3. Mint & Staking du Pass : acquisition express, staking optimisé
@@ -761,6 +745,7 @@ Quatre étapes pour utilisateurs déjà familiers avec Web3 :
 #### 3.5.3 Parcours Intermédiaire
 
 Trois étapes pour utilisateurs avec expérience préalable :
+
 1. Accès à l'écosystème avec Access Pass Platinum : prérequis, acquisition, avantages
 2. Utilisation du Cognitive Lock™ : staking stratégique, optimisation
 3. Incubation de projet via Proof-of-Vision™ : soumission, mentorat, financement
@@ -779,7 +764,6 @@ La section Access Pass Holders constitue un élément clé de validation sociale
     - Taille responsive (2.5rem sur desktop, 1.8rem sur mobile)
     - Dégradé de couleur bleu-violet identique aux autres titres de section
     - Positionnement centré pour une cohérence visuelle avec le reste de la page
-  
   - Description détaillée des avantages exclusifs :
     - Police Inter Regular (400)
     - Largeur optimisée (max-width: 800px) et centrée
@@ -1013,7 +997,7 @@ Le footer constitue un élément essentiel de la page, servant à la fois de poi
     - "Medium" avec icône Font Awesome
     - "Forum" avec icône Font Awesome
   - Icônes alignées et espacées uniformément des textes
-  - Ouverture des liens dans un nouvel onglet (target="_blank")
+  - Ouverture des liens dans un nouvel onglet (target="\_blank")
 
 - **Colonne Ressources** :
   - Titre "Ressources"
@@ -1025,7 +1009,7 @@ Le footer constitue un élément essentiel de la page, servant à la fois de poi
     - "FAQ" avec icône de question
     - "Glossaire" avec icône de livre
   - Indicateurs de format (PDF) pour les documents téléchargeables
-  - Ouverture des liens dans un nouvel onglet (target="_blank")
+  - Ouverture des liens dans un nouvel onglet (target="\_blank")
 
 ##### Section inférieure
 
@@ -1046,7 +1030,7 @@ Le footer constitue un élément essentiel de la page, servant à la fois de poi
   - Taille d'icône moyenne (font-size: 1.2rem)
   - Animation au survol (léger agrandissement et changement de couleur)
   - Couleur de base gris clair avec transition vers couleur spécifique au réseau au survol
-  - Ouverture des liens dans un nouvel onglet (target="_blank")
+  - Ouverture des liens dans un nouvel onglet (target="\_blank")
 
 #### Adaptation responsive
 
@@ -1334,7 +1318,7 @@ Ces modales s'ouvrent au clic sur les boutons "Découvrir son parcours" dans la 
 - **Implémentation technique** :
   - Éléments HTML dédiés avec positionnement absolu
   - Suivi par événements mousemove et requestAnimationFrame
-  - Détection des éléments interactifs via attributs data-*
+  - Détection des éléments interactifs via attributs data-\*
   - Gestion des cas particuliers (formulaires, sélection de texte)
 
 #### Notifications et toasts
@@ -1699,18 +1683,18 @@ Cette page constitue un point d'entrée efficace dans l'écosystème Money Facto
 
 Le site utilise une terminologie distinctive qui mérite d'être explicitée :
 
-| Terme | Description |
-|-------|-------------|
-| **Activation Cognitive™** | Processus central de Money Factory AI permettant de transformer les compétences en capital via la tokenisation |
-| **Skillchain Mining™** | Mécanisme de validation et récompense des compétences acquises |
-| **Économie de la Preuve** | Nouveau paradigme économique basé sur la validation et tokenisation des compétences et réalisations |
-| **Access Pass** | NFT donnant accès à l'écosystème Money Factory AI avec différents niveaux (Gold, Platinum, Diamond) |
-| **Cognitive Lock™** | Mécanisme de staking permettant de verrouiller des tokens $MFAI pour obtenir des avantages |
-| **Neuro-Dividends™** | Récompenses générées par le staking de tokens dans le Cognitive Lock™ |
-| **Synaptic Governance™** | Système de gouvernance participative de l'écosystème Money Factory AI |
-| **AI Co-Founder™** | IA nommée Zyno qui accompagne les utilisateurs dans leur parcours |
-| **Proof-of-Vision Incubator™** | Programme d'incubation de projets au sein de l'écosystème |
-| **Sovereign Builders™** | Membres actifs de l'écosystème ayant atteint un niveau avancé d'activation |
+| Terme                           | Description                                                                                                    |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| **Activation Cognitive™**      | Processus central de Money Factory AI permettant de transformer les compétences en capital via la tokenisation |
+| **Skillchain Mining™**         | Mécanisme de validation et récompense des compétences acquises                                                 |
+| **Économie de la Preuve**       | Nouveau paradigme économique basé sur la validation et tokenisation des compétences et réalisations            |
+| **Access Pass**                 | NFT donnant accès à l'écosystème Money Factory AI avec différents niveaux (Gold, Platinum, Diamond)            |
+| **Cognitive Lock™**            | Mécanisme de staking permettant de verrouiller des tokens $MFAI pour obtenir des avantages                     |
+| **Neuro-Dividends™**           | Récompenses générées par le staking de tokens dans le Cognitive Lock™                                         |
+| **Synaptic Governance™**       | Système de gouvernance participative de l'écosystème Money Factory AI                                          |
+| **AI Co-Founder™**             | IA nommée Zyno qui accompagne les utilisateurs dans leur parcours                                              |
+| **Proof-of-Vision Incubator™** | Programme d'incubation de projets au sein de l'écosystème                                                      |
+| **Sovereign Builders™**        | Membres actifs de l'écosystème ayant atteint un niveau avancé d'activation                                     |
 
 ### 8.2 Structure des fichiers et ressources
 
@@ -1742,18 +1726,24 @@ La page utilise une structure HTML5 sémantique avec des balises appropriées :
 ```html
 <!DOCTYPE html>
 <html lang="fr">
-<head>
+  <head>
     <!-- Métadonnées et ressources -->
-</head>
-<body>
+  </head>
+  <body>
     <header class="site-header"><!-- Navigation --></header>
     <section id="hero" class="hero-section"><!-- Contenu hero --></section>
-    <section id="personas" class="personas-section"><!-- Contenu personas --></section>
-    <section id="parcours" class="parcours-section"><!-- Contenu parcours --></section>
-    <section id="holders" class="holders-section"><!-- Contenu holders --></section>
+    <section id="personas" class="personas-section">
+      <!-- Contenu personas -->
+    </section>
+    <section id="parcours" class="parcours-section">
+      <!-- Contenu parcours -->
+    </section>
+    <section id="holders" class="holders-section">
+      <!-- Contenu holders -->
+    </section>
     <footer class="site-footer"><!-- Contenu footer --></footer>
     <!-- Modales et scripts -->
-</body>
+  </body>
 </html>
 ```
 
@@ -1763,12 +1753,14 @@ Les composants UI comme les cartes de persona suivent une structure cohérente :
 
 ```html
 <div class="persona-card">
-    <div class="persona-icon">
-        <i class="fas fa-user-graduate"></i>
-    </div>
-    <h3>Étudiant Curieux.se</h3>
-    <p>De la découverte à l'obtention de son premier Access Pass</p>
-    <button class="btn btn-primary open-modal" data-journey="etudiant">Découvre ton chemin vers la souveraineté</button>
+  <div class="persona-icon">
+    <i class="fas fa-user-graduate"></i>
+  </div>
+  <h3>Étudiant Curieux.se</h3>
+  <p>De la découverte à l'obtention de son premier Access Pass</p>
+  <button class="btn btn-primary open-modal" data-journey="etudiant">
+    Découvre ton chemin vers la souveraineté
+  </button>
 </div>
 ```
 
@@ -1778,16 +1770,19 @@ La timeline des parcours utilise une structure permettant le filtrage dynamique 
 
 ```html
 <div class="timeline-item" data-category="web2">
-    <div class="timeline-icon">
-        <i class="fas fa-globe"></i>
+  <div class="timeline-icon">
+    <i class="fas fa-globe"></i>
+  </div>
+  <div class="timeline-content">
+    <h3>Étape 1 : Découverte (Web2)</h3>
+    <div class="timeline-body">
+      <p>
+        <strong>Profil :</strong> Jeune entrepreneur(e), freelance ou
+        étudiant(e)...
+      </p>
+      <!-- Autres détails -->
     </div>
-    <div class="timeline-content">
-        <h3>Étape 1 : Découverte (Web2)</h3>
-        <div class="timeline-body">
-            <p><strong>Profil :</strong> Jeune entrepreneur(e), freelance ou étudiant(e)...</p>
-            <!-- Autres détails -->
-        </div>
-    </div>
+  </div>
 </div>
 ```
 
@@ -1795,29 +1790,30 @@ La timeline des parcours utilise une structure permettant le filtrage dynamique 
 
 #### 8.4.1 Métriques clés
 
-| Métrique | Valeur | Commentaire |
-|----------|--------|-------------|
-| Nombre de sections principales | 5 | Header, Hero, Personas, Parcours, Holders |
-| Nombre de personas | 6 | Étudiant, Entrepreneur, Développeur, Investisseur, Freelancer, DAO Voter |
-| Nombre de parcours | 3 | Standard (Web2), Accéléré, Intermédiaire |
-| Nombre de modales | 10+ | Parcours détaillés et témoignages |
-| Points d'interaction | 20+ | Boutons, filtres, cartes cliquables |
+| Métrique                       | Valeur | Commentaire                                                              |
+| ------------------------------ | ------ | ------------------------------------------------------------------------ |
+| Nombre de sections principales | 5      | Header, Hero, Personas, Parcours, Holders                                |
+| Nombre de personas             | 6      | Étudiant, Entrepreneur, Développeur, Investisseur, Freelancer, DAO Voter |
+| Nombre de parcours             | 3      | Standard (Web2), Accéléré, Intermédiaire                                 |
+| Nombre de modales              | 10+    | Parcours détaillés et témoignages                                        |
+| Points d'interaction           | 20+    | Boutons, filtres, cartes cliquables                                      |
 
 #### 8.4.2 Optimisations recommandées
 
-| Aspect | Recommandation | Impact |
-|--------|---------------|--------|
-| Chargement des images | Implémenter lazy loading | Amélioration des performances de chargement initial |
-| JavaScript | Minifier et regrouper les scripts | Réduction du temps de chargement et d'exécution |
-| CSS | Optimiser les sélecteurs et regrouper les styles | Amélioration du temps de rendu |
-| Accessibilité | Améliorer les attributs ARIA et le contraste | Meilleure expérience pour tous les utilisateurs |
-| Contenu dynamique | Mise en cache des données fréquemment utilisées | Réduction des calculs côté client |
+| Aspect                | Recommandation                                   | Impact                                              |
+| --------------------- | ------------------------------------------------ | --------------------------------------------------- |
+| Chargement des images | Implémenter lazy loading                         | Amélioration des performances de chargement initial |
+| JavaScript            | Minifier et regrouper les scripts                | Réduction du temps de chargement et d'exécution     |
+| CSS                   | Optimiser les sélecteurs et regrouper les styles | Amélioration du temps de rendu                      |
+| Accessibilité         | Améliorer les attributs ARIA et le contraste     | Meilleure expérience pour tous les utilisateurs     |
+| Contenu dynamique     | Mise en cache des données fréquemment utilisées  | Réduction des calculs côté client                   |
 
 ### 8.5 Compatibilité et tests
 
 #### 8.5.1 Compatibilité navigateurs
 
 La page utilise des technologies web modernes compatibles avec :
+
 - Chrome 60+
 - Firefox 60+
 - Safari 12+
@@ -1826,11 +1822,13 @@ La page utilise des technologies web modernes compatibles avec :
 #### 8.5.2 Responsive design
 
 Points de rupture (breakpoints) clés :
+
 - Mobile : < 768px
 - Tablette : 768px - 1024px
 - Desktop : > 1024px
 
 Adaptations principales :
+
 - Menu hamburger sur mobile
 - Réorganisation des grilles en colonnes simples
 - Ajustement des tailles de police et espacement

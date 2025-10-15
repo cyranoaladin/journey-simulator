@@ -106,8 +106,8 @@ The current implementation provides a UI simulation of the Cognitive Activation 
 
 ```typescript
 // Example ProofOfSkill.sol implementation
-import { Token } from '@solana/spl-token';
-import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js';
+import { Token } from "@solana/spl-token";
+import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 
 export const mintProofOfSkill = async (
   connection: Connection,
@@ -116,32 +116,32 @@ export const mintProofOfSkill = async (
     name: string;
     description: string;
     image: string;
-    attributes: Array<{trait_type: string, value: string}>;
-  }
+    attributes: Array<{ trait_type: string; value: string }>;
+  },
 ) => {
   try {
     // Create mint account
     const mintKeypair = Keypair.generate();
-    
+
     // Create token
     const tokenTransaction = new Transaction();
-    
+
     // Add instructions for minting NFT
     // ...
-    
+
     // Sign and send transaction
     const signature = await wallet.signAndSendTransaction(tokenTransaction);
-    
+
     return {
       success: true,
       signature,
-      mintAddress: mintKeypair.publicKey.toString()
+      mintAddress: mintKeypair.publicKey.toString(),
     };
   } catch (error) {
-    console.error('Error minting NFT:', error);
+    console.error("Error minting NFT:", error);
     return {
       success: false,
-      error: error.message
+      error: error.message,
     };
   }
 };
@@ -155,58 +155,61 @@ mintNFT: async (nftName: string) => {
   try {
     const { publicKey, signTransaction } = get().wallet;
     if (!publicKey || !signTransaction) {
-      throw new Error('Wallet not connected');
+      throw new Error("Wallet not connected");
     }
-    
+
     // Prepare metadata
     const metadata = {
       name: nftName,
       description: `This NFT certifies your mastery of ${nftName} in the Money Factory AI ecosystem.`,
-      image: `https://mfai.app/nft/${nftName.toLowerCase().replace(/\s+/g, '-')}.png`,
+      image: `https://mfai.app/nft/${nftName.toLowerCase().replace(/\s+/g, "-")}.png`,
       attributes: [
         { trait_type: "Proof Type", value: "Proof-of-Skill™" },
         { trait_type: "XP Earned", value: "100" },
-        { trait_type: "Completion Date", value: new Date().toISOString() }
-      ]
+        { trait_type: "Completion Date", value: new Date().toISOString() },
+      ],
     };
-    
+
     // Call actual mint function
     const result = await mintProofOfSkill(
       connection,
       { publicKey, signTransaction },
-      metadata
+      metadata,
     );
-    
+
     if (result.success) {
       // Update store with real transaction data
       set((state) => ({
         userProgress: {
           ...state.userProgress,
           nfts: [...state.userProgress.nfts, nftName],
-          transactions: [...(state.userProgress.transactions || []), {
-            type: 'mint',
-            hash: result.signature,
-            address: result.mintAddress,
-            timestamp: Date.now()
-          }]
-        }
+          transactions: [
+            ...(state.userProgress.transactions || []),
+            {
+              type: "mint",
+              hash: result.signature,
+              address: result.mintAddress,
+              timestamp: Date.now(),
+            },
+          ],
+        },
       }));
-      
+
       return result.mintAddress;
     } else {
       throw new Error(result.error);
     }
   } catch (error) {
-    console.error('Error minting NFT:', error);
+    console.error("Error minting NFT:", error);
     throw error;
   }
-}
+};
 ```
 
 ## Success Metrics
 
 1. **Transaction Success Rate**
-   - >95% success rate for all blockchain transactions
+   - > 95% success rate for all blockchain transactions
    - <3 second response time for transaction confirmation
 
 2. **User Engagement**

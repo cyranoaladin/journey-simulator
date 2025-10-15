@@ -1,15 +1,14 @@
-import React from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useWallet } from '@solana/wallet-adapter-react'
-import { AlertCircle, Wallet, X, CheckCircle, Loader } from 'lucide-react'
-import { useState } from 'react'
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
+import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { AlertCircle, Wallet, X, CheckCircle, Loader } from "lucide-react";
+import { useState } from "react";
+
+const ENABLE_WALLET = (import.meta as any).env?.VITE_ENABLE_WALLET === "1";
 
 const WalletConnectionBanner = () => {
-  const { connected, publicKey, connecting } = useWallet()
-  const [isDismissed, setIsDismissed] = useState(false)
+  const [isDismissed, setIsDismissed] = useState(false);
 
-  if (connected || isDismissed) return null
+  if (!ENABLE_WALLET || isDismissed) return null;
 
   return (
     <AnimatePresence>
@@ -22,32 +21,26 @@ const WalletConnectionBanner = () => {
         <div className="max-w-4xl mx-auto bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg p-4 shadow-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              {connecting ? (
-                <div className="w-6 h-6 rounded-full bg-yellow-500/30 flex items-center justify-center">
-                  <Loader className="text-yellow-400 animate-spin" size={16} />
-                </div>
-              ) : (
-                <AlertCircle className="text-yellow-400 flex-shrink-0" size={20} />
-              )}
+              <AlertCircle
+                className="text-yellow-400 flex-shrink-0"
+                size={20}
+              />
               <div>
                 <h3 className="font-semibold text-yellow-400">
-                  {connecting ? 'Connecting wallet...' : 'Wallet not connected'}
+                  Wallet not connected
                 </h3>
                 <p className="text-sm text-yellow-300/80">
-                  {connecting 
-                    ? 'Please approve the connection request in your wallet' 
-                    : 'Connect your Solana wallet (set to Devnet) to unlock all features and start minting Proof-of-Skill™ NFTs'}
+                  Connect your Solana wallet (set to Devnet) to unlock all
+                  features and start minting Proof-of-Skill™ NFTs
                 </p>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-2">
-              {!connecting && (
-                <div className="wallet-adapter-dropdown">
-                  <WalletMultiButton className="!bg-yellow-500 !text-black !px-4 !py-2 !rounded-lg !font-medium !hover:bg-yellow-400 !transition-colors !flex !items-center !space-x-2" />
-                </div>
-              )}
-              
+              <button className="bg-yellow-500 text-black px-4 py-2 rounded-lg font-medium opacity-80 cursor-not-allowed">
+                Connect Wallet
+              </button>
+
               <button
                 onClick={() => setIsDismissed(true)}
                 className="p-2 hover:bg-white/10 rounded-lg transition-colors"
@@ -60,7 +53,7 @@ const WalletConnectionBanner = () => {
         </div>
       </motion.div>
     </AnimatePresence>
-  )
-}
+  );
+};
 
-export default WalletConnectionBanner
+export default WalletConnectionBanner;

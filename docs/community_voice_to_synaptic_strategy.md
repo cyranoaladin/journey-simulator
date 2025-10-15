@@ -24,7 +24,6 @@ Move from **supporting conversations** to **orchestrating protocol evolution**, 
 
 - Upon profile creation, Zyno identifies **relational capital** and **strategic clarity** via AEPO™.
 - A **Skillchain** is generated with emphasis on:
-
   - Coordination Psychology
   - Protocol Narratives
   - Collective Decision Frameworks
@@ -36,7 +35,6 @@ Move from **supporting conversations** to **orchestrating protocol evolution**, 
 ### 🧩 **Phase 1: Contribution Chain**
 
 - Completes missions by:
-
   - Moderating conversations
   - Translating strategic content
   - Synthesizing summaries of ecosystem updates
@@ -57,7 +55,6 @@ Move from **supporting conversations** to **orchestrating protocol evolution**, 
 ### 🧭 **Phase 3: Governance Intelligence**
 
 - Stakes \$MFAI (Cognitive Lock™) to:
-
   - Activate **Mission Design privileges**
   - Suggest new Skillchains
   - Moderate Proof-of-Vision™ validations

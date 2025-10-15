@@ -23,7 +23,6 @@ Transform creative production into **traceable cognitive capital**, participate 
 ### ✍️ **Phase 0: Creator Signal Identified**
 
 - At onboarding, Zyno’s **AEPO™** maps Marie’s creative tendencies and technical fluency:
-
   - Visual storytelling
   - Prompt-based generation
   - Concept design (narratives, UX, identity)
@@ -35,7 +34,6 @@ Transform creative production into **traceable cognitive capital**, participate 
 ### 🎥 **Phase 1: Proof-of-Creation**
 
 - Completes missions such as:
-
   - Designing a strategic asset for another builder
   - Creating explainer visuals for Skillchains
   - Co-authoring interface templates with Zyno
@@ -48,7 +46,6 @@ Transform creative production into **traceable cognitive capital**, participate 
 ### 🧠 **Phase 2: Integrated Creative Streams**
 
 - Starts collaborating cross-functionally:
-
   - Embeds visuals into Proof-of-Vision™ files
   - Designs onboarding media for protocol pathways
   - Runs voice-based or AI-generated educational sessions
@@ -60,7 +57,6 @@ Transform creative production into **traceable cognitive capital**, participate 
 ### 🧭 **Phase 3: Creative Economy Architect**
 
 - Stakes \$MFAI (Cognitive Lock™) to:
-
   - Launch thematic creative missions
   - Approve contributions from other creators
   - Curate visual and interactive layers of Skillchains

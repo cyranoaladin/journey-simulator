@@ -1,8 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { holders } from '../data/holders';
-import { useJourneyStore } from '../store/journeyStore';
-import { Trophy, TrendingUp, Zap, ExternalLink, RefreshCw, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { holders } from "../data/holders";
+import { useJourneyStore } from "../store/journeyStore";
+import {
+  Trophy,
+  TrendingUp,
+  Zap,
+  ExternalLink,
+  RefreshCw,
+  AlertCircle,
+} from "lucide-react";
 // import { api } from '../utils/api'; // Will be used when backend is ready
 
 const AccessPassHolders: React.FC = () => {
@@ -18,18 +25,18 @@ const AccessPassHolders: React.FC = () => {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       // Try to fetch holders from backend (simulated for now)
-      console.log('Fetching access pass holders from backend...');
+      console.log("Fetching access pass holders from backend...");
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       // For now, use local data
       setHoldersData(holders);
-      
+
       setLastUpdated(new Date());
     } catch (err) {
-      console.error('Failed to load holders data:', err);
-      setError('Failed to load holders data. Using cached data.');
+      console.error("Failed to load holders data:", err);
+      setError("Failed to load holders data. Using cached data.");
       setHoldersData(holders); // Use local data as fallback
     } finally {
       setIsLoading(false);
@@ -39,34 +46,37 @@ const AccessPassHolders: React.FC = () => {
   // Auto-refresh holders data every 5 minutes
   useEffect(() => {
     loadHoldersData();
-    
+
     const interval = setInterval(loadHoldersData, 5 * 60 * 1000); // 5 minutes
     return () => clearInterval(interval);
   }, []);
 
   // Handle holder interaction tracking
-  const trackHolderInteraction = async (holderId: string, interactionType: string) => {
+  const trackHolderInteraction = async (
+    holderId: string,
+    interactionType: string,
+  ) => {
     try {
       // Simulate tracking (for now)
-      console.log('Tracking holder interaction:', {
+      console.log("Tracking holder interaction:", {
         holder_id: holderId,
         interaction_type: interactionType,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     } catch (err) {
-      console.error('Failed to track holder interaction:', err);
+      console.error("Failed to track holder interaction:", err);
     }
   };
 
   const openHolderModal = (holderId: string) => {
-    const holder = holdersData.find(h => h.id === holderId);
+    const holder = holdersData.find((h) => h.id === holderId);
     if (holder) {
       // Track interaction
-      trackHolderInteraction(holderId, 'modal_open');
-      
+      trackHolderInteraction(holderId, "modal_open");
+
       openModal({
-        type: 'holder',
-        holder
+        type: "holder",
+        holder,
       });
     }
   };
@@ -84,15 +94,17 @@ const AccessPassHolders: React.FC = () => {
           <div className="flex items-center justify-between mb-6">
             <div className="flex-1">
               <h2 className="text-3xl md:text-5xl font-space font-bold mb-6">
-                <span className="gradient-text">
-                  MFAI Access Pass Holders
-                </span>
+                <span className="gradient-text">MFAI Access Pass Holders</span>
               </h2>
               <p className="text-lg opacity-80 max-w-3xl mx-auto">
-                Meet the pioneers who transformed their skills into digital sovereignty through the <span className="font-semibold text-accent-cyan">Cognitive Activation Protocol™</span>
+                Meet the pioneers who transformed their skills into digital
+                sovereignty through the{" "}
+                <span className="font-semibold text-accent-cyan">
+                  Cognitive Activation Protocol™
+                </span>
               </p>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               {lastUpdated && (
                 <span className="text-sm opacity-60">
@@ -106,9 +118,9 @@ const AccessPassHolders: React.FC = () => {
                 disabled={isLoading}
                 className="flex items-center space-x-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all disabled:opacity-50"
               >
-                <RefreshCw 
-                  size={16} 
-                  className={isLoading ? 'animate-spin' : ''} 
+                <RefreshCw
+                  size={16}
+                  className={isLoading ? "animate-spin" : ""}
                 />
                 <span className="text-sm">Refresh</span>
               </motion.button>
@@ -140,27 +152,37 @@ const AccessPassHolders: React.FC = () => {
               onClick={() => openHolderModal(holder.id)}
               className="builders-circle-card card cursor-pointer"
             >
-              <div className={`builders-circle-badge bg-gradient-to-br ${
-                holder.passLevel === 'Diamond' ? 'from-blue-400 to-purple-600' :
-                holder.passLevel === 'Platinum' ? 'from-gray-300 to-blue-300' :
-                'from-yellow-400 to-orange-500'
-              }`}>
+              <div
+                className={`builders-circle-badge bg-gradient-to-br ${
+                  holder.passLevel === "Diamond"
+                    ? "from-blue-400 to-purple-600"
+                    : holder.passLevel === "Platinum"
+                      ? "from-gray-300 to-blue-300"
+                      : "from-yellow-400 to-orange-500"
+                }`}
+              >
                 <div className="absolute top-2 right-2 text-xs font-bold bg-black/30 text-white px-2 py-1 rounded-full">
                   {holder.passLevel} Pass Holder
                 </div>
-                
-                <div className={`builders-circle-avatar ${
-                  holder.passLevel === 'Diamond' ? 'bg-gradient-diamond' :
-                  holder.passLevel === 'Platinum' ? 'bg-gradient-platinum' :
-                  'bg-gradient-gold'
-                }`}>
+
+                <div
+                  className={`builders-circle-avatar ${
+                    holder.passLevel === "Diamond"
+                      ? "bg-gradient-diamond"
+                      : holder.passLevel === "Platinum"
+                        ? "bg-gradient-platinum"
+                        : "bg-gradient-gold"
+                  }`}
+                >
                   {holder.avatar}
                 </div>
-                
-                <h3 className="text-xl font-space font-bold text-white mb-1">{holder.name}</h3>
+
+                <h3 className="text-xl font-space font-bold text-white mb-1">
+                  {holder.name}
+                </h3>
                 <p className="text-white/90 font-medium">{holder.title}</p>
               </div>
-              
+
               <div className="builders-circle-metrics">
                 <div className="builders-circle-metric">
                   <div className="text-sm opacity-70">Time in ecosystem</div>
@@ -179,13 +201,13 @@ const AccessPassHolders: React.FC = () => {
                   <div className="font-bold">{holder.projects}</div>
                 </div>
               </div>
-              
+
               <div className="builders-circle-testimonial">
                 <p className="text-sm italic">
                   "{holder.testimonial.substring(0, 120)}..."
                 </p>
               </div>
-              
+
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -193,16 +215,16 @@ const AccessPassHolders: React.FC = () => {
               >
                 <span>View Success Story</span>
               </motion.button>
-              
+
               {/* Flip hint */}
               <div className="absolute bottom-2 right-2 text-xs text-white/40">
                 Tap to flip
               </div>
-              
+
               {/* Hover Card - Additional Details */}
               <AnimatePresence>
                 {hoveredHolder === holder.id && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 20 }}
@@ -210,20 +232,28 @@ const AccessPassHolders: React.FC = () => {
                   >
                     <div>
                       <div className="flex items-center space-x-3 mb-4">
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
-                          holder.passLevel === 'Diamond' ? 'bg-gradient-diamond' :
-                          holder.passLevel === 'Platinum' ? 'bg-gradient-platinum' :
-                          'bg-gradient-gold'
-                        }`}>
+                        <div
+                          className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
+                            holder.passLevel === "Diamond"
+                              ? "bg-gradient-diamond"
+                              : holder.passLevel === "Platinum"
+                                ? "bg-gradient-platinum"
+                                : "bg-gradient-gold"
+                          }`}
+                        >
                           {holder.avatar}
                         </div>
                         <div>
-                          <h3 className="font-space font-bold text-white">{holder.name}</h3>
+                          <h3 className="font-space font-bold text-white">
+                            {holder.name}
+                          </h3>
                           <p className="text-white/80">{holder.title}</p>
                         </div>
                       </div>
-                      
-                      <h4 className="font-semibold text-white mb-2">Key Achievements</h4>
+
+                      <h4 className="font-semibold text-white mb-2">
+                        Key Achievements
+                      </h4>
                       <div className="space-y-2 mb-4">
                         <div className="flex items-center space-x-2 text-sm text-white/90">
                           <Trophy size={14} className="text-accent-gold" />
@@ -235,11 +265,14 @@ const AccessPassHolders: React.FC = () => {
                         </div>
                         <div className="flex items-center space-x-2 text-sm text-white/90">
                           <Zap size={14} className="text-accent-cyan" />
-                          <span>{holder.metrics[4]?.label}: {holder.metrics[4]?.value}</span>
+                          <span>
+                            {holder.metrics[4]?.label}:{" "}
+                            {holder.metrics[4]?.value}
+                          </span>
                         </div>
                       </div>
                     </div>
-                    
+
                     <div>
                       <motion.button
                         whileHover={{ scale: 1.05 }}

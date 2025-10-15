@@ -1,7 +1,7 @@
 # 🛠️ `REFONTE_PARCOURS_UTILISATEURS_MFAI.md`
 
 **Money Factory AI – Strategic Redesign & Expansion Plan**
-*Version : 1.0 — Language: English — Audience: Dev Team, UX, Product Owner*
+_Version : 1.0 — Language: English — Audience: Dev Team, UX, Product Owner_
 
 ---
 
@@ -11,11 +11,11 @@
 
 The “User Journeys” page is a **strategic gateway** into the **Money Factory AI protocol**. It should **empower users** to self-identify within the ecosystem and **project themselves** along a personalized path toward Web3 sovereignty, using the native mechanics and tools of MFAI:
 
-* **Zyno (Cognitive AI Co-Founder™)**
-* **Cognitive Activation Protocol™** (Learn → Build → Prove → Activate → Scale)
-* **Skillchain Mining™, Proof-of-Skill™, Proof-of-Vision™**
-* **NFT Passes & \$MFAI Token Utility**
-* **Governance DAO, Launchpad, Coaching & Incubation**
+- **Zyno (Cognitive AI Co-Founder™)**
+- **Cognitive Activation Protocol™** (Learn → Build → Prove → Activate → Scale)
+- **Skillchain Mining™, Proof-of-Skill™, Proof-of-Vision™**
+- **NFT Passes & \$MFAI Token Utility**
+- **Governance DAO, Launchpad, Coaching & Incubation**
 
 ---
 
@@ -23,7 +23,7 @@ The “User Journeys” page is a **strategic gateway** into the **Money Factory
 
 | Pillar                 | Description                                                                               |
 | ---------------------- | ----------------------------------------------------------------------------------------- |
-| **Cognitive Clarity**  | Each journey must follow a clear narrative arc, based on the Activation Protocol™         |
+| **Cognitive Clarity**  | Each journey must follow a clear narrative arc, based on the Activation Protocol™        |
 | **Narrative Fidelity** | All content must respect the proprietary language and universe of Money Factory AI        |
 | **Gamified Learning**  | Journeys are not static; they're quests. XP, badges, NFTs, and airdrops act as milestones |
 | **Zyno-Centric UX**    | Zyno should guide, personalize and celebrate each phase of the journey                    |
@@ -35,53 +35,44 @@ The “User Journeys” page is a **strategic gateway** into the **Money Factory
 ### 📐 Proposed Structure of the New Page
 
 1. **Hero Section**
-
-   * Immersive headline: *“Choose your Cognitive Quest”*
-   * Zyno onboarding widget: *“Not sure where to start? Ask Zyno”*
-   * Persona filter (Visual): *Student, Entrepreneur, Investor, Builder, DAO Voter, Mentor...*
+   - Immersive headline: _“Choose your Cognitive Quest”_
+   - Zyno onboarding widget: _“Not sure where to start? Ask Zyno”_
+   - Persona filter (Visual): _Student, Entrepreneur, Investor, Builder, DAO Voter, Mentor..._
 
 2. **Smart Journey Selector**
-
-   * Interactive component → "Answer 3 questions" = Suggested journey (Zyno AI)
+   - Interactive component → "Answer 3 questions" = Suggested journey (Zyno AI)
 
 3. **Journey Explorer**
-
-   * Swipeable interactive cards (one per journey)
-   * Summary + “Start now” CTA + Preview XP track
+   - Swipeable interactive cards (one per journey)
+   - Summary + “Start now” CTA + Preview XP track
 
 4. **Journey Details Modal / Side Panel**
-
-   * Full walkthrough by stage (Learn → Build → Prove → Activate → Scale)
-   * Visual roadmap, token/NFT milestones, recommended tools, AI support
-   * Completion reward summary (certification, DAO role, airdrops, launchpad eligibility)
+   - Full walkthrough by stage (Learn → Build → Prove → Activate → Scale)
+   - Visual roadmap, token/NFT milestones, recommended tools, AI support
+   - Completion reward summary (certification, DAO role, airdrops, launchpad eligibility)
 
 5. **NFT Pass & Progression**
-
-   * Visual map of NFT unlocks along the journey
-   * Connects each path to the correct subscription & pass level
+   - Visual map of NFT unlocks along the journey
+   - Connects each path to the correct subscription & pass level
 
 6. **Social Layer**
-
-   * Embed Discord / community tags per journey
-   * Highlight top learners, DAO voters, Zyno certified users
+   - Embed Discord / community tags per journey
+   - Highlight top learners, DAO voters, Zyno certified users
 
 ---
 
 ### 🧠 Narrative Language to Use Consistently
 
-| Term                                   | Meaning                                               |
-| -------------------------------------- | ----------------------------------------------------- |
-| **Zyno**                               | The AI Co-Founder™, mentor and guide                  |
-| **Cognitive Activation Protocol™**     | The 5-phase progression model for any user            |
-| **Skillchain Mining™**                 | Progression mechanism turning knowledge into capital  |
+| Term                                     | Meaning                                               |
+| ---------------------------------------- | ----------------------------------------------------- |
+| **Zyno**                                 | The AI Co-Founder™, mentor and guide                 |
+| **Cognitive Activation Protocol™**      | The 5-phase progression model for any user            |
+| **Skillchain Mining™**                  | Progression mechanism turning knowledge into capital  |
 | **Proof-of-Skill™ / Proof-of-Vision™** | NFT-backed validation of learning or contribution     |
-| **Synaptic Governance™**               | Decentralized but merit-based voting mechanism        |
-| **Neuro-Dividends™**                   | Staking-linked revenue shared with active users       |
-| **Proof Pass™ / NFT Pass**             | Gold, Platinum, Diamond – tiers with perks and access |
-| **Activation Loop™**                   | Learn → Prove → Tokenize → Build → Govern → Earn      |
-
-
-
+| **Synaptic Governance™**                | Decentralized but merit-based voting mechanism        |
+| **Neuro-Dividends™**                    | Staking-linked revenue shared with active users       |
+| **Proof Pass™ / NFT Pass**              | Gold, Platinum, Diamond – tiers with perks and access |
+| **Activation Loop™**                    | Learn → Prove → Tokenize → Build → Govern → Earn      |
 
 # 🧭 SECTION 2 — Strategic User Journey Models
 
@@ -98,13 +89,13 @@ Every step is **gamified**, **supported by Zyno**, and **rewarded via NFTs and \
 **Profile**: Web2-native, knowledge seeker, time-rich
 **Goal**: Gain concrete skills, passive income, and join a DAO
 
-| Phase        | Learning Experience                                                |
-| ------------ | ------------------------------------------------------------------ |
-| **Learn**    | *"What is Web3?"* → 5-min animated intro + quiz = XP + badge       |
-| **Build**    | *Create a Solana wallet with Zyno guidance* → unlock dashboard     |
-| **Prove**    | *Pass the “Web3 Foundations” challenge* → mint Proof-of-Skill™ NFT |
-| **Activate** | *Join your first DAO vote* → XP boost + Zyno congratulation        |
-| **Scale**    | *Stake \$MFAI + share testimonial* → Neuro-Dividends™ unlocked     |
+| Phase        | Learning Experience                                                 |
+| ------------ | ------------------------------------------------------------------- |
+| **Learn**    | _"What is Web3?"_ → 5-min animated intro + quiz = XP + badge        |
+| **Build**    | _Create a Solana wallet with Zyno guidance_ → unlock dashboard      |
+| **Prove**    | _Pass the “Web3 Foundations” challenge_ → mint Proof-of-Skill™ NFT |
+| **Activate** | _Join your first DAO vote_ → XP boost + Zyno congratulation         |
+| **Scale**    | _Stake \$MFAI + share testimonial_ → Neuro-Dividends™ unlocked     |
 
 🎁 Rewards: NFT Résumé • DAO Role • Passive Income Starter Pack
 🧠 Zyno Says: “You’re not just learning. You’re mining skills into capital.”
@@ -116,13 +107,13 @@ Every step is **gamified**, **supported by Zyno**, and **rewarded via NFTs and \
 **Profile**: Product owner, Web2 business builder
 **Goal**: Tokenize a business idea, create sustainable Web3 revenue
 
-| Phase        | Learning Experience                                                       |
-| ------------ | ------------------------------------------------------------------------- |
-| **Learn**    | *“NFTs for Loyalty 101”* → Visual case studies + self-assessment          |
-| **Build**    | *Create your own gated content or NFT coupon model* with MFAI templates   |
-| **Prove**    | *Pitch your idea to Zyno + community preview* → earn Proof-of-Vision™ NFT |
-| **Activate** | *Integrate your Web3 layer into an existing product* + DAO feedback       |
-| **Scale**    | *Apply to Launchpad / raise funding from Synaptic DAO*                    |
+| Phase        | Learning Experience                                                        |
+| ------------ | -------------------------------------------------------------------------- |
+| **Learn**    | _“NFTs for Loyalty 101”_ → Visual case studies + self-assessment           |
+| **Build**    | _Create your own gated content or NFT coupon model_ with MFAI templates    |
+| **Prove**    | _Pitch your idea to Zyno + community preview_ → earn Proof-of-Vision™ NFT |
+| **Activate** | _Integrate your Web3 layer into an existing product_ + DAO feedback        |
+| **Scale**    | _Apply to Launchpad / raise funding from Synaptic DAO_                     |
 
 🎁 Rewards: NFT Blueprint • Vision NFT • Launchpad Ticket
 🧠 Zyno Says: “Turn your audience into stakeholders.”
@@ -136,11 +127,11 @@ Every step is **gamified**, **supported by Zyno**, and **rewarded via NFTs and \
 
 | Phase        | Learning Experience                                                    |
 | ------------ | ---------------------------------------------------------------------- |
-| **Learn**    | *“Intro to DeFi, DAOs and Yield Mechanics”* course + staking simulator |
-| **Build**    | *Simulate staking scenarios* → optimize portfolio with Zyno            |
-| **Prove**    | *Complete the Governance Certification* → unlock DAO voter badge       |
-| **Activate** | *Stake \$MFAI & vote in proposal #01* → DAO reward tier unlocked       |
-| **Scale**    | *Refer 2 investors + unlock Neuro-Dividends™ NFT*                      |
+| **Learn**    | _“Intro to DeFi, DAOs and Yield Mechanics”_ course + staking simulator |
+| **Build**    | _Simulate staking scenarios_ → optimize portfolio with Zyno            |
+| **Prove**    | _Complete the Governance Certification_ → unlock DAO voter badge       |
+| **Activate** | _Stake \$MFAI & vote in proposal #01_ → DAO reward tier unlocked       |
+| **Scale**    | _Refer 2 investors + unlock Neuro-Dividends™ NFT_                     |
 
 🎁 Rewards: Governance XP • Staking Rewards • Referral NFT
 🧠 Zyno Says: “Stake not only tokens, but your vision.”
@@ -154,11 +145,11 @@ Every step is **gamified**, **supported by Zyno**, and **rewarded via NFTs and \
 
 | Phase        | Learning Experience                                        |
 | ------------ | ---------------------------------------------------------- |
-| **Learn**    | *“Smart Contract Fast Track”* with MFAI SDK + Zyno prompts |
-| **Build**    | *Fork & deploy vesting or staking module*                  |
-| **Prove**    | *Audit by peer + Zyno* → mint Proof-of-Build™ NFT          |
-| **Activate** | *DAO Demo Day: present MVP to protocol community*          |
-| **Scale**    | *Enter Builder DAO Circle + apply for protocol grant*      |
+| **Learn**    | _“Smart Contract Fast Track”_ with MFAI SDK + Zyno prompts |
+| **Build**    | _Fork & deploy vesting or staking module_                  |
+| **Prove**    | _Audit by peer + Zyno_ → mint Proof-of-Build™ NFT         |
+| **Activate** | _DAO Demo Day: present MVP to protocol community_          |
+| **Scale**    | _Enter Builder DAO Circle + apply for protocol grant_      |
 
 🎁 Rewards: Dev NFT Badge • Git-linked Portfolio • Launch Boost
 🧠 Zyno Says: “Your code is your identity.”
@@ -172,11 +163,11 @@ Every step is **gamified**, **supported by Zyno**, and **rewarded via NFTs and \
 
 | Phase        | Learning Experience                                       |
 | ------------ | --------------------------------------------------------- |
-| **Learn**    | *MFAI Pedagogy Bootcamp* (Zyno + course builder)          |
-| **Build**    | *Launch your first “Zyno-Led Course”* with reward modules |
-| **Prove**    | *Get community feedback score + NFT Certificate*          |
-| **Activate** | *Join as Verified Mentor + moderate Discord DAO cohort*   |
-| **Scale**    | *Monetize your learning path as NFT series*               |
+| **Learn**    | _MFAI Pedagogy Bootcamp_ (Zyno + course builder)          |
+| **Build**    | _Launch your first “Zyno-Led Course”_ with reward modules |
+| **Prove**    | _Get community feedback score + NFT Certificate_          |
+| **Activate** | _Join as Verified Mentor + moderate Discord DAO cohort_   |
+| **Scale**    | _Monetize your learning path as NFT series_               |
 
 🎁 Rewards: Educator NFT • Training Revenue Share • DAO Speaker Role
 🧠 Zyno Says: “Teach to scale. Share to lead.”
@@ -191,15 +182,13 @@ Every step is **gamified**, **supported by Zyno**, and **rewarded via NFTs and \
 | Phase        | Learning Experience                                             |
 | ------------ | --------------------------------------------------------------- |
 | **Learn**    | \*"From Vision to Protocol": Self-assessment + Canvas with Zyno |
-| **Build**    | *Create the Vision Board NFT* → share to early supporters       |
-| **Prove**    | *Mint Proof-of-Vision™ + pre-DAO voting test*                   |
-| **Activate** | *Win access to MFAI Incubation via community traction*          |
-| **Scale**    | *Assemble DAO Co-founders, co-build MVP, apply for grant*       |
+| **Build**    | _Create the Vision Board NFT_ → share to early supporters       |
+| **Prove**    | _Mint Proof-of-Vision™ + pre-DAO voting test_                  |
+| **Activate** | _Win access to MFAI Incubation via community traction_          |
+| **Scale**    | _Assemble DAO Co-founders, co-build MVP, apply for grant_       |
 
 🎁 Rewards: Vision NFT • Incubation Access • DAO Startup Role
 🧠 Zyno Says: “Ideas are seeds. Let’s scale your forest.”
-
-
 
 # 🧬 SECTION 3 — Journey Architecture & Progression Logic
 
@@ -211,12 +200,12 @@ Every MFAI journey must be built as a **Cognitive Learning System**, grounded in
 
 ## 🧩 Core Framework: The 5-Phase Activation Structure
 
-| Phase           | Meaning                     | Action Types                                | Output                              |
-| --------------- | --------------------------- | ------------------------------------------- | ----------------------------------- |
-| **1. Learn**    | Cognitive Onboarding        | Watch, read, simulate, ask Zyno             | XP • Quiz pass • \$MFAI reward      |
-| **2. Build**    | Apply to your context       | Create project, wallet, smart contract, NFT | Project Draft • Vision NFT          |
-| **3. Prove**    | Validate your growth        | Pass test, mint Proof NFT, join DAO vote    | NFT • Role Access • Feedback        |
-| **4. Activate** | Engage on-chain & off-chain | Stake, submit to Launchpad, mentor          | DAO status • Token incentives       |
+| Phase           | Meaning                     | Action Types                                | Output                               |
+| --------------- | --------------------------- | ------------------------------------------- | ------------------------------------ |
+| **1. Learn**    | Cognitive Onboarding        | Watch, read, simulate, ask Zyno             | XP • Quiz pass • \$MFAI reward       |
+| **2. Build**    | Apply to your context       | Create project, wallet, smart contract, NFT | Project Draft • Vision NFT           |
+| **3. Prove**    | Validate your growth        | Pass test, mint Proof NFT, join DAO vote    | NFT • Role Access • Feedback         |
+| **4. Activate** | Engage on-chain & off-chain | Stake, submit to Launchpad, mentor          | DAO status • Token incentives        |
 | **5. Scale**    | Expand your impact          | Teach, refer, fund, launch                  | Neuro-Dividends™ • Governance voice |
 
 Each user journey is a **stacked narrative path**, with **front-end components** corresponding to these 5 stages.
@@ -240,7 +229,7 @@ Each user journey is a **stacked narrative path**, with **front-end components**
 ## 📊 Journey Progression Logic (Gamified Flow)
 
 ```plaintext
-[Persona Chosen] 
+[Persona Chosen]
    ➝ [Zyno Assessment: "What's your goal?"]
        ➝ [Suggested Journey Appears]
            ➝ [Learn Phase: watch → quiz → XP]
@@ -252,9 +241,9 @@ Each user journey is a **stacked narrative path**, with **front-end components**
 
 Each journey should:
 
-* Update in real time
-* Highlight pending actions
-* Reward visually + cognitively (Zyno feedback, confetti, etc.)
+- Update in real time
+- Highlight pending actions
+- Reward visually + cognitively (Zyno feedback, confetti, etc.)
 
 ---
 
@@ -265,10 +254,9 @@ Each journey should:
 3. Returns best-fit journey (with reasoning)
 4. Journey gets pinned at top with “Why Zyno recommends this” note
 5. Zyno follows each phase with:
-
-   * Explainer
-   * Quiz/help button
-   * Smart suggestion: “Claim \$MFAI”, “Upgrade to NFT Pass now”, “Vote on this DAO proposal”
+   - Explainer
+   - Quiz/help button
+   - Smart suggestion: “Claim \$MFAI”, “Upgrade to NFT Pass now”, “Vote on this DAO proposal”
 
 ---
 
@@ -278,26 +266,24 @@ Each journey should:
 | -------- | --------------------------------- | ----------------------------------- |
 | Learn    | Earn \$MFAI per quiz passed       | 50 \$MFAI for “Intro to Web3”       |
 | Build    | Receive NFT Draft Cert            | “eCommerce builder v1” NFT          |
-| Prove    | Mint Proof-of-Skill™ NFT          | “Zyno-Approved Marketer”            |
+| Prove    | Mint Proof-of-Skill™ NFT         | “Zyno-Approved Marketer”            |
 | Activate | Unlock DAO badge + staking rights | “DAO Explorer” NFT                  |
-| Scale    | Eligible for Neuro-Dividends™     | % of revenues distributed quarterly |
+| Scale    | Eligible for Neuro-Dividends™    | % of revenues distributed quarterly |
 
 ---
 
 ## 🧠 Summary of Dev Objectives
 
-* All journeys must be **modular, nested, data-driven**
-* Connect progress to:
+- All journeys must be **modular, nested, data-driven**
+- Connect progress to:
+  - **Wallet status**
+  - **\$MFAI balance**
+  - **NFT Pass level**
 
-  * **Wallet status**
-  * **\$MFAI balance**
-  * **NFT Pass level**
-* Zyno should be:
-
-  * Contextual assistant
-  * Knowledge validator
-  * Career accelerator
-
+- Zyno should be:
+  - Contextual assistant
+  - Knowledge validator
+  - Career accelerator
 
 # 🎨 SECTION 4 — UI/UX Guidelines for "User Journeys" Page
 
@@ -334,16 +320,16 @@ Deliver a **WOW-grade experience**, merging the clarity of Web2 onboarding with 
 
 ### Mobile-First Prioritization:
 
-* Swipeable journey cards
-* Sticky progress bar
-* Bottom action buttons (Start, Resume, Ask Zyno)
-* Modals for each phase, full-screen on small devices
+- Swipeable journey cards
+- Sticky progress bar
+- Bottom action buttons (Start, Resume, Ask Zyno)
+- Modals for each phase, full-screen on small devices
 
 ### Desktop View:
 
-* 2-column layout: Left (journey timeline), Right (Zyno Assistant / NFT display)
-* ScrollSync system: as user scrolls → side panel updates NFT/status
-* Top filters: Personas, Journey stage, NFT pass level
+- 2-column layout: Left (journey timeline), Right (Zyno Assistant / NFT display)
+- ScrollSync system: as user scrolls → side panel updates NFT/status
+- Top filters: Personas, Journey stage, NFT pass level
 
 ---
 
@@ -367,7 +353,7 @@ Deliver a **WOW-grade experience**, merging the clarity of Web2 onboarding with 
 | `<PhaseTimeline />` | Horizontal 5-phase animated bar per user              |
 | `<ZynoBox />`       | Context-aware helper (AI avatar + voice/chat)         |
 | `<NFTBadge />`      | NFT display + mint/claim status                       |
-| `<ProofStatus />`   | Shows Proof-of-Skill™ status and completion logic     |
+| `<ProofStatus />`   | Shows Proof-of-Skill™ status and completion logic    |
 | `<StartCTA />`      | Start/Resume buttons with clear next step             |
 | `<XPTracker />`     | Visual XP and rewards dashboard                       |
 
@@ -387,20 +373,19 @@ Deliver a **WOW-grade experience**, merging the clarity of Web2 onboarding with 
 
 ## 🔐 Accessibility & Performance
 
-* Use `aria-labelledby`, `aria-describedby` on modals, tooltips, and cards
-* Support keyboard navigation
-* Ensure dark/light mode compatibility
-* Lazy-load images, compress assets, avoid animation jank
+- Use `aria-labelledby`, `aria-describedby` on modals, tooltips, and cards
+- Support keyboard navigation
+- Ensure dark/light mode compatibility
+- Lazy-load images, compress assets, avoid animation jank
 
 ---
 
 ## 🧠 UX Notes from Whitepaper Narrative
 
-* Zyno must **feel alive**, like a co-pilot, not a pop-up
-* Journeys must **feel like quests**, not school curricula
-* Users must **see the value** of each action (XP, reward, access, reputation)
-* NFT minting must **feel meaningful**, not cosmetic
-
+- Zyno must **feel alive**, like a co-pilot, not a pop-up
+- Journeys must **feel like quests**, not school curricula
+- Users must **see the value** of each action (XP, reward, access, reputation)
+- NFT minting must **feel meaningful**, not cosmetic
 
 # 🪙 SECTION 5 — NFT & Token Mechanics + Data Integration
 
@@ -415,11 +400,11 @@ Ensure that each user journey **is tracked, rewarded and authenticated** via on-
 | Mechanism                                  | Role in Journey                                   | Interaction                                                          |
 | ------------------------------------------ | ------------------------------------------------- | -------------------------------------------------------------------- |
 | **NFT Passes** (Gold / Platinum / Diamond) | Unlock premium journeys, advanced rewards         | Detected via wallet connection (`wallet.getNFTs()`)                  |
-| **Proof-of-Skill™ NFTs**                   | Validate learning or project milestones           | Minted via MFAI smart contract (ERC721/SPL) upon phase completion    |
-| **Proof-of-Vision™ NFTs**                  | Represent innovative project ideas                | Submitted via form → validated by DAO → mintable                     |
+| **Proof-of-Skill™ NFTs**                  | Validate learning or project milestones           | Minted via MFAI smart contract (ERC721/SPL) upon phase completion    |
+| **Proof-of-Vision™ NFTs**                 | Represent innovative project ideas                | Submitted via form → validated by DAO → mintable                     |
 | **Skillchain XP**                          | Tracks user progression through gamified learning | Stored off-chain (localStorage) + optionally on-chain summary NFT    |
 | **\$MFAI Token**                           | Incentive, access, DAO rights                     | Wallet balance drives eligibility to actions (staking, voting, etc.) |
-| **Neuro-Dividends™**                       | Passive income from staking + contribution        | Calculated from staking % + Proof-of-Contribution NFTs               |
+| **Neuro-Dividends™**                      | Passive income from staking + contribution        | Calculated from staking % + Proof-of-Contribution NFTs               |
 
 ---
 
@@ -427,13 +412,13 @@ Ensure that each user journey **is tracked, rewarded and authenticated** via on-
 
 ### Wallet Connection
 
-* Use **Phantom, MetaMask, or WalletConnect** (Solana/EVM compatibility)
-* On connect: check NFT ownership, \$MFAI balance, pass level
+- Use **Phantom, MetaMask, or WalletConnect** (Solana/EVM compatibility)
+- On connect: check NFT ownership, \$MFAI balance, pass level
 
 ```js
 const wallet = await window.solana.connect();
 const nfts = await getUserNFTs(wallet.publicKey);
-const hasGoldPass = nfts.some(nft => nft.name.includes("Gold Pass"));
+const hasGoldPass = nfts.some((nft) => nft.name.includes("Gold Pass"));
 ```
 
 ---
@@ -458,14 +443,13 @@ Each phase can display a **“locked/unlocked”** badge based on real-time wall
 
 2. Zyno or backend AI validates success
 
-3. UI triggers modal: *“Congratulations! Ready to mint your Proof-of-Skill™ NFT?”*
+3. UI triggers modal: _“Congratulations! Ready to mint your Proof-of-Skill™ NFT?”_
 
 4. Smart contract interaction → Mint NFT with metadata:
-
-   * `persona`: student, entrepreneur…
-   * `skill`: "Web3 Wallet Setup"
-   * `score`: 85%
-   * `validated_by`: "Zyno AI v3.5"
+   - `persona`: student, entrepreneur…
+   - `skill`: "Web3 Wallet Setup"
+   - `score`: 85%
+   - `validated_by`: "Zyno AI v3.5"
 
 5. NFT appears in dashboard + on Solana/EVM explorer
 
@@ -485,23 +469,22 @@ Each phase can display a **“locked/unlocked”** badge based on real-time wall
 
 ## 🔐 Security Considerations
 
-* Use **backend validation** before minting NFT (to avoid cheat)
-* NFT metadata must be **immutable** (hosted on IPFS or Arweave)
-* Protect smart contract calls behind **auth & proof-of-completion** gate
-* For airdrops: whitelist wallet on backend once journey reaches Phase 4
+- Use **backend validation** before minting NFT (to avoid cheat)
+- NFT metadata must be **immutable** (hosted on IPFS or Arweave)
+- Protect smart contract calls behind **auth & proof-of-completion** gate
+- For airdrops: whitelist wallet on backend once journey reaches Phase 4
 
 ---
 
 ## 🔁 Token Utility Feedback Loops
 
-| Action                       | Reward                                |
-| ---------------------------- | ------------------------------------- |
-| Complete mission             | \$MFAI + XP                           |
+| Action                       | Reward                                 |
+| ---------------------------- | -------------------------------------- |
+| Complete mission             | \$MFAI + XP                            |
 | Stake \$MFAI                 | Unlock DAO actions + Neuro-Dividends™ |
-| Vote in DAO                  | Reputation NFT + multiplier           |
-| Refer user                   | Bonus NFT or \$MFAI                   |
-| Launch project via Launchpad | DAO-funded grant                      |
-
+| Vote in DAO                  | Reputation NFT + multiplier            |
+| Refer user                   | Bonus NFT or \$MFAI                    |
+| Launch project via Launchpad | DAO-funded grant                       |
 
 # 🧩 SECTION 6 — Finalization & Implementation Plan
 
@@ -513,7 +496,7 @@ Each phase can display a **“locked/unlocked”** badge based on real-time wall
 | ---------------------------- | -------------------- | ----------------------------------------------------------- |
 | **Narrative-first**          | Structure, text, CTA | Users feel like heroes of a quest, not clients of a SaaS    |
 | **Modular Journeys**         | Dev architecture     | Easy to add new personas or quests over time                |
-| **Gamification + Ownership** | Token/NFT system     | Users *earn and own* their progress (on-chain or off-chain) |
+| **Gamification + Ownership** | Token/NFT system     | Users _earn and own_ their progress (on-chain or off-chain) |
 | **AI-assisted UX**           | Zyno logic + chat    | Keeps journeys personal, human, intelligent                 |
 | **Token-Centric Utility**    | \$MFAI actions       | Users understand value at each stage                        |
 
@@ -533,9 +516,9 @@ Each phase can display a **“locked/unlocked”** badge based on real-time wall
 
 ### Smart CTA Behavior:
 
-* **Contextual**: Only shows relevant CTA
-* **Zyno-guided**: Suggests next step dynamically
-* **Progress-based**: CTA changes depending on user’s XP, wallet, pass
+- **Contextual**: Only shows relevant CTA
+- **Zyno-guided**: Suggests next step dynamically
+- **Progress-based**: CTA changes depending on user’s XP, wallet, pass
 
 ---
 
@@ -543,36 +526,36 @@ Each phase can display a **“locked/unlocked”** badge based on real-time wall
 
 ### 🔧 Step 1 — UI/UX Foundation
 
-* [ ] Implement mobile-first layout with component-based architecture
-* [ ] Load journeys from JSON or CMS for modularity
-* [ ] Integrate Framer Motion for transitions
+- [ ] Implement mobile-first layout with component-based architecture
+- [ ] Load journeys from JSON or CMS for modularity
+- [ ] Integrate Framer Motion for transitions
 
 ### 🎨 Step 2 — Frontend Components
 
-* [ ] `<JourneySelector />` — Persona filter
-* [ ] `<JourneyCard />` — Summary card
-* [ ] `<JourneyTimeline />` — 5 phases with status + Zyno
-* [ ] `<NFTInventory />` — Shows NFTs minted/unlocked
-* [ ] `<ProgressXP />` — Gamified XP display
-* [ ] `<CTASection />` — Smart contextual CTAs
+- [ ] `<JourneySelector />` — Persona filter
+- [ ] `<JourneyCard />` — Summary card
+- [ ] `<JourneyTimeline />` — 5 phases with status + Zyno
+- [ ] `<NFTInventory />` — Shows NFTs minted/unlocked
+- [ ] `<ProgressXP />` — Gamified XP display
+- [ ] `<CTASection />` — Smart contextual CTAs
 
 ### 🧠 Step 3 — AI & Logic
 
-* [ ] Zyno Assistant via sidebar/modal
-* [ ] Journey recommendations logic
-* [ ] Quiz & skill-check validation logic (local or via API)
+- [ ] Zyno Assistant via sidebar/modal
+- [ ] Journey recommendations logic
+- [ ] Quiz & skill-check validation logic (local or via API)
 
 ### 🔗 Step 4 — Blockchain / Wallet
 
-* [ ] Wallet connect (Phantom, MetaMask, WalletConnect)
-* [ ] Check for NFT Passes + token balance
-* [ ] Trigger NFT mint (with backend verification)
-* [ ] Handle gated access (e.g. DAO vote = needs NFT + \$MFAI)
+- [ ] Wallet connect (Phantom, MetaMask, WalletConnect)
+- [ ] Check for NFT Passes + token balance
+- [ ] Trigger NFT mint (with backend verification)
+- [ ] Handle gated access (e.g. DAO vote = needs NFT + \$MFAI)
 
 ### 📊 Step 5 — Data Storage
 
-* [ ] Use LocalStorage or Firebase for XP/save state
-* [ ] Backend DB or Moralis/Thirdweb for NFT display
+- [ ] Use LocalStorage or Firebase for XP/save state
+- [ ] Backend DB or Moralis/Thirdweb for NFT display
 
 ---
 
@@ -594,12 +577,9 @@ This “User Journeys” page is more than a UI — it’s the **interactive blu
 
 🔁 Each user must:
 
-* Feel seen (via personas)
-* Be guided (by Zyno)
-* Be rewarded (via tokens, NFTs, roles)
-* Be transformed (via learning, activation, scaling)
+- Feel seen (via personas)
+- Be guided (by Zyno)
+- Be rewarded (via tokens, NFTs, roles)
+- Be transformed (via learning, activation, scaling)
 
 🧠 Let’s make it cognitive, immersive, and unforgettable.
-
-
-

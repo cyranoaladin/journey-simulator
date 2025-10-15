@@ -1,48 +1,56 @@
-import React, { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { X, Award, Download, Share2, ExternalLink, Zap, AlertCircle } from 'lucide-react'
-import { useWallet } from '@solana/wallet-adapter-react'
-import { Certification } from '../types/journey'
-import NFTMintingModal from './NFTMintingModal'
-import { useJourneyStore } from '../store/journeyStore'
-import NFTProofModal from './NFTProofModal'
-import { getProofType } from '../data/proofsData'
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  X,
+  Award,
+  Download,
+  Share2,
+  ExternalLink,
+  Zap,
+  AlertCircle,
+} from "lucide-react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { Certification } from "../types/journey";
+import NFTMintingModal from "./NFTMintingModal";
+import { useJourneyStore } from "../store/journeyStore";
+import NFTProofModal from "./NFTProofModal";
+import { getProofType } from "../data/proofsData";
 // import { api } from '../utils/api' // Will be used when backend is ready
 
 interface CertificationModalProps {
-  certification: Certification
-  onClose: () => void
+  certification: Certification;
+  onClose: () => void;
 }
 
 const CertificationModal: React.FC<CertificationModalProps> = ({
   certification,
-  onClose
+  onClose,
 }) => {
-  const { connected } = useWallet()
-  const { selectedPersona, loadUserProgress } = useJourneyStore()
-  const [showMinting, setShowMinting] = useState(false)
-  const [mintedAddress, setMintedAddress] = useState<string | null>(null)
-  const [showProofModal, setShowProofModal] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { connected } = useWallet();
+  const { selectedPersona, loadUserProgress } = useJourneyStore();
+  const [showMinting, setShowMinting] = useState(false);
+  const [mintedAddress, setMintedAddress] = useState<string | null>(null);
+  const [showProofModal, setShowProofModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Extract phase number from certification ID
   const getPhaseNumber = () => {
     if (!certification.id) return 1;
-    
+
     // Try to extract phase number from ID
     const matches = certification.id.match(/phase-(\d+)/);
     if (matches && matches[1]) {
       return parseInt(matches[1], 10);
     }
-    
+
     // Fallback: check if ID contains phase names
-    if (certification.id.includes('learn')) return 1;
-    if (certification.id.includes('build')) return 2;
-    if (certification.id.includes('prove')) return 3;
-    if (certification.id.includes('activate')) return 4;
-    if (certification.id.includes('scale')) return 5;
-    
+    if (certification.id.includes("learn")) return 1;
+    if (certification.id.includes("build")) return 2;
+    if (certification.id.includes("prove")) return 3;
+    if (certification.id.includes("activate")) return 4;
+    if (certification.id.includes("scale")) return 5;
+
     return 1;
   };
 
@@ -51,83 +59,86 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
   // Handle certification download with backend tracking
   const handleDownload = async () => {
     try {
-      setIsLoading(true)
-      setError(null)
-      
+      setIsLoading(true);
+      setError(null);
+
       // Track download in backend (simulated for now)
-      console.log('Tracking certification download:', {
+      console.log("Tracking certification download:", {
         certification_id: certification.id,
         phase: phaseNumber,
         user_persona: selectedPersona?.id,
-        download_timestamp: new Date().toISOString()
-      })
-      
+        download_timestamp: new Date().toISOString(),
+      });
+
       // Simulate download
-      const link = document.createElement('a')
-      link.href = certification.imageUrl || '#'
-      link.download = `${certification.name}_certification.png`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      
+      const link = document.createElement("a");
+      link.href = certification.imageUrl || "#";
+      link.download = `${certification.name}_certification.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (err) {
-      console.error('Failed to track download:', err)
-      setError('Failed to track download. Please try again.')
+      console.error("Failed to track download:", err);
+      setError("Failed to track download. Please try again.");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   // Handle certification sharing with backend tracking
   const handleShare = async (platform: string) => {
     try {
-      setIsLoading(true)
-      setError(null)
-      
+      setIsLoading(true);
+      setError(null);
+
       // Track share in backend (simulated for now)
-      console.log('Tracking certification share:', {
+      console.log("Tracking certification share:", {
         certification_id: certification.id,
         platform: platform,
         phase: phaseNumber,
         user_persona: selectedPersona?.id,
-        share_timestamp: new Date().toISOString()
-      })
-      
+        share_timestamp: new Date().toISOString(),
+      });
+
       // Simulate sharing
-      const shareUrl = `https://mfai.app/certification/${certification.id}`
-      const shareText = `I just earned my ${certification.name} certification! 🎉 #MFAI #ProofOfSkill`
-      
-      if (platform === 'twitter') {
-        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank')
-      } else if (platform === 'linkedin') {
-        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank')
+      const shareUrl = `https://mfai.app/certification/${certification.id}`;
+      const shareText = `I just earned my ${certification.name} certification! 🎉 #MFAI #ProofOfSkill`;
+
+      if (platform === "twitter") {
+        window.open(
+          `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
+          "_blank",
+        );
+      } else if (platform === "linkedin") {
+        window.open(
+          `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+          "_blank",
+        );
       }
-      
     } catch (err) {
-      console.error('Failed to track share:', err)
-      setError('Failed to track share. Please try again.')
+      console.error("Failed to track share:", err);
+      setError("Failed to track share. Please try again.");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   // Handle NFT minting completion
   const handleMintedNFT = async (mintAddress: string) => {
     try {
-      setMintedAddress(mintAddress)
-      setShowMinting(false)
-      
+      setMintedAddress(mintAddress);
+      setShowMinting(false);
+
       // Reload user progress to get updated NFT count
-      await loadUserProgress()
-      
+      await loadUserProgress();
     } catch (err) {
-      console.error('Failed to reload progress after minting:', err)
+      console.error("Failed to reload progress after minting:", err);
     }
-  }
+  };
 
   // Get proof type based on persona and certification
   const getProofTypeForCert = () => {
-    if (!selectedPersona) return 'Skill';
+    if (!selectedPersona) return "Skill";
     return getProofType(selectedPersona.id, certification.id);
   };
 
@@ -135,77 +146,81 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
 
   // Get persona-specific styling
   const getPersonaStyle = () => {
-    if (!selectedPersona) return {}
-    
+    if (!selectedPersona) return {};
+
     switch (selectedPersona.id) {
-      case 'investor':
+      case "investor":
         return {
-          bgGradient: 'from-green-400 to-gold-500',
-          iconBg: 'bg-gold-500',
-          textColor: 'text-gold-500'
-        }
-      case 'web3-developer':
+          bgGradient: "from-green-400 to-gold-500",
+          iconBg: "bg-gold-500",
+          textColor: "text-gold-500",
+        };
+      case "web3-developer":
         return {
-          bgGradient: 'from-purple-400 to-pink-500',
-          iconBg: 'bg-purple-500',
-          textColor: 'text-purple-500'
-        }
-      case 'content-creator':
+          bgGradient: "from-purple-400 to-pink-500",
+          iconBg: "bg-purple-500",
+          textColor: "text-purple-500",
+        };
+      case "content-creator":
         return {
-          bgGradient: 'from-pink-400 to-purple-500',
-          iconBg: 'bg-pink-500',
-          textColor: 'text-pink-500'
-        }
-      case 'community-communicator':
+          bgGradient: "from-pink-400 to-purple-500",
+          iconBg: "bg-pink-500",
+          textColor: "text-pink-500",
+        };
+      case "community-communicator":
         return {
-          bgGradient: 'from-orange-400 to-red-500',
-          iconBg: 'bg-orange-500',
-          textColor: 'text-orange-500'
-        }
-      case 'project-manager':
+          bgGradient: "from-orange-400 to-red-500",
+          iconBg: "bg-orange-500",
+          textColor: "text-orange-500",
+        };
+      case "project-manager":
         return {
-          bgGradient: 'from-indigo-400 to-blue-500',
-          iconBg: 'bg-indigo-500',
-          textColor: 'text-indigo-500'
-        }
-      case 'defi-explorer':
+          bgGradient: "from-indigo-400 to-blue-500",
+          iconBg: "bg-indigo-500",
+          textColor: "text-indigo-500",
+        };
+      case "defi-explorer":
         return {
-          bgGradient: 'from-cyan-400 to-blue-500',
-          iconBg: 'bg-cyan-500',
-          textColor: 'text-cyan-500'
-        }
-      case 'nft-creator':
+          bgGradient: "from-cyan-400 to-blue-500",
+          iconBg: "bg-cyan-500",
+          textColor: "text-cyan-500",
+        };
+      case "nft-creator":
         return {
-          bgGradient: 'from-pink-400 to-orange-500',
-          iconBg: 'bg-pink-500',
-          textColor: 'text-pink-500'
-        }
+          bgGradient: "from-pink-400 to-orange-500",
+          iconBg: "bg-pink-500",
+          textColor: "text-pink-500",
+        };
       default:
         return {
-          bgGradient: 'from-blue-400 to-cyan-500',
-          iconBg: 'bg-blue-500',
-          textColor: 'text-blue-500'
-        }
+          bgGradient: "from-blue-400 to-cyan-500",
+          iconBg: "bg-blue-500",
+          textColor: "text-blue-500",
+        };
     }
-  }
+  };
 
-  const personaStyle = getPersonaStyle()
+  const personaStyle = getPersonaStyle();
 
   const handleMinted = (address: string) => {
-    setMintedAddress(address)
-    setShowMinting(false)
-  }
+    setMintedAddress(address);
+    setShowMinting(false);
+  };
 
   // Extract XP value from attributes
   const getXpValue = () => {
-    const xpAttribute = certification.attributes.find(attr => attr.trait_type === 'XP Earned');
+    const xpAttribute = certification.attributes.find(
+      (attr) => attr.trait_type === "XP Earned",
+    );
     return xpAttribute ? Number(xpAttribute.value) : 0;
   };
 
   // Extract phase from attributes
   const getPhaseValue = () => {
-    const phaseAttribute = certification.attributes.find(attr => attr.trait_type === 'Phase');
-    return phaseAttribute ? String(phaseAttribute.value) : '';
+    const phaseAttribute = certification.attributes.find(
+      (attr) => attr.trait_type === "Phase",
+    );
+    return phaseAttribute ? String(phaseAttribute.value) : "";
   };
 
   return (
@@ -246,7 +261,9 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
             >
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-space font-bold">Certification NFT</h2>
+                <h2 className="text-xl font-space font-bold">
+                  Certification NFT
+                </h2>
                 <button
                   onClick={onClose}
                   className="p-2 rounded-lg hover:bg-white/10 transition-colors"
@@ -256,39 +273,49 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
               </div>
 
               {/* NFT Card */}
-              <div className={`relative border-2 rounded-xl p-4 mb-6 bg-gradient-to-br ${personaStyle.bgGradient} shadow-lg`}>
+              <div
+                className={`relative border-2 rounded-xl p-4 mb-6 bg-gradient-to-br ${personaStyle.bgGradient} shadow-lg`}
+              >
                 {/* Persona Badge */}
                 <div className="absolute top-2 right-2">
                   <span className="px-2 py-1 rounded-full text-xs font-semibold bg-black/50 text-white capitalize">
-                    {selectedPersona?.title || 'Certification'}
+                    {selectedPersona?.title || "Certification"}
                   </span>
                 </div>
 
                 {/* NFT Image */}
                 <div className="w-full h-48 bg-black/20 rounded-lg mb-4 flex items-center justify-center">
                   {certification.imageUrl ? (
-                    <img 
-                      src={certification.imageUrl} 
-                      alt={certification.name} 
+                    <img
+                      src={certification.imageUrl}
+                      alt={certification.name}
                       className="w-full h-full object-cover rounded-lg"
                     />
                   ) : (
-                    <div className={`w-16 h-16 ${personaStyle.iconBg} rounded-full flex items-center justify-center`}>
+                    <div
+                      className={`w-16 h-16 ${personaStyle.iconBg} rounded-full flex items-center justify-center`}
+                    >
                       <Award size={32} className="text-white" />
                     </div>
                   )}
                 </div>
 
                 {/* NFT Info */}
-                <h3 className="font-space font-bold text-white mb-2">{certification.name}</h3>
-                <p className="text-white/80 text-sm mb-4">{certification.description}</p>
+                <h3 className="font-space font-bold text-white mb-2">
+                  {certification.name}
+                </h3>
+                <p className="text-white/80 text-sm mb-4">
+                  {certification.description}
+                </p>
 
                 {/* Attributes */}
                 <div className="space-y-2">
                   {certification.attributes.map((attr, index) => (
                     <div key={index} className="flex justify-between text-sm">
                       <span className="text-white/70">{attr.trait_type}:</span>
-                      <span className="text-white font-semibold">{attr.value}</span>
+                      <span className="text-white font-semibold">
+                        {attr.value}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -297,7 +324,9 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
               {/* Minting Status */}
               {mintedAddress && (
                 <div className="mb-6 bg-green-500/20 border border-green-500/30 rounded-lg p-3">
-                  <h4 className="font-semibold text-green-400 mb-2">NFT Minted!</h4>
+                  <h4 className="font-semibold text-green-400 mb-2">
+                    NFT Minted!
+                  </h4>
                   <div className="text-xs">
                     <div className="opacity-70 mb-1">Address:</div>
                     <div className="font-mono break-all">{mintedAddress}</div>
@@ -325,18 +354,22 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
                   className="flex flex-col items-center space-y-1 p-3 rounded-lg bg-white/10 hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Download size={20} />
-                  <span className="text-xs">{isLoading ? 'Downloading...' : 'Download'}</span>
+                  <span className="text-xs">
+                    {isLoading ? "Downloading..." : "Download"}
+                  </span>
                 </motion.button>
 
                 <motion.button
                   whileHover={{ scale: isLoading ? 1 : 1.02 }}
                   whileTap={{ scale: isLoading ? 1 : 0.98 }}
-                  onClick={() => handleShare('twitter')}
+                  onClick={() => handleShare("twitter")}
                   disabled={isLoading}
                   className="flex flex-col items-center space-y-1 p-3 rounded-lg bg-white/10 hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Share2 size={20} />
-                  <span className="text-xs">{isLoading ? 'Sharing...' : 'Share'}</span>
+                  <span className="text-xs">
+                    {isLoading ? "Sharing..." : "Share"}
+                  </span>
                 </motion.button>
 
                 <motion.button
@@ -344,7 +377,10 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
                   whileTap={{ scale: 0.98 }}
                   onClick={() => {
                     if (mintedAddress) {
-                      window.open(`https://explorer.solana.com/address/${mintedAddress}?cluster=testnet`, '_blank')
+                      window.open(
+                        `https://explorer.solana.com/address/${mintedAddress}?cluster=testnet`,
+                        "_blank",
+                      );
                     }
                   }}
                   disabled={!mintedAddress}
@@ -365,7 +401,11 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
                   className={`w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 bg-gradient-to-r ${personaStyle.bgGradient} text-white disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   <Zap size={16} />
-                  <span>{connected ? `Mint Proof-of-${proofType}™ NFT` : 'Connect Wallet to Mint'}</span>
+                  <span>
+                    {connected
+                      ? `Mint Proof-of-${proofType}™ NFT`
+                      : "Connect Wallet to Mint"}
+                  </span>
                 </motion.button>
               )}
 
@@ -373,7 +413,9 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
               <div className="mt-4 p-3 bg-white/5 rounded-lg">
                 <div className="flex justify-between text-xs">
                   <span className="opacity-70">Token ID:</span>
-                  <span className="font-mono">#{Math.random().toString(36).substr(2, 8).toUpperCase()}</span>
+                  <span className="font-mono">
+                    #{Math.random().toString(36).substr(2, 8).toUpperCase()}
+                  </span>
                 </div>
                 <div className="flex justify-between text-xs mt-1">
                   <span className="opacity-70">Blockchain:</span>
@@ -402,7 +444,7 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
         )}
       </AnimatePresence>
     </>
-  )
-}
+  );
+};
 
-export default CertificationModal
+export default CertificationModal;

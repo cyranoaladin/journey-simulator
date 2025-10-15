@@ -149,7 +149,7 @@ interface JourneyTimelineProps {
 
 ```tsx
 interface PhaseSectionProps {
-  phase: 'Learn' | 'Build' | 'Prove' | 'Activate' | 'Scale';
+  phase: "Learn" | "Build" | "Prove" | "Activate" | "Scale";
   description: string;
   mission: string;
   nftReward?: string;
@@ -282,7 +282,7 @@ export const journeys = [
 
 ```ts
 const userPersona = getUserPersona();
-const journey = journeys.find(j => j.persona === userPersona);
+const journey = journeys.find((j) => j.persona === userPersona);
 ```
 
 ### 🔹 Chargement dans composants :
@@ -326,7 +326,6 @@ const useUserState = create<UserState & Actions>((set, get) => ({
 ## 🔁 4. Persistant entre sessions
 
 - Utiliser `localStorage` ou `IndexedDB` pour stocker :
-
   - XP
   - Phase atteinte
   - Persona choisie
@@ -353,7 +352,6 @@ if (locked && !userState.nfts.includes("Proof-of-Skill™")) {
 
 - Passage vers CMS type Sanity ou Notion API
 - Configuration stockée sous forme de modèles :
-
   - `personaTemplate.json`
   - `phaseTemplate.json`
 
@@ -383,13 +381,13 @@ Permettre à la page `User Journeys` :
 ### 🔁 Exemples d’intégration
 
 ```tsx
-import { useAccount } from 'wagmi';
+import { useAccount } from "wagmi";
 
 const { address, isConnected } = useAccount();
 ```
 
 ```tsx
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useWallet } from "@solana/wallet-adapter-react";
 
 const { publicKey, connected } = useWallet();
 ```
@@ -405,7 +403,7 @@ const { publicKey, connected } = useWallet();
 
 ```ts
 const userNFTs = await getUserNFTs(walletAddress);
-const hasPass = userNFTs.some(nft => nft.name.includes('Gold Pass'));
+const hasPass = userNFTs.some((nft) => nft.name.includes("Gold Pass"));
 ```
 
 ---
@@ -413,7 +411,7 @@ const hasPass = userNFTs.some(nft => nft.name.includes('Gold Pass'));
 ## 🪙 3. Vérification du token \$MFAI
 
 ```ts
-const balance = await getTokenBalance(address, '$MFAI');
+const balance = await getTokenBalance(address, "$MFAI");
 const eligible = balance > 100;
 ```
 
@@ -431,7 +429,8 @@ const eligible = balance > 100;
 | **Scale**    | DAO role / Platinum Pass    |
 
 ```tsx
-if (!hasPass && phase === 'Build') return <LockedOverlay reason="Gold Pass required" />;
+if (!hasPass && phase === "Build")
+  return <LockedOverlay reason="Gold Pass required" />;
 ```
 
 ---
@@ -441,9 +440,9 @@ if (!hasPass && phase === 'Build') return <LockedOverlay reason="Gold Pass requi
 ```ts
 const mintNFT = async () => {
   const metadata = {
-    name: 'Proof-of-Skill: Web3 Basics',
-    image: '/nfts/web3_basic.png',
-    attributes: [{ trait_type: 'XP', value: 75 }],
+    name: "Proof-of-Skill: Web3 Basics",
+    image: "/nfts/web3_basic.png",
+    attributes: [{ trait_type: "XP", value: 75 }],
   };
 
   await thirdweb.mintTo(walletAddress, metadata);
@@ -511,7 +510,10 @@ Créer une interface :
 ### 🔧 Implémentation (simplifiée)
 
 ```tsx
-<ZynoBox context={`phase:${currentPhase}`} onPrompt={msg => sendToZynoAI(msg)} />
+<ZynoBox
+  context={`phase:${currentPhase}`}
+  onPrompt={(msg) => sendToZynoAI(msg)}
+/>
 ```
 
 Backend suggestion : `LangChain` avec vecteurs (OpenAI, Cohere, Zyno RAG)
@@ -536,11 +538,11 @@ Backend suggestion : `LangChain` avec vecteurs (OpenAI, Cohere, Zyno RAG)
 
 ```ts
 const getCTA = () => {
-  if (!walletConnected) return 'Connect your wallet';
-  if (!hasNFT) return 'Mint Proof-of-Skill™';
-  if (currentPhase === 'Learn') return 'Start Learning';
-  if (currentPhase === 'Prove') return 'Take the Quiz';
-  return 'Ask Zyno for Guidance';
+  if (!walletConnected) return "Connect your wallet";
+  if (!hasNFT) return "Mint Proof-of-Skill™";
+  if (currentPhase === "Learn") return "Start Learning";
+  if (currentPhase === "Prove") return "Take the Quiz";
+  return "Ask Zyno for Guidance";
 };
 ```
 
@@ -640,7 +642,6 @@ const getCTA = () => {
 
 - Réaliser des tests avec profils variés (builder, investisseur, curieux…)
 - Prendre en compte :
-
   - Accessibilité (ARIA)
   - Latence Web3
   - Adaptabilité des CTA

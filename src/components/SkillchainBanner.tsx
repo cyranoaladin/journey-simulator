@@ -1,16 +1,16 @@
-import React from 'react'
-import { motion } from 'framer-motion'
-import { Ticket as Pickaxe, Coins, Info } from 'lucide-react'
-import { useJourneyStore } from '../store/journeyStore'
-import { useWallet } from '@solana/wallet-adapter-react'
-import WalletFaucetButton from './WalletFaucetButton'
+import React from "react";
+import { motion } from "framer-motion";
+import { Ticket as Pickaxe, Coins, Info } from "lucide-react";
+import { useJourneyStore } from "../store/journeyStore";
+// import { useWallet } from '@solana/wallet-adapter-react'
+import WalletFaucetButton from "./WalletFaucetButton";
 
 const SkillchainBanner = () => {
-  const { userProgress, completeMission } = useJourneyStore()
-  const { connected } = useWallet()
-  
+  const { userProgress, completeMission } = useJourneyStore();
+  const connected = false;
+
   // Calculate progress based on completed phases
-  const progress = Math.min((userProgress.totalXP / 500) * 100, 100)
+  const progress = Math.min((userProgress.totalXP / 500) * 100, 100);
 
   return (
     <motion.div
@@ -32,17 +32,20 @@ const SkillchainBanner = () => {
               <span className="font-space font-semibold">
                 Skillchain Mining™
               </span>
-              
+
               {/* Tooltip */}
               <div className="absolute bottom-full left-0 mb-2 w-64 p-2 bg-primary-900 border border-white/20 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                 <div className="text-xs">
                   <p className="font-semibold mb-1">Skillchain Mining™</p>
-                  <p className="opacity-80">XP gained through the Cognitive Activation Protocol™ that transforms your skills into digital capital.</p>
+                  <p className="opacity-80">
+                    XP gained through the Cognitive Activation Protocol™ that
+                    transforms your skills into digital capital.
+                  </p>
                 </div>
                 <div className="absolute bottom-0 left-4 transform translate-y-1/2 rotate-45 w-2 h-2 bg-primary-900 border-r border-b border-white/20"></div>
               </div>
             </div>
-            
+
             <div className="hidden sm:flex items-center space-x-2">
               <div className="w-32 h-2 bg-white/20 rounded-full overflow-hidden">
                 <motion.div
@@ -52,7 +55,9 @@ const SkillchainBanner = () => {
                   className="h-full bg-gradient-primary"
                 />
               </div>
-              <span className="text-xs opacity-80">{Math.round(progress)}%</span>
+              <span className="text-xs opacity-80">
+                {Math.round(progress)}%
+              </span>
             </div>
           </div>
 
@@ -63,9 +68,9 @@ const SkillchainBanner = () => {
                 {userProgress.mfaiTokens.toFixed(1)} $MFAI
               </span>
             </div>
-            
+
             {connected && <WalletFaucetButton />}
-            
+
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -78,7 +83,7 @@ const SkillchainBanner = () => {
         </div>
       </div>
     </motion.div>
-  )
-}
+  );
+};
 
-export default SkillchainBanner
+export default SkillchainBanner;

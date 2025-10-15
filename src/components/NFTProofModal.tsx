@@ -1,30 +1,39 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Award, 
-  Download, 
-  Share2, 
-  ExternalLink, 
-  Copy, 
-  CheckCircle, 
-  X, 
-  Loader, 
-  Zap, 
+import React, { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Award,
+  Download,
+  Share2,
+  ExternalLink,
+  Copy,
+  CheckCircle,
+  X,
+  Loader,
+  Zap,
   Trophy,
   Twitter,
   Linkedin,
   MessageSquare,
   Wallet,
-  ArrowUp
-} from 'lucide-react';
-import { useWallet, useConnection } from '@solana/wallet-adapter-react';
-import { useJourneyStore } from '../store/journeyStore';
-import * as htmlToImage from 'html-to-image';
-import { saveAs } from 'file-saver';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+  ArrowUp,
+} from "lucide-react";
+// import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+const ENABLE_WALLET = (import.meta as any).env?.VITE_ENABLE_WALLET === "1";
+import { useJourneyStore } from "../store/journeyStore";
+import * as htmlToImage from "html-to-image";
+import { saveAs } from "file-saver";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 interface NFTProofModalProps {
-  proofType: 'Skill' | 'Vision' | 'Yield' | 'Build' | 'Creation' | 'Orchestration' | 'Design' | 'Invest';
+  proofType:
+    | "Skill"
+    | "Vision"
+    | "Yield"
+    | "Build"
+    | "Creation"
+    | "Orchestration"
+    | "Design"
+    | "Invest";
   title: string;
   description: string;
   imageUrl?: string;
@@ -32,7 +41,7 @@ interface NFTProofModalProps {
   phase: string;
   phaseNumber: number;
   completionDate?: string;
-  rarity?: 'common' | 'rare' | 'epic' | 'legendary';
+  rarity?: "common" | "rare" | "epic" | "legendary";
   onClose: () => void;
   onViewSkillchain?: () => void;
 }
@@ -46,12 +55,14 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
   phase,
   phaseNumber,
   completionDate = new Date().toLocaleDateString(),
-  rarity = 'rare',
+  rarity = "rare",
   onClose,
-  onViewSkillchain
+  onViewSkillchain,
 }) => {
-  const { publicKey, connected, connecting } = useWallet();
-  const { connection } = useConnection();
+  const publicKey = null as any;
+  const connected = false;
+  const connecting = false;
+  const connection = null as any;
   const { selectedPersona, mintNFT } = useJourneyStore();
   const [isMinting, setIsMinting] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -65,12 +76,12 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
   const [isDownloading, setIsDownloading] = useState(false);
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
   const [scrollPosition, setScrollPosition] = useState(0);
-  
+
   // Ref for the NFT card to capture for download
   const nftCardRef = useRef<HTMLDivElement>(null);
   // Ref for the modal content for scrolling
   const modalContentRef = useRef<HTMLDivElement>(null);
-  
+
   // Track scroll position for "back to top" button
   const handleScroll = () => {
     if (modalContentRef.current) {
@@ -81,11 +92,11 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
   useEffect(() => {
     const currentRef = modalContentRef.current;
     if (currentRef) {
-      currentRef.addEventListener('scroll', handleScroll);
-      return () => currentRef.removeEventListener('scroll', handleScroll);
+      currentRef.addEventListener("scroll", handleScroll);
+      return () => currentRef.removeEventListener("scroll", handleScroll);
     }
   }, []);
-  
+
   // Set a timeout to prevent infinite loading
   useEffect(() => {
     if (!imageLoaded && !imageError && imageUrl) {
@@ -94,7 +105,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
           setImageError(true);
         }
       }, 3000);
-      
+
       return () => clearTimeout(timer);
     }
   }, [imageLoaded, imageError, imageUrl]);
@@ -107,7 +118,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
           const balance = await connection.getBalance(publicKey);
           setWalletBalance(balance / 1000000000); // Convert lamports to SOL
         } catch (err) {
-          console.error('Error fetching balance:', err);
+          console.error("Error fetching balance:", err);
           setWalletBalance(null);
         }
       }
@@ -119,63 +130,63 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
   // Get persona-specific styling
   const getPersonaStyle = () => {
     if (!selectedPersona) return {};
-    
+
     switch (selectedPersona.id) {
-      case 'investor':
+      case "investor":
         return {
-          bgGradient: 'from-green-400 to-gold-500',
-          iconBg: 'bg-gold-500',
-          textColor: 'text-gold-500',
-          borderColor: 'border-gold-500'
+          bgGradient: "from-green-400 to-gold-500",
+          iconBg: "bg-gold-500",
+          textColor: "text-gold-500",
+          borderColor: "border-gold-500",
         };
-      case 'web3-developer':
+      case "web3-developer":
         return {
-          bgGradient: 'from-purple-400 to-pink-500',
-          iconBg: 'bg-purple-500',
-          textColor: 'text-purple-500',
-          borderColor: 'border-purple-500'
+          bgGradient: "from-purple-400 to-pink-500",
+          iconBg: "bg-purple-500",
+          textColor: "text-purple-500",
+          borderColor: "border-purple-500",
         };
-      case 'content-creator':
+      case "content-creator":
         return {
-          bgGradient: 'from-pink-400 to-purple-500',
-          iconBg: 'bg-pink-500',
-          textColor: 'text-pink-500',
-          borderColor: 'border-pink-500'
+          bgGradient: "from-pink-400 to-purple-500",
+          iconBg: "bg-pink-500",
+          textColor: "text-pink-500",
+          borderColor: "border-pink-500",
         };
-      case 'community-communicator':
+      case "community-communicator":
         return {
-          bgGradient: 'from-orange-400 to-red-500',
-          iconBg: 'bg-orange-500',
-          textColor: 'text-orange-500',
-          borderColor: 'border-orange-500'
+          bgGradient: "from-orange-400 to-red-500",
+          iconBg: "bg-orange-500",
+          textColor: "text-orange-500",
+          borderColor: "border-orange-500",
         };
-      case 'project-manager':
+      case "project-manager":
         return {
-          bgGradient: 'from-indigo-400 to-blue-500',
-          iconBg: 'bg-indigo-500',
-          textColor: 'text-indigo-500',
-          borderColor: 'border-indigo-500'
+          bgGradient: "from-indigo-400 to-blue-500",
+          iconBg: "bg-indigo-500",
+          textColor: "text-indigo-500",
+          borderColor: "border-indigo-500",
         };
-      case 'defi-explorer':
+      case "defi-explorer":
         return {
-          bgGradient: 'from-cyan-400 to-blue-500',
-          iconBg: 'bg-cyan-500',
-          textColor: 'text-cyan-500',
-          borderColor: 'border-cyan-500'
+          bgGradient: "from-cyan-400 to-blue-500",
+          iconBg: "bg-cyan-500",
+          textColor: "text-cyan-500",
+          borderColor: "border-cyan-500",
         };
-      case 'nft-creator':
+      case "nft-creator":
         return {
-          bgGradient: 'from-pink-400 to-orange-500',
-          iconBg: 'bg-pink-500',
-          textColor: 'text-pink-500',
-          borderColor: 'border-pink-500'
+          bgGradient: "from-pink-400 to-orange-500",
+          iconBg: "bg-pink-500",
+          textColor: "text-pink-500",
+          borderColor: "border-pink-500",
         };
       default:
         return {
-          bgGradient: 'from-blue-400 to-cyan-500',
-          iconBg: 'bg-blue-500',
-          textColor: 'text-blue-500',
-          borderColor: 'border-blue-500'
+          bgGradient: "from-blue-400 to-cyan-500",
+          iconBg: "bg-blue-500",
+          textColor: "text-blue-500",
+          borderColor: "border-blue-500",
         };
     }
   };
@@ -186,33 +197,33 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
   // Get rarity styling
   const getRarityStyle = (rarity: string) => {
     switch (rarity) {
-      case 'legendary':
+      case "legendary":
         return {
-          gradient: 'from-yellow-400 to-orange-500',
-          border: 'border-yellow-400',
-          shadow: 'shadow-yellow-400/30',
-          text: 'text-yellow-400'
+          gradient: "from-yellow-400 to-orange-500",
+          border: "border-yellow-400",
+          shadow: "shadow-yellow-400/30",
+          text: "text-yellow-400",
         };
-      case 'epic':
+      case "epic":
         return {
-          gradient: 'from-purple-400 to-pink-500',
-          border: 'border-purple-400',
-          shadow: 'shadow-purple-400/30',
-          text: 'text-purple-400'
+          gradient: "from-purple-400 to-pink-500",
+          border: "border-purple-400",
+          shadow: "shadow-purple-400/30",
+          text: "text-purple-400",
         };
-      case 'rare':
+      case "rare":
         return {
-          gradient: 'from-blue-400 to-cyan-500',
-          border: 'border-blue-400',
-          shadow: 'shadow-blue-400/30',
-          text: 'text-blue-400'
+          gradient: "from-blue-400 to-cyan-500",
+          border: "border-blue-400",
+          shadow: "shadow-blue-400/30",
+          text: "text-blue-400",
         };
       default:
         return {
-          gradient: 'from-gray-400 to-gray-600',
-          border: 'border-gray-400',
-          shadow: 'shadow-gray-400/30',
-          text: 'text-gray-400'
+          gradient: "from-gray-400 to-gray-600",
+          border: "border-gray-400",
+          shadow: "shadow-gray-400/30",
+          text: "text-gray-400",
         };
     }
   };
@@ -222,15 +233,24 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
   // Get proof type icon
   const getProofTypeIcon = () => {
     switch (proofType) {
-      case 'Skill': return <Award size={24} />;
-      case 'Vision': return <Zap size={24} />;
-      case 'Yield': return <Trophy size={24} />;
-      case 'Build': return <Award size={24} />;
-      case 'Creation': return <Award size={24} />;
-      case 'Orchestration': return <Award size={24} />;
-      case 'Design': return <Award size={24} />;
-      case 'Invest': return <Award size={24} />;
-      default: return <Award size={24} />;
+      case "Skill":
+        return <Award size={24} />;
+      case "Vision":
+        return <Zap size={24} />;
+      case "Yield":
+        return <Trophy size={24} />;
+      case "Build":
+        return <Award size={24} />;
+      case "Creation":
+        return <Award size={24} />;
+      case "Orchestration":
+        return <Award size={24} />;
+      case "Design":
+        return <Award size={24} />;
+      case "Invest":
+        return <Award size={24} />;
+      default:
+        return <Award size={24} />;
     }
   };
 
@@ -244,31 +264,30 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
   // Handle minting
   const handleMint = async () => {
     if (!connected || !publicKey) {
-      setError('Wallet not connected');
+      setError("Wallet not connected");
       return;
     }
-    
+
     setIsMinting(true);
     setError(null);
-    
+
     try {
       // Simulate minting steps
       for (let step = 1; step <= totalSteps; step++) {
         setCurrentStep(step);
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
-      
+
       // Call actual mint function
       const mintAddress = await mintNFT(title);
       setMintedAddress(mintAddress);
-      
+
       // Set explorer URL
       const url = `https://explorer.solana.com/address/${mintAddress}?cluster=testnet`;
       setExplorerUrl(url);
-      
     } catch (err: any) {
-      console.error('Error minting NFT:', err);
-      setError(err?.message || 'Failed to mint NFT. Please try again.');
+      console.error("Error minting NFT:", err);
+      setError(err?.message || "Failed to mint NFT. Please try again.");
     } finally {
       setIsMinting(false);
     }
@@ -277,11 +296,16 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
   // Get minting step text
   const getMintingStepText = () => {
     switch (currentStep) {
-      case 1: return 'Preparing metadata...';
-      case 2: return 'Connecting to Solana testnet...';
-      case 3: return 'Creating on-chain token...';
-      case 4: return `Finalizing Proof-of-${proofType}™ NFT...`;
-      default: return 'Processing...';
+      case 1:
+        return "Preparing metadata...";
+      case 2:
+        return "Connecting to Solana testnet...";
+      case 3:
+        return "Creating on-chain token...";
+      case 4:
+        return `Finalizing Proof-of-${proofType}™ NFT...`;
+      default:
+        return "Processing...";
     }
   };
 
@@ -295,7 +319,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
   // Copy explorer URL
   const copyExplorerUrl = async () => {
     if (!explorerUrl) return;
-    
+
     await navigator.clipboard.writeText(explorerUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -304,44 +328,48 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
   // Download NFT image
   const downloadImage = async () => {
     if (!nftCardRef.current) return;
-    
+
     setIsDownloading(true);
-    
+
     try {
       // Add watermark text
       const dataUrl = await htmlToImage.toPng(nftCardRef.current, {
         quality: 0.95,
-        backgroundColor: '#000000',
+        backgroundColor: "#000000",
         canvasWidth: nftCardRef.current.offsetWidth * 2,
         canvasHeight: nftCardRef.current.offsetHeight * 2,
         pixelRatio: 2,
-        skipFonts: true // Skip external fonts to avoid CORS issues
+        skipFonts: true, // Skip external fonts to avoid CORS issues
       });
-      
+
       // Create a canvas to add watermark
-      const canvas = document.createElement('canvas');
+      const canvas = document.createElement("canvas");
       const img = new Image();
-      
+
       img.onload = () => {
         canvas.width = img.width;
         canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        
+        const ctx = canvas.getContext("2d");
+
         if (!ctx) {
           saveAs(dataUrl, `Proof-of-${proofType}-${title}.png`);
           setIsDownloading(false);
           return;
         }
-        
+
         // Draw the image
         ctx.drawImage(img, 0, 0);
-        
+
         // Add watermark
-        ctx.font = 'bold 24px Arial';
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-        ctx.textAlign = 'center';
-        ctx.fillText(`Money Factory AI - Proof-of-${proofType}™`, canvas.width / 2, canvas.height - 30);
-        
+        ctx.font = "bold 24px Arial";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+        ctx.textAlign = "center";
+        ctx.fillText(
+          `Money Factory AI - Proof-of-${proofType}™`,
+          canvas.width / 2,
+          canvas.height - 30,
+        );
+
         // Convert to blob and save
         canvas.toBlob((blob) => {
           if (blob) {
@@ -352,44 +380,44 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
           setIsDownloading(false);
         });
       };
-      
+
       img.onerror = () => {
         saveAs(dataUrl, `Proof-of-${proofType}-${title}.png`);
         setIsDownloading(false);
       };
-      
+
       img.src = dataUrl;
     } catch (error) {
-      console.error('Error downloading image:', error);
+      console.error("Error downloading image:", error);
       setIsDownloading(false);
     }
   };
 
   // Share NFT
-  const shareNFT = (platform: 'twitter' | 'linkedin' | 'discord') => {
+  const shareNFT = (platform: "twitter" | "linkedin" | "discord") => {
     const text = `I just earned my Proof-of-${proofType}™ NFT "${title}" on Money Factory AI! #MoneyFactoryAI #ProofEconomy`;
-    const url = explorerUrl || 'https://moneyfactory.ai';
-    
-    let shareUrl = '';
-    
+    const url = explorerUrl || "https://moneyfactory.ai";
+
+    let shareUrl = "";
+
     switch (platform) {
-      case 'twitter':
+      case "twitter":
         shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
         break;
-      case 'linkedin':
+      case "linkedin":
         shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&title=${encodeURIComponent(text)}`;
         break;
-      case 'discord':
+      case "discord":
         navigator.clipboard.writeText(`${text} ${url}`);
-        alert('Link copied to clipboard! You can now paste it in Discord.');
+        alert("Link copied to clipboard! You can now paste it in Discord.");
         setShowShareOptions(false);
         return;
     }
-    
+
     if (shareUrl) {
-      window.open(shareUrl, '_blank');
+      window.open(shareUrl, "_blank");
     }
-    
+
     setShowShareOptions(false);
   };
 
@@ -403,7 +431,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
     if (modalContentRef.current) {
       modalContentRef.current.scrollTo({
         top: 0,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
   };
@@ -427,7 +455,9 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
         <div className="flex items-center justify-between mb-4 sticky top-0 bg-primary-900 z-10 pb-2">
           <div className="flex items-center space-x-2">
             {getProofTypeIcon()}
-            <h2 className="text-xl font-space font-bold">Proof-of-{proofType}™ NFT</h2>
+            <h2 className="text-xl font-space font-bold">
+              Proof-of-{proofType}™ NFT
+            </h2>
           </div>
           <button
             onClick={onClose}
@@ -439,26 +469,28 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
         </div>
 
         {/* Scrollable Content */}
-        <div 
-          ref={modalContentRef} 
+        <div
+          ref={modalContentRef}
           className="overflow-y-auto flex-1 pr-1 -mr-1 scroll-smooth"
           onScroll={handleScroll}
         >
           {/* NFT Card */}
-          <div 
+          <div
             ref={nftCardRef}
             className={`relative border-2 rounded-xl p-4 mb-6 bg-gradient-to-br ${personaStyle.bgGradient} ${personaStyle.borderColor} shadow-lg`}
           >
             {/* Persona Badge */}
             <div className="absolute top-2 right-2 z-10">
               <span className="px-2 py-1 rounded-full text-xs font-semibold bg-black/50 text-white capitalize">
-                {selectedPersona?.title || 'Certification'}
+                {selectedPersona?.title || "Certification"}
               </span>
             </div>
 
             {/* Rarity Badge */}
             <div className="absolute top-2 left-2 z-10">
-              <span className={`px-2 py-1 rounded-full text-xs font-semibold bg-black/50 ${rarityStyle.text} capitalize`}>
+              <span
+                className={`px-2 py-1 rounded-full text-xs font-semibold bg-black/50 ${rarityStyle.text} capitalize`}
+              >
                 {rarity}
               </span>
             </div>
@@ -469,13 +501,16 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
                 <>
                   {!imageLoaded && (
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <Loader className="animate-spin text-white/50" size={32} />
+                      <Loader
+                        className="animate-spin text-white/50"
+                        size={32}
+                      />
                     </div>
                   )}
-                  <img 
-                    src={imageUrl} 
+                  <img
+                    src={imageUrl}
                     alt={title}
-                    className={`w-full h-full object-cover rounded-lg transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                    className={`w-full h-full object-cover rounded-lg transition-opacity duration-300 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
                     onLoad={() => setImageLoaded(true)}
                     onError={() => setImageError(true)}
                   />
@@ -484,7 +519,9 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-700 to-primary-900">
                   <div className="text-center p-4">
                     <Award size={48} className="mx-auto mb-4 text-white/80" />
-                    <h3 className="text-white font-bold text-lg mb-2">Proof-of-{proofType}™</h3>
+                    <h3 className="text-white font-bold text-lg mb-2">
+                      Proof-of-{proofType}™
+                    </h3>
                     <p className="text-white/80 text-sm">{title}</p>
                   </div>
                 </div>
@@ -492,7 +529,9 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
             </div>
 
             {/* NFT Info */}
-            <h3 className="font-space font-bold text-white text-lg mb-2">{title}</h3>
+            <h3 className="font-space font-bold text-white text-lg mb-2">
+              {title}
+            </h3>
             <p className="text-white/80 text-sm mb-4">{description}</p>
 
             {/* Attributes */}
@@ -502,7 +541,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
                   <Trophy size={14} className="mr-1" />
                   XP Earned:
                 </span>
-                <motion.span 
+                <motion.span
                   initial={{ scale: 1 }}
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ duration: 1, repeat: 0 }}
@@ -519,7 +558,9 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-white/70 text-sm">Completion Date:</span>
-                <span className="text-white font-semibold text-sm">{completionDate}</span>
+                <span className="text-white font-semibold text-sm">
+                  {completionDate}
+                </span>
               </div>
             </div>
           </div>
@@ -531,16 +572,18 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
                 <Wallet size={16} className="mr-2" />
                 Wallet Status
               </h3>
-              
+
               {connected ? (
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="text-sm opacity-70">Connected:</span>
                     <span className="text-sm font-mono bg-green-500/20 text-green-400 px-2 py-0.5 rounded">
-                      {publicKey ? formatWalletAddress(publicKey.toString()) : 'Unknown'}
+                      {publicKey
+                        ? formatWalletAddress(publicKey.toString())
+                        : "Unknown"}
                     </span>
                   </div>
-                  
+
                   {walletBalance !== null && (
                     <div className="flex justify-between items-center">
                       <span className="text-sm opacity-70">Balance:</span>
@@ -549,12 +592,16 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
                       </span>
                     </div>
                   )}
-                  
+
                   <div className="flex justify-between items-center">
                     <span className="text-sm opacity-70">Network:</span>
                     <div className="flex items-center space-x-1">
                       <span className="text-sm">Solana Testnet</span>
-                      <img src="/images/solana.svg" alt="Solana" className="w-4 h-4" />
+                      <img
+                        src="/images/solana.svg"
+                        alt="Solana"
+                        className="w-4 h-4"
+                      />
                     </div>
                   </div>
                 </div>
@@ -563,7 +610,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
                   <p className="text-sm text-center opacity-80 mb-2">
                     Connect your wallet to mint this Proof-of-{proofType}™ NFT
                   </p>
-                  
+
                   <div className="wallet-adapter-dropdown">
                     <WalletMultiButton className="!bg-gradient-to-r !from-blue-600 !to-purple-600 !rounded-lg !py-2 !px-4 !text-white !font-medium" />
                   </div>
@@ -577,18 +624,20 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
             <div className="mb-6">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold">Minting in Progress</h3>
-                <span className="text-sm">{currentStep}/{totalSteps}</span>
+                <span className="text-sm">
+                  {currentStep}/{totalSteps}
+                </span>
               </div>
-              
+
               <div className="w-full bg-white/10 rounded-full h-2 mb-4">
-                <motion.div 
+                <motion.div
                   className={`h-full rounded-full bg-gradient-to-r ${personaStyle.bgGradient}`}
                   initial={{ width: 0 }}
                   animate={{ width: `${(currentStep / totalSteps) * 100}%` }}
                   transition={{ duration: 0.5 }}
                 />
               </div>
-              
+
               <div className="flex items-center justify-center space-x-3 text-sm">
                 <Loader className="animate-spin" size={16} />
                 <span>{getMintingStepText()}</span>
@@ -601,16 +650,21 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
             <div className="mb-6 bg-green-500/20 border border-green-500/30 rounded-lg p-4">
               <div className="flex items-center space-x-2 mb-3">
                 <CheckCircle className="text-green-400" size={20} />
-                <h3 className="font-semibold text-green-400">Proof-of-{proofType}™ Minted!</h3>
+                <h3 className="font-semibold text-green-400">
+                  Proof-of-{proofType}™ Minted!
+                </h3>
               </div>
               <p className="text-sm opacity-80 mb-3">
-                Your Proof-of-{proofType}™ NFT has been successfully minted on Solana Testnet
+                Your Proof-of-{proofType}™ NFT has been successfully minted on
+                Solana Testnet
               </p>
               <div className="bg-black/20 rounded-lg p-2">
                 <div className="text-xs opacity-70 mb-1">NFT Address:</div>
-                <div className="font-mono text-xs break-all">{mintedAddress}</div>
+                <div className="font-mono text-xs break-all">
+                  {mintedAddress}
+                </div>
               </div>
-              
+
               {onViewSkillchain && (
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -639,12 +693,16 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
               <span className="opacity-70">Token ID:</span>
               <div className="flex items-center space-x-1">
                 <span className="font-mono">{tokenId}</span>
-                <button 
+                <button
                   onClick={copyTokenId}
                   className="p-1 hover:bg-white/10 rounded transition-colors"
                   aria-label="Copy token ID"
                 >
-                  {copied ? <CheckCircle size={12} className="text-green-400" /> : <Copy size={12} />}
+                  {copied ? (
+                    <CheckCircle size={12} className="text-green-400" />
+                  ) : (
+                    <Copy size={12} />
+                  )}
                 </button>
               </div>
             </div>
@@ -665,7 +723,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
               <div className="flex justify-between items-center text-sm mt-1">
                 <span className="opacity-70">Explorer URL:</span>
                 <div className="flex items-center space-x-1">
-                  <button 
+                  <button
                     onClick={copyExplorerUrl}
                     className="p-1 hover:bg-white/10 rounded transition-colors text-blue-400 hover:text-blue-300"
                     aria-label="Copy explorer URL"
@@ -680,7 +738,9 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
           {/* Minting Tutorial */}
           {!mintedAddress && !isMinting && (
             <div className="p-3 bg-blue-500/20 border border-blue-500/30 rounded-lg">
-              <h4 className="text-sm font-semibold text-blue-400 mb-2">How to mint your Proof-of-{proofType}™ NFT:</h4>
+              <h4 className="text-sm font-semibold text-blue-400 mb-2">
+                How to mint your Proof-of-{proofType}™ NFT:
+              </h4>
               <ol className="text-sm space-y-1 list-decimal list-inside">
                 <li>Connect your Phantom wallet in Devnet mode</li>
                 <li>Click "Mint Proof-of-{proofType}™ NFT" button</li>
@@ -732,7 +792,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
               whileTap={{ scale: 0.98 }}
               onClick={() => {
                 if (explorerUrl) {
-                  window.open(explorerUrl, '_blank');
+                  window.open(explorerUrl, "_blank");
                 }
               }}
               className="w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white"
@@ -770,7 +830,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
             >
               <Share2 size={20} />
               <span className="text-sm">Share</span>
-              
+
               {/* Share Options Dropdown */}
               <AnimatePresence>
                 {showShareOptions && (
@@ -780,22 +840,22 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
                     exit={{ opacity: 0, y: -10 }}
                     className="absolute top-full mt-2 left-0 bg-primary-900 border border-white/20 rounded-lg p-2 w-32 z-10"
                   >
-                    <button 
-                      onClick={() => shareNFT('twitter')}
+                    <button
+                      onClick={() => shareNFT("twitter")}
                       className="w-full text-left px-2 py-1 text-sm hover:bg-white/10 rounded transition-colors flex items-center space-x-2"
                     >
                       <Twitter size={14} />
                       <span>Twitter</span>
                     </button>
-                    <button 
-                      onClick={() => shareNFT('linkedin')}
+                    <button
+                      onClick={() => shareNFT("linkedin")}
                       className="w-full text-left px-2 py-1 text-sm hover:bg-white/10 rounded transition-colors flex items-center space-x-2"
                     >
                       <Linkedin size={14} />
                       <span>LinkedIn</span>
                     </button>
-                    <button 
-                      onClick={() => shareNFT('discord')}
+                    <button
+                      onClick={() => shareNFT("discord")}
                       className="w-full text-left px-2 py-1 text-sm hover:bg-white/10 rounded transition-colors flex items-center space-x-2"
                     >
                       <MessageSquare size={14} />
@@ -811,7 +871,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
               whileTap={{ scale: 0.95 }}
               onClick={() => {
                 if (explorerUrl) {
-                  window.open(explorerUrl, '_blank');
+                  window.open(explorerUrl, "_blank");
                 }
               }}
               disabled={!mintedAddress}

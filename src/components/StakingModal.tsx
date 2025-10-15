@@ -1,54 +1,54 @@
-import React, { useState } from 'react'
-import { motion } from 'framer-motion'
-import { X, Coins, TrendingUp, Lock, Unlock } from 'lucide-react'
-import { useJourneyStore } from '../store/journeyStore'
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { X, Coins, TrendingUp, Lock, Unlock } from "lucide-react";
+import { useJourneyStore } from "../store/journeyStore";
 
 interface StakingModalProps {
-  onClose: () => void
-  availableAmount: number
-  currentStaked: number
-  onStake?: (amount: number) => void
+  onClose: () => void;
+  availableAmount: number;
+  currentStaked: number;
+  onStake?: (amount: number) => void;
 }
 
 const StakingModal: React.FC<StakingModalProps> = ({
   onClose,
   availableAmount,
   currentStaked,
-  onStake
+  onStake,
 }) => {
-  const [stakeAmount, setStakeAmount] = useState('')
-  const [isStaking, setIsStaking] = useState(false)
-  const { updateStaking } = useJourneyStore()
+  const [stakeAmount, setStakeAmount] = useState("");
+  const [isStaking, setIsStaking] = useState(false);
+  const { updateStaking } = useJourneyStore();
 
   const handleStake = async () => {
-    const amount = parseFloat(stakeAmount)
-    if (amount <= 0 || amount > availableAmount) return
+    const amount = parseFloat(stakeAmount);
+    if (amount <= 0 || amount > availableAmount) return;
 
-    setIsStaking(true)
-    
+    setIsStaking(true);
+
     // Simulate staking transaction
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
     if (onStake) {
-      onStake(amount)
+      onStake(amount);
     } else {
-      updateStaking(amount)
-      onClose()
+      updateStaking(amount);
+      onClose();
     }
-    
-    setIsStaking(false)
-  }
+
+    setIsStaking(false);
+  };
 
   const calculateRewards = (amount: number) => {
-    const apy = 0.125 // 12.5% APY
-    const dailyReward = (amount * apy) / 365
-    const monthlyReward = dailyReward * 30
-    const yearlyReward = amount * apy
-    
-    return { dailyReward, monthlyReward, yearlyReward }
-  }
+    const apy = 0.125; // 12.5% APY
+    const dailyReward = (amount * apy) / 365;
+    const monthlyReward = dailyReward * 30;
+    const yearlyReward = amount * apy;
 
-  const rewards = calculateRewards(parseFloat(stakeAmount) || 0)
+    return { dailyReward, monthlyReward, yearlyReward };
+  };
+
+  const rewards = calculateRewards(parseFloat(stakeAmount) || 0);
 
   return (
     <motion.div
@@ -85,7 +85,9 @@ const StakingModal: React.FC<StakingModalProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <div className="text-sm opacity-70">Staked</div>
-              <div className="text-lg font-bold text-accent-gold">{currentStaked.toFixed(2)} $MFAI</div>
+              <div className="text-lg font-bold text-accent-gold">
+                {currentStaked.toFixed(2)} $MFAI
+              </div>
             </div>
             <div>
               <div className="text-sm opacity-70">APY</div>
@@ -96,7 +98,9 @@ const StakingModal: React.FC<StakingModalProps> = ({
 
         {/* Stake Input */}
         <div className="mb-6">
-          <label className="block text-sm font-medium mb-2">Amount to stake</label>
+          <label className="block text-sm font-medium mb-2">
+            Amount to stake
+          </label>
           <div className="relative">
             <input
               type="number"
@@ -112,7 +116,9 @@ const StakingModal: React.FC<StakingModalProps> = ({
             </div>
           </div>
           <div className="flex justify-between text-xs mt-2">
-            <span className="opacity-70">Available: {availableAmount.toFixed(2)} $MFAI</span>
+            <span className="opacity-70">
+              Available: {availableAmount.toFixed(2)} $MFAI
+            </span>
             <button
               onClick={() => setStakeAmount(availableAmount.toString())}
               className="text-primary-400 hover:text-primary-300"
@@ -132,15 +138,21 @@ const StakingModal: React.FC<StakingModalProps> = ({
             <div className="grid grid-cols-3 gap-3 text-center">
               <div>
                 <div className="text-xs opacity-70">Daily</div>
-                <div className="font-bold text-green-400">{rewards.dailyReward.toFixed(3)}</div>
+                <div className="font-bold text-green-400">
+                  {rewards.dailyReward.toFixed(3)}
+                </div>
               </div>
               <div>
                 <div className="text-xs opacity-70">Monthly</div>
-                <div className="font-bold text-green-400">{rewards.monthlyReward.toFixed(2)}</div>
+                <div className="font-bold text-green-400">
+                  {rewards.monthlyReward.toFixed(2)}
+                </div>
               </div>
               <div>
                 <div className="text-xs opacity-70">Annual</div>
-                <div className="font-bold text-green-400">{rewards.yearlyReward.toFixed(1)}</div>
+                <div className="font-bold text-green-400">
+                  {rewards.yearlyReward.toFixed(1)}
+                </div>
               </div>
             </div>
           </div>
@@ -174,7 +186,12 @@ const StakingModal: React.FC<StakingModalProps> = ({
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={handleStake}
-          disabled={isStaking || !stakeAmount || parseFloat(stakeAmount) <= 0 || parseFloat(stakeAmount) > availableAmount}
+          disabled={
+            isStaking ||
+            !stakeAmount ||
+            parseFloat(stakeAmount) <= 0 ||
+            parseFloat(stakeAmount) > availableAmount
+          }
           className="w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 bg-gradient-primary text-white disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isStaking ? (
@@ -185,13 +202,13 @@ const StakingModal: React.FC<StakingModalProps> = ({
           ) : (
             <>
               <Lock size={16} />
-              <span>Stake {stakeAmount || '0'} $MFAI</span>
+              <span>Stake {stakeAmount || "0"} $MFAI</span>
             </>
           )}
         </motion.button>
       </motion.div>
     </motion.div>
-  )
-}
+  );
+};
 
-export default StakingModal
+export default StakingModal;
