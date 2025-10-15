@@ -1,13 +1,13 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Moon, Sun, Menu, X, ChevronDown, LogOut } from 'lucide-react'
+import { Moon, Sun, Menu, X, ChevronDown, LogOut, Zap } from 'lucide-react'
 import { useThemeStore } from '../store/themeStore'
 import { useAuth } from '../contexts/AuthContext'
 import { useState } from 'react'
 import WalletButton from './WalletButton'
 
 const Header = () => {
-  const { isDark, toggleTheme } = useThemeStore()
+const { isDark, toggleTheme, isNeon, toggleNeon } = useThemeStore()
   const { logout, user } = useAuth()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
@@ -103,6 +103,17 @@ const Header = () => {
               aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
             >
               {isDark ? <Sun size={20} /> : <Moon size={20} />}
+            </motion.button>
+
+            {/* Neon Toggle */}
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={toggleNeon}
+              className={`p-2 rounded-lg glass-effect ${isNeon ? 'text-accent-cyan' : ''}`}
+              aria-label={isNeon ? 'Disable neon mode' : 'Enable neon mode'}
+            >
+              <Zap size={20} />
             </motion.button>
 
             {/* Mobile Menu Button */}

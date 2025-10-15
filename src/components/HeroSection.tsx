@@ -16,6 +16,13 @@ const HeroSection = () => {
     activeJourneys: 0
   })
 
+  const quotes = [
+    "You don't pitch. You prove. And your proof becomes capital.",
+    'La preuve précède le capital. — Prove, then scale.',
+    'Build, prove, compound.',
+  ]
+  const [quoteIndex, setQuoteIndex] = useState(0)
+
   // Load platform stats from backend
   const loadPlatformStats = async () => {
     try {
@@ -48,6 +55,13 @@ const HeroSection = () => {
 
     // Load platform stats
     loadPlatformStats()
+  }, [])
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setQuoteIndex((i) => (i + 1) % quotes.length)
+    }, 8000)
+    return () => clearInterval(id)
   }, [])
 
   const scrollToPersonas = () => {
@@ -159,12 +173,12 @@ const HeroSection = () => {
             </motion.div>
 
             <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.0, duration: 0.8 }}
               className="text-sm italic opacity-70 font-space"
             >
-              "You don't pitch. You prove. And your proof becomes capital."
+              {quotes[quoteIndex]}
             </motion.p>
             
             <motion.div

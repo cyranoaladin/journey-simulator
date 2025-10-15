@@ -20,7 +20,7 @@ import BackToTopButton from './components/BackToTopButton'
 import { initParticles } from './utils/particles'
 
 function App() {
-  const { isDark } = useThemeStore()
+const { isDark, isNeon } = useThemeStore()
   const { selectedPersona } = useJourneyStore()
 
   useEffect(() => {
@@ -44,7 +44,7 @@ function App() {
           isDark 
             ? 'bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 text-white' 
             : 'bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 text-gray-900'
-        }`}>
+        } ${isNeon ? 'neon' : ''}`}>
           <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<LoginPage />} />
