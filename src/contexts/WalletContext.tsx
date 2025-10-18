@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode, useEffect } from 'react'
+import { type ReactNode, useMemo } from 'react'
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import {
@@ -11,8 +11,6 @@ import {
   CoinbaseWalletAdapter,
 } from '@solana/wallet-adapter-wallets'
 import { clusterApiUrl } from '@solana/web3.js'
-import { useMemo } from 'react'
-import { useJourneyStore } from '../store/journeyStore'
 
 // Import wallet adapter CSS
 import '@solana/wallet-adapter-react-ui/styles.css'
@@ -21,9 +19,8 @@ interface WalletContextProviderProps {
   children: ReactNode
 }
 
-export const WalletContextProvider: React.FC<WalletContextProviderProps> = ({ children }) => {
-  const { updateWalletConnection } = useJourneyStore();
-  
+
+export const WalletContextProvider = ({ children }: WalletContextProviderProps) => {
   // Configuration for Solana Devnet
   const network = 'devnet'
   const endpoint = useMemo(() => clusterApiUrl(network), [network])

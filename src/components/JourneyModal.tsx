@@ -1,4 +1,3 @@
-import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, CheckCircle, Clock, Trophy, Zap, ExternalLink, ArrowRight, TrendingUp } from 'lucide-react'
 import { useJourneyStore } from '../store/journeyStore'
@@ -99,7 +98,7 @@ const JourneyModal = () => {
                 Tools & Resources
               </h4>
               <div className="space-y-1">
-                {phase.tools.map((tool, idx) => (
+                {phase.tools.map((tool: string, idx: number) => (
                   <div key={idx} className="text-sm bg-white/5 rounded px-2 py-1">
                     {tool}
                   </div>
@@ -115,7 +114,7 @@ const JourneyModal = () => {
               Expected Outcomes
             </h3>
             <div className="grid gap-2">
-              {phase.outcomes.map((outcome, idx) => (
+              {phase.outcomes.map((outcome: string, idx: number) => (
                 <div key={idx} className="flex items-center text-sm">
                   <CheckCircle size={16} className="mr-2 text-green-400" />
                   {outcome}
@@ -210,7 +209,7 @@ const JourneyModal = () => {
               <div className="mb-6">
                 <h3 className="font-semibold text-lg mb-3">Journey Metrics</h3>
                 <div className="grid grid-cols-2 gap-4">
-                  {holder.metrics.map((metric, idx) => (
+                  {holder.metrics.map((metric: { label: string; value: string }, idx: number) => (
                     <div key={idx} className="bg-white/5 rounded-lg p-4">
                       <div className="text-sm opacity-80">{metric.label}</div>
                       <div className="text-lg font-mono font-semibold">{metric.value}</div>

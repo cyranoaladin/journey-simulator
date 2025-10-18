@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import { useState, type FC } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { holders } from '../data/holders';
 import { useJourneyStore } from '../store/journeyStore';
-import { Trophy, TrendingUp, Zap, Users, ExternalLink } from 'lucide-react';
+import { Trophy, TrendingUp, Zap, ExternalLink } from 'lucide-react';
 
-const AccessPassHolders: React.FC = () => {
+const AccessPassHolders: FC = () => {
   const { openModal } = useJourneyStore();
   const [hoveredHolder, setHoveredHolder] = useState<string | null>(null);
 

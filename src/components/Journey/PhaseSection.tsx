@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { JourneyPhase } from '../../types/journey';
 import { CheckCircle, Trophy, Coins, Zap, Play, Lock, ArrowRight, Rocket, Vote, Award, Palette, MessageSquare, Target, BarChart3, DollarSign } from 'lucide-react';
@@ -32,9 +31,9 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
   const highlightText = (text: string) => {
     return text.replace(
       /("([^"]+)")|(\*([^*]+)\*)/g,
-      (match, p1, p2, p3, p4) => {
-        if (p2) return `<span class="text-accent-cyan">"${p2}"</span>`;
-        if (p4) return `<span class="font-semibold text-accent-gold">${p4}</span>`;
+      (match, _p1, highlighted, _p3, emphasized) => {
+        if (highlighted) return `<span class="text-accent-cyan">"${highlighted}"</span>`;
+        if (emphasized) return `<span class="font-semibold text-accent-gold">${emphasized}</span>`;
         return match;
       }
     );

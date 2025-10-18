@@ -4,13 +4,19 @@ declare global {
   }
 }
 
-export const initParticles = () => {
-  // Load particles.js script dynamically
-  const script = document.createElement('script');
-  script.src = 'https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js';
-  script.onload = () => {
-    if (window.particlesJS) {
-      window.particlesJS('particles-js', {
+const PARTICLES_SCRIPT_ID = 'particles-js-script'
+
+const initialiseParticles = () => {
+  if (!window.particlesJS) {
+    return
+  }
+
+  if (!document.getElementById('particles-js')) {
+    requestAnimationFrame(initialiseParticles)
+    return
+  }
+
+  window.particlesJS('particles-js', {
         particles: {
           number: {
             value: 80,
@@ -111,8 +117,44 @@ export const initParticles = () => {
           }
         },
         retina_detect: true
-      });
+      })
+}
+
+export const initParticles = () => {
+  const existingScript = document.getElementById(PARTICLES_SCRIPT_ID) as HTMLScriptElement | null
+
+  if (existingScript) {
+    if (existingScript.dataset.initialised === 'true' || window.particlesJS) {
+      initialiseParticles()
+      existingScript.dataset.initialised = 'true'
+      return () => {}
     }
-  };
-  document.head.appendChild(script);
-};
+
+    const onLoad = () => {
+      initialiseParticles()
+      existingScript.dataset.initialised = 'true'
+    }
+
+    existingScript.addEventListener('load', onLoad, { once: true })
+    return () => {
+      existingScript.removeEventListener('load', onLoad)
+    }
+  }
+
+  const script = document.createElement('script')
+  script.id = PARTICLES_SCRIPT_ID
+  script.src = 'https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'
+  script.async = true
+
+  const onLoad = () => {
+    initialiseParticles()
+    script.dataset.initialised = 'true'
+  }
+
+  script.addEventListener('load', onLoad, { once: true })
+  document.head.appendChild(script)
+
+  return () => {
+    script.removeEventListener('load', onLoad)
+  }
+}

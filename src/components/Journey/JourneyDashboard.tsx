@@ -1,9 +1,8 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Coins, Users, TrendingUp, Award, Rocket, Vote } from 'lucide-react';
+import { Trophy, Coins, Award, Rocket, Vote } from 'lucide-react';
 import { useJourneyStore } from '../../store/journeyStore';
 
-const JourneyDashboard: React.FC = () => {
+const JourneyDashboard = () => {
   const { userProgress, selectedPersona } = useJourneyStore();
 
   const getPassGradient = (level: string) => {
@@ -20,34 +19,6 @@ const JourneyDashboard: React.FC = () => {
     if (power >= 500) return 'text-blue-400';
     if (power >= 100) return 'text-green-400';
     return 'text-gray-400';
-  };
-
-  // Get persona icon based on ID
-  const getPersonaIcon = () => {
-    if (!selectedPersona) return '💎';
-    
-    switch (selectedPersona.id) {
-      case 'curious-student':
-        return '🎓';
-      case 'web2-entrepreneur':
-        return '💼';
-      case 'web3-developer':
-        return '⚡';
-      case 'content-creator':
-        return '🎨';
-      case 'community-communicator':
-        return '🗣️';
-      case 'project-manager':
-        return '🎯';
-      case 'defi-explorer':
-        return '📊';
-      case 'nft-creator':
-        return '🖼️';
-      case 'investor':
-        return '💰';
-      default:
-        return selectedPersona.icon;
-    }
   };
 
   return (
@@ -166,8 +137,7 @@ const JourneyDashboard: React.FC = () => {
             {selectedPersona.phases.map((phase, index) => {
               const isCompleted = userProgress.completedPhases.includes(index);
               const isCurrent = index === userProgress.completedPhases.length;
-              const isLocked = index > userProgress.completedPhases.length;
-              
+
               return (
                 <div key={phase.id} className="text-center">
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2 ${

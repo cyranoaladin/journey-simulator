@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useWalletModal } from '@solana/wallet-adapter-react-ui'
@@ -19,12 +19,11 @@ import { useJourneyStore } from '../store/journeyStore'
 
 const WalletButton = () => {
   const { publicKey, wallet, disconnect, connected, connecting } = useWallet()
-  const { visible, setVisible } = useWalletModal()
+  const { setVisible } = useWalletModal()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [isConnecting, setIsConnecting] = useState(false)
   const [connectError, setConnectError] = useState<string | null>(null)
-  const [retryCount, setRetryCount] = useState(0)
   const { userProgress, updateWalletConnection } = useJourneyStore()
 
   // Update store when connection changes
@@ -61,7 +60,6 @@ const WalletButton = () => {
   }
 
   const handleRetry = () => {
-    setRetryCount(prev => prev + 1);
     setConnectError(null);
     handleConnect();
   };
@@ -267,7 +265,7 @@ const WalletButton = () => {
               <div className="space-y-2">
                 <button
                   onClick={() => {
-                    window.open(`https://explorer.solana.com/address/${publicKey!.toString()}?cluster=testnet`, '_blank')
+                    window.open(`https://explorer.solana.com/address/${publicKey!.toString()}?cluster=devnet`, '_blank')
                     setIsDropdownOpen(false)
                   }}
                   className="w-full flex items-center space-x-2 p-2 hover:bg-white/10 rounded-lg transition-colors"

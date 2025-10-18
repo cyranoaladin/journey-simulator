@@ -1,13 +1,11 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronDown, Sparkles } from 'lucide-react'
-import { useJourneyStore } from '../store/journeyStore'
 import SkillchainCard from './SkillchainCard'
 import WalletConnectionGuide from './WalletConnectionGuide'
 import { useWallet } from '@solana/wallet-adapter-react'
 
 const HeroSection = () => {
-  const { userProgress } = useJourneyStore()
   const { connected } = useWallet()
 
   useEffect(() => {

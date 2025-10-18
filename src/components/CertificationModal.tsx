@@ -250,7 +250,7 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
                   whileTap={{ scale: 0.98 }}
                   onClick={() => {
                     if (mintedAddress) {
-                      window.open(`https://explorer.solana.com/address/${mintedAddress}?cluster=testnet`, '_blank')
+                      window.open(`https://explorer.solana.com/address/${mintedAddress}?cluster=devnet`, '_blank')
                     }
                   }}
                   disabled={!mintedAddress}
