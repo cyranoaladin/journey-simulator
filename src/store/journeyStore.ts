@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { Persona, JourneyPhase, UserProgress, TestnetFeatures } from '../types/journey'
+import { Persona, UserProgress, TestnetFeatures } from '../types/journey'
 import { mintProofOfSkill } from '../utils/blockchain'
 
 interface JourneyState {
@@ -43,6 +43,8 @@ const initialUserProgress: UserProgress = {
   daoProposals: 0,
   testnetAirdropClaimed: false,
   socialShareCount: 0,
+  lastSharedPlatform: undefined,
+  shareHistory: [],
 }
 
 const initialTestnetFeatures: TestnetFeatures = {
@@ -138,18 +140,13 @@ export const useJourneyStore = create<JourneyState>()(
         }
       })),
 
-      updateWalletConnection: (connected, address) => set((state) => {
-        console.log("Updating wallet connection:", connected, address);
-        return {
-          userProgress: {
-            ...state.userProgress,
-            walletConnected: connected,
-            walletAddress: address,
-            // If wallet is connected and user has no tokens, give them some initial tokens
-            mfaiTokens: connected && state.userProgress.mfaiTokens === 0 ? 10 : state.userProgress.mfaiTokens,
-          }
-        };
-      }),
+      updateWalletConnection: (connected, address) => set((state) => ({
+        userProgress: {
+          ...state.userProgress,
+          walletConnected: connected,
+          walletAddress: connected ? address : undefined,
+        }
+      })),
 
       claimTestnetAirdrop: () => set((state) => ({
         userProgress: {
@@ -194,6 +191,11 @@ export const useJourneyStore = create<JourneyState>()(
         userProgress: {
           ...state.userProgress,
           socialShareCount: (state.userProgress.socialShareCount || 0) + 1,
+          lastSharedPlatform: platform,
+          shareHistory: [
+            { platform, timestamp: new Date().toISOString() },
+            ...(state.userProgress.shareHistory || []),
+          ].slice(0, 10),
         }
       })),
 
@@ -210,14 +212,15 @@ export const useJourneyStore = create<JourneyState>()(
       }),
       
       downloadNFT: async (nftName: string) => {
-        // Simulate download process
+        // Simulate download process and log the requested NFT name for analytics
         await new Promise(resolve => setTimeout(resolve, 1000))
+        console.info(`Simulated download for NFT: ${nftName}`)
         return true
       },
       
       viewNFTOnExplorer: (tokenId: string) => {
         // Generate explorer URL
-        const explorerUrl = `https://explorer.solana.com/address/${tokenId}?cluster=testnet`
+        const explorerUrl = `https://explorer.solana.com/address/${tokenId}?cluster=devnet`
         return explorerUrl
       },
       
@@ -241,7 +244,11 @@ export const useJourneyStore = create<JourneyState>()(
     {
       name: 'mfai-journey-storage',
       partialize: (state) => ({
-        userProgress: state.userProgress,
+        userProgress: {
+          ...state.userProgress,
+          walletConnected: false,
+          walletAddress: undefined,
+        },
         selectedPersona: state.selectedPersona,
       }),
     }

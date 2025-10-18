@@ -1,6 +1,5 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { Wallet, ExternalLink, Download, AlertCircle, CheckCircle, Settings, Zap } from 'lucide-react';
+import { Wallet, Download, AlertCircle, Settings, Zap } from 'lucide-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 const WalletConnectionGuide: React.FC = () => {

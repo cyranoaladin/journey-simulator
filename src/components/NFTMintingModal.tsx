@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { X, Award, Loader, CheckCircle, ExternalLink } from 'lucide-react'
-import { useWallet, useConnection } from '@solana/wallet-adapter-react'
+import { useWallet } from '@solana/wallet-adapter-react'
 import { PublicKey } from '@solana/web3.js'
 import { Certification } from '../types/journey'
 import { useJourneyStore } from '../store/journeyStore'
@@ -18,7 +18,6 @@ const NFTMintingModal: React.FC<NFTMintingModalProps> = ({
   onMinted
 }) => {
   const { publicKey, signTransaction } = useWallet()
-  const { connection } = useConnection()
   const { selectedPersona } = useJourneyStore()
   const [isMinting, setIsMinting] = useState(false)
   const [mintAddress, setMintAddress] = useState<string | null>(null)
@@ -258,7 +257,7 @@ const NFTMintingModal: React.FC<NFTMintingModalProps> = ({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => {
-                window.open(`https://explorer.solana.com/address/${mintAddress}?cluster=testnet`, '_blank')
+                window.open(`https://explorer.solana.com/address/${mintAddress}?cluster=devnet`, '_blank')
               }}
               className="w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white"
             >

@@ -1,6 +1,5 @@
-import React from 'react'
 import { motion } from 'framer-motion'
-import { Ticket as Pickaxe, Coins, Info } from 'lucide-react'
+import { Ticket as Pickaxe, Coins } from 'lucide-react'
 import { useJourneyStore } from '../store/journeyStore'
 import { useWallet } from '@solana/wallet-adapter-react'
 import WalletFaucetButton from './WalletFaucetButton'

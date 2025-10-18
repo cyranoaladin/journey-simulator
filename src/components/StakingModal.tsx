@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { X, Coins, TrendingUp, Lock, Unlock } from 'lucide-react'
+import { X, TrendingUp, Lock } from 'lucide-react'
 import { useJourneyStore } from '../store/journeyStore'
 
 interface StakingModalProps {
