@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { Persona, JourneyPhase, UserProgress, TestnetFeatures } from '../types/journey'
+import { Persona, UserProgress, TestnetFeatures } from '../types/journey'
 import { mintProofOfSkill } from '../utils/blockchain'
 
 interface JourneyState {
@@ -43,6 +43,8 @@ const initialUserProgress: UserProgress = {
   daoProposals: 0,
   testnetAirdropClaimed: false,
   socialShareCount: 0,
+  lastSharedPlatform: undefined,
+  shareHistory: [],
 }
 
 const initialTestnetFeatures: TestnetFeatures = {
@@ -189,6 +191,11 @@ export const useJourneyStore = create<JourneyState>()(
         userProgress: {
           ...state.userProgress,
           socialShareCount: (state.userProgress.socialShareCount || 0) + 1,
+          lastSharedPlatform: platform,
+          shareHistory: [
+            { platform, timestamp: new Date().toISOString() },
+            ...(state.userProgress.shareHistory || []),
+          ].slice(0, 10),
         }
       })),
 
@@ -205,8 +212,9 @@ export const useJourneyStore = create<JourneyState>()(
       }),
       
       downloadNFT: async (nftName: string) => {
-        // Simulate download process
+        // Simulate download process and log the requested NFT name for analytics
         await new Promise(resolve => setTimeout(resolve, 1000))
+        console.info(`Simulated download for NFT: ${nftName}`)
         return true
       },
       

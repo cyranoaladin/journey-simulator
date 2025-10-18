@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { Wallet, Coins, ExternalLink, Copy, CheckCircle, Wifi, WifiOff, Loader, AlertCircle } from 'lucide-react';
 

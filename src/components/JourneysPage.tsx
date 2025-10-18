@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useJourneyStore } from '../store/journeyStore';
 import JourneyCard from './Journey/JourneyCard';
@@ -147,10 +147,6 @@ const JourneysPage: React.FC = () => {
     setShowDAOVoteModal(false);
   };
 
-  const handleShareProof = () => {
-    setShowShareModal(true);
-  };
-
   // Show Staking Modal
   if (showStakingModal) {
     return (
@@ -228,10 +224,10 @@ const JourneysPage: React.FC = () => {
         {/* Persona Selection */}
         {!selectedPersona && (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {personas.map((persona, index) => (
-              <JourneyCard 
-                key={persona.id} 
-                persona={persona} 
+            {personas.map((persona) => (
+              <JourneyCard
+                key={persona.id}
+                persona={persona}
               />
             ))}
           </div>

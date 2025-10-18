@@ -58,6 +58,8 @@ export interface UserProgress {
   launchpadStatus?: 'pending' | 'approved' | 'rejected';
   testnetAirdropClaimed?: boolean;
   socialShareCount?: number;
+  lastSharedPlatform?: string;
+  shareHistory?: { platform: string; timestamp: string }[];
 }
 
 export interface AccessPassHolder {

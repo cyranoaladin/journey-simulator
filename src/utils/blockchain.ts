@@ -1,13 +1,9 @@
 import {
   Connection,
   PublicKey,
+  Keypair,
   LAMPORTS_PER_SOL,
 } from '@solana/web3.js';
-import {
-  Metaplex,
-  walletAdapterIdentity,
-  irysStorage,
-} from '@metaplex-foundation/js';
 
 // Constants
 const SOLANA_CLUSTER = 'devnet';
@@ -50,38 +46,41 @@ export const mintProofOfSkill = async (
     name: string;
     description: string;
     image: string;
-    attributes: Array<{trait_type: string, value: string | number}>;
+    attributes: Array<{ trait_type: string; value: string | number }>;
   }
-): Promise<{success: boolean, signature?: string, mintAddress?: string, error?: string}> => {
+): Promise<{ success: boolean; signature?: string; mintAddress?: string; error?: string }> => {
   try {
-    const connection = getConnection();
-    const { publicKey, signTransaction } = wallet;
-    
-    if (!publicKey || !signTransaction) {
+    const { publicKey } = wallet || {};
+
+    if (!publicKey) {
       throw new Error('Wallet not connected');
     }
-    
-    const metaplex = Metaplex.make(connection)
-      .use(walletAdapterIdentity({ publicKey, signTransaction } as any))
-      .use(irysStorage());
 
-    const { uri } = await metaplex.nfts().uploadMetadata(metadata);
-    const { nft, response } = await metaplex.nfts().create({
-      uri,
+    // Simulate asynchronous metadata upload and minting delay
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+
+    const normalizedAttributes = metadata.attributes.map((attribute) => ({
+      ...attribute,
+      value: String(attribute.value),
+    }));
+    console.debug('Simulated metadata upload for Proof-of-Skill NFT', {
       name: metadata.name,
-      sellerFeeBasisPoints: 0,
+      attributes: normalizedAttributes,
     });
+
+    const simulatedMint = Keypair.generate().publicKey.toBase58();
 
     return {
       success: true,
-      signature: response.signature,
-      mintAddress: nft.address.toString(),
+      signature: `simulated_mint_${Date.now()}`,
+      mintAddress: simulatedMint,
     };
   } catch (error) {
     console.error('Error minting NFT:', error);
+    const message = error instanceof Error ? error.message : String(error);
     return {
       success: false,
-      error: error.message
+      error: message
     };
   }
 };
@@ -90,28 +89,26 @@ export const mintProofOfSkill = async (
 export const stakeMFAI = async (
   wallet: any,
   amount: number
-): Promise<{success: boolean, signature?: string, error?: string}> => {
+): Promise<{ success: boolean; signature?: string; error?: string }> => {
   try {
-    const { publicKey, signTransaction } = wallet;
-    
-    if (!publicKey || !signTransaction) {
+    const { publicKey } = wallet || {};
+
+    if (!publicKey) {
       throw new Error('Wallet not connected');
     }
-    
-    // In a real implementation, we would:
-    // 1. Create a transaction to transfer tokens to a staking contract
-    // 2. Sign and send the transaction
-    
-    // For simulation purposes, we'll just return a success response
+
+    // For simulation purposes, we'll log the intended stake amount and return a success response
+    console.debug(`Simulated staking of ${amount} $MFAI for wallet ${publicKey.toBase58()}`);
     return {
       success: true,
       signature: 'simulated_stake_' + Date.now()
     };
   } catch (error) {
     console.error('Error staking MFAI:', error);
+    const message = error instanceof Error ? error.message : String(error);
     return {
       success: false,
-      error: error.message
+      error: message
     };
   }
 };
@@ -121,18 +118,12 @@ export const submitDAOVote = async (
   wallet: any,
   proposalId: string,
   vote: 'approve' | 'reject'
-): Promise<{success: boolean, signature?: string, error?: string}> => {
+): Promise<{ success: boolean; signature?: string; proposalId?: string; vote?: 'approve' | 'reject'; error?: string }> => {
   try {
-    const { publicKey, signTransaction } = wallet;
-    
-    if (!publicKey || !signTransaction) {
+    if (!wallet?.publicKey) {
       throw new Error('Wallet not connected');
     }
-    
-    // In a real implementation, we would:
-    // 1. Create a transaction to submit a vote to the governance program
-    // 2. Sign and send the transaction
-    
+
     // For simulation purposes, we'll just return a success response
     return {
       success: true,
@@ -142,9 +133,10 @@ export const submitDAOVote = async (
     };
   } catch (error) {
     console.error('Error submitting DAO vote:', error);
+    const message = error instanceof Error ? error.message : String(error);
     return {
       success: false,
-      error: error.message
+      error: message
     };
   }
 };
@@ -152,6 +144,7 @@ export const submitDAOVote = async (
 // Get NFTs owned by wallet
 export const getWalletNFTs = async (publicKey: PublicKey): Promise<any[]> => {
   try {
+    console.debug('Simulating NFT fetch for wallet', publicKey.toBase58());
     // In a real implementation, we would:
     // 1. Query the Solana blockchain for token accounts owned by the wallet
     // 2. Filter for NFTs (tokens with supply of 1)

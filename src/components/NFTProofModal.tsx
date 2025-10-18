@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Award, 
@@ -50,7 +50,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
   onClose,
   onViewSkillchain
 }) => {
-  const { publicKey, signTransaction, connected, connecting } = useWallet();
+  const { publicKey, signTransaction, connected } = useWallet();
   const { connection } = useConnection();
   const { selectedPersona, mintNFT } = useJourneyStore();
   const [isMinting, setIsMinting] = useState(false);

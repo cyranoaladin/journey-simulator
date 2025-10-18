@@ -1,6 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Moon, Sun, Menu, X, ChevronDown } from 'lucide-react'
+import { Moon, Sun, Menu, X } from 'lucide-react'
 import { useThemeStore } from '../store/themeStore'
 import { useState } from 'react'
 import WalletButton from './WalletButton'

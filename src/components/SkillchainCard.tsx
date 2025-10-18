@@ -1,24 +1,20 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { QrCode, ExternalLink, Copy, CheckCircle, Trophy, Coins, Award, Lock, Unlock, Wallet, Loader, AlertCircle } from 'lucide-react'
+import { ExternalLink, Copy, CheckCircle, Trophy, Coins, Award, Lock, Unlock, AlertCircle } from 'lucide-react'
 import { useJourneyStore } from '../store/journeyStore'
 import { useWallet } from '@solana/wallet-adapter-react'
 
 interface SkillchainCardProps {
   className?: string
-  showDetails?: boolean
 }
 
-const SkillchainCard: React.FC<SkillchainCardProps> = ({ 
-  className = '', 
-  showDetails = false 
+const SkillchainCard: React.FC<SkillchainCardProps> = ({
+  className = '',
 }) => {
   const { userProgress, selectedPersona } = useJourneyStore()
-  const { publicKey, wallet, disconnect, connected, connecting } = useWallet()
+  const { publicKey, connected, connecting } = useWallet()
   const [isFlipped, setIsFlipped] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [balance, setBalance] = useState<number | null>(null)
-  const [isLoadingBalance, setIsLoadingBalance] = useState(false)
   const [connectionError, setConnectionError] = useState<string | null>(null)
 
   // Listen for wallet errors
