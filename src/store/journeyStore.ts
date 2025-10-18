@@ -138,18 +138,13 @@ export const useJourneyStore = create<JourneyState>()(
         }
       })),
 
-      updateWalletConnection: (connected, address) => set((state) => {
-        console.log("Updating wallet connection:", connected, address);
-        return {
-          userProgress: {
-            ...state.userProgress,
-            walletConnected: connected,
-            walletAddress: address,
-            // If wallet is connected and user has no tokens, give them some initial tokens
-            mfaiTokens: connected && state.userProgress.mfaiTokens === 0 ? 10 : state.userProgress.mfaiTokens,
-          }
-        };
-      }),
+      updateWalletConnection: (connected, address) => set((state) => ({
+        userProgress: {
+          ...state.userProgress,
+          walletConnected: connected,
+          walletAddress: connected ? address : undefined,
+        }
+      })),
 
       claimTestnetAirdrop: () => set((state) => ({
         userProgress: {
@@ -217,7 +212,7 @@ export const useJourneyStore = create<JourneyState>()(
       
       viewNFTOnExplorer: (tokenId: string) => {
         // Generate explorer URL
-        const explorerUrl = `https://explorer.solana.com/address/${tokenId}?cluster=testnet`
+        const explorerUrl = `https://explorer.solana.com/address/${tokenId}?cluster=devnet`
         return explorerUrl
       },
       
@@ -241,7 +236,11 @@ export const useJourneyStore = create<JourneyState>()(
     {
       name: 'mfai-journey-storage',
       partialize: (state) => ({
-        userProgress: state.userProgress,
+        userProgress: {
+          ...state.userProgress,
+          walletConnected: false,
+          walletAddress: undefined,
+        },
         selectedPersona: state.selectedPersona,
       }),
     }

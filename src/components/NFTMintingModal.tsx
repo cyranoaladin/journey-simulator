@@ -258,7 +258,7 @@ const NFTMintingModal: React.FC<NFTMintingModalProps> = ({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => {
-                window.open(`https://explorer.solana.com/address/${mintAddress}?cluster=testnet`, '_blank')
+                window.open(`https://explorer.solana.com/address/${mintAddress}?cluster=devnet`, '_blank')
               }}
               className="w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white"
             >

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MessageCircle, X, Send, Sparkles } from 'lucide-react'
 
@@ -13,6 +13,12 @@ const ZynoAssistant = () => {
     }
   ])
   const [inputValue, setInputValue] = useState('')
+  const messageIdRef = useRef(messages[messages.length - 1]?.id ?? 0)
+
+  const getNextMessageId = () => {
+    messageIdRef.current += 1
+    return messageIdRef.current
+  }
 
   const zynoResponses = [
     "Excellent question! The Cognitive Activation Protocol™ transforms your skills into tokenized assets. Each step proves your evolution.",
@@ -32,7 +38,7 @@ const ZynoAssistant = () => {
 
     // Add user message
     const userMessage = {
-      id: messages.length + 1,
+      id: getNextMessageId(),
       text: inputValue,
       isZyno: false,
       timestamp: new Date()
@@ -43,13 +49,16 @@ const ZynoAssistant = () => {
 
     // Simulate Zyno response after a delay
     setTimeout(() => {
-      const zynoMessage = {
-        id: messages.length + 2,
-        text: zynoResponses[Math.floor(Math.random() * zynoResponses.length)],
-        isZyno: true,
-        timestamp: new Date()
-      }
-      setMessages(prev => [...prev, zynoMessage])
+      setMessages(prev => {
+        const zynoMessage = {
+          id: getNextMessageId(),
+          text: zynoResponses[Math.floor(Math.random() * zynoResponses.length)],
+          isZyno: true,
+          timestamp: new Date()
+        }
+
+        return [...prev, zynoMessage]
+      })
     }, 1000)
   }
 
