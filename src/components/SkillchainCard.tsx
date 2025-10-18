@@ -140,7 +140,7 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
   // Open Solana explorer
   const openExplorer = () => {
     if (publicKey) {
-      window.open(`https://explorer.solana.com/address/${publicKey.toString()}?cluster=testnet`, '_blank')
+      window.open(`https://explorer.solana.com/address/${publicKey.toString()}?cluster=devnet`, '_blank')
     }
   }
 

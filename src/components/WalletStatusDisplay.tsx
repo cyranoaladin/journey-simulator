@@ -67,7 +67,7 @@ const WalletStatusDisplay: React.FC<WalletStatusDisplayProps> = ({
   // Open explorer
   const openExplorer = () => {
     if (publicKey) {
-      window.open(`https://explorer.solana.com/address/${publicKey.toString()}?cluster=testnet`, '_blank');
+      window.open(`https://explorer.solana.com/address/${publicKey.toString()}?cluster=devnet`, '_blank');
     }
   };
 

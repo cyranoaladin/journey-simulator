@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { useEffect } from 'react'
 import { useJourneyStore } from './store/journeyStore'
 import { useThemeStore } from './store/themeStore'
 import { WalletContextProvider } from './contexts/WalletContext'
@@ -20,8 +19,11 @@ function App() {
   const { selectedPersona } = useJourneyStore()
 
   useEffect(() => {
-    // Initialize particles.js
-    initParticles()
+    const cleanup = initParticles()
+
+    return () => {
+      cleanup?.()
+    }
   }, [])
 
   useEffect(() => {

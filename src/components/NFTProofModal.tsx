@@ -263,7 +263,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
       setMintedAddress(result.mintAddress);
 
       // Set explorer URL
-      const url = `https://explorer.solana.com/address/${result.mintAddress}?cluster=testnet`;
+      const url = `https://explorer.solana.com/address/${result.mintAddress}?cluster=devnet`;
       setExplorerUrl(url);
       
     } catch (err: any) {
