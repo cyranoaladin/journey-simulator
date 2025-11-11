@@ -57,6 +57,70 @@ const getAuthHeaders = () => {
   };
 };
 
+// Centralized authenticated request with auto-refresh on 401
+const request = async <T>(
+  path: string,
+  options: RequestInit = {},
+  retryOnUnauthorized: boolean = true
+): Promise<T> => {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...options,
+    headers: {
+      ...(options.headers || {}),
+    },
+  });
+
+  if (response.status === 401 && retryOnUnauthorized) {
+    // Attempt token refresh once
+    const storedRefreshToken = localStorage.getItem('refreshToken');
+    if (!storedRefreshToken) {
+      const errorData: ApiError = await response.json().catch(() => ({
+        success: false,
+        message: 'Unauthorized and no refresh token available',
+      }));
+      throw new Error(errorData.message || 'Unauthorized');
+    }
+
+    // Refresh token
+    const refreshResp = await fetch(`${API_BASE_URL}/user/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken: storedRefreshToken }),
+    });
+
+    if (refreshResp.ok) {
+      const refreshData = await refreshResp.json();
+      if (refreshData?.accessToken) {
+        localStorage.setItem('accessToken', refreshData.accessToken);
+      }
+      if (refreshData?.refreshToken) {
+        localStorage.setItem('refreshToken', refreshData.refreshToken);
+      }
+
+      // Retry original request once with updated Authorization header
+      const retryResponse = await fetch(`${API_BASE_URL}${path}`, {
+        ...options,
+        headers: {
+          ...(options.headers || {}),
+          ...getAuthHeaders(),
+        },
+      });
+      return handleResponse<T>(retryResponse);
+    }
+
+    // Refresh failed
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    const errorData: ApiError = await refreshResp.json().catch(() => ({
+      success: false,
+      message: 'Token refresh failed',
+    }));
+    throw new Error(errorData.message || 'Token refresh failed');
+  }
+
+  return handleResponse<T>(response);
+};
+
 // Helper function to handle API responses
 const handleResponse = async <T>(response: Response): Promise<T> => {
   if (!response.ok) {
@@ -73,14 +137,11 @@ const handleResponse = async <T>(response: Response): Promise<T> => {
 export const api = {
   // Authentication
   login: async (email: string, password: string): Promise<LoginResponse> => {
-    const response = await fetch(`${API_BASE_URL}/user/login`, {
+    return request<LoginResponse>('/user/login', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
-    });
-    return handleResponse<LoginResponse>(response);
+    }, false);
   },
 
   register: async (userData: {
@@ -90,27 +151,22 @@ export const api = {
     wallet_address: string;
     persona: string;
   }): Promise<RegisterResponse> => {
-    const response = await fetch(`${API_BASE_URL}/user/register`, {
+    return request<RegisterResponse>('/user/register', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData),
-    });
-    return handleResponse<RegisterResponse>(response);
+    }, false);
   },
 
   logout: async (): Promise<void> => {
     const refreshToken = localStorage.getItem('refreshToken');
     if (refreshToken) {
       try {
-        await fetch(`${API_BASE_URL}/user/logout`, {
+        await request<void>('/user/logout', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ refreshToken }),
-        });
+        }, false);
       } catch (error) {
         console.error('Logout error:', error);
       }
@@ -123,40 +179,34 @@ export const api = {
       throw new Error('No refresh token available');
     }
 
-    const response = await fetch(`${API_BASE_URL}/user/refresh`, {
+    return request<{ accessToken: string; refreshToken?: string }>('/user/refresh', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
-    });
-    return handleResponse<{ accessToken: string; refreshToken?: string }>(response);
+    }, false);
   },
 
   verifyToken: async (): Promise<{ user: LoginResponse['user'] }> => {
-    const response = await fetch(`${API_BASE_URL}/user/profile`, {
+    return request<{ user: LoginResponse['user'] }>('/user/profile', {
       method: 'GET',
       headers: getAuthHeaders(),
     });
-    return handleResponse<{ user: LoginResponse['user'] }>(response);
   },
 
   // User profile
   getUserProfile: async (): Promise<LoginResponse['user']> => {
-    const response = await fetch(`${API_BASE_URL}/user/profile`, {
+    return request<LoginResponse['user']>('/user/profile', {
       method: 'GET',
       headers: getAuthHeaders(),
     });
-    return handleResponse<LoginResponse['user']>(response);
   },
 
   updateUserProfile: async (userData: Partial<LoginResponse['user']>): Promise<LoginResponse['user']> => {
-    const response = await fetch(`${API_BASE_URL}/user/update-profile`, {
+    return request<LoginResponse['user']>('/user/update-profile', {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(userData),
     });
-    return handleResponse<LoginResponse['user']>(response);
   },
 
   // Journey progress
@@ -165,21 +215,19 @@ export const api = {
     current_level?: number;
     completed_phases?: number;
   }): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/journey/user-progress`, {
+    return request<void>('/journey/user-progress', {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(progressData),
     });
-    return handleResponse<void>(response);
   },
 
   // Get user progress
   getUserProgress: async (): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/journey/user-progress`, {
+    return request<any>('/journey/user-progress', {
       method: 'GET',
       headers: getAuthHeaders(),
     });
-    return handleResponse<any>(response);
   },
 
   // Complete phase
@@ -188,12 +236,11 @@ export const api = {
     score?: number;
     nft_address?: string;
   }): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/journey/complete-phase`, {
+    return request<any>('/journey/complete-phase', {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(phaseData),
     });
-    return handleResponse<any>(response);
   },
 
   // NFT certificates
@@ -202,24 +249,22 @@ export const api = {
     nft_address: string;
     score?: number;
   }): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/user/nft-certificates`, {
+    return request<void>('/user/nft-certificates', {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(certificateData),
     });
-    return handleResponse<void>(response);
   },
 
   // Token transactions
   updateTokenBalance: async (tokenData: {
     mfai_tokens: number;
   }): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/user/tokens`, {
+    return request<void>('/user/tokens', {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(tokenData),
     });
-    return handleResponse<void>(response);
   },
 
   // Enhanced NFT certificate endpoint
@@ -232,12 +277,11 @@ export const api = {
     rarity: string;
     xp_earned: number;
   }): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/user/nft-certificates`, {
+    return request<any>('/user/nft-certificates', {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(certificateData),
     });
-    return handleResponse<any>(response);
   },
 
   // Track certification downloads
@@ -247,12 +291,11 @@ export const api = {
     user_persona?: string;
     download_timestamp: string;
   }): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/analytics/certification-download`, {
+    return request<any>('/analytics/certification-download', {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(downloadData),
     });
-    return handleResponse<any>(response);
   },
 
   // Track certification shares
@@ -263,21 +306,19 @@ export const api = {
     user_persona?: string;
     share_timestamp: string;
   }): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/analytics/certification-share`, {
+    return request<any>('/analytics/certification-share', {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(shareData),
     });
-    return handleResponse<any>(response);
   },
 
   // Get access pass holders
   getAccessPassHolders: async (): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/analytics/access-pass-holders`, {
+    return request<any>('/analytics/access-pass-holders', {
       method: 'GET',
       headers: getAuthHeaders(),
     });
-    return handleResponse<any>(response);
   },
 
   // Track holder interactions
@@ -286,21 +327,19 @@ export const api = {
     interaction_type: string;
     timestamp: string;
   }): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/analytics/holder-interaction`, {
+    return request<any>('/analytics/holder-interaction', {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(interactionData),
     });
-    return handleResponse<any>(response);
   },
 
   // Get platform statistics
   getPlatformStats: async (): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/analytics/platform-stats`, {
+    return request<any>('/analytics/platform-stats', {
       method: 'GET',
       headers: getAuthHeaders(),
     });
-    return handleResponse<any>(response);
   },
 };
 
