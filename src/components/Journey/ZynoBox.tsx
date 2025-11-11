@@ -1,7 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, Sparkles, ThumbsUp, ThumbsDown, X, Send } from 'lucide-react';
-import { useJourneyStore } from '../../store/journeyStore';
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  MessageCircle,
+  Sparkles,
+  ThumbsUp,
+  ThumbsDown,
+  X,
+  Send,
+} from "lucide-react";
+import { useJourneyStore } from "../../store/journeyStore";
 
 interface ZynoBoxProps {
   context?: string;
@@ -9,10 +16,10 @@ interface ZynoBoxProps {
   onPrompt?: (msg: string) => void;
 }
 
-const ZynoBox: React.FC<ZynoBoxProps> = ({ 
-  context = '',
+const ZynoBox: React.FC<ZynoBoxProps> = ({
+  context = "",
   tips = [],
-  onPrompt 
+  onPrompt,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentTip, setCurrentTip] = useState<string | null>(null);
@@ -26,7 +33,7 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
     "Your wallet isn't just a tool—it's your sovereign identity in the digital economy.",
     "This NFT is your on-chain diploma. It's cryptographic proof of your transformation.",
     "Your vote is your voice in the protocol. You're not just voting—you're co-creating the future.",
-    "Your skills now generate dividends. Congratulations! You've evolved from consumer to owner."
+    "Your skills now generate dividends. Congratulations! You've evolved from consumer to owner.",
   ];
 
   const entrepreneurTips = [
@@ -35,7 +42,7 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
     "Your MVP isn't just a product—it's an ecosystem where users become co-creators.",
     "A validated vision backed by community support is already valuable capital.",
     "Your stakeholders aren't just customers—they're co-owners of your success.",
-    "DAO funding isn't just investment—it's adoption by a community that believes in your vision."
+    "DAO funding isn't just investment—it's adoption by a community that believes in your vision.",
   ];
 
   const developerTips = [
@@ -44,7 +51,7 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
     "Great developers write code that works—architects create systems that evolve.",
     "An audit isn't judgment—it's validation that transforms your code into a trusted asset.",
     "Demo Day isn't competition—it's celebration of how you're evolving the ecosystem.",
-    "You no longer build on the protocol—you build the protocol itself."
+    "You no longer build on the protocol—you build the protocol itself.",
   ];
 
   const creatorTips = [
@@ -53,7 +60,7 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
     "Your Proof-of-Creation™ isn't just recognition—it's your creative license in the cognitive economy.",
     "Distribution is creation. Every airdrop builds the community that values your cognitive capital.",
     "Your creativity now generates autonomous value. Welcome to the cognitive economy where art creates capital.",
-    "AI doesn't replace creativity—it amplifies it. Your prompts become your signature style."
+    "AI doesn't replace creativity—it amplifies it. Your prompts become your signature style.",
   ];
 
   const communicatorTips = [
@@ -61,7 +68,7 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
     "Your missions become the paths others will follow. Design with intention.",
     "Leadership in Web3 is earned through contribution, not appointment.",
     "Your voice now shapes the collective intelligence of the ecosystem.",
-    "You now orchestrate the protocol's evolution. Your coordination becomes the ecosystem's nervous system."
+    "You now orchestrate the protocol's evolution. Your coordination becomes the ecosystem's nervous system.",
   ];
 
   const managerTips = [
@@ -69,7 +76,7 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
     "Your mission design becomes the infrastructure others use to create value.",
     "Proof-of-Orchestration™ validates your ability to turn chaos into coordinated value creation.",
     "Meta-missions coordinate the coordination. You're now orchestrating the orchestrators.",
-    "In a decentralized world, operations isn't back office. It's the engine of collective sovereignty."
+    "In a decentralized world, operations isn't back office. It's the engine of collective sovereignty.",
   ];
 
   const defiTips = [
@@ -78,7 +85,7 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
     "Your Proof-of-Yield™ demonstrates mastery over the complex dance of risk and reward in DeFi.",
     "Your vote shapes the future of DeFi. You're not just using protocols—you're governing them.",
     "Compounding isn't just about returns—it's about building sustainable wealth through disciplined DeFi mastery.",
-    "Risk management isn't limiting returns—it's ensuring your DeFi journey continues through market cycles."
+    "Risk management isn't limiting returns—it's ensuring your DeFi journey continues through market cycles.",
   ];
 
   const nftCreatorTips = [
@@ -87,7 +94,7 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
     "Validation transforms your art from personal expression to community-recognized value.",
     "Your collectors aren't just buyers—they're stakeholders in your creative journey.",
     "Royalties aren't just passive income—they're proof that your creativity generates perpetual value.",
-    "In the NFT economy, your reputation is your most valuable asset. Each creation builds your on-chain portfolio."
+    "In the NFT economy, your reputation is your most valuable asset. Each creation builds your on-chain portfolio.",
   ];
 
   const investorTips = [
@@ -96,7 +103,7 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
     "Your Proof-of-Invest™ isn't just a badge—it's validation of your capital allocation wisdom.",
     "Your capital allocation decisions now shape the protocol's future. You're not just investing—you're architecting.",
     "Your conviction now generates dividends. Welcome to the cognitive economy where aligned capital creates compounding value.",
-    "Due diligence isn't just risk management—it's the foundation of confident capital deployment."
+    "Due diligence isn't just risk management—it's the foundation of confident capital deployment.",
   ];
 
   // Default tips if none provided
@@ -105,20 +112,21 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
     "Your journey is unique. Based on your profile, I recommend starting with the Learn phase to build solid foundations.",
     "Proof-of-Skill™ NFTs aren't decorative - they're cryptographic proof of your transformation and open opportunities.",
     "The Proof Economy rewards created value, not time spent. Your skills become your capital.",
-    "Each completed phase brings you closer to digital sovereignty. Keep going, you're on the right track!"
+    "Each completed phase brings you closer to digital sovereignty. Keep going, you're on the right track!",
   ];
 
   // Use persona-specific tips if available
   const getActiveTips = () => {
-    if (selectedPersona?.id === 'curious-student') return curiousStudentTips;
-    if (selectedPersona?.id === 'web2-entrepreneur') return entrepreneurTips;
-    if (selectedPersona?.id === 'web3-developer') return developerTips;
-    if (selectedPersona?.id === 'content-creator') return creatorTips;
-    if (selectedPersona?.id === 'community-communicator') return communicatorTips;
-    if (selectedPersona?.id === 'project-manager') return managerTips;
-    if (selectedPersona?.id === 'defi-explorer') return defiTips;
-    if (selectedPersona?.id === 'nft-creator') return nftCreatorTips;
-    if (selectedPersona?.id === 'investor') return investorTips;
+    if (selectedPersona?.id === "curious-student") return curiousStudentTips;
+    if (selectedPersona?.id === "web2-entrepreneur") return entrepreneurTips;
+    if (selectedPersona?.id === "web3-developer") return developerTips;
+    if (selectedPersona?.id === "content-creator") return creatorTips;
+    if (selectedPersona?.id === "community-communicator")
+      return communicatorTips;
+    if (selectedPersona?.id === "project-manager") return managerTips;
+    if (selectedPersona?.id === "defi-explorer") return defiTips;
+    if (selectedPersona?.id === "nft-creator") return nftCreatorTips;
+    if (selectedPersona?.id === "investor") return investorTips;
     if (tips.length > 0) return tips;
     return defaultTips;
   };
@@ -134,30 +142,33 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
 
   // Get a contextual greeting based on user progress
   const getGreeting = () => {
-    if (!selectedPersona) return "Hi! I'm Zyno, your AI Co-Founder™. Ready to start your cognitive activation journey?";
-    
+    if (!selectedPersona)
+      return "Hi! I'm Zyno, your AI Co-Founder™. Ready to start your cognitive activation journey?";
+
     if (userProgress.completedPhases.length === 0) {
       return `Welcome to the ${selectedPersona.title} journey! I'm Zyno, your AI Co-Founder™. Let's transform your skills into capital.`;
     }
-    
+
     if (userProgress.completedPhases.length === selectedPersona.phases.length) {
       return "Congratulations on completing your journey! You've achieved digital sovereignty. What's your next adventure?";
     }
-    
+
     const currentPhaseIndex = userProgress.completedPhases.length;
     const currentPhase = selectedPersona.phases[currentPhaseIndex];
-    
+
     return `You're currently in the ${currentPhase.title} phase. I'm here to guide you through each step. How can I help you progress?`;
   };
 
   const handleFeedback = (positive: boolean) => {
     // In a real implementation, this would send feedback to a backend
-    console.log(`User gave ${positive ? 'positive' : 'negative'} feedback for tip: ${currentTip}`);
+    console.log(
+      `User gave ${positive ? "positive" : "negative"} feedback for tip: ${currentTip}`,
+    );
     setFeedbackGiven(true);
   };
 
   const getNewTip = () => {
-    const availableTips = activeTips.filter(tip => tip !== currentTip);
+    const availableTips = activeTips.filter((tip) => tip !== currentTip);
     const randomIndex = Math.floor(Math.random() * availableTips.length);
     setCurrentTip(availableTips[randomIndex]);
     setFeedbackGiven(false);
@@ -245,7 +256,7 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
                   </div>
                   <div className="bg-white/5 p-3 rounded-lg rounded-tl-none">
                     <p className="text-sm">{currentTip}</p>
-                    
+
                     {/* Feedback buttons */}
                     {!feedbackGiven ? (
                       <div className="flex justify-between mt-3">
@@ -310,10 +321,17 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
                   </div>
                   <div className="bg-white/5 p-3 rounded-lg rounded-tl-none">
                     <p className="text-sm">
-                      You've completed {userProgress.completedPhases.length} out of {selectedPersona.phases.length} phases. 
-                      {userProgress.completedPhases.length === 0 && " Ready to start your first phase?"}
-                      {userProgress.completedPhases.length > 0 && userProgress.completedPhases.length < selectedPersona.phases.length && " Keep up the great progress!"}
-                      {userProgress.completedPhases.length === selectedPersona.phases.length && " Amazing! You've achieved digital sovereignty!"}
+                      You've completed {userProgress.completedPhases.length} out
+                      of {selectedPersona.phases.length} phases.
+                      {userProgress.completedPhases.length === 0 &&
+                        " Ready to start your first phase?"}
+                      {userProgress.completedPhases.length > 0 &&
+                        userProgress.completedPhases.length <
+                          selectedPersona.phases.length &&
+                        " Keep up the great progress!"}
+                      {userProgress.completedPhases.length ===
+                        selectedPersona.phases.length &&
+                        " Amazing! You've achieved digital sovereignty!"}
                     </p>
                   </div>
                 </motion.div>
@@ -328,11 +346,11 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
                       placeholder="Ask Zyno a question..."
                       className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-white/60 focus:outline-none focus:border-primary-400"
                       onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
+                        if (e.key === "Enter") {
                           const input = e.currentTarget as HTMLInputElement;
                           if (input.value.trim()) {
                             onPrompt(input.value);
-                            input.value = '';
+                            input.value = "";
                           }
                         }
                       }}
@@ -341,10 +359,12 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => {
-                        const input = document.querySelector('input') as HTMLInputElement;
+                        const input = document.querySelector(
+                          "input",
+                        ) as HTMLInputElement;
                         if (input?.value.trim()) {
                           onPrompt(input.value);
-                          input.value = '';
+                          input.value = "";
                         }
                       }}
                       className="bg-gradient-primary p-2 rounded-lg"

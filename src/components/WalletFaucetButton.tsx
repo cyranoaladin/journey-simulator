@@ -1,28 +1,30 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Droplets, Loader, CheckCircle } from 'lucide-react';
-import { useWallet } from '@solana/wallet-adapter-react';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { Droplets, Loader, CheckCircle } from "lucide-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 interface WalletFaucetButtonProps {
   className?: string;
 }
 
-const WalletFaucetButton: React.FC<WalletFaucetButtonProps> = ({ className = '' }) => {
+const WalletFaucetButton: React.FC<WalletFaucetButtonProps> = ({
+  className = "",
+}) => {
   const { connected } = useWallet();
   const [isRequesting, setIsRequesting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
   const requestTestnetTokens = async () => {
     if (!connected || isRequesting) return;
-    
+
     setIsRequesting(true);
-    
+
     // Simulate faucet request
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
     setIsSuccess(true);
     setIsRequesting(false);
-    
+
     // Reset success state after 3 seconds
     setTimeout(() => {
       setIsSuccess(false);
@@ -39,8 +41,8 @@ const WalletFaucetButton: React.FC<WalletFaucetButtonProps> = ({ className = '' 
       disabled={isRequesting || isSuccess}
       className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
         isSuccess
-          ? 'bg-green-500 text-white'
-          : 'bg-blue-600 hover:bg-blue-500 text-white'
+          ? "bg-green-500 text-white"
+          : "bg-blue-600 hover:bg-blue-500 text-white"
       } disabled:opacity-50 ${className}`}
     >
       {isRequesting ? (

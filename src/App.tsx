@@ -1,109 +1,202 @@
-import { useEffect } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
-import { useJourneyStore } from './store/journeyStore'
-import { useThemeStore } from './store/themeStore'
-import { WalletContextProvider } from './contexts/WalletContext'
-import { AuthProvider } from './contexts/AuthContext'
-import ProtectedRoute from './components/ProtectedRoute'
-import Header from './components/Header'
-import HeroSection from './components/HeroSection'
-import JourneysPage from './components/JourneysPage'
-import LoginPage from './components/LoginPage'
-import RegisterPage from './components/RegisterPage'
-import SkillchainBanner from './components/SkillchainBanner'
-import AccessPassHolders from './components/AccessPassHolders'
-import Footer from './components/Footer'
-import JourneyModal from './components/JourneyModal'
-import ZynoAssistant from './components/ZynoAssistant'
-import WalletConnectionBanner from './components/WalletConnectionBanner'
-import BackToTopButton from './components/BackToTopButton'
-import { initParticles } from './utils/particles'
+import React, { Suspense, useEffect } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useJourneyStore } from "./store/journeyStore";
+import { useThemeStore } from "./store/themeStore";
+import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Header from "./components/Header";
+import HeroSection from "./components/HeroSection";
+import JourneysPage from "./components/JourneysPage";
+import LoginPage from "./components/LoginPage";
+import RegisterPage from "./components/RegisterPage";
+import SkillchainBanner from "./components/SkillchainBanner";
+import AccessPassHolders from "./components/AccessPassHolders";
+import Footer from "./components/Footer";
+import JourneyModal from "./components/JourneyModal";
+import ZynoAssistant from "./components/ZynoAssistant";
+import WalletConnectionBanner from "./components/WalletConnectionBanner";
+import BackToTopButton from "./components/BackToTopButton";
+import { initParticles } from "./utils/particles";
+
+const ENABLE_WALLET = (import.meta as any).env?.VITE_ENABLE_WALLET === "1";
+const DynamicWalletProvider = React.lazy(() =>
+  import("./contexts/WalletContext").then((m) => ({
+    default: m.WalletContextProvider,
+  })),
+);
+const Passthrough: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <>{children}</>
+);
 
 function App() {
-  const { isDark } = useThemeStore()
-  const { selectedPersona } = useJourneyStore()
+  const { isDark, isNeon } = useThemeStore();
+  const { selectedPersona } = useJourneyStore();
 
   useEffect(() => {
     // Initialize particles.js
-    initParticles()
-  }, [])
+    initParticles();
+  }, []);
 
   useEffect(() => {
     // Apply theme to document
     if (isDark) {
-      document.documentElement.classList.add('dark')
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove('dark')
+      document.documentElement.classList.remove("dark");
     }
-  }, [isDark])
+  }, [isDark]);
 
   return (
     <AuthProvider>
-      <WalletContextProvider>
-        <div className={`min-h-screen transition-colors duration-300 ${
-          isDark 
-            ? 'bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 text-white' 
-            : 'bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 text-gray-900'
-        }`}>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            
-            {/* Protected Routes */}
-            <Route path="/" element={
-              <ProtectedRoute>
-                <div>
-                  <Header />
-                  <WalletConnectionBanner />
-                  <SkillchainBanner />
-                  
-                  <main className="relative">
-                    {!selectedPersona && <HeroSection />}
-                    
-                    <JourneysPage />
-                    
-                    {!selectedPersona && <AccessPassHolders />}
-                  </main>
+      <Suspense fallback={<div />}>
+        {ENABLE_WALLET ? (
+          <DynamicWalletProvider>
+            <div
+              className={`min-h-screen transition-colors duration-300 ${
+                isDark
+                  ? "bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 text-white"
+                  : "bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 text-gray-900"
+              } ${isNeon ? "neon" : ""}`}
+            >
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
 
-                  <Footer />
-                  <JourneyModal />
-                  <ZynoAssistant />
-                  <BackToTopButton />
-                </div>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/journeys" element={
-              <ProtectedRoute>
-                <div>
-                  <Header />
-                  <WalletConnectionBanner />
-                  <SkillchainBanner />
-                  
-                  <main className="relative">
-                    {!selectedPersona && <HeroSection />}
-                    
-                    <JourneysPage />
-                    
-                    {!selectedPersona && <AccessPassHolders />}
-                  </main>
+                {/* Protected Routes */}
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <div>
+                        <Header />
+                        <WalletConnectionBanner />
+                        <SkillchainBanner />
 
-                  <Footer />
-                  <JourneyModal />
-                  <ZynoAssistant />
-                  <BackToTopButton />
-                </div>
-              </ProtectedRoute>
-            } />
-            
-            {/* Catch all route - redirect to home */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </div>
-      </WalletContextProvider>
+                        <main className="relative">
+                          {!selectedPersona && <HeroSection />}
+
+                          <JourneysPage />
+
+                          {!selectedPersona && <AccessPassHolders />}
+                        </main>
+
+                        <Footer />
+                        <JourneyModal />
+                        <ZynoAssistant />
+                        <BackToTopButton />
+                      </div>
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/journeys"
+                  element={
+                    <ProtectedRoute>
+                      <div>
+                        <Header />
+                        <WalletConnectionBanner />
+                        <SkillchainBanner />
+
+                        <main className="relative">
+                          {!selectedPersona && <HeroSection />}
+
+                          <JourneysPage />
+
+                          {!selectedPersona && <AccessPassHolders />}
+                        </main>
+
+                        <Footer />
+                        <JourneyModal />
+                        <ZynoAssistant />
+                        <BackToTopButton />
+                      </div>
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Catch all route - redirect to home */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </div>
+          </DynamicWalletProvider>
+        ) : (
+          <Passthrough>
+            <div
+              className={`min-h-screen transition-colors duration-300 ${
+                isDark
+                  ? "bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 text-white"
+                  : "bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 text-gray-900"
+              } ${isNeon ? "neon" : ""}`}
+            >
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+
+                {/* Protected Routes */}
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <div>
+                        <Header />
+                        <WalletConnectionBanner />
+                        <SkillchainBanner />
+
+                        <main className="relative">
+                          {!selectedPersona && <HeroSection />}
+
+                          <JourneysPage />
+
+                          {!selectedPersona && <AccessPassHolders />}
+                        </main>
+
+                        <Footer />
+                        <JourneyModal />
+                        <ZynoAssistant />
+                        <BackToTopButton />
+                      </div>
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/journeys"
+                  element={
+                    <ProtectedRoute>
+                      <div>
+                        <Header />
+                        <WalletConnectionBanner />
+                        <SkillchainBanner />
+
+                        <main className="relative">
+                          {!selectedPersona && <HeroSection />}
+
+                          <JourneysPage />
+
+                          {!selectedPersona && <AccessPassHolders />}
+                        </main>
+
+                        <Footer />
+                        <JourneyModal />
+                        <ZynoAssistant />
+                        <BackToTopButton />
+                      </div>
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Catch all route - redirect to home */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </div>
+          </Passthrough>
+        )}
+      </Suspense>
     </AuthProvider>
-  )
+  );
 }
 
-export default App
+export default App;

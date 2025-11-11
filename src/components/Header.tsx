@@ -1,47 +1,47 @@
-import React from 'react'
-import { motion } from 'framer-motion'
-import { Moon, Sun, Menu, X, ChevronDown, LogOut } from 'lucide-react'
-import { useThemeStore } from '../store/themeStore'
-import { useAuth } from '../contexts/AuthContext'
-import { useState } from 'react'
-import WalletButton from './WalletButton'
+import React from "react";
+import { motion } from "framer-motion";
+import { Moon, Sun, Menu, X, ChevronDown, LogOut, Zap } from "lucide-react";
+import { useThemeStore } from "../store/themeStore";
+import { useAuth } from "../contexts/AuthContext";
+import { useState } from "react";
+import WalletButton from "./WalletButton";
 
 const Header = () => {
-  const { isDark, toggleTheme } = useThemeStore()
-  const { logout, user } = useAuth()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(false)
+  const { isDark, toggleTheme, isNeon, toggleNeon } = useThemeStore();
+  const { logout, user } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const navItems = [
-    { label: 'Home', href: '#hero' },
-    { label: 'Journeys', href: '#personas' },
-  ]
+    { label: "Home", href: "#hero" },
+    { label: "Journeys", href: "#personas" },
+  ];
 
   // Handle scroll events to adjust header height
   React.useEffect(() => {
     const handleScroll = () => {
-      const scrollPosition = window.scrollY
-      setIsScrolled(scrollPosition > 50)
-    }
+      const scrollPosition = window.scrollY;
+      setIsScrolled(scrollPosition > 50);
+    };
 
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const scrollToSection = (href: string) => {
-    const element = document.querySelector(href)
+    const element = document.querySelector(href);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' })
+      element.scrollIntoView({ behavior: "smooth" });
     }
-    setIsMobileMenuOpen(false)
-  }
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <motion.header
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       className={`fixed top-0 left-0 right-0 z-50 glass-effect transition-all duration-300 ${
-        isScrolled ? 'py-2' : 'py-4'
+        isScrolled ? "py-2" : "py-4"
       }`}
     >
       <div className="container mx-auto px-4">
@@ -52,7 +52,11 @@ const Header = () => {
             className="flex items-center space-x-2"
           >
             <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <img src="/images/logo_mfai.png" alt="MFAI Logo" className="w-6 h-6" />
+              <img
+                src="/images/logo_mfai.png"
+                alt="MFAI Logo"
+                className="w-6 h-6"
+              />
             </div>
             <span className="font-space font-bold text-xl gradient-text">
               Money Factory AI
@@ -100,9 +104,22 @@ const Header = () => {
               whileTap={{ scale: 0.9 }}
               onClick={toggleTheme}
               className="p-2 rounded-lg glass-effect"
-              aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+              aria-label={
+                isDark ? "Switch to light mode" : "Switch to dark mode"
+              }
             >
               {isDark ? <Sun size={20} /> : <Moon size={20} />}
+            </motion.button>
+
+            {/* Neon Toggle */}
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={toggleNeon}
+              className={`p-2 rounded-lg glass-effect ${isNeon ? "text-accent-cyan" : ""}`}
+              aria-label={isNeon ? "Disable neon mode" : "Enable neon mode"}
+            >
+              <Zap size={20} />
             </motion.button>
 
             {/* Mobile Menu Button */}
@@ -136,7 +153,7 @@ const Header = () => {
                 {item.label}
               </motion.button>
             ))}
-            
+
             {/* Mobile Logout */}
             {user && (
               <div className="border-t border-gray-600/30 mt-4 pt-4">
@@ -158,7 +175,7 @@ const Header = () => {
         )}
       </div>
     </motion.header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

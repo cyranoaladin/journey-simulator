@@ -1,0 +1,33 @@
+/* Neon mode styles (scoped by the `.neon` class on a parent container) */
+
+.neon .gradient-text {
+  text-shadow:
+    0 0 6px rgba(34, 211, 238, 0.45),
+    0 0 14px rgba(99, 102, 241, 0.35);
+}
+
+.neon .btn-primary {
+  box-shadow:
+    0 0 12px rgba(34, 211, 238, 0.45),
+    0 0 22px rgba(99, 102, 241, 0.28);
+}
+
+.neon .glass-effect {
+  border-color: rgba(20, 241, 149, 0.35);
+  box-shadow: 0 0 18px rgba(20, 241, 149, 0.15);
+}
+
+.neon .card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 12px 28px rgba(34, 211, 238, 0.25),
+    0 0 20px rgba(99, 102, 241, 0.2);
+}
+
+.neon .badge {
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.22);
+}
+
+.neon .wallet-adapter-button-trigger {
+  box-shadow: 0 0 12px rgba(153, 69, 255, 0.28);
+}

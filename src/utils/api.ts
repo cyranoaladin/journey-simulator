@@ -1,5 +1,7 @@
-// API base URL - update this to match your backend URL
-const API_BASE_URL = 'http://localhost:3000'; // Update this to your backend URL
+// API base URL - can be overridden by Vite env (VITE_API_BASE_URL)
+const API_BASE_URL =
+  (import.meta as any).env?.VITE_API_BASE_URL || "http://localhost:3000";
+const IS_MOCK = (import.meta as any).env?.VITE_API_MOCK === "1";
 
 // API response interfaces
 export interface LoginResponse {
@@ -8,13 +10,13 @@ export interface LoginResponse {
     id: string;
     name: string;
     email: string;
-    role: 'admin' | 'user';
+    role: "admin" | "user";
     wallet_address: string;
-    persona?: 'student' | 'entrepreneur' | 'developer' | 'creator';
+    persona?: "student" | "entrepreneur" | "developer" | "creator";
     total_xp?: number;
     current_level?: number;
     completed_phases?: number;
-    subscription?: 'gold' | 'platinum' | 'diamond' | false;
+    subscription?: "gold" | "platinum" | "diamond" | false;
     is_active?: boolean;
   };
   accessToken: string;
@@ -28,13 +30,13 @@ export interface RegisterResponse {
     id: string;
     name: string;
     email: string;
-    role: 'admin' | 'user';
+    role: "admin" | "user";
     wallet_address: string;
-    persona?: 'student' | 'entrepreneur' | 'developer' | 'creator';
+    persona?: "student" | "entrepreneur" | "developer" | "creator";
     total_xp?: number;
     current_level?: number;
     completed_phases?: number;
-    subscription?: 'gold' | 'platinum' | 'diamond' | false;
+    subscription?: "gold" | "platinum" | "diamond" | false;
     is_active?: boolean;
   };
   accessToken: string;
@@ -50,10 +52,10 @@ export interface ApiError {
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('accessToken');
+  const token = localStorage.getItem("accessToken");
   return {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` }),
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
   };
 };
 
@@ -62,9 +64,11 @@ const handleResponse = async <T>(response: Response): Promise<T> => {
   if (!response.ok) {
     const errorData: ApiError = await response.json().catch(() => ({
       success: false,
-      message: 'Network error occurred'
+      message: "Network error occurred",
     }));
-    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    throw new Error(
+      errorData.message || `HTTP error! status: ${response.status}`,
+    );
   }
   return response.json();
 };
@@ -73,14 +77,39 @@ const handleResponse = async <T>(response: Response): Promise<T> => {
 export const api = {
   // Authentication
   login: async (email: string, password: string): Promise<LoginResponse> => {
-    const response = await fetch(`${API_BASE_URL}/user/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
-    return handleResponse<LoginResponse>(response);
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      return await handleResponse<LoginResponse>(response);
+    } catch (_) {
+      if (IS_MOCK) {
+        return {
+          success: true,
+          user: {
+            id: "u_demo",
+            name: "Demo User",
+            email,
+            role: "user",
+            wallet_address: "DemoWallet",
+            persona: "student",
+            total_xp: 0,
+            current_level: 1,
+            completed_phases: 0,
+            subscription: false,
+            is_active: true,
+          },
+          accessToken: "demo_access",
+          refreshToken: "demo_refresh",
+          message: "mocked login",
+        };
+      }
+      throw _;
+    }
   },
 
   register: async (userData: {
@@ -90,73 +119,167 @@ export const api = {
     wallet_address: string;
     persona: string;
   }): Promise<RegisterResponse> => {
-    const response = await fetch(`${API_BASE_URL}/user/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userData),
-    });
-    return handleResponse<RegisterResponse>(response);
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+      return await handleResponse<RegisterResponse>(response);
+    } catch (_) {
+      if (IS_MOCK) {
+        return {
+          success: true,
+          user: {
+            id: "u_demo",
+            name: userData.name || "Demo User",
+            email: userData.email,
+            role: "user",
+            wallet_address: userData.wallet_address || "DemoWallet",
+            persona: (userData.persona as any) || "student",
+            total_xp: 0,
+            current_level: 1,
+            completed_phases: 0,
+            subscription: false,
+            is_active: true,
+          },
+          accessToken: "demo_access",
+          refreshToken: "demo_refresh",
+          message: "mocked register",
+        };
+      }
+      throw _;
+    }
   },
 
   logout: async (): Promise<void> => {
-    const refreshToken = localStorage.getItem('refreshToken');
+    const refreshToken = localStorage.getItem("refreshToken");
     if (refreshToken) {
       try {
         await fetch(`${API_BASE_URL}/user/logout`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({ refreshToken }),
         });
       } catch (error) {
-        console.error('Logout error:', error);
+        console.error("Logout error:", error);
       }
     }
   },
 
-  refreshToken: async (): Promise<{ accessToken: string; refreshToken?: string }> => {
-    const refreshToken = localStorage.getItem('refreshToken');
+  refreshToken: async (): Promise<{
+    accessToken: string;
+    refreshToken?: string;
+  }> => {
+    const refreshToken = localStorage.getItem("refreshToken");
     if (!refreshToken) {
-      throw new Error('No refresh token available');
+      throw new Error("No refresh token available");
     }
 
     const response = await fetch(`${API_BASE_URL}/user/refresh`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ refreshToken }),
     });
-    return handleResponse<{ accessToken: string; refreshToken?: string }>(response);
+    return handleResponse<{ accessToken: string; refreshToken?: string }>(
+      response,
+    );
   },
 
-  verifyToken: async (): Promise<{ user: LoginResponse['user'] }> => {
-    const response = await fetch(`${API_BASE_URL}/user/profile`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    });
-    return handleResponse<{ user: LoginResponse['user'] }>(response);
+  verifyToken: async (): Promise<{ user: LoginResponse["user"] }> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/profile`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+      return await handleResponse<{ user: LoginResponse["user"] }>(response);
+    } catch (_) {
+      if (IS_MOCK) {
+        const email = "demo@mfai.com";
+        return {
+          user: {
+            id: "u_demo",
+            name: "Demo User",
+            email,
+            role: "user",
+            wallet_address: "DemoWallet",
+            persona: "student",
+            total_xp: 0,
+            current_level: 1,
+            completed_phases: 0,
+            subscription: false,
+            is_active: true,
+          },
+        };
+      }
+      throw _;
+    }
   },
 
   // User profile
-  getUserProfile: async (): Promise<LoginResponse['user']> => {
-    const response = await fetch(`${API_BASE_URL}/user/profile`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    });
-    return handleResponse<LoginResponse['user']>(response);
+  getUserProfile: async (): Promise<LoginResponse["user"]> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/profile`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+      return await handleResponse<LoginResponse["user"]>(response);
+    } catch (_) {
+      if (IS_MOCK) {
+        return {
+          id: "u_demo",
+          name: "Demo User",
+          email: "demo@mfai.com",
+          role: "user",
+          wallet_address: "DemoWallet",
+          persona: "student",
+          total_xp: 0,
+          current_level: 1,
+          completed_phases: 0,
+          subscription: false,
+          is_active: true,
+        };
+      }
+      throw _;
+    }
   },
 
-  updateUserProfile: async (userData: Partial<LoginResponse['user']>): Promise<LoginResponse['user']> => {
-    const response = await fetch(`${API_BASE_URL}/user/update-profile`, {
-      method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(userData),
-    });
-    return handleResponse<LoginResponse['user']>(response);
+  updateUserProfile: async (
+    userData: Partial<LoginResponse["user"]>,
+  ): Promise<LoginResponse["user"]> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/update-profile`, {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(userData),
+      });
+      return await handleResponse<LoginResponse["user"]>(response);
+    } catch (_) {
+      if (IS_MOCK) {
+        return {
+          id: "u_demo",
+          name: userData.name || "Demo User",
+          email:
+            (userData["email" as keyof typeof userData] as any) ||
+            "demo@mfai.com",
+          role: "user",
+          wallet_address: "DemoWallet",
+          persona: (userData.persona as any) || "student",
+          total_xp: 0,
+          current_level: 1,
+          completed_phases: 0,
+          subscription: false,
+          is_active: true,
+        };
+      }
+      throw _;
+    }
   },
 
   // Journey progress
@@ -165,21 +288,41 @@ export const api = {
     current_level?: number;
     completed_phases?: number;
   }): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/journey/user-progress`, {
-      method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(progressData),
-    });
-    return handleResponse<void>(response);
+    try {
+      const response = await fetch(`${API_BASE_URL}/journey/user-progress`, {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(progressData),
+      });
+      return await handleResponse<void>(response);
+    } catch (_) {
+      if (IS_MOCK) return;
+      throw _;
+    }
   },
 
   // Get user progress
   getUserProgress: async (): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/journey/user-progress`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    });
-    return handleResponse<any>(response);
+    try {
+      const response = await fetch(`${API_BASE_URL}/journey/user-progress`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+      return await handleResponse<any>(response);
+    } catch (_) {
+      if (IS_MOCK) {
+        return {
+          total_xp: 0,
+          current_level: 1,
+          completed_phases: 0,
+          mfai_tokens: 0,
+          staked_mfai: 0,
+          voting_power: 0,
+          nfts: [],
+        };
+      }
+      throw _;
+    }
   },
 
   // Complete phase
@@ -188,12 +331,17 @@ export const api = {
     score?: number;
     nft_address?: string;
   }): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/journey/complete-phase`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(phaseData),
-    });
-    return handleResponse<any>(response);
+    try {
+      const response = await fetch(`${API_BASE_URL}/journey/complete-phase`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(phaseData),
+      });
+      return await handleResponse<any>(response);
+    } catch (_) {
+      if (IS_MOCK) return { ok: true };
+      throw _;
+    }
   },
 
   // NFT certificates
@@ -202,24 +350,34 @@ export const api = {
     nft_address: string;
     score?: number;
   }): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/user/nft-certificates`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(certificateData),
-    });
-    return handleResponse<void>(response);
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/nft-certificates`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(certificateData),
+      });
+      return await handleResponse<void>(response);
+    } catch (_) {
+      if (IS_MOCK) return;
+      throw _;
+    }
   },
 
   // Token transactions
   updateTokenBalance: async (tokenData: {
     mfai_tokens: number;
   }): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/user/tokens`, {
-      method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(tokenData),
-    });
-    return handleResponse<void>(response);
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/tokens`, {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(tokenData),
+      });
+      return await handleResponse<void>(response);
+    } catch (_) {
+      if (IS_MOCK) return;
+      throw _;
+    }
   },
 
   // Enhanced NFT certificate endpoint
@@ -232,12 +390,17 @@ export const api = {
     rarity: string;
     xp_earned: number;
   }): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/user/nft-certificates`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(certificateData),
-    });
-    return handleResponse<any>(response);
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/nft-certificates`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(certificateData),
+      });
+      return await handleResponse<any>(response);
+    } catch (_) {
+      if (IS_MOCK) return { ok: true };
+      throw _;
+    }
   },
 
   // Track certification downloads
@@ -247,12 +410,20 @@ export const api = {
     user_persona?: string;
     download_timestamp: string;
   }): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/analytics/certification-download`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(downloadData),
-    });
-    return handleResponse<any>(response);
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/analytics/certification-download`,
+        {
+          method: "POST",
+          headers: getAuthHeaders(),
+          body: JSON.stringify(downloadData),
+        },
+      );
+      return await handleResponse<any>(response);
+    } catch (_) {
+      if (IS_MOCK) return { ok: true };
+      throw _;
+    }
   },
 
   // Track certification shares
@@ -263,21 +434,42 @@ export const api = {
     user_persona?: string;
     share_timestamp: string;
   }): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/analytics/certification-share`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(shareData),
-    });
-    return handleResponse<any>(response);
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/analytics/certification-share`,
+        {
+          method: "POST",
+          headers: getAuthHeaders(),
+          body: JSON.stringify(shareData),
+        },
+      );
+      return await handleResponse<any>(response);
+    } catch (_) {
+      if (IS_MOCK) return { ok: true };
+      throw _;
+    }
   },
 
   // Get access pass holders
   getAccessPassHolders: async (): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/analytics/access-pass-holders`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    });
-    return handleResponse<any>(response);
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/analytics/access-pass-holders`,
+        {
+          method: "GET",
+          headers: getAuthHeaders(),
+        },
+      );
+      return await handleResponse<any>(response);
+    } catch (_) {
+      if (IS_MOCK) {
+        return [
+          { id: "h1", name: "Alice", level: "gold" },
+          { id: "h2", name: "Bob", level: "platinum" },
+        ];
+      }
+      throw _;
+    }
   },
 
   // Track holder interactions
@@ -286,22 +478,36 @@ export const api = {
     interaction_type: string;
     timestamp: string;
   }): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/analytics/holder-interaction`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(interactionData),
-    });
-    return handleResponse<any>(response);
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/analytics/holder-interaction`,
+        {
+          method: "POST",
+          headers: getAuthHeaders(),
+          body: JSON.stringify(interactionData),
+        },
+      );
+      return await handleResponse<any>(response);
+    } catch (_) {
+      if (IS_MOCK) return { ok: true };
+      throw _;
+    }
   },
 
   // Get platform statistics
   getPlatformStats: async (): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/analytics/platform-stats`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    });
-    return handleResponse<any>(response);
+    try {
+      const response = await fetch(`${API_BASE_URL}/analytics/platform-stats`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+      return await handleResponse<any>(response);
+    } catch (_) {
+      if (IS_MOCK)
+        return { users: 1200, nfts: 3000, xp: 120000, activeJourneys: 80 };
+      throw _;
+    }
   },
 };
 
-export default api; 
+export default api;

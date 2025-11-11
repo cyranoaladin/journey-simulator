@@ -39,6 +39,7 @@
 Money Factory AI (MFAI) Journey Simulator is a revolutionary Web3-native platform that transforms users' skills into digital capital through the **Cognitive Activation Protocol™**. This protocol guides users through a structured 5-phase journey: Learn → Build → Prove → Activate → Scale.
 
 The platform integrates:
+
 - **AI Assistance** (Zyno AI Co-Founder™)
 - **NFT Certifications** (Proof-of-Skill™)
 - **Gamified XP Progression**
@@ -93,6 +94,7 @@ This journey simulator is designed to be integrated into the main Money Factory 
 4. **Data Integration**: Potential user data synchronization between platforms
 
 #### Recommended Integration Points:
+
 - **Homepage Hero Section**: Primary CTA to start journey simulation
 - **About Page**: Detailed explanation with link to try the simulator
 - **Navigation Menu**: Direct access to journey simulator
@@ -170,30 +172,35 @@ App
 The foundation of the platform is a 5-phase progression model:
 
 #### Phase 1: Learn
+
 - **Objective**: Acquire foundational knowledge
 - **Activities**: Interactive content, quizzes, videos
 - **Rewards**: XP, $MFAI tokens, basic NFT badges
 - **Duration**: 1-2 weeks
 
 #### Phase 2: Build
+
 - **Objective**: Apply knowledge to create projects
 - **Activities**: Wallet setup, project creation, MVP development
 - **Rewards**: Builder NFTs, increased XP, tool access
 - **Duration**: 2-3 weeks
 
 #### Phase 3: Prove
+
 - **Objective**: Validate skills through challenges
 - **Activities**: Skill assessments, peer review, certification
 - **Rewards**: Proof-of-Skill™ NFTs, community recognition
 - **Duration**: 1-2 weeks
 
 #### Phase 4: Activate
+
 - **Objective**: Engage in governance and staking
 - **Activities**: DAO voting, token staking, community participation
 - **Rewards**: Governance rights, staking rewards, voting power
 - **Duration**: Ongoing
 
 #### Phase 5: Scale
+
 - **Objective**: Expand impact and earn passive income
 - **Activities**: Teaching, project launching, ecosystem contribution
 - **Rewards**: Neuro-Dividends™, leadership roles, revenue sharing
@@ -204,31 +211,37 @@ The foundation of the platform is a 5-phase progression model:
 Each persona follows the same 5-phase structure but with tailored content:
 
 #### 1. Curious Student 🎓
+
 - **Target**: Newcomers to Web3
 - **Focus**: Learning fundamentals, earning first rewards
 - **Journey**: Web3 basics → Wallet setup → Skill certification → DAO participation → Passive income
 
 #### 2. Web2 Entrepreneur 💼
+
 - **Target**: Traditional business owners
 - **Focus**: Tokenizing business models
 - **Journey**: NFT business models → MVP creation → Vision validation → Product integration → Funding
 
 #### 3. Web3 Developer ⚡
+
 - **Target**: Technical builders
 - **Focus**: Protocol-level development
 - **Journey**: Smart contracts → DApp building → Code auditing → Demo Day → Core team
 
 #### 4. Content Creator 🎨
+
 - **Target**: Artists and creators
 - **Focus**: Monetizing creativity
 - **Journey**: NFT art economics → Collection creation → Community validation → Distribution → Revenue streams
 
 #### 5. Community Communicator 🗣️
+
 - **Target**: Community builders
 - **Focus**: Strategic coordination
 - **Journey**: Communication training → Mission design → Leadership validation → Governance → Protocol influence
 
 #### 6. Project Manager 🎯
+
 - **Target**: Operational experts
 - **Focus**: Mission orchestration
 - **Journey**: Ops DNA mapping → Mission design → Orchestration mastery → Meta-missions → Council membership
@@ -236,6 +249,7 @@ Each persona follows the same 5-phase structure but with tailored content:
 ### Token Economics
 
 #### $MFAI Token Utility
+
 - **Learning Rewards**: Earned through phase completion
 - **Staking**: Required for advanced phases and governance
 - **Governance**: Voting power in DAO decisions
@@ -243,6 +257,7 @@ Each persona follows the same 5-phase structure but with tailored content:
 - **Rewards**: Neuro-Dividends™ for active participants
 
 #### NFT Certifications
+
 - **Proof-of-Skill™**: Validates learning achievements
 - **Proof-of-Vision™**: Recognizes innovative ideas
 - **Proof-of-Build™**: Certifies technical contributions
@@ -255,30 +270,30 @@ Each persona follows the same 5-phase structure but with tailored content:
 
 ### Frontend Technologies
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| **React** | 18.2.0 | UI framework |
-| **TypeScript** | 5.2.2 | Type safety |
-| **Vite** | 4.5.0 | Build tool & dev server |
-| **Tailwind CSS** | 3.3.5 | Styling framework |
-| **Framer Motion** | 10.16.4 | Animations |
-| **Zustand** | 4.4.1 | State management |
-| **Lucide React** | 0.292.0 | Icon library |
+| Technology        | Version | Purpose                 |
+| ----------------- | ------- | ----------------------- |
+| **React**         | 18.2.0  | UI framework            |
+| **TypeScript**    | 5.2.2   | Type safety             |
+| **Vite**          | 4.5.0   | Build tool & dev server |
+| **Tailwind CSS**  | 3.3.5   | Styling framework       |
+| **Framer Motion** | 10.16.4 | Animations              |
+| **Zustand**       | 4.4.1   | State management        |
+| **Lucide React**  | 0.292.0 | Icon library            |
 
 ### Blockchain Technologies
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| **Solana Web3.js** | 1.98.2 | Blockchain interaction |
-| **Wallet Adapter** | 0.15.35 | Wallet integration |
-| **SPL Token** | 0.4.13 | Token operations |
+| Technology         | Version | Purpose                |
+| ------------------ | ------- | ---------------------- |
+| **Solana Web3.js** | 1.98.2  | Blockchain interaction |
+| **Wallet Adapter** | 0.15.35 | Wallet integration     |
+| **SPL Token**      | 0.4.13  | Token operations       |
 
 ### Development Tools
 
-| Tool | Purpose |
-|------|---------|
-| **ESLint** | Code linting |
-| **PostCSS** | CSS processing |
+| Tool             | Purpose             |
+| ---------------- | ------------------- |
+| **ESLint**       | Code linting        |
+| **PostCSS**      | CSS processing      |
 | **Autoprefixer** | CSS vendor prefixes |
 
 ---
@@ -350,8 +365,10 @@ money-factory-ai/
 ### Core Components
 
 #### App.tsx
+
 **Purpose**: Main application orchestrator
 **Responsibilities**:
+
 - Route management
 - Global layout
 - Context providers
@@ -383,28 +400,34 @@ function App() {
 ```
 
 #### JourneysPage.tsx
+
 **Purpose**: Main journey interface
 **Responsibilities**:
+
 - Persona selection
 - Journey timeline display
 - Phase management
 - Progress tracking
 
 **Key Features**:
+
 - Dynamic persona switching
 - Real-time progress updates
 - Modal management for phases
 - NFT minting integration
 
 #### SkillchainCard.tsx
+
 **Purpose**: Interactive progress visualization
 **Responsibilities**:
+
 - User progress display
 - 3D flip animation
 - Wallet status integration
 - NFT collection showcase
 
 **Technical Implementation**:
+
 ```typescript
 const [isFlipped, setIsFlipped] = useState(false)
 
@@ -423,14 +446,17 @@ return (
 ```
 
 #### WalletButton.tsx
+
 **Purpose**: Wallet connection and management
 **Responsibilities**:
+
 - Multi-wallet support
 - Connection status display
 - Transaction history
 - Network detection
 
 **Supported Wallets**:
+
 - Phantom
 - Solflare
 - Torus
@@ -442,8 +468,10 @@ return (
 ### Modal Components
 
 #### NFTProofModal.tsx
+
 **Purpose**: NFT certification display and minting
 **Features**:
+
 - Proof-of-Skill™ visualization
 - Minting workflow
 - Metadata display
@@ -451,16 +479,20 @@ return (
 - Download functionality
 
 #### StakingModal.tsx
+
 **Purpose**: Token staking interface
 **Features**:
+
 - Staking amount selection
 - APY calculation
 - Reward estimation
 - Cognitive Lock™ implementation
 
 #### DAOVoteModal.tsx
+
 **Purpose**: Governance participation
 **Features**:
+
 - Proposal display
 - Voting interface
 - Voting power calculation
@@ -473,47 +505,52 @@ return (
 ### Zustand Stores
 
 #### journeyStore.ts
+
 **Purpose**: Main application state management
 
 **State Structure**:
+
 ```typescript
 interface JourneyState {
   // Core journey data
-  selectedPersona: Persona | null
-  currentPhase: number
-  userProgress: UserProgress
-  
+  selectedPersona: Persona | null;
+  currentPhase: number;
+  userProgress: UserProgress;
+
   // UI state
-  isModalOpen: boolean
-  modalContent: any
-  
+  isModalOpen: boolean;
+  modalContent: any;
+
   // Blockchain features
-  testnetFeatures: TestnetFeatures
-  
+  testnetFeatures: TestnetFeatures;
+
   // Actions
-  setSelectedPersona: (persona: Persona | null) => void
-  updateProgress: (xp: number, nfts?: string[], mfai?: number) => void
-  completePhase: (phaseIndex: number) => void
-  mintNFT: (nftName: string) => Promise<string>
-  updateStaking: (amount: number) => void
-  updateVotingPower: (newPower: number) => void
-  updateWalletConnection: (connected: boolean, address?: string) => void
+  setSelectedPersona: (persona: Persona | null) => void;
+  updateProgress: (xp: number, nfts?: string[], mfai?: number) => void;
+  completePhase: (phaseIndex: number) => void;
+  mintNFT: (nftName: string) => Promise<string>;
+  updateStaking: (amount: number) => void;
+  updateVotingPower: (newPower: number) => void;
+  updateWalletConnection: (connected: boolean, address?: string) => void;
   // ... other actions
 }
 ```
 
 **Key Features**:
+
 - Persistent storage with Zustand persist middleware
 - Automatic XP and level calculation
 - NFT collection management
 - Wallet state synchronization
 
 #### themeStore.ts
+
 **Purpose**: Theme management
+
 ```typescript
 interface ThemeState {
-  isDark: boolean
-  toggleTheme: () => void
+  isDark: boolean;
+  toggleTheme: () => void;
 }
 ```
 
@@ -534,6 +571,7 @@ interface ThemeState {
 The platform currently operates in **simulation mode** with the following blockchain integrations:
 
 #### Wallet Connection
+
 - **Network**: Solana Devnet
 - **Auto-connect**: Disabled (user-initiated)
 - **Error Handling**: Comprehensive error states and user feedback
@@ -543,7 +581,7 @@ The platform currently operates in **simulation mode** with the following blockc
 export const WalletContextProvider: React.FC = ({ children }) => {
   const network = 'devnet'
   const endpoint = useMemo(() => clusterApiUrl(network), [network])
-  
+
   const wallets = useMemo(() => [
     new PhantomWalletAdapter(),
     new SolflareWalletAdapter(),
@@ -563,32 +601,34 @@ export const WalletContextProvider: React.FC = ({ children }) => {
 ```
 
 #### Transaction Simulation
+
 All blockchain operations are currently simulated with realistic delays and responses:
 
 ```typescript
 // Example: NFT Minting Simulation
 mintNFT: async (nftName: string) => {
   // Simulate minting delay
-  await new Promise(resolve => setTimeout(resolve, 2000))
-  
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
   // Generate mock mint address
-  const mintAddress = `${Math.random().toString(36).substr(2, 8)}${Math.random().toString(36).substr(2, 8)}`
-  
+  const mintAddress = `${Math.random().toString(36).substr(2, 8)}${Math.random().toString(36).substr(2, 8)}`;
+
   // Update state
   set((state) => ({
     userProgress: {
       ...state.userProgress,
       nfts: [...state.userProgress.nfts, nftName],
-    }
-  }))
-  
-  return mintAddress
-}
+    },
+  }));
+
+  return mintAddress;
+};
 ```
 
 ### Blockchain Utilities
 
 #### src/utils/blockchain.ts
+
 Provides utility functions for blockchain operations:
 
 - `getConnection()`: Initialize Solana connection
@@ -602,6 +642,7 @@ Provides utility functions for blockchain operations:
 ### Future Blockchain Integration
 
 See `docs/blockchain_integration_plan.md` for detailed implementation roadmap including:
+
 - Smart contract deployment
 - Real NFT minting with Metaplex
 - Token staking contracts
@@ -615,6 +656,7 @@ See `docs/blockchain_integration_plan.md` for detailed implementation roadmap in
 ### Design System
 
 #### Color Palette
+
 ```css
 /* Primary Colors */
 --primary-50: #f0f9ff;
@@ -622,58 +664,76 @@ See `docs/blockchain_integration_plan.md` for detailed implementation roadmap in
 --primary-900: #0f172a;
 
 /* Accent Colors */
---accent-cyan: #22D3EE;
---accent-purple: #C084FC;
---accent-gold: #FFD700;
---accent-mint: #14F195;
+--accent-cyan: #22d3ee;
+--accent-purple: #c084fc;
+--accent-gold: #ffd700;
+--accent-mint: #14f195;
 ```
 
 #### Typography
+
 - **Headings**: Space Grotesk (modern, tech-focused)
 - **Body**: Inter (readable, professional)
 - **Code**: Monospace (for addresses, hashes)
 
 #### Gradients
+
 ```css
-.bg-gradient-primary { background: linear-gradient(90deg, #4361ee, #7209b7); }
-.bg-gradient-solana { background: linear-gradient(90deg, #9945FF, #14F195); }
-.bg-gradient-gold { background: linear-gradient(90deg, #FFD700, #FFA500); }
+.bg-gradient-primary {
+  background: linear-gradient(90deg, #4361ee, #7209b7);
+}
+.bg-gradient-solana {
+  background: linear-gradient(90deg, #9945ff, #14f195);
+}
+.bg-gradient-gold {
+  background: linear-gradient(90deg, #ffd700, #ffa500);
+}
 ```
 
 ### Responsive Design
 
 #### Breakpoints
+
 - **Mobile**: < 768px
 - **Tablet**: 768px - 1024px
 - **Desktop**: > 1024px
 
 #### Mobile-First Approach
+
 All components are designed mobile-first with progressive enhancement:
 
 ```css
 /* Mobile base styles */
-.card { padding: 1rem; }
+.card {
+  padding: 1rem;
+}
 
 /* Tablet enhancement */
 @media (min-width: 768px) {
-  .card { padding: 1.5rem; }
+  .card {
+    padding: 1.5rem;
+  }
 }
 
 /* Desktop enhancement */
 @media (min-width: 1024px) {
-  .card { padding: 2rem; }
+  .card {
+    padding: 2rem;
+  }
 }
 ```
 
 ### Animation System
 
 #### Framer Motion Integration
+
 - **Page transitions**: Smooth enter/exit animations
 - **Component mounting**: Staggered animations for lists
 - **Interactions**: Hover and tap feedback
 - **Progress indicators**: Animated progress bars and counters
 
 #### Key Animation Patterns
+
 ```typescript
 // Staggered list animation
 const containerVariants = {
@@ -681,26 +741,28 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1
-    }
-  }
-}
+      staggerChildren: 0.1,
+    },
+  },
+};
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 }
-}
+  visible: { opacity: 1, y: 0 },
+};
 ```
 
 ### Accessibility
 
 #### WCAG 2.1 Compliance
+
 - **Color contrast**: Minimum 4.5:1 ratio
 - **Keyboard navigation**: Full keyboard support
 - **Screen readers**: Proper ARIA labels and roles
 - **Focus management**: Visible focus indicators
 
 #### Implementation
+
 ```typescript
 // Example: Accessible button
 <motion.button
@@ -721,6 +783,7 @@ const itemVariants = {
 ### Getting Started
 
 #### Environment Setup
+
 ```bash
 # Clone repository
 git clone https://github.com/cyranoaladin/journey-simulator.git
@@ -737,6 +800,7 @@ npm run dev
 ```
 
 #### Development Scripts
+
 ```bash
 # Development server with hot reload
 npm run dev
@@ -758,30 +822,32 @@ npm run preview
 ### Code Standards
 
 #### TypeScript Configuration
+
 - **Strict mode**: Enabled for type safety
 - **Path mapping**: Configured for clean imports
 - **ESLint integration**: Automatic linting
 
 #### Component Structure
+
 ```typescript
 // Standard component template
 interface ComponentProps {
   // Props with clear types
 }
 
-const Component: React.FC<ComponentProps> = ({ 
-  prop1, 
-  prop2 
+const Component: React.FC<ComponentProps> = ({
+  prop1,
+  prop2
 }) => {
   // Hooks at the top
   const [state, setState] = useState()
   const { storeValue } = useStore()
-  
+
   // Event handlers
   const handleEvent = () => {
     // Implementation
   }
-  
+
   // Render
   return (
     <div className="component-wrapper">
@@ -794,6 +860,7 @@ export default Component
 ```
 
 #### Styling Guidelines
+
 - **Tailwind-first**: Use Tailwind utilities
 - **Component classes**: For reusable patterns
 - **CSS modules**: For complex component-specific styles
@@ -802,6 +869,7 @@ export default Component
 ### Git Workflow
 
 #### Branch Strategy
+
 ```
 main                    # Production-ready code
 ├── develop            # Integration branch
@@ -811,6 +879,7 @@ main                    # Production-ready code
 ```
 
 #### Commit Convention
+
 ```
 feat: add NFT minting functionality
 fix: resolve wallet connection issue
@@ -827,6 +896,7 @@ test: add unit tests for journey store
 ### Environment Variables
 
 #### Required Variables
+
 ```bash
 # .env.local
 VITE_SOLANA_NETWORK=devnet
@@ -835,6 +905,7 @@ VITE_APP_VERSION=1.0.0
 ```
 
 #### Optional Variables
+
 ```bash
 # Analytics
 VITE_ANALYTICS_ID=your_analytics_id
@@ -851,57 +922,59 @@ VITE_ZYNO_API_URL=https://zyno.moneyfactory.ai
 ### Tailwind Configuration
 
 #### Custom Theme Extensions
+
 ```javascript
 // tailwind.config.js
 module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'space': ['Space Grotesk', 'sans-serif'],
-        'inter': ['Inter', 'sans-serif'],
+        space: ["Space Grotesk", "sans-serif"],
+        inter: ["Inter", "sans-serif"],
       },
       colors: {
         primary: {
-          50: '#f0f9ff',
-          500: '#4361ee',
-          900: '#0f172a',
+          50: "#f0f9ff",
+          500: "#4361ee",
+          900: "#0f172a",
         },
         accent: {
-          cyan: '#22D3EE',
-          purple: '#C084FC',
-          gold: '#FFD700',
-        }
+          cyan: "#22D3EE",
+          purple: "#C084FC",
+          gold: "#FFD700",
+        },
       },
       animation: {
-        'float': 'float 6s ease-in-out infinite',
-        'glow': 'glow 2s ease-in-out infinite alternate',
-      }
-    }
-  }
-}
+        float: "float 6s ease-in-out infinite",
+        glow: "glow 2s ease-in-out infinite alternate",
+      },
+    },
+  },
+};
 ```
 
 ### Vite Configuration
 
 #### Build Optimization
+
 ```typescript
 // vite.config.ts
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
-    exclude: ['lucide-react'],
+    exclude: ["lucide-react"],
   },
   build: {
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom'],
-          blockchain: ['@solana/web3.js', '@solana/wallet-adapter-react'],
-        }
-      }
-    }
-  }
-})
+          vendor: ["react", "react-dom"],
+          blockchain: ["@solana/web3.js", "@solana/wallet-adapter-react"],
+        },
+      },
+    },
+  },
+});
 ```
 
 ---
@@ -911,21 +984,25 @@ export default defineConfig({
 ### Testing Strategy
 
 #### Unit Tests
+
 - **Components**: React Testing Library
 - **Utilities**: Jest
 - **Stores**: Zustand testing utilities
 
 #### Integration Tests
+
 - **User flows**: Cypress
 - **Wallet integration**: Mock wallet providers
 - **API interactions**: MSW (Mock Service Worker)
 
 #### E2E Tests
+
 - **Critical paths**: Playwright
 - **Cross-browser**: Chrome, Firefox, Safari
 - **Mobile testing**: Device simulation
 
 ### Test Structure
+
 ```
 src/
 ├── __tests__/              # Test files
@@ -940,6 +1017,7 @@ src/
 ```
 
 ### Running Tests
+
 ```bash
 # Unit tests
 npm run test
@@ -964,6 +1042,7 @@ npm run test:all
 ### Build Process
 
 #### Production Build
+
 ```bash
 # Build for production
 npm run build
@@ -976,6 +1055,7 @@ npm run analyze
 ```
 
 #### Build Output
+
 ```
 dist/
 ├── assets/
@@ -989,6 +1069,7 @@ dist/
 ### Deployment Targets
 
 #### Vercel (Recommended)
+
 ```bash
 # Install Vercel CLI
 npm i -g vercel
@@ -1001,6 +1082,7 @@ vercel --prod
 ```
 
 #### Netlify
+
 ```bash
 # Build command
 npm run build
@@ -1013,6 +1095,7 @@ VITE_SOLANA_NETWORK=mainnet-beta
 ```
 
 #### Custom Server
+
 ```bash
 # Build and serve
 npm run build
@@ -1026,18 +1109,21 @@ node server.js
 ### Environment-Specific Configurations
 
 #### Development
+
 - Solana Devnet
 - Debug logging enabled
 - Hot module replacement
 - Source maps
 
 #### Staging
+
 - Solana Testnet
 - Error tracking
 - Performance monitoring
 - Feature flags
 
 #### Production
+
 - Solana Mainnet
 - Optimized bundles
 - CDN assets
@@ -1050,12 +1136,14 @@ node server.js
 ### Critical Issues
 
 #### 1. Wallet Connection on Mobile
+
 **Issue**: Phantom wallet connection may fail on mobile browsers
 **Workaround**: Use desktop browser or Phantom mobile app
 **Status**: Under investigation
 **Priority**: High
 
 #### 2. Transaction Simulation
+
 **Issue**: All blockchain transactions are currently simulated
 **Impact**: No real NFTs or tokens are minted
 **Solution**: Implement real blockchain integration (see roadmap)
@@ -1064,12 +1152,14 @@ node server.js
 ### Minor Issues
 
 #### 3. Animation Performance
+
 **Issue**: Complex animations may lag on older devices
 **Workaround**: Reduce motion in accessibility settings
 **Status**: Optimization in progress
 **Priority**: Medium
 
 #### 4. Image Loading
+
 **Issue**: Some persona images may load slowly
 **Workaround**: Images are lazy-loaded
 **Status**: Considering CDN implementation
@@ -1078,12 +1168,14 @@ node server.js
 ### Browser Compatibility
 
 #### Supported Browsers
+
 - ✅ Chrome 90+
 - ✅ Firefox 88+
 - ✅ Safari 14+
 - ✅ Edge 90+
 
 #### Known Limitations
+
 - ❌ Internet Explorer (not supported)
 - ⚠️ Safari < 14 (limited Web3 support)
 - ⚠️ Mobile browsers (wallet integration issues)
@@ -1093,6 +1185,7 @@ node server.js
 ## 🗺️ Roadmap
 
 ### Phase 1: Real Blockchain Integration (Q1 2024)
+
 - [ ] Deploy smart contracts on Solana Devnet
 - [ ] Implement real NFT minting with Metaplex
 - [ ] Connect staking to actual token contracts
@@ -1100,6 +1193,7 @@ node server.js
 - [ ] Add transaction history and verification
 
 ### Phase 2: Enhanced User Experience (Q2 2024)
+
 - [ ] Improve mobile responsiveness
 - [ ] Add advanced animations and micro-interactions
 - [ ] Implement progressive web app (PWA) features
@@ -1107,6 +1201,7 @@ node server.js
 - [ ] Enhance accessibility features
 
 ### Phase 3: AI Integration (Q3 2024)
+
 - [ ] Connect Zyno to real AI backend
 - [ ] Implement contextual guidance system
 - [ ] Add personalized learning paths
@@ -1114,6 +1209,7 @@ node server.js
 - [ ] Develop intelligent mission generation
 
 ### Phase 4: Advanced Features (Q4 2024)
+
 - [ ] Launch marketplace for NFT certifications
 - [ ] Implement mentorship system
 - [ ] Create project launchpad
@@ -1121,6 +1217,7 @@ node server.js
 - [ ] Develop mobile applications
 
 ### Phase 5: Ecosystem Expansion (2025)
+
 - [ ] Multi-chain support (Ethereum, Polygon)
 - [ ] Enterprise partnerships
 - [ ] Educational institution integration
@@ -1134,12 +1231,14 @@ node server.js
 ### Development Setup
 
 #### Prerequisites
+
 - Node.js 18+
 - Git
 - Solana CLI (for blockchain development)
 - Phantom wallet (for testing)
 
 #### Setup Process
+
 ```bash
 # Fork the repository
 git clone https://github.com/cyranoaladin/journey-simulator.git
@@ -1158,6 +1257,7 @@ npm run dev
 ### Contribution Guidelines
 
 #### Code Style
+
 - Follow existing TypeScript and React patterns
 - Use Tailwind CSS for styling
 - Write meaningful commit messages
@@ -1165,6 +1265,7 @@ npm run dev
 - Update documentation as needed
 
 #### Pull Request Process
+
 1. **Create Issue**: Describe the feature or bug
 2. **Fork & Branch**: Create a feature branch
 3. **Develop**: Implement changes with tests
@@ -1175,6 +1276,7 @@ npm run dev
 8. **Merge**: Approved PRs are merged to develop
 
 #### Areas for Contribution
+
 - 🐛 **Bug Fixes**: Resolve existing issues
 - ✨ **Features**: Implement new functionality
 - 📚 **Documentation**: Improve guides and docs
@@ -1185,12 +1287,14 @@ npm run dev
 ### Community
 
 #### Communication Channels
+
 - **Website**: [mfai.app](https://mfai.app)
 - **GitHub**: [github.com/cyranoaladin](https://github.com/cyranoaladin/)
 - **GitHub Issues**: For bug reports and feature requests
 - **GitHub Discussions**: For questions and ideas
 
 #### Code of Conduct
+
 We are committed to providing a welcoming and inclusive environment. Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
 
 ---
@@ -1210,14 +1314,17 @@ For licensing inquiries, contact: [legal@moneyfactory.ai](mailto:legal@moneyfact
 ## 📞 Support & Contact
 
 ### Technical Support
+
 - **Website**: [mfai.app](https://mfai.app)
 - **GitHub Issues**: For bug reports and feature requests
 
 ### Business Inquiries
+
 - **Website**: [mfai.app](https://mfai.app)
 - **GitHub**: [github.com/cyranoaladin](https://github.com/cyranoaladin/)
 
 ### Development Team
+
 - **Chief Operator & Blockchain Officer**: Alaeddine BEN RHOUMA
 - **GitHub**: [github.com/cyranoaladin](https://github.com/cyranoaladin/)
 
@@ -1228,6 +1335,7 @@ For licensing inquiries, contact: [legal@moneyfactory.ai](mailto:legal@moneyfact
 To integrate this journey simulator into the main Money Factory AI website at [mfai.app](https://mfai.app), follow these guidelines:
 
 #### 1. CTA Button Implementation
+
 ```html
 <!-- Primary CTA on homepage -->
 <a href="/journey-simulator" class="cta-button-primary">
@@ -1242,14 +1350,15 @@ To integrate this journey simulator into the main Money Factory AI website at [m
 ```
 
 #### 2. Routing Setup
+
 ```javascript
 // Next.js routing example
 // pages/journey-simulator.js or app/journey-simulator/page.js
 export default function JourneySimulator() {
   return (
-    <iframe 
-      src="https://journey-simulator.mfai.app" 
-      width="100%" 
+    <iframe
+      src="https://journey-simulator.mfai.app"
+      width="100%"
       height="100vh"
       frameBorder="0"
       title="Money Factory AI Journey Simulator"
@@ -1259,27 +1368,37 @@ export default function JourneySimulator() {
 ```
 
 #### 3. Subdomain Setup
+
 For optimal integration, consider hosting the simulator on a subdomain:
+
 - **Simulator URL**: `journey.mfai.app` or `simulator.mfai.app`
 - **Main Website**: `mfai.app`
 - **API Endpoint**: `api.mfai.app`
 
 #### 4. Analytics Integration
+
 ```javascript
 // Track journey simulator engagement
-gtag('event', 'journey_simulator_start', {
-  'event_category': 'engagement',
-  'event_label': 'persona_selection'
+gtag("event", "journey_simulator_start", {
+  event_category: "engagement",
+  event_label: "persona_selection",
 });
 ```
 
 #### 5. SEO Considerations
+
 ```html
 <!-- Meta tags for journey simulator page -->
-<meta name="description" content="Experience the Cognitive Activation Protocol™ - Transform your skills into digital capital through Money Factory AI's interactive journey simulator">
-<meta property="og:title" content="Money Factory AI Journey Simulator">
-<meta property="og:description" content="Discover how to transform your skills into capital in the Proof Economy">
-<meta property="og:url" content="https://mfai.app/journey-simulator">
+<meta
+  name="description"
+  content="Experience the Cognitive Activation Protocol™ - Transform your skills into digital capital through Money Factory AI's interactive journey simulator"
+/>
+<meta property="og:title" content="Money Factory AI Journey Simulator" />
+<meta
+  property="og:description"
+  content="Discover how to transform your skills into capital in the Proof Economy"
+/>
+<meta property="og:url" content="https://mfai.app/journey-simulator" />
 ```
 
 ---
@@ -1287,6 +1406,7 @@ gtag('event', 'journey_simulator_start', {
 ## 🙏 Acknowledgments
 
 ### Technologies
+
 - **Solana Foundation** for blockchain infrastructure
 - **React Team** for the amazing framework
 - **Tailwind Labs** for the utility-first CSS framework
@@ -1294,6 +1414,7 @@ gtag('event', 'journey_simulator_start', {
 - **Lucide** for the beautiful icons
 
 ### Community
+
 - **Early Adopters** who provided valuable feedback
 - **Beta Testers** who helped identify and resolve issues
 - **Contributors** who helped improve the platform
@@ -1303,9 +1424,9 @@ gtag('event', 'journey_simulator_start', {
 
 **Built with ❤️ by the Money Factory AI Team**
 
-*Transforming skills into capital through the Cognitive Activation Protocol™*
+_Transforming skills into capital through the Cognitive Activation Protocol™_
 
 ---
 
-*Last updated: January 2024*
-*Version: 1.0.0*
+_Last updated: January 2024_
+_Version: 1.0.0_

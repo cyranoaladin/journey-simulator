@@ -91,6 +91,7 @@ The $MFAI token is the lifeblood of the protocol economy, with multiple utility 
 - Incentives for learning and contribution
 
 The token economy is designed for sustainable growth through:
+
 - Skill-based minting tied to validated contributions
 - Staking mechanisms that reward long-term participation
 - Revenue sharing from protocol services

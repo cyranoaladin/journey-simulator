@@ -1,17 +1,29 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api, { LoginResponse, RegisterResponse } from '../utils/api';
-import { useJourneyStore } from '../store/journeyStore';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import { useNavigate } from "react-router-dom";
+import api, { LoginResponse, RegisterResponse } from "../utils/api";
+import { useJourneyStore } from "../store/journeyStore";
 
 // User interface matching your backend schema
-type User = LoginResponse['user'];
+type User = LoginResponse["user"];
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (userData: { name: string; email: string; password: string; wallet_address: string; persona: string }) => Promise<boolean>;
+  register: (userData: {
+    name: string;
+    email: string;
+    password: string;
+    wallet_address: string;
+    persona: string;
+  }) => Promise<boolean>;
   logout: () => void;
   checkAuth: () => boolean;
   refreshToken: () => Promise<boolean>;
@@ -22,7 +34,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -30,8 +42,6 @@ export const useAuth = () => {
 interface AuthProviderProps {
   children: ReactNode;
 }
-
-
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -45,8 +55,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const checkAuthStatus = async () => {
-    const token = localStorage.getItem('accessToken');
-    
+    const token = localStorage.getItem("accessToken");
+
     if (token) {
       try {
         // Verify token with backend
@@ -55,13 +65,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Load user progress from backend
         await loadUserProgress();
       } catch (error) {
-        console.error('Auth check failed:', error);
+        console.error("Auth check failed:", error);
         // Token is invalid, try to refresh
         const refreshed = await refreshToken();
         if (!refreshed) {
           // Refresh failed, clear everything
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
           setUser(null);
         }
       }
@@ -72,43 +82,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       const data = await api.login(email, password);
-      
+
       // Store tokens
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
-      
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
+
       // Set user
       setUser(data.user);
       // Load user progress from backend
       await loadUserProgress();
       return true;
     } catch (error) {
-      console.error('Login error:', error);
+      console.error("Login error:", error);
       return false;
     }
   };
 
-  const register = async (userData: { 
-    name: string; 
-    email: string; 
-    password: string; 
-    wallet_address: string; 
-    persona: string 
+  const register = async (userData: {
+    name: string;
+    email: string;
+    password: string;
+    wallet_address: string;
+    persona: string;
   }): Promise<boolean> => {
     try {
       const data = await api.register(userData);
-      
+
       // Store tokens
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
-      
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
+
       // Set user
       setUser(data.user);
       // Load user progress from backend
       await loadUserProgress();
       return true;
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error("Registration error:", error);
       return false;
     }
   };
@@ -116,13 +126,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const refreshToken = async (): Promise<boolean> => {
     try {
       const data = await api.refreshToken();
-      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem("accessToken", data.accessToken);
       if (data.refreshToken) {
-        localStorage.setItem('refreshToken', data.refreshToken);
+        localStorage.setItem("refreshToken", data.refreshToken);
       }
       return true;
     } catch (error) {
-      console.error('Token refresh failed:', error);
+      console.error("Token refresh failed:", error);
       return false;
     }
   };
@@ -132,18 +142,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Call logout endpoint to invalidate refresh token
       await api.logout();
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     } finally {
       // Clear local storage
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
       setUser(null);
-      navigate('/login');
+      navigate("/login");
     }
   };
 
   const checkAuth = (): boolean => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem("accessToken");
     return !!token && !!user;
   };
 
@@ -158,9 +168,5 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     refreshToken,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
-}; 
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};

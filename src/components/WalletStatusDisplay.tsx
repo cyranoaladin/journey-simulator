@@ -1,7 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { useWallet, useConnection } from '@solana/wallet-adapter-react';
-import { Wallet, Coins, ExternalLink, Copy, CheckCircle, Wifi, WifiOff, Loader, AlertCircle } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+// Wallet features disabled by default in dev; component will render a simple message
+const ENABLE_WALLET = (import.meta as any).env?.VITE_ENABLE_WALLET === "1";
+import {
+  Wallet,
+  Coins,
+  ExternalLink,
+  Copy,
+  CheckCircle,
+  Wifi,
+  WifiOff,
+  Loader,
+  AlertCircle,
+} from "lucide-react";
 
 interface WalletStatusDisplayProps {
   showBalance?: boolean;
@@ -12,10 +23,27 @@ interface WalletStatusDisplayProps {
 const WalletStatusDisplay: React.FC<WalletStatusDisplayProps> = ({
   showBalance = true,
   showNetwork = true,
-  className = ''
+  className = "",
 }) => {
-  const { publicKey, connected, connecting } = useWallet();
-  const { connection } = useConnection();
+  if (!ENABLE_WALLET) {
+    return (
+      <div
+        className={`p-4 rounded-lg border border-white/10 bg-white/5 ${className}`}
+      >
+        <h3 className="font-semibold mb-3 flex items-center">
+          <Wallet size={16} className="mr-2" />
+          Wallet Status
+        </h3>
+        <div className="text-center py-2 text-xs opacity-70">
+          Wallet features disabled in dev
+        </div>
+      </div>
+    );
+  }
+  const publicKey = null as any,
+    connected = false,
+    connecting = false;
+  const connection = null as any;
   const [balance, setBalance] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -31,8 +59,8 @@ const WalletStatusDisplay: React.FC<WalletStatusDisplayProps> = ({
           const bal = await connection.getBalance(publicKey);
           setBalance(bal / 1000000000); // Convert lamports to SOL
         } catch (err) {
-          console.error('Error fetching balance:', err);
-          setError('Failed to fetch balance');
+          console.error("Error fetching balance:", err);
+          setError("Failed to fetch balance");
           setBalance(null);
         } finally {
           setIsLoading(false);
@@ -43,10 +71,10 @@ const WalletStatusDisplay: React.FC<WalletStatusDisplayProps> = ({
     };
 
     fetchBalance();
-    
+
     // Set up interval to refresh balance
     const interval = setInterval(fetchBalance, 30000); // Refresh every 30 seconds
-    
+
     return () => clearInterval(interval);
   }, [connected, publicKey, connection]);
 
@@ -67,17 +95,22 @@ const WalletStatusDisplay: React.FC<WalletStatusDisplayProps> = ({
   // Open explorer
   const openExplorer = () => {
     if (publicKey) {
-      window.open(`https://explorer.solana.com/address/${publicKey.toString()}?cluster=testnet`, '_blank');
+      window.open(
+        `https://explorer.solana.com/address/${publicKey.toString()}?cluster=testnet`,
+        "_blank",
+      );
     }
   };
 
   return (
-    <div className={`p-4 rounded-lg border border-white/10 bg-white/5 ${className}`}>
+    <div
+      className={`p-4 rounded-lg border border-white/10 bg-white/5 ${className}`}
+    >
       <h3 className="font-semibold mb-3 flex items-center">
         <Wallet size={16} className="mr-2" />
         Wallet Status
       </h3>
-      
+
       {connected ? (
         <div className="space-y-3">
           {/* Connection Status */}
@@ -88,22 +121,28 @@ const WalletStatusDisplay: React.FC<WalletStatusDisplayProps> = ({
               <span className="text-sm text-green-400">Connected</span>
             </div>
           </div>
-          
+
           {/* Wallet Address */}
           <div className="flex justify-between items-center">
             <span className="text-sm opacity-70">Address:</span>
             <div className="flex items-center space-x-2">
-              <span className="text-sm font-mono">{formatAddress(publicKey!.toString())}</span>
+              <span className="text-sm font-mono">
+                {formatAddress(publicKey!.toString())}
+              </span>
               <button
                 onClick={copyAddress}
                 className="p-1 hover:bg-white/10 rounded transition-colors"
                 aria-label="Copy address"
               >
-                {copied ? <CheckCircle size={14} className="text-green-400" /> : <Copy size={14} />}
+                {copied ? (
+                  <CheckCircle size={14} className="text-green-400" />
+                ) : (
+                  <Copy size={14} />
+                )}
               </button>
             </div>
           </div>
-          
+
           {/* Balance */}
           {showBalance && (
             <div className="flex justify-between items-center">
@@ -121,12 +160,14 @@ const WalletStatusDisplay: React.FC<WalletStatusDisplayProps> = ({
               ) : (
                 <div className="flex items-center space-x-1">
                   <Coins size={14} />
-                  <span className="text-sm font-mono">{balance !== null ? `${balance.toFixed(4)} SOL` : 'Unknown'}</span>
+                  <span className="text-sm font-mono">
+                    {balance !== null ? `${balance.toFixed(4)} SOL` : "Unknown"}
+                  </span>
                 </div>
               )}
             </div>
           )}
-          
+
           {/* Network */}
           {showNetwork && (
             <div className="flex justify-between items-center">
@@ -134,11 +175,15 @@ const WalletStatusDisplay: React.FC<WalletStatusDisplayProps> = ({
               <div className="flex items-center space-x-1">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                 <span className="text-sm">Solana Devnet</span>
-                <img src="/images/solana.svg" alt="Solana" className="w-4 h-4 ml-1" />
+                <img
+                  src="/images/solana.svg"
+                  alt="Solana"
+                  className="w-4 h-4 ml-1"
+                />
               </div>
             </div>
           )}
-          
+
           {/* Explorer Link */}
           <button
             onClick={openExplorer}
@@ -164,7 +209,9 @@ const WalletStatusDisplay: React.FC<WalletStatusDisplayProps> = ({
             )}
           </div>
           <p className="text-xs opacity-70">
-            {connecting ? 'Please approve the connection request in your wallet' : 'Connect your wallet to view details'}
+            {connecting
+              ? "Please approve the connection request in your wallet"
+              : "Connect your wallet to view details"}
           </p>
         </div>
       )}

@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useJourneyStore } from '../store/journeyStore';
-import JourneyCard from './Journey/JourneyCard';
-import JourneyTimeline from './Journey/JourneyTimeline';
-import JourneyDashboard from './Journey/JourneyDashboard';
-import PhaseSection from './Journey/PhaseSection';
-import XPTracker from './Journey/XPTracker';
-import ZynoBox from './Journey/ZynoBox';
-import { personas } from '../data/personas';
-import NFTProofModal from './NFTProofModal';
-import { getProofType } from '../data/proofsData';
-import NFTMintingTutorial from './NFTMintingTutorial';
-import ShareModal from './ShareModal';
-import ProofCertificationsBoard from './ProofCertificationsBoard';
-import WalletStatusDisplay from './WalletStatusDisplay';
-import StakingModal from './StakingModal';
-import DAOVoteModal from './DAOVoteModal';
-import ResetProgressButton from './ResetProgressButton';
-import api from '../utils/api';
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useJourneyStore } from "../store/journeyStore";
+import JourneyCard from "./Journey/JourneyCard";
+import JourneyTimeline from "./Journey/JourneyTimeline";
+import JourneyDashboard from "./Journey/JourneyDashboard";
+import PhaseSection from "./Journey/PhaseSection";
+import XPTracker from "./Journey/XPTracker";
+import ZynoBox from "./Journey/ZynoBox";
+import { personas } from "../data/personas";
+import NFTProofModal from "./NFTProofModal";
+import { getProofType } from "../data/proofsData";
+import NFTMintingTutorial from "./NFTMintingTutorial";
+import ShareModal from "./ShareModal";
+import ProofCertificationsBoard from "./ProofCertificationsBoard";
+import WalletStatusDisplay from "./WalletStatusDisplay";
+import StakingModal from "./StakingModal";
+import DAOVoteModal from "./DAOVoteModal";
+import ResetProgressButton from "./ResetProgressButton";
+import api from "../utils/api";
 const JourneysPage: React.FC = () => {
   const {
     selectedPersona,
@@ -28,10 +28,12 @@ const JourneysPage: React.FC = () => {
     openModal,
     updateStaking,
     updateVotingPower,
-    loadUserProgress
+    loadUserProgress,
   } = useJourneyStore();
 
-  const [currentPhaseIndex, setCurrentPhaseIndex] = useState<number | null>(null);
+  const [currentPhaseIndex, setCurrentPhaseIndex] = useState<number | null>(
+    null,
+  );
   const [showProofModal, setShowProofModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showMintingTutorial, setShowMintingTutorial] = useState(false);
@@ -51,8 +53,8 @@ const JourneysPage: React.FC = () => {
         setError(null);
         await loadUserProgress();
       } catch (err) {
-        console.error('Failed to load user progress:', err);
-        setError('Failed to load your progress. Please refresh the page.');
+        console.error("Failed to load user progress:", err);
+        setError("Failed to load your progress. Please refresh the page.");
       } finally {
         setIsLoading(false);
       }
@@ -65,10 +67,10 @@ const JourneysPage: React.FC = () => {
     if (selectedPersona) {
       setCurrentPhaseIndex(index);
       openModal({
-        type: 'phase',
+        type: "phase",
         phase: selectedPersona.phases[index],
         phaseIndex: index,
-        persona: selectedPersona
+        persona: selectedPersona,
       });
     }
   };
@@ -81,12 +83,12 @@ const JourneysPage: React.FC = () => {
       setError(null);
 
       const phase = selectedPersona.phases[phaseIndex];
-      
+
       // Update progress in store (this will sync with backend)
       await updateProgress(
         phase.xpReward,
         phase.nftReward ? [phase.nftReward] : [],
-        phase.mfaiReward || 0
+        phase.mfaiReward || 0,
       );
 
       // Complete phase in store (this will sync with backend)
@@ -94,7 +96,9 @@ const JourneysPage: React.FC = () => {
       setCurrentPhaseIndex(phaseIndex);
 
       // Show success message
-      setSuccessMessage(`Phase ${phaseIndex + 1} completed! +${phase.xpReward} XP earned!`);
+      setSuccessMessage(
+        `Phase ${phaseIndex + 1} completed! +${phase.xpReward} XP earned!`,
+      );
       setTimeout(() => setSuccessMessage(null), 5000);
 
       // If there's an NFT reward, open the NFT proof modal
@@ -109,9 +113,14 @@ const JourneysPage: React.FC = () => {
           phase: phase.title,
           phaseNumber: phaseIndex + 1,
           completionDate: new Date().toLocaleDateString(),
-          rarity: phaseIndex === 4 ? 'legendary' :
-            phaseIndex === 3 ? 'epic' :
-              phaseIndex === 2 ? 'rare' : 'common'
+          rarity:
+            phaseIndex === 4
+              ? "legendary"
+              : phaseIndex === 3
+                ? "epic"
+                : phaseIndex === 2
+                  ? "rare"
+                  : "common",
         });
         setShowProofModal(true);
 
@@ -122,7 +131,10 @@ const JourneysPage: React.FC = () => {
       }
 
       // If staking is required, open the staking modal
-      if (phase.stakingRequired && userProgress.mfaiTokens >= phase.stakingRequired) {
+      if (
+        phase.stakingRequired &&
+        userProgress.mfaiTokens >= phase.stakingRequired
+      ) {
         setTimeout(() => {
           setShowStakingModal(true);
         }, 1000);
@@ -135,8 +147,8 @@ const JourneysPage: React.FC = () => {
         }, 1500);
       }
     } catch (err) {
-      console.error('Failed to complete phase:', err);
-      setError('Failed to complete phase. Please try again.');
+      console.error("Failed to complete phase:", err);
+      setError("Failed to complete phase. Please try again.");
     } finally {
       setIsCompletingPhase(false);
     }
@@ -156,9 +168,14 @@ const JourneysPage: React.FC = () => {
         phase: phase.title,
         phaseNumber: phaseIndex + 1,
         completionDate: new Date().toLocaleDateString(),
-        rarity: phaseIndex === 4 ? 'legendary' :
-          phaseIndex === 3 ? 'epic' :
-            phaseIndex === 2 ? 'rare' : 'common'
+        rarity:
+          phaseIndex === 4
+            ? "legendary"
+            : phaseIndex === 3
+              ? "epic"
+              : phaseIndex === 2
+                ? "rare"
+                : "common",
       });
 
       setShowProofModal(true);
@@ -179,30 +196,30 @@ const JourneysPage: React.FC = () => {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       // Update staking in store (this will sync with backend)
       updateStaking(amount);
       setShowStakingModal(false);
     } catch (err) {
-      console.error('Failed to complete staking:', err);
-      setError('Failed to complete staking. Please try again.');
+      console.error("Failed to complete staking:", err);
+      setError("Failed to complete staking. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleDAOVoteComplete = async (vote: 'approve' | 'reject') => {
+  const handleDAOVoteComplete = async (vote: "approve" | "reject") => {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       // Update voting power and progress in store (this will sync with backend)
       updateVotingPower(userProgress.votingPower + 10);
       await updateProgress(30, [`DAO Vote: ${vote}`], 5);
       setShowDAOVoteModal(false);
     } catch (err) {
-      console.error('Failed to complete DAO vote:', err);
-      setError('Failed to complete DAO vote. Please try again.');
+      console.error("Failed to complete DAO vote:", err);
+      setError("Failed to complete DAO vote. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -218,8 +235,8 @@ const JourneysPage: React.FC = () => {
       setError(null);
       await loadUserProgress();
     } catch (err) {
-      console.error('Failed to refresh progress:', err);
-      setError('Failed to refresh progress. Please try again.');
+      console.error("Failed to refresh progress:", err);
+      setError("Failed to refresh progress. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -229,18 +246,18 @@ const JourneysPage: React.FC = () => {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       // Set persona in store
       setSelectedPersona(persona);
-      
+
       // Update user profile with selected persona
       await api.updateUserProfile({ persona: persona.id });
-      
+
       setSuccessMessage(`Welcome to the ${persona.title} journey!`);
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
-      console.error('Failed to select persona:', err);
-      setError('Failed to select journey. Please try again.');
+      console.error("Failed to select persona:", err);
+      setError("Failed to select journey. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -395,10 +412,13 @@ const JourneysPage: React.FC = () => {
             </span>
           </h1>
           <p className="text-xl opacity-80 max-w-4xl mx-auto mb-8 leading-relaxed">
-            Discover how the <span className="font-semibold text-accent-cyan">Cognitive Activation Protocol™</span>
+            Discover how the{" "}
+            <span className="font-semibold text-accent-cyan">
+              Cognitive Activation Protocol™
+            </span>
             transforms your skills into capital based on your unique profile
           </p>
-          
+
           {/* Reset Progress Button */}
           <div className="flex justify-center">
             <ResetProgressButton />
@@ -414,10 +434,14 @@ const JourneysPage: React.FC = () => {
             className="mb-16"
           >
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-semibold mb-4">Select Your Journey Path</h2>
-              <p className="text-lg opacity-70">Choose the path that resonates with your goals and aspirations</p>
+              <h2 className="text-2xl font-semibold mb-4">
+                Select Your Journey Path
+              </h2>
+              <p className="text-lg opacity-70">
+                Choose the path that resonates with your goals and aspirations
+              </p>
             </div>
-            
+
             <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {personas.map((persona, index) => (
                 <motion.div
@@ -426,9 +450,7 @@ const JourneysPage: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 * index }}
                 >
-                  <JourneyCard
-                    persona={persona}
-                  />
+                  <JourneyCard persona={persona} />
                 </motion.div>
               ))}
             </div>
@@ -447,14 +469,17 @@ const JourneysPage: React.FC = () => {
               <div className="flex items-center justify-center mb-4">
                 <div className="text-4xl mr-3">{selectedPersona.icon}</div>
                 <h2 className="text-3xl font-space font-bold">
-                  <span className="text-accent-cyan">{selectedPersona.title}</span> Journey
+                  <span className="text-accent-cyan">
+                    {selectedPersona.title}
+                  </span>{" "}
+                  Journey
                 </h2>
               </div>
-              
+
               <p className="text-lg opacity-80 mb-6 max-w-3xl mx-auto">
                 <strong>Motivation:</strong> {selectedPersona.motivation}
               </p>
-              
+
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <div className="text-sm opacity-70">
                   <strong>Pass Type:</strong> {selectedPersona.passType}
@@ -464,7 +489,7 @@ const JourneysPage: React.FC = () => {
                   <strong>Target:</strong> {selectedPersona.targetProfile}
                 </div>
               </div>
-              
+
               <div className="mt-6">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -489,34 +514,40 @@ const JourneysPage: React.FC = () => {
                     <h3 className="text-xl font-semibold">Journey Progress</h3>
                     <div className="text-right">
                       <div className="text-2xl font-bold text-accent-cyan">
-                        {userProgress.completedPhases.length}/{selectedPersona.phases.length}
+                        {userProgress.completedPhases.length}/
+                        {selectedPersona.phases.length}
                       </div>
                       <div className="text-sm opacity-70">phases completed</div>
                     </div>
                   </div>
-                  
+
                   <div className="w-full bg-gray-700/50 rounded-full h-4 mb-4">
                     <motion.div
                       className="bg-gradient-to-r from-accent-cyan to-accent-purple h-4 rounded-full relative"
                       initial={{ width: 0 }}
-                      animate={{ 
-                        width: `${(userProgress.completedPhases.length / selectedPersona.phases.length) * 100}%` 
+                      animate={{
+                        width: `${(userProgress.completedPhases.length / selectedPersona.phases.length) * 100}%`,
                       }}
                       transition={{ duration: 0.8, ease: "easeOut" }}
                     >
                       <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse"></div>
                     </motion.div>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="text-sm opacity-70">
-                      {userProgress.completedPhases.length === selectedPersona.phases.length 
-                        ? "🎉 Journey Complete!" 
-                        : `Next: ${selectedPersona.phases[userProgress.completedPhases.length]?.title || 'Complete Journey'}`
-                      }
+                      {userProgress.completedPhases.length ===
+                      selectedPersona.phases.length
+                        ? "🎉 Journey Complete!"
+                        : `Next: ${selectedPersona.phases[userProgress.completedPhases.length]?.title || "Complete Journey"}`}
                     </div>
                     <div className="text-sm font-semibold text-accent-cyan">
-                      {Math.round((userProgress.completedPhases.length / selectedPersona.phases.length) * 100)}%
+                      {Math.round(
+                        (userProgress.completedPhases.length /
+                          selectedPersona.phases.length) *
+                          100,
+                      )}
+                      %
                     </div>
                   </div>
                 </div>
@@ -526,21 +557,27 @@ const JourneysPage: React.FC = () => {
               <div className="space-y-4">
                 <div className="glass-effect rounded-xl p-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-accent-gold">{userProgress.totalXP}</div>
+                    <div className="text-2xl font-bold text-accent-gold">
+                      {userProgress.totalXP}
+                    </div>
                     <div className="text-sm opacity-70">Total XP</div>
                   </div>
                 </div>
-                
+
                 <div className="glass-effect rounded-xl p-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-accent-purple">{userProgress.nfts.length}</div>
+                    <div className="text-2xl font-bold text-accent-purple">
+                      {userProgress.nfts.length}
+                    </div>
                     <div className="text-sm opacity-70">NFTs Earned</div>
                   </div>
                 </div>
-                
+
                 <div className="glass-effect rounded-xl p-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-accent-cyan">{userProgress.mfaiTokens.toFixed(1)}</div>
+                    <div className="text-2xl font-bold text-accent-cyan">
+                      {userProgress.mfaiTokens.toFixed(1)}
+                    </div>
                     <div className="text-sm opacity-70">$MFAI Tokens</div>
                   </div>
                 </div>
@@ -555,28 +592,38 @@ const JourneysPage: React.FC = () => {
             />
 
             {/* Current Phase Section - Only show if there are uncompleted phases */}
-            {userProgress.completedPhases.length < selectedPersona.phases.length && (
+            {userProgress.completedPhases.length <
+              selectedPersona.phases.length && (
               <div className="space-y-6">
                 <div className="text-center">
                   <h3 className="text-2xl font-semibold mb-2">Current Phase</h3>
                   <p className="text-lg opacity-70">
-                    Phase {userProgress.completedPhases.length + 1} of {selectedPersona.phases.length}
+                    Phase {userProgress.completedPhases.length + 1} of{" "}
+                    {selectedPersona.phases.length}
                   </p>
                 </div>
-                
+
                 <div className="grid lg:grid-cols-3 gap-6">
                   <div className="lg:col-span-2 relative">
                     <PhaseSection
-                      phase={selectedPersona.phases[userProgress.completedPhases.length]}
+                      phase={
+                        selectedPersona.phases[
+                          userProgress.completedPhases.length
+                        ]
+                      }
                       isCompleted={false}
                       isCurrent={true}
                       isLocked={false}
-                      onComplete={() => handlePhaseComplete(userProgress.completedPhases.length)}
-                      onMintNFT={() => handleViewNFT(userProgress.completedPhases.length)}
+                      onComplete={() =>
+                        handlePhaseComplete(userProgress.completedPhases.length)
+                      }
+                      onMintNFT={() =>
+                        handleViewNFT(userProgress.completedPhases.length)
+                      }
                       onStake={handleStaking}
                       onVote={handleDAOVote}
                     />
-                    
+
                     {/* Loading overlay for phase completion */}
                     {isCompletingPhase && (
                       <motion.div
@@ -586,18 +633,28 @@ const JourneysPage: React.FC = () => {
                       >
                         <div className="text-center">
                           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-cyan mx-auto mb-4"></div>
-                          <p className="text-white text-lg font-semibold">Completing phase...</p>
-                          <p className="text-white/70 text-sm">Please wait while we sync your progress</p>
+                          <p className="text-white text-lg font-semibold">
+                            Completing phase...
+                          </p>
+                          <p className="text-white/70 text-sm">
+                            Please wait while we sync your progress
+                          </p>
                         </div>
                       </motion.div>
                     )}
                   </div>
-                  
+
                   <div className="space-y-4">
                     <XPTracker
                       currentXP={userProgress.totalXP}
-                      phaseXP={selectedPersona.phases[userProgress.completedPhases.length]?.xpReward || 0}
-                      nextRewardAt={(Math.floor(userProgress.totalXP / 200) + 1) * 200}
+                      phaseXP={
+                        selectedPersona.phases[
+                          userProgress.completedPhases.length
+                        ]?.xpReward || 0
+                      }
+                      nextRewardAt={
+                        (Math.floor(userProgress.totalXP / 200) + 1) * 200
+                      }
                     />
 
                     {/* Proof Certifications Board */}
@@ -606,9 +663,7 @@ const JourneysPage: React.FC = () => {
                     {/* Wallet Status */}
                     <WalletStatusDisplay />
 
-                    {showMintingTutorial && (
-                      <NFTMintingTutorial />
-                    )}
+                    {showMintingTutorial && <NFTMintingTutorial />}
                   </div>
                 </div>
               </div>
@@ -618,12 +673,16 @@ const JourneysPage: React.FC = () => {
             {userProgress.completedPhases.length > 0 && (
               <div className="space-y-6">
                 <div className="text-center">
-                  <h3 className="text-2xl font-semibold mb-2">Completed Phases</h3>
+                  <h3 className="text-2xl font-semibold mb-2">
+                    Completed Phases
+                  </h3>
                   <p className="text-lg opacity-70">
-                    {userProgress.completedPhases.length} phase{userProgress.completedPhases.length > 1 ? 's' : ''} completed
+                    {userProgress.completedPhases.length} phase
+                    {userProgress.completedPhases.length > 1 ? "s" : ""}{" "}
+                    completed
                   </p>
                 </div>
-                
+
                 <div className="grid gap-4">
                   {userProgress.completedPhases.map((phaseIndex) => (
                     <motion.div
@@ -637,7 +696,7 @@ const JourneysPage: React.FC = () => {
                         isCompleted={true}
                         isCurrent={false}
                         isLocked={false}
-                        onComplete={() => { }}
+                        onComplete={() => {}}
                         onMintNFT={() => handleViewNFT(phaseIndex)}
                         onStake={handleStaking}
                         onVote={handleDAOVote}
@@ -649,7 +708,8 @@ const JourneysPage: React.FC = () => {
             )}
 
             {/* Journey Completion */}
-            {userProgress.completedPhases.length === selectedPersona.phases.length && (
+            {userProgress.completedPhases.length ===
+              selectedPersona.phases.length && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -660,36 +720,48 @@ const JourneysPage: React.FC = () => {
                   <div className="absolute inset-0 bg-gradient-to-br from-accent-gold/10 to-accent-purple/10"></div>
                   <div className="absolute top-0 right-0 w-32 h-32 bg-accent-gold/20 rounded-full -translate-y-16 translate-x-16"></div>
                   <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent-cyan/20 rounded-full translate-y-12 -translate-x-12"></div>
-                  
+
                   <div className="relative">
                     <div className="text-8xl mb-6">🎉</div>
                     <h3 className="text-4xl font-space font-bold mb-4 gradient-text">
                       Journey Completed!
                     </h3>
                     <p className="text-xl opacity-80 mb-8 max-w-2xl mx-auto">
-                      Congratulations! You have completed the <span className="font-semibold text-accent-cyan">{selectedPersona.title}</span> journey.
-                      You are now an active member of the Money Factory AI ecosystem.
+                      Congratulations! You have completed the{" "}
+                      <span className="font-semibold text-accent-cyan">
+                        {selectedPersona.title}
+                      </span>{" "}
+                      journey. You are now an active member of the Money Factory
+                      AI ecosystem.
                     </p>
-                    
+
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
                       <div className="glass-effect rounded-xl p-4">
-                        <div className="text-3xl font-bold text-accent-gold mb-2">{userProgress.totalXP}</div>
+                        <div className="text-3xl font-bold text-accent-gold mb-2">
+                          {userProgress.totalXP}
+                        </div>
                         <div className="text-sm opacity-70">Total XP</div>
                       </div>
                       <div className="glass-effect rounded-xl p-4">
-                        <div className="text-3xl font-bold text-accent-purple mb-2">{userProgress.nfts.length}</div>
+                        <div className="text-3xl font-bold text-accent-purple mb-2">
+                          {userProgress.nfts.length}
+                        </div>
                         <div className="text-sm opacity-70">NFTs Earned</div>
                       </div>
                       <div className="glass-effect rounded-xl p-4">
-                        <div className="text-3xl font-bold text-accent-cyan mb-2">{userProgress.mfaiTokens.toFixed(1)}</div>
+                        <div className="text-3xl font-bold text-accent-cyan mb-2">
+                          {userProgress.mfaiTokens.toFixed(1)}
+                        </div>
                         <div className="text-sm opacity-70">$MFAI Tokens</div>
                       </div>
                       <div className="glass-effect rounded-xl p-4">
-                        <div className="text-3xl font-bold text-accent-gold mb-2">{userProgress.votingPower}</div>
+                        <div className="text-3xl font-bold text-accent-gold mb-2">
+                          {userProgress.votingPower}
+                        </div>
                         <div className="text-sm opacity-70">Voting Power</div>
                       </div>
                     </div>
-                    
+
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                       <motion.button
                         whileHover={{ scale: 1.05 }}
@@ -718,8 +790,11 @@ const JourneysPage: React.FC = () => {
 
       {/* Zyno Assistant */}
       <ZynoBox
-        context={`persona:${selectedPersona?.id || 'none'};phase:${userProgress.completedPhases.length}`}
-        tips={selectedPersona?.phases[userProgress.completedPhases.length]?.zynoTips || []}
+        context={`persona:${selectedPersona?.id || "none"};phase:${userProgress.completedPhases.length}`}
+        tips={
+          selectedPersona?.phases[userProgress.completedPhases.length]
+            ?.zynoTips || []
+        }
         onPrompt={(msg) => console.log("User asked Zyno:", msg)}
       />
 
@@ -735,7 +810,7 @@ const JourneysPage: React.FC = () => {
             phase={currentProofData.phase}
             phaseNumber={currentProofData.phaseNumber}
             completionDate={currentProofData.completionDate}
-            rarity={currentProofData.rarity || 'rare'}
+            rarity={currentProofData.rarity || "rare"}
             onClose={() => {
               setShowProofModal(false);
               setShowMintingTutorial(false);

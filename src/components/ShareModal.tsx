@@ -1,6 +1,13 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Twitter, Linkedin, MessageSquare, Copy, CheckCircle } from 'lucide-react';
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  X,
+  Twitter,
+  Linkedin,
+  MessageSquare,
+  Copy,
+  CheckCircle,
+} from "lucide-react";
 
 interface ShareModalProps {
   proofType: string;
@@ -13,29 +20,29 @@ const ShareModal: React.FC<ShareModalProps> = ({
   proofType,
   title,
   explorerUrl,
-  onClose
+  onClose,
 }) => {
   const [copied, setCopied] = useState(false);
-  
+
   const shareText = `I just earned my Proof-of-${proofType}™ NFT "${title}" on Money Factory AI! #MoneyFactoryAI #ProofEconomy`;
-  const shareUrl = explorerUrl || 'https://moneyfactory.ai';
-  
+  const shareUrl = explorerUrl || "https://moneyfactory.ai";
+
   const shareToTwitter = () => {
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
-    window.open(url, '_blank');
+    window.open(url, "_blank");
   };
-  
+
   const shareToLinkedIn = () => {
     const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareText)}`;
-    window.open(url, '_blank');
+    window.open(url, "_blank");
   };
-  
+
   const copyToClipboard = async (text: string) => {
     await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-  
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -53,7 +60,9 @@ const ShareModal: React.FC<ShareModalProps> = ({
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-space font-bold">Share Your Achievement</h2>
+          <h2 className="text-xl font-space font-bold">
+            Share Your Achievement
+          </h2>
           <button
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-white/10 transition-colors"
@@ -61,7 +70,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
             <X size={20} />
           </button>
         </div>
-        
+
         {/* Share Text Preview */}
         <div className="bg-white/5 rounded-lg p-4 mb-6">
           <h3 className="font-semibold mb-2 text-sm">Share Message</h3>
@@ -72,7 +81,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
             </div>
           )}
         </div>
-        
+
         {/* Share Options */}
         <div className="space-y-3 mb-6">
           <motion.button
@@ -84,7 +93,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
             <Twitter size={16} />
             <span>Share on Twitter</span>
           </motion.button>
-          
+
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -94,7 +103,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
             <Linkedin size={16} />
             <span>Share on LinkedIn</span>
           </motion.button>
-          
+
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -105,22 +114,24 @@ const ShareModal: React.FC<ShareModalProps> = ({
             <span>Copy for Discord</span>
           </motion.button>
         </div>
-        
+
         {/* Copy Link */}
         <div className="flex items-center space-x-2 bg-white/5 rounded-lg p-3">
-          <div className="flex-1 truncate text-sm opacity-80">
-            {shareUrl}
-          </div>
+          <div className="flex-1 truncate text-sm opacity-80">{shareUrl}</div>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => copyToClipboard(shareUrl)}
             className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
           >
-            {copied ? <CheckCircle size={16} className="text-green-400" /> : <Copy size={16} />}
+            {copied ? (
+              <CheckCircle size={16} className="text-green-400" />
+            ) : (
+              <Copy size={16} />
+            )}
           </motion.button>
         </div>
-        
+
         {/* Success Message */}
         <AnimatePresence>
           {copied && (

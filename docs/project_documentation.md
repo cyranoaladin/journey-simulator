@@ -18,6 +18,7 @@ The project is built with:
 - **Solana Wallet Adapter** - Wallet integration
 
 The architecture follows a component-based approach with:
+
 - Global state management via Zustand stores
 - Context providers for wallet integration
 - Reusable UI components
@@ -49,7 +50,9 @@ The architecture follows a component-based approach with:
 ## Core Components
 
 ### App.tsx
+
 The main application component that orchestrates the layout and includes all major sections:
+
 - Header
 - Hero section
 - Persona selector
@@ -60,53 +63,69 @@ The main application component that orchestrates the layout and includes all maj
 - Zyno assistant
 
 ### Header.tsx
+
 Navigation component with:
+
 - Logo
 - Navigation links
 - Theme toggle
 - Wallet connection button
 
 ### HeroSection.tsx
+
 Landing section with:
+
 - Main headline and tagline
 - Call-to-action buttons
 - Animated access pass visual
 - Particle.js background
 
 ### PersonaSelector.tsx
+
 Allows users to choose their journey path:
+
 - Displays all available personas (Curious Student, Web2 Entrepreneur, etc.)
 - Shows persona details and motivation
 - Handles persona selection
 
 ### JourneyTimeline.tsx
+
 Visualizes the Cognitive Activation Protocol™:
+
 - Displays the 5 phases (Learn, Build, Prove, Activate, Scale)
 - Shows user progress through the journey
 - Includes dashboard with XP, tokens, and other metrics
 - Renders phase cards with details and actions
 
 ### PhaseProgressCard.tsx
+
 Individual phase card component:
+
 - Phase details (title, description, mission)
 - Rewards information (XP, NFT, tokens)
 - Action buttons based on phase status
 - Zyno AI tips
 
 ### AccessPassHolders.tsx
+
 Showcases success stories:
+
 - Displays profiles of users who completed journeys
 - Shows their achievements and testimonials
 - Includes pass level information (Gold, Platinum, Diamond)
 
 ### ZynoAssistant.tsx
+
 AI assistant interface:
+
 - Floating chat button
 - Chat interface with message history
 - Simulated AI responses
 
 ### Modal Components
+
 Various modal components for:
+
 - Phase details
 - NFT certification viewing
 - NFT minting
@@ -119,7 +138,9 @@ Various modal components for:
 The application uses Zustand for state management with two main stores:
 
 ### journeyStore.ts
+
 Manages the user's journey state:
+
 - Selected persona
 - Current phase
 - User progress (XP, NFTs, tokens, etc.)
@@ -128,7 +149,9 @@ Manages the user's journey state:
 - Wallet connection status
 
 ### themeStore.ts
+
 Handles the application theme:
+
 - Dark/light mode toggle
 - Theme persistence
 
@@ -137,7 +160,9 @@ Handles the application theme:
 The application integrates with Solana wallets through:
 
 ### WalletContext.tsx
+
 Provides wallet functionality:
+
 - Wallet connection
 - Transaction signing
 - Account information
@@ -146,20 +171,26 @@ Provides wallet functionality:
 ## Data Structure
 
 ### personas.ts
+
 Contains all journey paths with:
+
 - Persona details (title, description, icon, target profile)
 - Phase information for each persona
 - Missions, rewards, and requirements
 
 ### holders.ts
+
 Contains simulated success stories:
+
 - User profiles
 - Achievements
 - Testimonials
 - Metrics
 
 ### journey.ts
+
 TypeScript interfaces for:
+
 - Persona
 - JourneyPhase
 - UserProgress
@@ -171,6 +202,7 @@ TypeScript interfaces for:
 The platform offers six distinct user personas, each with a tailored journey through the Cognitive Activation Protocol™:
 
 ### 1. Curious Student
+
 - **Icon**: 🎓
 - **Title**: Curious Student
 - **Description**: Discover how to transform your curiosity into valuable skills in the Proof Economy
@@ -180,6 +212,7 @@ The platform offers six distinct user personas, each with a tailored journey thr
 - **Journey Focus**: Fundamentals of Web3, wallet setup, skill certification, DAO participation
 
 ### 2. Web2 Entrepreneur
+
 - **Icon**: 💼
 - **Title**: Web2 Entrepreneur
 - **Description**: Transform your traditional business for the Proof Economy
@@ -189,6 +222,7 @@ The platform offers six distinct user personas, each with a tailored journey thr
 - **Journey Focus**: NFT loyalty systems, tokenized business models, Proof-of-Vision™, Launchpad
 
 ### 3. Web3 Developer
+
 - **Icon**: ⚡
 - **Title**: Web3 Developer
 - **Description**: Leverage your technical skills in the Proof Economy
@@ -198,6 +232,7 @@ The platform offers six distinct user personas, each with a tailored journey thr
 - **Journey Focus**: Smart contracts, protocol design, Proof-of-Build™, Builder DAO
 
 ### 4. Community Communicator
+
 - **Icon**: 🗣️
 - **Title**: Community Communicator
 - **Description**: Evolve from community voice to synaptic strategist
@@ -207,6 +242,7 @@ The platform offers six distinct user personas, each with a tailored journey thr
 - **Journey Focus**: Coordination psychology, protocol narratives, mission design, Synaptic Governance™
 
 ### 5. Content Creator
+
 - **Icon**: 🎨
 - **Title**: Content Creator
 - **Description**: Transform your creativity into cognitive publications
@@ -216,6 +252,7 @@ The platform offers six distinct user personas, each with a tailored journey thr
 - **Journey Focus**: Generative craft, visual semiotics, creative streams, Cognitive Publisher
 
 ### 6. Project Manager
+
 - **Icon**: 🎯
 - **Title**: Project Manager
 - **Description**: Evolve from project manager to Mission Commander™
@@ -231,6 +268,7 @@ Each persona follows the same 5-phase Cognitive Activation Protocol™ (Learn �
 The platform showcases success stories through Access Pass Holders, who represent users who have completed their journeys and achieved digital sovereignty:
 
 ### 1. Amine - Diamond Pass Holder
+
 - **Title**: Senior Blockchain Developer
 - **Avatar**: 👨‍💻
 - **Duration**: 18 months in ecosystem
@@ -243,6 +281,7 @@ The platform showcases success stories through Access Pass Holders, who represen
   - DAO Status: Builder Circle
 
 ### 2. Leila - Platinum Pass Holder
+
 - **Title**: Cognitive Publisher
 - **Avatar**: 👩‍🎨
 - **Duration**: 10 months in ecosystem
@@ -255,6 +294,7 @@ The platform showcases success stories through Access Pass Holders, who represen
   - Monthly creative revenue: +240%
 
 ### 3. Karim - Gold Pass Holder
+
 - **Title**: Digital Economy Student
 - **Avatar**: 👨‍🎓
 - **Duration**: 4 months in ecosystem
@@ -268,6 +308,7 @@ The platform showcases success stories through Access Pass Holders, who represen
   - $MFAI earned: 125
 
 ### 4. Sarah - Platinum Pass Holder
+
 - **Title**: Synaptic Strategist
 - **Avatar**: 🗣️
 - **Duration**: 14 months in ecosystem
@@ -281,6 +322,7 @@ The platform showcases success stories through Access Pass Holders, who represen
   - Status: Leadership Circle
 
 ### 5. Marc - Diamond Pass Holder
+
 - **Title**: Mission Commander™
 - **Avatar**: 🎯
 - **Duration**: 16 months in ecosystem
@@ -294,6 +336,7 @@ The platform showcases success stories through Access Pass Holders, who represen
   - Revenue stream: Active
 
 ### 6. Elena - Platinum Pass Holder
+
 - **Title**: Web3 Entrepreneur
 - **Avatar**: 💼
 - **Duration**: 12 months in ecosystem
@@ -315,6 +358,7 @@ Each persona's journey consists of 5 phases with specific content:
 ### Curious Student Journey
 
 #### Phase 1: Learn
+
 - **Description**: Understand the basics of Web3 and the Proof Economy
 - **Mission**: Complete the introduction quiz and watch the explanatory videos
 - **Duration**: 1-2 weeks
@@ -324,6 +368,7 @@ Each persona's journey consists of 5 phases with specific content:
 - **Zyno Tip**: "You're not just learning. You're mining skills into capital. Each mastered concept becomes a tokenized asset."
 
 #### Phase 2: Build
+
 - **Description**: Create your first Solana wallet with Zyno's help
 - **Mission**: Set up your wallet and make your first transaction
 - **Duration**: 3-5 days
@@ -333,6 +378,7 @@ Each persona's journey consists of 5 phases with specific content:
 - **Zyno Tip**: "Your wallet isn't just a tool, it's your sovereign identity. Each transaction proves your evolution."
 
 #### Phase 3: Prove
+
 - **Description**: Validate your skills and mint your first Proof-of-Skill™ NFT
 - **Mission**: Pass the "Web3 Foundations" challenge and get certified
 - **Duration**: 1 week
@@ -342,6 +388,7 @@ Each persona's journey consists of 5 phases with specific content:
 - **Zyno Tip**: "This NFT isn't decorative. It's cryptographic proof of your transformation. It opens doors."
 
 #### Phase 4: Activate
+
 - **Description**: Participate in your first DAO vote and activate your rewards
 - **Mission**: Vote on a community proposal and stake your first $MFAI
 - **Duration**: 2-3 days
@@ -352,6 +399,7 @@ Each persona's journey consists of 5 phases with specific content:
 - **Zyno Tip**: "You're not voting, you're co-creating the future. Each decision shapes the ecosystem you own."
 
 #### Phase 5: Scale
+
 - **Description**: Unlock Neuro-Dividends™ and become an active member
 - **Mission**: Stake $MFAI and share your transformation testimonial
 - **Duration**: Ongoing
@@ -364,6 +412,7 @@ Each persona's journey consists of 5 phases with specific content:
 ### Web2 Entrepreneur Journey
 
 #### Phase 1: Learn
+
 - **Description**: NFTs for loyalty and new economic models
 - **Mission**: Study NFT use cases and evaluate your potential
 - **Duration**: 1 week
@@ -373,6 +422,7 @@ Each persona's journey consists of 5 phases with specific content:
 - **Zyno Tip**: "Your clients are no longer consumers, they become stakeholders. Transform audience into owners."
 
 #### Phase 2: Build
+
 - **Description**: Create your premium content model or loyalty NFT
 - **Mission**: Develop an MVP with MFAI templates
 - **Duration**: 2-3 weeks
@@ -382,6 +432,7 @@ Each persona's journey consists of 5 phases with specific content:
 - **Zyno Tip**: "Your MVP isn't a product, it's an ecosystem. Each user becomes a co-creator of value."
 
 #### Phase 3: Prove
+
 - **Description**: Pitch your idea to Zyno and the community
 - **Mission**: Present your Proof-of-Vision™ and get initial feedback
 - **Duration**: 1-2 weeks
@@ -392,6 +443,7 @@ Each persona's journey consists of 5 phases with specific content:
 - **Zyno Tip**: "Your vision becomes reality when it resonates with the community. Collective intelligence validates innovation."
 
 #### Phase 4: Activate
+
 - **Description**: Integrate your Web3 layer into your existing product
 - **Mission**: Launch the beta version and collect initial DAO feedback
 - **Duration**: 1 month
@@ -402,6 +454,7 @@ Each persona's journey consists of 5 phases with specific content:
 - **Zyno Tip**: "Adoption begins with utility. Your Web3 product must solve a real problem before being revolutionary."
 
 #### Phase 5: Scale
+
 - **Description**: Apply to the Launchpad and raise funds via Synaptic DAO
 - **Mission**: Submit your funding application and present to the DAO
 - **Duration**: 2-3 months
@@ -414,6 +467,7 @@ Each persona's journey consists of 5 phases with specific content:
 ## Key Features
 
 ### Simulated Progression
+
 - Users can progress through phases
 - Earn XP and tokens
 - Collect NFT certifications
@@ -421,23 +475,27 @@ Each persona's journey consists of 5 phases with specific content:
 - Participate in DAO votes
 
 ### NFT Integration
+
 - View NFT certifications
 - Mint NFTs on Solana testnet
 - Display NFT attributes and metadata
 
 ### Wallet Functionality
+
 - Connect to Solana wallets
 - View wallet balances
 - Sign transactions
 - View NFT collections
 
 ### Gamification Elements
+
 - XP progression system
 - Achievement badges
 - Level-up mechanics
 - Visual progress indicators
 
 ### AI Assistant
+
 - Contextual guidance from Zyno
 - Personalized recommendations
 - Journey-specific tips
@@ -445,6 +503,7 @@ Each persona's journey consists of 5 phases with specific content:
 ## Visual Design
 
 The application features:
+
 - Gradient-rich dark theme with cyberpunk aesthetics
 - Animated transitions and micro-interactions
 - Interactive cards and buttons
@@ -452,6 +511,7 @@ The application features:
 - Responsive design for all screen sizes
 
 ### Color Palette
+
 - Primary dark blue: `#0F172A`
 - Accent cyan: `#22D3EE`
 - Accent purple: `#C084FC`
@@ -459,12 +519,14 @@ The application features:
 - Gold: `#FFD700`
 
 ### Typography
+
 - Headings: Space Grotesk
 - Body: Inter
 
 ## User Flows
 
 ### New User Journey
+
 1. User lands on the hero section
 2. Explores available personas
 3. Selects a persona that matches their profile
@@ -474,6 +536,7 @@ The application features:
 7. Progresses through subsequent phases
 
 ### Wallet Connection
+
 1. User clicks "Connect Wallet" button
 2. Selects wallet provider
 3. Approves connection
@@ -481,6 +544,7 @@ The application features:
 5. User can now interact with blockchain features
 
 ### NFT Minting
+
 1. User completes a phase
 2. Receives option to mint a Proof-of-Skill™ NFT
 3. Confirms transaction through connected wallet
@@ -488,6 +552,7 @@ The application features:
 5. Can view NFT in their collection
 
 ### DAO Participation
+
 1. User reaches "Activate" phase
 2. Gains access to DAO voting
 3. Views active proposals
@@ -497,25 +562,30 @@ The application features:
 ## Technical Implementation Details
 
 ### Animations
+
 Framer Motion is used for:
+
 - Page transitions
 - Component mounting/unmounting
 - Hover and interaction effects
 - Progress indicators
 
 ### Responsive Design
+
 - Mobile-first approach
 - Breakpoints for tablet and desktop
 - Flexible layouts using Flexbox and Grid
 - Conditional rendering for different screen sizes
 
 ### Performance Optimizations
+
 - Code splitting
 - Lazy loading of components
 - Memoization of expensive calculations
 - Efficient state updates
 
 ### Simulated Blockchain
+
 - Mock wallet integration
 - Simulated transactions
 - Local storage for persistence
@@ -524,20 +594,24 @@ Framer Motion is used for:
 ## Dependencies
 
 ### Core Dependencies
+
 - react, react-dom: UI library
 - typescript: Type safety
 - vite: Build tool
 
 ### UI and Styling
+
 - tailwindcss: Utility-first CSS
 - framer-motion: Animation library
 - lucide-react: Icon library
 - clsx, tailwind-merge: Class utilities
 
 ### State Management
+
 - zustand: State management
 
 ### Blockchain Integration
+
 - @solana/wallet-adapter-base
 - @solana/wallet-adapter-react
 - @solana/wallet-adapter-react-ui
@@ -546,11 +620,13 @@ Framer Motion is used for:
 - @solana/spl-token
 
 ### Effects
+
 - particles.js: Background particle effects
 
 ## Future Enhancements
 
 Potential areas for improvement:
+
 - Full backend integration
 - Real blockchain transactions
 - Enhanced AI capabilities for Zyno

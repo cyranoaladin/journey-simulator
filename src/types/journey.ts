@@ -44,7 +44,7 @@ export interface PhaseModule {
 export interface UserProgress {
   totalXP: number;
   nfts: string[];
-  passLevel: 'Free' | 'Gold' | 'Platinum' | 'Diamond';
+  passLevel: "Free" | "Gold" | "Platinum" | "Diamond";
   mfaiTokens: number;
   stakedMfai: number;
   walletConnected: boolean;
@@ -53,8 +53,8 @@ export interface UserProgress {
   currentPersona?: string;
   votingPower: number;
   daoProposals: number;
-  incubationStatus?: 'pending' | 'approved' | 'rejected';
-  launchpadStatus?: 'pending' | 'approved' | 'rejected';
+  incubationStatus?: "pending" | "approved" | "rejected";
+  launchpadStatus?: "pending" | "approved" | "rejected";
   testnetAirdropClaimed?: boolean;
   socialShareCount?: number;
 }
@@ -63,7 +63,7 @@ export interface AccessPassHolder {
   id: string;
   name: string;
   title: string;
-  passLevel: 'Gold' | 'Platinum' | 'Diamond';
+  passLevel: "Gold" | "Platinum" | "Diamond";
   avatar: string;
   duration: string;
   certifications: number;
@@ -81,7 +81,7 @@ export interface Certification {
   name: string;
   description: string;
   imageUrl: string;
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  rarity: "common" | "rare" | "epic" | "legendary";
   attributes: {
     trait_type: string;
     value: string | number;
