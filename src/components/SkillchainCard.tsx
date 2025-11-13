@@ -33,24 +33,18 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
     if (!selectedPersona) return 'bg-gradient-diamond'
     
     switch (selectedPersona.id) {
-      case 'curious-student':
-        return 'bg-gradient-to-br from-blue-400 to-cyan-500'
-      case 'web2-entrepreneur':
-        return 'bg-gradient-to-br from-green-400 to-emerald-500'
-      case 'web3-developer':
-        return 'bg-gradient-to-br from-purple-400 to-pink-500'
-      case 'content-creator':
-        return 'bg-gradient-to-br from-pink-400 to-purple-500'
-      case 'community-communicator':
-        return 'bg-gradient-to-br from-orange-400 to-red-500'
-      case 'project-manager':
-        return 'bg-gradient-to-br from-indigo-400 to-blue-500'
-      case 'defi-explorer':
-        return 'bg-gradient-to-br from-cyan-400 to-blue-500'
-      case 'nft-creator':
-        return 'bg-gradient-to-br from-pink-400 to-orange-500'
-      case 'investor':
-        return 'bg-gradient-to-br from-green-400 to-gold-500'
+      case 'cognitive-activation-hub':
+        return 'bg-gradient-to-br from-sky-500 to-cyan-400'
+      case 'capital-foundry':
+        return 'bg-gradient-to-br from-emerald-500 to-teal-500'
+      case 'system-architect':
+        return 'bg-gradient-to-br from-purple-500 to-indigo-500'
+      case 'experience-studio':
+        return 'bg-gradient-to-br from-rose-500 to-fuchsia-500'
+      case 'impact-engine':
+        return 'bg-gradient-to-br from-amber-500 to-lime-500'
+      case 'resilience-master':
+        return 'bg-gradient-to-br from-slate-500 to-cyan-600'
       default:
         return 'bg-gradient-diamond'
     }
@@ -61,24 +55,18 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
     if (!selectedPersona) return '💎'
     
     switch (selectedPersona.id) {
-      case 'curious-student':
-        return '🎓'
-      case 'web2-entrepreneur':
-        return '💼'
-      case 'web3-developer':
-        return '⚡'
-      case 'content-creator':
-        return '🎨'
-      case 'community-communicator':
-        return '🗣️'
-      case 'project-manager':
-        return '🎯'
-      case 'defi-explorer':
-        return '📊'
-      case 'nft-creator':
-        return '🖼️'
-      case 'investor':
-        return '💰'
+      case 'cognitive-activation-hub':
+        return '🧠'
+      case 'capital-foundry':
+        return '🏛️'
+      case 'system-architect':
+        return '🛠️'
+      case 'experience-studio':
+        return '🎮'
+      case 'impact-engine':
+        return '🌍'
+      case 'resilience-master':
+        return '🛡️'
       default:
         return selectedPersona.icon
     }
@@ -112,6 +100,8 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
   }
 
   const nextTierProgress = getNextTierProgress();
+  const nextTierProgressRatio = Math.max(0, Math.min(1, nextTierProgress / 100));
+  const personaProgressRatio = Math.max(0, Math.min(1, progressPercentage / 100));
   const nextTierName = (xp: number) => {
     if (xp >= 2000) return 'Diamond (Max)';
     if (xp >= 1000) return 'Diamond';
@@ -179,8 +169,10 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
               copyAddress()
             }}
             className="ml-1 p-1 hover:bg-white/10 rounded transition-colors"
+            type="button"
+            aria-label={copied ? 'Address copied' : 'Copy wallet address'}
           >
-            {copied ? <CheckCircle size={12} /> : <Copy size={12} />}
+            {copied ? <CheckCircle size={12} aria-hidden="true" /> : <Copy size={12} aria-hidden="true" />}
           </button>
         </>
       );
@@ -201,12 +193,10 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
         animate={{ rotateY: isFlipped ? 180 : 0 }}
         transition={{ duration: 0.6, type: 'spring', damping: 20 }}
         onClick={() => setIsFlipped(!isFlipped)}
-        style={{ transformStyle: 'preserve-3d' }}
       >
         {/* Front of Card */}
         <div 
           className={`w-full h-full ${getPersonaGradient()} rounded-2xl p-6 shadow-2xl border border-white/20 relative overflow-hidden absolute backface-hidden`}
-          style={{ backfaceVisibility: 'hidden' }}
         >
           {/* Holographic effect */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 animate-pulse" />
@@ -268,11 +258,11 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
                 <span>Next Tier: {nextTierName(userProgress.totalXP)}</span>
                 <span>{nextTierProgress.toFixed(0)}%</span>
               </div>
-              <div className="w-full h-2 bg-black/30 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-black/30 rounded-full overflow-hidden">
                 <motion.div 
-                  className="h-full bg-white"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${nextTierProgress}%` }}
+                  className="h-full bg-white origin-left"
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: nextTierProgressRatio }}
                   transition={{ duration: 1, ease: "easeOut" }}
                 />
               </div>
@@ -287,9 +277,9 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
                 </div>
                 <div className="w-full h-2 bg-black/30 rounded-full overflow-hidden">
                   <motion.div 
-                    className="h-full bg-white"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progressPercentage}%` }}
+                    className="h-full bg-white origin-left"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: personaProgressRatio }}
                     transition={{ duration: 1, ease: "easeOut" }}
                   />
                 </div>
@@ -311,8 +301,7 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
 
         {/* Back of Card */}
         <div 
-          className={`w-full h-full ${getPersonaGradient()} rounded-2xl p-6 shadow-2xl border border-white/20 relative overflow-hidden absolute backface-hidden`}
-          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+          className={`w-full h-full ${getPersonaGradient()} rounded-2xl p-6 shadow-2xl border border-white/20 relative overflow-hidden absolute backface-hidden rotate-y-180`}
         >
           {/* Holographic effect */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 animate-pulse" />

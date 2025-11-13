@@ -51,12 +51,25 @@ Build a **modular, gamified, Web3-native React interface** to onboard diverse us
 | **Cognitive Activation Protocol™** | 5-phase path structure                         |
 | **Proof-of-Skill™ NFT**            | On-chain badge for completed learning steps    |
 | **Neuro-Dividends™**               | Token rewards tied to progression              |
-| **Persona**                         | A user archetype (student, investor...)        |
+| **Persona**                         | A user archetype (Cognitive Activation Hub, Capital Foundry, System Architect, Experience Studio, Impact Engine, Resilience Master) |
 | **XP**                              | Experience points to gamify journey            |
 | **NFT Pass**                        | Gold / Platinum / Diamond access tiers         |
 | **Journey Card**                    | Interactive entrypoint to a persona’s path     |
 
 ---
+
+### 💠 Pathway Refresh (Nov 2025)
+
+| Pathway | Narrative Focus | Primary Proof Type |
+| ------- | ---------------- | ------------------ |
+| Cognitive Activation Hub | Web3 cognition, Solana fluency, protocol mindset | Proof-of-Skill™ |
+| Capital Foundry | Solana-native finance, DeFi program design, launch orchestration | Proof-of-Yield™ |
+| System Architect | High-throughput infrastructure, AI x DePIN systems, guardian governance | Proof-of-Build™ |
+| Experience Studio | Creative dApps, narrative design, NFT-driven experiences | Proof-of-Creation™ |
+| Impact Engine | Synaptic governance, regenerative funding, community coordination | Proof-of-Orchestration™ |
+| Resilience Master | Security operations, exploit response, guardian agent mesh | Proof-of-Security™ |
+
+This mapping replaces the 2023-era student/investor/builder archetypes and should inform component copy, gradient themes, and proof metadata throughout the React implementation.
 
 ## 📁 Folder Structure (Recommended)
 ```
@@ -118,7 +131,7 @@ interface JourneyCardProps {
 - Responsive hover animation
 - Progress bar if journey started
 - Dynamic CTA: “Start”, “Resume”, “Restart”
-- Color theme varies by persona (e.g. student = blue, investor = green)
+- Color theme varies by pathway (e.g. Cognitive Activation Hub = cyan gradients, Capital Foundry = emerald gradients)
 
 ---
 
@@ -254,21 +267,21 @@ Permettre une **génération dynamique de parcours** à partir de fichiers de co
 ```ts
 export const journeys = [
   {
-    persona: "student",
-    label: "The Curious Student",
-    icon: "🎓",
-    tagline: "Learn to earn, grow with Web3",
+    persona: "cognitive-activation-hub",
+    label: "Cognitive Activation Hub",
+    icon: "🧠",
+    tagline: "Ignite your Solana cognition",
     phases: [
       {
-        title: "Learn",
-        description: "Understand the basics of Web3",
-        mission: "Complete the Intro Quiz",
-        xpReward: 50,
-        nftReward: "Web3 Explorer",
+        title: "Cognition Ignition",
+        description: "Decode Web3 paradigms and craft your activation thesis",
+        mission: "Complete the paradigm deep-dive and publish your mission statement",
+        xpReward: 60,
+        nftReward: "Proof-of-Skill™: Web3 Orientation",
       },
-      ...
+      // ...additional phases from personas.ts
     ],
-    requiredPass: "Gold",
+    requiredPass: "Genesis Cognition Pass",
   },
   ...
 ];
@@ -744,18 +757,18 @@ NFT Passes (Gold, Platinum, Diamond) must **not block access**, but should:
 
 ---
 
-### 🧬 5. Vocabulary & Persona Alignment
+### 🧬 5. Vocabulary & Pathway Alignment
 
 Use **MFAI-native narrative** and terms across all journeys.
 
-#### ✅ Valid Persona Names:
+#### ✅ Valid Pathway Names:
 
-- Curious Student
-- Web2 Entrepreneur
-- Aspiring Investor
-- Web3 Builder
-- Community Mentor
-- Visionary Creator
+- Cognitive Activation Hub
+- Capital Foundry
+- System Architect
+- Experience Studio
+- Impact Engine
+- Resilience Master
 
 #### ❌ Do Not Use:
 

@@ -12,8 +12,8 @@ const ResetProgressButton: React.FC<ResetProgressButtonProps> = ({ className = '
   const [showConfirm, setShowConfirm] = useState(false);
   const [resetComplete, setResetComplete] = useState(false);
 
-  const handleReset = () => {
-    resetProgress();
+  const handleReset = async () => {
+    await resetProgress();
     setShowConfirm(false);
     setResetComplete(true);
     

@@ -89,6 +89,7 @@ export interface Certification {
     trait_type: string;
     value: string | number;
   }[];
+  phaseId?: string;
   earnedAt?: Date;
   mintAddress?: string;
 }

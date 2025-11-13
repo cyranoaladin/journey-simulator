@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { AlertCircle, X, Loader } from 'lucide-react'
 import { useState } from 'react'
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
+import LazyWalletMultiButton from './wallet/LazyWalletMultiButton'
 
 const WalletConnectionBanner = () => {
   const { connected, connecting } = useWallet()
@@ -43,7 +43,7 @@ const WalletConnectionBanner = () => {
             <div className="flex items-center space-x-2">
               {!connecting && (
                 <div className="wallet-adapter-dropdown">
-                  <WalletMultiButton className="!bg-yellow-500 !text-black !px-4 !py-2 !rounded-lg !font-medium !hover:bg-yellow-400 !transition-colors !flex !items-center !space-x-2" />
+                  <LazyWalletMultiButton className="!bg-yellow-500 !text-black !px-4 !py-2 !rounded-lg !font-medium !hover:bg-yellow-400 !transition-colors !flex !items-center !space-x-2" />
                 </div>
               )}
               

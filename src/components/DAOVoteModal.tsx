@@ -59,8 +59,10 @@ const DAOVoteModal: FC<DAOVoteModalProps> = ({
 
   const proposal = getProposalData()
   const totalVotes = proposal.currentVotes.approve + proposal.currentVotes.reject
-  const approvePercentage = (proposal.currentVotes.approve / totalVotes) * 100
-  const rejectPercentage = (proposal.currentVotes.reject / totalVotes) * 100
+  const approvePercentage = totalVotes > 0 ? (proposal.currentVotes.approve / totalVotes) * 100 : 0
+  const rejectPercentage = totalVotes > 0 ? (proposal.currentVotes.reject / totalVotes) * 100 : 0
+  const approveProgressRatio = Math.max(0, Math.min(1, approvePercentage / 100))
+  const rejectProgressRatio = Math.max(0, Math.min(1, rejectPercentage / 100))
 
   const handleVote = async (vote: 'approve' | 'reject') => {
     setSelectedVote(vote)
@@ -103,8 +105,10 @@ const DAOVoteModal: FC<DAOVoteModalProps> = ({
           <button
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+            type="button"
+            aria-label="Close DAO vote modal"
           >
-            <X size={20} />
+            <X size={20} aria-hidden="true" />
           </button>
         </div>
 
@@ -157,10 +161,12 @@ const DAOVoteModal: FC<DAOVoteModalProps> = ({
                 </span>
                 <span>{proposal.currentVotes.approve} votes ({approvePercentage.toFixed(1)}%)</span>
               </div>
-              <div className="w-full bg-white/10 rounded-full h-2">
-                <div 
-                  className="h-full bg-green-400 rounded-full transition-all duration-500"
-                  style={{ width: `${approvePercentage}%` }}
+              <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+                <motion.div
+                  className="h-full bg-green-400 rounded-full origin-left"
+                  initial={false}
+                  animate={{ scaleX: approveProgressRatio }}
+                  transition={{ duration: 0.5 }}
                 />
               </div>
             </div>
@@ -173,10 +179,12 @@ const DAOVoteModal: FC<DAOVoteModalProps> = ({
                 </span>
                 <span>{proposal.currentVotes.reject} votes ({rejectPercentage.toFixed(1)}%)</span>
               </div>
-              <div className="w-full bg-white/10 rounded-full h-2">
-                <div 
-                  className="h-full bg-red-400 rounded-full transition-all duration-500"
-                  style={{ width: `${rejectPercentage}%` }}
+              <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+                <motion.div
+                  className="h-full bg-red-400 rounded-full origin-left"
+                  initial={false}
+                  animate={{ scaleX: rejectProgressRatio }}
+                  transition={{ duration: 0.5 }}
                 />
               </div>
             </div>

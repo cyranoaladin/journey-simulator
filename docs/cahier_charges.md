@@ -38,7 +38,7 @@ The “User Journeys” page is a **strategic gateway** into the **Money Factory
 
    * Immersive headline: *“Choose your Cognitive Quest”*
    * Zyno onboarding widget: *“Not sure where to start? Ask Zyno”*
-   * Persona filter (Visual): *Student, Entrepreneur, Investor, Builder, DAO Voter, Mentor...*
+   * Persona filter (Visual): *Cognitive Activation Hub, Capital Foundry, System Architect, Experience Studio, Impact Engine, Resilience Master*
 
 2. **Smart Journey Selector**
 
@@ -83,111 +83,111 @@ The “User Journeys” page is a **strategic gateway** into the **Money Factory
 
 
 
-# 🧭 SECTION 2 — Strategic User Journey Models
+## 🧠 Pathway 1 — The Cognitive Activation Hub
 
-### “From Web2 Intention to Web3 Activation”
+**Profile**: Ambitious crossover builders, researchers, and analysts entering Web3.
+**Goal**: Forge sovereign Web3 operating systems, master Solana fundamentals, and activate within the MFAI ecosystem.
 
-Each user journey follows the proprietary **Cognitive Activation Protocol™**:
-`Learn → Build → Prove → Activate → Scale`
-Every step is **gamified**, **supported by Zyno**, and **rewarded via NFTs and \$MFAI**.
+| Phase | Experience Highlights |
+| ----- | --------------------- |
+| **Cognition Ignition** | Decode the Cognitive Activation Protocol™, map centralized vs. decentralized architectures, and articulate an activation thesis. |
+| **Solana Systems Lab** | Inspect validator mechanics, replay transactions, and ship a guided Solana interaction in the sandbox. |
+| **Token Design Studio** | Model incentive flywheels, governance escalation paths, and publish a protocol impact canvas. |
+| **Identity & Security Forge** | Harden wallets, stress-test custody flows, and architect decentralized identity onboarding. |
+| **Ecosystem Activation** | Ship a live community contribution, align with a DAO workstream, and initiate your Skillchain Mining loop. |
 
----
-
-## 🧑‍🎓 1. The Curious Student
-
-**Profile**: Web2-native, knowledge seeker, time-rich
-**Goal**: Gain concrete skills, passive income, and join a DAO
-
-| Phase        | Learning Experience                                                |
-| ------------ | ------------------------------------------------------------------ |
-| **Learn**    | *"What is Web3?"* → 5-min animated intro + quiz = XP + badge       |
-| **Build**    | *Create a Solana wallet with Zyno guidance* → unlock dashboard     |
-| **Prove**    | *Pass the “Web3 Foundations” challenge* → mint Proof-of-Skill™ NFT |
-| **Activate** | *Join your first DAO vote* → XP boost + Zyno congratulation        |
-| **Scale**    | *Stake \$MFAI + share testimonial* → Neuro-Dividends™ unlocked     |
-
-🎁 Rewards: NFT Résumé • DAO Role • Passive Income Starter Pack
-🧠 Zyno Says: “You’re not just learning. You’re mining skills into capital.”
+🎁 Rewards: Genesis Cognition Pass • Proof-of-Skill™ orientation badges • DAO activation brief.
+🧠 Zyno Says: “Concepts are capital—refine mental models until conviction compounds into action.”
 
 ---
 
-## 👨‍💼 2. The Web2 Entrepreneur
+## 🏛️ Pathway 2 — The Capital Foundry
 
-**Profile**: Product owner, Web2 business builder
-**Goal**: Tokenize a business idea, create sustainable Web3 revenue
+**Profile**: Fintech founders, DeFi engineers, quants, and treasury strategists.
+**Goal**: Design performant Solana-native financial primitives and launch capital-efficient protocols.
 
-| Phase        | Learning Experience                                                       |
-| ------------ | ------------------------------------------------------------------------- |
-| **Learn**    | *“NFTs for Loyalty 101”* → Visual case studies + self-assessment          |
-| **Build**    | *Create your own gated content or NFT coupon model* with MFAI templates   |
-| **Prove**    | *Pitch your idea to Zyno + community preview* → earn Proof-of-Vision™ NFT |
-| **Activate** | *Integrate your Web3 layer into an existing product* + DAO feedback       |
-| **Scale**    | *Apply to Launchpad / raise funding from Synaptic DAO*                    |
+| Phase | Experience Highlights |
+| ----- | --------------------- |
+| **Protocol Discovery Sprint** | Benchmark Solana DeFi patterns, identify unmet market needs, and publish an opportunity matrix. |
+| **Program Forge Lab** | Build Anchor/Rust modules with deterministic testing, fuzzing harnesses, and performance benchmarking. |
+| **Oracle & Liquidity Mesh** | Integrate oracle feeds, simulate liquidity shocks, and architect cross-chain contingency plans. |
+| **Risk Command Center** | Define circuit breakers, treasury controls, and DAO-ready governance telemetry. |
+| **Launch & Scale Deck** | Complete economic audits, align capital partners, and secure Synaptic DAO launch votes. |
 
-🎁 Rewards: NFT Blueprint • Vision NFT • Launchpad Ticket
-🧠 Zyno Says: “Turn your audience into stakeholders.”
-
----
-
-## 💰 3. The Aspiring Investor
-
-**Profile**: Financially driven, curious about DeFi & passive yield
-**Goal**: Discover, stake, vote, and earn within MFAI’s economy
-
-| Phase        | Learning Experience                                                    |
-| ------------ | ---------------------------------------------------------------------- |
-| **Learn**    | *“Intro to DeFi, DAOs and Yield Mechanics”* course + staking simulator |
-| **Build**    | *Simulate staking scenarios* → optimize portfolio with Zyno            |
-| **Prove**    | *Complete the Governance Certification* → unlock DAO voter badge       |
-| **Activate** | *Stake \$MFAI & vote in proposal #01* → DAO reward tier unlocked       |
-| **Scale**    | *Refer 2 investors + unlock Neuro-Dividends™ NFT*                      |
-
-🎁 Rewards: Governance XP • Staking Rewards • Referral NFT
-🧠 Zyno Says: “Stake not only tokens, but your vision.”
+🎁 Rewards: Sovereign Capital Pass • Proof-of-Yield™ Sentinel NFT • Builder Network launch clearance.
+🧠 Zyno Says: “Performance is product-market fit—optimize every compute unit until capital trusts your code.”
 
 ---
 
-## 🧑‍💻 4. The Web3 Builder
+## 🛠️ Pathway 3 — The System Architect
 
-**Profile**: Dev or technical user ready to build tools
-**Goal**: Create a dApp or module within the MFAI ecosystem
+**Profile**: Systems engineers, AI researchers, hardware innovators, and DePIN operators.
+**Goal**: Architect high-throughput, AI-enhanced infrastructure that bridges physical and on-chain systems.
 
-| Phase        | Learning Experience                                        |
-| ------------ | ---------------------------------------------------------- |
-| **Learn**    | *“Smart Contract Fast Track”* with MFAI SDK + Zyno prompts |
-| **Build**    | *Fork & deploy vesting or staking module*                  |
-| **Prove**    | *Audit by peer + Zyno* → mint Proof-of-Build™ NFT          |
-| **Activate** | *DAO Demo Day: present MVP to protocol community*          |
-| **Scale**    | *Enter Builder DAO Circle + apply for protocol grant*      |
+| Phase | Experience Highlights |
+| ----- | --------------------- |
+| **Topology Reconnaissance** | Audit decentralized infrastructure layers and draft an architectural intent canvas. |
+| **DePIN Studio** | Design device onboarding kits, incentive mechanics, and telemetry assurance pipelines. |
+| **On-Chain Intelligence Lab** | Deploy verifiable AI inference, provenance trails, and privacy-preserving analytics. |
+| **Systems Hardening** | Implement reliability SLOs, guardian automation, and chaos simulations for protocol uptime. |
+| **Synaptic Rollout** | Stage DAO launch rehearsals, orchestrate mainnet transitions, and secure guardian council approval. |
 
-🎁 Rewards: Dev NFT Badge • Git-linked Portfolio • Launch Boost
-🧠 Zyno Says: “Your code is your identity.”
-
----
-
-## 🧑‍🏫 5. The Community Mentor
-
-**Profile**: Teacher, coach, content creator
-**Goal**: Train, lead, and grow the ecosystem from inside
-
-| Phase        | Learning Experience                                       |
-| ------------ | --------------------------------------------------------- |
-| **Learn**    | *MFAI Pedagogy Bootcamp* (Zyno + course builder)          |
-| **Build**    | *Launch your first “Zyno-Led Course”* with reward modules |
-| **Prove**    | *Get community feedback score + NFT Certificate*          |
-| **Activate** | *Join as Verified Mentor + moderate Discord DAO cohort*   |
-| **Scale**    | *Monetize your learning path as NFT series*               |
-
-🎁 Rewards: Educator NFT • Training Revenue Share • DAO Speaker Role
-🧠 Zyno Says: “Teach to scale. Share to lead.”
+🎁 Rewards: Architect Protocol Pass • Proof-of-Build™ artifacts • Guardian council readiness package.
+🧠 Zyno Says: “Great systems emerge from reusable primitives—design the cathedral by perfecting each block.”
 
 ---
 
-## 🎨 6. The Visionary Creator
+## 🎮 Pathway 4 — The Experience Studio
 
-**Profile**: Inventor with a strong idea but no execution path
-**Goal**: Validate and incubate a powerful Web3 vision
+**Profile**: Creative technologists, UX designers, game builders, and cultural storytellers.
+**Goal**: Ship immersive Solana experiences where narrative, mechanics, and community ownership interlock.
 
+| Phase | Experience Highlights |
+| ----- | --------------------- |
+| **Experience Discovery** | Run cultural reconnaissance, map player motivations, and define the experience compass. |
+| **NFT Systems Lab** | Prototype dynamic NFTs, royalty governance, and collector segmentation logic. |
+| **Gameplay & Mechanics Forge** | Orchestrate wallet-aware UX, progression systems, and integrity safeguards. |
+| **UX Elevation Studio** | Conduct usability labs, ship onboarding prototypes, and benchmark accessibility. |
+| **Launch & Community Resonance** | Deliver the live experience, activate Sovereign Builder partners, and seed ongoing community care. |
+
+🎁 Rewards: Experience Creator Pass • Proof-of-Creation™ badges • Cultural Impact Seal.
+🧠 Zyno Says: “Design with emotion and intent—the world stays when wonder meets reliability.”
+
+---
+
+## 🌍 Pathway 5 — The Impact Engine
+
+**Profile**: Governance strategists, policy innovators, NGO leaders, and regenerative economists.
+**Goal**: Build transparent funding rails, equitable DAO governance, and measurable social impact loops.
+
+| Phase | Experience Highlights |
+| ----- | --------------------- |
+| **Mission Charter Lab** | Codify purpose, stakeholder incentives, and ethical guardrails. |
+| **DAO Design Workshop** | Prototype voting mechanics, contribution rewards, and delegation frameworks. |
+| **Transparent Funding Protocols** | Launch verifiable treasury dashboards, grant flows, and impact metrics. |
+| **Identity & Reputation Mesh** | Deploy soulbound credentials, reputation oracles, and moderation pathways. |
+| **Synaptic Impact Launch** | Coordinate Synaptic Governance reviews, initiate Neuro-Dividend rewards, and run impact sprints. |
+
+🎁 Rewards: Impact Operator Pass • Proof-of-Orchestration™ NFT series • Neuro-Dividend pipelines.
+🧠 Zyno Says: “Design incentives people can feel—visible impact keeps communities in orbit.”
+
+---
+
+## 🛡️ Pathway 6 — The Resilience Master
+
+**Profile**: Security engineers, auditors, threat hunters, and reliability guardians.
+**Goal**: Safeguard Solana protocols through proactive defense, live-fire readiness, and guardian automation.
+
+| Phase | Experience Highlights |
+| ----- | --------------------- |
+| **Security Baseline Forge** | Analyze historical exploits, refine threat models, and craft secure coding SOPs. |
+| **Exploit Hunter Arena** | Run fuzzing gauntlets, produce exploit PoCs, and mature disclosure pathways. |
+| **Defense Systems Orchestrator** | Implement guardian agents, circuit breakers, and anomaly detection monitors. |
+| **On-Chain Incident Command** | Execute forensic drills, crisis communications, and guardian network coordination. |
+| **Red/Blue Evolution** | Institutionalize live-fire exercises, publish threat intelligence, and reward vulnerability burns. |
+
+🎁 Rewards: Resilience Sentinel Pass • Proof-of-Security™ artifacts • Guardian mesh command status.
+🧠 Zyno Says: “Resilience is a rhythm—treat every drill as rehearsal for the moment that protects the network.”
 | Phase        | Learning Experience                                             |
 | ------------ | --------------------------------------------------------------- |
 | **Learn**    | \*"From Vision to Protocol": Self-assessment + Canvas with Zyno |
@@ -227,7 +227,7 @@ Each user journey is a **stacked narrative path**, with **front-end components**
 
 | Component            | Description                                         | Behaviour                                 |
 | -------------------- | --------------------------------------------------- | ----------------------------------------- |
-| **Persona Card**     | Interactive card for user type (student, investor…) | Opens preview, filters journeys           |
+| **Persona Card**     | Interactive card for pathway (Cognitive Activation Hub, Capital Foundry…) | Opens preview, filters journeys           |
 | **Journey Card**     | Shows overview: avatar, goals, phases               | Click to open full roadmap                |
 | **Zyno Hint**        | Dynamic AI-driven tip per phase                     | Tooltip, modal, or voice prompt           |
 | **Progress Tracker** | XP bar + badges + NFT slots                         | Updated via localStorage or wallet        |

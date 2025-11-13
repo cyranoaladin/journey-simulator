@@ -1,6 +1,26 @@
+import type { FC } from 'react';
 import { motion } from 'framer-motion';
 import { JourneyPhase } from '../../types/journey';
-import { CheckCircle, Trophy, Coins, Zap, Play, Lock, ArrowRight, Rocket, Vote, Award, Palette, MessageSquare, Target, BarChart3, DollarSign } from 'lucide-react';
+import {
+  CheckCircle,
+  Trophy,
+  Coins,
+  Zap,
+  Play,
+  Lock,
+  ArrowRight,
+  Rocket,
+  Vote,
+  Award,
+  Palette,
+  MessageSquare,
+  Target,
+  BarChart3,
+  DollarSign,
+  Loader2,
+  Shield,
+  Hammer,
+} from 'lucide-react';
 import { getProofType } from '../../data/proofsData';
 import { useJourneyStore } from '../../store/journeyStore';
 
@@ -9,13 +29,14 @@ interface PhaseSectionProps {
   isCompleted: boolean;
   isCurrent: boolean;
   isLocked: boolean;
-  onComplete: () => void;
+  onComplete: () => Promise<void> | void;
   onMintNFT?: () => void;
   onStake?: () => void;
   onVote?: () => void;
+  isProcessing?: boolean;
 }
 
-const PhaseSection: React.FC<PhaseSectionProps> = ({
+const PhaseSection: FC<PhaseSectionProps> = ({
   phase,
   isCompleted,
   isCurrent,
@@ -23,13 +44,13 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
   onComplete,
   onMintNFT,
   onStake,
-  onVote
+  onVote,
+  isProcessing = false,
 }) => {
   const { selectedPersona } = useJourneyStore();
-  
-  // Highlight keywords in text
-  const highlightText = (text: string) => {
-    return text.replace(
+
+  const highlightText = (text: string) =>
+    text.replace(
       /("([^"]+)")|(\*([^*]+)\*)/g,
       (match, _p1, highlighted, _p3, emphasized) => {
         if (highlighted) return `<span class="text-accent-cyan">"${highlighted}"</span>`;
@@ -37,9 +58,15 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
         return match;
       }
     );
-  };
 
   const getButtonState = () => {
+    if (isProcessing) {
+      return {
+        text: 'Processing...',
+        disabled: true,
+        icon: <Loader2 size={16} className="animate-spin" />,
+      };
+    }
     if (isLocked) return { text: 'Locked', disabled: true, icon: <Lock size={16} /> };
     if (isCompleted) return { text: 'Completed', disabled: true, icon: <CheckCircle size={16} /> };
     if (isCurrent) return { text: 'Start Phase', disabled: false, icon: <Play size={16} /> };
@@ -48,24 +75,50 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
 
   const buttonState = getButtonState();
 
+  const handlePhaseCompletion = async () => {
+    if (buttonState.disabled) return;
+
+    try {
+      await onComplete();
+    } catch (error) {
+      console.error('Phase completion handler failed:', error);
+    }
+  };
+
+  const getProofTypeForPhase = () => {
+    if (!selectedPersona) return 'Skill';
+    return getProofType(selectedPersona.id, phase.id);
+  };
+
   const getPhaseIcon = () => {
     if (phase.isIncubation) return <Rocket size={20} />;
     if (phase.isLaunchpad) return <Trophy size={20} />;
     if (phase.daoVoteRequired) return <Vote size={20} />;
     if (phase.stakingRequired) return <Coins size={20} />;
-    if (phase.id.includes('creator')) return <Palette size={20} />;
-    if (phase.id.includes('communicator')) return <MessageSquare size={20} />;
-    if (phase.id.includes('manager')) return <Target size={20} />;
-    if (phase.id.includes('defi')) return <BarChart3 size={20} />;
-    if (phase.id.includes('investor')) return <DollarSign size={20} />;
-    if (phase.id.includes('nft')) return <Palette size={20} />;
-    return <Zap size={20} />;
-  };
 
-  // Get proof type for this phase
-  const getProofTypeForPhase = () => {
-    if (!selectedPersona) return 'Skill';
-    return getProofType(selectedPersona.id, phase.id);
+    const proofType = getProofTypeForPhase();
+    switch (proofType) {
+      case 'Skill':
+        return <Zap size={20} />;
+      case 'Vision':
+        return <Target size={20} />;
+      case 'Yield':
+        return <BarChart3 size={20} />;
+      case 'Build':
+        return <Hammer size={20} />;
+      case 'Creation':
+        return <Palette size={20} />;
+      case 'Orchestration':
+        return <MessageSquare size={20} />;
+      case 'Design':
+        return <Award size={20} />;
+      case 'Invest':
+        return <DollarSign size={20} />;
+      case 'Security':
+        return <Shield size={20} />;
+      default:
+        return <Zap size={20} />;
+    }
   };
 
   return (
@@ -74,23 +127,22 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       className={`border-2 rounded-xl p-6 transition-all duration-300 ${
-        isCompleted 
-          ? 'border-green-500 bg-green-500/10' 
-          : isCurrent 
-            ? 'border-primary-500 bg-primary-500/10' 
-            : isLocked 
-              ? 'border-gray-600 bg-gray-600/10' 
-              : 'border-gray-500 bg-gray-500/10'
+        isCompleted
+          ? 'border-green-500 bg-green-500/10'
+          : isCurrent
+          ? 'border-primary-500 bg-primary-500/10'
+          : isLocked
+          ? 'border-gray-600 bg-gray-600/10'
+          : 'border-gray-500 bg-gray-500/10'
       }`}
     >
-      {/* Phase Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
-          <div className={`p-2 rounded-lg ${
-            isCompleted ? 'bg-green-500' :
-            isCurrent ? 'bg-primary-500' :
-            'bg-gray-600'
-          }`}>
+          <div
+            className={`p-2 rounded-lg ${
+              isCompleted ? 'bg-green-500' : isCurrent ? 'bg-primary-500' : 'bg-gray-600'
+            }`}
+          >
             {getPhaseIcon()}
           </div>
           <div>
@@ -98,8 +150,7 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
             <p className="text-sm opacity-80">{phase.duration}</p>
           </div>
         </div>
-        
-        {/* Special Phase Badges */}
+
         <div className="flex space-x-2">
           {phase.isIncubation && (
             <span className="px-2 py-1 bg-purple-500/20 text-purple-400 text-xs rounded-full">
@@ -119,16 +170,16 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
         </div>
       </div>
 
-      {/* Phase Description */}
       <p className="text-sm opacity-90 mb-4">{phase.description}</p>
-      
-      {/* Mission */}
+
       <div className="bg-white/5 rounded-lg p-3 mb-4">
         <h4 className="font-semibold text-sm mb-2">Mission</h4>
-        <p className="text-sm" dangerouslySetInnerHTML={{ __html: highlightText(phase.mission) }}></p>
+        <p
+          className="text-sm"
+          dangerouslySetInnerHTML={{ __html: highlightText(phase.mission) }}
+        />
       </div>
 
-      {/* Modules (if available) */}
       {phase.modules && phase.modules.length > 0 && (
         <div className="mb-4">
           <h4 className="font-semibold text-sm mb-3">Modules & Deliverables</h4>
@@ -151,7 +202,6 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
         </div>
       )}
 
-      {/* Tools & Resources */}
       <div className="mb-4">
         <h4 className="font-semibold text-sm mb-2">Tools & Resources</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -163,7 +213,6 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
         </div>
       </div>
 
-      {/* Expected Outcomes */}
       <div className="mb-4">
         <h4 className="font-semibold text-sm mb-2">Expected Outcomes</h4>
         <div className="grid gap-1">
@@ -176,29 +225,26 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
         </div>
       </div>
 
-      {/* Rewards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
         <div className="text-center">
           <Trophy className="text-accent-gold mx-auto mb-1" size={16} />
           <div className="text-xs font-semibold">{phase.xpReward} XP</div>
         </div>
-        
+
         {phase.mfaiReward && (
           <div className="text-center">
             <Coins className="text-accent-gold mx-auto mb-1" size={16} />
             <div className="text-xs font-semibold">{phase.mfaiReward} $MFAI</div>
           </div>
         )}
-        
+
         {phase.nftReward && (
           <div className="text-center">
             <Award className="text-accent-purple mx-auto mb-1" size={16} />
-            <div className="text-xs font-semibold">
-              Proof-of-{getProofTypeForPhase()}™
-            </div>
+            <div className="text-xs font-semibold">Proof-of-{getProofTypeForPhase()}™</div>
           </div>
         )}
-        
+
         {phase.stakingRequired && (
           <div className="text-center">
             <Zap className="text-accent-cyan mx-auto mb-1" size={16} />
@@ -207,7 +253,6 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
         )}
       </div>
 
-      {/* Requirements */}
       {phase.requirements && phase.requirements.length > 0 && (
         <div className="mb-4">
           <h4 className="font-semibold text-sm mb-2">Prerequisites</h4>
@@ -222,7 +267,6 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
         </div>
       )}
 
-      {/* Zyno Tip */}
       <div className="bg-gradient-primary/20 border border-primary-500/30 rounded-lg p-3 mb-4">
         <div className="flex items-start space-x-2">
           <div className="w-6 h-6 bg-gradient-primary rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -230,16 +274,18 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
           </div>
           <div>
             <h4 className="font-semibold text-xs mb-1">Zyno says:</h4>
-            <p className="text-xs italic opacity-90" dangerouslySetInnerHTML={{ __html: highlightText(phase.zynoTip) }}></p>
+            <p
+              className="text-xs italic opacity-90"
+              dangerouslySetInnerHTML={{ __html: highlightText(phase.zynoTip) }}
+            />
           </div>
         </div>
       </div>
 
-      {/* Action Button */}
       <motion.button
         whileHover={{ scale: buttonState.disabled ? 1 : 1.02 }}
         whileTap={{ scale: buttonState.disabled ? 1 : 0.98 }}
-        onClick={onComplete}
+        onClick={handlePhaseCompletion}
         disabled={buttonState.disabled}
         className={`w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 ${
           buttonState.disabled
@@ -251,7 +297,6 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
         <span>{buttonState.text}</span>
       </motion.button>
 
-      {/* Additional Action Buttons for Specialized Journeys */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
         {isCompleted && phase.nftReward && onMintNFT && (
           <motion.button
@@ -264,17 +309,16 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
             <span>View Proof-of-{getProofTypeForPhase()}™</span>
           </motion.button>
         )}
-        
-        {/* Generic Staking Button */}
+
         {phase.stakingRequired && onStake && (
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={onStake}
-            disabled={isLocked}
+            disabled={isLocked || isProcessing}
             className={`py-2 px-4 rounded-lg transition-all flex items-center justify-center space-x-2 ${
-              isLocked 
-                ? 'border border-gray-600 text-gray-500 cursor-not-allowed' 
+              isLocked || isProcessing
+                ? 'border border-gray-600 text-gray-500 cursor-not-allowed'
                 : 'border border-accent-cyan text-accent-cyan hover:bg-accent-cyan hover:text-black'
             }`}
           >
@@ -282,17 +326,16 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
             <span>Stake $MFAI</span>
           </motion.button>
         )}
-        
-        {/* Generic DAO Vote Button */}
+
         {phase.daoVoteRequired && onVote && (
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={onVote}
-            disabled={isLocked}
+            disabled={isLocked || isProcessing}
             className={`py-2 px-4 rounded-lg transition-all flex items-center justify-center space-x-2 ${
-              isLocked 
-                ? 'border border-gray-600 text-gray-500 cursor-not-allowed' 
+              isLocked || isProcessing
+                ? 'border border-gray-600 text-gray-500 cursor-not-allowed'
                 : 'border border-accent-purple text-accent-purple hover:bg-accent-purple hover:text-white'
             }`}
           >

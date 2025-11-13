@@ -20,105 +20,77 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
   const { selectedPersona, userProgress } = useJourneyStore();
 
   // Enhanced tips based on different personas
-  const curiousStudentTips = [
-    "Knowledge is your first capital. Every concept you learn becomes your currency in the Proof Economy.",
-    "You're not just learning—you're mining skills into capital. Each mastered concept becomes a tokenized asset.",
-    "Your wallet isn't just a tool—it's your sovereign identity in the digital economy.",
-    "This NFT is your on-chain diploma. It's cryptographic proof of your transformation.",
-    "Your vote is your voice in the protocol. You're not just voting—you're co-creating the future.",
-    "Your skills now generate dividends. Congratulations! You've evolved from consumer to owner."
+  const cognitiveHubTips = [
+    'Concepts are capital. Every mental model you sharpen turns future builds into compounding assets.',
+    'Solana throughput is a design choice. Prototype until latency feels optional.',
+    'Token design is economic storytelling—make incentives the plot that everyone wants to follow.',
+    'Security is a ritual. Harden your wallet stack before the stakes climb.',
+    'DAO participation is practice for ownership. The earlier you vote, the faster you influence.',
+    'Publish your activation brief—clarity attracts collaborators and opportunities alike.'
   ];
 
-  const entrepreneurTips = [
-    "Your clients are not just consumers anymore. They become co-builders of your vision.",
-    "The most successful Web3 businesses solve real problems with token incentives.",
-    "Your MVP isn't just a product—it's an ecosystem where users become co-creators.",
-    "A validated vision backed by community support is already valuable capital.",
-    "Your stakeholders aren't just customers—they're co-owners of your success.",
-    "DAO funding isn't just investment—it's adoption by a community that believes in your vision."
+  const capitalFoundryTips = [
+    'Performance plus risk discipline is the edge. Optimize Anchor code as hard as you iterate token design.',
+    'Liquidity health tells the truth about your protocol. Stress-test it before users do.',
+    'Oracle integrity is non-negotiable—guard it like the protocol’s nervous system.',
+    'Circuit breakers and treasury dashboards win community trust when markets get loud.',
+    'Sovereign Builders Network meetings are momentum multipliers—arrive with data and a precise ask.',
+    'Neuro-Dividends reward shipping resilient primitives. Make that timeline concrete.'
   ];
 
-  const developerTips = [
-    "Your code isn't just functionality—it's your identity and reputation in the ecosystem.",
-    "The blockchain is immutable—write code like your reputation depends on it.",
-    "Great developers write code that works—architects create systems that evolve.",
-    "An audit isn't judgment—it's validation that transforms your code into a trusted asset.",
-    "Demo Day isn't competition—it's celebration of how you're evolving the ecosystem.",
-    "You no longer build on the protocol—you build the protocol itself."
+  const systemArchitectTips = [
+    'Think in primitives—every reusable component compounds ecosystem velocity.',
+    'Device incentives must feel fair on day one; otherwise your DePIN network never boots.',
+    'Bind AI outputs to provenance so enterprises can trust what you deploy.',
+    'Failure drills are your certification. Practice incidents before mainnet pressure arrives.',
+    'Guardian agents are teammates—activate them early in your rollout plan.',
+    'Documentation is infrastructure. Publish builder kits as soon as your topology stabilizes.'
   ];
 
-  const creatorTips = [
-    "Your creativity is more than content—it's cognitive capital. Every visual becomes a vector of value.",
-    "In the protocol, every visual is a vector of value. Your generative art becomes infrastructure for creativity.",
-    "Your Proof-of-Creation™ isn't just recognition—it's your creative license in the cognitive economy.",
-    "Distribution is creation. Every airdrop builds the community that values your cognitive capital.",
-    "Your creativity now generates autonomous value. Welcome to the cognitive economy where art creates capital.",
-    "AI doesn't replace creativity—it amplifies it. Your prompts become your signature style."
+  const experienceStudioTips = [
+    'Narrative clarity wins launches. Know exactly which emotion your experience should unlock.',
+    'Design NFT lifecycles so value grows post-mint; static metadata is wasted potential.',
+    'Token rewards need anti-bot habits baked in from sprint one.',
+    'Usability labs are cheaper than churn. Watch real users move through your flows.',
+    'Launch day is chapter one—keep rituals alive so community energy compounds.',
+    'Sovereign Builders intros connect creatives with execution muscle. Ask Zyno for the match.'
   ];
 
-  const communicatorTips = [
-    "Coordination is not management. It's strategy made relational.",
-    "Your missions become the paths others will follow. Design with intention.",
-    "Leadership in Web3 is earned through contribution, not appointment.",
-    "Your voice now shapes the collective intelligence of the ecosystem.",
-    "You now orchestrate the protocol's evolution. Your coordination becomes the ecosystem's nervous system."
+  const impactEngineTips = [
+    'Purpose statements anchor governance. Revisit them every time the DAO scales.',
+    'Contribution-based rewards keep momentum ethical and transparent.',
+    'Impact metrics are narrative fuel—share them in dashboards people actually read.',
+    'Soulbound credentials convert invisible labor into visible influence.',
+    'Synaptic Governance favors clarity. Enter votes with concise trade-off analysis.',
+    'Neuro-Dividends fund communities that stay accountable. Document your sprint outcomes.'
   ];
 
-  const managerTips = [
-    "You don't just manage tasks. You activate systems that deliver real outcomes.",
-    "Your mission design becomes the infrastructure others use to create value.",
-    "Proof-of-Orchestration™ validates your ability to turn chaos into coordinated value creation.",
-    "Meta-missions coordinate the coordination. You're now orchestrating the orchestrators.",
-    "In a decentralized world, operations isn't back office. It's the engine of collective sovereignty."
-  ];
-
-  const defiTips = [
-    "You don't just hold crypto. You validate, stake, and compound your knowledge into on-chain returns.",
-    "Liquidity providing isn't just parking tokens—you're becoming the infrastructure that powers DeFi.",
-    "Your Proof-of-Yield™ demonstrates mastery over the complex dance of risk and reward in DeFi.",
-    "Your vote shapes the future of DeFi. You're not just using protocols—you're governing them.",
-    "Compounding isn't just about returns—it's about building sustainable wealth through disciplined DeFi mastery.",
-    "Risk management isn't limiting returns—it's ensuring your DeFi journey continues through market cycles."
-  ];
-
-  const nftCreatorTips = [
-    "Your designs become immutable proofs of your creativity — tokenised, licensed, rewarded, and unstoppable.",
-    "A collection isn't just multiple pieces—it's a cohesive narrative that builds value through scarcity and community.",
-    "Validation transforms your art from personal expression to community-recognized value.",
-    "Your collectors aren't just buyers—they're stakeholders in your creative journey.",
-    "Royalties aren't just passive income—they're proof that your creativity generates perpetual value.",
-    "In the NFT economy, your reputation is your most valuable asset. Each creation builds your on-chain portfolio."
-  ];
-
-  const investorTips = [
-    "Capital works harder when it works together. Your stake is your voice — your conviction creates collective value.",
-    "Your evaluation isn't just an opinion—it's a signal that shapes collective intelligence about value.",
-    "Your Proof-of-Invest™ isn't just a badge—it's validation of your capital allocation wisdom.",
-    "Your capital allocation decisions now shape the protocol's future. You're not just investing—you're architecting.",
-    "Your conviction now generates dividends. Welcome to the cognitive economy where aligned capital creates compounding value.",
-    "Due diligence isn't just risk management—it's the foundation of confident capital deployment."
+  const resilienceMasterTips = [
+    'Every exploit report you study buys you future response time.',
+    'Fuzzing is non-negotiable—treat it like integration tests.',
+    'Guardian agents love playbooks. Hand them crisp emergency procedures.',
+    'On-chain forensics demand meticulous logs. Instrument before you need them.',
+    'Communication discipline during incidents preserves credibility.',
+    'Reward the fixes, not just the finds. Neuro-Dividends close the security loop.'
   ];
 
   // Default tips if none provided
   const defaultTips = [
-    "The Cognitive Activation Protocol™ transforms your skills into tokenized assets. Each step proves your evolution.",
-    "Your journey is unique. Based on your profile, I recommend starting with the Learn phase to build solid foundations.",
-    "Proof-of-Skill™ NFTs aren't decorative - they're cryptographic proof of your transformation and open opportunities.",
-    "The Proof Economy rewards created value, not time spent. Your skills become your capital.",
-    "Each completed phase brings you closer to digital sovereignty. Keep going, you're on the right track!"
+    'Every pathway converts capability into Proof-of-Skill™. Pick the mission that mirrors your ambition.',
+    'Zyno, your AI Co-Founder, adapts phases dynamically—ask for a custom sprint if you need one.',
+    'Proof assets are working credentials. Share them with collaborators to unlock opportunities faster.',
+    'Skillchain Mining rewards consistent progress. Small completions compound quickly.',
+    'The protocol agent mesh is active—ping us for Skillchain validation, guardian drills, or launch introductions.'
   ];
 
   // Use persona-specific tips if available
   const getActiveTips = () => {
-    if (selectedPersona?.id === 'curious-student') return curiousStudentTips;
-    if (selectedPersona?.id === 'web2-entrepreneur') return entrepreneurTips;
-    if (selectedPersona?.id === 'web3-developer') return developerTips;
-    if (selectedPersona?.id === 'content-creator') return creatorTips;
-    if (selectedPersona?.id === 'community-communicator') return communicatorTips;
-    if (selectedPersona?.id === 'project-manager') return managerTips;
-    if (selectedPersona?.id === 'defi-explorer') return defiTips;
-    if (selectedPersona?.id === 'nft-creator') return nftCreatorTips;
-    if (selectedPersona?.id === 'investor') return investorTips;
+    if (selectedPersona?.id === 'cognitive-activation-hub') return cognitiveHubTips;
+    if (selectedPersona?.id === 'capital-foundry') return capitalFoundryTips;
+    if (selectedPersona?.id === 'system-architect') return systemArchitectTips;
+    if (selectedPersona?.id === 'experience-studio') return experienceStudioTips;
+    if (selectedPersona?.id === 'impact-engine') return impactEngineTips;
+    if (selectedPersona?.id === 'resilience-master') return resilienceMasterTips;
     if (tips.length > 0) return tips;
     return defaultTips;
   };

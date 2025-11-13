@@ -1,12 +1,13 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Award, Download, Share2, ExternalLink, Zap } from 'lucide-react'
+import { X, Award, Download, Share2, ExternalLink, Zap, AlertCircle } from 'lucide-react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { Certification } from '../types/journey'
 import NFTMintingModal from './NFTMintingModal'
 import { useJourneyStore } from '../store/journeyStore'
 import NFTProofModal from './NFTProofModal'
 import { getProofType } from '../data/proofsData'
+// import { api } from '../utils/api' // Will be used when backend is ready
 
 interface CertificationModalProps {
   certification: Certification
@@ -18,10 +19,12 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
   onClose
 }) => {
   const { connected } = useWallet()
-  const { selectedPersona } = useJourneyStore()
+  const { selectedPersona, loadUserProgress } = useJourneyStore()
   const [showMinting, setShowMinting] = useState(false)
   const [mintedAddress, setMintedAddress] = useState<string | null>(null)
   const [showProofModal, setShowProofModal] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // Extract phase number from certification ID
   const getPhaseNumber = () => {
@@ -45,6 +48,83 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
 
   const phaseNumber = getPhaseNumber();
 
+  // Handle certification download with backend tracking
+  const handleDownload = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      
+      // Track download in backend (simulated for now)
+      console.log('Tracking certification download:', {
+        certification_id: certification.id,
+        phase: phaseNumber,
+        user_persona: selectedPersona?.id,
+        download_timestamp: new Date().toISOString()
+      })
+      
+      // Simulate download
+      const link = document.createElement('a')
+      link.href = certification.imageUrl || '#'
+      link.download = `${certification.name}_certification.png`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+    } catch (err) {
+      console.error('Failed to track download:', err)
+      setError('Failed to track download. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Handle certification sharing with backend tracking
+  const handleShare = async (platform: string) => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      
+      // Track share in backend (simulated for now)
+      console.log('Tracking certification share:', {
+        certification_id: certification.id,
+        platform: platform,
+        phase: phaseNumber,
+        user_persona: selectedPersona?.id,
+        share_timestamp: new Date().toISOString()
+      })
+      
+      // Simulate sharing
+      const shareUrl = `https://mfai.app/certification/${certification.id}`
+      const shareText = `I just earned my ${certification.name} certification! 🎉 #MFAI #ProofOfSkill`
+      
+      if (platform === 'twitter') {
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank')
+      } else if (platform === 'linkedin') {
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank')
+      }
+      
+    } catch (err) {
+      console.error('Failed to track share:', err)
+      setError('Failed to track share. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Handle NFT minting completion
+  const handleMintedNFT = async (mintAddress: string) => {
+    try {
+      setMintedAddress(mintAddress)
+      setShowMinting(false)
+      
+      // Reload user progress to get updated NFT count
+      await loadUserProgress()
+      
+    } catch (err) {
+      console.error('Failed to reload progress after minting:', err)
+    }
+  }
+
   // Get proof type based on persona and certification
   const getProofTypeForCert = () => {
     if (!selectedPersona) return 'Skill';
@@ -58,63 +138,52 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
     if (!selectedPersona) return {}
     
     switch (selectedPersona.id) {
-      case 'investor':
+      case 'cognitive-activation-hub':
         return {
-          bgGradient: 'from-green-400 to-gold-500',
-          iconBg: 'bg-gold-500',
-          textColor: 'text-gold-500'
+          bgGradient: 'from-sky-500 to-cyan-400',
+          iconBg: 'bg-sky-500',
+          textColor: 'text-cyan-300'
         }
-      case 'web3-developer':
+      case 'capital-foundry':
         return {
-          bgGradient: 'from-purple-400 to-pink-500',
-          iconBg: 'bg-purple-500',
-          textColor: 'text-purple-500'
+          bgGradient: 'from-emerald-500 to-teal-500',
+          iconBg: 'bg-emerald-500',
+          textColor: 'text-emerald-300'
         }
-      case 'content-creator':
+      case 'system-architect':
         return {
-          bgGradient: 'from-pink-400 to-purple-500',
-          iconBg: 'bg-pink-500',
-          textColor: 'text-pink-500'
+          bgGradient: 'from-purple-500 to-indigo-500',
+          iconBg: 'bg-purple-600',
+          textColor: 'text-indigo-300'
         }
-      case 'community-communicator':
+      case 'experience-studio':
         return {
-          bgGradient: 'from-orange-400 to-red-500',
-          iconBg: 'bg-orange-500',
-          textColor: 'text-orange-500'
+          bgGradient: 'from-rose-500 to-fuchsia-500',
+          iconBg: 'bg-rose-500',
+          textColor: 'text-fuchsia-300'
         }
-      case 'project-manager':
+      case 'impact-engine':
         return {
-          bgGradient: 'from-indigo-400 to-blue-500',
-          iconBg: 'bg-indigo-500',
-          textColor: 'text-indigo-500'
+          bgGradient: 'from-amber-500 to-lime-500',
+          iconBg: 'bg-amber-500',
+          textColor: 'text-lime-300'
         }
-      case 'defi-explorer':
+      case 'resilience-master':
         return {
-          bgGradient: 'from-cyan-400 to-blue-500',
-          iconBg: 'bg-cyan-500',
-          textColor: 'text-cyan-500'
-        }
-      case 'nft-creator':
-        return {
-          bgGradient: 'from-pink-400 to-orange-500',
-          iconBg: 'bg-pink-500',
-          textColor: 'text-pink-500'
+          bgGradient: 'from-slate-500 to-cyan-600',
+          iconBg: 'bg-slate-600',
+          textColor: 'text-cyan-300'
         }
       default:
         return {
-          bgGradient: 'from-blue-400 to-cyan-500',
-          iconBg: 'bg-blue-500',
-          textColor: 'text-blue-500'
+          bgGradient: 'from-sky-500 to-cyan-400',
+          iconBg: 'bg-sky-500',
+          textColor: 'text-cyan-300'
         }
     }
   }
 
   const personaStyle = getPersonaStyle()
-
-  const handleMinted = (address: string) => {
-    setMintedAddress(address)
-    setShowMinting(false)
-  }
 
   // Extract XP value from attributes
   const getXpValue = () => {
@@ -170,8 +239,10 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
                 <button
                   onClick={onClose}
                   className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                  type="button"
+                  aria-label="Close certification modal"
                 >
-                  <X size={20} />
+                  <X size={20} aria-hidden="true" />
                 </button>
               </div>
 
@@ -225,24 +296,38 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
                 </div>
               )}
 
+              {/* Error Display */}
+              {error && (
+                <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <AlertCircle className="text-red-400" size={16} />
+                    <span className="text-red-300 text-sm">{error}</span>
+                  </div>
+                </div>
+              )}
+
               {/* Actions */}
               <div className="grid grid-cols-3 gap-3 mb-4">
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="flex flex-col items-center space-y-1 p-3 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+                  whileHover={{ scale: isLoading ? 1 : 1.02 }}
+                  whileTap={{ scale: isLoading ? 1 : 0.98 }}
+                  onClick={handleDownload}
+                  disabled={isLoading}
+                  className="flex flex-col items-center space-y-1 p-3 rounded-lg bg-white/10 hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Download size={20} />
-                  <span className="text-xs">Download</span>
+                  <span className="text-xs">{isLoading ? 'Downloading...' : 'Download'}</span>
                 </motion.button>
 
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="flex flex-col items-center space-y-1 p-3 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+                  whileHover={{ scale: isLoading ? 1 : 1.02 }}
+                  whileTap={{ scale: isLoading ? 1 : 0.98 }}
+                  onClick={() => handleShare('twitter')}
+                  disabled={isLoading}
+                  className="flex flex-col items-center space-y-1 p-3 rounded-lg bg-white/10 hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Share2 size={20} />
-                  <span className="text-xs">Share</span>
+                  <span className="text-xs">{isLoading ? 'Sharing...' : 'Share'}</span>
                 </motion.button>
 
                 <motion.button
@@ -303,7 +388,7 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
           <NFTMintingModal
             certification={certification}
             onClose={() => setShowMinting(false)}
-            onMinted={handleMinted}
+            onMinted={handleMintedNFT}
           />
         )}
       </AnimatePresence>

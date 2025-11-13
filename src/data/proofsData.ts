@@ -1,7 +1,7 @@
 import { Certification } from '../types/journey';
 
 // Define proof types
-export type ProofType = 'Skill' | 'Vision' | 'Yield' | 'Build' | 'Creation' | 'Orchestration' | 'Design' | 'Invest';
+export type ProofType = 'Skill' | 'Vision' | 'Yield' | 'Build' | 'Creation' | 'Orchestration' | 'Design' | 'Invest' | 'Security';
 
 // Interface for proof data
 export interface ProofData {
@@ -19,28 +19,22 @@ export interface ProofData {
 
 // Mapping of persona IDs to proof types
 const personaProofTypeMap: Record<string, ProofType> = {
-  'curious-student': 'Skill',
-  'web2-entrepreneur': 'Vision',
-  'web3-developer': 'Build',
-  'content-creator': 'Creation',
-  'community-communicator': 'Orchestration',
-  'project-manager': 'Orchestration',
-  'defi-explorer': 'Yield',
-  'nft-creator': 'Design',
-  'investor': 'Invest'
+  'cognitive-activation-hub': 'Skill',
+  'capital-foundry': 'Yield',
+  'system-architect': 'Build',
+  'experience-studio': 'Creation',
+  'impact-engine': 'Orchestration',
+  'resilience-master': 'Security'
 };
 
 // Mapping of phase IDs to proof types (overrides persona default)
 const phaseProofTypeMap: Record<string, ProofType> = {
-  'student-prove': 'Skill',
-  'entrepreneur-prove': 'Vision',
-  'developer-prove': 'Build',
-  'creator-prove': 'Creation',
-  'communicator-prove': 'Orchestration',
-  'manager-prove': 'Orchestration',
-  'defi-prove': 'Yield',
-  'nft-prove': 'Design',
-  'investor-prove': 'Invest'
+  'ecosystem-engagement': 'Skill',
+  'capital-launchpad': 'Yield',
+  'synaptic-rollout': 'Build',
+  'experience-launch': 'Creation',
+  'synaptic-impact': 'Orchestration',
+  'redblue-evolution': 'Security'
 };
 
 // Helper function to get persona-specific proof data
@@ -57,38 +51,29 @@ export const getPersonaProofData = (
   
   // Default image fallbacks by persona
   const personaImages = {
-    'curious-student': '3109807/pexels-photo-3109807.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    'web2-entrepreneur': '3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    'web3-developer': '2004161/pexels-photo-2004161.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    'content-creator': '3888585/pexels-photo-3888585.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    'community-communicator': '3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    'project-manager': '3183153/pexels-photo-3183153.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    'defi-explorer': '844124/pexels-photo-844124.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    'nft-creator': '3222686/pexels-photo-3222686.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    'investor': '3760067/pexels-photo-3760067.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'cognitive-activation-hub': '3109807/pexels-photo-3109807.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'capital-foundry': '3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'system-architect': '1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'experience-studio': '214610/pexels-photo-214610.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'impact-engine': '3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'resilience-master': '3184339/pexels-photo-3184339.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
   };
 
   // Get persona-specific descriptions
   const getProofDescription = () => {
     switch (personaId) {
-      case 'curious-student':
-        return `This NFT certifies your mastery of Web3 fundamentals and proves your journey through the ${phase} phase.`;
-      case 'web2-entrepreneur':
-        return `This NFT validates your business tokenization strategy and successful completion of the ${phase} phase.`;
-      case 'web3-developer':
-        return `This NFT certifies your technical expertise in blockchain development and completion of the ${phase} phase.`;
-      case 'content-creator':
-        return `This NFT recognizes your creative contributions to the protocol and completion of the ${phase} phase.`;
-      case 'community-communicator':
-        return `This NFT validates your coordination skills and successful completion of the ${phase} phase.`;
-      case 'project-manager':
-        return `This NFT certifies your operational excellence and successful completion of the ${phase} phase.`;
-      case 'defi-explorer':
-        return `This NFT validates your DeFi expertise and successful completion of the ${phase} phase.`;
-      case 'nft-creator':
-        return `This NFT recognizes your NFT creation skills and successful completion of the ${phase} phase.`;
-      case 'investor':
-        return `This NFT certifies your investment acumen and successful completion of the ${phase} phase.`;
+      case 'cognitive-activation-hub':
+        return `This NFT certifies your mastery of foundational Web3 cognition and successful completion of the ${phase} phase.`;
+      case 'capital-foundry':
+        return `This NFT validates your Solana DeFi engineering capabilities and completion of the ${phase} phase.`;
+      case 'system-architect':
+        return `This NFT certifies your decentralized infrastructure expertise and completion of the ${phase} phase.`;
+      case 'experience-studio':
+        return `This NFT recognizes your creative systems design and successful completion of the ${phase} phase.`;
+      case 'impact-engine':
+        return `This NFT validates your governance and impact architecture mastery earned in the ${phase} phase.`;
+      case 'resilience-master':
+        return `This NFT certifies your security leadership in safeguarding Solana protocols through the ${phase} phase.`;
       default:
         return `This NFT certifies your successful completion of the ${phase} phase.`;
     }
@@ -101,7 +86,7 @@ export const getPersonaProofData = (
   const getImageUrl = () => {
     // In a real implementation, this would be a mapping to specific images
     // For now, we'll use placeholder images from Pexels
-    return baseImageUrl + (personaImages[personaId as keyof typeof personaImages] || personaImages['curious-student']);
+    return baseImageUrl + (personaImages[personaId as keyof typeof personaImages] || personaImages['cognitive-activation-hub']);
   };
 
   // Get rarity based on phase

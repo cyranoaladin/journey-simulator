@@ -12,20 +12,21 @@ interface JourneyState {
   modalContent: any
   setSelectedPersona: (persona: Persona | null) => void
   setCurrentPhase: (phase: number) => void
-  updateProgress: (xp: number, nfts?: string[], mfai?: number) => void
+  updateProgress: (xp: number, nfts?: string[], mfai?: number) => Promise<void>
   openModal: (content: any) => void
   closeModal: () => void
-  completePhase: (phaseIndex: number) => void
+  completePhase: (phaseIndex: number, options?: { score?: number; nftAddress?: string; phaseNumber?: number }) => Promise<void>
   updateStaking: (amount: number) => void
   updateVotingPower: (newPower: number) => void
   updateWalletConnection: (connected: boolean, address?: string) => void
   claimTestnetAirdrop: () => void
   mintNFT: (nftName: string, wallet: any) => Promise<{ mintAddress: string; signature: string }>
   shareJourney: (platform: string) => void
-  resetProgress: () => void
+  resetProgress: () => Promise<void>
   downloadNFT: (nftName: string) => Promise<boolean>
   viewNFTOnExplorer: (tokenId: string) => string
   completeMission: () => void
+  loadUserProgress: () => Promise<void>
 }
 
 const initialUserProgress: UserProgress = {
@@ -55,6 +56,37 @@ const initialTestnetFeatures: TestnetFeatures = {
   socialSharing: true,
 }
 
+const derivePassLevel = (
+  subscription: string | undefined,
+  totalXP: number,
+  totalNFTs: number
+): UserProgress['passLevel'] => {
+  switch (subscription) {
+    case 'diamond':
+      return 'Diamond'
+    case 'platinum':
+      return 'Platinum'
+    case 'gold':
+      return 'Gold'
+    default:
+      break
+  }
+
+  if (totalXP >= 2000 && totalNFTs >= 10) {
+    return 'Diamond'
+  }
+
+  if (totalXP >= 1000 && totalNFTs >= 5) {
+    return 'Platinum'
+  }
+
+  if (totalXP >= 500 && totalNFTs >= 2) {
+    return 'Gold'
+  }
+
+  return 'Free'
+}
+
 export const useJourneyStore = create<JourneyState>()(
   persist(
     (set, get) => ({
@@ -77,51 +109,77 @@ export const useJourneyStore = create<JourneyState>()(
       
       setCurrentPhase: (phase) => set({ currentPhase: phase }),
       
-      updateProgress: (xp, nfts = [], mfai = 0) => set((state) => {
+      updateProgress: async (xp, nfts = [], mfai = 0) => {
+        const state = get()
         const newTotalXP = state.userProgress.totalXP + xp
         const newMfaiTokens = state.userProgress.mfaiTokens + mfai
         
         // Determine new pass level based on XP and achievements
-        let newPassLevel = state.userProgress.passLevel
         const totalNFTs = state.userProgress.nfts.length + nfts.length
+        const newPassLevel = derivePassLevel(undefined, newTotalXP, totalNFTs)
         
-        if (newTotalXP >= 2000 && totalNFTs >= 10) {
-          newPassLevel = 'Diamond'
-        } else if (newTotalXP >= 1000 && totalNFTs >= 5) {
-          newPassLevel = 'Platinum'
-        } else if (newTotalXP >= 500 && totalNFTs >= 2) {
-          newPassLevel = 'Gold'
+        const updatedProgress = {
+          ...state.userProgress,
+          totalXP: newTotalXP,
+          nfts: [...state.userProgress.nfts, ...nfts],
+          mfaiTokens: newMfaiTokens,
+          passLevel: newPassLevel,
+          votingPower: state.userProgress.votingPower + Math.floor(xp / 10), // 1 voting power per 10 XP
         }
-        
-        return {
-          userProgress: {
-            ...state.userProgress,
-            totalXP: newTotalXP,
-            nfts: [...state.userProgress.nfts, ...nfts],
-            mfaiTokens: newMfaiTokens,
-            passLevel: newPassLevel,
-            votingPower: state.userProgress.votingPower + Math.floor(xp / 10), // 1 voting power per 10 XP
-          }
+
+        // Update local state
+        set({ userProgress: updatedProgress })
+
+        // Sync with backend
+        try {
+          await api.updateProgress({
+            total_xp: newTotalXP,
+            current_level: Math.floor(newTotalXP / 200), // Level based on XP
+            completed_phases: updatedProgress.completedPhases.length
+          })
+
+          // Update token balance
+          await api.updateTokenBalance({ mfai_tokens: newMfaiTokens })
+        } catch (error) {
+          console.error('Failed to sync progress with backend:', error)
         }
-      }),
+      },
       
       openModal: (content) => set({ isModalOpen: true, modalContent: content }),
       
       closeModal: () => set({ isModalOpen: false, modalContent: null }),
       
-      completePhase: (phaseIndex) => set((state) => {
-        // Check if phase is already completed to avoid duplicates
+      completePhase: async (phaseIndex, options = {}) => {
+        const state = get()
+
         if (state.userProgress.completedPhases.includes(phaseIndex)) {
-          return state;
+          return
         }
-        
-        return {
-          userProgress: {
-            ...state.userProgress,
-            completedPhases: [...state.userProgress.completedPhases, phaseIndex],
-          }
-        };
-      }),
+
+        const phaseNumber = options.phaseNumber ?? phaseIndex + 1
+
+        try {
+          await api.completePhase({
+            phase_number: phaseNumber,
+            score: options.score ?? 0,
+            ...(options.nftAddress ? { nft_address: options.nftAddress } : {})
+          })
+
+          const updatedPhases = Array.from(
+            new Set([...state.userProgress.completedPhases, phaseIndex])
+          ).sort((a, b) => a - b)
+
+          set({
+            userProgress: {
+              ...state.userProgress,
+              completedPhases: updatedPhases,
+            }
+          })
+        } catch (error) {
+          console.error('Failed to sync phase completion with backend:', error)
+          throw error
+        }
+      },
       
       updateStaking: (amount) => set((state) => ({
         userProgress: {
@@ -187,7 +245,7 @@ export const useJourneyStore = create<JourneyState>()(
         return { mintAddress: result.mintAddress, signature: result.signature };
       },
 
-      shareJourney: (platform: string) => set((state) => ({
+      shareJourney: (_platform: string) => set((state) => ({
         userProgress: {
           ...state.userProgress,
           socialShareCount: (state.userProgress.socialShareCount || 0) + 1,
@@ -199,17 +257,36 @@ export const useJourneyStore = create<JourneyState>()(
         }
       })),
 
-      resetProgress: () => set({
-        selectedPersona: null,
-        currentPhase: 0,
-        userProgress: {
-          ...initialUserProgress,
-          walletConnected: get().userProgress.walletConnected,
-          walletAddress: get().userProgress.walletAddress,
-        },
-        isModalOpen: false,
-        modalContent: null,
-      }),
+      resetProgress: async () => {
+        set({
+          selectedPersona: null,
+          currentPhase: 0,
+          userProgress: { ...initialUserProgress },
+          testnetFeatures: { ...initialTestnetFeatures },
+          isModalOpen: false,
+          modalContent: null,
+        })
+
+        if (typeof window !== 'undefined') {
+          try {
+            window.localStorage.removeItem('mfai-journey-storage')
+          } catch (error) {
+            console.error('Failed to clear persisted journey data:', error)
+          }
+        }
+
+        const hasAccessToken = typeof window !== 'undefined'
+          ? window.localStorage.getItem('accessToken')
+          : null
+
+        if (hasAccessToken) {
+          try {
+            await api.resetProgress()
+          } catch (error) {
+            console.error('Failed to reset progress on server:', error)
+          }
+        }
+      },
       
       downloadNFT: async (nftName: string) => {
         // Simulate download process and log the requested NFT name for analytics
@@ -239,7 +316,87 @@ export const useJourneyStore = create<JourneyState>()(
             votingPower: state.userProgress.votingPower + Math.floor(xpReward / 10),
           }
         };
-      })
+      }),
+
+      loadUserProgress: async () => {
+        const currentState = get()
+
+        try {
+          const response = await api.getUserProgress()
+
+          if (!response?.success) {
+            return
+          }
+
+          const progress = response.progress || {}
+          const totalXP: number = progress.total_xp ?? 0
+          const completedCount: number = typeof progress.completed_phases === 'number'
+            ? progress.completed_phases
+            : 0
+
+          const completedPhases = Array.from({ length: completedCount }, (_, index) => index)
+
+          const rawCertificates: any[] = Array.isArray(progress.nft_certificates)
+            ? progress.nft_certificates
+            : []
+
+          const mappedNfts = rawCertificates.map((certificate) => {
+            if (certificate?.title) {
+              return certificate.title as string
+            }
+
+            if (certificate?.phase) {
+              return `Phase ${certificate.phase} NFT`
+            }
+
+            if (certificate?.mint_address) {
+              return certificate.mint_address as string
+            }
+
+            if (certificate?.nft_address) {
+              return certificate.nft_address as string
+            }
+
+            return 'NFT Certificate'
+          })
+
+          const personaId: string | undefined = progress.persona || undefined
+          const matchedPersona = personaId
+            ? personas.find((persona) => persona.id === personaId)
+            : null
+
+          const passLevel = derivePassLevel(
+            progress.subscription,
+            totalXP,
+            mappedNfts.length
+          )
+
+          const mappedProgress: UserProgress = {
+            ...initialUserProgress,
+            totalXP,
+            nfts: mappedNfts,
+            passLevel,
+            mfaiTokens: progress.token_transactions?.mfai_tokens ?? 0,
+            stakedMfai: currentState.userProgress.stakedMfai,
+            walletConnected: currentState.userProgress.walletConnected,
+            walletAddress: currentState.userProgress.walletAddress,
+            completedPhases,
+            currentPersona: personaId,
+            votingPower: Math.floor(totalXP / 10),
+            daoProposals: currentState.userProgress.daoProposals,
+            testnetAirdropClaimed: currentState.userProgress.testnetAirdropClaimed,
+            socialShareCount: currentState.userProgress.socialShareCount,
+          }
+
+          set({
+            selectedPersona: matchedPersona ?? currentState.selectedPersona ?? null,
+            currentPhase: completedPhases.length,
+            userProgress: mappedProgress,
+          })
+        } catch (error) {
+          console.error('Failed to load user progress from backend:', error)
+        }
+      }
     }),
     {
       name: 'mfai-journey-storage',
