@@ -15,6 +15,7 @@ router.delete('/delete/:id', protect, journeyController.deleteJourney);
 router.get('/user-progress', protect, journeyController.getUserProgress);
 router.put('/user-progress', protect, journeyController.updateUserProgress);
 router.post('/complete-phase', protect, journeyController.completePhase);
+router.post('/reset-progress', protect, journeyController.resetUserProgress);
 router.get('/user-journeys', protect, journeyController.getUserJourneys);
 
 module.exports = router;

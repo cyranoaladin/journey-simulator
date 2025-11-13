@@ -1,5 +1,14 @@
 const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
 const User = require('../models/user');
+
+dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is not defined');
+}
 
 // Middleware to verify JWT token
 const protect = async (req, res, next) => {
@@ -20,7 +29,7 @@ const protect = async (req, res, next) => {
 
     try {
       // Verify token
-      const decoded = jwt.verify(token, 'mfaiapp');
+      const decoded = jwt.verify(token, JWT_SECRET);
       
       // Get user from token
       const user = await User.findById(decoded.id).select('-password');

@@ -5,6 +5,9 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const dotenv = require('dotenv');
+
+dotenv.config();
 const indexRouter = require('./routes/index');
 const userRouter = require('./routes/user-routes');
 const coursRoutes = require('./routes/cours-routes');
@@ -12,7 +15,13 @@ const journey = require('./routes/journey-routes');
 const analyticsRoutes = require('./routes/analytics-routes');
 const app = express();
 
-mongoose.connect('mongodb+srv://adambhedj13:mfaiapp@mfai.jj66vbt.mongodb.net/', {
+const MONGO_URI = process.env.MONGO_URI;
+
+if (!MONGO_URI) {
+  throw new Error('MONGO_URI environment variable is not defined');
+}
+
+mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
@@ -28,19 +37,28 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 // CORS middleware
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'],
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:4173',
+  'http://127.0.0.1:4173'
+]
+
+const corsOptions = {
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
-}));
+}
+
+app.use(cors(corsOptions))
+app.options('*', cors(corsOptions))
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
 app.use('/user', userRouter);
 app.use('/cours', coursRoutes);
 app.use('/journey', journey);

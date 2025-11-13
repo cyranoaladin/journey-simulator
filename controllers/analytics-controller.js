@@ -1,5 +1,5 @@
 const User = require('../models/user');
-const Journey = require('../models/journeys');
+const Journey = require('../models/Journeys');
 
 // Track certification downloads
 exports.trackCertificationDownload = async (req, res) => {

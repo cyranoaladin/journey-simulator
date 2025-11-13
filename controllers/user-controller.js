@@ -1,9 +1,14 @@
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const dotenv = require('dotenv');
 dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is not defined');
+}
 
 // Generate access token - short lived (15-60 minutes)
 const generateAccessToken = (user) => {
@@ -13,7 +18,7 @@ const generateAccessToken = (user) => {
         email: user.email,
         role: user.role
       },
-      "mfaiapp",
+      JWT_SECRET,
       { expiresIn: '1h' } // Short-lived token
     );
   };
@@ -39,8 +44,6 @@ const generateRefreshToken = (user) => {
       const { name, email, password, wallet_address, persona } = req.body;
   
       // Check if user already exists
-      console.log(req.body);
-      
       const userExists = await User.findOne({ email });
       if (userExists) {
         return res.status(400).json({ success: false, message: 'User with this email already exists' });
@@ -87,20 +90,17 @@ const generateRefreshToken = (user) => {
   exports.loginUser = async (req, res) => {
     try {
       const { email, password } = req.body;
-      console.log(req.body);
-
       // Find user by email
       const user = await User.findOne({ email });
-      console.log(user);
       if (!user) {
-        return res.status(401).json({ success: false, message: '22222Invalid email or password' });
+        return res.status(401).json({ success: false, message: 'Invalid email or password' });
       }
   
       // Check if password is correct
       const isMatch = await user.comparePassword(password);
       
       if (!isMatch) {
-        return res.status(401).json({ success: false, message: '1111Invalid email or password' });
+        return res.status(401).json({ success: false, message: 'Invalid email or password' });
       }
   
       // Check if user is active
@@ -109,11 +109,7 @@ const generateRefreshToken = (user) => {
       }
   
       // Generate tokens
-      const accessToken = jwt.sign(
-        { id: user._id, email: user.email, role: user.role },
-        "mfaiapp",
-        { expiresIn: '1h' }
-      );
+      const accessToken = generateAccessToken(user);
       
       // Create a refresh token
       const refreshToken = crypto.randomBytes(40).toString('hex');
@@ -122,9 +118,6 @@ const generateRefreshToken = (user) => {
       user.refreshToken = refreshToken;
       user.refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
       await user.save();
-      
-      console.log(`✅ Login successful for ${user.email}`);
-      console.log(`🔑 Generated access token (first 15 chars): ${accessToken.substring(0, 15)}...`);
       
       // Clear sensitive data
       const userToReturn = {
@@ -480,18 +473,48 @@ const generateRefreshToken = (user) => {
   exports.addNFTCertificate = async (req, res) => {
     try {
       const userId = req.user.id;
-      const { phase, nft_address, score } = req.body;
+      const {
+        phase,
+        nft_address,
+        mint_address,
+        score,
+        title,
+        description,
+        image_url,
+        rarity,
+        xp_earned
+      } = req.body;
+
+      const resolvedAddress = nft_address || mint_address;
+      if (!resolvedAddress) {
+        return res.status(400).json({
+          success: false,
+          message: 'NFT address is required'
+        });
+      }
+
+      const resolvedPhase = phase !== undefined ? Number(phase) : undefined;
+
+      const numericXp = xp_earned !== undefined ? Number(xp_earned) : undefined;
+
+      const certificatePayload = {
+        ...(resolvedPhase !== undefined && !Number.isNaN(resolvedPhase) && { phase: resolvedPhase }),
+        nft_address: resolvedAddress,
+        mint_address: resolvedAddress,
+        score: typeof score === 'number' ? score : 0,
+        mint_date: new Date(),
+        ...(title && { title }),
+        ...(description && { description }),
+        ...(image_url && { image_url }),
+        ...(rarity && { rarity }),
+        ...(numericXp !== undefined && !Number.isNaN(numericXp) && { xp_earned: numericXp })
+      };
 
       const user = await User.findByIdAndUpdate(
         userId,
         {
           $push: {
-            nft_certificates: {
-              phase,
-              nft_address,
-              score: score || 0,
-              mint_date: new Date()
-            }
+            nft_certificates: certificatePayload
           }
         },
         { new: true }

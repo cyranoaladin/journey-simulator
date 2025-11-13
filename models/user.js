@@ -1,6 +1,28 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const { subscription } = require('../controllers/user-controller');
+
+const personaValues = [
+    'cognitive-activation-hub',
+    'capital-foundry',
+    'system-architect',
+    'experience-studio',
+    'impact-engine',
+    'resilience-master',
+    // Legacy personas for backward compatibility
+    'curious-student',
+    'web2-entrepreneur',
+    'web3-developer',
+    'content-creator',
+    'community-communicator',
+    'project-manager',
+    'defi-explorer',
+    'nft-creator',
+    'investor',
+    'student',
+    'entrepreneur',
+    'developer',
+    'creator'
+];
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -25,7 +47,7 @@ const userSchema = new mongoose.Schema({
     },
     persona: {
         type: String,
-        enum: ['student', 'entrepreneur', 'developer', 'creator'],
+        enum: personaValues,
         required: true,
     },
     role: {
@@ -62,6 +84,9 @@ const userSchema = new mongoose.Schema({
             nft_address: {
                 type: String,
             },
+            mint_address: {
+                type: String,
+            },
             mint_date: {
                 type: Date,
                 default: Date.now,
@@ -69,6 +94,21 @@ const userSchema = new mongoose.Schema({
             score: {
                 type: Number,
                 default: 0,
+            },
+            title: {
+                type: String,
+            },
+            description: {
+                type: String,
+            },
+            image_url: {
+                type: String,
+            },
+            rarity: {
+                type: String,
+            },
+            xp_earned: {
+                type: Number,
             },
         }
     ],

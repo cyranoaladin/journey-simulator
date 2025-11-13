@@ -1,4 +1,4 @@
-const Journey = require('../models/journeys');
+const Journey = require('../models/Journeys');
 const User = require('../models/user');
 
 exports.createJourney = async (req, res) => {
@@ -95,7 +95,8 @@ exports.getUserProgress = async (req, res) => {
                 completed_phases: user.completed_phases,
                 nft_certificates: user.nft_certificates,
                 token_transactions: user.token_transactions,
-                subscription: user.subscription
+                subscription: user.subscription,
+                persona: user.persona
             }
         });
     } catch (error) {
@@ -142,6 +143,43 @@ exports.updateUserProgress = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Failed to update progress',
+            error: error.message
+        });
+    }
+};
+
+exports.resetUserProgress = async (req, res) => {
+    try {
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            {
+                total_xp: 0,
+                current_level: 0,
+                completed_phases: 0,
+                nft_certificates: [],
+                token_transactions: {
+                    mfai_tokens: 0,
+                    last_updated: new Date()
+                }
+            },
+            { new: true }
+        ).select('-password');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Progress reset successfully'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Failed to reset progress',
             error: error.message
         });
     }
