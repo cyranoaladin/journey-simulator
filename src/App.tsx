@@ -24,8 +24,11 @@ function App() {
   const { selectedPersona } = useJourneyStore()
 
   useEffect(() => {
-    // Initialize particles.js
-    initParticles()
+    const cleanup = initParticles()
+
+    return () => {
+      cleanup?.()
+    }
   }, [])
 
   useEffect(() => {
