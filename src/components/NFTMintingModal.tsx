@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { X, Award, Loader, CheckCircle, ExternalLink, AlertCircle } from 'lucide-react'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { PublicKey } from '@solana/web3.js'
 import { Certification } from '../types/journey'
 import { useJourneyStore } from '../store/journeyStore'
 import { api } from '../utils/api'
@@ -97,87 +96,52 @@ const NFTMintingModal: React.FC<NFTMintingModalProps> = ({
     if (!selectedPersona) return {}
     
     switch (selectedPersona.id) {
-      case 'investor':
+      case 'cognitive-activation-hub':
         return {
-          bgGradient: 'from-green-400 to-gold-500',
-          iconBg: 'bg-gold-500',
-          textColor: 'text-gold-500'
+          bgGradient: 'from-sky-500 to-cyan-400',
+          iconBg: 'bg-sky-500',
+          textColor: 'text-cyan-300'
         }
-      case 'web3-developer':
+      case 'capital-foundry':
         return {
-          bgGradient: 'from-purple-400 to-pink-500',
-          iconBg: 'bg-purple-500',
-          textColor: 'text-purple-500'
+          bgGradient: 'from-emerald-500 to-teal-500',
+          iconBg: 'bg-emerald-500',
+          textColor: 'text-emerald-300'
         }
-      case 'content-creator':
+      case 'system-architect':
         return {
-          bgGradient: 'from-pink-400 to-purple-500',
-          iconBg: 'bg-pink-500',
-          textColor: 'text-pink-500'
+          bgGradient: 'from-purple-500 to-indigo-500',
+          iconBg: 'bg-purple-600',
+          textColor: 'text-indigo-300'
         }
-      case 'community-communicator':
+      case 'experience-studio':
         return {
-          bgGradient: 'from-orange-400 to-red-500',
-          iconBg: 'bg-orange-500',
-          textColor: 'text-orange-500'
+          bgGradient: 'from-rose-500 to-fuchsia-500',
+          iconBg: 'bg-rose-500',
+          textColor: 'text-fuchsia-300'
         }
-      case 'project-manager':
+      case 'impact-engine':
         return {
-          bgGradient: 'from-indigo-400 to-blue-500',
-          iconBg: 'bg-indigo-500',
-          textColor: 'text-indigo-500'
+          bgGradient: 'from-amber-500 to-lime-500',
+          iconBg: 'bg-amber-500',
+          textColor: 'text-lime-300'
         }
-      case 'defi-explorer':
+      case 'resilience-master':
         return {
-          bgGradient: 'from-cyan-400 to-blue-500',
-          iconBg: 'bg-cyan-500',
-          textColor: 'text-cyan-500'
-        }
-      case 'nft-creator':
-        return {
-          bgGradient: 'from-pink-400 to-orange-500',
-          iconBg: 'bg-pink-500',
-          textColor: 'text-pink-500'
+          bgGradient: 'from-slate-500 to-cyan-600',
+          iconBg: 'bg-slate-600',
+          textColor: 'text-cyan-300'
         }
       default:
         return {
-          bgGradient: 'from-blue-400 to-cyan-500',
-          iconBg: 'bg-blue-500',
-          textColor: 'text-blue-500'
+          bgGradient: 'from-sky-500 to-cyan-400',
+          iconBg: 'bg-sky-500',
+          textColor: 'text-cyan-300'
         }
     }
   }
 
   const personaStyle = getPersonaStyle()
-
-  const handleMint = async () => {
-    if (!publicKey || !signTransaction) {
-      setError('Wallet not connected')
-      return
-    }
-
-    setIsMinting(true)
-    setError(null)
-
-    try {
-      // Simulate NFT minting with steps
-      for (let step = 1; step <= totalSteps; step++) {
-        setCurrentStep(step)
-        await new Promise(resolve => setTimeout(resolve, 1000))
-      }
-      
-      // Generate a simulated mint address
-      const simulatedMintAddress = PublicKey.unique().toString()
-      setMintAddress(simulatedMintAddress)
-      onMinted(simulatedMintAddress)
-      
-    } catch (err) {
-      console.error('Error during minting:', err)
-      setError('Error minting NFT')
-    } finally {
-      setIsMinting(false)
-    }
-  }
 
   const getMintingStepText = () => {
     switch (currentStep) {
@@ -210,8 +174,10 @@ const NFTMintingModal: React.FC<NFTMintingModalProps> = ({
           <button
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+            type="button"
+            aria-label="Close minting modal"
           >
-            <X size={20} />
+            <X size={20} aria-hidden="true" />
           </button>
         </div>
 

@@ -45,6 +45,11 @@ function App() {
             ? 'bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 text-white' 
             : 'bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 text-gray-900'
         }`}>
+          <div
+            id="particles-js"
+            className="pointer-events-none fixed inset-0 -z-10"
+            aria-hidden="true"
+          />
           <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<LoginPage />} />

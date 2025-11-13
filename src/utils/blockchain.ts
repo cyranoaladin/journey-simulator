@@ -4,15 +4,11 @@ import {
   Transaction, 
   SystemProgram, 
   LAMPORTS_PER_SOL,
-  Keypair,
-  sendAndConfirmTransaction
+  Keypair
 } from '@solana/web3.js';
 import { 
-  Token, 
   TOKEN_PROGRAM_ID, 
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  MintLayout,
-  AccountLayout
+  MintLayout
 } from '@solana/spl-token';
 
 // Constants
@@ -53,7 +49,7 @@ export const getWalletBalance = async (publicKey: PublicKey): Promise<number> =>
 // Mint NFT (Proof-of-Skill™)
 export const mintProofOfSkill = async (
   wallet: any,
-  metadata: {
+  _metadata: {
     name: string;
     description: string;
     image: string;
@@ -75,7 +71,7 @@ export const mintProofOfSkill = async (
     const lamports = await connection.getMinimumBalanceForRentExemption(MINT_SIZE);
     
     // Create transaction for token creation
-    const transaction = new Transaction().add(
+    new Transaction().add(
       SystemProgram.createAccount({
         fromPubkey: publicKey,
         newAccountPubkey: mintKeypair.publicKey,
@@ -101,9 +97,10 @@ export const mintProofOfSkill = async (
     };
   } catch (error) {
     console.error('Error minting NFT:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error occurred while minting';
     return {
       success: false,
-      error: error.message
+      error: message
     };
   }
 };
@@ -111,7 +108,7 @@ export const mintProofOfSkill = async (
 // Stake $MFAI tokens
 export const stakeMFAI = async (
   wallet: any,
-  amount: number
+  _amount: number
 ): Promise<{success: boolean, signature?: string, error?: string}> => {
   try {
     const { publicKey, signTransaction } = wallet;
@@ -131,9 +128,10 @@ export const stakeMFAI = async (
     };
   } catch (error) {
     console.error('Error staking MFAI:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error occurred while staking';
     return {
       success: false,
-      error: error.message
+      error: message
     };
   }
 };
@@ -151,6 +149,8 @@ export const submitDAOVote = async (
       throw new Error('Wallet not connected');
     }
     
+    console.log('Simulating DAO vote submission:', { proposalId, vote });
+
     // In a real implementation, we would:
     // 1. Create a transaction to submit a vote to the governance program
     // 2. Sign and send the transaction
@@ -158,21 +158,20 @@ export const submitDAOVote = async (
     // For simulation purposes, we'll just return a success response
     return {
       success: true,
-      signature: 'simulated_vote_' + Date.now(),
-      proposalId,
-      vote
+      signature: 'simulated_vote_' + Date.now()
     };
   } catch (error) {
     console.error('Error submitting DAO vote:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error occurred while submitting DAO vote';
     return {
       success: false,
-      error: error.message
+      error: message
     };
   }
 };
 
 // Get NFTs owned by wallet
-export const getWalletNFTs = async (publicKey: PublicKey): Promise<any[]> => {
+export const getWalletNFTs = async (_publicKey: PublicKey): Promise<any[]> => {
   try {
     // In a real implementation, we would:
     // 1. Query the Solana blockchain for token accounts owned by the wallet

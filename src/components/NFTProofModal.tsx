@@ -15,7 +15,8 @@ import {
   Linkedin,
   MessageSquare,
   Wallet,
-  ArrowUp
+  ArrowUp,
+  Shield
 } from 'lucide-react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { useJourneyStore } from '../store/journeyStore';
@@ -24,7 +25,7 @@ import { saveAs } from 'file-saver';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 interface NFTProofModalProps {
-  proofType: 'Skill' | 'Vision' | 'Yield' | 'Build' | 'Creation' | 'Orchestration' | 'Design' | 'Invest';
+  proofType: 'Skill' | 'Vision' | 'Yield' | 'Build' | 'Creation' | 'Orchestration' | 'Design' | 'Invest' | 'Security';
   title: string;
   description: string;
   imageUrl?: string;
@@ -50,7 +51,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
   onClose,
   onViewSkillchain
 }) => {
-  const { publicKey, connected, connecting } = useWallet();
+  const { publicKey, connected } = useWallet();
   const { connection } = useConnection();
   const { selectedPersona, mintNFT } = useJourneyStore();
   const [isMinting, setIsMinting] = useState(false);
@@ -121,61 +122,54 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
     if (!selectedPersona) return {};
     
     switch (selectedPersona.id) {
-      case 'investor':
+      case 'cognitive-activation-hub':
         return {
-          bgGradient: 'from-green-400 to-gold-500',
-          iconBg: 'bg-gold-500',
-          textColor: 'text-gold-500',
-          borderColor: 'border-gold-500'
+          bgGradient: 'from-sky-500 to-cyan-400',
+          iconBg: 'bg-sky-500',
+          textColor: 'text-cyan-300',
+          borderColor: 'border-cyan-300'
         };
-      case 'web3-developer':
+      case 'capital-foundry':
         return {
-          bgGradient: 'from-purple-400 to-pink-500',
-          iconBg: 'bg-purple-500',
-          textColor: 'text-purple-500',
-          borderColor: 'border-purple-500'
+          bgGradient: 'from-emerald-500 to-teal-500',
+          iconBg: 'bg-emerald-500',
+          textColor: 'text-emerald-300',
+          borderColor: 'border-emerald-300'
         };
-      case 'content-creator':
+      case 'system-architect':
         return {
-          bgGradient: 'from-pink-400 to-purple-500',
-          iconBg: 'bg-pink-500',
-          textColor: 'text-pink-500',
-          borderColor: 'border-pink-500'
+          bgGradient: 'from-purple-500 to-indigo-500',
+          iconBg: 'bg-purple-600',
+          textColor: 'text-indigo-300',
+          borderColor: 'border-indigo-300'
         };
-      case 'community-communicator':
+      case 'experience-studio':
         return {
-          bgGradient: 'from-orange-400 to-red-500',
-          iconBg: 'bg-orange-500',
-          textColor: 'text-orange-500',
-          borderColor: 'border-orange-500'
+          bgGradient: 'from-rose-500 to-fuchsia-500',
+          iconBg: 'bg-rose-500',
+          textColor: 'text-fuchsia-300',
+          borderColor: 'border-fuchsia-300'
         };
-      case 'project-manager':
+      case 'impact-engine':
         return {
-          bgGradient: 'from-indigo-400 to-blue-500',
-          iconBg: 'bg-indigo-500',
-          textColor: 'text-indigo-500',
-          borderColor: 'border-indigo-500'
+          bgGradient: 'from-amber-500 to-lime-500',
+          iconBg: 'bg-amber-500',
+          textColor: 'text-lime-300',
+          borderColor: 'border-lime-300'
         };
-      case 'defi-explorer':
+      case 'resilience-master':
         return {
-          bgGradient: 'from-cyan-400 to-blue-500',
-          iconBg: 'bg-cyan-500',
-          textColor: 'text-cyan-500',
-          borderColor: 'border-cyan-500'
-        };
-      case 'nft-creator':
-        return {
-          bgGradient: 'from-pink-400 to-orange-500',
-          iconBg: 'bg-pink-500',
-          textColor: 'text-pink-500',
-          borderColor: 'border-pink-500'
+          bgGradient: 'from-slate-500 to-cyan-600',
+          iconBg: 'bg-slate-600',
+          textColor: 'text-cyan-300',
+          borderColor: 'border-cyan-300'
         };
       default:
         return {
-          bgGradient: 'from-blue-400 to-cyan-500',
-          iconBg: 'bg-blue-500',
-          textColor: 'text-blue-500',
-          borderColor: 'border-blue-500'
+          bgGradient: 'from-sky-500 to-cyan-400',
+          iconBg: 'bg-sky-500',
+          textColor: 'text-cyan-300',
+          borderColor: 'border-cyan-300'
         };
     }
   };
@@ -230,6 +224,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
       case 'Orchestration': return <Award size={24} />;
       case 'Design': return <Award size={24} />;
       case 'Invest': return <Award size={24} />;
+      case 'Security': return <Shield size={24} />;
       default: return <Award size={24} />;
     }
   };

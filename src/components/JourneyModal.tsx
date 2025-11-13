@@ -1,4 +1,3 @@
-import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, CheckCircle, Clock, Trophy, Zap, ExternalLink, ArrowRight, TrendingUp } from 'lucide-react'
 import { useJourneyStore } from '../store/journeyStore'
@@ -8,15 +7,12 @@ import DAOVoteModal from './DAOVoteModal'
 import SkillchainCard from './SkillchainCard'
 
 const JourneyModal = () => {
-  const { isModalOpen, modalContent, closeModal, updateProgress, completePhase } = useJourneyStore()
+  const { isModalOpen, modalContent, closeModal } = useJourneyStore()
 
   if (!isModalOpen || !modalContent) return null
 
   const handleStartPhase = () => {
     if (modalContent.type === 'phase') {
-      const { phase, phaseIndex } = modalContent
-      updateProgress(phase.xpReward, phase.nftReward ? [phase.nftReward] : [])
-      completePhase(phaseIndex)
       closeModal()
     }
   }

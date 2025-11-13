@@ -33,6 +33,7 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
           description: `This NFT certifies your mastery of ${phase.title} phase in the ${selectedPersona.title} journey.`,
           imageUrl: phase.nftDesign || `/images/${phase.id}.png`,
           rarity: phaseIndex === 4 ? 'legendary' : phaseIndex === 3 ? 'epic' : phaseIndex === 2 ? 'rare' : 'common',
+          phaseId: phase.id,
           attributes: [
             { trait_type: 'Proof Type', value: `Proof-of-${proofType}™` },
             { trait_type: 'XP Earned', value: phase.xpReward },
@@ -54,6 +55,7 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
           description: `Complete the ${phase.title} phase to unlock this certification.`,
           imageUrl: phase.nftDesign || `/images/${phase.id}.png`,
           rarity: i === 4 ? 'legendary' : i === 3 ? 'epic' : i === 2 ? 'rare' : 'common',
+          phaseId: phase.id,
           attributes: [
             { trait_type: 'Proof Type', value: `Proof-of-${proofType}™` },
             { trait_type: 'XP Reward', value: phase.xpReward },
@@ -81,53 +83,47 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
     if (!selectedPersona) return {}
     
     switch (selectedPersona.id) {
-      case 'investor':
+      case 'cognitive-activation-hub':
         return {
-          bgGradient: 'from-green-400 to-gold-500',
-          iconBg: 'bg-gold-500',
-          textColor: 'text-gold-500'
+          bgGradient: 'from-sky-500 to-cyan-400',
+          iconBg: 'bg-sky-500',
+          textColor: 'text-cyan-300'
         }
-      case 'web3-developer':
+      case 'capital-foundry':
         return {
-          bgGradient: 'from-purple-400 to-pink-500',
-          iconBg: 'bg-purple-500',
-          textColor: 'text-purple-500'
+          bgGradient: 'from-emerald-500 to-teal-500',
+          iconBg: 'bg-emerald-500',
+          textColor: 'text-emerald-300'
         }
-      case 'content-creator':
+      case 'system-architect':
         return {
-          bgGradient: 'from-pink-400 to-purple-500',
-          iconBg: 'bg-pink-500',
-          textColor: 'text-pink-500'
+          bgGradient: 'from-purple-500 to-indigo-500',
+          iconBg: 'bg-purple-600',
+          textColor: 'text-indigo-300'
         }
-      case 'community-communicator':
+      case 'experience-studio':
         return {
-          bgGradient: 'from-orange-400 to-red-500',
-          iconBg: 'bg-orange-500',
-          textColor: 'text-orange-500'
+          bgGradient: 'from-rose-500 to-fuchsia-500',
+          iconBg: 'bg-rose-500',
+          textColor: 'text-fuchsia-300'
         }
-      case 'project-manager':
+      case 'impact-engine':
         return {
-          bgGradient: 'from-indigo-400 to-blue-500',
-          iconBg: 'bg-indigo-500',
-          textColor: 'text-indigo-500'
+          bgGradient: 'from-amber-500 to-lime-500',
+          iconBg: 'bg-amber-500',
+          textColor: 'text-lime-300'
         }
-      case 'defi-explorer':
+      case 'resilience-master':
         return {
-          bgGradient: 'from-cyan-400 to-blue-500',
-          iconBg: 'bg-cyan-500',
-          textColor: 'text-cyan-500'
-        }
-      case 'nft-creator':
-        return {
-          bgGradient: 'from-pink-400 to-orange-500',
-          iconBg: 'bg-pink-500',
-          textColor: 'text-pink-500'
+          bgGradient: 'from-slate-500 to-cyan-600',
+          iconBg: 'bg-slate-600',
+          textColor: 'text-cyan-300'
         }
       default:
         return {
-          bgGradient: 'from-blue-400 to-cyan-500',
-          iconBg: 'bg-blue-500',
-          textColor: 'text-blue-500'
+          bgGradient: 'from-sky-500 to-cyan-400',
+          iconBg: 'bg-sky-500',
+          textColor: 'text-cyan-300'
         }
     }
   };
@@ -165,7 +161,7 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
           {certifications.map((certification, index) => {
             const isLocked = certification.id.includes('locked');
             const isClaimed = userProgress.nfts.includes(certification.name);
-            const proofType = getProofType(selectedPersona?.id || '', certification.id);
+            const proofType = getProofType(selectedPersona?.id || '', certification.phaseId || certification.id);
             const isHovered = hoveredCertId === certification.id;
             
             return (
@@ -287,7 +283,7 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
       <AnimatePresence>
         {showProofModal && selectedCertification && (
           <NFTProofModal
-            proofType={getProofType(selectedPersona?.id || '', selectedCertification.id) as any}
+            proofType={getProofType(selectedPersona?.id || '', selectedCertification.phaseId || selectedCertification.id) as any}
             title={selectedCertification.name}
             description={selectedCertification.description}
             imageUrl={selectedCertification.imageUrl}

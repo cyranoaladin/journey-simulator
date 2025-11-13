@@ -48,14 +48,14 @@ This protocol is designed to be both flexible enough to accommodate diverse user
 
 MFAI offers multiple entry points for users based on their background, skills, and goals. Each journey is tailored to a specific user persona but follows the same Cognitive Activation Protocol™.
 
-Key user journeys include:
+Key user pathways include:
 
-- **The Curious Student**: For newcomers to Web3, focusing on learning fundamentals and earning initial rewards.
-- **The Web2 Entrepreneur**: For established professionals looking to tokenize their business models.
-- **The Web3 Builder**: For developers seeking to formalize their expertise and build protocol-level solutions.
-- **The Community Voice**: For communicators evolving from community support to strategic governance.
-- **The Content Maker**: For creators transforming their output into verifiable protocol contributions.
-- **The Project Manager**: For operational experts becoming Mission Commanders™ who orchestrate protocol activities.
+- **Cognitive Activation Hub**: For ambitious newcomers establishing sovereign Web3 mental models and Solana fluency.
+- **Capital Foundry**: For financial engineers architecting Solana-native liquidity systems and launch-ready protocols.
+- **System Architect**: For infrastructure innovators fusing AI, DePIN, and high-throughput Solana services.
+- **Experience Studio**: For creative technologists shipping culturally resonant dApps, NFT universes, and on-chain experiences.
+- **Impact Engine**: For coordinators designing regenerative governance, transparent funding rails, and Synaptic DAO missions.
+- **Resilience Master**: For security leaders safeguarding protocols through continuous offense-informed defense.
 
 Each journey is gamified with XP, NFT badges, token rewards, and increasing levels of protocol responsibility and rewards.
 

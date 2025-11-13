@@ -130,15 +130,10 @@ const RegisterPage: React.FC = () => {
 
   return (
     <>
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 relative">
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-accent-cyan/10 via-accent-purple/10 to-accent-gold/10"></div>
-        <div
-          className="absolute inset-0 opacity-20"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-          }}
-        ></div>
+        <div className="absolute inset-0 opacity-20 auth-background-pattern"></div>
       </div>
 
       <motion.div
@@ -322,11 +317,12 @@ const RegisterPage: React.FC = () => {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-colors" />
+                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-colors" aria-hidden="true" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-colors" />
+                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-colors" aria-hidden="true" />
                   )}
                 </button>
               </div>
@@ -357,11 +353,12 @@ const RegisterPage: React.FC = () => {
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
                 >
                   {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-colors" />
+                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-colors" aria-hidden="true" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-colors" />
+                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-colors" aria-hidden="true" />
                   )}
                 </button>
               </div>

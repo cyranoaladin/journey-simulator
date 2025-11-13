@@ -1,18 +1,8 @@
-import React, { createContext, useContext, ReactNode, useEffect } from 'react'
+import { ReactNode, useMemo, FC } from 'react'
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
-import {
-  PhantomWalletAdapter,
-  SolflareWalletAdapter,
-  TorusWalletAdapter,
-  LedgerWalletAdapter,
-  MathWalletAdapter,
-  TokenPocketWalletAdapter,
-  CoinbaseWalletAdapter,
-} from '@solana/wallet-adapter-wallets'
+import { SolflareWalletAdapter } from '@solana/wallet-adapter-wallets'
 import { clusterApiUrl } from '@solana/web3.js'
-import { useMemo } from 'react'
-import { useJourneyStore } from '../store/journeyStore'
 
 // Import wallet adapter CSS
 import '@solana/wallet-adapter-react-ui/styles.css'
@@ -21,9 +11,7 @@ interface WalletContextProviderProps {
   children: ReactNode
 }
 
-export const WalletContextProvider: React.FC<WalletContextProviderProps> = ({ children }) => {
-  const { updateWalletConnection } = useJourneyStore();
-  
+export const WalletContextProvider: FC<WalletContextProviderProps> = ({ children }) => {
   // Configuration for Solana Devnet
   const network = 'devnet'
   const endpoint = useMemo(() => clusterApiUrl(network), [network])
@@ -31,13 +19,7 @@ export const WalletContextProvider: React.FC<WalletContextProviderProps> = ({ ch
   // Supported wallets configuration
   const wallets = useMemo(
     () => [
-      new PhantomWalletAdapter(),
       new SolflareWalletAdapter(),
-      new TorusWalletAdapter(),
-      new LedgerWalletAdapter(),
-      new MathWalletAdapter(),
-      new TokenPocketWalletAdapter(),
-      new CoinbaseWalletAdapter(),
     ],
     []
   )

@@ -5,6 +5,12 @@ declare global {
 }
 
 export const initParticles = () => {
+  const container = document.getElementById('particles-js')
+  if (!container) {
+    console.warn('particles-js container not found; skipping particle initialization')
+    return
+  }
+
   // Load particles.js script dynamically
   const script = document.createElement('script');
   script.src = 'https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js';

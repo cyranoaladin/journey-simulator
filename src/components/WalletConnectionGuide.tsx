@@ -1,7 +1,6 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { Wallet, ExternalLink, Download, AlertCircle, CheckCircle, Settings, Zap } from 'lucide-react';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { Wallet, Download, AlertCircle, Settings, Zap } from 'lucide-react';
+import LazyWalletMultiButton from './wallet/LazyWalletMultiButton';
 
 const WalletConnectionGuide: React.FC = () => {
   return (
@@ -115,7 +114,7 @@ const WalletConnectionGuide: React.FC = () => {
             </p>
             <div className="flex items-center space-x-2">
               <div className="wallet-adapter-dropdown">
-                <WalletMultiButton className="!bg-gradient-to-r !from-blue-600 !to-purple-600 !rounded-lg !py-2 !px-4 !text-white !font-medium" />
+                <LazyWalletMultiButton className="!bg-gradient-to-r !from-blue-600 !to-purple-600 !rounded-lg !py-2 !px-4 !text-white !font-medium" />
               </div>
               <img src="/images/solana.svg" alt="Solana" className="w-5 h-5" />
             </div>

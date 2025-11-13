@@ -48,24 +48,18 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona }) => {
   // Get persona icon based on ID
   const getPersonaIcon = () => {
     switch (persona.id) {
-      case 'curious-student':
-        return '🎓';
-      case 'web2-entrepreneur':
-        return '💼';
-      case 'web3-developer':
-        return '⚡';
-      case 'content-creator':
-        return '🎨';
-      case 'community-communicator':
-        return '🗣️';
-      case 'project-manager':
-        return '🎯';
-      case 'defi-explorer':
-        return '📊';
-      case 'nft-creator':
-        return '🖼️';
-      case 'investor':
-        return '💰';
+      case 'cognitive-activation-hub':
+        return '🧠';
+      case 'capital-foundry':
+        return '🏛️';
+      case 'system-architect':
+        return '🛠️';
+      case 'experience-studio':
+        return '🎮';
+      case 'impact-engine':
+        return '🌍';
+      case 'resilience-master':
+        return '🛡️';
       default:
         return persona.icon;
     }
@@ -101,10 +95,12 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona }) => {
         
         {/* Progress bar if journey started */}
         {hasStarted && (
-          <div className="w-full h-1 bg-white/10 rounded-full mb-3">
-            <div 
-              className="h-full bg-gradient-primary rounded-full" 
-              style={{ width: `${progressPercentage}%` }}
+          <div className="w-full h-1 bg-white/10 rounded-full mb-3 overflow-hidden">
+            <motion.div
+              className="h-full bg-gradient-primary rounded-full origin-left"
+              initial={false}
+              animate={{ scaleX: Math.max(0, Math.min(1, progressPercentage / 100)) }}
+              transition={{ duration: 0.4 }}
             />
           </div>
         )}

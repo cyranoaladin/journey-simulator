@@ -1,139 +1,136 @@
-🎯 “The Pathfinder Protocol™”
-From Web2 Hustler to Web3 Sovereign
+🎯 “The Foundry Runway™”
+From Capital Founder to Solana Market Operator
 
-🔎 targed profile:
-Ambitious Web2 entrepreneurs with little or no blockchain experience, seeking to monetize their skills, build meaningful projects, and gain sovereign control over their economic future through the MFAI protocol.
+🔎 Target profile:
+Builders enrolling in the **Capital Foundry** pathway—fintech founders, DeFi engineers, quantitative strategists ready to architect Solana-native financial primitives.
 
-## 🎮 STORYBOARD — **“Mission: From Learner to Sovereign”**
+## 🎮 STORYBOARD — **“Mission: From Recon to Live Liquidity”**
 
-🔁 Based on the **Cognitive Activation Protocol™**
+🔁 Fully aligned with the **Cognitive Activation Protocol™**
 
 ---
 
-### 🧠 LEVEL 0: **The Awakening — Entry into the Protocol**
+### 🧠 LEVEL 0: **Foundry Intake — Diagnostic & Alignment**
 
 📍 **Narrative**
-Marie is a Web2 entrepreneur managing an online store. She stumbles upon [mfai.app](https://mfai.app), intrigued by its vision of learning that leads to real ownership.
+Marie runs a traditional treasury desk. After discovering [mfai.app](https://mfai.app), she selects the Capital Foundry pathway to translate her macro playbook into composable, on-chain liquidity systems.
 
 🧩 **Activation Task**
-→ Create an MFAI profile.
-→ Complete Zyno’s **AEPO™ Diagnostic** to determine cognitive and strategic potential.
+→ Create an MFAI profile and connect her research vault.
+→ Complete Zyno’s **DeFi Edge Diagnostic™** to map current strengths and blind spots.
 
 🎁 **Reward**
 
-- Access to her personalized **Skillchain™**
-- First mission unlocked
-- 10 \$MFAI welcome bonus
+- Genesis Cognition Pass access
+- Opportunity matrix starter pack
+- 10 $MFAI welcome stake for tooling credits
 
 ---
 
-### 📚 LEVEL 1: **Skillchain Mining™ Begins**
+### 📚 LEVEL 1: **Protocol Discovery Sprint**
 
 🎯 **Narrative**
-Marie enters the **Training Nexus**, guided by Zyno, her **AI Co-Founder™**.
-She starts completing missions on tokenized business models, AI marketing, and smart wallets.
+Guided by Zyno, Marie benchmarks Solana’s existing DeFi landscape, identifying stress points where throughput advantages are underutilized.
 
 🧠 **Tasks**
 
-- Complete 3 Skillchain Missions
-- Earn her first **Proof-of-Skill Token™** (NFT certification)
-- Join her first cohort discussion
+- Analyze five leading protocols with the Foundry heatmap suite
+- Publish an opportunity matrix contrasting capital efficiency and risk posture
+- Present findings to the Sovereign Builders briefing room
 
 🎁 **Reward**
 
-- 50 \$MFAI tokens
-- Badge: “Cognitive Explorer”
-- Profile listed in the DAO Talent Radar
+- 80 XP, 8 $MFAI
+- **DeFi Recon Marker** NFT
+- Access to Foundry peer review channel
 
 ---
 
-### ⚒️ LEVEL 2: **Proof-of-Vision™ — Build Her First Prototype**
+### ⚙️ LEVEL 2: **Program Forge Lab**
 
 🚀 **Narrative**
-With Zyno’s co-piloting, Marie begins building a **tokenized marketplace for artisan NFTs**.
-She uses smart contract templates, brand storytelling modules, and governance simulators.
+Marie now codes. With Anchor templates and Zyno’s code peer, she prototypes a lending primitive optimized for low-latency liquidations.
 
 🧠 **Tasks**
 
-- Submit her **Proof-of-Vision™**: strategic document + MVP wireframe
-- Integrate AI + DeFi components
-- Get peer-reviewed by 2 other builders
+- Ship an Anchor module with deterministic tests and fuzzing coverage
+- Benchmark compute unit usage versus mainnet comparables
+- Record a walkthrough for guardian reviewers
 
 🎁 **Reward**
 
-- NFT minted with Zyno’s timestamp
-- Access to the **Builder’s Arena**
-- Eligible for Launchpad submission
+- 110 XP, 11 $MFAI
+- **Anchor Mastery Crest** NFT
+- Eligibility for Guardian pre-audit slot
 
 ---
 
-### 🤝 LEVEL 3: **Contribution Layer — Rise in Reputation**
+### 🌐 LEVEL 3: **Oracle & Liquidity Mesh**
 
 📈 **Narrative**
-Marie now contributes back to the community. She mentors two newcomers and validates three micro-missions. Her on-chain **reputation score** grows.
+To guarantee data integrity and deep markets, Marie orchestrates oracles, AMM hooks, and cross-chain contingency plans.
 
 🧠 **Tasks**
 
-- Host a Zyno-guided webinar
-- Curate a resource bundle
-- Vote on 1 community mission update
+- Integrate two oracle feeds with redundancy checks
+- Simulate three liquidity shock scenarios and publish dashboards
+- Draft interoperability playbooks for bridge events
 
 🎁 **Reward**
 
-- Reputation bump → Unlock DAO visibility
-- Badge: “Protocol Contributor”
-- Partial **Neuro-Dividend™** stream unlocked
+- 120 XP, 12 $MFAI
+- **Liquidity Architect Token**
+- Entrance to the Guardian Liquidity Council
 
 ---
 
-### 🧭 LEVEL 4: **Launchpad Activation — Go Public**
+### 🛡️ LEVEL 4: **Risk Command Center**
 
 🎯 **Narrative**
-Marie stakes \$MFAI via a **Cognitive Lock™** and submits her project to the DAO.
-The proposal is validated through **Synaptic Governance™**, backed by her Proof-of-Vision™ and reputation.
+Marie operationalizes live risk management—circuit breakers, adaptive fees, and DAO telemetry.
 
 🧠 **Tasks**
 
-- Participate in DAO pitch session
-- Answer questions from curators
-- Submit tokenomics draft co-authored with Zyno
+- Configure circuit breaker logic tied to volatility thresholds
+- Publish a treasury telemetry dashboard for Synaptic DAO delegates
+- Run a mock incident with guardian observers
 
 🎁 **Reward**
 
-- Launchpad access
-- Initial funding (in \$MFAI + stablecoins)
-- Zyno Pro™ unlocked
-- DAO-wide visibility
+- 130 XP, 13 $MFAI
+- **Proof-of-Yield™ Sentinel** NFT
+- Nomination for Synaptic governance co-lead
 
 ---
 
-### 🏛️ FINAL LEVEL: **Sovereignty — From Profile to Power**
+### 🚀 FINAL LEVEL: **Launch & Scale Deck**
 
 👑 **Narrative**
-Marie is now an **active sovereign** within the protocol. She holds \$MFAI, mentors rising builders, and proposes new governance missions. Her income comes from **Neuro-Dividends™**, and she’s considered for a Curator role.
+With product, liquidity, and risk frameworks validated, Marie packages the launch storyline for the Sovereign Builders Network and Synaptic DAO.
 
 🧠 **Tasks**
 
-- Stake more \$MFAI to co-create missions
-- Lead a governance vote
-- Be nominated as DAO ambassador
+- Complete the Foundry economic audit
+- Pitch to the Builders Network council with guardian endorsements
+- Secure deployment votes and orchestrate the go-live communications plan
 
 🎁 **Final Rewards**
 
-- Title: “Protocol Sovereign”
-- Continuous Neuro-Dividends™
-- Lifetime access to MFAI’s ecosystem + first access to DePIN/DePAI deployments
+- 150 XP, 15 $MFAI
+- **Neuro-Dividend Initiator** artifact
+- Launch approval + capital partner pipeline
+- Upgrade to Zyno Pro™ liquidity playbooks
 
 ---
 
 ## 🧩 Core Mechanics Mapped to MFAI Protocol
 
-| Gamified Element | MFAI Equivalent                          |
-| ---------------- | ---------------------------------------- |
-| XP, Levels       | Reputation Score + Proof-of-Skill NFTs   |
-| Missions         | Adaptive Skillchains (via AEPO/AECO)     |
-| Quests           | Learn ➜ Build ➜ Prove ➜ Activate ➜ Scale |
-| Currency         | \$MFAI Token (earned, staked, used)      |
-| Items            | NFTs (Skill, Vision, Role)               |
-| Boss Levels      | DAO Pitch + Synaptic Governance™        |
-| Final Rank       | Protocol Sovereign                       |
+| Gamified Element | MFAI Equivalent                               |
+| ---------------- | --------------------------------------------- |
+| XP, Levels       | Foundry XP + Proof-of-Yield™ NFTs             |
+| Missions         | Capital Foundry pathway phases                |
+| Quests           | Learn ➜ Build ➜ Prove ➜ Activate ➜ Scale      |
+| Currency         | $MFAI Token (earned, staked, liquidity incentives) |
+| Items            | Foundry artifacts (Recon Marker, Sentinel, etc.) |
+| Boss Levels      | Sovereign Builders pitch + Synaptic Governance™ |
+| Final Rank       | Live Capital Operator                          |

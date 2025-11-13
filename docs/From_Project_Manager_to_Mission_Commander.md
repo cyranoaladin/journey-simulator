@@ -67,7 +67,7 @@ You move the protocol forward — not by building or funding — but by **orches
 
 ### 📡 **Phase 3: Cross-Team Coordination**
 
-- Lead multiple user types through orchestrated campaigns (builders, creators, investors)
+- Lead multiple pathway cohorts through orchestrated campaigns (capital founders, system architects, experience designers)
 - Monitor cognitive load, Proof generation, reward distribution
 - Upgrade to **Live Ops Mode™** with AI co-pilot Zyno Pro™
 

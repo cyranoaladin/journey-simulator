@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { X, Coins, TrendingUp, Lock, Unlock } from 'lucide-react'
+import { X, TrendingUp, Lock } from 'lucide-react'
 import { useJourneyStore } from '../store/journeyStore'
 
 interface StakingModalProps {
@@ -74,8 +74,10 @@ const StakingModal: React.FC<StakingModalProps> = ({
           <button
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+            type="button"
+            aria-label="Close staking modal"
           >
-            <X size={20} />
+            <X size={20} aria-hidden="true" />
           </button>
         </div>
 

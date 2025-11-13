@@ -1,4 +1,3 @@
-import React from 'react'
 import { motion } from 'framer-motion'
 import { Github, Twitter, MessageCircle, FileText, Users } from 'lucide-react'
 

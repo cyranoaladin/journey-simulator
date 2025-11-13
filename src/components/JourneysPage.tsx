@@ -17,7 +17,7 @@ import WalletStatusDisplay from './WalletStatusDisplay';
 import StakingModal from './StakingModal';
 import DAOVoteModal from './DAOVoteModal';
 import ResetProgressButton from './ResetProgressButton';
-import api from '../utils/api';
+
 const JourneysPage: React.FC = () => {
   const {
     selectedPersona,
@@ -42,6 +42,27 @@ const JourneysPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isCompletingPhase, setIsCompletingPhase] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const supportHighlights = [
+    {
+      title: 'Zyno, AI Co-Founder',
+      description: 'Zyno orchestrates personalized curricula, turns protocol complexity into guided actions, and pair-programs on Solana builds so each pathway compounds faster.',
+      bullets: [
+        'Design studio for strategy, token economics, and governance stress tests',
+        'Real-time AI pair for code reviews, prompt engineering, and architectural simulations',
+        'Cognitive activator that adapts missions based on Proof-of-Skill™ signals'
+      ]
+    },
+    {
+      title: 'Protocol Agent Mesh',
+      description: 'Specialized MFAI agents coordinate alongside Zyno to keep momentum high from ideation to launch.',
+      bullets: [
+        'Skillchain Miners validate mastery on-chain and unlock higher stakes missions',
+        'Guardian Agents monitor security, treasury health, and incident response drills',
+        'Sovereign Builders Network links founders with talent, capital, and Synaptic Governance'
+      ]
+    }
+  ];
 
   // Load user progress on component mount
   useEffect(() => {
@@ -81,6 +102,15 @@ const JourneysPage: React.FC = () => {
       setError(null);
 
       const phase = selectedPersona.phases[phaseIndex];
+      const wasFirstNft = userProgress.nfts.length === 0;
+      const projectedTokens = userProgress.mfaiTokens + (phase.mfaiReward || 0);
+      const nextPhaseNumber = phaseIndex + 1;
+
+      // Complete phase first to avoid duplicate submissions
+      await completePhase(phaseIndex, {
+        score: phase.xpReward,
+        phaseNumber: nextPhaseNumber,
+      });
       
       // Update progress in store (this will sync with backend)
       await updateProgress(
@@ -89,12 +119,10 @@ const JourneysPage: React.FC = () => {
         phase.mfaiReward || 0
       );
 
-      // Complete phase in store (this will sync with backend)
-      await completePhase(phaseIndex);
       setCurrentPhaseIndex(phaseIndex);
 
       // Show success message
-      setSuccessMessage(`Phase ${phaseIndex + 1} completed! +${phase.xpReward} XP earned!`);
+      setSuccessMessage(`Phase ${nextPhaseNumber} completed! +${phase.xpReward} XP earned!`);
       setTimeout(() => setSuccessMessage(null), 5000);
 
       // If there's an NFT reward, open the NFT proof modal
@@ -116,13 +144,13 @@ const JourneysPage: React.FC = () => {
         setShowProofModal(true);
 
         // Show minting tutorial for first-time users
-        if (userProgress.nfts.length === 0) {
+        if (wasFirstNft) {
           setShowMintingTutorial(true);
         }
       }
 
       // If staking is required, open the staking modal
-      if (phase.stakingRequired && userProgress.mfaiTokens >= phase.stakingRequired) {
+      if (phase.stakingRequired && projectedTokens >= phase.stakingRequired) {
         setTimeout(() => {
           setShowStakingModal(true);
         }, 1000);
@@ -220,27 +248,6 @@ const JourneysPage: React.FC = () => {
     } catch (err) {
       console.error('Failed to refresh progress:', err);
       setError('Failed to refresh progress. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handlePersonaSelection = async (persona: any) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      // Set persona in store
-      setSelectedPersona(persona);
-      
-      // Update user profile with selected persona
-      await api.updateUserProfile({ persona: persona.id });
-      
-      setSuccessMessage(`Welcome to the ${persona.title} journey!`);
-      setTimeout(() => setSuccessMessage(null), 3000);
-    } catch (err) {
-      console.error('Failed to select persona:', err);
-      setError('Failed to select journey. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -402,6 +409,33 @@ const JourneysPage: React.FC = () => {
           {/* Reset Progress Button */}
           <div className="flex justify-center">
             <ResetProgressButton />
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="mb-16"
+        >
+          <div className="grid md:grid-cols-2 gap-6">
+            {supportHighlights.map((highlight, index) => (
+              <div key={highlight.title} className="glass-effect rounded-2xl p-6 text-left">
+                <div className="flex items-start justify-between mb-4">
+                  <h3 className="text-xl font-semibold text-accent-cyan">{highlight.title}</h3>
+                  <span className="text-sm text-white/60">Agent {index + 1}</span>
+                </div>
+                <p className="text-base text-white/80 mb-4 leading-relaxed">{highlight.description}</p>
+                <ul className="space-y-2 text-sm text-white/70">
+                  {highlight.bullets.map((bullet) => (
+                    <li key={bullet} className="flex items-start gap-2">
+                      <span className="text-accent-cyan">{'>'}</span>
+                      <span>{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </motion.div>
 
@@ -575,6 +609,7 @@ const JourneysPage: React.FC = () => {
                       onMintNFT={() => handleViewNFT(userProgress.completedPhases.length)}
                       onStake={handleStaking}
                       onVote={handleDAOVote}
+                      isProcessing={isCompletingPhase}
                     />
                     
                     {/* Loading overlay for phase completion */}

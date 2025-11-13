@@ -1,6 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Moon, Sun, Menu, X, ChevronDown, LogOut } from 'lucide-react'
+import { Moon, Sun, Menu, X, LogOut } from 'lucide-react'
 import { useThemeStore } from '../store/themeStore'
 import { useAuth } from '../contexts/AuthContext'
 import { useState } from 'react'

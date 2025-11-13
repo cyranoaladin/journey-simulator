@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api, { LoginResponse, RegisterResponse } from '../utils/api';
+import api, { LoginResponse } from '../utils/api';
 import { useJourneyStore } from '../store/journeyStore';
 
 // User interface matching your backend schema
@@ -33,11 +33,11 @@ interface AuthProviderProps {
 
 
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-  const { loadUserProgress } = useJourneyStore();
+  const { loadUserProgress, resetProgress } = useJourneyStore();
 
   // Check authentication status on app load
   useEffect(() => {
@@ -63,8 +63,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
           setUser(null);
+          await resetProgress();
         }
       }
+    } else {
+      await resetProgress();
     }
     setIsLoading(false);
   };
@@ -79,6 +82,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       // Set user
       setUser(data.user);
+      // Clear any lingering progress from a previous session
+      await resetProgress();
       // Load user progress from backend
       await loadUserProgress();
       return true;
@@ -104,6 +109,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       // Set user
       setUser(data.user);
+      await resetProgress();
       // Load user progress from backend
       await loadUserProgress();
       return true;
@@ -138,6 +144,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       setUser(null);
+      await resetProgress();
       navigate('/login');
     }
   };

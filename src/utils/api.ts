@@ -222,6 +222,13 @@ export const api = {
     });
   },
 
+  resetProgress: async (): Promise<void> => {
+    return request<void>('/journey/reset-progress', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+  },
+
   // Get user progress
   getUserProgress: async (): Promise<any> => {
     return request<any>('/journey/user-progress', {

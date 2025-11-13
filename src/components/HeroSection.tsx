@@ -176,8 +176,7 @@ const HeroSection = () => {
               <img 
                 src="/images/activation_loop.png" 
                 alt="The Activation Loop™" 
-                className="max-w-full h-auto rounded-lg shadow-lg"
-                style={{ maxHeight: '150px' }}
+                className="max-w-full h-auto max-h-[150px] rounded-lg shadow-lg"
               />
             </motion.div>
           </motion.div>
