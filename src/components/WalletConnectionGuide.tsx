@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Wallet, Download, AlertCircle, Settings, Zap } from 'lucide-react';
-import LazyWalletMultiButton from './wallet/LazyWalletMultiButton';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 const WalletConnectionGuide: React.FC = () => {
   return (

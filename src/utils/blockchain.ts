@@ -1,20 +1,13 @@
-import { 
-  Connection, 
-  PublicKey, 
-  Transaction, 
-  SystemProgram, 
+import {
+  Connection,
+  PublicKey,
+  Keypair,
   LAMPORTS_PER_SOL,
-  Keypair
 } from '@solana/web3.js';
-import { 
-  TOKEN_PROGRAM_ID, 
-  MintLayout
-} from '@solana/spl-token';
 
 // Constants
 const SOLANA_CLUSTER = 'devnet';
 const SOLANA_ENDPOINT = `https://api.${SOLANA_CLUSTER}.solana.com`;
-const MINT_SIZE = MintLayout.span;
 
 // Initialize connection
 export const getConnection = () => {
@@ -53,51 +46,38 @@ export const mintProofOfSkill = async (
     name: string;
     description: string;
     image: string;
-    attributes: Array<{trait_type: string, value: string | number}>;
+    attributes: Array<{ trait_type: string; value: string | number }>;
   }
-): Promise<{success: boolean, signature?: string, mintAddress?: string, error?: string}> => {
+): Promise<{ success: boolean; signature?: string; mintAddress?: string; error?: string }> => {
   try {
-    const connection = getConnection();
-    const { publicKey, signTransaction } = wallet;
-    
-    if (!publicKey || !signTransaction) {
+    const { publicKey } = wallet || {};
+
+    if (!publicKey) {
       throw new Error('Wallet not connected');
     }
-    
-    // Create mint account
-    const mintKeypair = Keypair.generate();
-    
-    // Calculate token account rent
-    const lamports = await connection.getMinimumBalanceForRentExemption(MINT_SIZE);
-    
-    // Create transaction for token creation
-    new Transaction().add(
-      SystemProgram.createAccount({
-        fromPubkey: publicKey,
-        newAccountPubkey: mintKeypair.publicKey,
-        space: MINT_SIZE,
-        lamports,
-        programId: TOKEN_PROGRAM_ID,
-      })
-    );
-    
-    // Note: In a real implementation, we would:
-    // 1. Add instructions to initialize the mint
-    // 2. Create associated token account
-    // 3. Mint to the token account
-    // 4. Add metadata using Metaplex
-    
-    // For simulation purposes, we'll just return the mint address
-    // In production, we would sign and send the transaction
-    
+
+    // Simulate asynchronous metadata upload and minting delay
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+
+    const normalizedAttributes = metadata.attributes.map((attribute) => ({
+      ...attribute,
+      value: String(attribute.value),
+    }));
+    console.debug('Simulated metadata upload for Proof-of-Skill NFT', {
+      name: metadata.name,
+      attributes: normalizedAttributes,
+    });
+
+    const simulatedMint = Keypair.generate().publicKey.toBase58();
+
     return {
       success: true,
-      signature: 'simulated_signature_' + Date.now(),
-      mintAddress: mintKeypair.publicKey.toString()
+      signature: `simulated_mint_${Date.now()}`,
+      mintAddress: simulatedMint,
     };
   } catch (error) {
     console.error('Error minting NFT:', error);
-    const message = error instanceof Error ? error.message : 'Unknown error occurred while minting';
+    const message = error instanceof Error ? error.message : String(error);
     return {
       success: false,
       error: message
@@ -108,27 +88,24 @@ export const mintProofOfSkill = async (
 // Stake $MFAI tokens
 export const stakeMFAI = async (
   wallet: any,
-  _amount: number
-): Promise<{success: boolean, signature?: string, error?: string}> => {
+  amount: number
+): Promise<{ success: boolean; signature?: string; error?: string }> => {
   try {
-    const { publicKey, signTransaction } = wallet;
-    
-    if (!publicKey || !signTransaction) {
+    const { publicKey } = wallet || {};
+
+    if (!publicKey) {
       throw new Error('Wallet not connected');
     }
-    
-    // In a real implementation, we would:
-    // 1. Create a transaction to transfer tokens to a staking contract
-    // 2. Sign and send the transaction
-    
-    // For simulation purposes, we'll just return a success response
+
+    // For simulation purposes, we'll log the intended stake amount and return a success response
+    console.debug(`Simulated staking of ${amount} $MFAI for wallet ${publicKey.toBase58()}`);
     return {
       success: true,
       signature: 'simulated_stake_' + Date.now()
     };
   } catch (error) {
     console.error('Error staking MFAI:', error);
-    const message = error instanceof Error ? error.message : 'Unknown error occurred while staking';
+    const message = error instanceof Error ? error.message : String(error);
     return {
       success: false,
       error: message
@@ -141,20 +118,12 @@ export const submitDAOVote = async (
   wallet: any,
   proposalId: string,
   vote: 'approve' | 'reject'
-): Promise<{success: boolean, signature?: string, error?: string}> => {
+): Promise<{ success: boolean; signature?: string; proposalId?: string; vote?: 'approve' | 'reject'; error?: string }> => {
   try {
-    const { publicKey, signTransaction } = wallet;
-    
-    if (!publicKey || !signTransaction) {
+    if (!wallet?.publicKey) {
       throw new Error('Wallet not connected');
     }
-    
-    console.log('Simulating DAO vote submission:', { proposalId, vote });
 
-    // In a real implementation, we would:
-    // 1. Create a transaction to submit a vote to the governance program
-    // 2. Sign and send the transaction
-    
     // For simulation purposes, we'll just return a success response
     return {
       success: true,
@@ -162,7 +131,7 @@ export const submitDAOVote = async (
     };
   } catch (error) {
     console.error('Error submitting DAO vote:', error);
-    const message = error instanceof Error ? error.message : 'Unknown error occurred while submitting DAO vote';
+    const message = error instanceof Error ? error.message : String(error);
     return {
       success: false,
       error: message
@@ -173,6 +142,7 @@ export const submitDAOVote = async (
 // Get NFTs owned by wallet
 export const getWalletNFTs = async (_publicKey: PublicKey): Promise<any[]> => {
   try {
+    console.debug('Simulating NFT fetch for wallet', publicKey.toBase58());
     // In a real implementation, we would:
     // 1. Query the Solana blockchain for token accounts owned by the wallet
     // 2. Filter for NFTs (tokens with supply of 1)

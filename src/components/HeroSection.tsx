@@ -1,70 +1,61 @@
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
-import { ChevronDown, Sparkles, TrendingUp, Users, Award } from 'lucide-react'
-// import { useJourneyStore } from '../store/journeyStore' // Will be used when needed
-import SkillchainCard from './SkillchainCard'
-import WalletConnectionGuide from './WalletConnectionGuide'
-import { useWallet } from '@solana/wallet-adapter-react'
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { ChevronDown, Sparkles, TrendingUp, Users, Award } from 'lucide-react';
+import SkillchainCard from './SkillchainCard';
+import WalletConnectionGuide from './WalletConnectionGuide';
+import { useWallet } from '@solana/wallet-adapter-react';
 // import { api } from '../utils/api' // Will be used when backend is ready
 
 const HeroSection = () => {
-  const { connected } = useWallet()
+  const { connected } = useWallet();
   const [platformStats, setPlatformStats] = useState({
     totalUsers: 0,
     totalNFTs: 0,
     totalXP: 0,
-    activeJourneys: 0
-  })
+    activeJourneys: 0,
+  });
 
-  // Load platform stats from backend
   const loadPlatformStats = async () => {
     try {
-      // Simulate platform stats (for now)
       console.log('Fetching platform stats from backend...');
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      // Set mock data for now
       setPlatformStats({
         totalUsers: 1250,
         totalNFTs: 3400,
         totalXP: 125000,
-        activeJourneys: 89
+        activeJourneys: 89,
       });
     } catch (err) {
-      console.error('Failed to load platform stats:', err)
+      console.error('Failed to load platform stats:', err);
     }
-  }
+  };
 
   useEffect(() => {
-    // Create particles container
-    const particlesContainer = document.createElement('div')
-    particlesContainer.id = 'particles-js'
-    particlesContainer.className = 'absolute inset-0 z-0'
-    
-    const heroElement = document.getElementById('hero')
+    const particlesContainer = document.createElement('div');
+    particlesContainer.id = 'particles-js';
+    particlesContainer.className = 'absolute inset-0 z-0';
+
+    const heroElement = document.getElementById('hero');
     if (heroElement && !document.getElementById('particles-js')) {
-      heroElement.appendChild(particlesContainer)
+      heroElement.appendChild(particlesContainer);
     }
 
-    // Load platform stats
-    loadPlatformStats()
-  }, [])
+    loadPlatformStats();
+  }, []);
 
   const scrollToPersonas = () => {
-    const element = document.querySelector('#personas')
+    const element = document.querySelector('#personas');
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' })
+      element.scrollIntoView({ behavior: 'smooth' });
     }
-  }
+  };
 
   return (
     <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary-900/50 via-primary-800/30 to-primary-700/50" />
-      
+
       <div className="container mx-auto px-4 py-20 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Content */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -88,7 +79,7 @@ const HeroSection = () => {
               transition={{ delay: 0.4, duration: 0.8 }}
               className="text-lg md:text-xl mb-8 opacity-90 max-w-2xl"
             >
-              Discover how Money Factory AI transforms your skills into capital 
+              Discover how Money Factory AI transforms your skills into capital
               through the <span className="font-semibold text-accent-cyan">Cognitive Activation Protocol™</span>
             </motion.p>
 
@@ -118,7 +109,6 @@ const HeroSection = () => {
               </motion.button>
             </motion.div>
 
-            {/* Platform Stats */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -132,7 +122,7 @@ const HeroSection = () => {
                 <div className="text-lg font-bold">{platformStats.totalUsers.toLocaleString()}</div>
                 <div className="text-xs opacity-70">Active Users</div>
               </div>
-              
+
               <div className="bg-white/10 rounded-lg p-3 text-center">
                 <div className="flex items-center justify-center mb-2">
                   <Award className="text-accent-gold" size={20} />
@@ -140,7 +130,7 @@ const HeroSection = () => {
                 <div className="text-lg font-bold">{platformStats.totalNFTs.toLocaleString()}</div>
                 <div className="text-xs opacity-70">NFTs Minted</div>
               </div>
-              
+
               <div className="bg-white/10 rounded-lg p-3 text-center">
                 <div className="flex items-center justify-center mb-2">
                   <TrendingUp className="text-accent-purple" size={20} />
@@ -148,7 +138,7 @@ const HeroSection = () => {
                 <div className="text-lg font-bold">{platformStats.totalXP.toLocaleString()}</div>
                 <div className="text-xs opacity-70">Total XP</div>
               </div>
-              
+
               <div className="bg-white/10 rounded-lg p-3 text-center">
                 <div className="flex items-center justify-center mb-2">
                   <Sparkles className="text-accent-cyan" size={20} />
@@ -166,22 +156,21 @@ const HeroSection = () => {
             >
               "You don't pitch. You prove. And your proof becomes capital."
             </motion.p>
-            
+
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.0, duration: 0.8 }}
               className="mt-8 flex justify-center lg:justify-start"
             >
-              <img 
-                src="/images/activation_loop.png" 
-                alt="The Activation Loop™" 
+              <img
+                src="/images/activation_loop.png"
+                alt="The Activation Loop™"
                 className="max-w-full h-auto max-h-[150px] rounded-lg shadow-lg"
               />
             </motion.div>
           </motion.div>
 
-          {/* Skillchain Card Visual */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -191,7 +180,7 @@ const HeroSection = () => {
             <div className="w-80">
               <SkillchainCard />
             </div>
-            
+
             {!connected && (
               <div className="w-full max-w-md">
                 <WalletConnectionGuide />
@@ -201,7 +190,6 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* Scroll Indicator */}
       <motion.button
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -217,7 +205,7 @@ const HeroSection = () => {
         </motion.div>
       </motion.button>
     </section>
-  )
-}
+  );
+};
 
-export default HeroSection
+export default HeroSection;
