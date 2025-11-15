@@ -1,9 +1,9 @@
-import React from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Moon, Sun, Menu, X, LogOut } from 'lucide-react'
 import { useThemeStore } from '../store/themeStore'
 import { useAuth } from '../contexts/AuthContext'
-import { useState } from 'react'
 import WalletButton from './WalletButton'
 
 const Header = () => {
@@ -12,32 +12,59 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
 
+  const navigate = useNavigate()
+  const headerRef = useRef<HTMLElement | null>(null)
+
   const navItems = [
-    { label: 'Home', href: '#hero' },
-    { label: 'Journeys', href: '#personas' },
+    { label: 'Home', href: '/' },
+    { label: 'Journeys', href: '/journeys' },
+    { label: 'Zyno Console', href: '/zyno' },
+    { label: 'Playground', href: '/playground' }
   ]
 
+  const updateHeaderHeight = useCallback(() => {
+    if (!headerRef.current) return
+    const { height } = headerRef.current.getBoundingClientRect()
+    document.documentElement.style.setProperty('--header-height', `${Math.ceil(height)}px`)
+  }, [])
+
   // Handle scroll events to adjust header height
-  React.useEffect(() => {
+  useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY
       setIsScrolled(scrollPosition > 50)
     }
 
+    handleScroll()
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const scrollToSection = (href: string) => {
-    const element = document.querySelector(href)
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' })
+  useLayoutEffect(() => {
+    updateHeaderHeight()
+    window.addEventListener('resize', updateHeaderHeight)
+    return () => window.removeEventListener('resize', updateHeaderHeight)
+  }, [updateHeaderHeight])
+
+  useLayoutEffect(() => {
+    updateHeaderHeight()
+  }, [updateHeaderHeight, isScrolled, isMobileMenuOpen])
+
+  const handleNavigation = (href: string) => {
+    if (href.startsWith('#')) {
+      const element = document.querySelector(href)
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' })
+      }
+    } else {
+      navigate(href)
     }
     setIsMobileMenuOpen(false)
   }
 
   return (
     <motion.header
+      ref={headerRef}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       className={`fixed top-0 left-0 right-0 z-50 glass-effect transition-all duration-300 ${
@@ -65,7 +92,7 @@ const Header = () => {
               <motion.button
                 key={item.label}
                 whileHover={{ scale: 1.05 }}
-                onClick={() => scrollToSection(item.href)}
+                onClick={() => handleNavigation(item.href)}
                 className="text-base font-medium transition-colors hover:text-primary-500"
               >
                 {item.label}
@@ -130,7 +157,7 @@ const Header = () => {
               <motion.button
                 key={item.label}
                 whileHover={{ scale: 1.02 }}
-                onClick={() => scrollToSection(item.href)}
+                onClick={() => handleNavigation(item.href)}
                 className="block w-full text-left py-2 text-base font-medium transition-colors hover:text-primary-500"
               >
                 {item.label}

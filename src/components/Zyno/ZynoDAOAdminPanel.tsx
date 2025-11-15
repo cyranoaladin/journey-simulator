@@ -1,0 +1,377 @@
+import { useCallback, useEffect, useId, useMemo, useState } from 'react';
+import { CheckCircle2, Lock, Plus, RefreshCw, ShieldCheck, ThumbsDown, ThumbsUp } from 'lucide-react';
+import {
+  ADMIN_API_STORAGE_KEY
+} from './ZynoAgentScoreboard';
+import {
+  api,
+  DaoConfigResponse,
+  DaoProposal,
+  DaoVoter
+} from '../../utils/api';
+
+interface FetchState {
+  loading: boolean;
+  error: string | null;
+}
+
+const initialFetchState: FetchState = {
+  loading: false,
+  error: null
+};
+
+export default function ZynoDAOAdminPanel() {
+  const [fetchState, setFetchState] = useState<FetchState>(initialFetchState);
+  const [config, setConfig] = useState<DaoConfigResponse | null>(null);
+  const [proposals, setProposals] = useState<DaoProposal[]>([]);
+  const [adminApiKey, setAdminApiKey] = useState<string>(() => {
+    if (typeof window === 'undefined') {
+      return '';
+    }
+    return window.localStorage.getItem(ADMIN_API_STORAGE_KEY) ?? '';
+  });
+  const [newProposal, setNewProposal] = useState({ title: '', description: '' });
+  const [creating, setCreating] = useState(false);
+  const [voteSubmitting, setVoteSubmitting] = useState<Record<string, boolean>>({});
+  const [closing, setClosing] = useState<Record<string, boolean>>({});
+  const [selectedVoter, setSelectedVoter] = useState<string>('');
+  const adminKeyInputId = useId();
+  const voterSelectId = useId();
+
+  const storeAdminKey = useCallback((value: string) => {
+    setAdminApiKey(value);
+    if (typeof window !== 'undefined') {
+      if (value) {
+        window.localStorage.setItem(ADMIN_API_STORAGE_KEY, value);
+      } else {
+        window.localStorage.removeItem(ADMIN_API_STORAGE_KEY);
+      }
+    }
+  }, []);
+
+  const loadData = useCallback(async () => {
+    setFetchState({ loading: true, error: null });
+    try {
+      const [daoConfig, daoProposals] = await Promise.all([
+        api.getDaoConfig(),
+        api.getDaoProposals()
+      ]);
+      setConfig(daoConfig);
+      setProposals(daoProposals.proposals);
+      if (!selectedVoter && daoConfig.voters.length > 0) {
+        setSelectedVoter(daoConfig.voters[0].id);
+      }
+      setFetchState({ loading: false, error: null });
+    } catch (error) {
+      console.error('Failed to load DAO data:', error);
+      setFetchState({
+        loading: false,
+        error: error instanceof Error ? error.message : 'Chargement impossible'
+      });
+    }
+  }, [selectedVoter]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const quorumSummary = useMemo(() => {
+    if (!config) {
+      return '';
+    }
+    return `${config.quorumPercent}% de quorum • Puissance totale ${config.totalVotingPower}`;
+  }, [config]);
+
+  const handleCreateProposal = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!adminApiKey) {
+      setFetchState((prev) => ({ ...prev, error: 'Clé API admin requise pour créer une proposition.' }));
+      return;
+    }
+    if (!newProposal.title.trim()) {
+      setFetchState((prev) => ({ ...prev, error: 'Le titre de la proposition est requis.' }));
+      return;
+    }
+
+    setCreating(true);
+    setFetchState((prev) => ({ ...prev, error: null }));
+    try {
+      await api.createDaoProposal(
+        {
+          title: newProposal.title.trim(),
+          description: newProposal.description.trim() || undefined
+        },
+        adminApiKey
+      );
+      setNewProposal({ title: '', description: '' });
+      await loadData();
+    } catch (error) {
+      console.error('Failed to create DAO proposal:', error);
+      setFetchState((prev) => ({
+        ...prev,
+        error: error instanceof Error ? error.message : 'Création impossible'
+      }));
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const submitVote = async (proposalId: string, support: 'yes' | 'no') => {
+    if (!selectedVoter) {
+      setFetchState((prev) => ({ ...prev, error: 'Sélectionnez un votant avant de voter.' }));
+      return;
+    }
+
+    setVoteSubmitting((prev) => ({ ...prev, [proposalId]: true }));
+    setFetchState((prev) => ({ ...prev, error: null }));
+    try {
+      await api.castDaoVote(proposalId, {
+        voterId: selectedVoter,
+        support
+      });
+      await loadData();
+    } catch (error) {
+      console.error('Failed to vote on proposal:', error);
+      setFetchState((prev) => ({
+        ...prev,
+        error: error instanceof Error ? error.message : 'Vote impossible'
+      }));
+    } finally {
+      setVoteSubmitting((prev) => ({ ...prev, [proposalId]: false }));
+    }
+  };
+
+  const closeProposal = async (proposalId: string) => {
+    if (!adminApiKey) {
+      setFetchState((prev) => ({ ...prev, error: 'Clé API admin requise pour clôturer.' }));
+      return;
+    }
+
+    setClosing((prev) => ({ ...prev, [proposalId]: true }));
+    setFetchState((prev) => ({ ...prev, error: null }));
+    try {
+      await api.closeDaoProposal(proposalId, adminApiKey);
+      await loadData();
+    } catch (error) {
+      console.error('Failed to close proposal:', error);
+      setFetchState((prev) => ({
+        ...prev,
+        error: error instanceof Error ? error.message : 'Clôture impossible'
+      }));
+    } finally {
+      setClosing((prev) => ({ ...prev, [proposalId]: false }));
+    }
+  };
+
+  const renderVoterOption = (voter: DaoVoter) => {
+    const label = voter.name ? `${voter.name} • ${voter.weight}` : `${voter.id} • ${voter.weight}`;
+    return (
+      <option key={voter.id} value={voter.id}>
+        {label}
+      </option>
+    );
+  };
+
+  return (
+    <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900">
+      <header className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300">
+            <ShieldCheck size={20} />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold">Console DAO Zyno</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Suivi des propositions, quorum et votes pondérés</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={loadData}
+          disabled={fetchState.loading}
+          className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-slate-400/60"
+        >
+          <RefreshCw size={16} className={fetchState.loading ? 'animate-spin' : ''} />
+          Rafraîchir
+        </button>
+      </header>
+
+      {fetchState.error && (
+        <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">
+          {fetchState.error}
+        </p>
+      )}
+
+      {config && (
+        <div className="grid gap-2 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-900 dark:bg-emerald-500/10 dark:text-emerald-200">
+          <p className="font-medium">Paramètres DAO</p>
+          <p>{quorumSummary}</p>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="w-full sm:max-w-xs">
+              <label className="text-xs font-semibold uppercase tracking-wider" htmlFor={adminKeyInputId}>
+                Clé API admin
+              </label>
+              <input
+                id={adminKeyInputId}
+                type="password"
+                value={adminApiKey}
+                onChange={(event) => storeAdminKey(event.target.value)}
+                placeholder="Utilisée pour créer / clôturer"
+                className="mt-1 w-full rounded-md border border-emerald-200 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-400 dark:border-emerald-500/40 dark:bg-slate-900"
+              />
+            </div>
+            <div className="w-full sm:max-w-xs">
+              <label className="text-xs font-semibold uppercase tracking-wider" htmlFor={voterSelectId}>
+                Voter en tant que
+              </label>
+              <select
+                id={voterSelectId}
+                value={selectedVoter}
+                onChange={(event) => setSelectedVoter(event.target.value)}
+                aria-label="Voter en tant que"
+                title="Sélectionner un votant"
+                className="mt-1 w-full rounded-md border border-emerald-200 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-400 dark:border-emerald-500/40 dark:bg-slate-900"
+              >
+                <option value="">Sélectionner un votant</option>
+                {config.voters.map(renderVoterOption)}
+              </select>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <form onSubmit={handleCreateProposal} className="space-y-3 rounded-xl border border-slate-200 p-4 dark:border-slate-700/60">
+        <div className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+          <Plus size={16} />
+          Nouvelle proposition
+        </div>
+        <input
+          type="text"
+          value={newProposal.title}
+          onChange={(event) => setNewProposal((prev) => ({ ...prev, title: event.target.value }))}
+          placeholder="Titre (ex: Emission de tokens MVP)"
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-400 dark:border-slate-600 dark:bg-slate-900"
+        />
+        <textarea
+          value={newProposal.description}
+          onChange={(event) => setNewProposal((prev) => ({ ...prev, description: event.target.value }))}
+          placeholder="Description / contexte"
+          rows={3}
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-400 dark:border-slate-600 dark:bg-slate-900"
+        />
+        <button
+          type="submit"
+          disabled={creating}
+          className="inline-flex items-center gap-2 rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-slate-400/60"
+        >
+          {creating ? 'Création…' : 'Créer la proposition'}
+        </button>
+      </form>
+
+      <div className="space-y-3">
+        {proposals.length === 0 && !fetchState.loading && (
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Aucune proposition active pour l’instant.
+          </p>
+        )}
+
+        {proposals.map((proposal) => {
+          const voting = voteSubmitting[proposal.id];
+          const closingProposal = closing[proposal.id];
+          const statusBadgeClass = proposal.status === 'active'
+            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
+            : 'bg-slate-200 text-slate-700 dark:bg-slate-700/70 dark:text-slate-300';
+
+          return (
+            <article
+              key={proposal.id}
+              className="space-y-3 rounded-xl border border-slate-200 p-4 dark:border-slate-700/60"
+            >
+              <header className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h4 className="text-base font-semibold text-slate-900 dark:text-white">
+                    {proposal.title}
+                  </h4>
+                  {proposal.description && (
+                    <p className="text-sm text-slate-600 dark:text-slate-300">
+                      {proposal.description}
+                    </p>
+                  )}
+                </div>
+                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusBadgeClass}`}>
+                  {proposal.status === 'active' ? 'Active' : 'Clôturée'}
+                </span>
+              </header>
+
+              <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
+                <div className="rounded-lg bg-slate-100 p-3 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                  <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">Votes Oui</p>
+                  <p className="text-lg font-semibold text-emerald-600 dark:text-emerald-300">{proposal.votes.yes}</p>
+                </div>
+                <div className="rounded-lg bg-slate-100 p-3 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                  <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">Votes Non</p>
+                  <p className="text-lg font-semibold text-red-500 dark:text-red-300">{proposal.votes.no}</p>
+                </div>
+                <div className="rounded-lg bg-slate-100 p-3 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                  <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">Quorum</p>
+                  <p className="text-lg font-semibold">
+                    {proposal.quorumMet ? 'Atteint' : 'En cours'}
+                  </p>
+                </div>
+                <div className="rounded-lg bg-slate-100 p-3 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                  <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">Résultat</p>
+                  <p className="text-lg font-semibold">
+                    {proposal.outcome ? proposal.outcome : 'En délibération'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => submitVote(proposal.id, 'yes')}
+                  disabled={proposal.status !== 'active' || voting}
+                  className="inline-flex items-center gap-2 rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-slate-400/60"
+                >
+                  <ThumbsUp size={16} />
+                  Oui ({selectedVoter || '---'})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => submitVote(proposal.id, 'no')}
+                  disabled={proposal.status !== 'active' || voting}
+                  className="inline-flex items-center gap-2 rounded-md bg-red-500 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-red-400 disabled:cursor-not-allowed disabled:bg-slate-400/60"
+                >
+                  <ThumbsDown size={16} />
+                  Non
+                </button>
+                <button
+                  type="button"
+                  onClick={() => closeProposal(proposal.id)}
+                  disabled={proposal.status !== 'active' || closingProposal}
+                  className="inline-flex items-center gap-2 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:border-emerald-500 hover:text-emerald-600 dark:border-slate-600 dark:text-slate-300 dark:hover:border-emerald-500 dark:hover:text-emerald-300"
+                >
+                  <Lock size={16} />
+                  Clôturer
+                </button>
+              </div>
+
+              {proposal.status === 'closed' && proposal.outcome === 'accepted' && (
+                <p className="flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
+                  <CheckCircle2 size={16} />
+                  Décision acceptée — mise en œuvre recommandée.
+                </p>
+              )}
+
+              {proposal.status === 'closed' && proposal.outcome === 'rejected' && (
+                <p className="flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-500/10 dark:text-red-300">
+                  <ThumbsDown size={16} />
+                  Proposition rejetée — revoir la stratégie.
+                </p>
+              )}
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}

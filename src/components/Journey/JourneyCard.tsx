@@ -6,9 +6,10 @@ import { api } from '../../utils/api';
 
 interface JourneyCardProps {
   persona: Persona;
+  onSelected?: () => void;
 }
 
-const JourneyCard: React.FC<JourneyCardProps> = ({ persona }) => {
+const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
   const { setSelectedPersona, userProgress, loadUserProgress } = useJourneyStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,6 +37,10 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona }) => {
       
       // Reload user progress to get latest data
       await loadUserProgress();
+
+      if (onSelected) {
+        onSelected();
+      }
       
     } catch (error) {
       console.error('Failed to select persona:', error);

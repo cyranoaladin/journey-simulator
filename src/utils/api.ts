@@ -1,7 +1,70 @@
 // API base URL - update this to match your backend URL
-const API_BASE_URL = 'http://localhost:3000'; // Update this to your backend URL
+export const API_BASE_URL = 'http://localhost:3000'; // Update this to your backend URL
 
 // API response interfaces
+export interface AgentScoreboardEntry {
+  userId: string;
+  aepo: number;
+  aeco: number;
+  historyCount: number;
+  updatedAt: string | null;
+  profile: Record<string, unknown>;
+}
+
+export interface AgentScoreboardResponse {
+  users: AgentScoreboardEntry[];
+}
+
+export interface MissionExportPayload {
+  title?: string;
+  userId: string;
+  timestamp: string;
+  aepo?: number;
+  aecoPhase?: string;
+  agents?: string[];
+  generatedText?: string;
+  actions?: string[];
+}
+
+export interface DaoVoter {
+  id: string;
+  weight: number;
+  name?: string;
+}
+
+export interface DaoConfigResponse {
+  quorumPercent: number;
+  totalVotingPower: number;
+  voters: DaoVoter[];
+}
+
+export interface DaoVoteBreakdown {
+  yes: number;
+  no: number;
+}
+
+export interface DaoProposal {
+  id: string;
+  title: string;
+  description?: string;
+  createdBy?: string;
+  createdAt: string;
+  closedAt?: string;
+  status: 'active' | 'closed';
+  votes: DaoVoteBreakdown;
+  voterDetails: Record<string, { support: 'yes' | 'no'; weight: number }>;
+  quorumMet?: boolean;
+  outcome?: string;
+}
+
+export interface DaoProposalsResponse {
+  proposals: DaoProposal[];
+}
+
+export interface DaoProposalResponse {
+  proposal: DaoProposal;
+}
+
 export interface LoginResponse {
   success: boolean;
   user: {
@@ -347,6 +410,115 @@ export const api = {
       method: 'GET',
       headers: getAuthHeaders(),
     });
+  },
+
+  getAgentScoreboard: async (adminApiKey: string): Promise<AgentScoreboardResponse> => {
+    return request<AgentScoreboardResponse>('/admin/agent-scoreboard', {
+      method: 'GET',
+      headers: {
+        'x-api-key': adminApiKey,
+      },
+    }, false);
+  },
+
+  exportMissionSummary: async (
+    summary: MissionExportPayload,
+    format: 'pdf' | 'notion',
+    adminApiKey: string
+  ): Promise<Blob | string> => {
+    const response = await fetch(`${API_BASE_URL}/admin/export/mission`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': adminApiKey,
+      },
+      body: JSON.stringify({ summary, format }),
+    });
+
+    if (!response.ok) {
+      let message = `Export failed (status ${response.status})`;
+      try {
+        const errorData: ApiError = await response.json();
+        if (errorData?.message) {
+          message = errorData.message;
+        } else if (errorData?.error) {
+          message = errorData.error;
+        }
+      } catch (parseError) {
+        console.error('Failed to parse export error response:', parseError);
+      }
+      throw new Error(message);
+    }
+
+    if (format === 'pdf') {
+      return response.blob();
+    }
+
+    const notionResponse = await response.json();
+    if (!notionResponse?.content) {
+      throw new Error('Invalid export format received');
+    }
+    return notionResponse.content as string;
+  },
+
+  getDaoConfig: async (): Promise<DaoConfigResponse> => {
+    return request<DaoConfigResponse>('/dao/config', {
+      method: 'GET',
+    });
+  },
+
+  getDaoProposals: async (): Promise<DaoProposalsResponse> => {
+    return request<DaoProposalsResponse>('/dao/proposals', {
+      method: 'GET',
+    });
+  },
+
+  createDaoProposal: async (
+    payload: { title: string; description?: string; createdBy?: string },
+    adminApiKey: string
+  ): Promise<DaoProposalResponse> => {
+    return request<DaoProposalResponse>(
+      '/dao/proposals',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': adminApiKey,
+        },
+        body: JSON.stringify(payload),
+      },
+      false
+    );
+  },
+
+  castDaoVote: async (
+    proposalId: string,
+    payload: { voterId: string; support: boolean | 'yes' | 'no' }
+  ): Promise<DaoProposalResponse> => {
+    return request<DaoProposalResponse>(`/dao/proposals/${proposalId}/vote`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+  },
+
+  closeDaoProposal: async (
+    proposalId: string,
+    adminApiKey: string
+  ): Promise<DaoProposalResponse> => {
+    return request<DaoProposalResponse>(
+      `/dao/proposals/${proposalId}/close`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': adminApiKey,
+        },
+      },
+      false
+    );
   },
 };
 
