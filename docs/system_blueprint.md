@@ -234,27 +234,17 @@ mf-back/
 
 ### 6.5 Backend workflows
 
-1. **Registration**
-   - POST `/user/register` hashes the password, stores the persona, and returns `accessToken` plus `refreshToken`.
-   - The frontend persists tokens in local storage.
+1. **Registration**: POST `/user/register` hashes the password, stores the persona, and returns `accessToken` plus `refreshToken`. The frontend persists tokens in local storage.
 
-2. **Login**
-   - POST `/user/login` validates credentials and returns tokens alongside the active persona.
+2. **Login**: POST `/user/login` validates credentials and returns tokens alongside the active persona.
 
-3. **Progress load**
-   - GET `/journey/user-progress` (protected) hydrates the Zustand store with XP, NFTs, tokens, and completed phases.
+3. **Progress load**: GET `/journey/user-progress` (protected) hydrates the Zustand store with XP, NFTs, tokens, and completed phases.
 
-4. **Phase completion**
-   - The client calls `completePhase` (Zustand) then POST `/journey/complete-phase` with `phase_number`, `score`, and `nft_address`.
-   - The backend appends to `completed_phases` and `nft_certificates`.
-   - The frontend follows with PUT `/journey/user-progress` and PUT `/user/tokens` to synchronise XP and token balances.
+4. **Phase completion**: The client calls `completePhase` (Zustand) then POST `/journey/complete-phase` with `phase_number`, `score`, and `nft_address`. The backend appends to `completed_phases` and `nft_certificates`, and the frontend follows with PUT `/journey/user-progress` plus PUT `/user/tokens` to synchronise XP and token balances.
 
-5. **Progress reset**
-   - POST `/journey/reset-progress` wipes XP, tokens, and completed phases server-side.
-   - Zustand clears the local cache afterwards.
+5. **Progress reset**: POST `/journey/reset-progress` wipes XP, tokens, and completed phases server-side, and Zustand clears the local cache afterwards.
 
-6. **Analytics**
-   - `/analytics/certification-download`, `/analytics/certification-share`, `/analytics/holder-interaction`, and `/analytics/platform-stats` populate reporting dashboards.
+6. **Analytics**: `/analytics/certification-download`, `/analytics/certification-share`, `/analytics/holder-interaction`, and `/analytics/platform-stats` populate reporting dashboards.
 
 ---
 
@@ -271,13 +261,7 @@ mf-back/
 
 1. `PhaseSection` shows mission details and rewards.
 2. The `Start Phase` button triggers `handlePhaseComplete` in `JourneysPage`.
-3. The following actions run in sequence:
-   - `completePhase` (Zustand) posts to `/journey/complete-phase`.
-   - `updateProgress` updates XP, tokens, and NFTs via `/journey/user-progress` and `/user/tokens`.
-   - `setCurrentPhaseIndex` prepares the right modal.
-   - `NFTProofModal` appears when `nftReward` is present.
-   - `StakingModal` opens when `stakingRequired` thresholds are met.
-   - `DAOVoteModal` opens when `daoVoteRequired` is true.
+3. The following actions run in sequence: `completePhase` (Zustand) posts to `/journey/complete-phase`; `updateProgress` updates XP, tokens, and NFTs via `/journey/user-progress` and `/user/tokens`; `setCurrentPhaseIndex` prepares the right modal; `NFTProofModal` appears when `nftReward` is present; `StakingModal` opens when `stakingRequired` thresholds are met; `DAOVoteModal` opens when `daoVoteRequired` is true.
 4. Success feedback surfaces in the top-of-page toast banner.
 
 ### 7.3 Staking $MFAI

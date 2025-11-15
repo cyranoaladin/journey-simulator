@@ -1,4 +1,6 @@
-### ✅ Partie 1/6 – Introduction & Project Scope
+# Cahier des charges – Parcours React
+
+## Partie 1/6 – Introduction & Project Scope
 
 ```md
 # 🧠 USER_JOURNEYS_REACT_GUIDE.md
@@ -72,7 +74,7 @@ Build a **modular, gamified, Web3-native React interface** to onboard diverse us
 This mapping replaces the 2023-era student/investor/builder archetypes and should inform component copy, gradient themes, and proof metadata throughout the React implementation.
 
 ## 📁 Folder Structure (Recommended)
-```
+
 
 /components
 /Journey
@@ -91,7 +93,7 @@ journeyData.ts // JSON static journey config
 nftUtils.ts // NFT & wallet helpers
 zynoLogic.ts // AI prompts & logic bridge
 
-````
+
 
 ---
 
@@ -126,7 +128,7 @@ interface JourneyCardProps {
 }
 ```
 
-#### ✅ Features
+#### JourneyCard Features
 
 - Responsive hover animation
 - Progress bar if journey started
@@ -147,7 +149,7 @@ interface JourneyTimelineProps {
 }
 ```
 
-#### ✅ Features
+#### JourneyTimeline Features
 
 - Phase tabs with icons + progress
 - Phase title + description + mission
@@ -171,7 +173,7 @@ interface PhaseSectionProps {
 }
 ```
 
-#### ✅ Features
+#### Phase Section Features
 
 - Actionable CTA with conditional states
 - XP bar segment
@@ -193,7 +195,7 @@ interface NFTBadgeProps {
 }
 ```
 
-#### ✅ Features
+#### NFT Badge Features
 
 - Claimed = full color, animation
 - Unclaimed = grayscale with “Unlock” hint
@@ -213,7 +215,7 @@ interface ZynoBoxProps {
 }
 ```
 
-#### ✅ Features
+#### ZynoBox Features
 
 - “Zyno Suggests…” prompt engine
 - Optional voice bubble
@@ -233,7 +235,7 @@ interface XPTrackerProps {
 }
 ```
 
-#### ✅ Features
+#### XP Tracker Features
 
 - XP progress ring
 - Milestone animation when level up
@@ -291,14 +293,14 @@ export const journeys = [
 
 ## 🧠 2. Utilisation des données
 
-### 🔹 Filtrage dynamique :
+### 🔹 Filtrage dynamique
 
 ```ts
 const userPersona = getUserPersona();
 const journey = journeys.find(j => j.persona === userPersona);
 ```
 
-### 🔹 Chargement dans composants :
+### 🔹 Chargement dans composants
 
 ```tsx
 <JourneyTimeline
@@ -374,7 +376,7 @@ if (locked && !userState.nfts.includes("Proof-of-Skill™")) {
 
 ---
 
-## 🧠 Objectif
+## Objectif
 
 Permettre à la page `User Journeys` :
 
@@ -411,7 +413,7 @@ const { publicKey, connected } = useWallet();
 
 ## 🪪 2. Détection des NFT
 
-### ✅ Recommandé :
+### ✅ Recommandé
 
 - Appel backend API ou Thirdweb/Moralis/Metaplex
 - Filtrer par tag ou nom de la collection (Proof-of-Skill™, Pass, etc.)
@@ -515,7 +517,7 @@ Créer une interface :
 
 ## 🧠 2. Zyno AI Integration
 
-### 🧩 Objectifs :
+### 🧩 Objectifs
 
 - Fournir des **hints contextuels**
 - Répondre aux questions par phase
@@ -679,7 +681,7 @@ Cette page est **le cœur de l’expérience utilisateur MFAI**. Elle doit incar
 
 The “User Journeys” page must function as a **narrative simulator**, allowing all visitors — even those without a wallet — to fully understand how they could evolve through the Money Factory AI protocol.
 
-#### Core Objectives:
+#### Core Objectives
 
 - Explain and illustrate the **Cognitive Activation Protocol™**
 - Help users self-identify via personas and project into a gamified path
@@ -703,7 +705,7 @@ Each journey must allow full navigation through the 5 phases via:
   - Static Zyno tip or quote
   - Optional unlocks via NFT Pass
 
-#### Developer Notes:
+#### Developer Notes
 
 - Use React state or Zustand to simulate progress
 - XP and rewards should update locally only
@@ -733,18 +735,18 @@ NFT Passes (Gold, Platinum, Diamond) must **not block access**, but should:
 
 ### 🎨 4. Design Alignment: Solana + MFAI Brand
 
-#### 🎨 Color Scheme:
+#### 🎨 Color Scheme
 
 - Base: `#0F172A` (dark blue/black)
 - Accent: `#22D3EE` (cyan), `#C084FC` (purple), `#14F195` (mint)
 - Gradients: `linear-gradient(90deg, #9945FF, #14F195)`
 
-#### 🖋️ Fonts:
+#### 🖋️ Fonts
 
 - Headings: `Space Grotesk` or `General Sans`
 - Body: `Inter`, `Geist`, or `Manrope`
 
-#### 🖼️ Icons:
+#### 🖼️ Icons
 
 - Use only `Lucide`, `Phosphor` or custom MFAI icons
 - Replace Telegram-style emojis with semantic React-based icons
@@ -761,7 +763,7 @@ NFT Passes (Gold, Platinum, Diamond) must **not block access**, but should:
 
 Use **MFAI-native narrative** and terms across all journeys.
 
-#### ✅ Valid Pathway Names:
+#### ✅ Valid Pathway Names
 
 - Cognitive Activation Hub
 - Capital Foundry
@@ -770,11 +772,11 @@ Use **MFAI-native narrative** and terms across all journeys.
 - Impact Engine
 - Resilience Master
 
-#### ❌ Do Not Use:
+#### ❌ Do Not Use
 
 - “path”, “course”, “module”, “advisor”
 
-#### ✅ Use Instead:
+#### ✅ Use Instead
 
 | Generic Term  | MFAI Language        |
 | ------------- | -------------------- |

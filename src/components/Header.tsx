@@ -11,6 +11,9 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
+  const navigate = useNavigate()
+  const headerRef = useRef<HTMLElement | null>(null)
+
   const navItems = [
     { label: 'Home', href: '#hero' },
     { label: 'Journeys', href: '#personas' },
@@ -36,6 +39,7 @@ const Header = () => {
 
   return (
     <motion.header
+      ref={headerRef}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       className={`fixed top-0 left-0 right-0 z-50 glass-effect transition-all duration-300 ${
@@ -61,7 +65,7 @@ const Header = () => {
               <motion.button
                 key={item.label}
                 whileHover={{ scale: 1.05 }}
-                onClick={() => scrollToSection(item.href)}
+                onClick={() => handleNavigation(item.href)}
                 className="text-base font-medium transition-colors hover:text-primary-500"
               >
                 {item.label}
@@ -120,7 +124,7 @@ const Header = () => {
               <motion.button
                 key={item.label}
                 whileHover={{ scale: 1.02 }}
-                onClick={() => scrollToSection(item.href)}
+                onClick={() => handleNavigation(item.href)}
                 className="block w-full text-left py-2 text-base font-medium transition-colors hover:text-primary-500"
               >
                 {item.label}

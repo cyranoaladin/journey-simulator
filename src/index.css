@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --header-height: 92px;
+    --skillchain-banner-offset: 0px;
+    --wallet-banner-offset: 0px;
+  }
+
   html {
     scroll-behavior: smooth;
   }
@@ -16,6 +22,12 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Space Grotesk', sans-serif;
     line-height: 1.2;
+  }
+}
+
+@layer utilities {
+  .pt-header {
+    padding-top: calc(var(--header-height) + var(--skillchain-banner-offset) + var(--wallet-banner-offset));
   }
 }
 

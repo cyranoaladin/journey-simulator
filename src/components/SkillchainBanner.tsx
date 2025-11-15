@@ -1,22 +1,64 @@
 import { motion } from 'framer-motion'
+import { useLayoutEffect, useRef } from 'react'
 import { Ticket as Pickaxe, Coins } from 'lucide-react'
 import { useJourneyStore } from '../store/journeyStore'
 import { useWallet } from '@solana/wallet-adapter-react'
 import WalletFaucetButton from './WalletFaucetButton'
 
+const SKILLCHAIN_TOP_GAP = 16
+const SKILLCHAIN_BOTTOM_GAP = 12
+
 const SkillchainBanner = () => {
   const { userProgress, completeMission } = useJourneyStore()
   const { connected } = useWallet()
+  const bannerRef = useRef<HTMLDivElement | null>(null)
+
+  useLayoutEffect(() => {
+    const element = bannerRef.current
+    const root = document.documentElement
+
+    if (!element) {
+      root.style.setProperty('--skillchain-banner-offset', '0px')
+      return
+    }
+
+    const updateOffset = () => {
+      const { height } = element.getBoundingClientRect()
+      const offset = height > 0
+        ? Math.ceil(height + SKILLCHAIN_TOP_GAP + SKILLCHAIN_BOTTOM_GAP)
+        : 0
+      root.style.setProperty('--skillchain-banner-offset', `${offset}px`)
+    }
+
+    updateOffset()
+
+    const handleResize = () => updateOffset()
+    window.addEventListener('resize', handleResize)
+
+    let observer: ResizeObserver | null = null
+    if (typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(() => updateOffset())
+      observer.observe(element)
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      observer?.disconnect()
+      root.style.setProperty('--skillchain-banner-offset', '0px')
+    }
+  }, [])
   
   // Calculate progress based on completed phases
   const progress = Math.min((userProgress.totalXP / 500) * 100, 100)
 
   return (
     <motion.div
+      ref={bannerRef}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ delay: 0.5 }}
-      className="fixed top-16 left-0 right-0 z-40 glass-effect border-b border-white/10"
+      className="fixed left-0 right-0 z-40 glass-effect border-b border-white/10"
+      style={{ top: `calc(var(--header-height) + ${SKILLCHAIN_TOP_GAP}px)` }}
     >
       <div className="container mx-auto px-4 py-2">
         <div className="flex items-center justify-between text-sm">

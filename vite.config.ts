@@ -15,10 +15,11 @@ export default defineConfig({
       'process/browser.js': resolve(__dirname, 'node_modules/process/browser.js'),
       crypto: 'crypto-browserify',
       stream: 'stream-browserify',
+      '@storybook/globalThis': '@storybook/global'
     },
   },
   optimizeDeps: {
-    include: ['buffer', 'process', 'crypto-browserify', 'stream-browserify'],
+    include: ['buffer', 'process', 'crypto-browserify', 'stream-browserify', '@storybook/global'],
     exclude: ['lucide-react'],
   },
   define: {

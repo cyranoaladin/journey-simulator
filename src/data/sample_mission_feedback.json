@@ -1,0 +1,15 @@
+{
+  "userId": "user_789XYZ",
+  "timestamp": "2025-11-13T18:45:00Z",
+  "aepoScore": 87,
+  "aecoPhase": "Launchpad",
+  "agents": [
+    "OnboardingAgent",
+    "BuilderAgent",
+    "TokenAgent",
+    "DAOAgent",
+    "PitchAgent",
+    "InvestorAgent"
+  ],
+  "generatedText": "Le parcours utilisateur a permis de générer un projet Web3 complet structuré autour d'une DAO gouvernée par token. Le whitepaper, le pitch deck et les paramètres de tokenomics ont été validés via les agents spécialisés. L'utilisateur est prêt à présenter son projet à un Launchpad Solana.\n\nRecommandations :\n- Finaliser l'audit smart contract via AuditAgent\n- Améliorer l'engagement Discord (via CommunityAgent)\n- Prévoir une itération de feedback avec ReflectionAgent."
+}
