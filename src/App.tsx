@@ -24,11 +24,11 @@ import JourneysPreview from './components/JourneysPreview'
 function App() {
   const { isDark } = useThemeStore()
   useEffect(() => {
-    initParticles()
+    const cleanup = initParticles()
+    return () => cleanup?.()
   }, [])
 
   useEffect(() => {
-    // Apply theme to document
     if (isDark) {
       document.documentElement.classList.add('dark')
     } else {
@@ -39,99 +39,74 @@ function App() {
   return (
     <AuthProvider>
       <WalletContextProvider>
-        <div className={`min-h-screen transition-colors duration-300 ${
-          isDark 
-            ? 'bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 text-white' 
-            : 'bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 text-gray-900'
-        }`}>
+        <div
+          className={`min-h-screen transition-colors duration-300 ${
+            isDark
+              ? 'bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 text-white'
+              : 'bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 text-gray-900'
+          }`}
+        >
           <div
             id="particles-js"
             className="pointer-events-none fixed inset-0 -z-10"
             aria-hidden="true"
           />
           <Routes>
-            {/* Public Routes */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
 
-            {/* Protected Routes */}
-            <Route path="/" element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <WalletConnectionBanner />
-                  <SkillchainBanner />
-                  
-                  <main className="relative">
-                    <HeroSection />
-                    <JourneysPreview />
-                    <AccessPassHolders />
-                  </main>
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <div>
+                    <Header />
+                    <WalletConnectionBanner />
+                    <SkillchainBanner />
 
-                  <Footer />
-                  <JourneyModal />
-                  <ZynoAssistant />
-                  <BackToTopButton />
-                </AppLayout>
-              </ProtectedRoute>
-            } />
+                    <main className="relative">
+                      {!selectedPersona && <HeroSection />}
 
-            <Route path="/playground" element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <WalletConnectionBanner />
-                  <SkillchainBanner />
+                      <JourneysPage />
 
-                  <main className="relative">
-                    <PlaygroundPage />
-                  </main>
+                      {!selectedPersona && <AccessPassHolders />}
+                    </main>
 
-                  <Footer />
-                  <JourneyModal />
-                  <ZynoAssistant />
-                  <BackToTopButton />
-                </AppLayout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/journeys" element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <WalletConnectionBanner />
-                  <SkillchainBanner />
-                  
-                  <main className="relative">
-                    <JourneysPage />
-                  </main>
+                    <Footer />
+                    <JourneyModal />
+                    <ZynoAssistant />
+                    <BackToTopButton />
+                  </div>
+                </ProtectedRoute>
+              }
+            />
 
-                  <Footer />
-                  <JourneyModal />
-                  <ZynoAssistant />
-                  <BackToTopButton />
-                </AppLayout>
-              </ProtectedRoute>
-            } />
+            <Route
+              path="/journeys"
+              element={
+                <ProtectedRoute>
+                  <div>
+                    <Header />
+                    <WalletConnectionBanner />
+                    <SkillchainBanner />
 
-            <Route path="/zyno" element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <WalletConnectionBanner />
-                  <SkillchainBanner />
+                    <main className="relative">
+                      {!selectedPersona && <HeroSection />}
 
-                  <main className="relative">
-                    <section className="max-w-6xl mx-auto px-4 py-10">
-                      <ZynoConsole />
-                    </section>
-                  </main>
+                      <JourneysPage />
 
-                  <Footer />
-                  <JourneyModal />
-                  <ZynoAssistant />
-                  <BackToTopButton />
-                </AppLayout>
-              </ProtectedRoute>
-            } />
-            
-            {/* Catch all route - redirect to home */}
+                      {!selectedPersona && <AccessPassHolders />}
+                    </main>
+
+                    <Footer />
+                    <JourneyModal />
+                    <ZynoAssistant />
+                    <BackToTopButton />
+                  </div>
+                </ProtectedRoute>
+              }
+            />
+
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

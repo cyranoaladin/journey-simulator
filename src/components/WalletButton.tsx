@@ -60,9 +60,9 @@ const WalletButton = () => {
   }
 
   const handleRetry = () => {
-    setConnectError(null)
-    handleConnect()
-  }
+    setConnectError(null);
+    handleConnect();
+  };
 
   const handleDisconnect = () => {
     disconnect()
@@ -265,7 +265,7 @@ const WalletButton = () => {
               <div className="space-y-2">
                 <button
                   onClick={() => {
-                    window.open(`https://explorer.solana.com/address/${publicKey!.toString()}?cluster=testnet`, '_blank')
+                    window.open(`https://explorer.solana.com/address/${publicKey!.toString()}?cluster=devnet`, '_blank')
                     setIsDropdownOpen(false)
                   }}
                   className="w-full flex items-center space-x-2 p-2 hover:bg-white/10 rounded-lg transition-colors"

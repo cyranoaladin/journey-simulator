@@ -1,4 +1,4 @@
-import { ReactNode, useMemo, FC } from 'react'
+import { type ReactNode, useMemo } from 'react'
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-wallets'
@@ -11,7 +11,8 @@ interface WalletContextProviderProps {
   children: ReactNode
 }
 
-export const WalletContextProvider: FC<WalletContextProviderProps> = ({ children }) => {
+
+export const WalletContextProvider = ({ children }: WalletContextProviderProps) => {
   // Configuration for Solana Devnet
   const network = 'devnet'
   const endpoint = useMemo(() => clusterApiUrl(network), [network])

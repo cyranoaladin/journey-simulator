@@ -1,66 +1,41 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { Moon, Sun, Menu, X, LogOut } from 'lucide-react'
-import { useThemeStore } from '../store/themeStore'
-import { useAuth } from '../contexts/AuthContext'
-import WalletButton from './WalletButton'
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Moon, Sun, Menu, X, LogOut } from 'lucide-react';
+import { useThemeStore } from '../store/themeStore';
+import { useAuth } from '../contexts/AuthContext';
+import WalletButton from './WalletButton';
 
 const Header = () => {
-  const { isDark, toggleTheme } = useThemeStore()
-  const { logout, user } = useAuth()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(false)
+  const { isDark, toggleTheme } = useThemeStore();
+  const { logout, user } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const navigate = useNavigate()
   const headerRef = useRef<HTMLElement | null>(null)
 
   const navItems = [
-    { label: 'Home', href: '/' },
-    { label: 'Journeys', href: '/journeys' },
-    { label: 'Zyno Console', href: '/zyno' },
-    { label: 'Playground', href: '/playground' }
-  ]
+    { label: 'Home', href: '#hero' },
+    { label: 'Journeys', href: '#personas' },
+  ];
 
-  const updateHeaderHeight = useCallback(() => {
-    if (!headerRef.current) return
-    const { height } = headerRef.current.getBoundingClientRect()
-    document.documentElement.style.setProperty('--header-height', `${Math.ceil(height)}px`)
-  }, [])
-
-  // Handle scroll events to adjust header height
   useEffect(() => {
     const handleScroll = () => {
-      const scrollPosition = window.scrollY
-      setIsScrolled(scrollPosition > 50)
+      const scrollPosition = window.scrollY;
+      setIsScrolled(scrollPosition > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToSection = (href: string) => {
+    const element = document.querySelector(href);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
     }
-
-    handleScroll()
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  useLayoutEffect(() => {
-    updateHeaderHeight()
-    window.addEventListener('resize', updateHeaderHeight)
-    return () => window.removeEventListener('resize', updateHeaderHeight)
-  }, [updateHeaderHeight])
-
-  useLayoutEffect(() => {
-    updateHeaderHeight()
-  }, [updateHeaderHeight, isScrolled, isMobileMenuOpen])
-
-  const handleNavigation = (href: string) => {
-    if (href.startsWith('#')) {
-      const element = document.querySelector(href)
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' })
-      }
-    } else {
-      navigate(href)
-    }
-    setIsMobileMenuOpen(false)
-  }
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <motion.header
@@ -73,7 +48,6 @@ const Header = () => {
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between">
-          {/* Logo */}
           <motion.div
             whileHover={{ scale: 1.05 }}
             className="flex items-center space-x-2"
@@ -86,7 +60,6 @@ const Header = () => {
             </span>
           </motion.div>
 
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
               <motion.button
@@ -100,12 +73,9 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* Actions */}
           <div className="flex items-center space-x-4">
-            {/* Wallet Button */}
             <WalletButton />
 
-            {/* User Info and Logout */}
             {user && (
               <div className="hidden md:flex items-center space-x-2">
                 <span className="text-sm text-gray-300">{user.email}</span>
@@ -121,31 +91,28 @@ const Header = () => {
               </div>
             )}
 
-            {/* Theme Toggle */}
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={toggleTheme}
               className="p-2 rounded-lg glass-effect"
-              aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {isDark ? <Sun size={20} /> : <Moon size={20} />}
             </motion.button>
 
-            {/* Mobile Menu Button */}
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="md:hidden p-2 rounded-lg glass-effect"
-              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
             >
               {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </motion.button>
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <motion.nav
             initial={{ opacity: 0, y: -20 }}
@@ -163,8 +130,7 @@ const Header = () => {
                 {item.label}
               </motion.button>
             ))}
-            
-            {/* Mobile Logout */}
+
             {user && (
               <div className="border-t border-gray-600/30 mt-4 pt-4">
                 <div className="flex items-center justify-between py-2">
@@ -185,7 +151,7 @@ const Header = () => {
         )}
       </div>
     </motion.header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;
