@@ -1,3 +1,5 @@
+![Coverage Badge](https://img.shields.io/badge/coverage-Jest-green?style=flat-square)
+
 # Money Factory AI - Journey Simulator
 
 **A Web3-native platform implementing the Cognitive Activation Protocol™**
@@ -39,6 +41,7 @@
 Money Factory AI (MFAI) Journey Simulator is a revolutionary Web3-native platform that transforms users' skills into digital capital through the **Cognitive Activation Protocol™**. This protocol guides users through a structured 5-phase journey: Learn → Build → Prove → Activate → Scale.
 
 The platform integrates:
+
 - **AI Assistance** (Zyno AI Co-Founder™)
 - **NFT Certifications** (Proof-of-Skill™)
 - **Gamified XP Progression**
@@ -92,7 +95,8 @@ This journey simulator is designed to be integrated into the main Money Factory 
 3. **Consistent Branding**: Matching design language and user experience
 4. **Data Integration**: Potential user data synchronization between platforms
 
-#### Recommended Integration Points:
+#### Recommended Integration Points
+
 - **Homepage Hero Section**: Primary CTA to start journey simulation
 - **About Page**: Detailed explanation with link to try the simulator
 - **Navigation Menu**: Direct access to journey simulator
@@ -143,7 +147,6 @@ User Action → State Update → Blockchain Transaction → UI Feedback
 
 ### Component Hierarchy
 
-```
 App
 ├── Header (Navigation + Wallet)
 ├── HeroSection (Landing + Skillchain Card)
@@ -159,7 +162,90 @@ App
     ├── NFTProofModal
     ├── StakingModal
     └── DAOVoteModal
-```
+
+### Architecture Fonctionnelle de Zyno (MVP Multi-Agent)
++------------------------+
+|     Utilisateur       |
++----------+------------+
+           |
+           v
++------------------------+
+|  Interface Frontend    | ← ZynoConsole (React)
+|  - Input utilisateur   |
+|  - ZynoMissionFlow     |
+|  - AgentLogViewer      |
++----------+------------+
+           |
+           v
++------------------------+
+|     API Express.js     |
+|  - /orchestration      |
+|  - /admin/agent-logs   |
+|  - /admin/rag/upload   |
++----------+------------+
+           |
+           v
++----------------------------+
+|     Orchestrateur Zyno     |
+|  (orchestrateZyno())       |
+|  - Détection d’intention   |
+|  - Sélection d’agents      |
+|  - Chaînage & contexte     |
++-----+----------------------+
+      |
+      v
++---------------------------------------------+
+|               Agents (17)                   |
+| - BuilderAgent, CoachAgent, DAOAgent, etc.  |
+| - Tous héritent de AgentTemplate            |
+| - Appellent RAG + LLM via helpers           |
++------------------+--------------------------+
+                     |
+                     v
+   +-------------------------+     +----------------------+
+   |       RAG Client        |     |     LLM Helper        |
+   |  - Ingestion/Search     |     |  - Appel OpenAI/Gemini|
+   +-----------+-------------+     +----------+------------+
+               |                             |
+               v                             v
++----------------------------+   +------------------------------+
+| Base de documents RAG     |   |   Résultat de complétion     |
+| (.md, .pdf thématiques)   |   |   (prompt → réponse)         |
++----------------------------+   +------------------------------+
+
+               |
+               v
++-----------------------------------+
+| Base MongoDB (Logs & Mémoire)     |
+| - agentFeedbackLog                |
+| - journeyHistory / memoryProfile |
++-----------------------------------+
+
+Éléments clés :
+
+Zyno agit comme chef d’orchestre intelligent, déclenchant les agents selon :
+
+L’intention de l’utilisateur.
+
+La phase du parcours (AECO).
+
+Le profil AEPO (type d’apprenant).
+
+Les agents utilisent :
+
+des documents enrichis (RAG).
+
+des modèles LLM externes (OpenAI, Gemini).
+
+la mémoire des interactions précédentes.
+
+Interface ZynoConsole : offre un contrôle total :
+
+Visualisation du parcours (ZynoMissionFlow).
+
+Logs filtrables (AgentLogViewer).
+
+Upload RAG et test prompt live.
 
 ---
 
@@ -170,30 +256,35 @@ App
 The foundation of the platform is a 5-phase progression model:
 
 #### Phase 1: Learn
+
 - **Objective**: Acquire foundational knowledge
 - **Activities**: Interactive content, quizzes, videos
 - **Rewards**: XP, $MFAI tokens, basic NFT badges
 - **Duration**: 1-2 weeks
 
 #### Phase 2: Build
+
 - **Objective**: Apply knowledge to create projects
 - **Activities**: Wallet setup, project creation, MVP development
 - **Rewards**: Builder NFTs, increased XP, tool access
 - **Duration**: 2-3 weeks
 
 #### Phase 3: Prove
+
 - **Objective**: Validate skills through challenges
 - **Activities**: Skill assessments, peer review, certification
 - **Rewards**: Proof-of-Skill™ NFTs, community recognition
 - **Duration**: 1-2 weeks
 
 #### Phase 4: Activate
+
 - **Objective**: Engage in governance and staking
 - **Activities**: DAO voting, token staking, community participation
 - **Rewards**: Governance rights, staking rewards, voting power
 - **Duration**: Ongoing
 
 #### Phase 5: Scale
+
 - **Objective**: Expand impact and earn passive income
 - **Activities**: Teaching, project launching, ecosystem contribution
 - **Rewards**: Neuro-Dividends™, leadership roles, revenue sharing
@@ -204,31 +295,37 @@ The foundation of the platform is a 5-phase progression model:
 Each persona follows the same 5-phase structure but with tailored content:
 
 #### 1. Curious Student 🎓
+
 - **Target**: Newcomers to Web3
 - **Focus**: Learning fundamentals, earning first rewards
 - **Journey**: Web3 basics → Wallet setup → Skill certification → DAO participation → Passive income
 
 #### 2. Web2 Entrepreneur 💼
+
 - **Target**: Traditional business owners
 - **Focus**: Tokenizing business models
 - **Journey**: NFT business models → MVP creation → Vision validation → Product integration → Funding
 
 #### 3. Web3 Developer ⚡
+
 - **Target**: Technical builders
 - **Focus**: Protocol-level development
 - **Journey**: Smart contracts → DApp building → Code auditing → Demo Day → Core team
 
 #### 4. Content Creator 🎨
+
 - **Target**: Artists and creators
 - **Focus**: Monetizing creativity
 - **Journey**: NFT art economics → Collection creation → Community validation → Distribution → Revenue streams
 
 #### 5. Community Communicator 🗣️
+
 - **Target**: Community builders
 - **Focus**: Strategic coordination
 - **Journey**: Communication training → Mission design → Leadership validation → Governance → Protocol influence
 
 #### 6. Project Manager 🎯
+
 - **Target**: Operational experts
 - **Focus**: Mission orchestration
 - **Journey**: Ops DNA mapping → Mission design → Orchestration mastery → Meta-missions → Council membership
@@ -236,6 +333,7 @@ Each persona follows the same 5-phase structure but with tailored content:
 ### Token Economics
 
 #### $MFAI Token Utility
+
 - **Learning Rewards**: Earned through phase completion
 - **Staking**: Required for advanced phases and governance
 - **Governance**: Voting power in DAO decisions
@@ -243,6 +341,7 @@ Each persona follows the same 5-phase structure but with tailored content:
 - **Rewards**: Neuro-Dividends™ for active participants
 
 #### NFT Certifications
+
 - **Proof-of-Skill™**: Validates learning achievements
 - **Proof-of-Vision™**: Recognizes innovative ideas
 - **Proof-of-Build™**: Certifies technical contributions
@@ -350,8 +449,10 @@ money-factory-ai/
 ### Core Components
 
 #### App.tsx
+
 **Purpose**: Main application orchestrator
 **Responsibilities**:
+
 - Route management
 - Global layout
 - Context providers
@@ -383,28 +484,34 @@ function App() {
 ```
 
 #### JourneysPage.tsx
+
 **Purpose**: Main journey interface
 **Responsibilities**:
+
 - Persona selection
 - Journey timeline display
 - Phase management
 - Progress tracking
 
 **Key Features**:
+
 - Dynamic persona switching
 - Real-time progress updates
 - Modal management for phases
 - NFT minting integration
 
 #### SkillchainCard.tsx
+
 **Purpose**: Interactive progress visualization
 **Responsibilities**:
+
 - User progress display
 - 3D flip animation
 - Wallet status integration
 - NFT collection showcase
 
 **Technical Implementation**:
+
 ```typescript
 const [isFlipped, setIsFlipped] = useState(false)
 
@@ -423,14 +530,17 @@ return (
 ```
 
 #### WalletButton.tsx
+
 **Purpose**: Wallet connection and management
 **Responsibilities**:
+
 - Multi-wallet support
 - Connection status display
 - Transaction history
 - Network detection
 
 **Supported Wallets**:
+
 - Phantom
 - Solflare
 - Torus
@@ -442,8 +552,10 @@ return (
 ### Modal Components
 
 #### NFTProofModal.tsx
+
 **Purpose**: NFT certification display and minting
 **Features**:
+
 - Proof-of-Skill™ visualization
 - Minting workflow
 - Metadata display
@@ -451,16 +563,20 @@ return (
 - Download functionality
 
 #### StakingModal.tsx
+
 **Purpose**: Token staking interface
 **Features**:
+
 - Staking amount selection
 - APY calculation
 - Reward estimation
 - Cognitive Lock™ implementation
 
 #### DAOVoteModal.tsx
+
 **Purpose**: Governance participation
 **Features**:
+
 - Proposal display
 - Voting interface
 - Voting power calculation
@@ -473,9 +589,11 @@ return (
 ### Zustand Stores
 
 #### journeyStore.ts
+
 **Purpose**: Main application state management
 
 **State Structure**:
+
 ```typescript
 interface JourneyState {
   // Core journey data
@@ -503,13 +621,16 @@ interface JourneyState {
 ```
 
 **Key Features**:
+
 - Persistent storage with Zustand persist middleware
 - Automatic XP and level calculation
 - NFT collection management
 - Wallet state synchronization
 
 #### themeStore.ts
+
 **Purpose**: Theme management
+
 ```typescript
 interface ThemeState {
   isDark: boolean
@@ -534,6 +655,7 @@ interface ThemeState {
 The platform currently operates in **simulation mode** with the following blockchain integrations:
 
 #### Wallet Connection
+
 - **Network**: Solana Devnet
 - **Auto-connect**: Disabled (user-initiated)
 - **Error Handling**: Comprehensive error states and user feedback
@@ -563,6 +685,7 @@ export const WalletContextProvider: React.FC = ({ children }) => {
 ```
 
 #### Transaction Simulation
+
 All blockchain operations are currently simulated with realistic delays and responses:
 
 ```typescript
@@ -589,6 +712,7 @@ mintNFT: async (nftName: string) => {
 ### Blockchain Utilities
 
 #### src/utils/blockchain.ts
+
 Provides utility functions for blockchain operations:
 
 - `getConnection()`: Initialize Solana connection
@@ -602,6 +726,7 @@ Provides utility functions for blockchain operations:
 ### Future Blockchain Integration
 
 See `docs/blockchain_integration_plan.md` for detailed implementation roadmap including:
+
 - Smart contract deployment
 - Real NFT minting with Metaplex
 - Token staking contracts
@@ -615,6 +740,7 @@ See `docs/blockchain_integration_plan.md` for detailed implementation roadmap in
 ### Design System
 
 #### Color Palette
+
 ```css
 /* Primary Colors */
 --primary-50: #f0f9ff;
@@ -629,11 +755,13 @@ See `docs/blockchain_integration_plan.md` for detailed implementation roadmap in
 ```
 
 #### Typography
+
 - **Headings**: Space Grotesk (modern, tech-focused)
 - **Body**: Inter (readable, professional)
 - **Code**: Monospace (for addresses, hashes)
 
 #### Gradients
+
 ```css
 .bg-gradient-primary { background: linear-gradient(90deg, #4361ee, #7209b7); }
 .bg-gradient-solana { background: linear-gradient(90deg, #9945FF, #14F195); }
@@ -643,11 +771,13 @@ See `docs/blockchain_integration_plan.md` for detailed implementation roadmap in
 ### Responsive Design
 
 #### Breakpoints
+
 - **Mobile**: < 768px
 - **Tablet**: 768px - 1024px
 - **Desktop**: > 1024px
 
 #### Mobile-First Approach
+
 All components are designed mobile-first with progressive enhancement:
 
 ```css
@@ -668,12 +798,14 @@ All components are designed mobile-first with progressive enhancement:
 ### Animation System
 
 #### Framer Motion Integration
+
 - **Page transitions**: Smooth enter/exit animations
 - **Component mounting**: Staggered animations for lists
 - **Interactions**: Hover and tap feedback
 - **Progress indicators**: Animated progress bars and counters
 
 #### Key Animation Patterns
+
 ```typescript
 // Staggered list animation
 const containerVariants = {
@@ -695,12 +827,14 @@ const itemVariants = {
 ### Accessibility
 
 #### WCAG 2.1 Compliance
+
 - **Color contrast**: Minimum 4.5:1 ratio
 - **Keyboard navigation**: Full keyboard support
 - **Screen readers**: Proper ARIA labels and roles
 - **Focus management**: Visible focus indicators
 
 #### Implementation
+
 ```typescript
 // Example: Accessible button
 <motion.button
@@ -721,6 +855,7 @@ const itemVariants = {
 ### Getting Started
 
 #### Environment Setup
+
 ```bash
 # Clone repository
 git clone https://github.com/cyranoaladin/journey-simulator.git
@@ -737,6 +872,7 @@ npm run dev
 ```
 
 #### Development Scripts
+
 ```bash
 # Development server with hot reload
 npm run dev
@@ -758,11 +894,13 @@ npm run preview
 ### Code Standards
 
 #### TypeScript Configuration
+
 - **Strict mode**: Enabled for type safety
 - **Path mapping**: Configured for clean imports
 - **ESLint integration**: Automatic linting
 
 #### Component Structure
+
 ```typescript
 // Standard component template
 interface ComponentProps {
@@ -794,6 +932,7 @@ export default Component
 ```
 
 #### Styling Guidelines
+
 - **Tailwind-first**: Use Tailwind utilities
 - **Component classes**: For reusable patterns
 - **CSS modules**: For complex component-specific styles
@@ -802,6 +941,7 @@ export default Component
 ### Git Workflow
 
 #### Branch Strategy
+
 ```
 main                    # Production-ready code
 ├── develop            # Integration branch
@@ -811,6 +951,7 @@ main                    # Production-ready code
 ```
 
 #### Commit Convention
+
 ```
 feat: add NFT minting functionality
 fix: resolve wallet connection issue
@@ -827,6 +968,7 @@ test: add unit tests for journey store
 ### Environment Variables
 
 #### Required Variables
+
 ```bash
 # .env.local
 VITE_SOLANA_NETWORK=devnet
@@ -835,6 +977,7 @@ VITE_APP_VERSION=1.0.0
 ```
 
 #### Optional Variables
+
 ```bash
 # Analytics
 VITE_ANALYTICS_ID=your_analytics_id
@@ -851,6 +994,7 @@ VITE_ZYNO_API_URL=https://zyno.moneyfactory.ai
 ### Tailwind Configuration
 
 #### Custom Theme Extensions
+
 ```javascript
 // tailwind.config.js
 module.exports = {
@@ -884,6 +1028,7 @@ module.exports = {
 ### Vite Configuration
 
 #### Build Optimization
+
 ```typescript
 // vite.config.ts
 export default defineConfig({
@@ -911,21 +1056,25 @@ export default defineConfig({
 ### Testing Strategy
 
 #### Unit Tests
+
 - **Components**: React Testing Library
 - **Utilities**: Jest
 - **Stores**: Zustand testing utilities
 
 #### Integration Tests
+
 - **User flows**: Cypress
 - **Wallet integration**: Mock wallet providers
 - **API interactions**: MSW (Mock Service Worker)
 
 #### E2E Tests
+
 - **Critical paths**: Playwright
 - **Cross-browser**: Chrome, Firefox, Safari
 - **Mobile testing**: Device simulation
 
 ### Test Structure
+
 ```
 src/
 ├── __tests__/              # Test files
@@ -940,6 +1089,7 @@ src/
 ```
 
 ### Running Tests
+
 ```bash
 # Unit tests
 npm run test
@@ -964,6 +1114,7 @@ npm run test:all
 ### Build Process
 
 #### Production Build
+
 ```bash
 # Build for production
 npm run build
@@ -976,6 +1127,7 @@ npm run analyze
 ```
 
 #### Build Output
+
 ```
 dist/
 ├── assets/
@@ -989,6 +1141,7 @@ dist/
 ### Deployment Targets
 
 #### Vercel (Recommended)
+
 ```bash
 # Install Vercel CLI
 npm i -g vercel
@@ -1001,6 +1154,7 @@ vercel --prod
 ```
 
 #### Netlify
+
 ```bash
 # Build command
 npm run build
@@ -1013,6 +1167,7 @@ VITE_SOLANA_NETWORK=mainnet-beta
 ```
 
 #### Custom Server
+
 ```bash
 # Build and serve
 npm run build
@@ -1026,18 +1181,21 @@ node server.js
 ### Environment-Specific Configurations
 
 #### Development
+
 - Solana Devnet
 - Debug logging enabled
 - Hot module replacement
 - Source maps
 
 #### Staging
+
 - Solana Testnet
 - Error tracking
 - Performance monitoring
 - Feature flags
 
 #### Production
+
 - Solana Mainnet
 - Optimized bundles
 - CDN assets
@@ -1050,12 +1208,14 @@ node server.js
 ### Critical Issues
 
 #### 1. Wallet Connection on Mobile
+
 **Issue**: Phantom wallet connection may fail on mobile browsers
 **Workaround**: Use desktop browser or Phantom mobile app
 **Status**: Under investigation
 **Priority**: High
 
 #### 2. Transaction Simulation
+
 **Issue**: All blockchain transactions are currently simulated
 **Impact**: No real NFTs or tokens are minted
 **Solution**: Implement real blockchain integration (see roadmap)
@@ -1064,12 +1224,14 @@ node server.js
 ### Minor Issues
 
 #### 3. Animation Performance
+
 **Issue**: Complex animations may lag on older devices
 **Workaround**: Reduce motion in accessibility settings
 **Status**: Optimization in progress
 **Priority**: Medium
 
 #### 4. Image Loading
+
 **Issue**: Some persona images may load slowly
 **Workaround**: Images are lazy-loaded
 **Status**: Considering CDN implementation
@@ -1078,12 +1240,14 @@ node server.js
 ### Browser Compatibility
 
 #### Supported Browsers
+
 - ✅ Chrome 90+
 - ✅ Firefox 88+
 - ✅ Safari 14+
 - ✅ Edge 90+
 
 #### Known Limitations
+
 - ❌ Internet Explorer (not supported)
 - ⚠️ Safari < 14 (limited Web3 support)
 - ⚠️ Mobile browsers (wallet integration issues)
@@ -1093,6 +1257,7 @@ node server.js
 ## 🗺️ Roadmap
 
 ### Phase 1: Real Blockchain Integration (Q1 2024)
+
 - [ ] Deploy smart contracts on Solana Devnet
 - [ ] Implement real NFT minting with Metaplex
 - [ ] Connect staking to actual token contracts
@@ -1100,6 +1265,7 @@ node server.js
 - [ ] Add transaction history and verification
 
 ### Phase 2: Enhanced User Experience (Q2 2024)
+
 - [ ] Improve mobile responsiveness
 - [ ] Add advanced animations and micro-interactions
 - [ ] Implement progressive web app (PWA) features
@@ -1107,6 +1273,7 @@ node server.js
 - [ ] Enhance accessibility features
 
 ### Phase 3: AI Integration (Q3 2024)
+
 - [ ] Connect Zyno to real AI backend
 - [ ] Implement contextual guidance system
 - [ ] Add personalized learning paths
@@ -1114,6 +1281,7 @@ node server.js
 - [ ] Develop intelligent mission generation
 
 ### Phase 4: Advanced Features (Q4 2024)
+
 - [ ] Launch marketplace for NFT certifications
 - [ ] Implement mentorship system
 - [ ] Create project launchpad
@@ -1121,6 +1289,7 @@ node server.js
 - [ ] Develop mobile applications
 
 ### Phase 5: Ecosystem Expansion (2025)
+
 - [ ] Multi-chain support (Ethereum, Polygon)
 - [ ] Enterprise partnerships
 - [ ] Educational institution integration
@@ -1134,12 +1303,14 @@ node server.js
 ### Development Setup
 
 #### Prerequisites
+
 - Node.js 18+
 - Git
 - Solana CLI (for blockchain development)
 - Phantom wallet (for testing)
 
 #### Setup Process
+
 ```bash
 # Fork the repository
 git clone https://github.com/cyranoaladin/journey-simulator.git
@@ -1158,6 +1329,7 @@ npm run dev
 ### Contribution Guidelines
 
 #### Code Style
+
 - Follow existing TypeScript and React patterns
 - Use Tailwind CSS for styling
 - Write meaningful commit messages
@@ -1165,6 +1337,7 @@ npm run dev
 - Update documentation as needed
 
 #### Pull Request Process
+
 1. **Create Issue**: Describe the feature or bug
 2. **Fork & Branch**: Create a feature branch
 3. **Develop**: Implement changes with tests
@@ -1175,6 +1348,7 @@ npm run dev
 8. **Merge**: Approved PRs are merged to develop
 
 #### Areas for Contribution
+
 - 🐛 **Bug Fixes**: Resolve existing issues
 - ✨ **Features**: Implement new functionality
 - 📚 **Documentation**: Improve guides and docs
@@ -1185,12 +1359,14 @@ npm run dev
 ### Community
 
 #### Communication Channels
+
 - **Website**: [mfai.app](https://mfai.app)
 - **GitHub**: [github.com/cyranoaladin](https://github.com/cyranoaladin/)
 - **GitHub Issues**: For bug reports and feature requests
 - **GitHub Discussions**: For questions and ideas
 
 #### Code of Conduct
+
 We are committed to providing a welcoming and inclusive environment. Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
 
 ---
@@ -1210,14 +1386,17 @@ For licensing inquiries, contact: [legal@moneyfactory.ai](mailto:legal@moneyfact
 ## 📞 Support & Contact
 
 ### Technical Support
+
 - **Website**: [mfai.app](https://mfai.app)
 - **GitHub Issues**: For bug reports and feature requests
 
 ### Business Inquiries
+
 - **Website**: [mfai.app](https://mfai.app)
 - **GitHub**: [github.com/cyranoaladin](https://github.com/cyranoaladin/)
 
 ### Development Team
+
 - **Chief Operator & Blockchain Officer**: Alaeddine BEN RHOUMA
 - **GitHub**: [github.com/cyranoaladin](https://github.com/cyranoaladin/)
 
@@ -1228,6 +1407,7 @@ For licensing inquiries, contact: [legal@moneyfactory.ai](mailto:legal@moneyfact
 To integrate this journey simulator into the main Money Factory AI website at [mfai.app](https://mfai.app), follow these guidelines:
 
 #### 1. CTA Button Implementation
+
 ```html
 <!-- Primary CTA on homepage -->
 <a href="/journey-simulator" class="cta-button-primary">
@@ -1242,6 +1422,7 @@ To integrate this journey simulator into the main Money Factory AI website at [m
 ```
 
 #### 2. Routing Setup
+
 ```javascript
 // Next.js routing example
 // pages/journey-simulator.js or app/journey-simulator/page.js
@@ -1259,12 +1440,15 @@ export default function JourneySimulator() {
 ```
 
 #### 3. Subdomain Setup
+
 For optimal integration, consider hosting the simulator on a subdomain:
+
 - **Simulator URL**: `journey.mfai.app` or `simulator.mfai.app`
 - **Main Website**: `mfai.app`
 - **API Endpoint**: `api.mfai.app`
 
 #### 4. Analytics Integration
+
 ```javascript
 // Track journey simulator engagement
 gtag('event', 'journey_simulator_start', {
@@ -1274,6 +1458,7 @@ gtag('event', 'journey_simulator_start', {
 ```
 
 #### 5. SEO Considerations
+
 ```html
 <!-- Meta tags for journey simulator page -->
 <meta name="description" content="Experience the Cognitive Activation Protocol™ - Transform your skills into digital capital through Money Factory AI's interactive journey simulator">
@@ -1287,6 +1472,7 @@ gtag('event', 'journey_simulator_start', {
 ## 🙏 Acknowledgments
 
 ### Technologies
+
 - **Solana Foundation** for blockchain infrastructure
 - **React Team** for the amazing framework
 - **Tailwind Labs** for the utility-first CSS framework
@@ -1294,6 +1480,7 @@ gtag('event', 'journey_simulator_start', {
 - **Lucide** for the beautiful icons
 
 ### Community
+
 - **Early Adopters** who provided valuable feedback
 - **Beta Testers** who helped identify and resolve issues
 - **Contributors** who helped improve the platform
@@ -1306,6 +1493,19 @@ gtag('event', 'journey_simulator_start', {
 *Transforming skills into capital through the Cognitive Activation Protocol™*
 
 ---
+# Exemple d’intégration de sample_mission_feedback.json dans React pour test local
+import React from 'react';
+import MissionFeedbackSummary from './MissionFeedbackSummary';
+import feedbackMock from './sample_mission_feedback.json'; // si statique ou mocké
+
+const TestFeedbackSummary = () => (
+  <div className="max-w-3xl mx-auto mt-10">
+    <MissionFeedbackSummary summary={feedbackMock} />
+  </div>
+);
+
+export default TestFeedbackSummary;
+
 
 *Last updated: January 2024*
 *Version: 1.0.0*

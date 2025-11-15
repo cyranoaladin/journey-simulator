@@ -1,4 +1,4 @@
-## 🧱 The Operator Protocol™
+# The Operator Protocol
 
 **_From Project Manager to Mission Commander™_**
 
@@ -6,7 +6,7 @@
 
 ---
 
-### 🎯 Who is this for?
+## Who is this for?
 
 You are a **mission orchestrator, system thinker, PM, product strategist, or operations lead**.
 You’re great at connecting the dots, removing friction, and aligning contributors around shared outcomes.
@@ -20,7 +20,7 @@ Money Factory AI turns your operational fluency into **protocol-native mission d
 
 ---
 
-### 🧬 A New Role: Strategic Orchestrator of the Cognitive Economy™
+## A New Role: Strategic Orchestrator of the Cognitive Economy™
 
 As an Operator Protocol™ user, you become the **nerve center of execution**.
 You don’t just assign tasks. You design scalable flows backed by:
@@ -33,9 +33,9 @@ You move the protocol forward — not by building or funding — but by **orches
 
 ---
 
-## 🧭 Your Journey — Phase by Phase
+## Your Journey — Phase by Phase
 
-### 🧬 **Phase 0: Ops DNA Mapping**
+### Phase 0: Ops DNA Mapping
 
 - AEPO™ identifies your execution archetype: planner, catalyst, finisher, or integrator
 - You receive your **Mission Ops Compass™** (showing how you interact with other user types)
@@ -45,7 +45,7 @@ You move the protocol forward — not by building or funding — but by **orches
 
 ---
 
-### 🧠 **Phase 1: Shadow-to-Command Training**
+### Phase 1: Shadow-to-Command Training
 
 - Join ongoing missions as observer or co-pilot
 - Learn protocol logic (skillchain pacing, task validation, mission loops)
@@ -96,7 +96,7 @@ You move the protocol forward — not by building or funding — but by **orches
 
 ---
 
-### 🧩 Why this matters
+## 🧩 Why this matters
 
 Builders need orchestration. Creators need structure. Visionaries need traction.
 You are the connective tissue that makes the protocol work at scale — across time, talent, and purpose.
@@ -106,7 +106,7 @@ You are the connective tissue that makes the protocol work at scale — across t
 
 ---
 
-### 🔍 Want to test your ops mastery?
+## 🔍 Want to test your ops mastery?
 
 Explore the Operator Protocol™
 📎 _See mission loops from inside the ecosystem_

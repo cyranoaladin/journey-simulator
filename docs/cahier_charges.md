@@ -67,7 +67,7 @@ The “User Journeys” page is a **strategic gateway** into the **Money Factory
 
 ---
 
-### 🧠 Narrative Language to Use Consistently
+### Narrative Language to Use Consistently
 
 | Term                                   | Meaning                                               |
 | -------------------------------------- | ----------------------------------------------------- |
@@ -80,10 +80,9 @@ The “User Journeys” page is a **strategic gateway** into the **Money Factory
 | **Proof Pass™ / NFT Pass**             | Gold, Platinum, Diamond – tiers with perks and access |
 | **Activation Loop™**                   | Learn → Prove → Tokenize → Build → Govern → Earn      |
 
+## SECTION 2 — Detailed Journey Blueprints
 
-
-
-## 🧠 Pathway 1 — The Cognitive Activation Hub
+## Pathway 1 — The Cognitive Activation Hub
 
 **Profile**: Ambitious crossover builders, researchers, and analysts entering Web3.
 **Goal**: Forge sovereign Web3 operating systems, master Solana fundamentals, and activate within the MFAI ecosystem.
@@ -188,6 +187,7 @@ The “User Journeys” page is a **strategic gateway** into the **Money Factory
 
 🎁 Rewards: Resilience Sentinel Pass • Proof-of-Security™ artifacts • Guardian mesh command status.
 🧠 Zyno Says: “Resilience is a rhythm—treat every drill as rehearsal for the moment that protects the network.”
+
 | Phase        | Learning Experience                                             |
 | ------------ | --------------------------------------------------------------- |
 | **Learn**    | \*"From Vision to Protocol": Self-assessment + Canvas with Zyno |
@@ -199,17 +199,15 @@ The “User Journeys” page is a **strategic gateway** into the **Money Factory
 🎁 Rewards: Vision NFT • Incubation Access • DAO Startup Role
 🧠 Zyno Says: “Ideas are seeds. Let’s scale your forest.”
 
+## SECTION 3 — Journey Architecture & Progression Logic
 
-
-# 🧬 SECTION 3 — Journey Architecture & Progression Logic
-
-### 🧠 Design Philosophy
+### Design Philosophy
 
 Every MFAI journey must be built as a **Cognitive Learning System**, grounded in the proprietary **Cognitive Activation Protocol™**, with **progressive unlocks**, **Zyno interactions**, **token rewards**, and **NFT-based validation**.
 
 ---
 
-## 🧩 Core Framework: The 5-Phase Activation Structure
+### 🧩 Core Framework: The 5-Phase Activation Structure
 
 | Phase           | Meaning                     | Action Types                                | Output                              |
 | --------------- | --------------------------- | ------------------------------------------- | ----------------------------------- |
@@ -223,7 +221,7 @@ Each user journey is a **stacked narrative path**, with **front-end components**
 
 ---
 
-## 🧱 Modular Component System (Front-End Layout)
+### 🧱 Modular Component System (Front-End Layout)
 
 | Component            | Description                                         | Behaviour                                 |
 | -------------------- | --------------------------------------------------- | ----------------------------------------- |
@@ -237,7 +235,7 @@ Each user journey is a **stacked narrative path**, with **front-end components**
 
 ---
 
-## 📊 Journey Progression Logic (Gamified Flow)
+### 📊 Journey Progression Logic (Gamified Flow)
 
 ```plaintext
 [Persona Chosen] 
@@ -258,7 +256,7 @@ Each journey should:
 
 ---
 
-## 🔁 UX Logic for “Zyno Guided Mode”
+### 🔁 UX Logic for “Zyno Guided Mode”
 
 1. **User clicks "Zyno Help Me Choose"**
 2. Zyno asks 2-3 questions: skill level, goal, available time
@@ -272,7 +270,7 @@ Each journey should:
 
 ---
 
-## 🎖️ Token, NFT & Reward Integration (per phase)
+### 🎖️ Token, NFT & Reward Integration (per phase)
 
 | Phase    | Token/NFT Action                  | Example                             |
 | -------- | --------------------------------- | ----------------------------------- |
@@ -284,7 +282,7 @@ Each journey should:
 
 ---
 
-## 🧠 Summary of Dev Objectives
+### 🧠 Summary of Dev Objectives
 
 * All journeys must be **modular, nested, data-driven**
 * Connect progress to:
@@ -298,16 +296,15 @@ Each journey should:
   * Knowledge validator
   * Career accelerator
 
+## SECTION 4 — UI/UX Guidelines for "User Journeys" Page
 
-# 🎨 SECTION 4 — UI/UX Guidelines for "User Journeys" Page
-
-### 🎯 Objective
+### UX Objective
 
 Deliver a **WOW-grade experience**, merging the clarity of Web2 onboarding with the **immersive, gamified, user-centric UX** of Web3-native platforms — all while expressing the unique **cognitive identity of Money Factory AI**.
 
 ---
 
-## 🧠 Core Design Philosophy
+### 🧠 Core Design Philosophy
 
 | Principle                 | Description                                                                   |
 | ------------------------- | ----------------------------------------------------------------------------- |
@@ -319,7 +316,7 @@ Deliver a **WOW-grade experience**, merging the clarity of Web2 onboarding with 
 
 ---
 
-## 🎨 Colors & Fonts
+### 🎨 Colors & Fonts
 
 | Element            | Spec                                                                           |
 | ------------------ | ------------------------------------------------------------------------------ |
@@ -330,16 +327,16 @@ Deliver a **WOW-grade experience**, merging the clarity of Web2 onboarding with 
 
 ---
 
-## 📱 Layout & Structure
+### 📱 Layout & Structure
 
-### Mobile-First Prioritization:
+#### Mobile-First Prioritization
 
 * Swipeable journey cards
 * Sticky progress bar
 * Bottom action buttons (Start, Resume, Ask Zyno)
 * Modals for each phase, full-screen on small devices
 
-### Desktop View:
+#### Desktop View
 
 * 2-column layout: Left (journey timeline), Right (Zyno Assistant / NFT display)
 * ScrollSync system: as user scrolls → side panel updates NFT/status
@@ -347,7 +344,7 @@ Deliver a **WOW-grade experience**, merging the clarity of Web2 onboarding with 
 
 ---
 
-## 🖱️ Interactions & Feedback
+### 🖱️ Interactions & Feedback
 
 | Event            | Response                                           |
 | ---------------- | -------------------------------------------------- |
@@ -359,7 +356,7 @@ Deliver a **WOW-grade experience**, merging the clarity of Web2 onboarding with 
 
 ---
 
-## 🧩 UI Components (Developer Naming Suggestions)
+### 🧩 UI Components (Developer Naming Suggestions)
 
 | Component Name      | Description                                           |
 | ------------------- | ----------------------------------------------------- |
@@ -373,7 +370,7 @@ Deliver a **WOW-grade experience**, merging the clarity of Web2 onboarding with 
 
 ---
 
-## ✨ Microinteractions / Animations
+### ✨ Microinteractions / Animations
 
 | Type                | Tool                 | Usage                               |
 | ------------------- | -------------------- | ----------------------------------- |
@@ -385,7 +382,7 @@ Deliver a **WOW-grade experience**, merging the clarity of Web2 onboarding with 
 
 ---
 
-## 🔐 Accessibility & Performance
+### 🔐 Accessibility & Performance
 
 * Use `aria-labelledby`, `aria-describedby` on modals, tooltips, and cards
 * Support keyboard navigation
@@ -394,23 +391,22 @@ Deliver a **WOW-grade experience**, merging the clarity of Web2 onboarding with 
 
 ---
 
-## 🧠 UX Notes from Whitepaper Narrative
+### 🧠 UX Notes from Whitepaper Narrative
 
 * Zyno must **feel alive**, like a co-pilot, not a pop-up
 * Journeys must **feel like quests**, not school curricula
 * Users must **see the value** of each action (XP, reward, access, reputation)
 * NFT minting must **feel meaningful**, not cosmetic
 
+## SECTION 5 — NFT & Token Mechanics + Data Integration
 
-# 🪙 SECTION 5 — NFT & Token Mechanics + Data Integration
-
-### 🎯 Objective
+### Integration Objective
 
 Ensure that each user journey **is tracked, rewarded and authenticated** via on-chain mechanisms or hybrid off-chain states, fully aligned with MFAI's vision of **Skillchain Mining™**, **Proof-of-Skill™**, and **Neuro-Dividends™**.
 
 ---
 
-## 🧠 Core Mechanisms to Integrate
+### 🧠 Core Mechanisms to Integrate
 
 | Mechanism                                  | Role in Journey                                   | Interaction                                                          |
 | ------------------------------------------ | ------------------------------------------------- | -------------------------------------------------------------------- |
@@ -423,9 +419,9 @@ Ensure that each user journey **is tracked, rewarded and authenticated** via on-
 
 ---
 
-## 🔗 Wallet Logic & Detection
+### 🔗 Wallet Logic & Detection
 
-### Wallet Connection
+#### Wallet Connection
 
 * Use **Phantom, MetaMask, or WalletConnect** (Solana/EVM compatibility)
 * On connect: check NFT ownership, \$MFAI balance, pass level
@@ -438,7 +434,7 @@ const hasGoldPass = nfts.some(nft => nft.name.includes("Gold Pass"));
 
 ---
 
-## 🪙 Token-Gated Access
+### 🪙 Token-Gated Access
 
 | Journey Phase     | Required Assets                                |
 | ----------------- | ---------------------------------------------- |
@@ -452,7 +448,7 @@ Each phase can display a **“locked/unlocked”** badge based on real-time wall
 
 ---
 
-## 🎖️ NFT Minting Flow (Simplified)
+### 🎖️ NFT Minting Flow (Simplified)
 
 1. **User completes quiz or project**
 
@@ -471,7 +467,7 @@ Each phase can display a **“locked/unlocked”** badge based on real-time wall
 
 ---
 
-## 📊 Progress & Data Storage
+### 📊 Progress & Data Storage
 
 | Data Type            | Storage                                       | Notes                                                           |
 | -------------------- | --------------------------------------------- | --------------------------------------------------------------- |
@@ -483,7 +479,7 @@ Each phase can display a **“locked/unlocked”** badge based on real-time wall
 
 ---
 
-## 🔐 Security Considerations
+### 🔐 Security Considerations
 
 * Use **backend validation** before minting NFT (to avoid cheat)
 * NFT metadata must be **immutable** (hosted on IPFS or Arweave)
@@ -492,7 +488,7 @@ Each phase can display a **“locked/unlocked”** badge based on real-time wall
 
 ---
 
-## 🔁 Token Utility Feedback Loops
+### 🔁 Token Utility Feedback Loops
 
 | Action                       | Reward                                |
 | ---------------------------- | ------------------------------------- |
@@ -502,12 +498,11 @@ Each phase can display a **“locked/unlocked”** badge based on real-time wall
 | Refer user                   | Bonus NFT or \$MFAI                   |
 | Launch project via Launchpad | DAO-funded grant                      |
 
-
-# 🧩 SECTION 6 — Finalization & Implementation Plan
+## 🧩 SECTION 6 — Finalization & Implementation Plan
 
 ---
 
-## ✅ General Design Intent Recap
+### ✅ General Design Intent Recap
 
 | Principle                    | Applied To           | Justification                                               |
 | ---------------------------- | -------------------- | ----------------------------------------------------------- |
@@ -519,9 +514,9 @@ Each phase can display a **“locked/unlocked”** badge based on real-time wall
 
 ---
 
-## 🧠 Smart CTA System (Call-to-Action Design)
+### 🧠 Smart CTA System (Call-to-Action Design)
 
-### CTA Categories per Phase
+#### CTA Categories per Phase
 
 | Phase    | CTA Example                                       | Button Style                 |
 | -------- | ------------------------------------------------- | ---------------------------- |
@@ -531,7 +526,7 @@ Each phase can display a **“locked/unlocked”** badge based on real-time wall
 | Activate | “Stake \$MFAI Now” / “Vote in DAO”                | DAO (Dark button + DAO icon) |
 | Scale    | “Apply to Launchpad” / “Join as Mentor”           | VIP (Gold glow)              |
 
-### Smart CTA Behavior:
+#### Smart CTA Behavior
 
 * **Contextual**: Only shows relevant CTA
 * **Zyno-guided**: Suggests next step dynamically
@@ -539,15 +534,15 @@ Each phase can display a **“locked/unlocked”** badge based on real-time wall
 
 ---
 
-## 🛠️ Developer Action Plan
+### 🛠️ Developer Action Plan
 
-### 🔧 Step 1 — UI/UX Foundation
+#### 🔧 Step 1 — UI/UX Foundation
 
 * [ ] Implement mobile-first layout with component-based architecture
 * [ ] Load journeys from JSON or CMS for modularity
 * [ ] Integrate Framer Motion for transitions
 
-### 🎨 Step 2 — Frontend Components
+#### 🎨 Step 2 — Frontend Components
 
 * [ ] `<JourneySelector />` — Persona filter
 * [ ] `<JourneyCard />` — Summary card
@@ -556,20 +551,20 @@ Each phase can display a **“locked/unlocked”** badge based on real-time wall
 * [ ] `<ProgressXP />` — Gamified XP display
 * [ ] `<CTASection />` — Smart contextual CTAs
 
-### 🧠 Step 3 — AI & Logic
+#### 🧠 Step 3 — AI & Logic
 
 * [ ] Zyno Assistant via sidebar/modal
 * [ ] Journey recommendations logic
 * [ ] Quiz & skill-check validation logic (local or via API)
 
-### 🔗 Step 4 — Blockchain / Wallet
+#### 🔗 Step 4 — Blockchain / Wallet
 
 * [ ] Wallet connect (Phantom, MetaMask, WalletConnect)
 * [ ] Check for NFT Passes + token balance
 * [ ] Trigger NFT mint (with backend verification)
 * [ ] Handle gated access (e.g. DAO vote = needs NFT + \$MFAI)
 
-### 📊 Step 5 — Data Storage
+#### 📊 Step 5 — Data Storage
 
 * [ ] Use LocalStorage or Firebase for XP/save state
 * [ ] Backend DB or Moralis/Thirdweb for NFT display
@@ -600,6 +595,3 @@ This “User Journeys” page is more than a UI — it’s the **interactive blu
 * Be transformed (via learning, activation, scaling)
 
 🧠 Let’s make it cognitive, immersive, and unforgettable.
-
-
-

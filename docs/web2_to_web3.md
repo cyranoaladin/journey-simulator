@@ -1,4 +1,5 @@
-🎯 “The Foundry Runway™”
+## The Foundry Runway
+
 From Capital Founder to Solana Market Operator
 
 🔎 Target profile:
@@ -27,7 +28,7 @@ Marie runs a traditional treasury desk. After discovering [mfai.app](https://mfa
 
 ---
 
-### 📚 LEVEL 1: **Protocol Discovery Sprint**
+### LEVEL 1: **Protocol Discovery Sprint**
 
 🎯 **Narrative**
 Guided by Zyno, Marie benchmarks Solana’s existing DeFi landscape, identifying stress points where throughput advantages are underutilized.
