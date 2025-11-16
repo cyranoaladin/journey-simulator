@@ -1,0 +1,7 @@
+# Real-World Assets (RWA) and Tokenization
+
+Topics covered:
+- Definition of RWA
+- How RWA are brought on-chain
+- Legal/Compliance challenges
+- Use cases (real estate, invoices, bonds)

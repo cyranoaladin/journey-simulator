@@ -1,0 +1,8 @@
+# Tokenomics Model Overview
+
+This document explains how to design a sustainable token economy for Web3 projects, including:
+- Token allocation
+- Vesting schedules
+- Utility and governance roles
+- Burn and mint mechanisms
+- Integration with staking models

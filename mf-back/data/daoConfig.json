@@ -1,0 +1,8 @@
+{
+  "quorumPercent": 60,
+  "voters": [
+    { "id": "founder", "weight": 3 },
+    { "id": "core_team", "weight": 2 },
+    { "id": "community", "weight": 5 }
+  ]
+}

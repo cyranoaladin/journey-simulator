@@ -1,0 +1,10 @@
+{
+  "track": "Web3 Legal",
+  "phases": [
+    { "phase": "Guide", "agent": "GuideAgent" },
+    { "phase": "Compliance", "agent": "Web3LegalAgent" },
+    { "phase": "DAO Governance", "agent": "DAOAgent" },
+    { "phase": "Security Audit", "agent": "AuditAgent" },
+    { "phase": "Token Compliance", "agent": "TokenAgent" }
+  ]
+}

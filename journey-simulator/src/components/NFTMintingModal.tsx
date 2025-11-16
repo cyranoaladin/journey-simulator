@@ -1,157 +1,139 @@
-import React, { useState } from 'react'
-import { motion } from 'framer-motion'
-import { X, Award, Loader, CheckCircle, ExternalLink, AlertCircle } from 'lucide-react'
-import { useWallet } from '@solana/wallet-adapter-react'
-import { Certification } from '../types/journey'
-import { useJourneyStore } from '../store/journeyStore'
-import { api } from '../utils/api'
+import { useState, type FC } from 'react';
+import { motion } from 'framer-motion';
+import { X, Award, Loader, CheckCircle, ExternalLink, AlertCircle } from 'lucide-react';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { Certification } from '../types/journey';
+import { useJourneyStore } from '../store/journeyStore';
+import { api } from '../utils/api';
 
 interface NFTMintingModalProps {
-  certification: Certification
-  onClose: () => void
-  onMinted: (mintAddress: string) => void
+  certification: Certification;
+  onClose: () => void;
+  onMinted: (mintAddress: string) => void;
 }
 
-const NFTMintingModal: React.FC<NFTMintingModalProps> = ({
-  certification,
-  onClose,
-  onMinted
-}) => {
-  const { publicKey, signTransaction } = useWallet()
-  const { selectedPersona, loadUserProgress } = useJourneyStore()
-  const [isMinting, setIsMinting] = useState(false)
-  const [mintAddress, setMintAddress] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [currentStep, setCurrentStep] = useState(1)
-  const [backendError, setBackendError] = useState<string | null>(null)
-  const totalSteps = 4
+const NFTMintingModal: FC<NFTMintingModalProps> = ({ certification, onClose, onMinted }) => {
+  const { publicKey, signTransaction } = useWallet();
+  const { selectedPersona, loadUserProgress } = useJourneyStore();
+  const [isMinting, setIsMinting] = useState(false);
+  const [mintAddress, setMintAddress] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [backendError, setBackendError] = useState<string | null>(null);
+  const totalSteps = 4;
 
-  // Handle NFT minting with backend sync
   const handleMintNFT = async () => {
     if (!publicKey || !signTransaction) {
-      setError('Please connect your wallet first')
-      return
+      setError('Please connect your wallet first');
+      return;
     }
 
     try {
-      setIsMinting(true)
-      setError(null)
-      setBackendError(null)
-      setCurrentStep(1)
+      setIsMinting(true);
+      setError(null);
+      setBackendError(null);
+      setCurrentStep(1);
 
-      // Step 1: Validate certification
-      setCurrentStep(2)
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      setCurrentStep(2);
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Step 2: Generate NFT metadata
-      setCurrentStep(3)
-      // Metadata generation (commented out for now)
-      // const metadata = {
-      //   name: certification.name,
-      //   description: certification.description,
-      //   image: certification.imageUrl,
-      //   attributes: [
-      //     { trait_type: 'Phase', value: certification.phase || 1 },
-      //     { trait_type: 'Persona', value: selectedPersona?.title || 'Unknown' },
-      //     { trait_type: 'Rarity', value: certification.rarity || 'rare' }
-      //   ]
-      // }
+      setCurrentStep(3);
 
-      // Step 3: Mint NFT (simulated)
-      setCurrentStep(4)
-      const simulatedMintAddress = `mint_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-      
-      // Step 4: Sync with backend
+      setCurrentStep(4);
+      const simulatedMintAddress = `mint_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
       try {
         await api.addNFTCertificateEnhanced({
-          phase: 1, // Default phase
+          phase: 1,
           title: certification.name,
           description: certification.description,
           image_url: certification.imageUrl,
           mint_address: simulatedMintAddress,
           rarity: certification.rarity || 'rare',
-          xp_earned: 100 // Default XP
-        })
+          xp_earned: 100,
+        });
 
-        // Reload user progress to get updated NFT count
-        await loadUserProgress()
+        await loadUserProgress();
       } catch (backendErr) {
-        console.error('Failed to sync NFT with backend:', backendErr)
-        setBackendError('NFT minted but failed to sync with backend. Please refresh the page.')
+        console.error('Failed to sync NFT with backend:', backendErr);
+        setBackendError('NFT minted but failed to sync with backend. Please refresh the page.');
       }
 
-      setMintAddress(simulatedMintAddress)
-      onMinted(simulatedMintAddress)
-
+      setMintAddress(simulatedMintAddress);
+      onMinted(simulatedMintAddress);
     } catch (err) {
-      console.error('NFT minting failed:', err)
-      setError('Failed to mint NFT. Please try again.')
+      console.error('NFT minting failed:', err);
+      setError('Failed to mint NFT. Please try again.');
     } finally {
-      setIsMinting(false)
+      setIsMinting(false);
     }
-  }
+  };
 
-  // Get persona-specific styling
   const getPersonaStyle = () => {
-    if (!selectedPersona) return {}
-    
+    if (!selectedPersona) return {};
+
     switch (selectedPersona.id) {
       case 'cognitive-activation-hub':
         return {
           bgGradient: 'from-sky-500 to-cyan-400',
           iconBg: 'bg-sky-500',
-          textColor: 'text-cyan-300'
-        }
+          textColor: 'text-cyan-300',
+        };
       case 'capital-foundry':
         return {
           bgGradient: 'from-emerald-500 to-teal-500',
           iconBg: 'bg-emerald-500',
-          textColor: 'text-emerald-300'
-        }
+          textColor: 'text-emerald-300',
+        };
       case 'system-architect':
         return {
           bgGradient: 'from-purple-500 to-indigo-500',
           iconBg: 'bg-purple-600',
-          textColor: 'text-indigo-300'
-        }
+          textColor: 'text-indigo-300',
+        };
       case 'experience-studio':
         return {
           bgGradient: 'from-rose-500 to-fuchsia-500',
           iconBg: 'bg-rose-500',
-          textColor: 'text-fuchsia-300'
-        }
+          textColor: 'text-fuchsia-300',
+        };
       case 'impact-engine':
         return {
           bgGradient: 'from-amber-500 to-lime-500',
           iconBg: 'bg-amber-500',
-          textColor: 'text-lime-300'
-        }
+          textColor: 'text-lime-300',
+        };
       case 'resilience-master':
         return {
           bgGradient: 'from-slate-500 to-cyan-600',
           iconBg: 'bg-slate-600',
-          textColor: 'text-cyan-300'
-        }
+          textColor: 'text-cyan-300',
+        };
       default:
         return {
           bgGradient: 'from-sky-500 to-cyan-400',
           iconBg: 'bg-sky-500',
-          textColor: 'text-cyan-300'
-        }
+          textColor: 'text-cyan-300',
+        };
     }
-  }
+  };
 
-  const personaStyle = getPersonaStyle()
+  const personaStyle = getPersonaStyle();
 
   const getMintingStepText = () => {
     switch (currentStep) {
-      case 1: return 'Preparing metadata...'
-      case 2: return 'Connecting to Solana testnet...'
-      case 3: return 'Creating on-chain token...'
-      case 4: return 'Finalizing Proof-of-Skill™ NFT...'
-      default: return 'Processing...'
+      case 1:
+        return 'Preparing metadata...';
+      case 2:
+        return 'Connecting to Solana testnet...';
+      case 3:
+        return 'Creating on-chain token...';
+      case 4:
+        return 'Finalizing Proof-of-Skill™ NFT...';
+      default:
+        return 'Processing...';
     }
-  }
+  };
 
   return (
     <motion.div
@@ -168,7 +150,6 @@ const NFTMintingModal: React.FC<NFTMintingModalProps> = ({
         onClick={(e) => e.stopPropagation()}
         className="bg-primary-900 rounded-2xl p-6 max-w-md w-full border border-white/20"
       >
-        {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-space font-bold">Mint Proof-of-Skill™ NFT</h2>
           <button
@@ -181,17 +162,20 @@ const NFTMintingModal: React.FC<NFTMintingModalProps> = ({
           </button>
         </div>
 
-        {/* NFT Preview */}
-        <div className={`relative border-2 rounded-xl p-4 mb-6 bg-gradient-to-br ${personaStyle.bgGradient || 'from-blue-400 to-cyan-500'} border-white/20`}>
+        <div
+          className={`relative border-2 rounded-xl p-4 mb-6 bg-gradient-to-br ${
+            personaStyle.bgGradient || 'from-blue-400 to-cyan-500'
+          } border-white/20`}
+        >
           <div className="w-full h-48 bg-black/20 rounded-lg mb-4 flex items-center justify-center">
             {certification.imageUrl ? (
-              <img 
-                src={certification.imageUrl} 
-                alt={certification.name} 
-                className="w-full h-full object-cover rounded-lg"
-              />
+              <img src={certification.imageUrl} alt={certification.name} className="w-full h-full object-cover rounded-lg" />
             ) : (
-              <div className={`w-16 h-16 ${personaStyle.iconBg || 'bg-blue-500'} rounded-full flex items-center justify-center`}>
+              <div
+                className={`w-16 h-16 ${
+                  personaStyle.iconBg || 'bg-blue-500'
+                } rounded-full flex items-center justify-center`}
+              >
                 <Award size={32} className="text-white" />
               </div>
             )}
@@ -200,7 +184,6 @@ const NFTMintingModal: React.FC<NFTMintingModalProps> = ({
           <p className="text-white/80 text-sm">{certification.description}</p>
         </div>
 
-        {/* Minting Status */}
         {!mintAddress && !error && !isMinting && (
           <div className="mb-6">
             <h3 className="font-semibold mb-3">Minting Details</h3>
@@ -221,23 +204,24 @@ const NFTMintingModal: React.FC<NFTMintingModalProps> = ({
           </div>
         )}
 
-        {/* Minting Progress */}
         {isMinting && (
           <div className="mb-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold">Minting in Progress</h3>
-              <span className="text-sm">{currentStep}/{totalSteps}</span>
+              <span className="text-sm">
+                {currentStep}/{totalSteps}
+              </span>
             </div>
-            
+
             <div className="w-full bg-white/10 rounded-full h-2 mb-4">
-              <motion.div 
+              <motion.div
                 className={`h-full rounded-full bg-gradient-to-r ${personaStyle.bgGradient || 'from-blue-400 to-cyan-500'}`}
                 initial={{ width: 0 }}
                 animate={{ width: `${(currentStep / totalSteps) * 100}%` }}
                 transition={{ duration: 0.5 }}
               />
             </div>
-            
+
             <div className="flex items-center justify-center space-x-3 text-sm">
               <Loader className="animate-spin" size={16} />
               <span>{getMintingStepText()}</span>
@@ -245,7 +229,6 @@ const NFTMintingModal: React.FC<NFTMintingModalProps> = ({
           </div>
         )}
 
-        {/* Success State */}
         {mintAddress && (
           <div className="mb-6 bg-green-500/20 border border-green-500/30 rounded-lg p-4">
             <div className="flex items-center space-x-2 mb-3">
@@ -262,7 +245,6 @@ const NFTMintingModal: React.FC<NFTMintingModalProps> = ({
           </div>
         )}
 
-        {/* Error State */}
         {error && (
           <div className="mb-6 bg-red-500/20 border border-red-500/30 rounded-lg p-4">
             <div className="flex items-center space-x-2 mb-2">
@@ -273,7 +255,6 @@ const NFTMintingModal: React.FC<NFTMintingModalProps> = ({
           </div>
         )}
 
-        {/* Backend Error State */}
         {backendError && (
           <div className="mb-6 bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-4">
             <div className="flex items-center space-x-2 mb-2">
@@ -284,7 +265,6 @@ const NFTMintingModal: React.FC<NFTMintingModalProps> = ({
           </div>
         )}
 
-        {/* Actions */}
         <div className="space-y-3">
           {!isMinting && !mintAddress && !error && (
             <motion.button
@@ -292,7 +272,9 @@ const NFTMintingModal: React.FC<NFTMintingModalProps> = ({
               whileTap={{ scale: 0.98 }}
               onClick={handleMintNFT}
               disabled={isMinting || !publicKey}
-              className={`w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 bg-gradient-to-r ${personaStyle.bgGradient || 'from-blue-400 to-cyan-500'} text-white disabled:opacity-50 disabled:cursor-not-allowed`}
+              className={`w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 bg-gradient-to-r ${
+                personaStyle.bgGradient || 'from-blue-400 to-cyan-500'
+              } text-white disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               <Award size={16} />
               <span>Mint Proof-of-Skill™ NFT</span>
@@ -304,7 +286,7 @@ const NFTMintingModal: React.FC<NFTMintingModalProps> = ({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => {
-                window.open(`https://explorer.solana.com/address/${mintAddress}?cluster=testnet`, '_blank')
+                window.open(`https://explorer.solana.com/address/${mintAddress}?cluster=devnet`, '_blank');
               }}
               className="w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white"
             >
@@ -323,17 +305,14 @@ const NFTMintingModal: React.FC<NFTMintingModalProps> = ({
           </motion.button>
         </div>
 
-        {/* Wallet Connection Warning */}
         {!publicKey && (
           <div className="mt-4 p-3 bg-yellow-500/20 border border-yellow-500/30 rounded-lg">
-            <p className="text-sm text-yellow-400">
-              Connect your Solana wallet to mint this Proof-of-Skill™ NFT
-            </p>
+            <p className="text-sm text-yellow-400">Connect your Solana wallet to mint this Proof-of-Skill™ NFT</p>
           </div>
         )}
       </motion.div>
     </motion.div>
-  )
-}
+  );
+};
 
-export default NFTMintingModal
+export default NFTMintingModal;

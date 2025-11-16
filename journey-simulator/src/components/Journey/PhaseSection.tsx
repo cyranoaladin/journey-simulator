@@ -1,4 +1,4 @@
-import React from 'react';
+import type { FC } from 'react';
 import { motion } from 'framer-motion';
 import { JourneyPhase } from '../../types/journey';
 import {
@@ -19,7 +19,7 @@ import {
   DollarSign,
   Loader2,
   Shield,
-  Hammer
+  Hammer,
 } from 'lucide-react';
 import { getProofType } from '../../data/proofsData';
 import { useJourneyStore } from '../../store/journeyStore';
@@ -36,7 +36,7 @@ interface PhaseSectionProps {
   isProcessing?: boolean;
 }
 
-const PhaseSection: React.FC<PhaseSectionProps> = ({
+const PhaseSection: FC<PhaseSectionProps> = ({
   phase,
   isCompleted,
   isCurrent,
@@ -45,23 +45,27 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
   onMintNFT,
   onStake,
   onVote,
-  isProcessing = false
+  isProcessing = false,
 }) => {
   const { selectedPersona } = useJourneyStore();
 
   const highlightText = (text: string) =>
     text.replace(
       /("([^"]+)")|(\*([^*]+)\*)/g,
-      (match, _p1, p2, _p3, p4) => {
-        if (p2) return `<span class="text-accent-cyan">"${p2}"</span>`;
-        if (p4) return `<span class="font-semibold text-accent-gold">${p4}</span>`;
+      (match, _p1, highlighted, _p3, emphasized) => {
+        if (highlighted) return `<span class="text-accent-cyan">"${highlighted}"</span>`;
+        if (emphasized) return `<span class="font-semibold text-accent-gold">${emphasized}</span>`;
         return match;
       }
     );
 
   const getButtonState = () => {
     if (isProcessing) {
-      return { text: 'Processing...', disabled: true, icon: <Loader2 size={16} className="animate-spin" /> };
+      return {
+        text: 'Processing...',
+        disabled: true,
+        icon: <Loader2 size={16} className="animate-spin" />,
+      };
     }
     if (isLocked) return { text: 'Locked', disabled: true, icon: <Lock size={16} /> };
     if (isCompleted) return { text: 'Completed', disabled: true, icon: <CheckCircle size={16} /> };
@@ -79,6 +83,11 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
     } catch (error) {
       console.error('Phase completion handler failed:', error);
     }
+  };
+
+  const getProofTypeForPhase = () => {
+    if (!selectedPersona) return 'Skill';
+    return getProofType(selectedPersona.id, phase.id);
   };
 
   const getPhaseIcon = () => {
@@ -112,11 +121,6 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
     }
   };
 
-  const getProofTypeForPhase = () => {
-    if (!selectedPersona) return 'Skill';
-    return getProofType(selectedPersona.id, phase.id);
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -126,10 +130,10 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
         isCompleted
           ? 'border-green-500 bg-green-500/10'
           : isCurrent
-            ? 'border-primary-500 bg-primary-500/10'
-            : isLocked
-              ? 'border-gray-600 bg-gray-600/10'
-              : 'border-gray-500 bg-gray-500/10'
+          ? 'border-primary-500 bg-primary-500/10'
+          : isLocked
+          ? 'border-gray-600 bg-gray-600/10'
+          : 'border-gray-500 bg-gray-500/10'
       }`}
     >
       <div className="flex items-center justify-between mb-4">
@@ -149,13 +153,19 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
 
         <div className="flex space-x-2">
           {phase.isIncubation && (
-            <span className="px-2 py-1 bg-purple-500/20 text-purple-400 text-xs rounded-full">Incubation</span>
+            <span className="px-2 py-1 bg-purple-500/20 text-purple-400 text-xs rounded-full">
+              Incubation
+            </span>
           )}
           {phase.isLaunchpad && (
-            <span className="px-2 py-1 bg-gold-500/20 text-gold-400 text-xs rounded-full">Launchpad</span>
+            <span className="px-2 py-1 bg-gold-500/20 text-gold-400 text-xs rounded-full">
+              Launchpad
+            </span>
           )}
           {phase.daoVoteRequired && (
-            <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full">DAO Vote</span>
+            <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full">
+              DAO Vote
+            </span>
           )}
         </div>
       </div>
@@ -164,7 +174,10 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
 
       <div className="bg-white/5 rounded-lg p-3 mb-4">
         <h4 className="font-semibold text-sm mb-2">Mission</h4>
-        <p className="text-sm" dangerouslySetInnerHTML={{ __html: highlightText(phase.mission) }}></p>
+        <p
+          className="text-sm"
+          dangerouslySetInnerHTML={{ __html: highlightText(phase.mission) }}
+        />
       </div>
 
       {phase.modules && phase.modules.length > 0 && (
@@ -261,7 +274,10 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
           </div>
           <div>
             <h4 className="font-semibold text-xs mb-1">Zyno says:</h4>
-            <p className="text-xs italic opacity-90" dangerouslySetInnerHTML={{ __html: highlightText(phase.zynoTip) }}></p>
+            <p
+              className="text-xs italic opacity-90"
+              dangerouslySetInnerHTML={{ __html: highlightText(phase.zynoTip) }}
+            />
           </div>
         </div>
       </div>
@@ -272,7 +288,9 @@ const PhaseSection: React.FC<PhaseSectionProps> = ({
         onClick={handlePhaseCompletion}
         disabled={buttonState.disabled}
         className={`w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 ${
-          buttonState.disabled ? 'bg-gray-600 text-gray-400 cursor-not-allowed' : 'bg-gradient-primary text-white hover:shadow-lg'
+          buttonState.disabled
+            ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+            : 'bg-gradient-primary text-white hover:shadow-lg'
         }`}
       >
         {buttonState.icon}

@@ -1,8 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { Persona, UserProgress, TestnetFeatures } from '../types/journey'
-import { personas } from '../data/personas'
-import { api } from '../utils/api'
+import { mintProofOfSkill } from '../utils/blockchain'
 
 interface JourneyState {
   selectedPersona: Persona | null
@@ -21,7 +20,7 @@ interface JourneyState {
   updateVotingPower: (newPower: number) => void
   updateWalletConnection: (connected: boolean, address?: string) => void
   claimTestnetAirdrop: () => void
-  mintNFT: (nftName: string) => Promise<string>
+  mintNFT: (nftName: string, wallet: any) => Promise<{ mintAddress: string; signature: string }>
   shareJourney: (platform: string) => void
   resetProgress: () => Promise<void>
   downloadNFT: (nftName: string) => Promise<boolean>
@@ -33,6 +32,7 @@ interface JourneyState {
 const initialUserProgress: UserProgress = {
   totalXP: 0,
   nfts: [],
+  nftMints: [],
   passLevel: 'Free',
   mfaiTokens: 0,
   stakedMfai: 0,
@@ -44,6 +44,8 @@ const initialUserProgress: UserProgress = {
   daoProposals: 0,
   testnetAirdropClaimed: false,
   socialShareCount: 0,
+  lastSharedPlatform: undefined,
+  shareHistory: [],
 }
 
 const initialTestnetFeatures: TestnetFeatures = {
@@ -200,9 +202,7 @@ export const useJourneyStore = create<JourneyState>()(
         userProgress: {
           ...state.userProgress,
           walletConnected: connected,
-          walletAddress: address,
-          // If wallet is connected and user has no tokens, give them some initial tokens
-          mfaiTokens: connected && state.userProgress.mfaiTokens === 0 ? 10 : state.userProgress.mfaiTokens,
+          walletAddress: connected ? address : undefined,
         }
       })),
 
@@ -214,27 +214,46 @@ export const useJourneyStore = create<JourneyState>()(
         }
       })),
 
-      mintNFT: async (nftName: string) => {
-        // Simulate NFT minting with delay
-        await new Promise(resolve => setTimeout(resolve, 2000))
-        
-        // Generate mock mint address
-        const mintAddress = `${Math.random().toString(36).substr(2, 8)}${Math.random().toString(36).substr(2, 8)}`
-        
+      mintNFT: async (nftName: string, wallet: any) => {
+        const metadata = {
+          name: nftName,
+          description: `Proof-of-Skill NFT for ${nftName}`,
+          image: 'https://placehold.co/600x400.png',
+          attributes: [
+            { trait_type: 'App', value: 'Money Factory AI' },
+            { trait_type: 'Type', value: 'Proof-of-Skill' },
+          ],
+        };
+
+        const result = await mintProofOfSkill(wallet, metadata);
+
+        if (!result.success || !result.mintAddress || !result.signature) {
+          throw new Error(result.error || 'Mint failed');
+        }
+
         set((state) => ({
           userProgress: {
             ...state.userProgress,
             nfts: [...state.userProgress.nfts, nftName],
-          }
-        }))
-        
-        return mintAddress
+            nftMints: [
+              ...(state.userProgress.nftMints || []),
+              { name: nftName, address: result.mintAddress!, signature: result.signature! },
+            ],
+          },
+        }));
+
+        return { mintAddress: result.mintAddress, signature: result.signature };
       },
 
       shareJourney: (_platform: string) => set((state) => ({
         userProgress: {
           ...state.userProgress,
           socialShareCount: (state.userProgress.socialShareCount || 0) + 1,
+          lastSharedPlatform: platform,
+          shareHistory: [
+            { platform, timestamp: new Date().toISOString() },
+            ...(state.userProgress.shareHistory || []),
+          ].slice(0, 10),
         }
       })),
 
@@ -269,15 +288,16 @@ export const useJourneyStore = create<JourneyState>()(
         }
       },
       
-      downloadNFT: async (_nftName: string) => {
-        // Simulate download process
+      downloadNFT: async (nftName: string) => {
+        // Simulate download process and log the requested NFT name for analytics
         await new Promise(resolve => setTimeout(resolve, 1000))
+        console.info(`Simulated download for NFT: ${nftName}`)
         return true
       },
       
       viewNFTOnExplorer: (tokenId: string) => {
         // Generate explorer URL
-        const explorerUrl = `https://explorer.solana.com/address/${tokenId}?cluster=testnet`
+        const explorerUrl = `https://explorer.solana.com/address/${tokenId}?cluster=devnet`
         return explorerUrl
       },
       
@@ -381,7 +401,11 @@ export const useJourneyStore = create<JourneyState>()(
     {
       name: 'mfai-journey-storage',
       partialize: (state) => ({
-        userProgress: state.userProgress,
+        userProgress: {
+          ...state.userProgress,
+          walletConnected: false,
+          walletAddress: undefined,
+        },
         selectedPersona: state.selectedPersona,
       }),
     }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState, type FC } from 'react'
 import { motion } from 'framer-motion'
 import { X, Vote, TrendingUp, CheckCircle, XCircle, Clock } from 'lucide-react'
 import { JourneyPhase } from '../types/journey'
@@ -11,7 +11,7 @@ interface DAOVoteModalProps {
   onVote?: (vote: 'approve' | 'reject') => void
 }
 
-const DAOVoteModal: React.FC<DAOVoteModalProps> = ({
+const DAOVoteModal: FC<DAOVoteModalProps> = ({
   onClose,
   phase,
   votingPower,

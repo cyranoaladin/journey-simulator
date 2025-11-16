@@ -8,8 +8,8 @@ interface SkillchainCardProps {
   className?: string
 }
 
-const SkillchainCard: React.FC<SkillchainCardProps> = ({ 
-  className = ''
+const SkillchainCard: React.FC<SkillchainCardProps> = ({
+  className = '',
 }) => {
   const { userProgress, selectedPersona } = useJourneyStore()
   const { publicKey, connected, connecting } = useWallet()
@@ -166,7 +166,7 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
   // Open Solana explorer
   const openExplorer = () => {
     if (publicKey) {
-      window.open(`https://explorer.solana.com/address/${publicKey.toString()}?cluster=testnet`, '_blank')
+      window.open(`https://explorer.solana.com/address/${publicKey.toString()}?cluster=devnet`, '_blank')
     }
   }
 

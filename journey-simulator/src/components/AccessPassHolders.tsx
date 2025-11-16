@@ -18,14 +18,14 @@ const AccessPassHolders: React.FC = () => {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       // Try to fetch holders from backend (simulated for now)
       console.log('Fetching access pass holders from backend...');
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       // For now, use local data
       setHoldersData(holders);
-      
+
       setLastUpdated(new Date());
     } catch (err) {
       console.error('Failed to load holders data:', err);
@@ -39,7 +39,7 @@ const AccessPassHolders: React.FC = () => {
   // Auto-refresh holders data every 5 minutes
   useEffect(() => {
     loadHoldersData();
-    
+
     const interval = setInterval(loadHoldersData, 5 * 60 * 1000); // 5 minutes
     return () => clearInterval(interval);
   }, []);
@@ -63,7 +63,7 @@ const AccessPassHolders: React.FC = () => {
     if (holder) {
       // Track interaction
       trackHolderInteraction(holderId, 'modal_open');
-      
+
       openModal({
         type: 'holder',
         holder
@@ -92,7 +92,7 @@ const AccessPassHolders: React.FC = () => {
                 Meet the pioneers who transformed their skills into digital sovereignty through the <span className="font-semibold text-accent-cyan">Cognitive Activation Protocol™</span>
               </p>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               {lastUpdated && (
                 <span className="text-sm opacity-60">
@@ -106,9 +106,9 @@ const AccessPassHolders: React.FC = () => {
                 disabled={isLoading}
                 className="flex items-center space-x-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all disabled:opacity-50"
               >
-                <RefreshCw 
-                  size={16} 
-                  className={isLoading ? 'animate-spin' : ''} 
+                <RefreshCw
+                  size={16}
+                  className={isLoading ? 'animate-spin' : ''}
                 />
                 <span className="text-sm">Refresh</span>
               </motion.button>
@@ -148,7 +148,7 @@ const AccessPassHolders: React.FC = () => {
                 <div className="absolute top-2 right-2 text-xs font-bold bg-black/30 text-white px-2 py-1 rounded-full">
                   {holder.passLevel} Pass Holder
                 </div>
-                
+
                 <div className={`builders-circle-avatar ${
                   holder.passLevel === 'Diamond' ? 'bg-gradient-diamond' :
                   holder.passLevel === 'Platinum' ? 'bg-gradient-platinum' :
@@ -156,11 +156,11 @@ const AccessPassHolders: React.FC = () => {
                 }`}>
                   {holder.avatar}
                 </div>
-                
+
                 <h3 className="text-xl font-space font-bold text-white mb-1">{holder.name}</h3>
                 <p className="text-white/90 font-medium">{holder.title}</p>
               </div>
-              
+
               <div className="builders-circle-metrics">
                 <div className="builders-circle-metric">
                   <div className="text-sm opacity-70">Time in ecosystem</div>
@@ -179,13 +179,13 @@ const AccessPassHolders: React.FC = () => {
                   <div className="font-bold">{holder.projects}</div>
                 </div>
               </div>
-              
+
               <div className="builders-circle-testimonial">
                 <p className="text-sm italic">
                   "{holder.testimonial.substring(0, 120)}..."
                 </p>
               </div>
-              
+
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -193,16 +193,16 @@ const AccessPassHolders: React.FC = () => {
               >
                 <span>View Success Story</span>
               </motion.button>
-              
+
               {/* Flip hint */}
               <div className="absolute bottom-2 right-2 text-xs text-white/40">
                 Tap to flip
               </div>
-              
+
               {/* Hover Card - Additional Details */}
               <AnimatePresence>
                 {hoveredHolder === holder.id && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 20 }}
@@ -222,7 +222,7 @@ const AccessPassHolders: React.FC = () => {
                           <p className="text-white/80">{holder.title}</p>
                         </div>
                       </div>
-                      
+
                       <h4 className="font-semibold text-white mb-2">Key Achievements</h4>
                       <div className="space-y-2 mb-4">
                         <div className="flex items-center space-x-2 text-sm text-white/90">
@@ -239,7 +239,7 @@ const AccessPassHolders: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div>
                       <motion.button
                         whileHover={{ scale: 1.05 }}

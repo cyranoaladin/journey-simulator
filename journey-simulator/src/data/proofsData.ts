@@ -157,5 +157,5 @@ export const getNFTMetadata = (
 
 // Get explorer URL for NFT
 export const getExplorerUrl = (mintAddress: string) => {
-  return `https://explorer.solana.com/address/${mintAddress}?cluster=testnet`;
+  return `https://explorer.solana.com/address/${mintAddress}?cluster=devnet`;
 };
