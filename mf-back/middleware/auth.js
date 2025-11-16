@@ -2,9 +2,11 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const User = require('../models/user');
 
-dotenv.config();
+dotenv.config({
+  quiet: true
+});
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET || (process.env.NODE_ENV === 'test' ? 'test-secret' : null);
 
 if (!JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable is not defined');

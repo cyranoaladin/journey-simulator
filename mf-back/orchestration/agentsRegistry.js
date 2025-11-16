@@ -1,0 +1,20 @@
+module.exports = {
+  GuideAgent: require('../agents/GuideAgent'),
+  CoachAgent: require('../agents/CoachAgent'),
+  PitchAgent: require('../agents/PitchAgent'),
+  Web3LegalAgent: require('../agents/Web3LegalAgent'),
+  NFTAgent: require('../agents/NFTAgent'),
+  TokenAgent: require('../agents/TokenAgent'),
+  LaunchpadAgent: require('../agents/LaunchpadAgent'),
+  BuilderAgent: require('../agents/BuilderAgent'),
+  DAOAgent: require('../agents/DAOAgent'),
+  AuditAgent: require('../agents/AuditAgent'),
+  ProductAgent: require('../agents/ProductAgent'),
+  DevAgent: require('../agents/DevAgent'),
+  InvestorAgent: require('../agents/InvestorAgent'),
+  OnboardingAgent: require('../agents/OnboardingAgent'),
+  GrowthAgent: require('../agents/GrowthAgent'),
+  CommunityAgent: require('../agents/CommunityAgent'),
+  ReflectionAgent: require('../agents/ReflectionAgent')
+};
+

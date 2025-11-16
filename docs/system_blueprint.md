@@ -4,7 +4,7 @@ Last updated: 13 November 2025
 
 ## 1. Vision and Product Narrative
 
-Money Factory AI (MFAI) is a Web3 journey simulator that brings the **Cognitive Activation Protocol (TM)** to life. The goal is to transform human expertise into on-chain value through gamified missions, Proof-of-Skill (TM) NFTs, and the $MFAI token economy.
+Money Factory AI (MFAI) is a Web3 journey simulator that brings the **Cognitive Activation Protocol™** to life. The goal is to transform human expertise into on-chain value through gamified missions, Proof-of-Skill™ NFTs, and the $MFAI token economy.
 
 The platform combines:
 
@@ -22,7 +22,7 @@ Six strategic personas define specialised learning paths: Cognitive Activation H
 |--------|-------------|----------------|--------------|
 | **Onboarding** | Account creation, wallet connection, persona selection | End user, auth backend | Session tokens, active persona |
 | **Progression** | Phase-by-phase advancement with XP, NFTs, and $MFAI rewards | End user, journey store, API | Accumulated XP, NFTs, tokens |
-| **Certification** | Proof-of-* (TM) NFT issuance | End user, `NFTProofModal` | Virtual NFT, mint tutorial |
+| **Certification** | Proof-of-*™ NFT issuance | End user, `NFTProofModal` | Virtual NFT, mint tutorial |
 | **Tokenomics** | Airdrop simulations, staking, DAO voting | End user, `StakingModal`, `DAOVoteModal` | Staked tokens, recorded votes |
 | **Analytics** | Interaction tracking, downloads, sharing events | Analytics controller | Dashboards, logs |
 | **AI Support** | Contextual guidance via ZynoBox | End user, ZynoBox | Prompts, tailored tutorials |
@@ -234,27 +234,17 @@ mf-back/
 
 ### 6.5 Backend workflows
 
-1. **Registration**
-   - POST `/user/register` hashes the password, stores the persona, and returns `accessToken` plus `refreshToken`.
-   - The frontend persists tokens in local storage.
+1. **Registration**: POST `/user/register` hashes the password, stores the persona, and returns `accessToken` plus `refreshToken`. The frontend persists tokens in local storage.
 
-2. **Login**
-   - POST `/user/login` validates credentials and returns tokens alongside the active persona.
+2. **Login**: POST `/user/login` validates credentials and returns tokens alongside the active persona.
 
-3. **Progress load**
-   - GET `/journey/user-progress` (protected) hydrates the Zustand store with XP, NFTs, tokens, and completed phases.
+3. **Progress load**: GET `/journey/user-progress` (protected) hydrates the Zustand store with XP, NFTs, tokens, and completed phases.
 
-4. **Phase completion**
-   - The client calls `completePhase` (Zustand) then POST `/journey/complete-phase` with `phase_number`, `score`, and `nft_address`.
-   - The backend appends to `completed_phases` and `nft_certificates`.
-   - The frontend follows with PUT `/journey/user-progress` and PUT `/user/tokens` to synchronise XP and token balances.
+4. **Phase completion**: The client calls `completePhase` (Zustand) then POST `/journey/complete-phase` with `phase_number`, `score`, and `nft_address`. The backend appends to `completed_phases` and `nft_certificates`, and the frontend follows with PUT `/journey/user-progress` plus PUT `/user/tokens` to synchronise XP and token balances.
 
-5. **Progress reset**
-   - POST `/journey/reset-progress` wipes XP, tokens, and completed phases server-side.
-   - Zustand clears the local cache afterwards.
+5. **Progress reset**: POST `/journey/reset-progress` wipes XP, tokens, and completed phases server-side, and Zustand clears the local cache afterwards.
 
-6. **Analytics**
-   - `/analytics/certification-download`, `/analytics/certification-share`, `/analytics/holder-interaction`, and `/analytics/platform-stats` populate reporting dashboards.
+6. **Analytics**: `/analytics/certification-download`, `/analytics/certification-share`, `/analytics/holder-interaction`, and `/analytics/platform-stats` populate reporting dashboards.
 
 ---
 
@@ -271,13 +261,7 @@ mf-back/
 
 1. `PhaseSection` shows mission details and rewards.
 2. The `Start Phase` button triggers `handlePhaseComplete` in `JourneysPage`.
-3. The following actions run in sequence:
-   - `completePhase` (Zustand) posts to `/journey/complete-phase`.
-   - `updateProgress` updates XP, tokens, and NFTs via `/journey/user-progress` and `/user/tokens`.
-   - `setCurrentPhaseIndex` prepares the right modal.
-   - `NFTProofModal` appears when `nftReward` is present.
-   - `StakingModal` opens when `stakingRequired` thresholds are met.
-   - `DAOVoteModal` opens when `daoVoteRequired` is true.
+3. The following actions run in sequence: `completePhase` (Zustand) posts to `/journey/complete-phase`; `updateProgress` updates XP, tokens, and NFTs via `/journey/user-progress` and `/user/tokens`; `setCurrentPhaseIndex` prepares the right modal; `NFTProofModal` appears when `nftReward` is present; `StakingModal` opens when `stakingRequired` thresholds are met; `DAOVoteModal` opens when `daoVoteRequired` is true.
 4. Success feedback surfaces in the top-of-page toast banner.
 
 ### 7.3 Staking $MFAI
@@ -402,7 +386,7 @@ export interface UserProgress {
 
 ### 10.1 Home and onboarding
 
-- **HeroSection** launches the demo and highlights the Cognitive Activation Protocol (TM).
+- **HeroSection** launches the demo and highlights the Cognitive Activation Protocol™.
 - **SkillchainBanner** delivers the Proof Economy and Synaptic DAO value proposition.
 - **AccessPassHolders** showcases success stories across Gold, Platinum, and Diamond tiers.
 
@@ -424,7 +408,7 @@ export interface UserProgress {
 
 ### 11.1 Governance
 
-- `Proof-of-Skill (TM)` NFTs are prerequisites for voting.
+- `Proof-of-Skill™` NFTs are prerequisites for voting.
 - `daoVoteRequired` appears in specific phases (for example, Capital Foundry launch and scale deck).
 - Future work: Synaptic Governance smart contracts to back DAO operations.
 
@@ -457,7 +441,7 @@ export interface UserProgress {
 
 - `docs/cahier_charges.md` collects high-level requirements.
 - `docs/project_documentation.md` covers the narrative documentation.
-- `docs/protocol_paper_en.md` is the Cognitive Activation Protocol (TM) whitepaper.
+- `docs/protocol_paper_en.md` is the Cognitive Activation Protocol™ whitepaper.
 - `docs/blockchain_integration_plan.md` outlines the Web3 roadmap.
 
 ### 13.2 Useful commands

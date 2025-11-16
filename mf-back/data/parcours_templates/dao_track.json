@@ -1,0 +1,12 @@
+{
+  "name": "DAO Track",
+  "steps": [
+    "onboarding",
+    "guide",
+    "dao_legal",
+    "governance_setup",
+    "token_design",
+    "vote_simulation",
+    "launch"
+  ]
+}

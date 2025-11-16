@@ -1,0 +1,4 @@
+#!/usr/bin/env node
+
+// Delegate to the canonical backend server entrypoint.
+require('../../../mf-back/bin/www');

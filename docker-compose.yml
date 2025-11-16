@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: ./mf-back
+      dockerfile: Dockerfile
+      args:
+        INSTALL_DEV: "true"
+    command: npm run dev
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      MONGO_URI: mongodb://mongo:27017/journey
+      ADMIN_API_KEY: change-me
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./mf-back:/usr/src/app
+      - api-node-modules:/usr/src/app/node_modules
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  mongo:
+    image: mongo:6
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  mongo-data:
+  api-node-modules:

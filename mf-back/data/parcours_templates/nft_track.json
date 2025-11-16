@@ -1,0 +1,11 @@
+{
+  "track": "NFT",
+  "phases": [
+    { "phase": "Guide", "agent": "GuideAgent" },
+    { "phase": "Coach", "agent": "CoachAgent" },
+    { "phase": "NFT Design", "agent": "NFTAgent" },
+    { "phase": "Legal Review", "agent": "Web3LegalAgent" },
+    { "phase": "Community", "agent": "CommunityAgent" },
+    { "phase": "Launch", "agent": "LaunchpadAgent" }
+  ]
+}

@@ -1,8 +1,0 @@
-node_modules/
-.DS_Store
-.env
-dist/
-web/cache/
-npm-debug.log*
-yarn-error.log*
-pnpm-debug.log*
