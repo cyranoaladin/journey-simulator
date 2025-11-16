@@ -33,7 +33,7 @@ const JourneysPreview = () => {
 
   return (
     <section id="personas" className="relative py-20">
-      <div className="container mx-auto px-4 space-y-16">
+      <div className="mx-auto w-full px-0 space-y-16 sm:px-2 lg:px-4 xl:px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -59,7 +59,7 @@ const JourneysPreview = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="grid md:grid-cols-2 gap-6"
+          className="grid gap-6 md:grid-cols-2"
         >
           {supportHighlights.map((highlight) => (
             <div key={highlight.title} className="glass-effect rounded-2xl p-6 text-left">
@@ -97,7 +97,7 @@ const JourneysPreview = () => {
             </motion.button>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid gap-6">
             {personas.map((persona) => (
               <JourneyCard
                 key={persona.id}

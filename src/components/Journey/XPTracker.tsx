@@ -64,6 +64,10 @@ const XPTracker: React.FC<XPTrackerProps> = ({
     userProgress.passLevel === 'Platinum' ? 1.3 :
     userProgress.passLevel === 'Gold' ? 1.2 : 1;
 
+  const rewardProgress = nextRewardAt > 0
+    ? Math.min((currentXP / nextRewardAt) * 100, 100)
+    : 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -165,14 +169,15 @@ const XPTracker: React.FC<XPTrackerProps> = ({
             <span>Next reward at:</span>
             <span>{nextRewardAt} XP</span>
           </div>
-          <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-accent-gold rounded-full" 
-              style={{ width: `${Math.min((currentXP / nextRewardAt) * 100, 100)}%` }}
-            />
-          </div>
+          <progress
+            className="mfai-progress mfai-progress-accent"
+            max={100}
+            value={rewardProgress}
+            aria-label="Progress toward next reward"
+            aria-valuetext={`${Math.max(nextRewardAt - currentXP, 0)} XP needed`}
+          />
           <p className="text-xs mt-2 opacity-60 text-center">
-            {nextRewardAt - currentXP} XP needed for next reward
+            {Math.max(nextRewardAt - currentXP, 0)} XP needed for next reward
           </p>
         </div>
       )}

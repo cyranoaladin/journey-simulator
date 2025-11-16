@@ -31,7 +31,7 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
   // Get persona-specific card styling
   const getPersonaGradient = () => {
     if (!selectedPersona) return 'bg-gradient-diamond'
-    
+
     switch (selectedPersona.id) {
       case 'cognitive-activation-hub':
         return 'bg-gradient-to-br from-sky-500 to-cyan-400'
@@ -108,6 +108,46 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
     if (xp >= 500) return 'Platinum';
     return 'Gold';
   };
+
+  const personaMissions = selectedPersona
+    ? selectedPersona.phases.map((phase, index) => {
+        const isCompleted = userProgress.completedPhases.includes(index)
+        const isCurrent = !isCompleted && index === userProgress.completedPhases.length
+        const status = isCompleted ? 'completed' : isCurrent ? 'active' : 'locked'
+
+        return {
+          index,
+          title: phase.title,
+          mission: phase.mission,
+          xpReward: phase.xpReward,
+          nftReward: phase.nftReward,
+          status,
+        }
+      })
+    : []
+
+  const getMissionStatusStyles = (status: 'completed' | 'active' | 'locked') => {
+    switch (status) {
+      case 'completed':
+        return 'text-green-300 bg-green-500/20 border-green-500/30'
+      case 'active':
+        return 'text-yellow-200 bg-yellow-400/20 border-yellow-400/30'
+      default:
+        return 'text-white/50 bg-white/10 border-white/10'
+    }
+  }
+
+  const renderMissionStatusIcon = (status: 'completed' | 'active' | 'locked') => {
+    if (status === 'completed') {
+      return <CheckCircle size={12} className="mr-1" />
+    }
+
+    if (status === 'active') {
+      return <Unlock size={12} className="mr-1" />
+    }
+
+    return <Lock size={12} className="mr-1" />
+  }
 
   // Format wallet address
   const formatAddress = (address: string) => {
@@ -187,16 +227,18 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
   };
 
   return (
-    <div className={`perspective fixed-card-container ${className}`}>
+    <div className={`relative ${className}`}>
       <motion.div
-        className="relative w-full h-full preserve-3d cursor-pointer"
+        className="relative w-full preserve-3d cursor-pointer"
         animate={{ rotateY: isFlipped ? 180 : 0 }}
         transition={{ duration: 0.6, type: 'spring', damping: 20 }}
         onClick={() => setIsFlipped(!isFlipped)}
+        style={{ transformStyle: 'preserve-3d' }}
       >
         {/* Front of Card */}
         <div 
-          className={`w-full h-full ${getPersonaGradient()} rounded-2xl p-6 shadow-2xl border border-white/20 relative overflow-hidden absolute backface-hidden`}
+          className={`relative w-full ${getPersonaGradient()} rounded-2xl p-6 shadow-2xl border border-white/20 overflow-hidden backface-hidden`}
+          style={{ minHeight: '360px', transform: 'rotateY(0deg)', transformStyle: 'preserve-3d' }}
         >
           {/* Holographic effect */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 animate-pulse" />
@@ -301,83 +343,109 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
 
         {/* Back of Card */}
         <div 
-          className={`w-full h-full ${getPersonaGradient()} rounded-2xl p-6 shadow-2xl border border-white/20 relative overflow-hidden absolute backface-hidden rotate-y-180`}
+          className={`absolute inset-0 w-full ${getPersonaGradient()} rounded-2xl p-6 shadow-2xl border border-white/20 overflow-hidden backface-hidden`}
+          style={{ minHeight: '360px', transform: 'rotateY(180deg)', transformStyle: 'preserve-3d' }}
         >
           {/* Holographic effect */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 animate-pulse" />
           
-          <div className="relative z-10">
-            <h3 className="font-space font-bold text-white text-lg mb-4">Proof Certifications</h3>
-            
-            {/* NFT Certifications */}
-            <div className="space-y-2 mb-4">
-              {userProgress.nfts.length > 0 ? (
-                userProgress.nfts.map((nft, index) => (
-                  <div key={index} className="bg-black/20 rounded-lg p-2 flex items-center">
-                    <Award className="text-yellow-400 mr-2" size={16} />
-                    <span className="text-sm text-white">{nft}</span>
-                  </div>
-                ))
-              ) : (
-                <div className="text-sm text-white/60 text-center py-2">
-                  No certifications yet
-                </div>
-              )}
-            </div>
-            
-            {/* Completed Phases */}
-            {selectedPersona && userProgress.completedPhases.length > 0 && (
-              <div className="mb-4">
-                <h4 className="text-sm font-semibold text-white/90 mb-2">Completed Phases</h4>
-                <div className="space-y-1">
-                  {userProgress.completedPhases.map((phaseIndex) => (
-                    <div key={phaseIndex} className="text-xs text-white/80 flex items-center">
-                      <CheckCircle size={12} className="mr-1 text-green-400" />
-                      <span>{selectedPersona.phases[phaseIndex].title}: {selectedPersona.phases[phaseIndex].xpReward} XP</span>
+          <div className="relative z-10 flex h-full flex-col">
+            <h3 className="font-space font-bold text-white text-lg mb-3">Mission Briefing</h3>
+
+            <div className="flex-1 overflow-hidden">
+              {personaMissions.length > 0 ? (
+                <div className="space-y-2 h-full overflow-y-auto pr-1">
+                  {personaMissions.map((mission) => (
+                    <div
+                      key={mission.index}
+                      className="rounded-xl border border-white/10 bg-black/25 p-3"
+                    >
+                      <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-white/60">
+                        <span>Phase {mission.index + 1}</span>
+                        <span
+                          className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold ${getMissionStatusStyles(mission.status)}`}
+                        >
+                          {renderMissionStatusIcon(mission.status)}
+                          {mission.status === 'completed'
+                            ? 'Completed'
+                            : mission.status === 'active'
+                              ? 'In Progress'
+                              : 'Locked'}
+                        </span>
+                      </div>
+                      <div className="mt-2 text-sm font-semibold text-white">
+                        {mission.title}
+                      </div>
+                      <p className="mt-1 text-xs text-white/70 line-clamp-2">
+                        {mission.mission}
+                      </p>
+                      <div className="mt-2 flex items-center justify-between text-[11px] text-white/60">
+                        <span>{mission.xpReward} XP</span>
+                        {mission.nftReward && (
+                          <span className="inline-flex items-center gap-1">
+                            <Award size={12} className="text-yellow-300" />
+                            {mission.nftReward}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
-            
-            {/* QR Code */}
-            {publicKey && (
-              <div className="flex justify-center mb-3">
-                <div className="bg-white p-2 rounded-lg">
-                  <img 
-                    src={getQrCodeUrl()} 
-                    alt="Wallet QR Code" 
-                    className="w-24 h-24"
-                  />
+              ) : (
+                <div className="flex h-full items-center justify-center rounded-xl border border-dashed border-white/15 bg-white/5 text-center text-sm text-white/60">
+                  Select a persona to reveal mission steps
                 </div>
-              </div>
-            )}
-            
-            {/* Solana Explorer Link */}
-            {publicKey && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  openExplorer()
-                }}
-                className="w-full py-2 px-3 bg-black/40 hover:bg-black/60 text-white rounded-lg text-xs font-medium flex items-center justify-center space-x-1"
-              >
-                <ExternalLink size={12} />
-                <span>View on Solana Explorer</span>
-              </button>
-            )}
-            
-            {/* Zyno Certification */}
-            <div className="mt-4 text-center">
-              <div className="text-xs text-white/60 italic">
-                "Every proof you mint is a piece of your sovereign capital. This card grows with your skills."
-              </div>
-              <div className="text-xs text-white/40 mt-1">
-                Certified by Zyno AI Co-Founder™
+              )}
+            </div>
+
+            <div className="mt-4">
+              <h4 className="text-sm font-semibold text-white/80 mb-2">Proof Certifications</h4>
+              <div className="space-y-2">
+                {userProgress.nfts.length > 0 ? (
+                  userProgress.nfts.map((nft, index) => (
+                    <div key={index} className="flex items-center rounded-lg border border-white/10 bg-black/20 p-2 text-sm text-white">
+                      <Award className="mr-2 text-yellow-300" size={16} />
+                      <span className="truncate">{nft}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="rounded-lg border border-dashed border-white/15 bg-white/5 py-2 text-center text-sm text-white/60">
+                    No certifications minted yet
+                  </div>
+                )}
               </div>
             </div>
-            
-            {/* Flip hint */}
+
+            {publicKey && (
+              <div className="mt-4 rounded-xl border border-white/15 bg-black/20 p-3">
+                <div className="mb-3 text-xs uppercase tracking-[0.2em] text-white/50">Wallet QR</div>
+                <div className="flex justify-center">
+                  <div className="rounded-lg bg-white p-2">
+                    <img
+                      src={getQrCodeUrl()}
+                      alt="Wallet QR Code"
+                      className="h-24 w-24"
+                    />
+                  </div>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    openExplorer()
+                  }}
+                  className="mt-3 flex w-full items-center justify-center gap-1 rounded-lg bg-black/40 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-black/60"
+                >
+                  <ExternalLink size={12} />
+                  <span>View on Solana Explorer</span>
+                </button>
+              </div>
+            )}
+
+            <div className="mt-3 text-center text-xs italic text-white/60">
+              "Every proof you mint is a piece of your sovereign capital. This card grows with your skills."
+              <div className="mt-1 text-white/40">Certified by Zyno AI Co-Founder™</div>
+            </div>
+
             <div className="absolute bottom-2 right-2 text-xs text-white/40">
               Tap to flip
             </div>

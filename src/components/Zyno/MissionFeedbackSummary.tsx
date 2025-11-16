@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
-import { Download } from 'lucide-react';
+import { Download, PenSquare } from 'lucide-react';
 import { api } from '../../utils/api';
-import { ADMIN_API_STORAGE_KEY } from './ZynoAgentScoreboard';
+import { useAgentScoreboardContext } from './AgentScoreboardContext';
+import { sendToNotion } from '../../utils/sendToNotion';
 
 export type MissionSummary = {
   userId: string;
@@ -21,12 +22,8 @@ type Props = {
 export default function MissionFeedbackSummary({ summary }: Props) {
   const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [adminApiKey, setAdminApiKey] = useState<string>(() => {
-    if (typeof window === 'undefined') {
-      return '';
-    }
-    return window.localStorage.getItem(ADMIN_API_STORAGE_KEY) ?? '';
-  });
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const { apiKey, setApiKey } = useAgentScoreboardContext();
 
   const formattedTimestamp = useMemo(() => {
     if (!summary?.timestamp) {
@@ -44,24 +41,18 @@ export default function MissionFeedbackSummary({ summary }: Props) {
   }
 
   const handleApiKeyChange = (value: string) => {
-    setAdminApiKey(value);
-    if (typeof window !== 'undefined') {
-      if (value) {
-        window.localStorage.setItem(ADMIN_API_STORAGE_KEY, value);
-      } else {
-        window.localStorage.removeItem(ADMIN_API_STORAGE_KEY);
-      }
-    }
+    setApiKey(value);
   };
 
   const exportSummary = async (format: 'pdf' | 'notion') => {
-    if (!adminApiKey) {
+    if (!apiKey) {
       setError('Renseignez la clé API admin (utilisée aussi par le scoreboard).');
       return;
     }
 
     setIsExporting(true);
     setError(null);
+    setSuccessMessage(null);
 
     const payload = {
       title: summary.title || `Mission ${summary.aecoPhase}`,
@@ -75,7 +66,7 @@ export default function MissionFeedbackSummary({ summary }: Props) {
     };
 
     try {
-      const result = await api.exportMissionSummary(payload, format, adminApiKey);
+      const result = await api.exportMissionSummary(payload, format, apiKey);
 
       if (format === 'pdf') {
         const blob = result as Blob;
@@ -94,6 +85,28 @@ export default function MissionFeedbackSummary({ summary }: Props) {
         anchor.download = 'mission-report-notion.md';
         anchor.click();
         URL.revokeObjectURL(url);
+
+        try {
+          await sendToNotion({
+            userId: payload.userId,
+            personaId: payload.aecoPhase,
+            personaTitle: payload.title,
+            summary: summary.generatedText,
+            markdownContent: content,
+            metadata: {
+              agents: summary.agents,
+              aepoScore: summary.aepoScore,
+              aecoPhase: summary.aecoPhase,
+              exportedAt: new Date().toISOString(),
+              actions: summary.actions
+            }
+          });
+          setSuccessMessage('Synthèse envoyée vers Notion.');
+        } catch (notionError) {
+          console.error('Notion webhook failed:', notionError);
+          const notionMessage = notionError instanceof Error ? notionError.message : 'Envoi vers Notion impossible.';
+          setError(notionMessage);
+        }
       }
     } catch (exportError) {
       console.error('Mission export failed:', exportError);
@@ -123,7 +136,7 @@ export default function MissionFeedbackSummary({ summary }: Props) {
             disabled={isExporting || !summary}
             className="inline-flex items-center gap-2 rounded-md border border-indigo-200 px-3 py-1.5 text-sm font-medium text-indigo-600 transition hover:border-indigo-500 hover:text-indigo-700 dark:border-indigo-500/40 dark:text-indigo-300"
           >
-            <Download size={16} />
+            <PenSquare size={16} />
             Notion
           </button>
         </div>
@@ -151,7 +164,7 @@ export default function MissionFeedbackSummary({ summary }: Props) {
         Clé API admin
         <input
           type="password"
-          value={adminApiKey}
+          value={apiKey}
           onChange={(event) => handleApiKeyChange(event.target.value)}
           placeholder="Saisir la clé x-api-key"
           className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-400 dark:border-slate-600 dark:bg-slate-800"
@@ -161,6 +174,12 @@ export default function MissionFeedbackSummary({ summary }: Props) {
       {error && (
         <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">
           {error}
+        </p>
+      )}
+
+      {successMessage && (
+        <p className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-300">
+          {successMessage}
         </p>
       )}
 

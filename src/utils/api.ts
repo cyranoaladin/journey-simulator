@@ -15,6 +15,20 @@ export interface AgentScoreboardResponse {
   users: AgentScoreboardEntry[];
 }
 
+export interface RagDocument {
+  name: string;
+  path: string;
+}
+
+export interface RagDocumentsResponse {
+  documents: RagDocument[];
+}
+
+export interface RagUploadResponse {
+  status: string;
+  details?: Record<string, unknown>;
+}
+
 export interface MissionExportPayload {
   title?: string;
   userId: string;
@@ -419,6 +433,42 @@ export const api = {
         'x-api-key': adminApiKey,
       },
     }, false);
+  },
+
+  listRagDocuments: async (adminApiKey: string): Promise<RagDocumentsResponse> => {
+    return request<RagDocumentsResponse>('/admin/rag/documents', {
+      method: 'GET',
+      headers: {
+        'x-api-key': adminApiKey,
+      },
+    }, false);
+  },
+
+  uploadRagDocument: async (file: File, adminApiKey: string): Promise<RagUploadResponse> => {
+    const formData = new FormData();
+    formData.append('document', file);
+
+    const response = await fetch(`${API_BASE_URL}/admin/rag/upload`, {
+      method: 'POST',
+      headers: {
+        'x-api-key': adminApiKey,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      try {
+        const errorData: ApiError = await response.json();
+        throw new Error(errorData.message || errorData.error || 'Upload failed');
+      } catch (error) {
+        if (error instanceof Error) {
+          throw error;
+        }
+        throw new Error('Upload failed');
+      }
+    }
+
+    return response.json();
   },
 
   exportMissionSummary: async (

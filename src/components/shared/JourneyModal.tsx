@@ -1,13 +1,42 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, CheckCircle, Clock, Trophy, Zap, ExternalLink, ArrowRight, TrendingUp } from 'lucide-react'
-import { useJourneyStore } from '../store/journeyStore'
-import CertificationModal from './CertificationModal'
-import StakingModal from './StakingModal'
-import DAOVoteModal from './DAOVoteModal'
-import SkillchainCard from './SkillchainCard'
+import { useNavigate } from 'react-router-dom'
+import { useJourneyStore } from '../../store/journeyStore'
+import CertificationModal from '../CertificationModal'
+import StakingModal from '../StakingModal'
+import DAOVoteModal from '../DAOVoteModal'
+import SkillchainCard from '../SkillchainCard'
+import { personas } from '../../data/personas'
+import type { AccessPassHolder } from '../../types/journey'
 
 const JourneyModal = () => {
+  const navigate = useNavigate()
   const { isModalOpen, modalContent, closeModal } = useJourneyStore()
+
+  const handleFollowHolderJourney = (holder: AccessPassHolder) => {
+    if (!holder) return
+
+    const recommendedPersona = holder.recommendedPersonaId
+      ? personas.find((persona) => persona.id === holder.recommendedPersonaId)
+      : undefined
+
+    closeModal()
+    navigate('/journeys', {
+      state: {
+        source: 'access-pass-holder',
+        holderId: holder.id,
+        recommendedPersonaId: holder.recommendedPersonaId,
+        recommendedPersonaTitle: recommendedPersona?.title,
+      },
+    })
+  }
+
+  const handleLearnMoreSkillchain = () => {
+    closeModal()
+    navigate('/resources', {
+      state: { focus: 'skillchain-card' },
+    })
+  }
 
   if (!isModalOpen || !modalContent) return null
 
@@ -157,7 +186,7 @@ const JourneyModal = () => {
   }
 
   const renderHolderModal = () => {
-    const { holder } = modalContent
+    const { holder } = modalContent as { holder: AccessPassHolder }
     
     return (
       <div className="max-w-4xl w-full max-h-[90vh] overflow-y-auto">
@@ -274,6 +303,7 @@ const JourneyModal = () => {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
+              onClick={() => handleFollowHolderJourney(holder)}
               className="flex-1 btn-primary flex items-center justify-center space-x-2"
             >
               <ArrowRight size={20} />
@@ -282,6 +312,7 @@ const JourneyModal = () => {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
+              onClick={handleLearnMoreSkillchain}
               className="flex-1 btn-secondary flex items-center justify-center space-x-2"
             >
               <ExternalLink size={20} />

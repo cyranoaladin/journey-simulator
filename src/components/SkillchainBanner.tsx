@@ -53,12 +53,12 @@ const SkillchainBanner = () => {
 
   return (
     <motion.div
+      id="skillchain-banner"
       ref={bannerRef}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ delay: 0.5 }}
-      className="fixed left-0 right-0 z-40 glass-effect border-b border-white/10"
-      style={{ top: `calc(var(--header-height) + ${SKILLCHAIN_TOP_GAP}px)` }}
+      className="fixed left-0 right-0 z-40 glass-effect border-b border-white/10 top-[calc(var(--header-height)+16px)]"
     >
       <div className="container mx-auto px-4 py-2">
         <div className="flex items-center justify-between text-sm">

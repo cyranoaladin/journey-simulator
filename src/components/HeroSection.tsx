@@ -5,10 +5,12 @@ import { ChevronDown, Sparkles, TrendingUp, Users, Award } from 'lucide-react'
 import SkillchainCard from './SkillchainCard'
 import WalletConnectionGuide from './WalletConnectionGuide'
 import { useWallet } from '@solana/wallet-adapter-react'
+import { useNavigate } from 'react-router-dom'
 // import { api } from '../utils/api' // Will be used when backend is ready
 
 const HeroSection = () => {
   const { connected } = useWallet()
+  const navigate = useNavigate()
   const [platformStats, setPlatformStats] = useState({
     totalUsers: 0,
     totalNFTs: 0,
@@ -55,6 +57,10 @@ const HeroSection = () => {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' })
     }
+  }
+
+  const handleUnlockSovereignty = () => {
+    navigate('/journeys')
   }
 
   return (
@@ -112,6 +118,7 @@ const HeroSection = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="btn-secondary flex items-center justify-center space-x-2"
+                onClick={handleUnlockSovereignty}
               >
                 <Sparkles size={20} />
                 <span>Unlock your digital sovereignty</span>
@@ -166,6 +173,17 @@ const HeroSection = () => {
             >
               "You don't pitch. You prove. And your proof becomes capital."
             </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.1, duration: 0.8 }}
+              className="mt-6 flex items-center justify-center gap-3 text-xs uppercase tracking-[0.3em] text-white/70 lg:justify-start"
+            >
+              <span>Powered by</span>
+              <img src="/images/solana.svg" alt="Solana" className="h-6 w-6" />
+              <span>Solana</span>
+            </motion.div>
             
             <motion.div
               initial={{ opacity: 0 }}
@@ -174,8 +192,8 @@ const HeroSection = () => {
               className="mt-8 flex justify-center lg:justify-start"
             >
               <img 
-                src="/images/activation_loop.png" 
-                alt="The Activation Loop™" 
+                src="/images/logo_mfai.png" 
+                alt="Money Factory AI" 
                 className="max-w-full h-auto max-h-[150px] rounded-lg shadow-lg"
               />
             </motion.div>

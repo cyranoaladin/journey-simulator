@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion'
-import { Github, Twitter, MessageCircle, FileText, Users } from 'lucide-react'
+import { motion } from 'framer-motion';
+import { FileText, Github, MessageCircle, Twitter, Users } from 'lucide-react';
 
 const Footer = () => {
   const footerLinks = {
@@ -19,47 +19,48 @@ const Footer = () => {
       { label: 'Litepaper', href: '#', icon: FileText },
       { label: 'Protocol Paper', href: '#', icon: FileText },
       { label: 'FAQ', href: '#', icon: FileText },
-    ]
-  }
+    ],
+  };
 
   return (
-    <footer className="py-20 border-t border-white/10">
+    <footer className="border-t border-white/10 py-20">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* Brand */}
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-                <img src="/images/logo_mfai.png" alt="MFAI Logo" className="w-6 h-6" />
+            <div className="mb-4 flex items-center space-x-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary">
+                <img src="/images/logo_mfai.png" alt="MFAI Logo" className="h-6 w-6" />
               </div>
-              <span className="font-space font-bold text-xl gradient-text">
-                Money Factory AI
-              </span>
+              <span className="font-space text-xl font-bold gradient-text">Money Factory AI</span>
             </div>
-            <p className="text-sm opacity-80 max-w-xs">
+            <p className="max-w-xs text-sm opacity-80">
               Transform your skills into capital in the Proof Economy through the Cognitive Activation Protocol™
             </p>
+            <div className="mt-4 flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-white/60">
+              <span>Powered by</span>
+              <img src="/images/solana.svg" alt="Solana" className="h-5 w-5" />
+              <span>Solana</span>
+            </div>
           </motion.div>
 
-          {/* Journeys */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <h3 className="font-space font-semibold text-lg mb-4">Journeys</h3>
+            <h3 className="mb-4 font-space text-lg font-semibold">Journeys</h3>
             <ul className="space-y-2">
               {footerLinks.journeys.map((link) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="text-sm opacity-80 hover:opacity-100 hover:text-primary-400 transition-colors"
+                    className="text-sm opacity-80 transition-colors hover:text-primary-400 hover:opacity-100"
                   >
                     {link.label}
                   </a>
@@ -68,52 +69,48 @@ const Footer = () => {
             </ul>
           </motion.div>
 
-          {/* Community */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <h3 className="font-space font-semibold text-lg mb-4">Community</h3>
+            <h3 className="mb-4 font-space text-lg font-semibold">Community</h3>
             <ul className="space-y-2">
               {footerLinks.community.map((link) => {
-                const Icon = link.icon
+                const Icon = link.icon;
                 return (
                   <li key={link.label}>
                     <a
                       href={link.href}
-                      className="flex items-center space-x-2 text-sm opacity-80 hover:opacity-100 hover:text-primary-400 transition-colors"
+                      className="flex items-center space-x-2 text-sm opacity-80 transition-colors hover:text-primary-400 hover:opacity-100"
                     >
                       <Icon size={16} />
                       <span>{link.label}</span>
                     </a>
                   </li>
-                )
+                );
               })}
             </ul>
           </motion.div>
         </div>
 
-        {/* Bottom */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.6 }}
           viewport={{ once: true }}
-          className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center"
+          className="mt-12 flex flex-col items-center justify-between border-t border-white/10 pt-8 text-sm opacity-60 md:flex-row"
         >
-          <p className="text-sm opacity-60">
-            © 2024 Money Factory AI. All rights reserved.
-          </p>
-          <div className="flex items-center space-x-4 mt-4 md:mt-0">
+          <p>© 2024 Money Factory AI. All rights reserved.</p>
+          <div className="mt-4 flex items-center space-x-4 md:mt-0">
             {[Twitter, MessageCircle, Github].map((Icon, index) => (
               <motion.a
-                key={index}
+                key={Icon.displayName ?? index}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 href="#"
-                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
               >
                 <Icon size={16} />
               </motion.a>
@@ -122,7 +119,7 @@ const Footer = () => {
         </motion.div>
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

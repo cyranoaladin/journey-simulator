@@ -74,6 +74,7 @@ export interface AccessPassHolder {
     label: string;
     value: string;
   }[];
+  recommendedPersonaId?: string;
 }
 
 export interface Certification {

@@ -1,25 +1,29 @@
 import { useEffect } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { useThemeStore } from './store/themeStore'
 import { WalletContextProvider } from './contexts/WalletContext'
 import { AuthProvider } from './contexts/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
-import HeroSection from './components/HeroSection'
-import JourneysPage from './components/JourneysPage'
 import LoginPage from './components/LoginPage'
 import RegisterPage from './components/RegisterPage'
-import SkillchainBanner from './components/SkillchainBanner'
-import AccessPassHolders from './components/AccessPassHolders'
-import Footer from './components/Footer'
-import JourneyModal from './components/JourneyModal'
-import ZynoAssistant from './components/ZynoAssistant'
-import WalletConnectionBanner from './components/WalletConnectionBanner'
-import BackToTopButton from './components/BackToTopButton'
-import ZynoConsole from './components/Zyno/ZynoConsole'
-import PlaygroundPage from './components/PlaygroundPage'
 import { initParticles } from './utils/particles'
-import AppLayout from './components/AppLayout'
-import JourneysPreview from './components/JourneysPreview'
+import Layout from './components/layout/Layout'
+import Dashboard from './pages/Dashboard'
+import Journey from './pages/Journey'
+import Playground from './pages/Playground'
+import Dao from './pages/Dao'
+import Resources from './pages/Resources'
+import Support from './pages/Support'
+import Zyno from './pages/Zyno'
+import JourneyCompleted from './pages/JourneyCompleted'
+
+const ProtectedLayout = () => (
+  <ProtectedRoute>
+    <Layout>
+      <Outlet />
+    </Layout>
+  </ProtectedRoute>
+)
 
 function App() {
   const { isDark } = useThemeStore()
@@ -41,8 +45,8 @@ function App() {
       <WalletContextProvider>
         <div className={`min-h-screen transition-colors duration-300 ${
           isDark 
-            ? 'bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 text-white' 
-            : 'bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 text-gray-900'
+            ? 'bg-surface-950 text-white'
+            : 'bg-surface-50 text-surface-900'
         }`}>
           <div
             id="particles-js"
@@ -50,88 +54,20 @@ function App() {
             aria-hidden="true"
           />
           <Routes>
-            {/* Public Routes */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
 
-            {/* Protected Routes */}
-            <Route path="/" element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <WalletConnectionBanner />
-                  <SkillchainBanner />
-                  
-                  <main className="relative">
-                    <HeroSection />
-                    <JourneysPreview />
-                    <AccessPassHolders />
-                  </main>
+            <Route element={<ProtectedLayout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="journeys" element={<Journey />} />
+              <Route path="journeys/completed" element={<JourneyCompleted />} />
+              <Route path="playground" element={<Playground />} />
+              <Route path="dao" element={<Dao />} />
+              <Route path="resources" element={<Resources />} />
+              <Route path="support" element={<Support />} />
+              <Route path="zyno" element={<Zyno />} />
+            </Route>
 
-                  <Footer />
-                  <JourneyModal />
-                  <ZynoAssistant />
-                  <BackToTopButton />
-                </AppLayout>
-              </ProtectedRoute>
-            } />
-
-            <Route path="/playground" element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <WalletConnectionBanner />
-                  <SkillchainBanner />
-
-                  <main className="relative">
-                    <PlaygroundPage />
-                  </main>
-
-                  <Footer />
-                  <JourneyModal />
-                  <ZynoAssistant />
-                  <BackToTopButton />
-                </AppLayout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/journeys" element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <WalletConnectionBanner />
-                  <SkillchainBanner />
-                  
-                  <main className="relative">
-                    <JourneysPage />
-                  </main>
-
-                  <Footer />
-                  <JourneyModal />
-                  <ZynoAssistant />
-                  <BackToTopButton />
-                </AppLayout>
-              </ProtectedRoute>
-            } />
-
-            <Route path="/zyno" element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <WalletConnectionBanner />
-                  <SkillchainBanner />
-
-                  <main className="relative">
-                    <section className="max-w-6xl mx-auto px-4 py-10">
-                      <ZynoConsole />
-                    </section>
-                  </main>
-
-                  <Footer />
-                  <JourneyModal />
-                  <ZynoAssistant />
-                  <BackToTopButton />
-                </AppLayout>
-              </ProtectedRoute>
-            } />
-            
-            {/* Catch all route - redirect to home */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useJourneyStore } from '../store/journeyStore';
+import { useNavigate } from 'react-router-dom';
 import JourneyCard from './Journey/JourneyCard';
 import JourneyTimeline from './Journey/JourneyTimeline';
 import JourneyDashboard from './Journey/JourneyDashboard';
@@ -30,6 +31,7 @@ const JourneysPage: React.FC = () => {
     updateVotingPower,
     loadUserProgress
   } = useJourneyStore();
+  const navigate = useNavigate();
 
   const [currentPhaseIndex, setCurrentPhaseIndex] = useState<number | null>(null);
   const [showProofModal, setShowProofModal] = useState(false);
@@ -97,14 +99,50 @@ const JourneysPage: React.FC = () => {
   const handlePhaseComplete = async (phaseIndex: number) => {
     if (!selectedPersona) return;
 
+    const phase = selectedPersona.phases[phaseIndex];
+    const totalPhases = selectedPersona.phases.length;
+    const completedCount = userProgress.completedPhases.length;
+    const nextPhaseNumber = phaseIndex + 1;
+    const isFinalPhase = completedCount + 1 >= totalPhases;
+    const projectedXP = userProgress.totalXP + (phase.xpReward || 0);
+    const projectedTokens = userProgress.mfaiTokens + (phase.mfaiReward || 0);
+    const projectedVotingPower = userProgress.votingPower + Math.floor((phase.xpReward || 0) / 10);
+    const mintedNftsAfter = phase.nftReward
+      ? Array.from(new Set([...userProgress.nfts, phase.nftReward]))
+      : [...userProgress.nfts];
+    const maxJourneyXp = selectedPersona.phases.reduce((sum, currentPhase) => sum + (currentPhase.xpReward || 0), 0);
+    const aepoScore = maxJourneyXp > 0 ? Math.min(100, Math.round((projectedXP / maxJourneyXp) * 100)) : 100;
+    const aecoScore = Math.min(100, Math.round(aepoScore * 0.9 + 10));
+    const completionSummary = {
+      personaId: selectedPersona.id,
+      personaTitle: selectedPersona.title,
+      personaIcon: selectedPersona.icon,
+      passType: selectedPersona.passType,
+      totalXP: projectedXP,
+      mfaiTokens: projectedTokens,
+      votingPower: projectedVotingPower,
+      mintedNfts: mintedNftsAfter,
+      completedPhases: totalPhases,
+      totalPhases,
+      aepoScore,
+      aecoScore,
+      completedAt: new Date().toISOString(),
+      phases: selectedPersona.phases.map(({ id, title, mission, xpReward, nftReward, duration }) => ({
+        id,
+        title,
+        mission,
+        xpReward,
+        nftReward,
+        duration
+      }))
+    };
+
+    let shouldNavigateToCompletion = false;
+
     try {
       setIsCompletingPhase(true);
       setError(null);
-
-      const phase = selectedPersona.phases[phaseIndex];
       const wasFirstNft = userProgress.nfts.length === 0;
-      const projectedTokens = userProgress.mfaiTokens + (phase.mfaiReward || 0);
-      const nextPhaseNumber = phaseIndex + 1;
 
       // Complete phase first to avoid duplicate submissions
       await completePhase(phaseIndex, {
@@ -162,11 +200,17 @@ const JourneysPage: React.FC = () => {
           setShowDAOVoteModal(true);
         }, 1500);
       }
+
+      shouldNavigateToCompletion = isFinalPhase;
     } catch (err) {
       console.error('Failed to complete phase:', err);
       setError('Failed to complete phase. Please try again.');
     } finally {
       setIsCompletingPhase(false);
+
+      if (shouldNavigateToCompletion) {
+        navigate('/journeys/completed', { state: { summary: completionSummary } });
+      }
     }
   };
 
@@ -452,7 +496,7 @@ const JourneysPage: React.FC = () => {
               <p className="text-lg opacity-70">Choose the path that resonates with your goals and aspirations</p>
             </div>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 gap-6">
               {personas.map((persona, index) => (
                 <motion.div
                   key={persona.id}

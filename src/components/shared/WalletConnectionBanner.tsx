@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { AlertCircle, X, Loader } from 'lucide-react'
 import { useLayoutEffect, useRef, useState } from 'react'
-import LazyWalletMultiButton from './wallet/LazyWalletMultiButton'
+import LazyWalletMultiButton from '../wallet/LazyWalletMultiButton'
 
 const WALLET_TOP_GAP = 12
 const WALLET_BOTTOM_GAP = 16
@@ -61,8 +61,7 @@ const WalletConnectionBanner = () => {
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -50 }}
-        className="fixed left-0 right-0 z-40 mx-4"
-        style={{ top: `calc(var(--header-height) + var(--skillchain-banner-offset) + ${WALLET_TOP_GAP}px)` }}
+        className="fixed left-0 right-0 z-40 mx-4 top-[calc(var(--header-height)+var(--skillchain-banner-offset)+12px)]"
       >
         <div className="max-w-4xl mx-auto bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg p-4 shadow-lg">
           <div className="flex items-center justify-between">

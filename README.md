@@ -989,6 +989,9 @@ VITE_ENABLE_REAL_BLOCKCHAIN=false
 # API endpoints
 VITE_API_BASE_URL=https://api.moneyfactory.ai
 VITE_ZYNO_API_URL=https://zyno.moneyfactory.ai
+
+# Knowledge base distribution
+VITE_RESOURCE_LIBRARY_BASE_URL=https://cdn.moneyfactory.ai/knowledge-vault
 ```
 
 ### Tailwind Configuration

@@ -1,79 +1,21 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { BarChart3, RefreshCw } from 'lucide-react';
-import type { AgentScoreboardEntry, AgentScoreboardResponse } from '../../utils/api';
-import { api } from '../../utils/api';
-
-interface FetchState {
-  loading: boolean;
-  error: string | null;
-  lastUpdated: Date | null;
-  data: AgentScoreboardEntry[];
-}
-
-export const ADMIN_API_STORAGE_KEY = 'zyno-admin-api-key';
-
-const initialState: FetchState = {
-  loading: false,
-  error: null,
-  lastUpdated: null,
-  data: [],
-};
+import type { AgentScoreboardEntry } from '../../utils/api';
+import { useAgentScoreboardContext } from './AgentScoreboardContext';
 
 export default function ZynoAgentScoreboard() {
-  const [state, setState] = useState<FetchState>(initialState);
-  const [apiKey, setApiKey] = useState<string>(() => {
-    if (typeof window === 'undefined') {
-      return '';
-    }
-    return window.localStorage.getItem(ADMIN_API_STORAGE_KEY) ?? '';
-  });
-
-  const fetchScoreboard = useCallback(async (key: string) => {
-    if (!key) {
-      setState((prev) => ({ ...prev, error: 'Fournissez une clé API admin.', data: [] }));
-      return;
-    }
-
-    setState((prev) => ({ ...prev, loading: true, error: null }));
-
-    try {
-      const response: AgentScoreboardResponse = await api.getAgentScoreboard(key);
-      setState({
-        loading: false,
-        error: null,
-        lastUpdated: new Date(),
-        data: response.users,
-      });
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(ADMIN_API_STORAGE_KEY, key);
-      }
-    } catch (error) {
-      console.error('Failed to load agent scoreboard:', error);
-      setState({
-        loading: false,
-        error: error instanceof Error ? error.message : 'Chargement impossible',
-        lastUpdated: null,
-        data: [],
-      });
-    }
-  }, []);
-
-  useEffect(() => {
-    if (apiKey) {
-      fetchScoreboard(apiKey);
-    }
-  }, [apiKey, fetchScoreboard]);
+  const { state, apiKey, setApiKey, fetchScoreboard } = useAgentScoreboardContext();
 
   const totalAgents = state.data.length;
   const averageAepo = useMemo(() => {
     if (!totalAgents) return 0;
-    const sum = state.data.reduce((acc, entry) => acc + entry.aepo, 0);
+    const sum = state.data.reduce<number>((acc, entry) => acc + entry.aepo, 0);
     return Math.round(sum / totalAgents);
   }, [state.data, totalAgents]);
 
   const averageAeco = useMemo(() => {
     if (!totalAgents) return 0;
-    const sum = state.data.reduce((acc, entry) => acc + entry.aeco, 0);
+    const sum = state.data.reduce<number>((acc, entry) => acc + entry.aeco, 0);
     return Math.round(sum / totalAgents);
   }, [state.data, totalAgents]);
 
@@ -159,7 +101,7 @@ export default function ZynoAgentScoreboard() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 dark:divide-slate-700/40">
-            {state.data.map((entry) => {
+            {state.data.map((entry: AgentScoreboardEntry) => {
               const profileName = (() => {
                 const details = entry.profile as { name?: unknown } | undefined;
                 return typeof details?.name === 'string' ? details.name : entry.userId;

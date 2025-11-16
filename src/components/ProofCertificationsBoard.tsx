@@ -31,7 +31,7 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
           id: `${selectedPersona.id}-${phase.id}`,
           name: phase.nftReward,
           description: `This NFT certifies your mastery of ${phase.title} phase in the ${selectedPersona.title} journey.`,
-          imageUrl: phase.nftDesign || `/images/${phase.id}.png`,
+          imageUrl: phase.nftDesign || '/images/logo_mfai.png',
           rarity: phaseIndex === 4 ? 'legendary' : phaseIndex === 3 ? 'epic' : phaseIndex === 2 ? 'rare' : 'common',
           phaseId: phase.id,
           attributes: [
@@ -53,7 +53,7 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
           id: `${selectedPersona.id}-${phase.id}-locked`,
           name: phase.nftReward,
           description: `Complete the ${phase.title} phase to unlock this certification.`,
-          imageUrl: phase.nftDesign || `/images/${phase.id}.png`,
+          imageUrl: phase.nftDesign || '/images/logo_mfai.png',
           rarity: i === 4 ? 'legendary' : i === 3 ? 'epic' : i === 2 ? 'rare' : 'common',
           phaseId: phase.id,
           attributes: [
@@ -190,10 +190,9 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
                         alt={certification.name} 
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          // Fallback for image loading errors
                           const target = e.target as HTMLImageElement;
                           target.onerror = null;
-                          target.src = 'https://images.pexels.com/photos/3109807/pexels-photo-3109807.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1';
+                          target.src = '/images/logo_mfai.png';
                         }}
                       />
                     ) : (

@@ -20,6 +20,7 @@ export const holders: AccessPassHolder[] = [
       { label: 'Core team status', value: 'Active' },
       { label: 'Monthly Neuro-Dividends™', value: '2,400 $MFAI' },
     ],
+    recommendedPersonaId: 'system-architect',
   },
   {
     id: 'sarah',
@@ -40,6 +41,7 @@ export const holders: AccessPassHolder[] = [
       { label: 'Leadership Circle', value: 'Member' },
       { label: 'Community impact score', value: '9.2/10' },
     ],
+    recommendedPersonaId: 'impact-engine',
   },
   {
     id: 'elena',
@@ -60,6 +62,7 @@ export const holders: AccessPassHolder[] = [
       { label: 'Total funding raised', value: '150K $MFAI' },
       { label: 'Team members hired', value: '12' },
     ],
+    recommendedPersonaId: 'capital-foundry',
   },
   {
     id: 'marcus',
@@ -80,6 +83,7 @@ export const holders: AccessPassHolder[] = [
       { label: 'Investment committee', value: 'Chair' },
       { label: 'Protocol yield optimization', value: '+15% APY' },
     ],
+    recommendedPersonaId: 'capital-foundry',
   },
   {
     id: 'zara',
@@ -100,6 +104,7 @@ export const holders: AccessPassHolder[] = [
       { label: 'Creator platform users', value: '200+' },
       { label: 'Monthly royalties', value: '800 $MFAI' },
     ],
+    recommendedPersonaId: 'experience-studio',
   },
   {
     id: 'karim',
@@ -120,6 +125,7 @@ export const holders: AccessPassHolder[] = [
       { label: 'Staking rewards', value: '25 $MFAI/month' },
       { label: 'Learning streak', value: '180 days' },
     ],
+    recommendedPersonaId: 'cognitive-activation-hub',
   },
   {
     id: 'alex',
@@ -140,6 +146,7 @@ export const holders: AccessPassHolder[] = [
       { label: 'DeFi research papers', value: '3' },
       { label: 'Average APY achieved', value: '22.5%' },
     ],
+    recommendedPersonaId: 'capital-foundry',
   },
   {
     id: 'maya',
@@ -160,5 +167,6 @@ export const holders: AccessPassHolder[] = [
       { label: 'Mission Design Council', value: 'Active' },
       { label: 'Operational efficiency gain', value: '+40%' },
     ],
+    recommendedPersonaId: 'impact-engine',
   },
 ]

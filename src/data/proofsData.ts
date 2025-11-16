@@ -1,5 +1,7 @@
 import { Certification } from '../types/journey';
 
+const LOGO_IMAGE_PATH = '/images/logo_mfai.png';
+
 // Define proof types
 export type ProofType = 'Skill' | 'Vision' | 'Yield' | 'Build' | 'Creation' | 'Orchestration' | 'Design' | 'Invest' | 'Security';
 
@@ -46,19 +48,6 @@ export const getPersonaProofData = (
   phase: string,
   phaseNumber: number
 ): Certification => {
-  // Base URL for proof images
-  const baseImageUrl = 'https://images.pexels.com/photos/';
-  
-  // Default image fallbacks by persona
-  const personaImages = {
-    'cognitive-activation-hub': '3109807/pexels-photo-3109807.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    'capital-foundry': '3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    'system-architect': '1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    'experience-studio': '214610/pexels-photo-214610.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    'impact-engine': '3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    'resilience-master': '3184339/pexels-photo-3184339.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-  };
-
   // Get persona-specific descriptions
   const getProofDescription = () => {
     switch (personaId) {
@@ -82,12 +71,7 @@ export const getPersonaProofData = (
   // Generate a unique ID
   const uniqueId = `${personaId}-${phaseId}-${Date.now()}`;
 
-  // Get image URL based on persona and phase
-  const getImageUrl = () => {
-    // In a real implementation, this would be a mapping to specific images
-    // For now, we'll use placeholder images from Pexels
-    return baseImageUrl + (personaImages[personaId as keyof typeof personaImages] || personaImages['cognitive-activation-hub']);
-  };
+  const getImageUrl = () => LOGO_IMAGE_PATH;
 
   // Get rarity based on phase
   const getRarity = () => {
@@ -145,7 +129,7 @@ export const getNFTMetadata = (
   return {
     name: title,
     description: description,
-    image: "https://moneyfactory.ai/nft/proof.png", // Placeholder
+    image: LOGO_IMAGE_PATH,
     attributes: [
       { trait_type: "Proof Type", value: `Proof-of-${proofType}™` },
       { trait_type: "XP Earned", value: xpEarned },
@@ -156,7 +140,7 @@ export const getNFTMetadata = (
     properties: {
       files: [
         {
-          uri: "https://moneyfactory.ai/nft/proof.png",
+          uri: LOGO_IMAGE_PATH,
           type: "image/png"
         }
       ],

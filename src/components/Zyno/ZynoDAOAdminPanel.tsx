@@ -1,14 +1,12 @@
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 import { CheckCircle2, Lock, Plus, RefreshCw, ShieldCheck, ThumbsDown, ThumbsUp } from 'lucide-react';
 import {
-  ADMIN_API_STORAGE_KEY
-} from './ZynoAgentScoreboard';
-import {
   api,
   DaoConfigResponse,
   DaoProposal,
   DaoVoter
 } from '../../utils/api';
+import { useAgentScoreboardContext } from './AgentScoreboardContext';
 
 interface FetchState {
   loading: boolean;
@@ -24,30 +22,20 @@ export default function ZynoDAOAdminPanel() {
   const [fetchState, setFetchState] = useState<FetchState>(initialFetchState);
   const [config, setConfig] = useState<DaoConfigResponse | null>(null);
   const [proposals, setProposals] = useState<DaoProposal[]>([]);
-  const [adminApiKey, setAdminApiKey] = useState<string>(() => {
-    if (typeof window === 'undefined') {
-      return '';
-    }
-    return window.localStorage.getItem(ADMIN_API_STORAGE_KEY) ?? '';
-  });
+  const { apiKey, setApiKey } = useAgentScoreboardContext();
   const [newProposal, setNewProposal] = useState({ title: '', description: '' });
   const [creating, setCreating] = useState(false);
   const [voteSubmitting, setVoteSubmitting] = useState<Record<string, boolean>>({});
   const [closing, setClosing] = useState<Record<string, boolean>>({});
   const [selectedVoter, setSelectedVoter] = useState<string>('');
   const adminKeyInputId = useId();
-  const voterSelectId = useId();
-
-  const storeAdminKey = useCallback((value: string) => {
-    setAdminApiKey(value);
-    if (typeof window !== 'undefined') {
-      if (value) {
-        window.localStorage.setItem(ADMIN_API_STORAGE_KEY, value);
-      } else {
-        window.localStorage.removeItem(ADMIN_API_STORAGE_KEY);
-      }
-    }
-  }, []);
+  const rawVoterSelectId = useId();
+  const voterSelectId = useMemo(
+    () => `zyno-dao-voter-${rawVoterSelectId.replace(/[^a-zA-Z0-9-]/g, '')}`,
+    [rawVoterSelectId]
+  );
+  const voterHelpTextId = `${voterSelectId}-hint`;
+  const voterLabelId = `${voterSelectId}-label`;
 
   const loadData = useCallback(async () => {
     setFetchState({ loading: true, error: null });
@@ -84,7 +72,7 @@ export default function ZynoDAOAdminPanel() {
 
   const handleCreateProposal = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!adminApiKey) {
+    if (!apiKey) {
       setFetchState((prev) => ({ ...prev, error: 'Clé API admin requise pour créer une proposition.' }));
       return;
     }
@@ -101,7 +89,7 @@ export default function ZynoDAOAdminPanel() {
           title: newProposal.title.trim(),
           description: newProposal.description.trim() || undefined
         },
-        adminApiKey
+        apiKey
       );
       setNewProposal({ title: '', description: '' });
       await loadData();
@@ -142,7 +130,7 @@ export default function ZynoDAOAdminPanel() {
   };
 
   const closeProposal = async (proposalId: string) => {
-    if (!adminApiKey) {
+    if (!apiKey) {
       setFetchState((prev) => ({ ...prev, error: 'Clé API admin requise pour clôturer.' }));
       return;
     }
@@ -150,7 +138,7 @@ export default function ZynoDAOAdminPanel() {
     setClosing((prev) => ({ ...prev, [proposalId]: true }));
     setFetchState((prev) => ({ ...prev, error: null }));
     try {
-      await api.closeDaoProposal(proposalId, adminApiKey);
+      await api.closeDaoProposal(proposalId, apiKey);
       await loadData();
     } catch (error) {
       console.error('Failed to close proposal:', error);
@@ -207,29 +195,41 @@ export default function ZynoDAOAdminPanel() {
           <p>{quorumSummary}</p>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="w-full sm:max-w-xs">
-              <label className="text-xs font-semibold uppercase tracking-wider" htmlFor={adminKeyInputId}>
+                <label
+                  className="text-xs font-semibold uppercase tracking-wider"
+                  htmlFor={adminKeyInputId}
+                >
                 Clé API admin
               </label>
               <input
                 id={adminKeyInputId}
                 type="password"
-                value={adminApiKey}
-                onChange={(event) => storeAdminKey(event.target.value)}
+                  value={apiKey}
+                  onChange={(event) => setApiKey(event.target.value)}
                 placeholder="Utilisée pour créer / clôturer"
                 className="mt-1 w-full rounded-md border border-emerald-200 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-400 dark:border-emerald-500/40 dark:bg-slate-900"
               />
             </div>
             <div className="w-full sm:max-w-xs">
-              <label className="text-xs font-semibold uppercase tracking-wider" htmlFor={voterSelectId}>
+              <label
+                id={voterLabelId}
+                className="text-xs font-semibold uppercase tracking-wider"
+                htmlFor={voterSelectId}
+              >
                 Voter en tant que
               </label>
+              <p id={voterHelpTextId} className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+                Choisissez un profil votant avant de soumettre un vote.
+              </p>
               <select
                 id={voterSelectId}
+                name="dao-voter"
                 value={selectedVoter}
                 onChange={(event) => setSelectedVoter(event.target.value)}
-                aria-label="Voter en tant que"
+                aria-labelledby={voterLabelId}
+                aria-describedby={voterHelpTextId}
                 title="Sélectionner un votant"
-                className="mt-1 w-full rounded-md border border-emerald-200 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-400 dark:border-emerald-500/40 dark:bg-slate-900"
+                className="mt-2 w-full rounded-md border border-emerald-200 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-400 dark:border-emerald-500/40 dark:bg-slate-900"
               >
                 <option value="">Sélectionner un votant</option>
                 {config.voters.map(renderVoterOption)}
