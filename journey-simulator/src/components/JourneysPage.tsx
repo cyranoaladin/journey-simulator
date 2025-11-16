@@ -445,8 +445,205 @@ const JourneysPage: FC = () => {
 
         {selectedPersona && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
-            {/* Selected journey content retained exactly as in your current file */}
-            {/* ... existing JSX from your latest version ... */}
+            <div className="glass-effect rounded-2xl p-8 text-center">
+              <div className="flex items-center justify-center mb-4">
+                <div className="text-4xl mr-3">{selectedPersona.icon}</div>
+                <h2 className="text-3xl font-space font-bold">
+                  <span className="text-accent-cyan">{selectedPersona.title}</span> Journey
+                </h2>
+              </div>
+              <p className="text-lg opacity-80 mb-6 max-w-3xl mx-auto">
+                <strong>Motivation:</strong> {selectedPersona.motivation}
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <div className="text-sm opacity-70">
+                  <strong>Pass Type:</strong> {selectedPersona.passType}
+                </div>
+                <div className="w-px h-4 bg-white/20 hidden sm:block" />
+                <div className="text-sm opacity-70">
+                  <strong>Target:</strong> {selectedPersona.targetProfile}
+                </div>
+              </div>
+              <div className="mt-6">
+                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleBackToPersonas} className="btn-secondary">
+                  ← Back to all journeys
+                </motion.button>
+              </div>
+            </div>
+
+            <JourneyDashboard />
+
+            <div className="grid lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <div className="glass-effect rounded-2xl p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-semibold">Journey Progress</h3>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-accent-cyan">
+                        {userProgress.completedPhases.length}/{selectedPersona.phases.length}
+                      </div>
+                      <div className="text-sm opacity-70">phases completed</div>
+                    </div>
+                  </div>
+                  <div className="w-full bg-gray-700/50 rounded-full h-4 mb-4">
+                    <motion.div
+                      className="bg-gradient-to-r from-accent-cyan to-accent-purple h-4 rounded-full relative"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(userProgress.completedPhases.length / selectedPersona.phases.length) * 100}%` }}
+                      transition={{ duration: 0.8, ease: 'easeOut' }}
+                    >
+                      <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse" />
+                    </motion.div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm opacity-70">
+                      {userProgress.completedPhases.length === selectedPersona.phases.length
+                        ? '🎉 Journey Complete!'
+                        : `Next: ${selectedPersona.phases[userProgress.completedPhases.length]?.title || 'Complete Journey'}`}
+                    </div>
+                    <div className="text-sm font-semibold text-accent-cyan">
+                      {Math.round((userProgress.completedPhases.length / selectedPersona.phases.length) * 100)}%
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="glass-effect rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-accent-gold">{userProgress.totalXP}</div>
+                  <div className="text-sm opacity-70">Total XP</div>
+                </div>
+                <div className="glass-effect rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-accent-purple">{userProgress.nfts.length}</div>
+                  <div className="text-sm opacity-70">NFTs Earned</div>
+                </div>
+                <div className="glass-effect rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-accent-cyan">{userProgress.mfaiTokens.toFixed(1)}</div>
+                  <div className="text-sm opacity-70">$MFAI Tokens</div>
+                </div>
+              </div>
+            </div>
+
+            <JourneyTimeline phases={selectedPersona.phases} currentPhase={userProgress.completedPhases.length} onPhaseChange={handlePhaseChange} />
+
+            {userProgress.completedPhases.length < selectedPersona.phases.length && (
+              <div className="space-y-6">
+                <div className="text-center">
+                  <h3 className="text-2xl font-semibold mb-2">Current Phase</h3>
+                  <p className="text-lg opacity-70">
+                    Phase {userProgress.completedPhases.length + 1} of {selectedPersona.phases.length}
+                  </p>
+                </div>
+                <div className="grid lg:grid-cols-3 gap-6">
+                  <div className="lg:col-span-2 relative">
+                    <PhaseSection
+                      phase={selectedPersona.phases[userProgress.completedPhases.length]}
+                      isCompleted={false}
+                      isCurrent
+                      isLocked={false}
+                      onComplete={() => handlePhaseComplete(userProgress.completedPhases.length)}
+                      onMintNFT={() => handleViewNFT(userProgress.completedPhases.length)}
+                      onStake={handleStaking}
+                      onVote={handleDAOVote}
+                      isProcessing={isCompletingPhase}
+                    />
+                    {isCompletingPhase && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center rounded-xl"
+                      >
+                        <div className="text-center">
+                          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-cyan mx-auto mb-4" />
+                          <p className="text-white text-lg font-semibold">Completing phase...</p>
+                          <p className="text-white/70 text-sm">Please wait while we sync your progress</p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
+                  <div className="space-y-4">
+                    <XPTracker
+                      currentXP={userProgress.totalXP}
+                      phaseXP={selectedPersona.phases[userProgress.completedPhases.length]?.xpReward || 0}
+                      nextRewardAt={(Math.floor(userProgress.totalXP / 200) + 1) * 200}
+                    />
+                    <ProofCertificationsBoard />
+                    <WalletStatusDisplay />
+                    {showMintingTutorial && <NFTMintingTutorial />}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {userProgress.completedPhases.length > 0 && (
+              <div className="space-y-6">
+                <div className="text-center">
+                  <h3 className="text-2xl font-semibold mb-2">Completed Phases</h3>
+                  <p className="text-lg opacity-70">
+                    {userProgress.completedPhases.length} phase{userProgress.completedPhases.length > 1 ? 's' : ''} completed
+                  </p>
+                </div>
+                <div className="grid gap-4">
+                  {userProgress.completedPhases.map((phaseIndex) => (
+                    <motion.div key={selectedPersona.phases[phaseIndex].id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 * phaseIndex }}>
+                      <PhaseSection
+                        phase={selectedPersona.phases[phaseIndex]}
+                        isCompleted
+                        isCurrent={false}
+                        isLocked={false}
+                        onComplete={() => {}}
+                        onMintNFT={() => handleViewNFT(phaseIndex)}
+                        onStake={handleStaking}
+                        onVote={handleDAOVote}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {userProgress.completedPhases.length === selectedPersona.phases.length && (
+              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
+                <div className="glass-effect rounded-2xl p-8 max-w-4xl mx-auto border-2 border-accent-gold relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-accent-gold/10 to-accent-purple/10" />
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-accent-gold/20 rounded-full -translate-y-16 translate-x-16" />
+                  <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent-cyan/20 rounded-full translate-y-12 -translate-x-12" />
+                  <div className="relative">
+                    <div className="text-8xl mb-6">🎉</div>
+                    <h3 className="text-4xl font-space font-bold mb-4 gradient-text">Journey Completed!</h3>
+                    <p className="text-xl opacity-80 mb-8 max-w-2xl mx-auto">
+                      Congratulations! You have completed the <span className="font-semibold text-accent-cyan">{selectedPersona.title}</span> journey. You are now an active member of the Money Factory AI ecosystem.
+                    </p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                      <div className="glass-effect rounded-xl p-4">
+                        <div className="text-3xl font-bold text-accent-gold mb-2">{userProgress.totalXP}</div>
+                        <div className="text-sm opacity-70">Total XP</div>
+                      </div>
+                      <div className="glass-effect rounded-xl p-4">
+                        <div className="text-3xl font-bold text-accent-purple mb-2">{userProgress.nfts.length}</div>
+                        <div className="text-sm opacity-70">NFTs Earned</div>
+                      </div>
+                      <div className="glass-effect rounded-xl p-4">
+                        <div className="text-3xl font-bold text-accent-cyan mb-2">{userProgress.mfaiTokens.toFixed(1)}</div>
+                        <div className="text-sm opacity-70">$MFAI Tokens</div>
+                      </div>
+                      <div className="glass-effect rounded-xl p-4">
+                        <div className="text-3xl font-bold text-accent-gold mb-2">{userProgress.votingPower}</div>
+                        <div className="text-sm opacity-70">Voting Power</div>
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                      <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleBackToPersonas} className="btn-primary">
+                        Explore other journeys
+                      </motion.button>
+                      <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setShowShareModal(true)} className="btn-secondary">
+                        Share your achievement
+                      </motion.button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
           </motion.div>
         )}
       </main>

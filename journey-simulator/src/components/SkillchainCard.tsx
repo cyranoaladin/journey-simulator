@@ -113,7 +113,7 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
     ? selectedPersona.phases.map((phase, index) => {
         const isCompleted = userProgress.completedPhases.includes(index)
         const isCurrent = !isCompleted && index === userProgress.completedPhases.length
-        const status = isCompleted ? 'completed' : isCurrent ? 'active' : 'locked'
+      const status: 'completed' | 'active' | 'locked' = isCompleted ? 'completed' : isCurrent ? 'active' : 'locked'
 
         return {
           index,

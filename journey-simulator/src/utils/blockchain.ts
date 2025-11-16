@@ -42,7 +42,7 @@ export const getWalletBalance = async (publicKey: PublicKey): Promise<number> =>
 // Mint NFT (Proof-of-Skill™)
 export const mintProofOfSkill = async (
   wallet: any,
-  _metadata: {
+  metadata: {
     name: string;
     description: string;
     image: string;
@@ -127,7 +127,9 @@ export const submitDAOVote = async (
     // For simulation purposes, we'll just return a success response
     return {
       success: true,
-      signature: 'simulated_vote_' + Date.now()
+      signature: 'simulated_vote_' + Date.now(),
+      proposalId,
+      vote
     };
   } catch (error) {
     console.error('Error submitting DAO vote:', error);
@@ -140,7 +142,7 @@ export const submitDAOVote = async (
 };
 
 // Get NFTs owned by wallet
-export const getWalletNFTs = async (_publicKey: PublicKey): Promise<any[]> => {
+export const getWalletNFTs = async (publicKey: PublicKey): Promise<any[]> => {
   try {
     console.debug('Simulating NFT fetch for wallet', publicKey.toBase58());
     // In a real implementation, we would:

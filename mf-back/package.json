@@ -5,8 +5,8 @@
   "scripts": {
     "start": "node ./bin/www",
     "dev": "nodemon ./bin/www",
-    "test": "cross-env NODE_ENV=test SKIP_DB_CONNECTION=true jest --passWithNoTests",
-    "test:coverage": "cross-env NODE_ENV=test SKIP_DB_CONNECTION=true jest --coverage --passWithNoTests",
+    "test": "cross-env NODE_ENV=test SKIP_DB_CONNECTION=true jest --passWithNoTests --runInBand",
+    "test:coverage": "cross-env NODE_ENV=test SKIP_DB_CONNECTION=true jest --coverage --passWithNoTests --runInBand",
     "rag:upload": "node scripts/rag_upload.js"
   },
   "dependencies": {

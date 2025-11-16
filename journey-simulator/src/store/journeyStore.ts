@@ -1,6 +1,8 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { Persona, UserProgress, TestnetFeatures } from '../types/journey'
+import { personas } from '../data/personas'
+import { api } from '../utils/api'
 import { mintProofOfSkill } from '../utils/blockchain'
 
 interface JourneyState {
@@ -245,7 +247,7 @@ export const useJourneyStore = create<JourneyState>()(
         return { mintAddress: result.mintAddress, signature: result.signature };
       },
 
-      shareJourney: (_platform: string) => set((state) => ({
+      shareJourney: (platform: string) => set((state) => ({
         userProgress: {
           ...state.userProgress,
           socialShareCount: (state.userProgress.socialShareCount || 0) + 1,
