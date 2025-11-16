@@ -1,0 +1,36 @@
+<!-- /playground/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Playground</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    textarea { width: 100%; height: 150px; margin-bottom: 10px; }
+    button { padding: 10px; font-weight: bold; }
+    pre { background: #f4f4f4; padding: 10px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>🎮 Zyno Prompt Playground</h1>
+  <label for="prompt">Prompt :</label>
+  <textarea id="prompt" aria-label="Prompt playground input"></textarea>
+  <button onclick="runPrompt()">▶ Exécuter</button>
+  <h3>Réponse LLM :</h3>
+  <pre id="output">[Réponse ici]</pre>
+
+  <script>
+    async function runPrompt() {
+      const prompt = document.getElementById('prompt').value;
+      const res = await fetch('/orchestration', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input: prompt, userId: "playground" })
+      });
+      const data = await res.json();
+      document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,466 @@
+import { useEffect, useMemo, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import {
+  Activity,
+  Bot,
+  ClipboardList,
+  History,
+  Lightbulb,
+  Loader2,
+  Rocket,
+  ScanLine,
+  Send,
+  Sparkles,
+  Target,
+  TimerReset,
+} from 'lucide-react';
+import AgentLogViewer from './AgentLogViewer';
+import ZynoMissionFlow from './ZynoMissionFlow';
+import MissionFeedbackSummary, { MissionSummary } from './MissionFeedbackSummary';
+import type { OrchestrationResult } from './types';
+import sampleMissionSummary from '../../data/sample_mission_feedback.json';
+import ZynoAgentScoreboard from './ZynoAgentScoreboard';
+import ZynoDAOAdminPanel from './ZynoDAOAdminPanel';
+import AgentFeedbackForm from './AgentFeedbackForm';
+import { API_BASE_URL } from '../../utils/api';
+import { AgentScoreboardProvider } from './AgentScoreboardContext';
+import ResourceUploader from './ResourceUploader';
+
+const quickIntents = [
+  {
+    label: 'Pitch deck synthèse',
+    value: 'Analyse ma mission actuelle et génère un pitch deck investisseur prêt pour la Synaptic DAO.',
+    icon: Rocket,
+  },
+  {
+    label: 'Audit Tokenomics',
+    value: 'Évalue la viabilité de mon token en identifiant faiblesses, risques de dilution et scénarios de rétention.',
+    icon: Activity,
+  },
+  {
+    label: 'Plan DAO',
+    value: 'Construis un plan de vote DAO avec quorum, niveaux de pouvoir et suivi AEPO/AECO.',
+    icon: Target,
+  },
+  {
+    label: 'Mémo investisseur',
+    value: 'Produit un mémo investisseur clair avec traction, roadmap et besoins de liquidité.',
+    icon: Lightbulb,
+  },
+] as const;
+
+const consoleMotion = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.45, ease: [0.23, 1, 0.32, 1] },
+  },
+} as const;
+
+type Status = 'idle' | 'loading' | 'error';
+type PromptStatus = 'pending' | 'success' | 'error';
+
+interface PromptHistoryEntry {
+  id: string;
+  text: string;
+  createdAt: string;
+  status: PromptStatus;
+}
+
+const generatePromptId = () => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `prompt-${Math.random().toString(36).slice(2, 11)}`;
+};
+
+interface ZynoConsoleProps {
+  onMissionUpdate?: (summary: MissionSummary | null) => void;
+}
+
+export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
+  const [userInput, setUserInput] = useState('');
+  const [status, setStatus] = useState<Status>('idle');
+  const [result, setResult] = useState<OrchestrationResult | null>(null);
+  const [missionSummary, setMissionSummary] = useState<MissionSummary | null>(
+    sampleMissionSummary as MissionSummary,
+  );
+  const [history, setHistory] = useState<PromptHistoryEntry[]>([]);
+  const shouldReduceMotion = useReducedMotion();
+
+  const buildSummaryFromResult = (payload: OrchestrationResult): MissionSummary => {
+    const activationLevels = payload.executedAgents
+      .map((agentName: string) => payload.results[agentName]?.activationLevel ?? null)
+      .filter((value): value is number => typeof value === 'number');
+
+    const aepoScore = activationLevels.length
+      ? Math.round(
+          (activationLevels.reduce((sum: number, value: number) => sum + value, 0) /
+            activationLevels.length) *
+            100,
+        )
+      : 50;
+
+    const generatedTextLines = payload.executedAgents.map((agentName: string) => {
+      const agentResult = payload.results[agentName];
+      const summaryText = agentResult?.ae_summary ?? 'Résumé indisponible';
+      return `• ${agentName} → ${summaryText}`;
+    });
+
+    return {
+      userId: 'demo_user',
+      timestamp: new Date().toISOString(),
+      aepoScore,
+      aecoPhase: payload.intent,
+      agents: payload.executedAgents,
+      generatedText: `Synthèse générée automatiquement :\n${generatedTextLines.join('\n')}`,
+    };
+  };
+
+  const handleRunSimulation = async (prompt?: string) => {
+    const intent = prompt ?? userInput;
+    const trimmed = intent.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    const entryId = generatePromptId();
+    setHistory((prev) => [
+      { id: entryId, text: trimmed, createdAt: new Date().toISOString(), status: 'pending' },
+      ...prev,
+    ]);
+
+    setStatus('loading');
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/orchestration`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input: trimmed, userId: 'demo_user' }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      const payload: OrchestrationResult = await response.json();
+      const summary = buildSummaryFromResult(payload);
+      setResult(payload);
+      setMissionSummary(summary);
+      setStatus('idle');
+      setHistory((prev) =>
+        prev.map((entry) =>
+          entry.id === entryId ? { ...entry, status: 'success' } : entry,
+        ),
+      );
+
+      if (!prompt) {
+        setUserInput('');
+      }
+    } catch (error) {
+      console.error('Simulation error:', error);
+      setStatus('error');
+      setMissionSummary(null);
+      setHistory((prev) =>
+        prev.map((entry) =>
+          entry.id === entryId ? { ...entry, status: 'error' } : entry,
+        ),
+      );
+    }
+  };
+
+  const handleReset = () => {
+    setStatus('idle');
+    setResult(null);
+    setMissionSummary(null);
+  };
+
+  useEffect(() => {
+    onMissionUpdate?.(missionSummary);
+  }, [missionSummary, onMissionUpdate]);
+
+  const missionHighlights = useMemo(() => {
+    if (!missionSummary) {
+      return {
+        aepo: 0,
+        agents: 0,
+        timestamp: null as string | null,
+      };
+    }
+
+    return {
+      aepo: missionSummary.aepoScore,
+      agents: missionSummary.agents.length,
+      timestamp: new Date(missionSummary.timestamp).toLocaleString(),
+    };
+  }, [missionSummary]);
+
+  return (
+    <AgentScoreboardProvider>
+      <motion.section
+        variants={shouldReduceMotion ? undefined : consoleMotion}
+        initial={shouldReduceMotion ? false : 'hidden'}
+        whileInView={shouldReduceMotion ? undefined : 'visible'}
+        viewport={shouldReduceMotion ? undefined : { once: true, margin: '-120px' }}
+        className="space-y-8"
+      >
+        <header className="mfai-console-panel flex flex-col gap-4">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-accent text-white shadow-neon-ring">
+                <Bot size={22} />
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-mfai-text/60">
+                  Zyno Mission Control
+                </p>
+                <h2 className="mt-1 text-2xl font-semibold text-slate-900 dark:text-mfai-text md:text-3xl">
+                  Console agentique interactive
+                </h2>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-sm text-slate-600 dark:text-mfai-text/80 sm:grid-cols-3">
+              <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
+                <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">
+                  Score AEPO
+                </span>
+                <p className="mt-1 text-lg font-semibold text-accent">
+                  {missionHighlights.aepo || '—'}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
+                <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">
+                  Agents activés
+                </span>
+                <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-mfai-text">
+                  {missionHighlights.agents}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
+                <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">
+                  Dernière synchronisation
+                </span>
+                <p className="mt-1 text-xs text-slate-600 dark:text-mfai-text/70">
+                  {missionHighlights.timestamp ?? 'Jamais'}
+                </p>
+              </div>
+            </div>
+          </div>
+          <p className="max-w-3xl text-sm text-slate-600 dark:text-mfai-text/80 md:text-base">
+            Décrivez vos missions, relancez des agents ou déclenchez des exports DAO. Les templates rapides ci-dessous
+            accélèrent les interactions et garantissent un guidage complet pour votre parcours Web3.
+          </p>
+        </header>
+
+        <div className="console-response-grid gap-6">
+          <div className="flex flex-col gap-5">
+            <motion.form
+              onSubmit={(event) => {
+                event.preventDefault();
+                handleRunSimulation();
+              }}
+              className="mfai-console-panel space-y-4"
+            >
+              <label
+                htmlFor="zyno-console-input"
+                className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-mfai-text/80"
+              >
+                <Sparkles size={16} className="text-accent" />
+                Entrée mission / intention
+              </label>
+              <textarea
+                id="zyno-console-input"
+                className="min-h-[140px] w-full rounded-3xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm text-slate-900 shadow-inner-glow focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/40 dark:border-mfai-border/60 dark:bg-mfai-surfaceAlt/50 dark:text-mfai-text"
+                placeholder="Ex : Orchestrer la roadmap de lancement pour mon protocole DeFi et identifier les risques critiques."
+                value={userInput}
+                onChange={(event) => setUserInput(event.target.value)}
+              />
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3 text-xs text-slate-600 dark:text-mfai-text/70">
+                  <ClipboardList size={14} />
+                  <span>Historique stocké localement — vos prompts restent privés.</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <motion.button
+                    type="button"
+                    whileHover={shouldReduceMotion || status === 'loading' ? undefined : { scale: 1.05 }}
+                    whileTap={shouldReduceMotion || status === 'loading' ? undefined : { scale: 0.97 }}
+                    disabled={status === 'loading'}
+                    onClick={handleReset}
+                    className="inline-flex items-center gap-2 rounded-2xl border border-slate-200/70 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600 transition hover:border-accent/40 hover:text-accent dark:border-mfai-border/60 dark:text-mfai-text/70"
+                  >
+                    <TimerReset size={14} />
+                    Réinitialiser
+                  </motion.button>
+                  <motion.button
+                    type="submit"
+                    whileHover={shouldReduceMotion || status === 'loading' ? undefined : { scale: 1.03 }}
+                    whileTap={shouldReduceMotion || status === 'loading' ? undefined : { scale: 0.97 }}
+                    disabled={status === 'loading'}
+                    className={`inline-flex items-center gap-2 rounded-2xl px-5 py-2 text-sm font-semibold transition duration-300 ease-out-quart focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
+                      status === 'loading'
+                        ? 'cursor-wait border border-slate-200/70 bg-slate-100 text-slate-500 dark:border-mfai-border/60 dark:bg-mfai-surfaceMuted dark:text-mfai-text/50'
+                        : 'bg-gradient-accent text-white shadow-neon-ring'
+                    }`}
+                  >
+                    {status === 'loading' ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                    {status === 'loading' ? 'Analyse en cours…' : 'Lancer la simulation'}
+                  </motion.button>
+                </div>
+              </div>
+            </motion.form>
+
+            <div className="mfai-console-panel space-y-3">
+              <p className="text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-mfai-text/60">
+                Templates rapides
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {quickIntents.map((intent) => (
+                  <motion.button
+                    type="button"
+                    key={intent.label}
+                    whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
+                    whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
+                    onClick={() => {
+                      setUserInput(intent.value);
+                      handleRunSimulation(intent.value);
+                    }}
+                    className="inline-flex items-center gap-2 rounded-2xl border border-accent/40 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-accent transition-colors hover:bg-accent/10 dark:bg-mfai-surface/60"
+                  >
+                    <intent.icon size={14} />
+                    {intent.label}
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mfai-console-panel space-y-4">
+              <header className="flex items-center justify-between text-sm text-slate-600 dark:text-mfai-text/70">
+                <div className="flex items-center gap-2">
+                  <History size={16} />
+                  Historique des requêtes
+                </div>
+                <button
+                  type="button"
+                  className="text-xs text-accent underline-offset-4 hover:underline"
+                  onClick={() => setHistory([])}
+                >
+                  Effacer
+                </button>
+              </header>
+              {history.length === 0 ? (
+                <p className="text-sm text-slate-600 dark:text-mfai-text/60">
+                  Aucune mission enregistrée pour le moment.
+                </p>
+              ) : (
+                <ul className="flex flex-col gap-3">
+                  {history.map((entry) => (
+                    <li
+                      key={entry.id}
+                      className="rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm text-slate-700 dark:border-mfai-border/60 dark:bg-mfai-surfaceAlt/40 dark:text-mfai-text/80"
+                    >
+                      <div className="flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-mfai-text/60">
+                        <span>{new Date(entry.createdAt).toLocaleTimeString()}</span>
+                        <span
+                          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                            entry.status === 'success'
+                              ? 'bg-success/15 text-success'
+                              : entry.status === 'error'
+                                ? 'bg-danger/15 text-danger'
+                                : 'bg-info/15 text-info'
+                          }`}
+                        >
+                          {entry.status === 'success' && 'Terminé'}
+                          {entry.status === 'error' && 'Erreur'}
+                          {entry.status === 'pending' && 'En cours'}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-sm font-medium text-slate-800 dark:text-mfai-text">{entry.text}</p>
+                      <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                        <motion.button
+                          type="button"
+                          whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
+                          whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
+                          className="rounded-full border border-slate-200/70 px-3 py-1 text-xs text-slate-600 hover:border-accent/60 hover:text-accent dark:border-mfai-border/60 dark:text-mfai-text/70"
+                          onClick={() => setUserInput(entry.text)}
+                        >
+                          Réutiliser
+                        </motion.button>
+                        <motion.button
+                          type="button"
+                          whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
+                          whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
+                          className="rounded-full border border-accent/40 px-3 py-1 text-xs text-accent hover:bg-accent/10"
+                          onClick={() => handleRunSimulation(entry.text)}
+                        >
+                          Relancer
+                        </motion.button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-5">
+            <MissionFeedbackSummary summary={missionSummary} />
+
+            {result ? (
+              <div className="mfai-console-panel space-y-4">
+                <header className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-mfai-text/80">
+                    <ScanLine size={16} className="text-accent" />
+                    Flux de mission
+                  </div>
+                  <span className="text-xs uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/60">
+                    Mode {result.mode}
+                  </span>
+                </header>
+                <ZynoMissionFlow
+                  intent={result.intent}
+                  mode={result.mode}
+                  executedAgents={result.executedAgents}
+                  results={result.results}
+                />
+              </div>
+            ) : (
+              <div className="mfai-console-panel text-sm text-slate-600 dark:text-mfai-text/60">
+                Lancer une simulation pour visualiser l&apos;enchaînement des agents et leurs livrables.
+              </div>
+            )}
+
+            {result?.executedAgents?.length ? (
+              <div className="mfai-console-panel space-y-3">
+                <header className="space-y-1">
+                  <h3 className="text-base font-semibold text-slate-800 dark:text-mfai-text">
+                    Partagez votre expérience agentique
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-mfai-text/70">
+                    Donnez une note AECO à chaque agent pour affiner les recommandations futures.
+                  </p>
+                </header>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {result.executedAgents.map((agentName: string) => (
+                    <AgentFeedbackForm
+                      key={agentName}
+                      agentName={agentName}
+                      userId={missionSummary?.userId ?? 'demo_user'}
+                      missionId={result?.parcoursTemplate?.templateId}
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            <ZynoAgentScoreboard />
+            <ResourceUploader />
+            <ZynoDAOAdminPanel />
+            <AgentLogViewer />
+          </div>
+        </div>
+      </motion.section>
+    </AgentScoreboardProvider>
+  );
+}
