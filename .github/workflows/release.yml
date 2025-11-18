@@ -141,3 +141,27 @@ jobs:
       - name: Run Prisma migrate deploy (prod)
         if: ${{ env.DATABASE_URL != '' }}
         run: npm run migrate:deploy
+
+  post-deploy-health:
+    runs-on: ubuntu-latest
+    needs: deploy-migrate
+    env:
+      HEALTHCHECK_BASE_URL: ${{ secrets.HEALTHCHECK_BASE_URL }}
+      ADMIN_API_KEY: ${{ secrets.ADMIN_API_KEY }}
+    steps:
+      - name: Check /api/healthz
+        if: ${{ env.HEALTHCHECK_BASE_URL != '' }}
+        run: |
+          set -euo pipefail
+          echo "Checking $HEALTHCHECK_BASE_URL/api/healthz"
+          body=$(curl -fsSL "$HEALTHCHECK_BASE_URL/api/healthz")
+          echo "$body"
+          echo "$body" | grep -q '"ok"' || (echo "healthz missing ok" && exit 1)
+      - name: Smoke test /admin/state (x-api-key)
+        if: ${{ env.HEALTHCHECK_BASE_URL != '' && env.ADMIN_API_KEY != '' }}
+        run: |
+          set -euo pipefail
+          echo "Checking $HEALTHCHECK_BASE_URL/admin/state"
+          html=$(curl -fsSL -H "x-api-key: $ADMIN_API_KEY" "$HEALTHCHECK_BASE_URL/admin/state")
+          echo "$html" | head -c 5000
+          echo "$html" | grep -qi 'JourneyState' || (echo "admin state did not render" && exit 1)
