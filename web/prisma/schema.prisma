@@ -60,3 +60,24 @@ model AgentRun {
   status    String   @default("ok")
   createdAt DateTime @default(now())
 }
+
+model JourneyState {
+  id           String   @id @default(cuid())
+  journeyId    String   @unique
+  last_state   Json
+  last_metadata Json?
+  updatedAt    DateTime @updatedAt
+  createdAt    DateTime @default(now())
+}
+
+model AgentLog {
+  id        String   @id @default(cuid())
+  ts        DateTime @default(now())
+  journeyId String?
+  userId    String?
+  agent     String
+  action    String
+  details   Json?
+  @@index([journeyId, ts])
+  @@index([userId, ts])
+}
