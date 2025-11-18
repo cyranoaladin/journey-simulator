@@ -13,7 +13,11 @@
     "test:e2e": "playwright test",
     "e2e:install": "playwright install --with-deps",
     "verify": "npm run lint && npm run build && npm run test:unit && npm run test:e2e",
+    "migrate:deploy": "prisma migrate deploy",
     "postinstall": "next telemetry disable || true"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "engines": {
     "node": ">=18.17.0"
