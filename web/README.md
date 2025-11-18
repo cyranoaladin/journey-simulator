@@ -91,6 +91,15 @@ Notes:
 - Commandes:
   - prisma: npm --prefix web run prisma -- --help (ou npx prisma ...)
 
+### Réinitialiser un utilisateur de démo
+- Supprimer les logs et mints de 'demo_user', et (optionnel) réinitialiser un JourneyState:
+```bash
+# Depuis web/
+npm run reset:demo
+# Ou, avec un journeyId spécifique
+npm run reset:demo -- --journeyId=YOUR_JOURNEY_ID
+```
+
 ### Migrations / Index
 - Dev: appliquez le schéma sans créer de migration (convenable pour SQLite dev)
 ```bash
@@ -169,6 +178,16 @@ Note: En production, utilisez une vraie valeur de secret (vault/CI secrets), et 
   - Étapes: lint, build, unit, E2E, artifacts (coverage + Playwright)
   - Optionnel: upload des sourcemaps Sentry si SENTRY_AUTH_TOKEN/SENTRY_ORG/SENTRY_PROJECT sont configurés
   - Optionnel: build & push image Docker si DOCKER_REGISTRY/DOCKER_USERNAME/DOCKER_PASSWORD/DOCKER_IMAGE sont définis
+
+### CI/CD Secrets & post-deploy checks
+- Secrets requis/optionnels (Repository Settings → Secrets and variables → Actions):
+  - DATABASE_URL: utilisé par le job deploy-migrate (Prisma migrate deploy)
+  - HEALTHCHECK_BASE_URL: base publique (ex: https://app.example.com) pour le job post-deploy-health
+  - ADMIN_API_KEY: clé d’accès admin pour le smoke test /admin/state
+  - (Optionnels) SENTRY_AUTH_TOKEN/SENTRY_ORG/SENTRY_PROJECT, DOCKER_*
+- Jobs:
+  - deploy-migrate: applique les migrations Prisma en prod (condition: DATABASE_URL défini)
+  - post-deploy-health: vérifie /api/healthz et /admin/state (condition: HEALTHCHECK_BASE_URL défini; ADMIN_API_KEY requis pour /admin/state)
 
 ## Déploiement
 - Docker (prod):
