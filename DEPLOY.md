@@ -30,19 +30,18 @@ Populate these values by copying `mf-back/.env.example` to `mf-back/.env` for lo
 
 Copy `journey-simulator/.env.example` and provide a target webhook if the export flow is required.
 
-### Next.js App (`journey-simulator/web`)
+### Next.js App (`web`)
 
 | Variable | Description | Local default |
 | --- | --- | --- |
-| `DATABASE_PROVIDER` | Prisma provider (`sqlite` or `postgresql`) | `sqlite` |
-| `DATABASE_URL` | Prisma connection string | `file:./prisma/dev.db` |
+| `DATABASE_URL` | Postgres connection string used by Prisma | `postgresql://postgres:postgres@localhost:5432/mfai?schema=public` |
 | `NEXT_PUBLIC_SOLANA_RPC_URL` | Cluster URL exposed to the browser | `https://api.devnet.solana.com` |
 | `SOLANA_RPC_URL` | Server-side cluster URL | `https://api.devnet.solana.com` |
 | `SENTRY_DSN` | Optional Sentry DSN for full-stack telemetry | _unset_ |
 | `MINTER_SECRET_KEY` | Guarded signer secret for NFT minting | _unset_ |
 | `KILL_SWITCH` | Disable on-chain execution when set to `1` | `0` |
 
-Use `journey-simulator/web/.env.example` as the base file and adjust `DATABASE_URL` when pointing to Postgres.
+Use `web/.env.example` as the base file and update `DATABASE_URL` to point to your managed Postgres instance in production.
 
 ## Local Development (Docker)
 
@@ -57,7 +56,7 @@ The script builds the backend image with development dependencies and starts thr
 - `mongo`: MongoDB 6 with a health check
 - `journey-web`: Next.js UI connected to the Prisma database
 
-An optional Postgres service (`postgres`) is available for the Next.js stack. Prisma defaults to SQLite; when Postgres is preferred, update `journey-simulator/web/.env` with `DATABASE_PROVIDER=postgresql` and a `DATABASE_URL` pointing at the container (`postgresql://prisma:prisma@postgres:5432/prisma?schema=public`).
+An optional Postgres service (`postgres`) is available for the Next.js stack. Prisma now targets Postgres by default; update `web/.env` with a `DATABASE_URL` pointing at the container (`postgresql://prisma:prisma@postgres:5432/prisma?schema=public`).
 
 Stop the stack with:
 
@@ -123,3 +122,42 @@ docker compose logs -f api
 - Update dependencies: `npm update --prefix mf-back`
 
 Keep the `.env.example` file in sync with any new variables so deployments remain reproducible.
+
+## Automated VPS Deployment
+
+For monorepo deployments on a bare VPS, the repository ships with a hardened script that builds all packages, applies database migrations, and orchestrates the runtime with PM2.
+
+```bash
+# 1. Copy the template and adjust credentials (never commit real secrets)
+cp .deploy.env.example .deploy.env
+
+# 2. Run the automated deployment
+BRANCH=feat/full-monorepo-sync ./scripts/deploy.sh
+```
+
+The script performs the following actions:
+
+1. Loads environment variables from `.deploy.env` (or the file pointed to by `$DEPLOY_ENV_FILE`).
+2. Pulls the selected branch from Git and installs dependencies for all three packages (`mf-back`, `web`, `journey-simulator`).
+3. Builds the Vite frontend, builds the Next.js application (triggering `prisma generate`), and applies Prisma migrations via `npm run migrate:deploy --prefix web`.
+4. Optionally runs the test suites when `RUN_TESTS=true` is exported.
+5. Starts or reloads PM2 using `ecosystem.config.cjs`, which launches:
+  - `mf-backend` (Express API, default port `3000`)
+  - `mf-next` (Next.js server, default port `3001`)
+  - `mf-journey-preview` (Vite preview server, default port `5173`)
+
+**Infrastructure requirements:**
+
+- MongoDB instance reachable at the `MONGO_URI` specified in `.deploy.env`.
+- Postgres instance exposed via `DATABASE_URL` for Prisma and the Next.js admin experience.
+- Node.js 20 LTS, npm 10+, and PM2 (`npm install -g pm2`).
+- Reverse proxy (e.g., Nginx or Caddy) forwarding public domains to the PM2-managed processes.
+
+After the initial run, persist PM2 across reboots with:
+
+```bash
+pm2 startup
+pm2 save
+```
+
+Regenerate the Prisma client whenever the schema changes by rerunning `./scripts/deploy.sh`.
