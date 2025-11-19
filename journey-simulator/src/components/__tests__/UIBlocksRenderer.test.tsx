@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
 import UIBlocksRenderer from '../UIBlocks/UIBlocksRenderer'
 import type { JourneyStepResponse } from '../../types/uiBlocks'
 

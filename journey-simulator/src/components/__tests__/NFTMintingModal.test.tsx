@@ -1,8 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import NFTMintingModal from '../NFTMintingModal'
 import type { Certification } from '../../types/journey'
 import { useJourneyStore } from '../../store/journeyStore'
-import { vi } from 'vitest'
 
 vi.mock('@solana/wallet-adapter-react', () => ({
   useWallet: () => ({ publicKey: { toBase58: ()=>'F11111111111111111111111111111111111111111' } })
@@ -32,11 +32,11 @@ describe('NFTMintingModal', () => {
   })
 
   it('runs simulate then execute and shows tx signature + explorer link', async () => {
-    const onMinted = jest.fn()
-    const onClose = jest.fn()
+    const onMinted = vi.fn()
+    const onClose = vi.fn()
     render(<NFTMintingModal certification={cert} onClose={onClose} onMinted={onMinted} />)
 
-    const button = screen.getByText('Mint Proof-of-Skill™ NFT')
+    const button = screen.getByRole('button', { name: /Mint Proof-of-Skill/i })
     fireEvent.click(button)
 
     await waitFor(()=>expect(screen.getByText(/Transaction Signature/i)).toBeInTheDocument())
