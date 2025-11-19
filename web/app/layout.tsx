@@ -1,4 +1,5 @@
 import './globals.css'
+import 'swagger-ui-react/swagger-ui.css'
 import type { Metadata } from 'next'
 import WalletProvider from '@/components/WalletProvider'
 
