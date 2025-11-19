@@ -14,18 +14,45 @@ import type {
   EvaluationBlock,
   ActionSuggestionsBlock,
   XpBlock,
+  DiagramBlock,
+  DAODashboardBlock,
+  ProjectSelectionBlock,
 } from "../../types/uiBlocks";
+import mermaid from "mermaid";
+import DAODashboard from "../DAO/DAODashboard";
+
+function StreamingText({ text, speed = 10 }: { text: string; speed?: number }) {
+  const [displayed, setDisplayed] = useState("");
+
+  useEffect(() => {
+    let i = 0;
+    setDisplayed("");
+    const timer = setInterval(() => {
+      if (i < text.length) {
+        setDisplayed((prev) => prev + text.charAt(i));
+        i++;
+      } else {
+        clearInterval(timer);
+      }
+    }, speed);
+    return () => clearInterval(timer);
+  }, [text, speed]);
+
+  return (
+    <div
+      className="prose prose-invert text-sm"
+      dangerouslySetInnerHTML={{
+        __html: renderBasicMarkdown(displayed),
+      }}
+    />
+  );
+}
 
 function Text({ block }: { block: TextBlock }) {
   return (
     <div className="bg-white/5 rounded-xl p-4">
       <h4 className="font-semibold mb-2">{block.title}</h4>
-      <div
-        className="prose prose-invert text-sm"
-        dangerouslySetInnerHTML={{
-          __html: renderBasicMarkdown(block.body_markdown),
-        }}
-      />
+      <StreamingText text={block.body_markdown} speed={5} />
     </div>
   );
 }
@@ -70,10 +97,10 @@ function Quiz({ block }: { block: QuizBlock }) {
   const score =
     showExplain && mode === "certifying"
       ? block.questions.reduce(
-          (acc, q) =>
-            acc + ((answers[q.id] ?? -1) === q.correct_option_index ? 1 : 0),
-          0,
-        )
+        (acc, q) =>
+          acc + ((answers[q.id] ?? -1) === q.correct_option_index ? 1 : 0),
+        0,
+      )
       : null;
   return (
     <div className="bg-white/5 rounded-xl p-4">
@@ -112,11 +139,10 @@ function Quiz({ block }: { block: QuizBlock }) {
                     onClick={() =>
                       setAnswers((prev) => ({ ...prev, [q.id]: idx }))
                     }
-                    className={`w-full text-left px-3 py-2 rounded-md transition border ${
-                      selected
-                        ? "border-accent-cyan/60 bg-accent-cyan/10"
-                        : "border-white/10 hover:border-white/20"
-                    } ${isCorrect ? "bg-green-600/20 border-green-500/50" : ""} ${isWrong ? "bg-red-600/20 border-red-500/50" : ""}`}
+                    className={`w-full text-left px-3 py-2 rounded-md transition border ${selected
+                      ? "border-accent-cyan/60 bg-accent-cyan/10"
+                      : "border-white/10 hover:border-white/20"
+                      } ${isCorrect ? "bg-green-600/20 border-green-500/50" : ""} ${isWrong ? "bg-red-600/20 border-red-500/50" : ""}`}
                   >
                     {opt}
                   </button>
@@ -274,7 +300,7 @@ function Mission({ block }: { block: MissionBlock }) {
 }
 
 function Resources({ block }: { block: ResourceBlock }) {
-  const isFlashcards = (r: ResourceItem) => /flashcard/i.test(r.label);
+  const isFlashcards = (r: ResourceItem) => r.resource_type === 'flashcard';
   const copyDeck = (r: ResourceItem) => {
     const content = `# ${r.label}\n\n${r.description ?? ""}\n${r.url ?? ""}`;
     navigator.clipboard.writeText(content);
@@ -420,19 +446,19 @@ function Evaluation({ block }: { block: EvaluationBlock }) {
           const scoreValue = Math.max(0, Math.min(ax.score ?? 0, maxScore));
           return (
             <div key={i} className="text-xs">
-            <div className="flex items-center justify-between">
-              <span className="font-medium">{ax.name}</span>
-              <span>
-                {ax.score}/{ax.max_score}
-              </span>
-            </div>
-            <progress
-              className="w-full h-1.5 overflow-hidden rounded bg-white/10 [appearance:none] [&::-webkit-progress-bar]:bg-transparent [&::-webkit-progress-value]:bg-accent-cyan [&::-moz-progress-bar]:bg-accent-cyan"
-              value={scoreValue}
-              max={maxScore}
-              aria-label={`Score ${ax.name}`}
-            />
-            <div className="opacity-80 mt-1">{ax.comment}</div>
+              <div className="flex items-center justify-between">
+                <span className="font-medium">{ax.name}</span>
+                <span>
+                  {ax.score}/{ax.max_score}
+                </span>
+              </div>
+              <progress
+                className="w-full h-1.5 overflow-hidden rounded bg-white/10 [appearance:none] [&::-webkit-progress-bar]:bg-transparent [&::-webkit-progress-value]:bg-accent-cyan [&::-moz-progress-bar]:bg-accent-cyan"
+                value={scoreValue}
+                max={maxScore}
+                aria-label={`Score ${ax.name}`}
+              />
+              <div className="opacity-80 mt-1">{ax.comment}</div>
             </div>
           );
         })}
@@ -523,6 +549,7 @@ function ActionSuggestions({ block }: { block: ActionSuggestionsBlock }) {
             initial={{ opacity: 0, x: 40, y: 20 }}
             animate={{ opacity: 1, x: 0, y: 0 }}
             exit={{ opacity: 0, x: 40, y: 20 }}
+            data-testid="action-suggestions-toast"
             className="fixed bottom-4 right-4 z-50 rounded-lg shadow-lg bg-red-600/90 text-white border border-white/20 p-3 w-[320px]"
           >
             <div className="text-sm font-semibold mb-1">
@@ -558,9 +585,25 @@ function ActionSuggestions({ block }: { block: ActionSuggestionsBlock }) {
 function Xp({ block }: { block: XpBlock }) {
   const safeMax = Math.max(block.next_level_xp ?? 0, block.current_xp ?? 0, 1);
   const current = Math.max(0, Math.min(safeMax, block.current_xp ?? 0));
+
   return (
-    <div className="bg-white/5 rounded-xl p-4">
-      <h4 className="font-semibold mb-1">{block.title ?? "Progression"}</h4>
+    <div className="bg-white/5 rounded-xl p-4 relative overflow-visible">
+      <div className="flex justify-between items-end mb-1">
+        <h4 className="font-semibold">{block.title ?? "Progression"}</h4>
+        <AnimatePresence>
+          {block.gained_xp > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.8 }}
+              animate={{ opacity: 1, y: -20, scale: 1.2 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="absolute right-4 -top-2 text-accent-cyan font-bold text-xl shadow-glow"
+            >
+              +{block.gained_xp} XP
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
       <progress
         className="w-full h-2 overflow-hidden rounded bg-white/10 [appearance:none] [&::-webkit-progress-bar]:bg-transparent [&::-webkit-progress-value]:bg-accent-cyan [&::-moz-progress-bar]:bg-accent-cyan"
         value={current}
@@ -568,10 +611,86 @@ function Xp({ block }: { block: XpBlock }) {
         aria-label="Progression XP"
       />
       <div className="text-xs mt-1 opacity-80">
-        +{block.gained_xp} XP • {block.current_xp}/{block.next_level_xp}
+        {block.current_xp}/{block.next_level_xp} XP
       </div>
       {block.comment && (
         <div className="text-xs opacity-70 mt-1">{block.comment}</div>
+      )}
+    </div>
+  );
+}
+
+function Diagram({ block }: { block: DiagramBlock }) {
+  const [svg, setSvg] = useState<string>("");
+
+  useEffect(() => {
+    mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose' });
+    const renderDiagram = async () => {
+      try {
+        const { svg } = await mermaid.render(`mermaid-${block.id}`, block.content);
+        setSvg(svg);
+      } catch (e) {
+        console.error("Mermaid render error:", e);
+        setSvg(`<div class="text-red-400 text-xs">Failed to render diagram</div>`);
+      }
+    };
+    renderDiagram();
+  }, [block.content, block.id]);
+
+  return (
+    <div className="bg-white/5 rounded-xl p-4">
+      <h4 className="font-semibold mb-2">{block.title}</h4>
+      <div
+        className="overflow-x-auto flex justify-center bg-black/20 rounded-lg p-4"
+        dangerouslySetInnerHTML={{ __html: svg }}
+      />
+      {block.caption && (
+        <div className="text-xs opacity-70 mt-2 text-center">{block.caption}</div>
+      )}
+    </div>
+  );
+}
+
+function ProjectSelection({ block }: { block: ProjectSelectionBlock }) {
+  const [selected, setSelected] = useState<string | null>(null);
+  return (
+    <div className="bg-white/5 rounded-xl p-4">
+      <h4 className="font-semibold mb-4">{block.title}</h4>
+      <div className="grid gap-4 md:grid-cols-2">
+        {block.projects.map((p) => (
+          <div
+            key={p.id}
+            onClick={() => setSelected(p.id)}
+            className={`p-4 rounded-lg border cursor-pointer transition-all ${selected === p.id
+              ? "border-accent-cyan bg-accent-cyan/10"
+              : "border-white/10 hover:border-white/20"
+              }`}
+          >
+            <div className="flex justify-between items-start mb-2">
+              <h5 className="font-medium">{p.name}</h5>
+              <span className="text-xs bg-white/10 px-2 py-1 rounded">
+                {Math.round((p.currentFunding / p.fundingGoal) * 100)}% funded
+              </span>
+            </div>
+            <p className="text-sm opacity-80 mb-3 line-clamp-2">
+              {p.description}
+            </p>
+            <div className="flex flex-wrap gap-1">
+              {p.tags.map((t) => (
+                <span key={t} className="text-[10px] px-1.5 py-0.5 rounded bg-white/5">
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      {selected && (
+        <div className="mt-4 flex justify-end">
+          <button className="px-4 py-2 rounded-md bg-gradient-primary text-white text-sm font-medium">
+            Confirmer la sélection
+          </button>
+        </div>
       )}
     </div>
   );
@@ -602,6 +721,21 @@ export default function UIBlocksRenderer({
         return <ActionSuggestions key={b.id} block={b} />;
       case "xp_block":
         return <Xp key={b.id} block={b} />;
+      case "diagram_block":
+        return <Diagram key={b.id} block={b} />;
+      case "dao_dashboard_block":
+        return (
+          <div className="bg-white/5 rounded-xl p-4" key={b.id}>
+            <h4 className="font-semibold mb-4">{b.title}</h4>
+            <DAODashboard
+              votingPower={b.votingPower}
+              proposals={b.proposals}
+              onVote={(pid, vote) => console.log("Vote:", pid, vote)}
+            />
+          </div>
+        );
+      case "project_selection_block":
+        return <ProjectSelection key={b.id} block={b} />;
       default:
         return null;
     }

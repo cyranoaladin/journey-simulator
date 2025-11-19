@@ -18,4 +18,9 @@ router.post('/complete-phase', protect, journeyController.completePhase);
 router.post('/reset-progress', protect, journeyController.resetUserProgress);
 router.get('/user-journeys', protect, journeyController.getUserJourneys);
 
+// AI / Zyno routes
+// Note: We might want to protect these, but for dev/demo ease we can leave them open or use 'protect'
+router.post('/:journeyId/step', journeyController.step);
+router.post('/:journeyId/submit', journeyController.submit);
+
 module.exports = router;

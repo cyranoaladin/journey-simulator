@@ -317,7 +317,7 @@ const NFTMintingModal: FC<NFTMintingModalProps> = ({
               <div className="text-xs opacity-70 mb-1">
                 Transaction Signature:
               </div>
-              <div className="font-mono text-xs break-all">{mintTxSig}</div>
+              <div className="font-mono text-xs break-all" data-testid="mint-tx-signature">{mintTxSig}</div>
             </div>
           </div>
         )}

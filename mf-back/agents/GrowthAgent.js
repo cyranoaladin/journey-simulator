@@ -1,32 +1,27 @@
-const { getRagSnippets } = require('../rag/ragClient');
-const { createAgentResponse } = require('./telemetryUtils');
+const BaseAgent = require("./BaseAgent");
 
-module.exports = async function GrowthAgent(agentInput = {}, context = {}) {
-  const user = agentInput.user || context.user || { id: 'demo_user' };
-  const phase = agentInput.phase || context.phase || 'Growth';
-  const intent = context.intent || agentInput.intent || null;
-  const objective =
-    agentInput.objective || context.objective || agentInput.input || context.input || 'plan de traction';
+class GrowthAgent extends BaseAgent {
+  constructor() {
+    super("GrowthAgent");
+  }
 
-  const snippets = await getRagSnippets({ query: objective, userContext: user });
+  buildSystemPrompt(ctx) {
+    return `Tu es le **GrowthAgent** de Money Factory AI.
+Ton expertises : Go-to-Market, Community Building, Marketing Web3.
 
-  return createAgentResponse('GrowthAgent', {
-    phase,
-    intent,
-    objective,
-    prompt: `Tracer une strategie d'acquisition pour "${objective}"`,
-    reasoning:
-      'Analyse les benchmarks de croissance et les audiences RAG pour definir les canaux a plus fort effet levier.',
-    action: 'Lancer la campagne pilote et suivre les indicateurs clefs proposes.',
-    summary: 'Strategie de traction generee',
-    outcome: 'Campagne acquisition planifiee',
-    payload: {
-      output: 'Canaux acquisition et metriques proposes',
-      nextSteps: ['Lancement de campagne Twitter / Discord'],
-    },
-    snippets,
-    metrics: { confidence: 0.86, success: true, impact: 'medium' },
-    user,
-  });
-};
+Tu aides les utilisateurs à préparer leur lancement, leur calendrier de contenu et leur stratégie d'acquisition.`;
+  }
 
+  buildUserPrompt(ctx) {
+    return `Contexte : ${ctx.phaseId} / ${ctx.trackId}
+Demande utilisateur : "${ctx.lastInput}"
+
+Propose des actions concrètes ou des ressources pour aider l'utilisateur.`;
+  }
+
+  // GrowthAgent might return free text or specific blocks depending on the need.
+  // For now, we keep it simple or let Zyno orchestrate it.
+  // If called directly for a "submit" action, it might return an evaluation too.
+}
+
+module.exports = GrowthAgent;

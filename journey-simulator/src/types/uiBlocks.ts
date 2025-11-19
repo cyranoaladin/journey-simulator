@@ -34,7 +34,7 @@ export type ResourceItem = {
   label: string
   description?: string
   url?: string
-  resource_type: 'article' | 'video' | 'template' | 'code_snippet' | 'checklist' | 'tool_link'
+  resource_type: 'article' | 'video' | 'template' | 'code_snippet' | 'checklist' | 'tool_link' | 'flashcard'
   agent_owner: string
 }
 export type ResourceBlock = { kind: 'resource_block'; id: string; title: string; resources: ResourceItem[] }
@@ -53,6 +53,14 @@ export type ActionSuggestion = { label: string; action_id: string }
 export type ActionSuggestionsBlock = { kind: 'action_suggestions_block'; id: string; title: string; suggestions: ActionSuggestion[] }
 export type XpBlock = { kind: 'xp_block'; id: string; title?: string; current_xp: number; gained_xp: number; next_level_xp: number; comment?: string }
 
+export type DiagramBlock = { kind: 'diagram_block'; id: string; title: string; diagram_type: 'mermaid'; content: string; caption?: string }
+
+export type Proposal = { id: string; title: string; description: string; votesFor: number; votesAgainst: number; status: 'active' | 'passed' | 'rejected'; endDate: string }
+export type DAODashboardBlock = { kind: 'dao_dashboard_block'; id: string; title: string; votingPower: number; proposals: Proposal[] }
+
+export type Project = { id: string; name: string; description: string; tags: string[]; fundingGoal: number; currentFunding: number }
+export type ProjectSelectionBlock = { kind: 'project_selection_block'; id: string; title: string; projects: Project[] }
+
 export type UIBlock =
   | TextBlock
   | ChecklistBlock
@@ -63,6 +71,9 @@ export type UIBlock =
   | EvaluationBlock
   | ActionSuggestionsBlock
   | XpBlock
+  | DiagramBlock
+  | DAODashboardBlock
+  | ProjectSelectionBlock
 
 export type AgentAction = { agent_name: string; reason: string; action: string; parameters?: Record<string, any> }
 export type NextState = { phase_id: string; completed_missions: string[]; xp_delta: number; notes?: string }

@@ -57,6 +57,10 @@
     background-color: var(--color-page);
     color: var(--color-text);
     transition: background-color 200ms ease, color 200ms ease;
+    background-image: 
+      radial-gradient(circle at 15% 50%, rgba(165, 99, 245, 0.08), transparent 25%),
+      radial-gradient(circle at 85% 30%, rgba(67, 97, 238, 0.08), transparent 25%);
+    background-attachment: fixed;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -78,9 +82,24 @@
   }
   
   .glass-effect {
-    @apply backdrop-blur-2xl border shadow-halo-soft transition-shadow duration-300 ease-out-quart;
-    @apply border-slate-200/60 bg-white/80 text-slate-900;
-    @apply dark:border-mfai-border dark:bg-mfai-surface dark:text-mfai-text;
+    @apply backdrop-blur-xl border shadow-lg transition-all duration-300 ease-out;
+    @apply border-white/20 bg-white/70 text-slate-900;
+    @apply dark:border-white/10 dark:bg-slate-900/60 dark:text-white;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .glass-effect-heavy {
+    @apply backdrop-blur-2xl border shadow-xl;
+    @apply border-white/30 bg-white/90;
+    @apply dark:border-white/15 dark:bg-slate-900/80;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 10px currentColor;
+  }
+  
+  .box-glow {
+    box-shadow: 0 0 20px rgba(165, 99, 245, 0.3);
   }
 
   .card-surface-layer {

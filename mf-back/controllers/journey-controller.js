@@ -10,7 +10,7 @@ exports.createJourney = async (req, res) => {
             current_phase,
             completion_percentage,
             phases_status } = req.body;
-        
+
         const journey = new Journey({
             user_id: req.user.id,
             user_wallet,
@@ -20,17 +20,17 @@ exports.createJourney = async (req, res) => {
             completion_percentage,
             phases_status
         });
-        
+
         await journey.save();
         res.status(201).json({
             success: true,
             journey
         });
     } catch (error) {
-        res.status(400).json({ 
-            success: false, 
+        res.status(400).json({
+            success: false,
             message: 'Failed to create journey',
-            error: error.message 
+            error: error.message
         });
     }
 };
@@ -53,10 +53,10 @@ exports.getAllJourney = async (req, res) => {
             journeys
         });
     } catch (error) {
-        res.status(400).json({ 
-            success: false, 
+        res.status(400).json({
+            success: false,
             message: 'Failed to fetch journeys',
-            error: error.message 
+            error: error.message
         });
     }
 };
@@ -69,10 +69,10 @@ exports.getUserJourneys = async (req, res) => {
             journeys
         });
     } catch (error) {
-        res.status(400).json({ 
-            success: false, 
+        res.status(400).json({
+            success: false,
             message: 'Failed to fetch user journeys',
-            error: error.message 
+            error: error.message
         });
     }
 };
@@ -111,7 +111,7 @@ exports.getUserProgress = async (req, res) => {
 exports.updateUserProgress = async (req, res) => {
     try {
         const { total_xp, current_level, completed_phases } = req.body;
-        
+
         const updateData = {};
         if (total_xp !== undefined) updateData.total_xp = total_xp;
         if (current_level !== undefined) updateData.current_level = current_level;
@@ -188,7 +188,7 @@ exports.resetUserProgress = async (req, res) => {
 exports.completePhase = async (req, res) => {
     try {
         const { phase_number, score, nft_address } = req.body;
-        
+
         // Update user progress
         const user = await User.findByIdAndUpdate(
             req.user.id,
@@ -263,4 +263,107 @@ exports.deleteJourney = async (req, res) => {
         res.status(400).json({ success: false, message: error });
     }
 
-};  
+};
+
+// --- AI / Zyno Integration ---
+
+const ZynoAgent = require('../agents/ZynoAgent');
+const TokenomicsAgent = require('../agents/TokenomicsAgent');
+// const GrowthAgent = require('../agents/GrowthAgent'); // Future use
+
+exports.step = async (req, res) => {
+    try {
+        const { journeyId } = req.params;
+        const {
+            userInput,
+            phaseId,
+            trackId,
+            language,
+            journeyState,
+            mode, // discovery, builder, expert
+            tone  // pedagogical, investor_pitch
+        } = req.body;
+
+        // In a real app, we might fetch the journey from DB to verify ownership/state
+        // const journey = await Journey.findById(journeyId);
+
+        const zyno = new ZynoAgent();
+        const ctx = {
+            userId: req.user ? req.user.id : 'anonymous',
+            journeyId,
+            phaseId,
+            trackId,
+            language: language || 'fr',
+            userProfile: {
+                persona: trackId, // simplistic mapping for now
+                mode,
+                tone
+            },
+            lastInput: userInput,
+            journeyState
+        };
+
+        const result = await zyno.run(ctx);
+
+        // Here we could save the agent logs to DB
+
+        res.status(200).json(result.payload);
+
+    } catch (error) {
+        console.error('Zyno Step Error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to process journey step',
+            error: error.message
+        });
+    }
+};
+
+exports.submit = async (req, res) => {
+    try {
+        const { journeyId } = req.params;
+        const {
+            missionId,
+            submission,
+            inputType,
+            trackId,
+            phaseId
+        } = req.body;
+
+        const AgentFactory = require('../agents/AgentFactory');
+
+        // Use AgentFactory to select the best agent for this submission
+        const agent = AgentFactory.getAgentForContext({ trackId, phaseId, missionId });
+        console.log(`[Submit] Selected agent ${agent.name} for track ${trackId}, phase ${phaseId}`);
+
+        const ctx = {
+            userId: req.user ? req.user.id : 'anonymous',
+            journeyId,
+            phaseId,
+            trackId,
+            submission,
+            lastInput: submission // for generic prompt
+        };
+
+        const result = await agent.run(ctx);
+
+        // Calculate XP delta (simple logic for MVP)
+        const xpDelta = Math.floor((result.payload.global_score || 0) * 10); // Score / 10 * 100 ?? No, score is usually /10. So * 10 = 0-100 XP.
+
+        res.status(200).json({
+            evaluation: result.payload,
+            next_state: {
+                xp_delta: xpDelta,
+                completed_missions: [missionId]
+            }
+        });
+
+    } catch (error) {
+        console.error('Submission Error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to process submission',
+            error: error.message
+        });
+    }
+};
