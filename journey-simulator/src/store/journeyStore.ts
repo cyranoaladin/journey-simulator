@@ -5,6 +5,8 @@ import { personas } from '../data/personas'
 import { api } from '../utils/api'
 import { mintProofOfSkill } from '../utils/blockchain'
 
+import type { JourneyStepResponse, Mode, Tone } from '../types/uiBlocks'
+
 interface JourneyState {
   selectedPersona: Persona | null
   currentPhase: number
@@ -12,8 +14,18 @@ interface JourneyState {
   testnetFeatures: TestnetFeatures
   isModalOpen: boolean
   modalContent: any
+  apiJourneyId: string | null
+  lastStep: JourneyStepResponse | null
+  uiMode: Mode
+  uiTone: Tone
+  isStepLoading: boolean
+  setIsStepLoading: (loading: boolean) => void
   setSelectedPersona: (persona: Persona | null) => void
   setCurrentPhase: (phase: number) => void
+  setUiMode: (mode: Mode) => void
+  setUiTone: (tone: Tone) => void
+  ensureApiJourneyId: () => string
+  runInteractiveStep: (args: { phaseId: string; trackId: string; userInput?: string }) => Promise<JourneyStepResponse>
   updateProgress: (xp: number, nfts?: string[], mfai?: number) => Promise<void>
   openModal: (content: any) => void
   closeModal: () => void
@@ -98,6 +110,11 @@ export const useJourneyStore = create<JourneyState>()(
       testnetFeatures: initialTestnetFeatures,
       isModalOpen: false,
       modalContent: null,
+      apiJourneyId: null,
+      lastStep: null,
+      uiMode: 'discovery',
+      uiTone: 'pedagogical',
+      isStepLoading: false,
 
       setSelectedPersona: (persona) => set({ 
         selectedPersona: persona, 
@@ -110,7 +127,44 @@ export const useJourneyStore = create<JourneyState>()(
       }),
       
       setCurrentPhase: (phase) => set({ currentPhase: phase }),
-      
+
+      setUiMode: (mode) => set({ uiMode: mode }),
+      setUiTone: (tone) => set({ uiTone: tone }),
+      setIsStepLoading: (loading) => set({ isStepLoading: loading }),
+
+      ensureApiJourneyId: () => {
+        const state = get()
+        if (state.apiJourneyId) return state.apiJourneyId
+        const id = (typeof crypto !== 'undefined' && 'randomUUID' in crypto) ? (crypto as any).randomUUID() : Math.random().toString(36).slice(2)
+        set({ apiJourneyId: id })
+        return id
+      },
+
+      runInteractiveStep: async ({ phaseId, trackId, userInput }) => {
+        const id = get().ensureApiJourneyId()
+        const { uiMode, uiTone } = get()
+        const body = {
+          phaseId,
+          trackId,
+          userInput,
+          language: 'fr' as const,
+          mode: uiMode,
+          tone: uiTone,
+          journeyState: { xp: get().userProgress.totalXP, completed: get().userProgress.completedPhases }
+        }
+        const base = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:3000'
+        try{
+          set({ isStepLoading: true })
+          const resp = await fetch(`${base}/api/journeys/${id}/step`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+          if (!resp.ok) throw new Error(`step failed: ${resp.status}`)
+          const json = await resp.json()
+          set({ lastStep: json })
+          return json
+        } finally {
+          set({ isStepLoading: false })
+        }
+      },
+
       updateProgress: async (xp, nfts = [], mfai = 0) => {
         const state = get()
         const newTotalXP = state.userProgress.totalXP + xp

@@ -285,7 +285,7 @@ mf-back/
 
 ### 7.6 Wallet management
 
-- `WalletButton` hooks into `WalletContext` and Solana wallet adapters.
+- `WalletButton` hooks into `WalletContext` and dynamically loads Solana wallet adapters (Phantom, Solflare, and the Torus/Web3Auth bridge — flagged as experimental pending the provider's deprecation notice).
 - `WalletStatusDisplay` surfaces address, SOL balance, and token counts.
 - `WalletFaucetButton` requests Devnet SOL for testing.
 
@@ -317,6 +317,11 @@ mf-back/
 |-------------|----------------|
 | Local dev | `VITE_SOLANA_NETWORK=devnet`, API `http://localhost:3000` |
 | Future production | Hosted API (HTTPS), Solana mainnet, Metaplex |
+
+### 8.4 Quality gates
+
+1. `npm run test:e2e` executes Playwright, covering the wallet modal flow end-to-end.
+2. Post-automation, perform manual wallet QA in Chrome or Brave with Phantom (primary) and Torus (backup) to confirm connection, reconnection, and session persistence while monitoring the Torus deprecation banner.
 
 ---
 

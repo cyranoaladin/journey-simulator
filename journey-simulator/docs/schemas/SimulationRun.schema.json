@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SimulationRun",
+  "type": "object",
+  "required": ["id", "journey_id", "started_at", "result"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "journey_id": { "type": "string", "format": "uuid" },
+    "started_at": { "type": "string", "format": "date-time" },
+    "finished_at": { "type": "string", "format": "date-time" },
+    "score": { "type": "number" },
+    "logs": { "type": "array", "items": { "type": "object" } },
+    "result": { "type": "object" }
+  },
+  "additionalProperties": false
+}

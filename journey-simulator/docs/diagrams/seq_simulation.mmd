@@ -1,0 +1,12 @@
+sequenceDiagram
+  participant U as User
+  participant F as Frontend
+  participant API as API v1
+  participant Z as Zyno (GPT-5.1)
+
+  U->>F: Choose persona/phase
+  F->>API: POST /journeys/{id}/step
+  API->>Z: Orchestrate (prompt + schema)
+  Z-->>API: JourneyStepResponse (JSON)
+  API-->>F: ui_blocks + next_state
+  F->>U: Render interactions

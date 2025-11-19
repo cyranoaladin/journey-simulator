@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useThemeStore } from './store/themeStore';
 import { WalletContextProvider } from './contexts/WalletContext';
@@ -16,6 +16,7 @@ import Resources from './pages/Resources';
 import Support from './pages/Support';
 import Zyno from './pages/Zyno';
 import JourneyCompleted from './pages/JourneyCompleted';
+import HomePage from './pages/HomePage';
 
 const ProtectedLayout = () => (
   <ProtectedRoute>
@@ -24,6 +25,8 @@ const ProtectedLayout = () => (
     </Layout>
   </ProtectedRoute>
 );
+
+const DebugMint = lazy(() => import('./pages/DebugMint'));
 
 function App() {
   const { isDark } = useThemeStore();
@@ -57,11 +60,13 @@ function App() {
             aria-hidden="true"
           />
           <Routes>
+            <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
 
             <Route element={<ProtectedLayout />}>
-              <Route index element={<Dashboard />} />
+              <Route path="debug/mint" element={<Suspense fallback={<div>Loading…</div>}><DebugMint /></Suspense>} />
+              <Route path="dashboard" element={<Dashboard />} />
               <Route path="journeys" element={<Journey />} />
               <Route path="journeys/completed" element={<JourneyCompleted />} />
               <Route path="playground" element={<Playground />} />

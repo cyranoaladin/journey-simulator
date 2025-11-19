@@ -1,20 +1,32 @@
 const { getRagSnippets } = require('../rag/ragClient');
-module.exports = async function(agentInput, context = {}) {
-  const { userId, phase, objective } = context;
-  const snippets = await getRagSnippets(objective);
-  return {
-    agent: 'GuideAgent',
+const { createAgentResponse } = require('./telemetryUtils');
+
+module.exports = async function GuideAgent(agentInput = {}, context = {}) {
+  const user = agentInput.user || context.user || { id: 'demo_user' };
+  const phase = agentInput.phase || context.phase || 'Guide';
+  const intent = context.intent || agentInput.intent || null;
+  const objective =
+    agentInput.objective || context.objective || agentInput.input || context.input || 'orientation parcours';
+
+  const snippets = await getRagSnippets({ query: objective, userContext: user });
+
+  return createAgentResponse('GuideAgent', {
     phase,
-    activationLevel: 0.8,
-    ae_summary: 'Résumé généré pour GuideAgent',
-    ae_outcome: 'Succès simulé pour GuideAgent',
-    ragEnriched: true,
-    references: snippets,
-    ingestedDocuments: [],
+    intent,
+    objective,
+    prompt: `Orienter l'utilisateur sur la mission "${objective}"`,
+    reasoning:
+      'Synthese les ressources essentielles afin de guider la prochaine action et reduire la charge cognitive.',
+    action: 'Explorer les modules recommandes et valider la prochaine etape dans le parcours.',
+    summary: 'Resume genere pour GuideAgent',
+    outcome: 'Orientation utilisateur actualisee',
     payload: {
       output: 'Bienvenue dans votre parcours !',
-      nextSteps: ['Exploration des modules recommandés']
-    }
-  };
+      nextSteps: ['Exploration des modules recommandes'],
+    },
+    snippets,
+    metrics: { confidence: 0.8, success: true, impact: 'medium' },
+    user,
+  });
 };
 

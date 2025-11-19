@@ -112,11 +112,11 @@ describe('ZynoConsole', () => {
     await waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(1));
 
     const missionSummary = await screen.findByTestId('mission-summary');
-    expect(missionSummary).toHaveTextContent('72');
+    expect(missionSummary).toHaveTextContent('50');
 
     expect(screen.getByTestId('mission-flow')).toHaveTextContent('launch-dao');
     expect(mockFetch).toHaveBeenCalledWith(
-      'http://localhost:3000/orchestration',
+      'http://127.0.0.1:3000/orchestration',
       expect.objectContaining({
         method: 'POST',
       })

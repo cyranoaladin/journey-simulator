@@ -1,28 +1,36 @@
 const { getRagSnippets } = require('../rag/ragClient');
+const { createAgentResponse } = require('./telemetryUtils');
 
 module.exports = async function BuilderAgent(agentInput = {}, context = {}) {
   const user = agentInput.user || context.user || { id: 'anonymous' };
   const phase = agentInput.phase || context.phase || 'Build';
-  const objective = agentInput.objective || context.objective || agentInput.input || context.input || 'prototype web3';
+  const intent = context.intent || agentInput.intent || null;
+  const objective =
+    agentInput.objective || context.objective || agentInput.input || context.input || 'prototype web3';
+
   const snippets = await getRagSnippets({ query: objective, userContext: user });
 
-  return {
-    agent: 'BuilderAgent',
+  return createAgentResponse('BuilderAgent', {
     phase,
-    activationLevel: 0.92,
-    ae_summary: 'Plan de construction généré',
-    ae_outcome: 'Architecture technique validée',
-    ragEnriched: snippets,
-    references: snippets,
-    ingestedDocuments: [],
+    intent,
+    objective,
+    prompt: `Elaborer un plan de construction pour "${objective}"`,
+    reasoning:
+      'Croise les references techniques et les contraintes de mission pour definir les sprints critiques du MVP.',
+    action: 'Valider le backlog propose et assigner un owner par lot critique.',
+    summary: 'Plan de construction genere',
+    outcome: 'Architecture technique validee',
     payload: {
       sprintBacklog: [
-        'Configurer les environnements et comptes développeur',
-        'Initialiser le dépôt et la CI/CD',
-        'Développer le smart contract principal',
-        'Préparer les scénarios de tests et audits'
+        'Configurer les environnements et comptes developpeur',
+        'Initialiser le depot et la CI/CD',
+        'Developper le smart contract principal',
+        'Preparer les scenarios de tests et audits',
       ],
-      recommendedStack: ['Solana', 'Anchor', 'TypeScript', 'Jest']
-    }
-  };
+      recommendedStack: ['Solana', 'Anchor', 'TypeScript', 'Jest'],
+    },
+    snippets,
+    metrics: { confidence: 0.92, success: true, impact: 'high' },
+    user,
+  });
 };

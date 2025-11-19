@@ -22,13 +22,13 @@ export default defineConfig({
       'process/': resolve(__dirname, 'node_modules/process/browser.js'),
       'process/browser': resolve(__dirname, 'node_modules/process/browser.js'),
       'process/browser.js': resolve(__dirname, 'node_modules/process/browser.js'),
-      crypto: 'crypto-browserify',
       stream: 'stream-browserify',
-      '@storybook/globalThis': '@storybook/global'
+      '@storybook/globalThis': '@storybook/global',
+      '@': resolve(__dirname, 'src'),
     },
   },
   optimizeDeps: {
-    include: ['buffer', 'process', 'crypto-browserify', 'stream-browserify', '@storybook/global'],
+    include: ['buffer', 'process', 'stream-browserify', '@storybook/global'],
     exclude: ['lucide-react'],
   },
   define: {

@@ -1,6 +1,8 @@
 import type { FC } from 'react';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { JourneyPhase } from '../../types/journey';
+import type { AgentTimelineEntry } from '../Zyno/types';
 import {
   CheckCircle,
   Trophy,
@@ -23,6 +25,10 @@ import {
 } from 'lucide-react';
 import { getProofType } from '../../data/proofsData';
 import { useJourneyStore } from '../../store/journeyStore';
+import PhaseInteractionBlock from './PhaseInteractionBlock';
+import UIBlocksRenderer from '../UIBlocks/UIBlocksRenderer';
+import MintCelebrationBanner from '../MintCelebrationBanner';
+import type { JourneyStepResponse } from '../../types/uiBlocks';
 
 interface PhaseSectionProps {
   phase: JourneyPhase;
@@ -34,6 +40,8 @@ interface PhaseSectionProps {
   onStake?: () => void;
   onVote?: () => void;
   isProcessing?: boolean;
+  activeStep?: AgentTimelineEntry | null;
+  onFeedbackRequest?: (step: AgentTimelineEntry) => void;
 }
 
 const PhaseSection: FC<PhaseSectionProps> = ({
@@ -46,8 +54,11 @@ const PhaseSection: FC<PhaseSectionProps> = ({
   onStake,
   onVote,
   isProcessing = false,
+  activeStep,
+  onFeedbackRequest,
 }) => {
-  const { selectedPersona } = useJourneyStore();
+  const { selectedPersona, lastStep, runInteractiveStep, uiMode, uiTone, setUiMode, setUiTone, openModal, isStepLoading } = useJourneyStore();
+  const [stepError, setStepError] = useState<string | null>(null);
 
   const highlightText = (text: string) =>
     text.replace(
@@ -172,6 +183,14 @@ const PhaseSection: FC<PhaseSectionProps> = ({
 
       <p className="text-sm opacity-90 mb-4">{phase.description}</p>
 
+      <div className="mb-4">
+        <PhaseInteractionBlock
+          phaseId={phase.id}
+          currentStep={activeStep ?? null}
+          onFeedback={onFeedbackRequest}
+        />
+      </div>
+
       <div className="bg-white/5 rounded-lg p-3 mb-4">
         <h4 className="font-semibold text-sm mb-2">Mission</h4>
         <p
@@ -211,6 +230,93 @@ const PhaseSection: FC<PhaseSectionProps> = ({
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Interactive UI Blocks (Zyno) */}
+      <div className="mb-4 space-y-2">
+        <div className="flex items-center justify-between">
+          <h4 className="font-semibold text-sm">Phase interactive (Zyno)</h4>
+          <div className="flex items-center gap-2 text-xs">
+            <select value={uiMode} onChange={(e)=>setUiMode(e.target.value as any)} className="bg-white/10 rounded px-2 py-1">
+              <option value="discovery">discovery</option>
+              <option value="builder">builder</option>
+              <option value="expert">expert</option>
+            </select>
+            <select value={uiTone} onChange={(e)=>setUiTone(e.target.value as any)} className="bg-white/10 rounded px-2 py-1">
+              <option value="pedagogical">pedagogical</option>
+              <option value="investor_pitch">investor_pitch</option>
+              <option value="critical">critical</option>
+            </select>
+            <button
+              className="px-3 py-1.5 rounded bg-gradient-primary text-white"
+              onClick={async () => {
+                try{
+                  setStepError(null)
+                  await runInteractiveStep({ phaseId: phase.id, trackId: selectedPersona?.id || 'track' })
+                }catch(e:any){
+                  setStepError(e?.message || 'Erreur lors du chargement de la phase.')
+                }
+              }}
+              disabled={isProcessing || isStepLoading}
+            >
+              {isStepLoading ? <Loader2 size={14} className="animate-spin" /> : 'Lancer l’étape'}
+            </button>
+          </div>
+        </div>
+        {stepError && (
+          <div className="mb-2 rounded-lg border border-red-500/40 bg-red-600/15 text-red-200 text-xs px-3 py-2">
+            {stepError}
+          </div>
+        )}
+        {lastStep && (
+          <>
+            {/* Mint celebration banner when evaluation score is high */}
+            {(() => {
+              try{
+                const evalBlock = (lastStep as any)?.ui_blocks?.find((b:any)=>b.kind==='evaluation_block')
+                if(!evalBlock) return null
+                const score = Number(evalBlock.global_score || 0)
+                const maxScore = Number(evalBlock.max_score || 100)
+                const threshold = Math.max(70, Math.round(maxScore*0.6))
+                if(score < threshold) return null
+                const phaseId = (lastStep as any)?.metadata?.phase_id || 'phase'
+                return (
+                  <div className="mb-2">
+                    <MintCelebrationBanner
+                      score={score}
+                      maxScore={maxScore}
+                      phaseId={phaseId}
+                      onMint={() => {
+                        const cert = {
+                          id: `proof-${phaseId}`,
+                          name: `Proof-of-Skill™: ${phaseId}`,
+                          description: evalBlock.feedback || 'Skill certification',
+                          imageUrl: '',
+                          attributes: [
+                            { trait_type: 'Score', value: `${score}/${maxScore}` },
+                            { trait_type: 'Phase', value: phaseId },
+                          ]
+                        }
+                        openModal({ type: 'certification', certification: cert })
+                      }}
+                    />
+                  </div>
+                )
+              }catch{ return null }
+            })()}
+            {isStepLoading ? (
+              <div className="rounded-xl border border-white/10 p-4">
+                <div className="animate-pulse space-y-3">
+                  <div className="h-4 bg-white/10 rounded w-1/3" />
+                  <div className="h-24 bg-white/10 rounded" />
+                  <div className="h-4 bg-white/10 rounded w-1/2" />
+                </div>
+              </div>
+            ) : (
+              <UIBlocksRenderer response={lastStep as JourneyStepResponse} />
+            )}
+          </>
+        )}
       </div>
 
       <div className="mb-4">

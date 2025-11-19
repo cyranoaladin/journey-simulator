@@ -1,0 +1,12 @@
+sequenceDiagram
+  participant U as User
+  participant F as Frontend
+  participant API as API v1
+  participant W as Wallet
+
+  U->>F: Connect wallet
+  F->>API: POST /auth/siws/challenge
+  API-->>F: challenge
+  F->>W: sign(challenge)
+  F->>API: POST /auth/siws/verify (signature)
+  API-->>F: JWT

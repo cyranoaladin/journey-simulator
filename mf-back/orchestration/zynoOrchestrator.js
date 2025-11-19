@@ -6,6 +6,99 @@ const computeAEPO = require('../metrics/computeAEPO');
 const { saveMetric } = require('../memory/agent_metrics');
 const agentMemory = require('../memory/agent_memory');
 
+function normalizeReferences(agentResult = {}) {
+  if (Array.isArray(agentResult.sources)) {
+    return agentResult.sources;
+  }
+  if (Array.isArray(agentResult.references)) {
+    return agentResult.references;
+  }
+  if (Array.isArray(agentResult.ragEnriched)) {
+    return agentResult.ragEnriched;
+  }
+  if (Array.isArray(agentResult.ragSnippets)) {
+    return agentResult.ragSnippets;
+  }
+  return [];
+}
+
+function summarizeOutput(output) {
+  if (output == null) {
+    return '';
+  }
+  if (typeof output === 'string') {
+    return output.slice(0, 280);
+  }
+  try {
+    return JSON.stringify(output).slice(0, 280);
+  } catch (error) {
+    return '';
+  }
+}
+
+function normalizeAgentResponse(agentName, agentResult = {}, context = {}, metadata = {}) {
+  const {
+    phase = null,
+    intent = null,
+    input: contextInput = null,
+    objective = null,
+  } = context;
+
+  const promptSent = agentResult.prompt ?? agentResultPrompt(agentResult) ?? contextInput ?? objective ?? null;
+  const references = normalizeReferences(agentResult);
+  const durationMs = metadata.durationMs ?? agentResult?.metrics?.durationMs ?? null;
+  const startedAt = metadata.startedAt ?? null;
+  const completedAt = metadata.completedAt ?? null;
+
+  const metrics = {
+    ...(agentResult.metrics || {}),
+    durationMs,
+    startedAt,
+    completedAt,
+  };
+
+  const reasoning = agentResult.reasoning ?? agentResult.ae_summary ?? agentResult.summary ?? null;
+  const action = agentResult.action ?? agentResult.ae_outcome ?? null;
+  const structuredOutput = agentResult.output ?? agentResult.payload ?? null;
+  const response = agentResult.response ?? agentResult.rawResponse ?? agentResult.payload ?? null;
+
+  return {
+    agent: agentName,
+    phase,
+    intent,
+    prompt: promptSent,
+    reasoning,
+    action,
+    sources: references,
+    references,
+    ragSnippets: references,
+    ragEnriched: references,
+    output: structuredOutput,
+    response,
+    feedback: {
+      ae_summary: agentResult.ae_summary ?? null,
+      ae_outcome: agentResult.ae_outcome ?? null,
+      aepo: metrics?.aepo ?? null,
+      aeco: metrics?.aeco ?? null,
+    },
+    metrics,
+    raw: agentResult,
+  };
+}
+
+function agentResultPrompt(agentResult = {}) {
+  if (typeof agentResult.prompt === 'string') {
+    return agentResult.prompt;
+  }
+  if (agentResult?.meta?.prompt) {
+    return agentResult.meta.prompt;
+  }
+  if (agentResult?.payload?.prompt) {
+    return agentResult.payload.prompt;
+  }
+  return null;
+}
+
 async function detectIntent(userInput = '') {
   const normalized = (userInput || '').toLowerCase();
   if (normalized.includes('launchpad')) return 'launchpad_readiness';
@@ -40,8 +133,9 @@ function mapIntentToAgents(intent) {
   return taskMap[intent]?.agents || [];
 }
 
-async function triggerAgents(agentNames, mode, context) {
+async function triggerAgents(agentNames, mode, context, intent) {
   const results = {};
+  const timeline = [];
   const missionInput = context.input || context.objective || '';
   const buildAgentInput = () => ({
     user: context.user || { id: context.userId },
@@ -100,17 +194,44 @@ async function triggerAgents(agentNames, mode, context) {
         ae_outcome: agentResult?.ae_outcome ?? null,
         payload: agentResult?.payload ?? null
       });
-
-      return {
-        ...agentResult,
-        metrics: {
-          ...(agentResult?.metrics || {}),
-          aepo: aepoScore,
+      const completedAt = new Date();
+      const normalized = normalizeAgentResponse(
+        agentName,
+        {
+          ...agentResult,
+          metrics: {
+            ...(agentResult?.metrics || {}),
+            aepo: aepoScore,
+            durationMs,
+            success,
+            errorCount
+          }
+        },
+        { ...context, intent },
+        {
           durationMs,
-          success,
-          errorCount
+          startedAt: new Date(startedAt).toISOString(),
+          completedAt: completedAt.toISOString()
         }
-      };
+      );
+
+      timeline.push({
+        agent: agentName,
+        phase: context.phase ?? null,
+        intent,
+        status: success ? 'completed' : 'failed',
+        startedAt: normalized.metrics.startedAt ?? new Date(startedAt).toISOString(),
+        completedAt: normalized.metrics.completedAt ?? completedAt.toISOString(),
+        durationMs,
+        prompt: normalized.prompt,
+        reasoning: normalized.reasoning,
+        action: normalized.action,
+        summary: summarizeOutput(normalized.output ?? normalized.response),
+        sources: normalized.sources,
+        feedback: normalized.feedback,
+      });
+
+      return normalized;
     } catch (error) {
       const durationMs = Date.now() - startedAt;
       const aepoScore = computeAEPO({ duration: durationMs, success: false, retries: 1 });
@@ -129,6 +250,26 @@ async function triggerAgents(agentNames, mode, context) {
         success: false,
         errorCount: 1,
         error: error.message
+      });
+      timeline.push({
+        agent: agentName,
+        phase: context.phase ?? null,
+        intent,
+        status: 'failed',
+        startedAt: new Date(startedAt).toISOString(),
+        completedAt: new Date().toISOString(),
+        durationMs,
+        prompt: context.input ?? context.objective ?? null,
+        reasoning: null,
+        action: null,
+        summary: error?.message ?? 'Erreur non spécifiée',
+        sources: [],
+        feedback: {
+          ae_summary: null,
+          ae_outcome: null,
+          aepo: aepoScore,
+          aeco: null,
+        },
       });
       throw error;
     }
@@ -158,7 +299,7 @@ async function triggerAgents(agentNames, mode, context) {
       }
     }
   }
-  return results;
+  return { resultMap: results, timeline };
 }
 
 async function orchestrateZyno(userInput, context = {}) {
@@ -173,7 +314,9 @@ async function orchestrateZyno(userInput, context = {}) {
       intent,
       mode,
       parcoursTemplate: template,
-      results: {}
+      results: {},
+      timeline: [],
+      currentStep: null
     };
   }
 
@@ -181,14 +324,27 @@ async function orchestrateZyno(userInput, context = {}) {
     ...context,
     input: context.input || userInput,
     objective: context.objective || userInput
-  });
+  }, intent);
+
+  const { resultMap, timeline } = executionResult;
+  const currentStep = timeline.length ? timeline[timeline.length - 1] : null;
+
+  if (currentStep && context.userId) {
+    agentMemory.update(context.userId, {
+      lastStep: currentStep,
+      lastIntent: intent,
+      lastTimeline: timeline.slice(-5),
+    });
+  }
 
   return {
     executedAgents: agents,
     intent,
     mode,
     parcoursTemplate: template,
-    results: executionResult
+    results: resultMap,
+    timeline,
+    currentStep
   };
 }
 

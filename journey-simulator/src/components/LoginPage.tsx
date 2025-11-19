@@ -74,9 +74,9 @@ const LoginPage: React.FC = () => {
   return (
         <>
       <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 relative">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-accent-cyan/10 via-accent-purple/10 to-accent-gold/10"></div>
-          <div className="absolute inset-0 opacity-20 auth-background-pattern"></div>
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-accent-cyan/10 via-accent-purple/10 to-accent-gold/10"></div>
+          <div className="pointer-events-none absolute inset-0 opacity-20 auth-background-pattern"></div>
         </div>
 
       <motion.div

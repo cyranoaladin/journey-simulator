@@ -25,6 +25,7 @@ import AgentFeedbackForm from './AgentFeedbackForm';
 import { API_BASE_URL } from '../../utils/api';
 import { AgentScoreboardProvider } from './AgentScoreboardContext';
 import ResourceUploader from './ResourceUploader';
+import ZynoDecisionPanel from './ZynoDecisionPanel';
 
 const quickIntents = [
   {
@@ -90,22 +91,23 @@ export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
   const shouldReduceMotion = useReducedMotion();
 
   const buildSummaryFromResult = (payload: OrchestrationResult): MissionSummary => {
-    const activationLevels = payload.executedAgents
-      .map((agentName: string) => payload.results[agentName]?.activationLevel ?? null)
+    const timeline = payload.timeline ?? [];
+    const agentScores = timeline
+      .map((entry) => entry.feedback?.aepo ?? payload.results[entry.agent]?.feedback?.aepo ?? null)
       .filter((value): value is number => typeof value === 'number');
 
-    const aepoScore = activationLevels.length
-      ? Math.round(
-          (activationLevels.reduce((sum: number, value: number) => sum + value, 0) /
-            activationLevels.length) *
-            100,
+    const aepoScore = agentScores.length
+      ? Math.min(
+          100,
+          Math.round(
+            agentScores.reduce((sum, value) => sum + value, 0) / agentScores.length
+          )
         )
       : 50;
 
-    const generatedTextLines = payload.executedAgents.map((agentName: string) => {
-      const agentResult = payload.results[agentName];
-      const summaryText = agentResult?.ae_summary ?? 'Résumé indisponible';
-      return `• ${agentName} → ${summaryText}`;
+    const generatedTextLines = timeline.map((entry) => {
+      const reasoning = entry.reasoning ?? payload.results[entry.agent]?.feedback?.ae_summary ?? 'Résumé indisponible';
+      return `• ${entry.agent} → ${reasoning}`;
     });
 
     return {
@@ -113,7 +115,7 @@ export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
       timestamp: new Date().toISOString(),
       aepoScore,
       aecoPhase: payload.intent,
-      agents: payload.executedAgents,
+      agents: timeline.length ? timeline.map((entry) => entry.agent) : payload.executedAgents,
       generatedText: `Synthèse générée automatiquement :\n${generatedTextLines.join('\n')}`,
     };
   };
@@ -195,6 +197,9 @@ export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
       timestamp: new Date(missionSummary.timestamp).toLocaleString(),
     };
   }, [missionSummary]);
+
+  const currentTimeline = result?.timeline ?? [];
+  const currentStep = result?.currentStep ?? null;
 
   return (
     <AgentScoreboardProvider>
@@ -405,6 +410,8 @@ export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
           </div>
 
           <div className="flex flex-col gap-5">
+            <ZynoDecisionPanel currentStep={currentStep} timeline={currentTimeline} />
+
             <MissionFeedbackSummary summary={missionSummary} />
 
             {result ? (

@@ -1,0 +1,20 @@
+graph LR
+  subgraph User
+    U[User]
+  end
+  subgraph Frontend
+    F[Journey Simulator (React/TS)]
+  end
+  subgraph Backend
+    B[API v1]
+    Z[Zyno Orchestrator]
+    A[Agents]
+    DB[(DB)]
+  end
+  subgraph Solana
+    S[(Solana devnet)]
+  end
+
+  U --> F --> B --> Z --> A
+  B --> DB
+  B --> S

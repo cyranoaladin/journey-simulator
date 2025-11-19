@@ -35,7 +35,7 @@ type NavItem = {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Home', href: '/', icon: Sparkles },
+  { label: 'Home', href: '/dashboard', icon: Sparkles },
   { label: 'Journeys', href: '/journeys', icon: Waypoints },
   { label: 'Zyno Console', href: '/zyno', icon: BrainCircuit, badge: 'Live' },
   { label: 'Playground', href: '/playground', icon: Atom },

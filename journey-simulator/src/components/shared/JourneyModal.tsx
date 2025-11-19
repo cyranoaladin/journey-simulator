@@ -14,6 +14,7 @@ import { useJourneyStore } from '../../store/journeyStore';
 import CertificationModal from '../CertificationModal';
 import StakingModal from '../StakingModal';
 import DAOVoteModal from '../DAOVoteModal';
+import AgentFeedbackModal from '../Zyno/AgentFeedbackModal';
 import SkillchainCard from '../SkillchainCard';
 import { personas } from '../../data/personas';
 import type { AccessPassHolder } from '../../types/journey';
@@ -327,6 +328,17 @@ const JourneyModal = () => {
         return renderPhaseModal();
       case 'holder':
         return renderHolderModal();
+      case 'agent-feedback':
+        if (!modalContent.step) {
+          return null;
+        }
+        return (
+          <AgentFeedbackModal
+            step={modalContent.step}
+            userId={modalContent.userId || 'demo_user'}
+            missionId={modalContent.missionId}
+          />
+        );
       case 'certification':
         return (
           <CertificationModal

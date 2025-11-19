@@ -6,9 +6,8 @@ on:
       - 'mf-back/**'
       - '.github/workflows/backend-tests.yml'
   pull_request:
-    paths:
-      - 'mf-back/**'
-      - '.github/workflows/backend-tests.yml'
+    branches:
+      - '**'
 
 jobs:
   test:

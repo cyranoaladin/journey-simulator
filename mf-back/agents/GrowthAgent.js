@@ -1,21 +1,32 @@
 const { getRagSnippets } = require('../rag/ragClient');
+const { createAgentResponse } = require('./telemetryUtils');
 
-module.exports = async function(agentInput, context = {}) {
-  const { userId, phase, objective } = context;
-  const snippets = await getRagSnippets(objective);
-  return {
-    agent: 'GrowthAgent',
+module.exports = async function GrowthAgent(agentInput = {}, context = {}) {
+  const user = agentInput.user || context.user || { id: 'demo_user' };
+  const phase = agentInput.phase || context.phase || 'Growth';
+  const intent = context.intent || agentInput.intent || null;
+  const objective =
+    agentInput.objective || context.objective || agentInput.input || context.input || 'plan de traction';
+
+  const snippets = await getRagSnippets({ query: objective, userContext: user });
+
+  return createAgentResponse('GrowthAgent', {
     phase,
-    activationLevel: 0.85,
-    ae_summary: 'Stratégie de traction générée',
-    ae_outcome: 'Campagne d’acquisition planifiée',
-    ragEnriched: true,
-    references: snippets,
-    ingestedDocuments: [],
+    intent,
+    objective,
+    prompt: `Tracer une strategie d'acquisition pour "${objective}"`,
+    reasoning:
+      'Analyse les benchmarks de croissance et les audiences RAG pour definir les canaux a plus fort effet levier.',
+    action: 'Lancer la campagne pilote et suivre les indicateurs clefs proposes.',
+    summary: 'Strategie de traction generee',
+    outcome: 'Campagne acquisition planifiee',
     payload: {
-      output: 'Canaux d’acquisition et métriques proposés',
-      nextSteps: ['Lancement de campagne Twitter / Discord']
-    }
-  };
+      output: 'Canaux acquisition et metriques proposes',
+      nextSteps: ['Lancement de campagne Twitter / Discord'],
+    },
+    snippets,
+    metrics: { confidence: 0.86, success: true, impact: 'medium' },
+    user,
+  });
 };
 

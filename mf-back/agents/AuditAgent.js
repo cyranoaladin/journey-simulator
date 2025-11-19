@@ -1,21 +1,32 @@
 const { getRagSnippets } = require('../rag/ragClient');
+const { createAgentResponse } = require('./telemetryUtils');
 
-module.exports = async function(agentInput, context = {}) {
-  const { userId, phase, objective } = context;
-  const snippets = await getRagSnippets(objective);
-  return {
-    agent: 'AuditAgent',
+module.exports = async function AuditAgent(agentInput = {}, context = {}) {
+  const user = agentInput.user || context.user || { id: 'demo_user' };
+  const phase = agentInput.phase || context.phase || 'Audit';
+  const intent = context.intent || agentInput.intent || null;
+  const objective =
+    agentInput.objective || context.objective || agentInput.input || context.input || 'audit securite contrat';
+
+  const snippets = await getRagSnippets({ query: objective, userContext: user });
+
+  return createAgentResponse('AuditAgent', {
     phase,
-    activationLevel: 0.9,
-    ae_summary: 'Analyse de sécurité automatique initiée',
-    ae_outcome: 'Points faibles identifiés + recommandations',
-    ragEnriched: true,
-    references: snippets,
-    ingestedDocuments: [],
+    intent,
+    objective,
+    prompt: `Identifier les risques de securite critiques pour "${objective}"`,
+    reasoning:
+      'Analyse les contrats, checklists de securite et incidents similaires pour detecter les surfaces de risque.',
+    action: 'Prioriser les correctifs proposes et planifier un audit externe cible.',
+    summary: 'Analyse de securite automatique initiee',
+    outcome: 'Points faibles identifies et recommandations structurees',
     payload: {
-      output: 'Audit préliminaire des contrats terminé',
-      nextSteps: ['Correction des vulnérabilités', 'Audit formel externe']
-    }
-  };
+      output: 'Audit preliminaire des contrats termine',
+      nextSteps: ['Correction des vulnerabilites', 'Audit formel externe'],
+    },
+    snippets,
+    metrics: { confidence: 0.9, success: true, impact: 'high' },
+    user,
+  });
 };
 

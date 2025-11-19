@@ -1,12 +1,15 @@
 import { useEffect, useState, type FC } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Coins, Award, Rocket, Vote, RefreshCw } from 'lucide-react';
+import { Trophy, Coins, Award, Rocket, Vote, RefreshCw, ExternalLink } from 'lucide-react';
 import { useJourneyStore } from '../../store/journeyStore';
+
+import { API_BASE_URL } from '../../utils/api'
 
 const JourneyDashboard: FC = () => {
   const { userProgress, selectedPersona, loadUserProgress } = useJourneyStore();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [lastMint, setLastMint] = useState<{ signature: string; network: string; createdAt: string } | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -17,6 +20,16 @@ const JourneyDashboard: FC = () => {
         if (isMounted) {
           setLastUpdated(new Date());
         }
+        // Fetch last mint (best-effort)
+        try{
+          const headers: Record<string,string> = {}
+          try { const uid = localStorage.getItem('userId'); if(uid) headers['x-user-id'] = uid } catch {}
+          const res = await fetch(`${API_BASE_URL}/api/mint/last`, { headers })
+          if(res.ok){
+            const json = await res.json()
+            if(json?.last){ setLastMint({ signature: json.last.signature, network: json.last.network, createdAt: json.last.createdAt }) }
+          }
+        }catch{}
       } catch (error) {
         console.error('Failed to refresh progress:', error);
       }
@@ -173,6 +186,39 @@ const JourneyDashboard: FC = () => {
           <div className="text-sm text-accent-cyan mt-1">
             {userProgress.passLevel === 'Free' ? 'Upgrade available' : 'Premium active'}
           </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+className="card" id="last-mint-card"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <Award className="text-accent-purple" size={22} />
+            <span className="text-base opacity-80">Last Mint</span>
+          </div>
+          {lastMint ? (
+            <>
+              <div className="text-xs opacity-80 mb-1">{new Date(lastMint.createdAt).toLocaleString()}</div>
+              <div className="text-xs break-all opacity-70">
+                {lastMint.signature || 'N/A'}
+              </div>
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-xs opacity-70">{lastMint.network}</span>
+                {lastMint.signature && (
+                  <button
+                    onClick={()=>window.open(`https://explorer.solana.com/tx/${lastMint.signature}?cluster=devnet`, '_blank')}
+                    className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white"
+                  >
+                    <ExternalLink size={14} /> Explorer
+                  </button>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="text-sm opacity-60">No recent mint</div>
+          )}
         </motion.div>
 
         {selectedPersona && (

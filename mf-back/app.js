@@ -46,16 +46,25 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 // CORS middleware
-const allowedOrigins = [
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
+const allowedOrigins = new Set([
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:4173',
   'http://127.0.0.1:4173',
-  'http://127.0.0.1:5173'
-]
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:5174'
+]);
 
 const corsOptions = {
-  origin: allowedOrigins,
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.has(origin) || isDevelopment) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`Origin ${origin} not allowed by CORS`));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'x-api-key', 'X-API-KEY']

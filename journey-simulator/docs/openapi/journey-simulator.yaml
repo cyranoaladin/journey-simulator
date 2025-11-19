@@ -1,0 +1,268 @@
+openapi: 3.0.3
+info:
+  title: Journey Simulator API
+  version: 1.0.0
+  description: API v1 pour orchestrer les parcours (Zyno + agents) et les intégrations Solana (devnet)
+servers:
+  - url: /api/v1
+paths:
+  /auth/siws/challenge:
+    post:
+      summary: Émettre un challenge SIWS
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  challenge:
+                    type: string
+  /auth/siws/verify:
+    post:
+      summary: Vérifier la signature SIWS et émettre un JWT
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+  /journeys:
+    post:
+      summary: Créer un journey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title: { type: string, minLength: 3 }
+                userEmail: { type: string }
+              required: [title]
+      responses:
+        "201": { description: Created }
+        "409": { description: Conflict }
+  /journeys/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      summary: Récupérer un journey
+      responses:
+        "200": { description: OK }
+        "404": { description: Not Found }
+  /journeys/{id}/step:
+    post:
+      summary: Exécuter une étape orchestrée par Zyno (GPT-5.1)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phaseId: { type: string }
+                trackId: { type: string }
+                userInput: { type: string, description: "Entrée libre pour guidage utilisateur (facultatif)." }
+                actionId: { type: string, description: "Identifiant d’action issu d’un ActionSuggestionsBlock (facultatif)." }
+                language: { type: string, enum: [fr, en] }
+                mode: { type: string, enum: [discovery, builder, expert] }
+                tone: { type: string, enum: [pedagogical, investor_pitch, critical] }
+                journeyState: { type: object }
+              required: [phaseId, trackId, language, journeyState]
+      responses:
+        "200":
+          description: UI Blocks + next_state pour rendu front
+          content:
+            application/json:
+              schema:
+                $ref: "../schemas/JourneyStepResponse.schema.json"
+  /journeys/{id}/complete:
+    post:
+      summary: Marquer le journey comme complété
+      responses:
+        "200": { description: OK }
+  /journeys/{id}/submit:
+    post:
+      summary: Soumettre une mission pour évaluation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                missionId: { type: string }
+                inputType: { type: string, enum: [text, markdown_document, code_snippet, link, choice] }
+                submission: { type: string }
+                language: { type: string, enum: [fr, en] }
+                mode: { type: string, enum: [discovery, builder, expert] }
+                tone: { type: string, enum: [pedagogical, investor_pitch, critical] }
+                trackId: { type: string }
+                phaseId: { type: string }
+                journeyState: { type: object }
+              required: [missionId, inputType, submission, language]
+      responses:
+        "200":
+          description: Évaluation + XP (UI Blocks + next_state)
+          content:
+            application/json:
+              schema:
+                $ref: "../schemas/JourneyStepResponse.schema.json"
+  /journeys/{id}/state:
+    get:
+      summary: Récupérer l’état courant (last_state) d’un journey
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: false
+          description: Optionnel. Si fourni, vérifie que l’état appartient à cet utilisateur.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string }
+                  last_state: { type: object }
+                  last_metadata: { type: object }
+                  updatedAt: { type: number }
+        "404": { description: Not Found }
+  /journeys/{id}/mint-badge:
+    post:
+      summary: Demander le mint d’un badge NFT (devnet)
+      responses:
+        "202":
+          description: Accepted (tx en cours)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  signature: { type: string }
+                  explorerUrl: { type: string }
+  /mint/last:
+    get:
+      summary: Récupérer le dernier mint enregistré
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: false
+          description: Optionnel. Si fourni, filtre par utilisateur. Alternativement, l’en-tête x-user-id peut être utilisé.
+        - in: header
+          name: x-user-id
+          schema:
+            type: string
+          required: false
+          description: Optionnel. Identifie l’utilisateur pour retourner uniquement son dernier mint.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  last:
+                    type: object
+                    nullable: true
+                    properties:
+                      signature: { type: string }
+                      network: { type: string }
+                      createdAt: { type: string, format: date-time }
+                      spec: { type: object }
+  /journeys/audit:
+    post:
+      summary: Audit rapide d’un projet existant (pitch ou URL)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pitch: { type: string }
+                url: { type: string }
+                language: { type: string, enum: [fr, en] }
+              anyOf:
+                - required: [pitch]
+                - required: [url]
+      responses:
+        "200":
+          description: Évaluation + document d’audit (UI Blocks)
+          content:
+            application/json:
+              schema:
+                $ref: "../schemas/JourneyStepResponse.schema.json"
+  /healthz:
+    get:
+      summary: Healthcheck
+      responses:
+        "200": { description: OK }
+  /metrics:
+    get:
+      summary: Exposer les métriques Prometheus
+      responses:
+        "200": { description: OK }
+  /agents/logs:
+    get:
+      summary: Lister les derniers événements des agents (activité)
+      parameters:
+        - in: query
+          name: journeyId
+          schema: { type: string }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 200 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  logs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ts: { type: number }
+                        journeyId: { type: string }
+                        userId: { type: string }
+                        agent: { type: string }
+                        action: { type: string }
+                        details: { type: object }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code: { type: string }
+            message: { type: string }
+            correlation_id: { type: string }
+security:
+  - bearerAuth: []

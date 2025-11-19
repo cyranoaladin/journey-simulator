@@ -43,7 +43,10 @@ describe('Agent outputs stay consistent', () => {
       expect(result.agent).toBe(agentName);
       expect(result.phase).toBe(sharedContext.phase);
       expect(result.ragEnriched).toBeTruthy();
-      expect(result.references).toEqual([{ title: 'playbook', content: 'Use fallback knowledge.' }]);
+      expect(result.references).toHaveLength(1);
+      expect(result.references[0]).toEqual(
+        expect.objectContaining({ title: 'playbook', content: 'Use fallback knowledge.' })
+      );
       expect(result.payload).toBeDefined();
       expect(getRagSnippets).toHaveBeenCalled();
     });

@@ -5,13 +5,13 @@ On distingue **Backend (BE)**, **Frontend (FE)** et **Contenu / Produit (CT)**.
 
 ## 1. Préparation générale & environnement
 
-* [ ] **(BE)** `.env` configuré avec :
+* [x] **(BE)** `.env` configuré avec :
 
-  * [ ] `OPENAI_API_KEY`
-  * [ ] paramètres de base pour Solana devnet (RPC, cluster)
-  * [ ] variables d’URL frontend / backend (si séparés)
-* [ ] **(BE)** Client OpenAI centralisé (`openaiClient.ts` ou équivalent) instancié une seule fois.
-* [ ] **(BE)** Environnement de staging fonctionnel (base + backend + frontend) pour les tests internes.
+  * [x] `OPENAI_API_KEY`
+  * [x] paramètres de base pour Solana devnet (RPC, cluster)
+  * [x] variables d’URL frontend / backend (si séparés)
+* [x] **(BE)** Client OpenAI centralisé (`openaiClient.ts` ou équivalent) instancié une seule fois.
+* [x] **(BE)** Environnement de staging fonctionnel (base + backend + frontend) pour les tests internes.
 * [x] **(BE)** Script simple pour réinitialiser un utilisateur “de démo” (journey_state + XP + NFTs) entre deux démonstrations.
 
 ---
@@ -20,30 +20,30 @@ On distingue **Backend (BE)**, **Frontend (FE)** et **Contenu / Produit (CT)**.
 
 ### 2.1. Accès au modèle
 
-* [ ] **(BE)** Fonction générique d’appel LLM pour Zyno (via Responses API ou Chat Completions) :
+* [x] **(BE)** Fonction générique d’appel LLM pour Zyno (via Responses API ou Chat Completions) :
 
-  * [ ] Paramètre `model` (par défaut `"gpt-5.1"`).
-  * [ ] Paramètre `temperature`.
-  * [ ] Paramètre de longueur (`max_output_tokens` / `max_tokens`).
-* [ ] **(BE)** Gestion des erreurs LLM :
+  * [x] Paramètre `model` (par défaut `"gpt-5.1"`).
+  * [x] Paramètre `temperature`.
+  * [x] Paramètre de longueur (`max_output_tokens` / `max_tokens`).
+* [x] **(BE)** Gestion des erreurs LLM :
 
-  * [ ] Retry de base sur erreurs réseau / 5xx.
-  * [ ] Gestion des 429 (rate limit) avec backoff.
-  * [ ] Logs d’erreurs lisibles pour debug.
+  * [x] Retry de base sur erreurs réseau / 5xx.
+  * [x] Gestion des 429 (rate limit) avec backoff.
+  * [x] Logs d’erreurs lisibles pour debug.
 
 ### 2.2. Zyno orchestrateur
 
-* [ ] **(BE)** Prompt système **complet** de Zyno implémenté (celui que nous avons défini, adapté si besoin).
-* [ ] **(BE)** Zyno reçoit bien :
+* [x] **(BE)** Prompt système **complet** de Zyno implémenté (celui que nous avons défini, adapté si besoin).
+* [x] **(BE)** Zyno reçoit bien :
 
-  * [ ] `persona_id`
-  * [ ] `journey_track` (builder / growth / dao / migration / education…)
-  * [ ] `phase_id` (learn / build / prove / activate / scale)
-  * [ ] `mode` (discovery / builder / expert)
-  * [ ] `language` (fr/en)
-  * [ ] état courant du `journey_state` (missions, XP, NFTs…)
-  * [ ] dernière entrée utilisateur.
-* [ ] **(BE)** Réponse de Zyno **strictement** au format JSON `JourneyStepResponse` (Structured Outputs / JSON Schema).
+  * [x] `persona_id`
+  * [x] `journey_track` (builder / growth / dao / migration / education…)
+  * [x] `phase_id` (learn / build / prove / activate / scale)
+  * [x] `mode` (discovery / builder / expert)
+  * [x] `language` (fr/en)
+  * [x] état courant du `journey_state` (missions, XP, NFTs…)
+  * [x] dernière entrée utilisateur.
+* [x] **(BE)** Réponse de Zyno **strictement** au format JSON `JourneyStepResponse` (Structured Outputs / JSON Schema).
 * [x] **(BE)** Validation JSON côté backend (parser, vérifier que tous les champs obligatoires sont présents).
 * [x] **(BE)** Logs pour chaque appel Zyno :
 
@@ -90,24 +90,24 @@ On distingue **Backend (BE)**, **Frontend (FE)** et **Contenu / Produit (CT)**.
 ### 3.3. Progression, XP, modes
 
 * [ ] **(BE)** Système d’XP cohérent (récompense par mission / quiz / étape).
-* [ ] **(BE)** `next_state` de `JourneyStepResponse` correctement appliqué (phase actuelle, missions complétées, XP delta).
+* [x] **(BE)** `next_state` de `JourneyStepResponse` correctement appliqué (phase actuelle, missions complétées, XP delta).
 * [ ] **(CT/BE)** Modes **discovery / builder / expert** définis :
 
-  * [ ] Zyno reçoit ce paramètre.
+  * [x] Zyno reçoit ce paramètre.
   * [ ] Variation réelle de la complexité des missions / évaluations selon le mode.
 
 ---
 
 ## 4. Intégration Solana (devnet)
 
-* [ ] **(BE)** Paramètres Solana devnet configurés (RPC, cluster).
-* [ ] **(BE)** Connecteur simple pour :
+* [x] **(BE)** Paramètres Solana devnet configurés (RPC, cluster).
+* [x] **(BE)** Connecteur simple pour :
 
-  * [ ] Mint d’un NFT “Proof-of-*” sur devnet pour un user/wallet.
-* [ ] **(FE)** Intégration wallet (Phantom ou autre) fonctionnelle sur desktop :
+  * [x] Mint d’un NFT “Proof-of-*” sur devnet pour un user/wallet.
+* [x] **(FE)** Intégration wallet (Phantom ou autre) fonctionnelle sur desktop :
 
-  * [ ] connexion
-  * [ ] affichage de l’adresse
+  * [x] connexion
+  * [x] affichage de l’adresse
 * [x] **(BE/FE)** Un **flux complet** testé :
 
   * [x] une mission de type `prove` validée → backend détecte condition → front propose modale de mint → signature sur devnet → confirmation visuelle (et log).
@@ -122,13 +122,13 @@ On distingue **Backend (BE)**, **Frontend (FE)** et **Contenu / Produit (CT)**.
 * [ ] **(FE)** Écran d’accueil Journey Simulator avec :
 
   * [ ] présentation rapide,
-  * [ ] sélection de persona,
-  * [ ] sélection de mode (discovery / builder / expert).
-* [ ] **(FE)** Écran principal de parcours avec layout **3 colonnes** (ou équivalent) :
+  * [x] sélection de persona,
+  * [x] sélection de mode (discovery / builder / expert).
+* [x] **(FE)** Écran principal de parcours avec layout **3 colonnes** (ou équivalent) :
 
   * [ ] gauche : timeline phases + résumé persona + XP.
-  * [ ] centre : blocs actifs (missions, quiz, documents…).
-  * [ ] droite : logs des agents + ressources.
+  * [x] centre : blocs actifs (missions, quiz, documents…).
+  * [x] droite : logs des agents + ressources.
 
 ### 5.2. Composants par type de bloc UI
 
@@ -164,8 +164,8 @@ Pour chaque type de `UIBlock` du JSON :
   * [ ] affichage des axes (scores + commentaires) sous forme de liste ou graph simplifié.
 * [x] **(FE)** `ActionSuggestionsBlock` :
 
-  * [ ] boutons / liens pour chaque suggestion (`label` → `action_id`).
-  * [ ] propagation de l’action au backend ou au routeur front.
+  * [x] boutons / liens pour chaque suggestion (`label` → `action_id`).
+  * [x] propagation de l’action au backend ou au routeur front.
 * [x] **(FE)** `XpBlock` :
 
   * [ ] barre ou compteur XP
@@ -179,8 +179,8 @@ Pour chaque type de `UIBlock` du JSON :
 * [ ] **(FE)** (Optionnel mais très “wow”) Petite “pastille active” sur les agents actuellement impliqués dans la réponse courante.
 * [x] **(FE)** Entrée centrale pour “Parler à Zyno” :
 
-  * [ ] champ texte,
-  * [ ] envoi → `POST /journeys/:id/step` → rafraîchissement des blocs.
+  * [x] champ texte,
+  * [x] envoi → `POST /journeys/:id/step` → rafraîchissement des blocs.
 
 ---
 
@@ -272,24 +272,24 @@ Pour chaque type de `UIBlock` du JSON :
 * [ ] **(BE)** Utilisateur de démo prédéfini (`demo_user_id`) avec :
 
   * [ ] journey_state prérempli pour un parcours “type” (ex. builder tokenomics).
-* [ ] **(CT)** Script de démo écrit (séquence des écrans à montrer) :
+* [x] **(CT)** Script de démo écrit (séquence des écrans à montrer) :
 
-  * [ ] 1) choix persona + mode,
-  * [ ] 2) écran d’une phase avec missions + ressources,
-  * [ ] 3) soumission d’une mission / quiz,
-  * [ ] 4) évaluation + XP + suggestion de mint NFT,
-  * [ ] 5) lancement d’un vote ou action DAO simulée (si prévu).
-* [ ] **(BE/FE)** Bouton ou paramètre pour basculer en “mode démo” (désactive par exemple l’enregistrement réel des données personnelles).
+  * [x] 1) choix persona + mode,
+  * [x] 2) écran d’une phase avec missions + ressources,
+  * [x] 3) soumission d’une mission / quiz,
+  * [x] 4) évaluation + XP + suggestion de mint NFT,
+  * [x] 5) lancement d’un vote ou action DAO simulée (si prévu).
+* [x] **(BE/FE)** Bouton ou paramètre pour basculer en “mode démo” (désactive par exemple l’enregistrement réel des données personnelles).
 
 ---
 
 ## 10. Tests & validation
 
-* [ ] **(BE)** Tests unitaires de base :
+* [x] **(BE)** Tests unitaires de base :
 
-  * [ ] parsing de `JourneyStepResponse`,
-  * [ ] mise à jour de `journey_state`,
-  * [ ] gestion des erreurs LLM.
+  * [x] parsing de `JourneyStepResponse`,
+  * [x] mise à jour de `journey_state`,
+  * [x] gestion des erreurs LLM.
 * [ ] **(FE)** Tests manuels (ou Cypress/Playwright minimal) :
 
   * [ ] un scénario complet par persona principal.

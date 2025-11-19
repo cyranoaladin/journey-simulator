@@ -1,4 +1,4 @@
-import { useState, useEffect, type FC } from 'react';
+import { useState, useEffect, type FC, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useJourneyStore } from '../store/journeyStore';
 import { useNavigate } from 'react-router-dom';
@@ -18,6 +18,8 @@ import WalletStatusDisplay from './WalletStatusDisplay';
 import StakingModal from './StakingModal';
 import DAOVoteModal from './DAOVoteModal';
 import ResetProgressButton from './ResetProgressButton';
+import { API_BASE_URL } from '../utils/api';
+import type { AgentTimelineEntry } from './Zyno/types';
 
 const JourneysPage: FC = () => {
   const {
@@ -44,6 +46,7 @@ const JourneysPage: FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isCompletingPhase, setIsCompletingPhase] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [currentZynoStep, setCurrentZynoStep] = useState<AgentTimelineEntry | null>(null);
 
   const supportHighlights = [
     {
@@ -84,6 +87,56 @@ const JourneysPage: FC = () => {
 
     loadProgress();
   }, [loadUserProgress]);
+
+  const fetchCurrentZynoStep = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/orchestration/current-step?userId=${encodeURIComponent('demo_user')}`
+      );
+      if (!response.ok) {
+        return;
+      }
+      const data = await response.json();
+      setCurrentZynoStep(data?.currentStep ?? null);
+    } catch (fetchError) {
+      console.warn('Unable to refresh current Zyno step:', fetchError);
+    }
+  }, []);
+
+  const handleAgentFeedbackRequest = useCallback(
+    (step: AgentTimelineEntry) => {
+      if (!step) {
+        return;
+      }
+
+      const missionId = selectedPersona ? `${selectedPersona.id}-${step.phase ?? 'phase'}` : null;
+
+      openModal({
+        type: 'agent-feedback',
+        step,
+        userId: 'demo_user',
+        missionId,
+      });
+    },
+    [openModal, selectedPersona]
+  );
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const run = async () => {
+      if (!isMounted) return;
+      await fetchCurrentZynoStep();
+    };
+
+    run();
+    const interval = setInterval(run, 30000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [fetchCurrentZynoStep]);
 
   const handlePhaseChange = (index: number) => {
     if (selectedPersona) {
@@ -155,6 +208,8 @@ const JourneysPage: FC = () => {
         phase.nftReward ? [phase.nftReward] : [],
         phase.mfaiReward || 0,
       );
+
+      await fetchCurrentZynoStep();
 
       setCurrentPhaseIndex(phaseIndex);
       setSuccessMessage(`Phase ${nextPhaseNumber} completed! +${phase.xpReward} XP earned!`);
@@ -546,6 +601,8 @@ const JourneysPage: FC = () => {
                       onStake={handleStaking}
                       onVote={handleDAOVote}
                       isProcessing={isCompletingPhase}
+                      activeStep={currentZynoStep}
+                      onFeedbackRequest={handleAgentFeedbackRequest}
                     />
                     {isCompletingPhase && (
                       <motion.div
@@ -570,6 +627,14 @@ const JourneysPage: FC = () => {
                     <ProofCertificationsBoard />
                     <WalletStatusDisplay />
                     {showMintingTutorial && <NFTMintingTutorial />}
+                    {/* Agent Activity Feed */}
+                    <div className="mt-2">
+                      {/* lazy import avoided for simplicity */}
+                      {(() => {
+                        const Comp = require('./AgentActivityFeed').default
+                        return <Comp />
+                      })()}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -595,6 +660,8 @@ const JourneysPage: FC = () => {
                         onMintNFT={() => handleViewNFT(phaseIndex)}
                         onStake={handleStaking}
                         onVote={handleDAOVote}
+                        activeStep={currentZynoStep?.phase === selectedPersona.phases[phaseIndex].id ? currentZynoStep : null}
+                        onFeedbackRequest={handleAgentFeedbackRequest}
                       />
                     </motion.div>
                   ))}

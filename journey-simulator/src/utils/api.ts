@@ -1,5 +1,6 @@
-// API base URL - update this to match your backend URL
-export const API_BASE_URL = 'http://localhost:3000'; // Update this to your backend URL
+// API base URL - configurable via environment variable for different deployments
+export const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:3000';
 
 // API response interfaces
 export interface AgentScoreboardEntry {
@@ -424,6 +425,24 @@ export const api = {
       method: 'GET',
       headers: getAuthHeaders(),
     });
+  },
+
+  // Solana minting (Next.js API)
+  solanaMintSimulate: async (payload: { recipient: string; name: string; symbol: string; uri: string }): Promise<{ ok: boolean; sim: { ok: boolean; estFeeLamports: number; riskScore: number; network: string } }> => {
+    return request(`/api/mint/simulate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }, false)
+  },
+
+  solanaMintExecute: async (sim: { ok: boolean; estFeeLamports: number; riskScore: number; network: string }): Promise<{ ok: boolean; tx: { txSig: string } }> => {
+    const userId = (typeof window !== 'undefined') ? window.localStorage.getItem('userId') : null
+    return request(`/api/mint/execute`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(userId ? { 'x-user-id': userId } : {}) },
+      body: JSON.stringify({ sim }),
+    }, false)
   },
 
   getAgentScoreboard: async (adminApiKey: string): Promise<AgentScoreboardResponse> => {

@@ -52,6 +52,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         // Verify token with backend
         const data = await api.verifyToken();
         setUser(data.user);
+        try { localStorage.setItem('userId', data.user.id) } catch {}
         // Load user progress from backend
         await loadUserProgress();
       } catch (error) {
@@ -82,6 +83,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       
       // Set user
       setUser(data.user);
+      try { localStorage.setItem('userId', data.user.id) } catch {}
       // Clear any lingering progress from a previous session
       await resetProgress();
       // Load user progress from backend
@@ -109,6 +111,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       
       // Set user
       setUser(data.user);
+      try { localStorage.setItem('userId', data.user.id) } catch {}
       await resetProgress();
       // Load user progress from backend
       await loadUserProgress();
@@ -144,6 +147,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       setUser(null);
+      try { localStorage.removeItem('userId') } catch {}
       await resetProgress();
       navigate('/login');
     }

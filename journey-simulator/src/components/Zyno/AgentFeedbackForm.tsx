@@ -7,9 +7,10 @@ type AgentFeedbackFormProps = {
   agentName: string;
   userId: string;
   missionId?: string | null;
+  onSuccess?: () => void;
 };
 
-const AgentFeedbackForm = ({ agentName, userId, missionId }: AgentFeedbackFormProps) => {
+const AgentFeedbackForm = ({ agentName, userId, missionId, onSuccess }: AgentFeedbackFormProps) => {
   const [rating, setRating] = useState('');
   const [comment, setComment] = useState('');
   const [status, setStatus] = useState<SubmissionStatus>('idle');
@@ -45,6 +46,7 @@ const AgentFeedbackForm = ({ agentName, userId, missionId }: AgentFeedbackFormPr
       }
 
       setStatus('success');
+      onSuccess?.();
     } catch (submissionError) {
       setError(submissionError instanceof Error ? submissionError.message : 'Erreur inattendue');
       setStatus('error');

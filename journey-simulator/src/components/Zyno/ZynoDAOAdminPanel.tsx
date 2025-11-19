@@ -29,13 +29,10 @@ export default function ZynoDAOAdminPanel() {
   const [closing, setClosing] = useState<Record<string, boolean>>({});
   const [selectedVoter, setSelectedVoter] = useState<string>('');
   const adminKeyInputId = useId();
-  const rawVoterSelectId = useId();
-  const voterSelectId = useMemo(
-    () => `zyno-dao-voter-${rawVoterSelectId.replace(/[^a-zA-Z0-9-]/g, '')}`,
-    [rawVoterSelectId]
-  );
+  const voterSelectId = useId();
   const voterHelpTextId = `${voterSelectId}-hint`;
   const voterLabelId = `${voterSelectId}-label`;
+  const voterSelectLabel = 'Voter en tant que';
 
   const loadData = useCallback(async () => {
     setFetchState({ loading: true, error: null });
@@ -216,7 +213,7 @@ export default function ZynoDAOAdminPanel() {
                 className="text-xs font-semibold uppercase tracking-wider"
                 htmlFor={voterSelectId}
               >
-                Voter en tant que
+                {voterSelectLabel}
               </label>
               <p id={voterHelpTextId} className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
                 Choisissez un profil votant avant de soumettre un vote.
@@ -226,9 +223,10 @@ export default function ZynoDAOAdminPanel() {
                 name="dao-voter"
                 value={selectedVoter}
                 onChange={(event) => setSelectedVoter(event.target.value)}
+                aria-label={voterSelectLabel}
                 aria-labelledby={voterLabelId}
                 aria-describedby={voterHelpTextId}
-                title="Sélectionner un votant"
+                title={voterSelectLabel}
                 className="mt-2 w-full rounded-md border border-emerald-200 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-400 dark:border-emerald-500/40 dark:bg-slate-900"
               >
                 <option value="">Sélectionner un votant</option>

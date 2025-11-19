@@ -172,6 +172,21 @@ async function getLogs(journeyId){
 
 Note: En production, utilisez une vraie valeur de secret (vault/CI secrets), et ne laissez pas la clé par défaut.
 
+## API Docs (OpenAPI)
+
+- Spécification: `docs/openapi/journey-simulator.yaml`
+- Prévisualiser localement (choisir l'une des options):
+  - RapiDoc (web component)
+    ```bash
+    npm run openapi:rapidoc
+    # Ouvre http://127.0.0.1:8089/preview.html
+    ```
+  - ReDoc (CLI)
+    ```bash
+    npm run openapi:redoc
+    # Ouvre http://127.0.0.1:8088
+    ```
+
 ## Déploiement & CI
 - CI GitHub Actions: .github/workflows/ci.yml (Node 20, cache npm, Playwright E2E)
 - CD par tags SemVer: .github/workflows/release.yml (push sur vX.Y.Z)

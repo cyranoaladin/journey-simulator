@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { NextResponse } from 'next/server'
 
-jest.mock('../server/db', () => ({ prisma: { mintLog: { create: jest.fn(async ()=>({ id:'m1' })) } } }))
+jest.mock('@/server/db', () => ({ prisma: { mintLog: { create: jest.fn(async ()=>({ id:'m1' })) } } }))
 
 describe('API /api/mint', () => {
   it('simulate rejects bad request', async () => {
