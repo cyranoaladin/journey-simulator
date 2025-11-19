@@ -1,13 +1,15 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 
 jest.mock('@solana/wallet-adapter-react', () => ({
-  useConnection: () => ({ connection: { sendRawTransaction: jest.fn(), confirmTransaction: jest.fn() } }),
-  useWallet: () => ({ publicKey: null })
+  useConnection: () => ({
+    connection: { sendRawTransaction: jest.fn(), confirmTransaction: jest.fn() },
+  }),
+  useWallet: () => ({ publicKey: null }),
 }))
 
 // Mock web3 to avoid ESM parsing issues and heavy deps
 jest.mock('@solana/web3.js', () => ({
-  VersionedTransaction: { deserialize: jest.fn(() => ({})) }
+  VersionedTransaction: { deserialize: jest.fn(() => ({})) },
 }))
 
 // Dynamic import to ensure mocks are applied

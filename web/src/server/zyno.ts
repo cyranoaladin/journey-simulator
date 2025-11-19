@@ -3,9 +3,9 @@ type JourneyStepInput = {
   personaId?: string
   trackId: string
   phaseId: string
-  language: 'fr'|'en'
-  mode?: 'discovery'|'builder'|'expert'
-  tone?: 'pedagogical'|'investor_pitch'|'critical'
+  language: 'fr' | 'en'
+  mode?: 'discovery' | 'builder' | 'expert'
+  tone?: 'pedagogical' | 'investor_pitch' | 'critical'
   journeyState?: any
   userInput?: string
   actionId?: string
@@ -17,29 +17,29 @@ const JOURNEY_STEP_SCHEMA = {
     $schema: 'http://json-schema.org/draft-07/schema#',
     title: 'JourneyStepResponse',
     type: 'object',
-    required: ['metadata','ui_blocks','agent_actions','next_state'],
+    required: ['metadata', 'ui_blocks', 'agent_actions', 'next_state'],
     properties: {
       metadata: {
         type: 'object',
-        required: ['persona_id','journey_track','phase_id','language'],
+        required: ['persona_id', 'journey_track', 'phase_id', 'language'],
         properties: {
           persona_id: { type: 'string' },
           journey_track: { type: 'string' },
           phase_id: { type: 'string' },
-          language: { type: 'string', enum: ['fr','en'] },
-          mode: { type: 'string', enum: ['discovery','builder','expert'] },
-          tone: { type: 'string', enum: ['pedagogical','investor_pitch','critical'] },
+          language: { type: 'string', enum: ['fr', 'en'] },
+          mode: { type: 'string', enum: ['discovery', 'builder', 'expert'] },
+          tone: { type: 'string', enum: ['pedagogical', 'investor_pitch', 'critical'] },
           title: { type: 'string' },
-          summary: { type: 'string' }
+          summary: { type: 'string' },
         },
-        additionalProperties: false
+        additionalProperties: false,
       },
       ui_blocks: { type: 'array' },
       agent_actions: { type: 'array' },
-      next_state: { type: 'object' }
-    }
+      next_state: { type: 'object' },
+    },
   },
-  strict: true
+  strict: true,
 }
 
 function buildSystemPrompt(): string {
@@ -65,29 +65,30 @@ function buildUserPrompt(input: JourneyStepInput): string {
   ].join('\n')
 }
 
-async function withTimeout<T>(p: Promise<T>, ms: number): Promise<T>{
-  const ctrl = new AbortController()
-  const t = setTimeout(()=>ctrl.abort(), ms)
-  try{
-    // @ts-ignore
-    const res = await p.then((r:any)=>r, (e:any)=>{ throw e })
-    clearTimeout(t)
-    return res
-  }catch(e){
-    clearTimeout(t)
-    throw e
+async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  let timeoutHandle: ReturnType<typeof setTimeout> | undefined
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutHandle = setTimeout(() => reject(new Error(`Timeout after ${ms}ms`)), ms)
+  })
+
+  try {
+    return await Promise.race([promise, timeoutPromise])
+  } finally {
+    if (timeoutHandle) clearTimeout(timeoutHandle)
   }
 }
 
-export async function callZynoStep(input: JourneyStepInput){
-  const { apiKey, url, model, maxTokens, temperature } = (await import('@/infra/openaiConfig')).getOpenAIConfig('step')
-  if(!apiKey) throw new Error('OPENAI_API_KEY missing')
+export async function callZynoStep(input: JourneyStepInput) {
+  const { apiKey, url, model, maxTokens, temperature } = (
+    await import('@/infra/openaiConfig')
+  ).getOpenAIConfig('step')
+  if (!apiKey) throw new Error('OPENAI_API_KEY missing')
 
   const payload = {
     model,
     input: [
       { role: 'system', content: buildSystemPrompt() },
-      { role: 'user', content: buildUserPrompt(input) }
+      { role: 'user', content: buildUserPrompt(input) },
     ],
     response_format: { type: 'json_schema', json_schema: JOURNEY_STEP_SCHEMA },
     max_output_tokens: maxTokens,
@@ -95,17 +96,24 @@ export async function callZynoStep(input: JourneyStepInput){
     reasoning: { effort: 'medium' },
   }
 
-  const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` }
+  const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` }
 
   let attempt = 0
   const maxAttempts = 3
   const started = Date.now()
-  while(attempt < maxAttempts){
-    try{
-      const res = await withTimeout(fetch(url, { method: 'POST', headers, body: JSON.stringify(payload) }), 30000)
-      if(!res.ok){
-        if(res.status===429 || res.status>=500){ attempt++; await new Promise(r=>setTimeout(r, 500*attempt)); continue }
-        const text = await res.text().catch(()=>`HTTP ${res.status}`)
+  while (attempt < maxAttempts) {
+    try {
+      const res = await withTimeout(
+        fetch(url, { method: 'POST', headers, body: JSON.stringify(payload) }),
+        30000
+      )
+      if (!res.ok) {
+        if (res.status === 429 || res.status >= 500) {
+          attempt++
+          await new Promise((r) => setTimeout(r, 500 * attempt))
+          continue
+        }
+        const text = await res.text().catch(() => `HTTP ${res.status}`)
         throw new Error(text)
       }
       const json = await res.json()
@@ -117,12 +125,16 @@ export async function callZynoStep(input: JourneyStepInput){
         duration_ms: Date.now() - started,
         usage: json?.usage || json?.output?.[0]?.usage || undefined,
       }
-      try{ console.log('[ZynoStep]', meta) }catch{}
+      try {
+        console.log('[ZynoStep]', meta)
+      } catch (logError) {
+        console.warn('Failed to log Zyno step metrics', logError)
+      }
       return { out, meta }
-    }catch(e:any){
+    } catch (e: any) {
       attempt++
-      if(attempt>=maxAttempts) throw e
-      await new Promise(r=>setTimeout(r, 600*attempt))
+      if (attempt >= maxAttempts) throw e
+      await new Promise((r) => setTimeout(r, 600 * attempt))
     }
   }
   throw new Error('Zyno call exhausted')
@@ -133,15 +145,15 @@ export type EvaluateInput = {
   trackId?: string
   phaseId?: string
   missionId: string
-  inputType: 'text'|'markdown_document'|'code_snippet'|'link'|'choice'
+  inputType: 'text' | 'markdown_document' | 'code_snippet' | 'link' | 'choice'
   submission: string
-  language: 'fr'|'en'
-  mode?: 'discovery'|'builder'|'expert'
-  tone?: 'pedagogical'|'investor_pitch'|'critical'
+  language: 'fr' | 'en'
+  mode?: 'discovery' | 'builder' | 'expert'
+  tone?: 'pedagogical' | 'investor_pitch' | 'critical'
   journeyState?: any
 }
 
-function buildEvalSystemPrompt(): string{
+function buildEvalSystemPrompt(): string {
   return [
     'Tu es Zyno, évaluateur des missions du Journey Simulator.',
     'Tu dois RENVOYER UNIQUEMENT un JSON strict conforme au schema JourneyStepResponse.',
@@ -151,7 +163,7 @@ function buildEvalSystemPrompt(): string{
   ].join('\n')
 }
 
-function buildEvalUserPrompt(input: EvaluateInput): string{
+function buildEvalUserPrompt(input: EvaluateInput): string {
   return [
     `trackId=${input.trackId ?? ''}`,
     `phaseId=${input.phaseId ?? ''}`,
@@ -163,19 +175,21 @@ function buildEvalUserPrompt(input: EvaluateInput): string{
     `journeyState=${JSON.stringify(input.journeyState ?? {})}`,
     '--- Submission Start ---',
     input.submission,
-    '--- Submission End ---'
+    '--- Submission End ---',
   ].join('\n')
 }
 
-export async function callZynoEvaluate(input: EvaluateInput){
-  const { apiKey, url, model, maxTokens, temperature } = (await import('@/infra/openaiConfig')).getOpenAIConfig('eval')
-  if(!apiKey) throw new Error('OPENAI_API_KEY missing')
+export async function callZynoEvaluate(input: EvaluateInput) {
+  const { apiKey, url, model, maxTokens, temperature } = (
+    await import('@/infra/openaiConfig')
+  ).getOpenAIConfig('eval')
+  if (!apiKey) throw new Error('OPENAI_API_KEY missing')
 
   const payload = {
     model,
     input: [
       { role: 'system', content: buildEvalSystemPrompt() },
-      { role: 'user', content: buildEvalUserPrompt(input) }
+      { role: 'user', content: buildEvalUserPrompt(input) },
     ],
     response_format: { type: 'json_schema', json_schema: JOURNEY_STEP_SCHEMA },
     max_output_tokens: maxTokens,
@@ -183,17 +197,24 @@ export async function callZynoEvaluate(input: EvaluateInput){
     reasoning: { effort: 'low' },
   }
 
-  const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` }
+  const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` }
 
   let attempt = 0
   const maxAttempts = 3
   const started = Date.now()
-  while(attempt < maxAttempts){
-    try{
-      const res = await withTimeout(fetch(url, { method: 'POST', headers, body: JSON.stringify(payload) }), 30000)
-      if(!res.ok){
-        if(res.status===429 || res.status>=500){ attempt++; await new Promise(r=>setTimeout(r, 500*attempt)); continue }
-        const text = await res.text().catch(()=>`HTTP ${res.status}`)
+  while (attempt < maxAttempts) {
+    try {
+      const res = await withTimeout(
+        fetch(url, { method: 'POST', headers, body: JSON.stringify(payload) }),
+        30000
+      )
+      if (!res.ok) {
+        if (res.status === 429 || res.status >= 500) {
+          attempt++
+          await new Promise((r) => setTimeout(r, 500 * attempt))
+          continue
+        }
+        const text = await res.text().catch(() => `HTTP ${res.status}`)
         throw new Error(text)
       }
       const json = await res.json()
@@ -204,12 +225,16 @@ export async function callZynoEvaluate(input: EvaluateInput){
         duration_ms: Date.now() - started,
         usage: json?.usage || json?.output?.[0]?.usage || undefined,
       }
-      try{ console.log('[ZynoEval]', meta) }catch{}
+      try {
+        console.log('[ZynoEval]', meta)
+      } catch (logError) {
+        console.warn('Failed to log Zyno eval metrics', logError)
+      }
       return { out, meta }
-    }catch(e:any){
+    } catch (e: any) {
       attempt++
-      if(attempt>=maxAttempts) throw e
-      await new Promise(r=>setTimeout(r, 600*attempt))
+      if (attempt >= maxAttempts) throw e
+      await new Promise((r) => setTimeout(r, 600 * attempt))
     }
   }
   throw new Error('Zyno evaluation exhausted')

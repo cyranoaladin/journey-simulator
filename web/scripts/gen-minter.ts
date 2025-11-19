@@ -10,7 +10,11 @@ async function main() {
 
   const outDir = path.resolve(process.cwd(), 'scripts')
   const outPath = path.resolve(process.cwd(), 'minter.json')
-  try { fs.mkdirSync(outDir, { recursive: true }) } catch {}
+  try {
+    fs.mkdirSync(outDir, { recursive: true })
+  } catch (dirError) {
+    console.warn('Could not create scripts directory; continuing anyway', dirError)
+  }
 
   fs.writeFileSync(outPath, JSON.stringify(secretBytes, null, 2))
   console.log('Saved keypair to:', outPath)

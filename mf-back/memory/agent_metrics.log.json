@@ -795,5 +795,206 @@
         "comment": "Auto-feedback for GuideAgent responding to \"simulate onboarding\"."
       }
     }
+  },
+  {
+    "timestamp": "2025-11-19T04:39:50.023Z",
+    "agentName": "OnboardingAgent",
+    "userId": "cli-user",
+    "missionId": "mission-1763527190005",
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 18,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-11-19T04:39:50.027Z",
+    "agentName": "GuideAgent",
+    "userId": "cli-user",
+    "missionId": "mission-1763527190005",
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 3,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-11-19T04:39:50.027Z",
+    "agentName": "GuideAgent",
+    "userId": "cli-user",
+    "missionId": "mission-1763527190005",
+    "type": "AECO",
+    "value": {
+      "aepoScore": 100,
+      "feedback": {
+        "clarity": 4,
+        "helpfulness": 4,
+        "satisfaction": 4,
+        "comment": "Auto-feedback for GuideAgent responding to \"simulate onboarding\"."
+      }
+    }
+  },
+  {
+    "timestamp": "2025-11-19T04:39:50.380Z",
+    "agentName": "NFTAgent",
+    "userId": "user-1",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 0,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-11-19T04:39:50.382Z",
+    "agentName": "TokenAgent",
+    "userId": "user-1",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 1,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-11-19T04:39:50.382Z",
+    "agentName": "CommunityAgent",
+    "userId": "user-1",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 2,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-11-19T04:39:50.384Z",
+    "agentName": "CoachAgent",
+    "userId": "user-2",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 0,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-11-19T04:39:50.386Z",
+    "agentName": "BuilderAgent",
+    "userId": "user-3",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 0,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-11-19T04:39:50.386Z",
+    "agentName": "ProductAgent",
+    "userId": "user-3",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 0,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-11-19T04:39:50.387Z",
+    "agentName": "DevAgent",
+    "userId": "user-3",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 0,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-11-19T04:39:50.388Z",
+    "agentName": "AuditAgent",
+    "userId": "user-3",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 0,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-11-19T04:39:50.505Z",
+    "agentName": "BuilderAgent",
+    "userId": "integration-user",
+    "missionId": "mission-99",
+    "type": "AECO",
+    "value": {
+      "aepoScore": 89,
+      "feedback": {
+        "clarity": 4,
+        "helpfulness": 5,
+        "satisfaction": 4,
+        "comment": "Agent helped clearly define tasks."
+      }
+    }
+  },
+  {
+    "timestamp": "2025-11-19T04:39:50.602Z",
+    "agentName": "NFTAgent",
+    "userId": "demo-mission-user",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 0,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-11-19T04:39:50.603Z",
+    "agentName": "TokenAgent",
+    "userId": "demo-mission-user",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 1,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-11-19T04:39:50.604Z",
+    "agentName": "CommunityAgent",
+    "userId": "demo-mission-user",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 2,
+      "success": true,
+      "errorCount": 0
+    }
   }
 ]

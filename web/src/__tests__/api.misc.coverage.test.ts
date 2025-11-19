@@ -37,7 +37,13 @@ describe('Misc API coverage', () => {
     const { POST } = mod as any
     const bad = await POST({ json: async () => ({}) } as any)
     expect(bad.status).toBe(400)
-    const ok = await POST({ json: async () => ({ address: '11111111111111111111', signature: 'abcdef0123456789', challenge: '550e8400-e29b-41d4-a716-446655440000' }) } as any)
+    const ok = await POST({
+      json: async () => ({
+        address: '11111111111111111111',
+        signature: 'abcdef0123456789',
+        challenge: '550e8400-e29b-41d4-a716-446655440000',
+      }),
+    } as any)
     expect(ok.status).toBe(200)
     const json = await (ok as NextResponse).json()
     expect(typeof json.token).toBe('string')
@@ -61,7 +67,9 @@ describe('Misc API coverage', () => {
 
   it('GET /api/mint/last returns null when no row', async () => {
     jest.resetModules()
-    jest.doMock('@/server/db', () => ({ prisma: { mintLog: { findFirst: jest.fn(async () => null) } } }))
+    jest.doMock('@/server/db', () => ({
+      prisma: { mintLog: { findFirst: jest.fn(async () => null) } },
+    }))
     const mod = await import('../../app/api/mint/last/route')
     const { GET } = mod as any
     const res = await GET({ url: 'http://localhost/api/mint/last', headers: new Headers() } as any)
@@ -72,10 +80,24 @@ describe('Misc API coverage', () => {
 
   it('GET /api/mint/last returns last row when present', async () => {
     jest.resetModules()
-    jest.doMock('@/server/db', () => ({ prisma: { mintLog: { findFirst: jest.fn(async () => ({ signature: 'sig', network: 'devnet', createdAt: new Date().toISOString(), spec: { a: 1 } })) } } }))
+    jest.doMock('@/server/db', () => ({
+      prisma: {
+        mintLog: {
+          findFirst: jest.fn(async () => ({
+            signature: 'sig',
+            network: 'devnet',
+            createdAt: new Date().toISOString(),
+            spec: { a: 1 },
+          })),
+        },
+      },
+    }))
     const mod = await import('../../app/api/mint/last/route')
     const { GET } = mod as any
-    const res = await GET({ url: 'http://localhost/api/mint/last?userId=u1', headers: new Headers() } as any)
+    const res = await GET({
+      url: 'http://localhost/api/mint/last?userId=u1',
+      headers: new Headers(),
+    } as any)
     expect(res.status).toBe(200)
     const json = await (res as NextResponse).json()
     expect(json.last?.signature).toBe('sig')
@@ -107,6 +129,6 @@ describe('Misc API coverage', () => {
     const res2 = await GET({ url: 'http://localhost/api/agents/logs?journeyId=abc&limit=5' } as any)
     expect(res2.status).toBe(200)
     const json2 = await (res2 as NextResponse).json()
-    expect(json2.logs.every((l:any)=>l.journeyId==='abc')).toBe(true)
+    expect(json2.logs.every((l: any) => l.journeyId === 'abc')).toBe(true)
   })
 })

@@ -1,12 +1,19 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 
-const Body = z.object({ name: z.string(), email: z.string().email(), password: z.string().min(6), wallet_address: z.string().optional(), persona: z.string().optional() })
+const Body = z.object({
+  name: z.string(),
+  email: z.string().email(),
+  password: z.string().min(6),
+  wallet_address: z.string().optional(),
+  persona: z.string().optional(),
+})
 
-export async function POST(req: Request){
-  const json = await req.json().catch(()=>null)
+export async function POST(req: Request) {
+  const json = await req.json().catch(() => null)
   const parsed = Body.safeParse(json)
-  if(!parsed.success) return NextResponse.json({ success: false, message: 'bad_request' }, { status: 400 })
+  if (!parsed.success)
+    return NextResponse.json({ success: false, message: 'bad_request' }, { status: 400 })
   const { name, email } = parsed.data
   const user = {
     id: 'demo_user',
@@ -21,5 +28,10 @@ export async function POST(req: Request){
     subscription: false as const,
     is_active: true,
   }
-  return NextResponse.json({ success: true, user, accessToken: 'demo.access.token', refreshToken: 'demo.refresh.token' })
+  return NextResponse.json({
+    success: true,
+    user,
+    accessToken: 'demo.access.token',
+    refreshToken: 'demo.refresh.token',
+  })
 }

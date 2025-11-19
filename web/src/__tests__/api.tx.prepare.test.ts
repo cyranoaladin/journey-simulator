@@ -2,18 +2,31 @@
 import { NextResponse } from 'next/server'
 
 jest.mock('@solana/web3.js', () => {
-  class PublicKey { constructor(_: string) {} }
-  class Connection { constructor(_: string) {} getLatestBlockhash = async () => ({ blockhash: 'BH' }) }
+  class PublicKey {
+    constructor(_: string) {}
+  }
+  class Connection {
+    constructor(_: string) {}
+    getLatestBlockhash = async () => ({ blockhash: 'BH' })
+  }
   const SystemProgram = { transfer: (_: any) => ({}) }
   class TransactionMessage {
     constructor(_: any) {}
-    compileToV0Message(){ return { compiled: true } as any }
+    compileToV0Message() {
+      return { compiled: true } as any
+    }
   }
   class VersionedTransaction {
     message: any
-    constructor(message: any){ this.message = message }
-    serialize(){ return new Uint8Array([1,2,3]) }
-    static deserialize(_: Uint8Array){ return new VersionedTransaction({}) }
+    constructor(message: any) {
+      this.message = message
+    }
+    serialize() {
+      return new Uint8Array([1, 2, 3])
+    }
+    static deserialize(_: Uint8Array) {
+      return new VersionedTransaction({})
+    }
   }
   return { PublicKey, Connection, SystemProgram, TransactionMessage, VersionedTransaction }
 })
@@ -27,7 +40,9 @@ describe('API /api/tx/prepare', () => {
     delete (process as any).env.SOLANA_RPC_URL
     const mod = await import('../../app/api/tx/prepare/route')
     const { POST } = mod as any
-    const req = { json: async () => ({ kind: 'transfer', params: { to: 'X', payer: 'Y', lamports: 1 } }) } as any
+    const req = {
+      json: async () => ({ kind: 'transfer', params: { to: 'X', payer: 'Y', lamports: 1 } }),
+    } as any
     const res = await POST(req)
     expect(res.status).toBe(500)
     const json = await (res as NextResponse).json()

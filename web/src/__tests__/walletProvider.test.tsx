@@ -3,20 +3,24 @@ import WalletProvider from '@/components/WalletProvider'
 
 jest.mock('@solana/wallet-adapter-react', () => ({
   ConnectionProvider: ({ children }: any) => <div data-testid="connection">{children}</div>,
-  WalletProvider: ({ children }: any) => <div data-testid="wallet">{children}</div>
+  WalletProvider: ({ children }: any) => <div data-testid="wallet">{children}</div>,
 }))
 
 jest.mock('@solana/wallet-adapter-react-ui', () => ({
-  WalletModalProvider: ({ children }: any) => <div data-testid="modal">{children}</div>
+  WalletModalProvider: ({ children }: any) => <div data-testid="modal">{children}</div>,
 }))
 
 jest.mock('@solana/wallet-adapter-phantom', () => ({
-  PhantomWalletAdapter: function PW() {}
+  PhantomWalletAdapter: function PW() {},
 }))
 
 describe('WalletProvider', () => {
   it('renders children inside providers', () => {
-    render(<WalletProvider><div>Child</div></WalletProvider>)
+    render(
+      <WalletProvider>
+        <div>Child</div>
+      </WalletProvider>
+    )
     expect(screen.getByText('Child')).toBeInTheDocument()
     expect(screen.getByTestId('connection')).toBeInTheDocument()
     expect(screen.getByTestId('wallet')).toBeInTheDocument()

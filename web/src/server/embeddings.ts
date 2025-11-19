@@ -2,7 +2,10 @@
 export type Vector = number[]
 
 export function embedText(text: string): Vector {
-  const tokens = text.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean)
+  const tokens = text
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean)
   const dim = 64
   const vec = new Array(dim).fill(0)
   for (const t of tokens) {

@@ -15,13 +15,27 @@ describe('API /api/journeys/[id]/state and /api/agents/logs', () => {
     const stepMod = await import('../../app/api/journeys/[id]/step/route')
     const { POST } = stepMod as any
     const stepUrl = new URL('http://localhost/api/journeys/abc/step')
-    const stepRes = await POST({ json: async () => ({ phaseId:'learn', trackId:'builder', language:'fr', journeyState:{} }), url: stepUrl.toString() } as any, { params: { id: 'abc' } } as any)
+    const stepRes = await POST(
+      {
+        json: async () => ({
+          phaseId: 'learn',
+          trackId: 'builder',
+          language: 'fr',
+          journeyState: {},
+        }),
+        url: stepUrl.toString(),
+      } as any,
+      { params: { id: 'abc' } } as any
+    )
     expect(stepRes.status).toBe(200)
 
     const stateMod = await import('../../app/api/journeys/[id]/state/route')
     const { GET } = stateMod as any
     const stateUrl = new URL('http://localhost/api/journeys/abc/state')
-    const stateRes = await GET({ url: stateUrl.toString() } as any, { params: { id: 'abc' } } as any)
+    const stateRes = await GET(
+      { url: stateUrl.toString() } as any,
+      { params: { id: 'abc' } } as any
+    )
     expect(stateRes.status).toBe(200)
     const json = await (stateRes as NextResponse).json()
     expect(json).toHaveProperty('last_state')

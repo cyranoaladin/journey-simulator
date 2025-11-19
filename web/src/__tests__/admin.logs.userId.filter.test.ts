@@ -1,24 +1,44 @@
 /** @jest-environment node */
-import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 
 const findManyMock = jest.fn(async (args?: any) => {
   // Return only u1 if where.userId is set, else return both
   if (args?.where?.userId === 'u1') {
     return [
-      { id: 'l1', userId: 'u1', ts: new Date('2025-01-01T10:00:00Z'), agent: 'Zyno', action: 'step', details: {} },
+      {
+        id: 'l1',
+        userId: 'u1',
+        ts: new Date('2025-01-01T10:00:00Z'),
+        agent: 'Zyno',
+        action: 'step',
+        details: {},
+      },
     ]
   }
   return [
-    { id: 'l1', userId: 'u1', ts: new Date('2025-01-01T10:00:00Z'), agent: 'Zyno', action: 'step', details: {} },
-    { id: 'l2', userId: 'u2', ts: new Date('2025-01-02T10:00:00Z'), agent: 'Zyno', action: 'step', details: {} },
+    {
+      id: 'l1',
+      userId: 'u1',
+      ts: new Date('2025-01-01T10:00:00Z'),
+      agent: 'Zyno',
+      action: 'step',
+      details: {},
+    },
+    {
+      id: 'l2',
+      userId: 'u2',
+      ts: new Date('2025-01-02T10:00:00Z'),
+      agent: 'Zyno',
+      action: 'step',
+      details: {},
+    },
   ]
 })
 
 jest.mock('@/server/db', () => ({
   prisma: {
     agentLog: { findMany: (args?: any) => findManyMock(args) },
-  }
+  },
 }))
 
 describe('Admin Logs page userId filter (server-side)', () => {

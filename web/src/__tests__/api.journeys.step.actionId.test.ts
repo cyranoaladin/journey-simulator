@@ -2,15 +2,24 @@
 import { NextResponse } from 'next/server'
 
 const sampleOut = {
-  metadata: { persona_id: 'demo', journey_track: 'builder', phase_id: 'learn', language: 'fr', mode: 'builder', tone: 'pedagogical', title: 'Step' },
-  ui_blocks: [
-    { kind: 'text_block', id: 'tb', title: 'Intro', body_markdown: 'Hello' },
-  ],
+  metadata: {
+    persona_id: 'demo',
+    journey_track: 'builder',
+    phase_id: 'learn',
+    language: 'fr',
+    mode: 'builder',
+    tone: 'pedagogical',
+    title: 'Step',
+  },
+  ui_blocks: [{ kind: 'text_block', id: 'tb', title: 'Intro', body_markdown: 'Hello' }],
   agent_actions: [],
   next_state: { phase_id: 'learn', completed_missions: [], xp_delta: 0 },
 }
 
-const callSpy = jest.fn(async () => ({ out: sampleOut, meta: { model: 'gpt-5.1', duration_ms: 50, usage: { total_tokens: 42 } } }))
+const callSpy = jest.fn(async () => ({
+  out: sampleOut,
+  meta: { model: 'gpt-5.1', duration_ms: 50, usage: { total_tokens: 42 } },
+}))
 
 jest.mock('@/server/zyno', () => ({
   callZynoStep: (...args: any[]) => callSpy(...args),
@@ -28,7 +37,16 @@ describe('API /api/journeys/[id]/step with actionId', () => {
     const mod = await import(path)
     const { POST } = mod as any
     const url = new URL('http://localhost/api/journeys/abc/step?llm=1')
-    const req = { json: async () => ({ phaseId: 'learn', trackId: 'builder', language: 'fr', journeyState: {}, actionId: 'go_next' }), url: url.toString() } as any
+    const req = {
+      json: async () => ({
+        phaseId: 'learn',
+        trackId: 'builder',
+        language: 'fr',
+        journeyState: {},
+        actionId: 'go_next',
+      }),
+      url: url.toString(),
+    } as any
     const res = await POST(req, { params: { id: 'abc' } } as any)
     expect(res.status).toBe(200)
     expect(callSpy).toHaveBeenCalledTimes(1)
