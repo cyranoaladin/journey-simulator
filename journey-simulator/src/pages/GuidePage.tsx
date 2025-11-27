@@ -25,6 +25,7 @@ const GuidePage = () => {
         { id: 'ai-agents', label: 'AI Agents', icon: Brain },
         { id: 'progression', label: 'Progression & XP', icon: Trophy },
         { id: 'economy', label: 'Economy & DAO', icon: Coins },
+        { id: 'launch', label: 'Launch & Collaterize', icon: Rocket },
         { id: 'workflow', label: 'User Workflow', icon: Layers },
     ];
 
@@ -372,6 +373,123 @@ const GuidePage = () => {
                                     </div>
                                     <div className="h-2 w-full rounded-full bg-white/10">
                                         <div className="h-full w-2/3 rounded-full bg-green-500"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Launch & Collaterize */}
+                    <section id="launch" className="mb-20 scroll-mt-24">
+                        <div className="mb-6 flex items-center gap-3 border-b border-white/10 pb-4">
+                            <Rocket className="text-pink-500" size={32} />
+                            <h2 className="text-3xl font-bold">Launch & Collaterize</h2>
+                        </div>
+
+                        <div className="space-y-8 text-white/80">
+                            <p className="text-lg leading-relaxed">
+                                The ultimate goal of the Money Factory AI journey is to launch a successful, sustainable Web3 protocol. We utilize <strong>Collaterize</strong>, a secure launchpad mechanism that ensures fair distribution and instant liquidity.
+                            </p>
+
+                            {/* Requirements & Fees */}
+                            <div className="grid gap-6 md:grid-cols-3">
+                                <div className="rounded-xl bg-[#1a1a2e] p-6 border border-white/10">
+                                    <h4 className="text-pink-400 font-bold mb-2 flex items-center gap-2">
+                                        <Coins size={16} /> Access Requirement
+                                    </h4>
+                                    <p className="text-sm text-white/70">
+                                        To submit a project for DAO review and launch, you must stake <strong>1,000+ $MFAI</strong>. This ensures commitment and aligns incentives.
+                                    </p>
+                                </div>
+                                <div className="rounded-xl bg-[#1a1a2e] p-6 border border-white/10">
+                                    <h4 className="text-blue-400 font-bold mb-2 flex items-center gap-2">
+                                        <Brain size={16} /> Zyno Support
+                                    </h4>
+                                    <p className="text-sm text-white/70">
+                                        Your launch is orchestrated by specialized agents: <strong>CFO</strong> (Tokenomics), <strong>Engineer</strong> (Contracts), <strong>Risk</strong> (Security), and <strong>Legal</strong> (Compliance).
+                                    </p>
+                                </div>
+                                <div className="rounded-xl bg-[#1a1a2e] p-6 border border-white/10">
+                                    <h4 className="text-green-400 font-bold mb-2 flex items-center gap-2">
+                                        <Zap size={16} /> Ecosystem Fee
+                                    </h4>
+                                    <p className="text-sm text-white/70">
+                                        Successful launches contribute <strong>2%</strong> of raised capital to the ecosystem, with 15% of that fee burned to support $MFAI deflation.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="grid gap-6 md:grid-cols-2">
+                                <div className="rounded-2xl border border-pink-500/30 bg-pink-500/10 p-6">
+                                    <h3 className="mb-4 text-xl font-bold text-white flex items-center gap-2">
+                                        <Zap size={20} /> The Bonding Curve
+                                    </h3>
+                                    <p className="text-sm leading-relaxed text-white/70 mb-4">
+                                        Projects launch on a <strong>Bonding Curve</strong>. This mathematical formula determines the token price based on supply.
+                                    </p>
+                                    <ul className="space-y-2 text-sm text-white/60">
+                                        <li className="flex items-start gap-2">
+                                            <span className="text-pink-400">•</span>
+                                            <span><strong>Fair Launch:</strong> No pre-sale or insider allocation. Everyone buys at the curve price.</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <span className="text-pink-400">•</span>
+                                            <span><strong>Instant Trading:</strong> Buy and sell immediately against the curve contract.</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <span className="text-pink-400">•</span>
+                                            <span><strong>Dynamic Pricing:</strong> Price increases as more tokens are bought, rewarding early adopters.</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div className="rounded-2xl border border-blue-500/30 bg-blue-500/10 p-6">
+                                    <h3 className="mb-4 text-xl font-bold text-white flex items-center gap-2">
+                                        <Shield size={20} /> Safety & Graduation
+                                    </h3>
+                                    <p className="text-sm leading-relaxed text-white/70 mb-4">
+                                        When the bonding curve reaches its market cap target (e.g., ~85 SOL), the project <strong>Graduates</strong>.
+                                    </p>
+                                    <ul className="space-y-2 text-sm text-white/60">
+                                        <li className="flex items-start gap-2">
+                                            <span className="text-blue-400">•</span>
+                                            <span><strong>Liquidity Migration:</strong> Funds are automatically moved to a DEX (Meteora/Raydium).</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <span className="text-blue-400">•</span>
+                                            <span><strong>Liquidity Lock:</strong> LP tokens are burned or locked, preventing rug pulls.</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <span className="text-blue-400">•</span>
+                                            <span><strong>Renounced Ownership:</strong> Contract ownership is revoked to ensure decentralization.</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div className="rounded-xl bg-[#1a1a2e] p-8 border border-white/10">
+                                <h3 className="text-2xl font-bold text-white mb-6 text-center">The Launch Lifecycle</h3>
+                                <div className="relative">
+                                    {/* Connecting Line */}
+                                    <div className="absolute left-[15px] top-8 h-[calc(100%-60px)] w-0.5 bg-gradient-to-b from-indigo-500 to-pink-500 md:left-1/2 md:-ml-0.5 md:h-0.5 md:w-full md:top-[15px]"></div>
+
+                                    <div className="grid gap-8 md:grid-cols-4">
+                                        {[
+                                            { title: '1. Validation', desc: 'Tokenomics Audit & DAO Vote (8.0+ Score)' },
+                                            { title: '2. Deployment', desc: 'Token Minting & Bonding Curve Creation' },
+                                            { title: '3. Trading', desc: 'Public Buy/Sell on Curve (Price Discovery)' },
+                                            { title: '4. Graduation', desc: 'DEX Listing & Liquidity Lock' }
+                                        ].map((step, idx) => (
+                                            <div key={idx} className="relative flex md:flex-col items-center gap-4 md:text-center">
+                                                <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0d0d1a] border-2 border-indigo-500 text-sm font-bold text-white">
+                                                    {idx + 1}
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-white">{step.title}</h4>
+                                                    <p className="text-xs text-white/50">{step.desc}</p>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
