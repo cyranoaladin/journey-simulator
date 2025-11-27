@@ -1,111 +1,111 @@
-L’idée de base : considérer **GPT-5.1** comme ton “moteur cognitif unique” derrière Zyno et tes 17 agents, puis l’encapsuler proprement pour que chaque agent l’utilise avec un rôle, un contexte et un type de sortie bien définis.
+The core idea: consider **GPT-5.1** as your "single cognitive engine" behind Zyno and your 17 agents, then encapsulate it properly so that each agent uses it with a well-defined role, context, and output type.
 
-Je vais organiser la réponse en 3 niveaux :
+I will organize the answer in 3 levels:
 
-1. **Comment utiliser GPT-5.1 via l’API (technique pur)**
-2. **Comment en tirer *toutes* les possibilités utiles pour un système multi-agents comme le tien**
-3. **Spécifications concrètes à donner à ton agent IA développeur pour l’intégrer dans Money Factory AI / Journey Simulator**
+1. **How to use GPT-5.1 via API (pure technical)**
+2. **How to leverage *all* useful possibilities for a multi-agent system like yours**
+3. **Concrete specifications to give to your AI developer agent to integrate it into Money Factory AI / Journey Simulator**
 
 ---
 
-## 1. GPT-5.1 via API : ce qu’il faut vraiment savoir
+## 1. GPT-5.1 via API: what you really need to know
 
-### 1.1. Quels modèles pour ton projet ?
+### 1.1. Which models for your project?
 
-D’après la documentation OpenAI, tu as aujourd’hui plusieurs modèles de la famille 5.x, notamment : ([developers.openai.com][1])
+According to OpenAI documentation, you now have several models in the 5.x family, notably: ([developers.openai.com][1])
 
 * **`gpt-5.1`**
 
   > “Great for coding and agentic tasks across domains.”
-  > → C’est le modèle “généraliste + raisonneur” idéal pour **Zyno** (orchestrateur) et pour les agents qui doivent faire de la stratégie complexe (tokenomics, architecture de parcours, diagnostic business, etc.).
+  > → This is the ideal "generalist + reasoner" model for **Zyno** (orchestrator) and for agents that need to perform complex strategy (tokenomics, journey architecture, business diagnostic, etc.).
 
-* **`gpt-5.1-mini`** (ou équivalents “mini”)
-  → Moins cher, plus rapide, mais un peu moins puissant. Très adapté pour :
+* **`gpt-5.1-mini`** (or "mini" equivalents)
+  → Cheaper, faster, but slightly less powerful. Very suitable for:
 
-  * les micro-agents spécialisés (quiz, reformulation, résumé, classification),
-  * les étapes de back-and-forth rapide avec l’utilisateur.
+  * specialized micro-agents (quiz, reformulation, summary, classification),
+  * rapid back-and-forth steps with the user.
 
 * **`gpt-5.1-codex` / `gpt-5.1-codex-mini`** ([developers.openai.com][1])
-  → Optimisés pour le code. Intéressant plus tard si un des parcours inclut de la génération de smart contracts, de scripts Solana, etc., mais pas prioritaire pour ton MVP “parcours business / launch”.
+  → Optimized for code. Interesting later if one of the tracks includes smart contract generation, Solana scripts, etc., but not a priority for your "business / launch track" MVP.
 
 ---
 
-### 1.2. Endpoints : Chat Completions vs Responses
+### 1.2. Endpoints: Chat Completions vs Responses
 
-OpenAI propose deux grandes interfaces HTTP : ([developers.openai.com][2])
+OpenAI offers two main HTTP interfaces: ([developers.openai.com][2])
 
-* **Chat Completions (historiques)**
+* **Chat Completions (legacy)**
 
-  * Endpoint : `POST https://api.openai.com/v1/chat/completions`
-  * Modèle d’appel classique : `model`, `messages`, `temperature`, `max_tokens`, etc.
-  * Très stable, simple, très bien pour :
+  * Endpoint: `POST https://api.openai.com/v1/chat/completions`
+  * Classic call model: `model`, `messages`, `temperature`, `max_tokens`, etc.
+  * Very stable, simple, very good for:
 
-    * MVP rapide,
-    * interactions “chat” classiques.
+    * Fast MVP,
+    * classic "chat" interactions.
 
-* **Responses API (recommandée pour les agents)** ([developers.openai.com][2])
+* **Responses API (recommended for agents)** ([developers.openai.com][2])
 
-  * Pensée pour :
+  * Designed for:
 
-    * **les agents**,
-    * les **outils** (tool calling, web search, file search, code interpreter…),
-    * les **structured outputs** (JSON garanti conforme à un schéma),
-    * le **reasoning avancé** avec paramètres comme `reasoning_effort`.
-  * C’est cette API qui est mise en avant dans les guides “Building agents”, “Built-in tools”, “Structured outputs”, “File search”, etc. ([developers.openai.com][2])
+    * **agents**,
+    * **tools** (tool calling, web search, file search, code interpreter…),
+    * **structured outputs** (JSON guaranteed to conform to a schema),
+    * **advanced reasoning** with parameters like `reasoning_effort`.
+  * This is the API highlighted in the guides “Building agents”, “Built-in tools”, “Structured outputs”, “File search”, etc. ([developers.openai.com][2])
 
-**Recommandation pour ton projet :**
+**Recommendation for your project:**
 
-* Pour un MVP **multi-agents** avec Zyno, parcours, quiz, documents, etc. :
+* For a **multi-agent** MVP with Zyno, tracks, quizzes, documents, etc.:
 
-  * **Backend “sérieux” : Responses API + GPT-5.1** (raisonnement, tools, JSON structurés).
-  * Tu peux garder **Chat Completions** pour des utilitaires simples ou pour les premiers tests.
-
----
-
-### 1.3. Paramètres importants de GPT-5.1 à exploiter
-
-D’après les docs de “Building agents” et de la famille GPT-5.x : ([developers.openai.com][3])
-
-* **`model`** : `"gpt-5.1"` ou `"gpt-5.1-mini"`.
-* **`temperature`** : contrôle la créativité.
-
-  * 0–0.3 : raisonnement “sérieux”, évaluations, quiz.
-  * 0.5–0.8 : idéation, génération de contenu marketing, storytelling.
-* **`top_p`** : filtrage probabiliste. 0.9–0.95 marche bien en pratique.
-* **`max_output_tokens`** (ou équivalent) : limite la longueur de la sortie → crucial pour maîtriser les coûts.
-* **`reasoning_effort`** (sur les modèles de raisonnement comme GPT-5.x) ([developers.openai.com][3])
-
-  * `low` : rapide, peu coûteux.
-  * `medium` : bon compromis (recommandé par OpenAI pour beaucoup de cas).
-  * `high` : pour les tâches vraiment complexes (design complet de tokenomics, architecture d’un parcours complet, etc.).
-* **`response_format`** : pour forcer des sorties structurées (JSON) via la “Structured outputs guide”.
-* **`tools` / `tool_choice`** : pour déclarer des fonctions (ou des outils OpenAI type file_search, web_search, code_interpreter) que le modèle peut appeler. ([developers.openai.com][2])
-* **`metadata`** : pour taguer les requêtes avec `journey_id`, `agent_id`, `user_id` (utile pour tes logs et ton analytics).
+  * **"Serious" Backend: Responses API + GPT-5.1** (reasoning, tools, structured JSON).
+  * You can keep **Chat Completions** for simple utilities or for initial tests.
 
 ---
 
-## 2. Intégration technique de base (clé API, client, wrappers)
+### 1.3. Important GPT-5.1 parameters to leverage
 
-### 2.1. Clé API et `.env`
+According to "Building agents" and GPT-5.x family docs: ([developers.openai.com][3])
 
-Dans ton projet Node/TS :
+* **`model`**: `"gpt-5.1"` or `"gpt-5.1-mini"`.
+* **`temperature`**: controls creativity.
+
+  * 0–0.3: "serious" reasoning, evaluations, quizzes.
+  * 0.5–0.8: ideation, marketing content generation, storytelling.
+* **`top_p`**: probabilistic filtering. 0.9–0.95 works well in practice.
+* **`max_output_tokens`** (or equivalent): limits output length → crucial for cost control.
+* **`reasoning_effort`** (on reasoning models like GPT-5.x) ([developers.openai.com][3])
+
+  * `low`: fast, low cost.
+  * `medium`: good compromise (recommended by OpenAI for many cases).
+  * `high`: for truly complex tasks (full tokenomics design, full journey architecture, etc.).
+* **`response_format`**: to force structured outputs (JSON) via the “Structured outputs guide”.
+* **`tools` / `tool_choice`**: to declare functions (or OpenAI tools like file_search, web_search, code_interpreter) that the model can call. ([developers.openai.com][2])
+* **`metadata`**: to tag requests with `journey_id`, `agent_id`, `user_id` (useful for your logs and analytics).
+
+---
+
+## 2. Basic technical integration (API key, client, wrappers)
+
+### 2.1. API Key and .env
+
+In your Node/TS project:
 
 ```bash
 npm install openai dotenv
 ```
 
-Fichier `.env` (non versionné) :
+.env file (not versioned):
 
 ```env
 OPENAI_API_KEY=sk-xxxxx
 OPENAI_BASE_URL=https://api.openai.com/v1
 ```
 
-> À ce stade, tu peux rester sur l’URL par défaut d’OpenAI. Si un jour tu passes par un proxy, un gateway ou un provider compatible, tu n’auras qu’à changer `OPENAI_BASE_URL`.
+> At this stage, you can stay on the default OpenAI URL. If one day you switch to a proxy, gateway, or compatible provider, you'll just need to change `OPENAI_BASE_URL`.
 
 ---
 
-### 2.2. Client Node/TypeScript unifié
+### 2.2. Unified Node/TypeScript Client
 
 ```ts
 // src/infra/openaiClient.ts
@@ -113,20 +113,20 @@ import OpenAI from "openai";
 import "dotenv/config";
 
 if (!process.env.OPENAI_API_KEY) {
-  throw new Error("OPENAI_API_KEY manquante dans .env");
+  throw new Error("OPENAI_API_KEY missing in .env");
 }
 
 export const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-  // baseURL: process.env.OPENAI_BASE_URL, // facultatif si tu restes chez OpenAI
+  // baseURL: process.env.OPENAI_BASE_URL, // optional if you stay with OpenAI
 });
 ```
 
 ---
 
-### 2.3. Wrapper générique pour tes agents (Chat Completions – version simple)
+### 2.3. Generic wrapper for your agents (Chat Completions – simple version)
 
-Pour un premier MVP, tu peux commencer par **Chat Completions** avec GPT-5.1, même si tu migreras ensuite sur Responses API :
+For a first MVP, you can start with **Chat Completions** with GPT-5.1, even if you migrate to Responses API later:
 
 ```ts
 // src/llm/callGpt5.ts
@@ -160,28 +160,28 @@ export async function callGpt5Chat(params: {
   const choice = completion.choices[0];
   return {
     message: choice.message,
-    usage: completion.usage, // tokens consommés
+    usage: completion.usage, // consumed tokens
     id: completion.id,
   };
 }
 ```
 
-> **Remarque honnête :** la doc détaillée de la nouvelle Responses API n’est pas lisible directement dans mon environnement, donc je ne peux pas te donner la *signature exacte* sans te renvoyer à la référence officielle. Mais le principe sera le même : un wrapper `callGpt5Responses(...)` qui prendra `model`, `input`, `tools`, `response_format`, etc., et retournera une sortie structurée.
+> **Honest note:** the detailed doc for the new Responses API is not directly readable in my environment, so I cannot give you the *exact signature* without referring you to the official reference. But the principle will be the same: a wrapper `callGpt5Responses(...)` that takes `model`, `input`, `tools`, `response_format`, etc., and returns a structured output.
 
 ---
 
-## 3. Adapter GPT-5.1 à tes agents et à la logique métier
+## 3. Adapting GPT-5.1 to your agents and business logic
 
-L’idée clé : **une seule brique LLM**, mais :
+Key idea: **a single LLM brick**, but:
 
-* des **prompts système** différents,
-* des **schemas de sortie** différents,
-* des **paramètres différents** (temperature, reasoning_effort),
-* pour chaque **agent** (Builder, Growth, DAO, Legal, Education, etc.).
+* different **system prompts**,
+* different **output schemas**,
+* different **parameters** (temperature, reasoning_effort),
+* for each **agent** (Builder, Growth, DAO, Legal, Education, etc.).
 
-### 3.1. Abstraction “BaseAgent”
+### 3.1. "BaseAgent" Abstraction
 
-Spécification à donner à l’agent développeur :
+Specification to give to the developer agent:
 
 ```ts
 // src/agents/BaseAgent.ts
@@ -190,16 +190,16 @@ import { callGpt5Chat, AgentMessage } from "../llm/callGpt5";
 export interface AgentContext {
   userId: string;
   journeyId: string;
-  phaseId: string;     // ex: "diagnostic", "ideation", "tokenomics"
-  trackId: string;     // ex: "builder", "growth", "dao"
+  phaseId: string;     // e.g. "diagnostic", "ideation", "tokenomics"
+  trackId: string;     // e.g. "builder", "growth", "dao"
   language: "fr" | "en";
-  userProfile: Record<string, any>; // niveau, préférences, contraintes
-  history: AgentMessage[]; // éventuellement, historique local à l’agent
+  userProfile: Record<string, any>; // level, preferences, constraints
+  history: AgentMessage[]; // optionally, agent-local history
 }
 
 export interface AgentOutput<TPayload = any> {
   rawMessage: AgentMessage;
-  payload: TPayload;   // JSON parsé si structured output
+  payload: TPayload;   // parsed JSON if structured output
 }
 
 export abstract class BaseAgent<TPayload = any> {
@@ -241,120 +241,120 @@ export abstract class BaseAgent<TPayload = any> {
 }
 ```
 
-> Ensuite, chaque agent concret (BuilderAgent, GrowthAgent, DAOAgent, etc.) spécialise `buildSystemPrompt`, `buildUserPrompt`, `parseOutput`.
+> Then, each concrete agent (BuilderAgent, GrowthAgent, DAOAgent, etc.) specializes `buildSystemPrompt`, `buildUserPrompt`, `parseOutput`.
 
 ---
 
-### 3.2. Rôle de Zyno (orchestrateur) avec GPT-5.1
+### 3.2. Role of Zyno (orchestrator) with GPT-5.1
 
-**Zyno** ne fait pas que “répondre à l’utilisateur” ; il :
+**Zyno** doesn't just "answer the user"; it:
 
-1. Lit l’état courant du parcours (`journey_state`).
-2. Interprète la dernière action utilisateur.
-3. Décide :
+1. Reads the current journey state (`journey_state`).
+2. Interprets the last user action.
+3. Decides:
 
-   * quels agents invoquer (Builder, Growth, DAO, Education, Legal…),
-   * quels **types de ressources** afficher (quiz, checklist, templates, micro-docs, call-to-action, etc.),
-   * comment formater la prochaine étape.
+   * which agents to invoke (Builder, Growth, DAO, Education, Legal…),
+   * what **types of resources** to display (quiz, checklist, templates, micro-docs, call-to-action, etc.),
+   * how to format the next step.
 
-Zyno utilisera **GPT-5.1** avec :
+Zyno will use **GPT-5.1** with:
 
-* `reasoning_effort: "medium"` la plupart du temps, `high` ponctuellement pour de grosses décisions de design. ([developers.openai.com][3])
-* `temperature ≈ 0.4–0.6` pour garder un bon niveau de déterminisme.
+* `reasoning_effort: "medium"` most of the time, `high` occasionally for major design decisions. ([developers.openai.com][3])
+* `temperature ≈ 0.4–0.6` to keep a good level of determinism.
 
-Le prompt système de Zyno doit expliciter :
+Zyno's system prompt must make explicit:
 
-* le **catalogue d’agents** disponibles,
-* le **modèle de données** du `journey_state`,
-* la **structure JSON** attendue en sortie (actions à lancer, ressources à proposer, messages à afficher).
+* the available **agent catalog**,
+* the **data model** of `journey_state`,
+* the expected **JSON structure** in output (actions to launch, resources to propose, messages to display).
 
 ---
 
-## 4. Ressources, interactions et productions concrètes à confier à GPT-5.1
+## 4. Resources, interactions, and concrete productions to entrust to GPT-5.1
 
-Là, on traduit ta demande : *“la simulation ne doit pas se limiter à quelques textes mais proposer des interactions et des ressources concrètes et diversifiées”*.
+Here, we translate your request: *"the simulation must not be limited to a few texts but propose concrete and diversified interactions and resources"*.
 
-### 4.1. Types de ressources que GPT-5.1 peut produire
+### 4.1. Types of resources GPT-5.1 can produce
 
-Pour chaque phase / parcours, un agent peut produire (via JSON ou Markdown) :
+For each phase / track, an agent can produce (via JSON or Markdown):
 
-1. **Textes structurés “pédagogiques”**
+1. **Structured "pedagogical" texts**
 
-   * Explications pas-à-pas (ex : “Comment fonctionne un launch Solana et un Internet Capital Market ?”).
-   * FAQ personnalisée à partir des réponses du user.
+   * Step-by-step explanations (e.g., "How does a Solana launch and an Internet Capital Market work?").
+   * Personalized FAQ based on user answers.
 
-2. **Checklists et plans d’action**
+2. **Checklists and action plans**
 
-   * “To-do list 7 jours avant le TGE”,
-   * “To-do list 30 jours pour valider le PMF sur Solana”,
-   * “Checklist conformité / risques (pas du conseil juridique, mais des points de vigilance).”
+   * "7-day pre-TGE to-do list",
+   * "30-day to-do list to validate PMF on Solana",
+   * "Compliance / risk checklist (not legal advice, but watchpoints)."
 
-3. **Génération de documents prêts à transformer en PDF**
+3. **Generation of documents ready to transform into PDF**
 
-   * Plan de **whitepaper** personnalisé,
-   * **One-pager investisseur** (en Markdown → conversion en PDF),
-   * **Pitch deck outline** (liste de slides avec contenu recommandé),
-   * **Tokenomics sheet** (tableau en Markdown ou JSON).
+   * Personalized **whitepaper** plan,
+   * **Investor one-pager** (in Markdown → PDF conversion),
+   * **Pitch deck outline** (list of slides with recommended content),
+   * **Tokenomics sheet** (table in Markdown or JSON).
 
-4. **Quiz & évaluations**
+4. **Quizzes & evaluations**
 
-   * QCM pour vérifier la compréhension :
+   * MCQ to verify understanding:
 
-     * “Comprendre Solana (frais, TPS, comptes, tokens SPL)”,
-     * “Comprendre la logique d’Internet Capital Markets”,
-     * “Comprendre les mécanismes d’une DAO”.
-   * Chaque question avec :
+     * "Understand Solana (fees, TPS, accounts, SPL tokens)",
+     * "Understand the logic of Internet Capital Markets",
+     * "Understand the mechanisms of a DAO".
+   * Each question with:
 
-     * énoncé,
+     * statement,
      * 3–5 options,
-     * bonne réponse,
-     * explication.
+     * correct answer,
+     * explanation.
 
-5. **Grilles d’évaluation & scoring**
+5. **Evaluation grids & scoring**
 
-   * Score de maturité du projet sur 4 axes :
+   * Project maturity score on 4 axes:
 
-     * Vision & narration,
-     * Architecture produit,
-     * Tokenomics & incitations,
-     * Opérations & communauté.
-   * Chaque axe : score 0–5 + commentaire + recommandations.
+     * Vision & storytelling,
+     * Product architecture,
+     * Tokenomics & incentives,
+     * Operations & community.
+   * Each axis: score 0–5 + comment + recommendations.
 
-6. **Templates de communication**
+6. **Communication templates**
 
-   * Threads X/Twitter sur le lancement,
-   * Script de vidéo pour annoncer le projet,
-   * Email pour recruter des beta-testeurs, etc.
+   * X/Twitter threads on launch,
+   * Video script to announce the project,
+   * Email to recruit beta testers, etc.
 
 ---
 
-### 4.2. Structured outputs : un schéma commun pour tes parcours
+### 4.2. Structured outputs: a common schema for your tracks
 
-Pour exploiter à fond GPT-5.1 dans les parcours, demande systématiquement des **sorties JSON** sous une forme unifiée, par exemple :
+To fully leverage GPT-5.1 in tracks, systematically request **JSON outputs** in a unified form, for example:
 
 ```json
 {
   "ui_blocks": [
     {
       "type": "text",
-      "title": "Diagnostic de ton projet",
+      "title": "Project diagnostic",
       "body_markdown": "..."
     },
     {
       "type": "checklist",
-      "title": "Prochaines étapes",
+      "title": "Next steps",
       "items": [
-        { "label": "Valider ton problème utilisateur", "done": false },
-        { "label": "Choisir ton modèle de token", "done": false }
+        { "label": "Validate your user problem", "done": false },
+        { "label": "Choose your token model", "done": false }
       ]
     },
     {
       "type": "quiz",
-      "title": "As-tu compris les bases de Solana ?",
+      "title": "Did you understand Solana basics?",
       "questions": [
         {
           "id": "q1",
-          "question": "Pourquoi les frais sur Solana sont-ils en général très bas ?",
+          "question": "Why are Solana fees generally very low?",
           "options": ["A ...", "B ...", "C ..."],
           "correct_option_index": 1,
           "explanation": "..."
@@ -365,181 +365,181 @@ Pour exploiter à fond GPT-5.1 dans les parcours, demande systématiquement des 
   "agent_suggestions": [
     {
       "agent": "GrowthAgent",
-      "reason": "L'utilisateur veut préparer la communication autour du launch",
+      "reason": "The user wants to prepare communication around the launch",
       "action": "generate_30_day_content_calendar"
     }
   ],
   "next_user_prompts": [
-    "Choisis une des prochaines étapes dans la checklist.",
-    "Souhaites-tu approfondir la partie tokenomics ou la partie go-to-market ?"
+    "Choose one of the next steps in the checklist.",
+    "Do you want to deepen the tokenomics part or the go-to-market part?"
   ]
 }
 ```
 
-Ton backend :
+Your backend:
 
-1. Passe ce schéma comme **JSON Schema** à GPT-5.1 (via `response_format` de la Responses API). ([developers.openai.com][2])
-2. Parse la réponse JSON.
-3. Traduit `ui_blocks` → composants UI côté front.
-4. Traduit `agent_suggestions` → appels à d’autres agents.
-5. Affiche `next_user_prompts` comme boutons ou suggestions.
+1. Passes this schema as **JSON Schema** to GPT-5.1 (via `response_format` of the Responses API). ([developers.openai.com][2])
+2. Parses the JSON response.
+3. Translates `ui_blocks` → UI components front-side.
+4. Translates `agent_suggestions` → calls to other agents.
+5. Displays `next_user_prompts` as buttons or suggestions.
 
-> C’est ce qui transforme ton application en **vraie simulation interactive**, plutôt qu’un simple “chat”.
+> This is what transforms your application into a **real interactive simulation**, rather than a simple "chat".
 
 ---
 
-### 4.3. Exemples spécifiques par phase de parcours
+### 4.3. Specific examples by journey phase
 
 **Phase 1 – Onboarding / Profiling**
 
-* Objectif : comprendre niveau, projet, contraintes.
-* GPT-5.1 génère :
+* Objective: understand level, project, constraints.
+* GPT-5.1 generates:
 
-  * Un **résumé du profil**,
-  * Un **score de maturité**,
-  * Une **suggestion de parcours** (Builder, Growth, DAO, Migration vers web3, etc.),
-  * 3–4 **questions clé** pour affiner.
+  * A **profile summary**,
+  * A **maturity score**,
+  * A **track suggestion** (Builder, Growth, DAO, Migration to web3, etc.),
+  * 3–4 **key questions** to refine.
 
-**Phase 2 – Diagnostic Business / Produit**
+**Phase 2 – Business / Product Diagnostic**
 
-* GPT-5.1 produit :
+* GPT-5.1 produces:
 
-  * Une **carte des risques**,
-  * Une **décomposition du projet** en modules (core app, smart contract, infra, front, communauté),
-  * 2–3 **scénarios** (MVP light / MVP medium / MVP ambitieux).
+  * A **risk map**,
+  * A **project breakdown** into modules (core app, smart contract, infra, front, community),
+  * 2–3 **scenarios** (MVP light / MVP medium / MVP ambitious).
 
 **Phase 3 – Tokenomics / Internet Capital Markets**
 
-* GPT-5.1 propose :
+* GPT-5.1 proposes:
 
-  * 2–3 architectures de tokenomics (utility-only, utility+governance, dual-token, etc.),
-  * un tableau comparatif (pro / cons / risques),
-  * un premier **JSON de tokenomics** à raffiner dans un agent dédié.
+  * 2–3 tokenomics architectures (utility-only, utility+governance, dual-token, etc.),
+  * a comparative table (pros / cons / risks),
+  * a first **tokenomics JSON** to refine in a dedicated agent.
 
 **Phase 4 – Go-to-Market / Growth**
 
-* GPT-5.1 construit :
+* GPT-5.1 builds:
 
-  * un **calendrier de contenus** (30 jours),
-  * des **variantes de positionnement**,
-  * des **assets** (threads, scripts, bullet points pour pitch oral).
+  * a **content calendar** (30 days),
+  * **positioning variants**,
+  * **assets** (threads, scripts, bullet points for oral pitch).
 
-**Phase 5 – DAO / Gouvernance**
+**Phase 5 – DAO / Governance**
 
-* GPT-5.1 génère :
+* GPT-5.1 generates:
 
-  * des **templates de propositions** (“governance proposals”),
-  * un **schéma de roles & permissions**,
-  * une **charte communautaire**.
+  * **proposal templates** (“governance proposals”),
+  * a **roles & permissions schema**,
+  * a **community charter**.
 
-À chaque phase, les **UI blocks** produisent de l’interactivité : quiz, choix de scénarios, to-do list, boutons d’action.
-
----
-
-## 5. Stratégie multi-modèles et coûts
-
-Pour rester crédible devant des investisseurs, il faut aussi une **stratégie de coût / latence** structurée (les docs “Rate limits” & “Keep costs low & accuracy high” vont dans ce sens). ([developers.openai.com][2])
-
-Proposition :
-
-* **Zyno (orchestrateur)** :
-
-  * Modèle : `gpt-5.1`
-  * `reasoning_effort`: `"medium"` par défaut, `"high"` sur les grosses décisions.
-  * Usage : 1 appel par “grand pas” de la simulation.
-
-* **Agents lourds (Tokenomics, DAO design, Architecture parcours)** :
-
-  * Modèle : `gpt-5.1`
-  * Température : 0.4–0.6
-  * Max tokens de sortie raisonnable (1 000–1 500).
-
-* **Agents légers (quiz, reformulation, résumé, classification, micro-feedback)** :
-
-  * Modèle : `gpt-5.1-mini` (ou autre modèle plus léger selon la doc des modèles).
-  * Température : 0.2–0.4
-  * Sorties courtes (<400 tokens).
-
-* **Mécanisme de retry & backoff** :
-
-  * En cas de 429 (rate limit) → retry avec backoff exponentiel, voire fallback temporaire sur un modèle plus petit pour ne pas casser la simulation.
+At each phase, the **UI blocks** produce interactivity: quiz, scenario choice, to-do list, action buttons.
 
 ---
 
-## 6. Spécifications concrètes à donner à ton agent IA développeur
+## 5. Multi-model strategy and costs
 
-Voici, en mode “TODO clair”, ce que tu peux donner à un agent IA / dev pour intégrer GPT-5.1 proprement :
+To remain credible to investors, you also need a structured **cost / latency strategy** (the "Rate limits" & "Keep costs low & accuracy high" docs support this). ([developers.openai.com][2])
 
-### 6.1. Infrastructure LLM
+Proposal:
 
-1. **Mettre en place la configuration OpenAI** :
+* **Zyno (orchestrator)**:
 
-   * fichier `.env` avec `OPENAI_API_KEY` (+ éventuellement `OPENAI_BASE_URL`),
-   * module `openaiClient.ts` qui instancie le client.
+  * Model: `gpt-5.1`
+  * `reasoning_effort`: `"medium"` by default, `"high"` on major decisions.
+  * Usage: 1 call per "major step" of the simulation.
 
-2. **Créer un module `llm/`** avec :
+* **Heavy Agents (Tokenomics, DAO design, Journey Architecture)**:
 
-   * `callGpt5Chat(...)` (Chat Completions) comme dans l’exemple,
-   * plus tard : `callGpt5Responses(...)` pour la Responses API (avec `tools` et `response_format`).
+  * Model: `gpt-5.1`
+  * Temperature: 0.4–0.6
+  * Reasonable max output tokens (1,000–1,500).
 
-3. **Traçabilité & monitoring** :
+* **Light Agents (quiz, reformulation, summary, classification, micro-feedback)**:
 
-   * logguer `model`, tokens utilisés, temps de réponse, `journeyId`, `agentName`.
+  * Model: `gpt-5.1-mini` (or other lighter model according to model docs).
+  * Temperature: 0.2–0.4
+  * Short outputs (<400 tokens).
+
+* **Retry & backoff mechanism**:
+
+  * In case of 429 (rate limit) → retry with exponential backoff, or even temporary fallback to a smaller model to not break the simulation.
 
 ---
 
-### 6.2. Architecture Agents
+## 6. Concrete specifications to give to your AI developer agent
 
-1. **Implémenter `BaseAgent`** (voir plus haut) avec :
+Here is, in "clear TODO" mode, what you can give to an AI / dev agent to integrate GPT-5.1 properly:
+
+### 6.1. LLM Infrastructure
+
+1. **Set up OpenAI configuration**:
+
+   * .env file with `OPENAI_API_KEY` (+ optionally `OPENAI_BASE_URL`),
+   * `openaiClient.ts` module that instantiates the client.
+
+2. **Create a `llm/` module** with:
+
+   * `callGpt5Chat(...)` (Chat Completions) as in the example,
+   * later: `callGpt5Responses(...)` for Responses API (with `tools` and `response_format`).
+
+3. **Traceability & monitoring**:
+
+   * log `model`, used tokens, response time, `journeyId`, `agentName`.
+
+---
+
+### 6.2. Agent Architecture
+
+1. **Implement `BaseAgent`** (see above) with:
 
    * `buildSystemPrompt(ctx)`,
    * `buildUserPrompt(ctx)`,
    * `parseOutput(text, ctx)`.
 
-2. **Créer les agents principaux** :
+2. **Create main agents**:
 
    * `ZynoOrchestratorAgent`
    * `BuilderAgent`
    * `GrowthAgent`
    * `DAOAgent`
-   * éventuellement : `EducationAgent`, `RiskAgent`, `TokenomicsAgent`, `EvalAgent`…
+   * optionally: `EducationAgent`, `RiskAgent`, `TokenomicsAgent`, `EvalAgent`…
 
-3. **Pour chaque agent**, définir :
+3. **For each agent**, define:
 
-   * un **prompt système** détaillé (rôle, objectifs, ton, contraintes),
-   * le **type de ressources** qu’il produit :
+   * a detailed **system prompt** (role, objectives, tone, constraints),
+   * the **type of resources** it produces:
 
      * `ui_blocks` (TOC, checklists, quiz, templates, etc.),
-     * `agent_suggestions` (pour enchaîner les autres agents),
+     * `agent_suggestions` (to chain other agents),
      * `next_user_prompts`.
-   * une **fonction `parseOutput`** qui :
+   * a **parseOutput function** that:
 
-     * tente de parser du JSON,
-     * sinon, applique une stratégie de récupération (ex. essayer d’extraire un bloc JSON dans un texte Markdown).
+     * attempts to parse JSON,
+     * otherwise, applies a recovery strategy (e.g. try to extract a JSON block in Markdown text).
 
 ---
 
-### 6.3. Contrat API entre front et backend
+### 6.3. API Contract between front and backend
 
-Définir un endpoint unique :
+Define a unique endpoint:
 
 ```http
 POST /api/journeys/:journeyId/step
 ```
 
-Body :
+Body:
 
 ```json
 {
   "phaseId": "diagnostic",
   "trackId": "builder",
-  "userInput": "Texte ou choix de l'utilisateur",
+  "userInput": "Text or user choice",
   "language": "fr",
-  "journeyState": { ... }  // état sérialisé
+  "journeyState": { ... }  // serialized state
 }
 ```
 
-Réponse :
+Response:
 
 ```json
 {
@@ -552,44 +552,44 @@ Réponse :
 }
 ```
 
-Le backend :
+The backend:
 
-1. Appelle **Zyno** avec GPT-5.1.
-2. Zyno renvoie une liste d’**agents à invoquer** + un schéma cible de `ui_blocks`.
-3. Le backend invoque les agents requis (en série ou en parallèle).
-4. Assemble tous les `ui_blocks` et renvoie au front.
-
----
-
-### 6.4. Préparer la migration vers RAG
-
-Même si, pour l’instant, tu utilises seulement GPT-5.1 “nu”, pense dès maintenant à :
-
-* **Modéliser une “tool” `search_in_knowledge_base`** dans tes prompts :
-
-  * Aujourd’hui : implémentée par un simple appel LLM (qui “fait semblant” de chercher, ou s’appuie sur sa connaissance générale, avec un disclaimer).
-  * Demain : cette tool appellera ton pipeline RAG (ou la File Search de la Responses API). ([developers.openai.com][2])
-
-* **Conserver un champ `source` ou `provenance`** dans les ressources générées (ex. `source: "rag" | "llm"`), pour pouvoir basculer facilement.
+1. Calls **Zyno** with GPT-5.1.
+2. Zyno returns a list of **agents to invoke** + a target schema of `ui_blocks`.
+3. The backend invokes required agents (serially or in parallel).
+4. Assembles all `ui_blocks` and sends back to front.
 
 ---
 
-## 7. En résumé opérationnel
+### 6.4. Prepare migration to RAG
 
-* **GPT-5.1** est ton **moteur de raisonnement** pour Zyno et les agents “intelligents”.
-* Tu l’appelles via :
+Even if, for now, you only use "bare" GPT-5.1, think right now about:
 
-  * **Chat Completions** (simple, direct, parfait pour le MVP),
-  * ou mieux, **Responses API** pour :
+* **Model a "tool" `search_in_knowledge_base`** in your prompts:
+
+  * Today: implemented by a simple LLM call (which "pretends" to search, or relies on its general knowledge, with a disclaimer).
+  * Tomorrow: this tool will call your RAG pipeline (or the File Search of the Responses API). ([developers.openai.com][2])
+
+* **Keep a source or provenance field** in generated resources (e.g. `source: "rag" | "llm"`), to be able to switch easily.
+
+---
+
+## 7. In operational summary
+
+* **GPT-5.1** is your **reasoning engine** for Zyno and "intelligent" agents.
+* You call it via:
+
+  * **Chat Completions** (simple, direct, perfect for MVP),
+  * or better, **Responses API** for:
 
     * tools,
     * structured outputs,
     * reasoning_effort.
-* Tu construis une **couche d’abstraction LLM** (`callGpt5...`) et une **hiérarchie d’agents** (`BaseAgent` + agents spécialisés).
-* Les sorties de GPT-5.1 ne sont pas seulement du texte, mais des **structures JSON de UI** :
+* You build an **LLM abstraction layer** (`callGpt5...`) and an **agent hierarchy** (`BaseAgent` + specialized agents).
+* GPT-5.1 outputs are not just text, but **UI JSON structures**:
 
-  * textes, checklists, quiz, scoring, templates de documents, suggestions d’actions.
-* Zyno orchestre tout : en fonction de l’état du parcours, il décide **quels agents** appeler et **quelles interactions** proposer.
+  * texts, checklists, quiz, scoring, document templates, action suggestions.
+* Zyno orchestrates everything: depending on the journey state, it decides **which agents** to call and **what interactions** to propose.
 
 
 

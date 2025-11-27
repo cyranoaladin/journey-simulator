@@ -57,17 +57,14 @@ export const WalletContextProvider = ({ children }: WalletContextProviderProps) 
     void (async () => {
       try {
         const [
-          { PhantomWalletAdapter },
           { SolflareWalletAdapter },
           { TorusWalletAdapter }
         ] = await Promise.all([
-          import('@solana/wallet-adapter-phantom'),
           import('@solana/wallet-adapter-solflare'),
           import('@solana/wallet-adapter-torus')
         ])
 
         const adapters: WalletAdapter[] = [
-          new PhantomWalletAdapter(),
           new SolflareWalletAdapter({ network }),
           new TorusWalletAdapter()
         ]

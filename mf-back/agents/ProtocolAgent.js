@@ -23,7 +23,19 @@ Tone: Technical, precise, engineering-focused. Use terms like "Merkle Tree", "Ze
         return `Here is the protocol architecture or technical question from the user:
 "${ctx.submission}"
 
-Analyze this technical proposal and provide engineering feedback.`;
+**Your task:**
+1. Analyze this technical proposal from an engineering perspective
+2. Evaluate the quality, feasibility, and technical depth of the response
+3. Provide a **global_score** from 0 to 10 where:
+   - 0-3: Poor understanding, major technical flaws
+   - 4-6: Basic understanding, some good points but lacks depth
+   - 7-8: Good technical analysis with solid reasoning
+   - 9-10: Excellent, production-ready architecture with deep insights
+
+4. Provide detailed **feedback** explaining your score
+5. Break down your evaluation into **axes** (e.g., "Technical Feasibility", "Scalability", "Solana Best Practices") with individual scores
+
+Be fair but rigorous in your evaluation. Reward well-thought-out answers even if brief.`;
     }
 
     async run(ctx) {

@@ -19,7 +19,9 @@ const zynoRoutes = require('./routes/zyno-routes');
 const ragRoutes = require('./routes/rag-routes');
 const exportRoutes = require('./routes/export-routes');
 const daoRoutes = require('./routes/dao-routes');
+const agentRoutes = require('./routes/agent-routes');
 const feedbackRoutes = require('./routes/feedback');
+const favoritesRoutes = require('./routes/favorites');
 const app = express();
 
 const shouldSkipDbConnection = process.env.SKIP_DB_CONNECTION === 'true';
@@ -48,30 +50,29 @@ app.set('view engine', 'pug');
 // CORS middleware
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
-const allowedOrigins = new Set([
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'http://localhost:4173',
-  'http://127.0.0.1:4173',
-  'http://127.0.0.1:5173',
-  'http://127.0.0.1:5174'
-]);
-
 const corsOptions = {
-  origin(origin, callback) {
-    if (!origin || allowedOrigins.has(origin) || isDevelopment) {
-      return callback(null, true);
-    }
-
-    return callback(new Error(`Origin ${origin} not allowed by CORS`));
-  },
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:4173',
+    'http://localhost:3000',
+    'http://localhost:3003',
+    'http://127.0.0.1:4173',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:5174',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3002',
+    'http://127.0.0.1:3003'
+  ],
   credentials: true,
+  optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'x-api-key', 'X-API-KEY']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'x-api-key', 'X-API-KEY', 'x-user-id']
 }
 
-app.use(cors(corsOptions))
-app.options('*', cors(corsOptions))
+// Apply CORS middleware
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -81,12 +82,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/user', userRouter);
 app.use('/cours', coursRoutes);
 app.use('/journey', journey);
+app.use('/api/journeys', journey); // Alias for frontend compatibility
 app.use('/analytics', analyticsRoutes);
 app.use('/', zynoRoutes);
 app.use('/', ragRoutes);
 app.use('/', exportRoutes);
-app.use('/', daoRoutes);
+app.use('/dao', daoRoutes);
+app.use('/api/agents', agentRoutes);
 app.use('/api/feedback', feedbackRoutes);
+app.use('/api/favorites', favoritesRoutes);
 
 // Auth verification route
 app.get('/auth/verify', (req, res) => {

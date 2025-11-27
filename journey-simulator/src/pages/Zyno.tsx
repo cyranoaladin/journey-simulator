@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import WalletConnectionBanner from '../components/shared/WalletConnectionBanner';
 import SkillchainBanner from '../components/SkillchainBanner';
-import ZynoConsole from '../components/Zyno/ZynoConsole';
+import { ZynoConsole } from '../components/Zyno/ZynoConsole';
 import DashboardZyno from '../components/Zyno/DashboardZyno';
 import type { MissionSummary } from '../components/Zyno/MissionFeedbackSummary';
 

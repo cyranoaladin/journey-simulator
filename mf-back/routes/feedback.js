@@ -8,7 +8,7 @@ router.post('/', async (req, res) => {
     const { agentName, userId, missionId, rating, comment } = req.body;
 
     if (!agentName || !userId || typeof rating === 'undefined') {
-      return res.status(400).json({ error: 'Champs requis manquants.' });
+      return res.status(400).json({ error: 'Missing required fields.' });
     }
 
     const feedbackData = {
@@ -27,10 +27,10 @@ router.post('/', async (req, res) => {
       }
     });
 
-    res.status(200).json({ message: 'Feedback utilisateur enregistré avec succès.' });
+    res.status(200).json({ message: 'User feedback successfully recorded.' });
   } catch (err) {
-    console.error('Erreur feedback AECO:', err);
-    res.status(500).json({ error: 'Erreur serveur lors de l’enregistrement du feedback.' });
+    console.error('AECO feedback error:', err);
+    res.status(500).json({ error: 'Server error while saving feedback.' });
   }
 });
 

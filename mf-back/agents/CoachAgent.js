@@ -1,32 +1,66 @@
-const { getRagSnippets } = require('../rag/ragClient');
-const { createAgentResponse } = require('./telemetryUtils');
+const BaseAgent = require('./BaseAgent');
 
-module.exports = async function CoachAgent(agentInput = {}, context = {}) {
-  const user = agentInput.user || context.user || { id: 'demo_user' };
-  const phase = agentInput.phase || context.phase || 'Coaching';
-  const intent = context.intent || agentInput.intent || null;
-  const objective =
-    agentInput.objective || context.objective || agentInput.input || context.input || 'coaching de mission';
+class CoachAgent extends BaseAgent {
+  constructor() {
+    super("CoachAgent");
+  }
 
-  const snippets = await getRagSnippets({ query: objective, userContext: user });
+  buildSystemPrompt(ctx) {
+    return `You are the **CoachAgent**, a personal development and leadership coach.
+Your goal is to help the user grow as a founder and leader.
 
-  return createAgentResponse('CoachAgent', {
-    phase,
-    intent,
-    objective,
-    prompt: `Analyser la progression utilisateur pour "${objective}"`,
-    reasoning:
-      'Compare les scores AEPO/AECO et les retours precedents pour suggerer un plan de coaching cible.',
-    action: 'Planifier une session de coaching et suivre la liste de micro-objectifs proposes.',
-    summary: 'Resume genere pour CoachAgent',
-    outcome: 'Feuille de route de coaching ajustee',
-    payload: {
-      output: 'Suivi personnalise genere',
-      nextSteps: ['Rappel des objectifs a atteindre'],
-    },
-    snippets,
-    metrics: { confidence: 0.82, success: true, impact: 'medium' },
-    user,
-  });
-};
+Your responsibilities:
+1. Help with soft skills (communication, leadership).
+2. Discuss founder psychology (burnout, resilience).
+3. Facilitate decision-making frameworks.
+4. Provide accountability.
 
+Tone: Supportive, questioning (Socratic), empowering.`;
+  }
+
+  buildUserPrompt(ctx) {
+    return `User Input: "${ctx.submission || ctx.lastInput}"
+
+Provide coaching or feedback.`;
+  }
+
+  async run(ctx) {
+    const EVALUATION_SCHEMA = {
+      type: "json_schema",
+      json_schema: {
+        name: "CoachResponse",
+        strict: true,
+        schema: {
+          type: "object",
+          required: ["global_score", "feedback", "axes"],
+          properties: {
+            global_score: { type: "number" },
+            feedback: { type: "string" },
+            axes: {
+              type: "array",
+              items: {
+                type: "object",
+                required: ["name", "score", "max_score", "comment"],
+                properties: {
+                  name: { type: "string" },
+                  score: { type: "number" },
+                  max_score: { type: "number" },
+                  comment: { type: "string" },
+                },
+                additionalProperties: false,
+              },
+            },
+          },
+          additionalProperties: false,
+        },
+      },
+    };
+
+    return super.run(ctx, {
+      response_format: EVALUATION_SCHEMA,
+      temperature: 0.6,
+    });
+  }
+}
+
+module.exports = CoachAgent;

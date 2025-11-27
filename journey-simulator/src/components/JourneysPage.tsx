@@ -1,5 +1,6 @@
 import { useState, useEffect, type FC } from "react";
 import { motion } from "framer-motion";
+import MessageDisplay from "../components/shared/MessageDisplay";
 import { useJourneyStore } from "../store/journeyStore";
 import JourneyCard from "./Journey/JourneyCard";
 import ZynoBox from "./Journey/ZynoBox";
@@ -8,12 +9,10 @@ import ResetProgressButton from "./ResetProgressButton";
 import JourneyWorkspace from "./Journey/JourneyWorkspace";
 
 const JourneysPage: FC = () => {
-  const {
-    selectedPersona,
-    setSelectedPersona,
-    userProgress,
-    loadUserProgress,
-  } = useJourneyStore();
+  const selectedPersona = useJourneyStore((state) => state.selectedPersona);
+  const setSelectedPersona = useJourneyStore((state) => state.setSelectedPersona);
+  const userProgress = useJourneyStore((state) => state.userProgress);
+  const loadUserProgress = useJourneyStore((state) => state.loadUserProgress);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,11 +42,14 @@ const JourneysPage: FC = () => {
   ];
 
   useEffect(() => {
+    console.log("JourneysPage: useEffect triggered");
     const loadProgress = async () => {
+      console.log("JourneysPage: loading progress...");
       try {
         setIsLoading(true);
         setError(null);
         await loadUserProgress();
+        console.log("JourneysPage: progress loaded successfully");
       } catch (err) {
         console.error("Failed to load user progress:", err);
         setError("Failed to load your progress. Please refresh the page.");
@@ -102,51 +104,28 @@ const JourneysPage: FC = () => {
       <div className="sticky top-0 z-40 bg-primary-900/80 backdrop-blur-md border-b border-white/10">
         <div className="container mx-auto px-4 py-4">
           {successMessage && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="mb-4 p-3 bg-green-500/20 border border-green-500/30 rounded-lg"
-            >
-              <div className="flex items-center space-x-3">
-                <div className="text-green-400">🎉</div>
-                <span className="text-green-300 text-sm">{successMessage}</span>
-                <button
-                  onClick={() => setSuccessMessage(null)}
-                  className="ml-auto text-green-400 hover:text-green-300"
-                >
-                  ✕
-                </button>
-              </div>
-            </motion.div>
+            <MessageDisplay
+              type="success"
+              message={successMessage}
+              onClose={() => setSuccessMessage(null)}
+            />
           )}
 
           {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg"
-            >
-              <div className="flex items-center space-x-3">
-                <div className="text-red-400">⚠️</div>
-                <span className="text-red-300 text-sm">{error}</span>
-                <div className="ml-auto flex space-x-2">
-                  <button
-                    onClick={handleRefreshProgress}
-                    disabled={isLoading}
-                    className="text-red-400 hover:text-red-300 disabled:opacity-50 text-sm"
-                  >
-                    🔄 Refresh
-                  </button>
-                  <button
-                    onClick={() => setError(null)}
-                    className="text-red-400 hover:text-red-300"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
-            </motion.div>
+            <div className="mb-4 flex justify-between items-start">
+              <MessageDisplay
+                type="error"
+                message={error}
+                onClose={() => setError(null)}
+              />
+              <button
+                onClick={handleRefreshProgress}
+                disabled={isLoading}
+                className="ml-4 px-4 py-2 rounded-lg bg-red-600/20 hover:bg-red-700/20 border border-red-500/30 text-red-300 disabled:opacity-50 text-sm self-start"
+              >
+                {isLoading ? 'Refreshing...' : '🔄 Refresh'}
+              </button>
+            </div>
           )}
         </div>
       </div>

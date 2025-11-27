@@ -66,7 +66,7 @@ export default function AgentFeedbackModal({ step, userId, missionId }: AgentFee
     <div className="w-full max-w-xl overflow-hidden rounded-2xl bg-white text-slate-900 shadow-2xl dark:bg-slate-900 dark:text-white">
       <header className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-4 dark:border-slate-700">
         <div>
-          <p className="text-xs uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">Retour agentique</p>
+          <p className="text-xs uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">Agent Feedback</p>
           <h2 className="mt-1 text-xl font-semibold">Partagez votre avis sur {step.agent}</h2>
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             Phase : {step.phase ?? 'Non specifiee'} • Intent : {step.intent ?? 'Indefinie'}

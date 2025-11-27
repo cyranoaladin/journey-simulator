@@ -60,29 +60,29 @@ const ResourceUploader = () => {
     setUploadMessage(null);
 
     if (!hasApiKey) {
-      setUploadMessage('Fournissez une clé API admin pour lancer l\'ingestion.');
+      setUploadMessage('Provide an admin API key to start ingestion.');
       return;
     }
     if (!selectedFile) {
-      setUploadMessage('Sélectionnez un document .md, .txt, .json ou .csv.');
+      setUploadMessage('Select a .md, .txt, .json or .csv document.');
       return;
     }
 
     const extension = selectedFile.name.slice(selectedFile.name.lastIndexOf('.')).toLowerCase();
     if (!ACCEPTED_EXTENSIONS.includes(extension)) {
-      setUploadMessage('Format non supporté. Utilisez de préférence des fichiers texte ou markdown.');
+      setUploadMessage('Unsupported format. Please use text or markdown files.');
       return;
     }
 
     try {
       setUploading(true);
       await api.uploadRagDocument(selectedFile, apiKey!.trim());
-      setUploadMessage(`✅ ${selectedFile.name} a été ingéré avec succès.`);
+      setUploadMessage(`✅ ${selectedFile.name} successfully ingested.`);
       setSelectedFile(null);
       await loadDocuments();
     } catch (error) {
       console.error('RAG upload failed:', error);
-      setUploadMessage(error instanceof Error ? error.message : 'Ingestion impossible.');
+      setUploadMessage(error instanceof Error ? error.message : 'Ingestion failed.');
     } finally {
       setUploading(false);
     }
@@ -96,9 +96,9 @@ const ResourceUploader = () => {
             <UploadCloud size={20} />
           </div>
           <div>
-            <h3 className="text-lg font-semibold">Ingestion RAG locale</h3>
+            <h3 className="text-lg font-semibold">Local RAG Ingestion</h3>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Ajoute des ressources pour renforcer la mémoire des agents Zyno.
+              Add resources to strengthen Zyno agents' memory.
             </p>
           </div>
         </div>
@@ -109,23 +109,23 @@ const ResourceUploader = () => {
           className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-slate-400/60"
         >
           <RefreshCw size={16} className={fetchState.loading ? 'animate-spin' : ''} />
-          Rafraîchir
+          Refresh
         </button>
       </header>
 
       <form onSubmit={handleUpload} className="space-y-3 rounded-xl border border-dashed border-slate-300 p-4 dark:border-slate-600">
         <div className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
           <Shield size={18} />
-          <span>La clé API admin est partagée avec le scoreboard. Elle est requise pour l\'ingestion.</span>
+          <span>The admin API key is shared with the scoreboard. It is required for ingestion.</span>
         </div>
         {!hasApiKey && (
           <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            Clé API admin
+            Admin API Key
             <input
               type="password"
               value={apiKey ?? ''}
               onChange={(event) => setApiKey(event.target.value)}
-              placeholder="Saisir la clé x-api-key"
+              placeholder="Enter x-api-key"
               className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-400 dark:border-slate-600 dark:bg-slate-800"
             />
           </label>
@@ -134,10 +134,10 @@ const ResourceUploader = () => {
         <label className="flex flex-col items-center justify-center gap-3 rounded-xl bg-slate-50 p-6 text-center text-sm text-slate-600 transition hover:bg-slate-100 dark:bg-slate-800/70 dark:text-slate-300 dark:hover:bg-slate-800">
           <FolderOpen size={22} />
           <span>
-            {selectedFile ? selectedFile.name : 'Glisse ton fichier ici ou clique pour sélectionner'}
+            {selectedFile ? selectedFile.name : 'Drag your file here or click to select'}
           </span>
           <span className="text-xs text-slate-400 dark:text-slate-500">
-            Formats conseillés : markdown, texte, JSON. Taille maximale 2&nbsp;Mo.
+            Recommended formats: markdown, text, JSON. Max size 2&nbsp;MB.
           </span>
           <input
             type="file"
@@ -155,12 +155,12 @@ const ResourceUploader = () => {
           {uploading ? (
             <>
               <Loader2 size={16} className="animate-spin" />
-              Ingestion en cours…
+              Ingestion in progress…
             </>
           ) : (
             <>
               <UploadCloud size={16} />
-              Lancer l\'upload
+              Start Upload
             </>
           )}
         </button>
@@ -174,12 +174,12 @@ const ResourceUploader = () => {
 
       <div className="space-y-2">
         <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-          Documents indexés ({documents.length})
+          Indexed Documents ({documents.length})
         </h4>
         {fetchState.loading ? (
           <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-500 dark:bg-slate-800 dark:text-slate-300">
             <Loader2 size={16} className="animate-spin" />
-            Synchronisation…
+            Syncing…
           </div>
         ) : fetchState.error ? (
           <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">
@@ -187,7 +187,7 @@ const ResourceUploader = () => {
           </p>
         ) : documents.length === 0 ? (
           <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500 dark:border-slate-700/60 dark:bg-slate-800 dark:text-slate-300">
-            Aucun document indexé pour le moment.
+            No documents indexed yet.
           </p>
         ) : (
           <ul className="space-y-2">
@@ -203,7 +203,7 @@ const ResourceUploader = () => {
                   </span>
                 </span>
                 <span className="text-[11px] uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                  Stocké localement
+                  Stored Locally
                 </span>
               </li>
             ))}

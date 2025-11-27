@@ -48,7 +48,7 @@ function buildPrompt(agentName, objective) {
     return `Analyse de mission orchestree par ${agentName}`;
   }
 
-  return `${agentName} doit analyser la mission suivante : "${objective}".`;
+  return `${agentName} must analyze the following mission: "${objective}".`;
 }
 
 function createAgentResponse(agentName, options = {}) {

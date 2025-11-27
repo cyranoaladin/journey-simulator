@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useJourneyStore } from "../../store/journeyStore";
+// TEMPORARILY DISABLED - import { useFavoritesStore } from "../../store/favoritesStore";
 import type {
   JourneyStepResponse,
   UIBlock,
@@ -15,11 +16,15 @@ import type {
   ActionSuggestionsBlock,
   XpBlock,
   DiagramBlock,
-  DAODashboardBlock,
   ProjectSelectionBlock,
+  NarrativeChoiceBlock,
 } from "../../types/uiBlocks";
 import mermaid from "mermaid";
-import DAODashboard from "../DAO/DAODashboard";
+import GovernanceDashboard from "../Governance/GovernanceDashboard";
+import NarrativeChoice from "./NarrativeChoiceBlock";
+import IndicatorBlockComponent, { IndicatorBlock as IndicatorBlockType } from "./IndicatorBlock";
+import InteractiveTemplateComponent, { InteractiveTemplateBlock as InteractiveTemplateBlockType } from "./InteractiveTemplateBlock";
+// TEMPORARILY DISABLED - import { Star } from "lucide-react";
 
 function StreamingText({ text, speed = 10 }: { text: string; speed?: number }) {
   const [displayed, setDisplayed] = useState("");
@@ -94,14 +99,84 @@ function Quiz({ block }: { block: QuizBlock }) {
   const [answers, setAnswers] = useState<Record<string, number | null>>({});
   const [showExplain, setShowExplain] = useState(false);
   const [mode, setMode] = useState<"training" | "certifying">("training");
-  const score =
-    showExplain && mode === "certifying"
-      ? block.questions.reduce(
-        (acc, q) =>
-          acc + ((answers[q.id] ?? -1) === q.correct_option_index ? 1 : 0),
-        0,
-      )
-      : null;
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const ensureApiJourneyId = useJourneyStore((s) => s.ensureApiJourneyId);
+  const selectedPersona = useJourneyStore((s) => s.selectedPersona);
+  const lastStep = useJourneyStore((s) => s.lastStep);
+  const updateProgress = useJourneyStore((s) => s.updateProgress);
+
+  const score = block.questions.reduce(
+    (acc, q) =>
+      acc + ((answers[q.id] ?? -1) === q.correct_option_index ? 1 : 0),
+    0,
+  );
+
+  const allAnswered = block.questions.every((q) => answers[q.id] !== undefined);
+
+  const onSubmit = async () => {
+    if (!allAnswered) return;
+
+    try {
+      setSubmitting(true);
+      setError(null);
+      const id = ensureApiJourneyId();
+      const base =
+        (import.meta as any).env?.VITE_API_BASE_URL || "http://127.0.0.1:3000";
+
+      const body = {
+        missionId: block.id, // Using block ID as mission ID for quiz
+        inputType: "quiz_submission",
+        submission: JSON.stringify({
+          answers,
+          score,
+          max_score: block.questions.length,
+          mode: "certifying"
+        }),
+        language: "en",
+        mode: "builder",
+        tone: "pedagogical",
+        trackId: selectedPersona?.id,
+        phaseId: lastStep?.metadata?.phase_id,
+        journeyState: useJourneyStore.getState().userProgress,
+      };
+
+      const resp = await fetch(`${base}/api/journeys/${id}/submit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (!resp.ok) throw new Error(`submit failed: ${resp.status}`);
+      const json = await resp.json();
+
+      // Extract next_step from the response
+      const nextStep = json.next_step || json;
+
+      // Update global lastStep so renderer can show evaluation/xp blocks
+      useJourneyStore.setState({ lastStep: nextStep });
+
+      // Apply XP delta locally
+      const xpDelta = Number(json?.rewards?.xp_delta || json?.next_state?.xp_delta || 0);
+      if (
+        !isNaN(xpDelta) &&
+        xpDelta > 0 &&
+        typeof updateProgress === "function"
+      ) {
+        await updateProgress(xpDelta);
+      }
+
+      // Show explanations after submission
+      setShowExplain(true);
+
+    } catch (e: any) {
+      setError(e?.message || String(e));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="bg-white/5 rounded-xl p-4">
       <div className="flex items-center justify-between mb-2">
@@ -110,20 +185,35 @@ function Quiz({ block }: { block: QuizBlock }) {
           <span className="opacity-70">Mode</span>
           <div className="inline-flex rounded-md overflow-hidden border border-white/10">
             <button
-              className={`px-2 py-1 ${mode === "training" ? "bg-accent-cyan/20" : "bg-transparent"}`}
-              onClick={() => setMode("training")}
+              className={`px-3 py-1.5 transition-colors ${mode === "training" ? "bg-accent-cyan/20 text-accent-cyan font-medium" : "bg-transparent hover:bg-white/5"}`}
+              onClick={() => {
+                setMode("training");
+                setShowExplain(false);
+                setAnswers({});
+              }}
             >
-              Entraînement
+              Training
             </button>
             <button
-              className={`px-2 py-1 ${mode === "certifying" ? "bg-accent-purple/20" : "bg-transparent"}`}
-              onClick={() => setMode("certifying")}
+              className={`px-3 py-1.5 transition-colors ${mode === "certifying" ? "bg-accent-purple/20 text-accent-purple font-medium" : "bg-transparent hover:bg-white/5"}`}
+              onClick={() => {
+                setMode("certifying");
+                setShowExplain(false);
+                setAnswers({});
+              }}
             >
-              Certifiant
+              Certifying
             </button>
           </div>
         </div>
       </div>
+
+      {mode === "certifying" && (
+        <div className="mb-4 p-3 rounded bg-accent-purple/10 border border-accent-purple/20 text-xs text-accent-purple/90">
+          <strong>Certifying Mode:</strong> Answer all questions to submit. Your score will be recorded and XP awarded.
+        </div>
+      )}
+
       <div className="space-y-4">
         {block.questions.map((q) => (
           <div key={q.id} className="border border-white/10 rounded-lg p-3">
@@ -133,16 +223,21 @@ function Quiz({ block }: { block: QuizBlock }) {
                 const selected = answers[q.id] === idx;
                 const isCorrect = showExplain && idx === q.correct_option_index;
                 const isWrong = showExplain && selected && !isCorrect;
+
+                // In certifying mode, don't show colors until submitted (showExplain is true)
+                const showColors = showExplain;
+
                 return (
                   <button
                     key={idx}
                     onClick={() =>
                       setAnswers((prev) => ({ ...prev, [q.id]: idx }))
                     }
+                    disabled={mode === "certifying" && showExplain} // Disable changes after submission
                     className={`w-full text-left px-3 py-2 rounded-md transition border ${selected
                       ? "border-accent-cyan/60 bg-accent-cyan/10"
                       : "border-white/10 hover:border-white/20"
-                      } ${isCorrect ? "bg-green-600/20 border-green-500/50" : ""} ${isWrong ? "bg-red-600/20 border-red-500/50" : ""}`}
+                      } ${showColors && isCorrect ? "bg-green-600/20 border-green-500/50" : ""} ${showColors && isWrong ? "bg-red-600/20 border-red-500/50" : ""}`}
                   >
                     {opt}
                   </button>
@@ -151,34 +246,53 @@ function Quiz({ block }: { block: QuizBlock }) {
             </div>
             {showExplain && (
               <div className="text-xs mt-2 opacity-80">
-                Explication: {q.explanation}
+                Explanation: {q.explanation}
               </div>
             )}
           </div>
         ))}
       </div>
-      <div className="mt-3 flex items-center gap-3">
-        <button
-          className="px-3 py-2 rounded-md bg-accent-cyan/20"
-          onClick={() => setShowExplain(true)}
-        >
-          Voir corrections
-        </button>
-        <button
-          className="px-3 py-2 rounded-md border border-white/10"
-          onClick={() => {
-            setAnswers({});
-            setShowExplain(false);
-          }}
-        >
-          Réinitialiser
-        </button>
-        {score !== null && (
-          <span className="text-xs opacity-80">
-            Score: {score}/{block.questions.length}
+
+      <div className="mt-4 flex items-center justify-between gap-3">
+        <div className="flex gap-2">
+          {mode === "training" && (
+            <button
+              className="px-3 py-2 rounded-md bg-accent-cyan/20 hover:bg-accent-cyan/30 transition-colors text-sm"
+              onClick={() => setShowExplain(true)}
+            >
+              Check Answers
+            </button>
+          )}
+
+          <button
+            className="px-3 py-2 rounded-md border border-white/10 hover:bg-white/5 transition-colors text-sm"
+            onClick={() => {
+              setAnswers({});
+              setShowExplain(false);
+              setError(null);
+            }}
+          >
+            Reset
+          </button>
+        </div>
+
+        {mode === "certifying" && !showExplain && (
+          <button
+            className="px-4 py-2 rounded-md bg-gradient-primary text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+            disabled={!allAnswered || submitting}
+            onClick={onSubmit}
+          >
+            {submitting ? "Submitting..." : "Submit Certification"}
+          </button>
+        )}
+
+        {score !== null && showExplain && (
+          <span className="text-sm font-medium">
+            Score: <span className={score === block.questions.length ? "text-green-400" : "text-white"}>{score}/{block.questions.length}</span>
           </span>
         )}
       </div>
+      {error && <div className="mt-2 text-xs text-red-400">{error}</div>}
     </div>
   );
 }
@@ -204,7 +318,7 @@ function Mission({ block }: { block: MissionBlock }) {
         missionId: block.id,
         inputType: block.expected_input_type,
         submission: value,
-        language: "fr",
+        language: "en",
         mode: "builder",
         tone: "pedagogical",
         trackId: selectedPersona?.id,
@@ -218,10 +332,15 @@ function Mission({ block }: { block: MissionBlock }) {
       });
       if (!resp.ok) throw new Error(`submit failed: ${resp.status}`);
       const json = await resp.json();
+
+      // Extract next_step from the response
+      const nextStep = json.next_step || json;
+
       // Update global lastStep so renderer can show evaluation/xp blocks
-      useJourneyStore.setState({ lastStep: json });
+      useJourneyStore.setState({ lastStep: nextStep });
+
       // Apply XP delta locally
-      const xpDelta = Number(json?.next_state?.xp_delta || 0);
+      const xpDelta = Number(json?.rewards?.xp_delta || json?.next_state?.xp_delta || 0);
       if (
         !isNaN(xpDelta) &&
         xpDelta > 0 &&
@@ -249,7 +368,7 @@ function Mission({ block }: { block: MissionBlock }) {
           className="px-3 py-1.5 rounded-md border border-white/10"
           onClick={() => setShowHelp((v) => !v)}
         >
-          Comprendre la mission
+          Understand the mission
         </button>
         {block.nft_reward_id && (
           <span className="px-2 py-1 text-xs rounded bg-accent-purple/20">
@@ -259,9 +378,9 @@ function Mission({ block }: { block: MissionBlock }) {
       </div>
       {showHelp && (
         <div className="text-xs bg-black/30 rounded-md p-2 mb-2">
-          Conseil: fournissez un livrable adapté au type{" "}
-          {block.expected_input_type}. Un agent évaluera votre production et
-          proposera un feedback actionnable.
+          Tip: provide a deliverable adapted to the type{" "}
+          {block.expected_input_type}. An agent will evaluate your production and
+          offer actionable feedback.
         </div>
       )}
 
@@ -293,7 +412,7 @@ function Mission({ block }: { block: MissionBlock }) {
         disabled={submitting || !value.trim()}
         onClick={onSubmit}
       >
-        {submitting ? "Envoi..." : "Soumettre la mission"}
+        {submitting ? "Sending..." : "Submit mission"}
       </button>
     </div>
   );
@@ -305,56 +424,111 @@ function Resources({ block }: { block: ResourceBlock }) {
     const content = `# ${r.label}\n\n${r.description ?? ""}\n${r.url ?? ""}`;
     navigator.clipboard.writeText(content);
   };
+
+  // TEMPORARILY DISABLED - Favorites functionality
+  // const { addFavorite, removeFavoriteByResourceId, isFavorite } = useFavoritesStore();
+  // const ensureApiJourneyId = useJourneyStore((s) => s.ensureApiJourneyId);
+
+  // const toggleFavorite = async (r: ResourceItem) => {
+  //   const journeyId = ensureApiJourneyId();
+  //   
+  //   if (isFavorite(r.id)) {
+  //     await removeFavoriteByResourceId(r.id);
+  //   } else {
+  //     await addFavorite({
+  //       userId: 'anonymous',
+  //       journeyId,
+  //       resource: {
+  //         id: r.id,
+  //         label: r.label,
+  //         description: r.description,
+  //         url: r.url,
+  //         resource_type: r.resource_type,
+  //         agent_owner: r.agent_owner,
+  //       },
+  //     });
+  //   }
+  // };
+
   return (
     <div className="bg-white/5 rounded-xl p-4">
       <h4 className="font-semibold mb-2">{block.title}</h4>
       <div className="grid gap-2">
-        {block.resources.map((r) => (
-          <div
-            key={r.id}
-            className="border border-white/10 rounded-lg p-3 flex items-center justify-between"
-          >
-            <div>
-              <div className="font-medium">{r.label}</div>
-              {r.description && (
-                <div className="text-xs opacity-80">{r.description}</div>
-              )}
-              <div className="text-[11px] opacity-70 mt-1">
-                Proposé par {r.agent_owner} • {r.resource_type}
+        {block.resources.map((r) => {
+          // const favorited = isFavorite(r.id);
+          return (
+            <div
+              key={r.id}
+              className="border border-white/10 rounded-lg p-3 flex items-center justify-between"
+            >
+              <div>
+                <div className="font-medium">{r.label}</div>
+                {r.description && (
+                  <div className="text-xs opacity-80">{r.description}</div>
+                )}
+                <div className="text-[11px] opacity-70 mt-1">
+                  Proposed by {r.agent_owner} • {r.resource_type}
+                </div>
+              </div>
+              <div className="flex gap-2">
+                {r.url ? (
+                  <a
+                    className="px-3 py-1.5 rounded-md bg-accent-cyan/20 text-xs hover:bg-accent-cyan/30 transition-colors"
+                    href={r.url}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open
+                  </a>
+                ) : (
+                  <a
+                    className="px-3 py-1.5 rounded-md bg-white/10 text-xs hover:bg-white/20 transition-colors"
+                    href={`https://www.google.com/search?q=${encodeURIComponent(r.label + " " + (r.resource_type || ""))}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Search
+                  </a>
+                )}
+                {isFlashcards(r) && (
+                  <button
+                    className="px-3 py-1.5 rounded-md bg-accent-purple/20 text-xs hover:bg-accent-purple/30 transition-colors"
+                    onClick={() => copyDeck(r)}
+                  >
+                    Flashcards
+                  </button>
+                )}
+                {/* TEMPORARILY DISABLED - Favorite button
+                <button
+                  className={`px-3 py-1.5 rounded-md text-xs transition-colors ${
+                    favorited
+                      ? "bg-accent-gold/20 border border-accent-gold/50 hover:bg-accent-gold/30"
+                      : "border border-white/10 hover:bg-white/5"
+                  }`}
+                  onClick={() => toggleFavorite(r)}
+                  title={favorited ? "Retirer des favoris" : "Ajouter aux favoris"}
+                >
+                  <Star
+                    size={14}
+                    className={favorited ? "fill-accent-gold text-accent-gold" : ""}
+                  />
+                </button>
+                */}
+                <button
+                  className="px-3 py-1.5 rounded-md border border-white/10 text-xs hover:bg-white/5 transition-colors"
+                  onClick={() =>
+                    navigator.clipboard.writeText(
+                      `${r.label}\n${r.description ?? ""}\n${r.url ?? ""}`,
+                    )
+                  }
+                  title="Copy information"
+                >
+                  Copy
+                </button>
               </div>
             </div>
-            <div className="flex gap-2">
-              {r.url && (
-                <a
-                  className="px-3 py-1.5 rounded-md bg-accent-cyan/20"
-                  href={r.url}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Ouvrir
-                </a>
-              )}
-              {isFlashcards(r) && (
-                <button
-                  className="px-3 py-1.5 rounded-md bg-accent-purple/20"
-                  onClick={() => copyDeck(r)}
-                >
-                  Flashcards
-                </button>
-              )}
-              <button
-                className="px-3 py-1.5 rounded-md border border-white/10"
-                onClick={() =>
-                  navigator.clipboard.writeText(
-                    `${r.label}\n${r.description ?? ""}\n${r.url ?? ""}`,
-                  )
-                }
-              >
-                Copier
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -441,7 +615,7 @@ function Evaluation({ block }: { block: EvaluationBlock }) {
       </div>
       <p className="text-sm opacity-90 mb-2">{block.feedback}</p>
       <div className="grid gap-2">
-        {block.axes.map((ax, i) => {
+        {(block.axes || []).map((ax, i) => {
           const maxScore = Math.max(ax.max_score ?? 0, 1);
           const scoreValue = Math.max(0, Math.min(ax.score ?? 0, maxScore));
           return (
@@ -495,7 +669,7 @@ function ActionSuggestions({ block }: { block: ActionSuggestionsBlock }) {
         trackId: selectedPersona?.id || "builder",
         userInput: `action_id=${actionId}`,
         actionId,
-        language: (lastStep?.metadata?.language || "fr") as "fr" | "en",
+        language: (lastStep?.metadata?.language || "en") as "fr" | "en",
         mode: (lastStep?.metadata?.mode || "discovery") as
           | "discovery"
           | "builder"
@@ -519,7 +693,7 @@ function ActionSuggestions({ block }: { block: ActionSuggestionsBlock }) {
       console.error("ActionSuggestions step failed", e);
       const code = /step failed: (\d+)/.exec(e?.message || "")?.[1];
       setToastMsg(
-        `Échec de l’action${code ? ` (HTTP ${code})` : ""}. Veuillez réessayer.`,
+        `Action failed${code ? ` (HTTP ${code})` : ""}. Please try again.`,
       );
       setLastFailedActionId(actionId);
     } finally {
@@ -553,7 +727,7 @@ function ActionSuggestions({ block }: { block: ActionSuggestionsBlock }) {
             className="fixed bottom-4 right-4 z-50 rounded-lg shadow-lg bg-red-600/90 text-white border border-white/20 p-3 w-[320px]"
           >
             <div className="text-sm font-semibold mb-1">
-              Action indisponible
+              Action unavailable
             </div>
             <div className="text-xs opacity-90">{toastMsg}</div>
             <div className="mt-2 flex gap-2 justify-end">
@@ -565,14 +739,14 @@ function ActionSuggestions({ block }: { block: ActionSuggestionsBlock }) {
                   }}
                   className="text-xs px-2 py-1 rounded bg-white/15 hover:bg-white/25 border border-white/30"
                 >
-                  Retenter
+                  Retry
                 </button>
               )}
               <button
                 onClick={() => setToastMsg(null)}
                 className="text-xs px-2 py-1 rounded border border-white/30 hover:bg-white/10"
               >
-                Fermer
+                Close
               </button>
             </div>
           </motion.div>
@@ -589,7 +763,7 @@ function Xp({ block }: { block: XpBlock }) {
   return (
     <div className="bg-white/5 rounded-xl p-4 relative overflow-visible">
       <div className="flex justify-between items-end mb-1">
-        <h4 className="font-semibold">{block.title ?? "Progression"}</h4>
+        <h4 className="font-semibold">{block.title ?? "Progress"}</h4>
         <AnimatePresence>
           {block.gained_xp > 0 && (
             <motion.div
@@ -608,7 +782,7 @@ function Xp({ block }: { block: XpBlock }) {
         className="w-full h-2 overflow-hidden rounded bg-white/10 [appearance:none] [&::-webkit-progress-bar]:bg-transparent [&::-webkit-progress-value]:bg-accent-cyan [&::-moz-progress-bar]:bg-accent-cyan"
         value={current}
         max={safeMax}
-        aria-label="Progression XP"
+        aria-label="XP Progress"
       />
       <div className="text-xs mt-1 opacity-80">
         {block.current_xp}/{block.next_level_xp} XP
@@ -688,7 +862,7 @@ function ProjectSelection({ block }: { block: ProjectSelectionBlock }) {
       {selected && (
         <div className="mt-4 flex justify-end">
           <button className="px-4 py-2 rounded-md bg-gradient-primary text-white text-sm font-medium">
-            Confirmer la sélection
+            Confirm selection
           </button>
         </div>
       )}
@@ -701,6 +875,15 @@ export default function UIBlocksRenderer({
 }: {
   response: JourneyStepResponse;
 }) {
+  // Safety check
+  if (!response || !response.ui_blocks || !Array.isArray(response.ui_blocks)) {
+    return (
+      <div className="bg-white/5 rounded-xl p-4 text-center">
+        <p className="text-slate-400">Aucun contenu à afficher</p>
+      </div>
+    );
+  }
+
   const render = (b: UIBlock) => {
     switch (b.kind) {
       case "text_block":
@@ -727,7 +910,7 @@ export default function UIBlocksRenderer({
         return (
           <div className="bg-white/5 rounded-xl p-4" key={b.id}>
             <h4 className="font-semibold mb-4">{b.title}</h4>
-            <DAODashboard
+            <GovernanceDashboard
               votingPower={b.votingPower}
               proposals={b.proposals}
               onVote={(pid, vote) => console.log("Vote:", pid, vote)}
@@ -736,12 +919,54 @@ export default function UIBlocksRenderer({
         );
       case "project_selection_block":
         return <ProjectSelection key={b.id} block={b} />;
+      case "narrative_choice_block":
+        return <NarrativeChoice key={b.id} block={b as NarrativeChoiceBlock} />;
+      case "indicator_block":
+        return <IndicatorBlockComponent key={b.id} block={b as IndicatorBlockType} />;
+      case "interactive_template_block":
+        return <InteractiveTemplateComponent key={b.id} block={b as InteractiveTemplateBlockType} />;
       default:
         return null;
     }
   };
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const item = {
+    hidden: { y: 20, opacity: 0 },
+    show: { y: 0, opacity: 1 }
+  };
+
   return (
-    <section className="space-y-3">{response.ui_blocks.map(render)}</section>
+    <motion.div
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="space-y-6"
+    >
+      <AnimatePresence>
+        {response.ui_blocks.map((b) => (
+          <motion.div
+            key={b.id}
+            variants={item}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="origin-top"
+          >
+            {render(b)}
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </motion.div>
   );
 }

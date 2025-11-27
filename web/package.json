@@ -27,8 +27,6 @@
     "node": ">=18.17.0"
   },
   "dependencies": {
-    "@metaplex-foundation/mpl-token-metadata": "^3.3.0",
-    "@metaplex-foundation/umi": "^1.4.1",
     "@prisma/client": "5.20.0",
     "@sentry/nextjs": "^8.9.2",
     "@solana/wallet-adapter-base": "^0.9.24",

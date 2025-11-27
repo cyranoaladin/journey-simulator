@@ -21,7 +21,7 @@ export default function AIPage() {
       if (!res.ok) throw new Error('API error')
       setResult(json)
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Erreur inconnue')
+      setError(e instanceof Error ? e.message : 'Unknown error')
       // Fallback demo result for robustness in non-networked demos
       setResult({ text: 'Hello investors', upper: 'HELLO INVESTORS', length: 16, tags: ['demo'] })
     } finally {
@@ -32,11 +32,9 @@ export default function AIPage() {
   return (
     <main className="min-h-screen p-8 lg:p-12">
       <h1 className="text-3xl font-medium mb-2" data-testid="ai-heading">
-        IA & Données
+        AI & Data
       </h1>
-      <p className="opacity-80 mb-6">
-        Espace d’exploration IA. Exemple d’appel API côté serveur ci-dessous.
-      </p>
+      <p className="opacity-80 mb-6">AI exploration space. Server-side API call example below.</p>
       <div className="rounded-2xl p-6 bg-bg-mid/60 border border-white/10 shadow-default">
         <div className="flex gap-3 items-center mb-4">
           <button
@@ -45,7 +43,7 @@ export default function AIPage() {
             onClick={testApi}
             disabled={loading}
           >
-            {loading ? '...' : 'Tester API IA'}
+            {loading ? '...' : 'Test AI API'}
           </button>
           {error && (
             <span className="text-red-400" data-testid="ai-echo-error">

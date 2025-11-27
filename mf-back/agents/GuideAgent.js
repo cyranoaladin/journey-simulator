@@ -1,32 +1,67 @@
-const { getRagSnippets } = require('../rag/ragClient');
-const { createAgentResponse } = require('./telemetryUtils');
+const BaseAgent = require('./BaseAgent');
 
-module.exports = async function GuideAgent(agentInput = {}, context = {}) {
-  const user = agentInput.user || context.user || { id: 'demo_user' };
-  const phase = agentInput.phase || context.phase || 'Guide';
-  const intent = context.intent || agentInput.intent || null;
-  const objective =
-    agentInput.objective || context.objective || agentInput.input || context.input || 'orientation parcours';
+class GuideAgent extends BaseAgent {
+  constructor() {
+    super("GuideAgent");
+  }
 
-  const snippets = await getRagSnippets({ query: objective, userContext: user });
+  buildSystemPrompt(ctx) {
+    return `You are the **GuideAgent**, the friendly and helpful orientation guide for Money Factory AI.
+Your goal is to welcome the user, explain the journey ahead, and help them get started.
 
-  return createAgentResponse('GuideAgent', {
-    phase,
-    intent,
-    objective,
-    prompt: `Orienter l'utilisateur sur la mission "${objective}"`,
-    reasoning:
-      'Synthese les ressources essentielles afin de guider la prochaine action et reduire la charge cognitive.',
-    action: 'Explorer les modules recommandes et valider la prochaine etape dans le parcours.',
-    summary: 'Resume genere pour GuideAgent',
-    outcome: 'Orientation utilisateur actualisee',
-    payload: {
-      output: 'Bienvenue dans votre parcours !',
-      nextSteps: ['Exploration des modules recommandes'],
-    },
-    snippets,
-    metrics: { confidence: 0.8, success: true, impact: 'medium' },
-    user,
-  });
-};
+Your responsibilities:
+1. Welcome the user warmly.
+2. Explain the current phase or track they are in.
+3. Provide clear next steps.
+4. Answer general questions about the platform or the journey.
 
+Tone: Warm, welcoming, helpful, clear.`;
+  }
+
+  buildUserPrompt(ctx) {
+    return `The user is in the "${ctx.phaseId}" phase of the "${ctx.trackId}" track.
+User Input: "${ctx.submission || ctx.lastInput || 'Hello'}"
+
+Provide a welcoming response and guide them on what to do next.`;
+  }
+
+  async run(ctx) {
+    const EVALUATION_SCHEMA = {
+      type: "json_schema",
+      json_schema: {
+        name: "GuideResponse",
+        strict: true,
+        schema: {
+          type: "object",
+          required: ["global_score", "feedback", "axes"],
+          properties: {
+            global_score: { type: "number", description: "Always 10 for guide interactions" },
+            feedback: { type: "string", description: "The welcome message and guidance" },
+            axes: {
+              type: "array",
+              items: {
+                type: "object",
+                required: ["name", "score", "max_score", "comment"],
+                properties: {
+                  name: { type: "string" },
+                  score: { type: "number" },
+                  max_score: { type: "number" },
+                  comment: { type: "string" },
+                },
+                additionalProperties: false,
+              },
+            },
+          },
+          additionalProperties: false,
+        },
+      },
+    };
+
+    return super.run(ctx, {
+      response_format: EVALUATION_SCHEMA,
+      temperature: 0.7,
+    });
+  }
+}
+
+module.exports = GuideAgent;

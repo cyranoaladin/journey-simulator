@@ -1,32 +1,67 @@
-const { getRagSnippets } = require('../rag/ragClient');
-const { createAgentResponse } = require('./telemetryUtils');
+const BaseAgent = require('./BaseAgent');
 
-module.exports = async function OnboardingAgent(agentInput = {}, context = {}) {
-  const user = agentInput.user || context.user || { id: 'demo_user' };
-  const phase = agentInput.phase || context.phase || 'Onboarding';
-  const intent = context.intent || agentInput.intent || null;
-  const objective =
-    agentInput.objective || context.objective || agentInput.input || context.input || 'accueil utilisateur';
+class OnboardingAgent extends BaseAgent {
+  constructor() {
+    super("OnboardingAgent");
+  }
 
-  const snippets = await getRagSnippets({ query: objective, userContext: user });
+  buildSystemPrompt(ctx) {
+    return `You are the **OnboardingAgent**, responsible for setting up the user's environment and profile.
+Your goal is to ensure the user is ready to start their journey.
 
-  return createAgentResponse('OnboardingAgent', {
-    phase,
-    intent,
-    objective,
-    prompt: `Analyser le profil utilisateur pour "${objective}"`,
-    reasoning:
-      'Recueille les signaux demographiques et parcours passes pour recommander une configuration personnalisee.',
-    action: 'Suivre les etapes de configuration proposees et valider la connexion wallet.',
-    summary: 'Profil utilisateur initial analyse',
-    outcome: 'Setup personnalise recommande',
-    payload: {
-      output: 'Bienvenue ! Voici vos prochaines etapes personnalisees',
-      nextSteps: ['Choisir un parcours', 'Configurer votre wallet Phantom'],
-    },
-    snippets,
-    metrics: { confidence: 0.78, success: true, impact: 'medium' },
-    user,
-  });
-};
+Your responsibilities:
+1. Verify wallet connection (conceptually).
+2. Help the user select their persona/track if not already done.
+3. Explain the tools they will need (Phantom wallet, etc.).
+4. Troubleshoot basic setup issues.
 
+Tone: Helpful, patient, instructional.`;
+  }
+
+  buildUserPrompt(ctx) {
+    return `User is in "${ctx.phaseId}" phase.
+User Input: "${ctx.submission || ctx.lastInput || 'Ready to start'}"
+
+Provide onboarding instructions or confirmation of setup.`;
+  }
+
+  async run(ctx) {
+    const EVALUATION_SCHEMA = {
+      type: "json_schema",
+      json_schema: {
+        name: "OnboardingResponse",
+        strict: true,
+        schema: {
+          type: "object",
+          required: ["global_score", "feedback", "axes"],
+          properties: {
+            global_score: { type: "number" },
+            feedback: { type: "string" },
+            axes: {
+              type: "array",
+              items: {
+                type: "object",
+                required: ["name", "score", "max_score", "comment"],
+                properties: {
+                  name: { type: "string" },
+                  score: { type: "number" },
+                  max_score: { type: "number" },
+                  comment: { type: "string" },
+                },
+                additionalProperties: false,
+              },
+            },
+          },
+          additionalProperties: false,
+        },
+      },
+    };
+
+    return super.run(ctx, {
+      response_format: EVALUATION_SCHEMA,
+      temperature: 0.5,
+    });
+  }
+}
+
+module.exports = OnboardingAgent;

@@ -61,6 +61,54 @@ export type DAODashboardBlock = { kind: 'dao_dashboard_block'; id: string; title
 export type Project = { id: string; name: string; description: string; tags: string[]; fundingGoal: number; currentFunding: number }
 export type ProjectSelectionBlock = { kind: 'project_selection_block'; id: string; title: string; projects: Project[] }
 
+export type NarrativeChoiceOption = {
+  id: string;
+  label: string;
+  description: string;
+  outcomeSummary: string;
+}
+
+export type NarrativeChoiceBlock = {
+  kind: 'narrative_choice_block';
+  id: string;
+  title: string;
+  description: string;
+  choices: NarrativeChoiceOption[];
+}
+
+export type IndicatorValue = {
+  name: string;
+  value: number;
+  max: number;
+  color?: string;
+}
+
+export type TemplateField = {
+  name: string;
+  label: string;
+  type: 'text' | 'textarea' | 'number' | 'select';
+  placeholder?: string;
+  options?: string[];
+}
+
+export type InteractiveTemplateBlock = {
+  kind: 'interactive_template_block';
+  id: string;
+  title: string;
+  description: string;
+  templateType: 'one-pager' | 'pitch-deck' | 'tokenomics' | 'governance' | 'launch-plan';
+  fields: TemplateField[];
+  agentOwner: string;
+}
+
+export type IndicatorBlock = {
+  kind: 'indicator_block';
+  id: string;
+  title: string;
+  indicators: IndicatorValue[];
+  type: 'gauge' | 'radar' | 'bar';
+}
+
 export type UIBlock =
   | TextBlock
   | ChecklistBlock
@@ -74,6 +122,9 @@ export type UIBlock =
   | DiagramBlock
   | DAODashboardBlock
   | ProjectSelectionBlock
+  | NarrativeChoiceBlock
+  | IndicatorBlock
+  | InteractiveTemplateBlock
 
 export type AgentAction = { agent_name: string; reason: string; action: string; parameters?: Record<string, any> }
 export type NextState = { phase_id: string; completed_missions: string[]; xp_delta: number; notes?: string }

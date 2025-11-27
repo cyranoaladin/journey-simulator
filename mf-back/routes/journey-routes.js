@@ -23,4 +23,7 @@ router.get('/user-journeys', protect, journeyController.getUserJourneys);
 router.post('/:journeyId/step', journeyController.step);
 router.post('/:journeyId/submit', journeyController.submit);
 
+// Demo mode route
+router.post('/load-demo', journeyController.loadDemoState);
+
 module.exports = router;

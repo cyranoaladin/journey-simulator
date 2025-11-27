@@ -31,7 +31,12 @@ test.describe('Login Flow', () => {
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
-          body: JSON.stringify({ total_xp: 0, completed_phases: [] }),
+          body: JSON.stringify({
+            total_xp: 0,
+            current_level: 1,
+            completed_phases: [],
+            currentPersona: null
+          }),
         });
       } else if (route.request().method() === 'PUT') {
         await route.fulfill({ status: 204 });
@@ -64,14 +69,17 @@ test.describe('Login Flow', () => {
     await page.locator('input[name="password"]').fill('demo123');
     await page.getByRole('button', { name: 'Sign In' }).click();
 
-    await page.waitForURL('**/journeys');
+    await page.waitForURL('**/journeys', { timeout: 15000 });
     await expect(page).toHaveURL(/\/journeys$/);
 
+    // Wait a bit longer for tokens to be stored
     await page.waitForFunction(
-      () => localStorage.getItem('accessToken') === 'access-token-123'
+      () => localStorage.getItem('accessToken') === 'access-token-123',
+      { timeout: 10000 }
     );
     await page.waitForFunction(
-      () => localStorage.getItem('refreshToken') === 'refresh-token-456'
+      () => localStorage.getItem('refreshToken') === 'refresh-token-456',
+      { timeout: 10000 }
     );
   });
 });

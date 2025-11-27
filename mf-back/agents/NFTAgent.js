@@ -1,32 +1,66 @@
-const { getRagSnippets } = require('../rag/ragClient');
-const { createAgentResponse } = require('./telemetryUtils');
+const BaseAgent = require('./BaseAgent');
 
-module.exports = async function NFTAgent(agentInput = {}, context = {}) {
-  const user = agentInput.user || context.user || { id: 'demo_user' };
-  const phase = agentInput.phase || context.phase || 'NFT';
-  const intent = context.intent || agentInput.intent || null;
-  const objective =
-    agentInput.objective || context.objective || agentInput.input || context.input || 'lancement collection NFT';
+class NFTAgent extends BaseAgent {
+  constructor() {
+    super("NFTAgent");
+  }
 
-  const snippets = await getRagSnippets({ query: objective, userContext: user });
+  buildSystemPrompt(ctx) {
+    return `You are the **NFTAgent**, a specialist in Non-Fungible Tokens on Solana.
+Your goal is to help the user design and launch NFT collections.
 
-  return createAgentResponse('NFTAgent', {
-    phase,
-    intent,
-    objective,
-    prompt: `Concevoir un modele NFT pour "${objective}"`,
-    reasoning:
-      'Etudie les collections similaires et les retours RAG pour suggere un positionnement et une structure de metadata.',
-    action: 'Preparer les assets graphiques et configurer la metadata selon le schema propose.',
-    summary: 'Modele NFT genere',
-    outcome: 'Proposition de collection',
-    payload: {
-      output: 'Prototype NFT pret a mint',
-      nextSteps: ['Uploader les assets', 'Configurer la metadata'],
-    },
-    snippets,
-    metrics: { confidence: 0.85, success: true, impact: 'medium' },
-    user,
-  });
-};
+Your responsibilities:
+1. Advise on metadata standards (Metaplex).
+2. Review collection strategy (rarity, utility).
+3. Help with minting logic (Candy Machine).
+4. Discuss royalty enforcement and marketplaces.
 
+Tone: Creative, technical (specific to NFTs), trend-aware.`;
+  }
+
+  buildUserPrompt(ctx) {
+    return `User Input: "${ctx.submission || ctx.lastInput}"
+
+Review the NFT collection proposal or technical setup.`;
+  }
+
+  async run(ctx) {
+    const EVALUATION_SCHEMA = {
+      type: "json_schema",
+      json_schema: {
+        name: "NFTResponse",
+        strict: true,
+        schema: {
+          type: "object",
+          required: ["global_score", "feedback", "axes"],
+          properties: {
+            global_score: { type: "number" },
+            feedback: { type: "string" },
+            axes: {
+              type: "array",
+              items: {
+                type: "object",
+                required: ["name", "score", "max_score", "comment"],
+                properties: {
+                  name: { type: "string" },
+                  score: { type: "number" },
+                  max_score: { type: "number" },
+                  comment: { type: "string" },
+                },
+                additionalProperties: false,
+              },
+            },
+          },
+          additionalProperties: false,
+        },
+      },
+    };
+
+    return super.run(ctx, {
+      response_format: EVALUATION_SCHEMA,
+      temperature: 0.4,
+    });
+  }
+}
+
+module.exports = NFTAgent;

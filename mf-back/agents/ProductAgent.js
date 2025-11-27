@@ -1,32 +1,66 @@
-const { getRagSnippets } = require('../rag/ragClient');
-const { createAgentResponse } = require('./telemetryUtils');
+const BaseAgent = require('./BaseAgent');
 
-module.exports = async function ProductAgent(agentInput = {}, context = {}) {
-  const user = agentInput.user || context.user || { id: 'demo_user' };
-  const phase = agentInput.phase || context.phase || 'Product';
-  const intent = context.intent || agentInput.intent || null;
-  const objective =
-    agentInput.objective || context.objective || agentInput.input || context.input || 'roadmap produit';
+class ProductAgent extends BaseAgent {
+  constructor() {
+    super("ProductAgent");
+  }
 
-  const snippets = await getRagSnippets({ query: objective, userContext: user });
+  buildSystemPrompt(ctx) {
+    return `You are the **ProductAgent**, a Web3 product manager.
+Your goal is to help the user define their product, roadmap, and features.
 
-  return createAgentResponse('ProductAgent', {
-    phase,
-    intent,
-    objective,
-    prompt: `Concevoir une feuille de route produit pour "${objective}"`,
-    reasoning:
-      'Croise feedback utilisateurs et benchmarks pour ordonner les fonctionnalites prioritaires.',
-    action: 'Programmer les tests utilisateurs et ajuster la maquette selon la roadmap proposee.',
-    summary: 'Feuille de route produit creee',
-    outcome: 'Maquette fonctionnelle alignee sur le besoin utilisateur',
-    payload: {
-      output: 'Roadmap produit generee avec features cles',
-      nextSteps: ['Tests utilisateurs', 'Amelioration UX/UI'],
-    },
-    snippets,
-    metrics: { confidence: 0.77, success: true, impact: 'medium' },
-    user,
-  });
-};
+Your responsibilities:
+1. Review product specifications and user stories.
+2. Help prioritize features (MVP vs. future).
+3. Ensure product-market fit alignment.
+4. Advise on user experience flows (high level).
 
+Tone: Strategic, user-centric, organized.`;
+  }
+
+  buildUserPrompt(ctx) {
+    return `User Input: "${ctx.submission || ctx.lastInput}"
+
+Review the product definition or roadmap.`;
+  }
+
+  async run(ctx) {
+    const EVALUATION_SCHEMA = {
+      type: "json_schema",
+      json_schema: {
+        name: "ProductResponse",
+        strict: true,
+        schema: {
+          type: "object",
+          required: ["global_score", "feedback", "axes"],
+          properties: {
+            global_score: { type: "number" },
+            feedback: { type: "string" },
+            axes: {
+              type: "array",
+              items: {
+                type: "object",
+                required: ["name", "score", "max_score", "comment"],
+                properties: {
+                  name: { type: "string" },
+                  score: { type: "number" },
+                  max_score: { type: "number" },
+                  comment: { type: "string" },
+                },
+                additionalProperties: false,
+              },
+            },
+          },
+          additionalProperties: false,
+        },
+      },
+    };
+
+    return super.run(ctx, {
+      response_format: EVALUATION_SCHEMA,
+      temperature: 0.4,
+    });
+  }
+}
+
+module.exports = ProductAgent;

@@ -99,14 +99,14 @@ describe('ZynoConsole', () => {
   });
 
   it('enables mission launch and renders mission feedback after success', async () => {
-    const { default: ZynoConsole } = await import('../ZynoConsole');
+    const { ZynoConsole } = await import('../ZynoConsole');
 
     render(<ZynoConsole />);
 
-    const textarea = screen.getByLabelText('Entrée mission / intention');
-    await userEvent.type(textarea, 'Construire un hub DAO');
+    const textarea = screen.getByLabelText('Mission Input / Intent');
+    await userEvent.type(textarea, 'Build a DAO hub');
 
-    const launchButton = screen.getByRole('button', { name: 'Lancer la simulation' });
+    const launchButton = screen.getByRole('button', { name: 'Start Simulation' });
     await userEvent.click(launchButton);
 
     await waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(1));

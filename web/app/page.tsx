@@ -7,15 +7,15 @@ export default function Home() {
         <div className="grid lg:grid-cols-2 gap-6 items-center">
           <div>
             <h1 className="text-5xl font-semibold font-[Poppins] mb-4">
-              Dashboard premium — Journey
+              Premium Dashboard — Journey
             </h1>
             <p className="opacity-90 mb-6">
-              Front Next.js browser-only. Sécurité: aucune API key ou API Node en client. Opérations
-              sensibles côté serveur.
+              Browser-only Next.js frontend. Security: no API keys or Node APIs on the client.
+              Sensitive operations server-side.
             </p>
             <div className="flex gap-3">
               <Link href="/wallet" className="btn btn-primary">
-                Connexion Wallet
+                Connect Wallet
               </Link>
               <Link href="/docs" className="btn border-white/20">
                 Documentation
@@ -23,7 +23,7 @@ export default function Home() {
             </div>
           </div>
           <div aria-hidden className="">
-            {/* Mesh SVG simple */}
+            {/* Simple Mesh SVG */}
             <svg viewBox="0 0 500 320" className="w-full h-auto">
               <defs>
                 <radialGradient id="mesh1" cx="20%" cy="20%" r="60%">
@@ -45,27 +45,27 @@ export default function Home() {
       </section>
 
       <section>
-        <h2 className="text-3xl font-medium mb-6">Entrer</h2>
+        <h2 className="text-3xl font-medium mb-6">Enter</h2>
         <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <li className="rounded-2xl p-6 bg-bg-mid/60 border border-white/10 shadow-default hover:shadow-glow transition">
             <h3 className="text-xl font-medium mb-2">Mint NFT</h3>
-            <p className="opacity-75 mb-3">Flux sécurisé: préparation serveur, signature wallet.</p>
+            <p className="opacity-75 mb-3">Secure flow: server preparation, wallet signature.</p>
             <Link href="/mint" className="btn btn-primary">
               Mint
             </Link>
           </li>
           <li className="rounded-2xl p-6 bg-bg-mid/60 border border-white/10 shadow-default hover:shadow-glow transition">
             <h3 className="text-xl font-medium mb-2">Transactions</h3>
-            <p className="opacity-75 mb-3">Préparation côté serveur, signature client.</p>
+            <p className="opacity-75 mb-3">Server-side preparation, client signature.</p>
             <Link href="/tx" className="btn btn-primary">
-              Préparer
+              Prepare
             </Link>
           </li>
           <li className="rounded-2xl p-6 bg-bg-mid/60 border border-white/10 shadow-default hover:shadow-glow transition">
-            <h3 className="text-xl font-medium mb-2">IA & Données</h3>
-            <p className="opacity-75 mb-3">Appels IA et DB côté serveur, jamais en front.</p>
+            <h3 className="text-xl font-medium mb-2">AI & Data</h3>
+            <p className="opacity-75 mb-3">AI and DB calls server-side, never on frontend.</p>
             <Link href="/ai" className="btn btn-primary">
-              Explorer
+              Explore
             </Link>
           </li>
         </ul>

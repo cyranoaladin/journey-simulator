@@ -1,138 +1,65 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { useJourneyStore } from '../../store/journeyStore';
-import { JourneyPhase } from '../../types/journey';
+import { CheckCircle2, Lock, PlayCircle } from 'lucide-react';
 
-interface JourneyTimelineProps {
-  phases: JourneyPhase[];
-  currentPhase: number;
-  onPhaseChange: (index: number) => void;
+interface Phase {
+  id: string;
+  title: string;
+  description: string;
+  [key: string]: any;
 }
 
-const JourneyTimeline: React.FC<JourneyTimelineProps> = ({ 
-  phases, 
-  currentPhase, 
-  onPhaseChange 
-}) => {
-  const { userProgress, loadUserProgress } = useJourneyStore();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+interface JourneyTimelineProps {
+  phases: Phase[];
+  currentPhase: number;
+  onPhaseChange?: (index: number) => void;
+}
 
-  // Auto-refresh progress every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        await loadUserProgress();
-      } catch (error) {
-        console.error('Failed to auto-refresh timeline:', error);
-      }
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, [loadUserProgress]);
-
-  // Handle phase change with backend sync
-  const handlePhaseChange = async (index: number) => {
-    if (index > userProgress.completedPhases.length) return; // Can't skip ahead
-    
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      // Update current phase in backend if needed
-      // This could be implemented as a separate API call if needed
-      await loadUserProgress();
-      
-      // Call the original onPhaseChange callback
-      onPhaseChange(index);
-      
-    } catch (error) {
-      console.error('Failed to change phase:', error);
-      setError('Failed to update phase. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+export default function JourneyTimeline({ phases, currentPhase, onPhaseChange }: JourneyTimelineProps) {
   return (
-    <div className="mb-12">
-      {/* Error Display */}
-      {error && (
-        <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
-          <div className="flex items-center space-x-2">
-            <div className="text-red-400">⚠️</div>
-            <span className="text-red-300 text-sm">{error}</span>
-          </div>
-        </div>
-      )}
+    <div className="space-y-3">
+      {phases.map((phase, index) => {
+        const isCompleted = index < currentPhase;
+        const isActive = index === currentPhase;
+        const isLocked = index > currentPhase;
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="relative"
-      >
-        {/* Timeline Track */}
-        <div className="h-1 bg-white/10 rounded-full w-full absolute top-5 z-0"></div>
-        
-        {/* Progress Bar */}
-        <motion.div 
-          className="h-1 bg-gradient-primary rounded-full absolute top-5 z-0"
-          initial={{ width: '0%' }}
-          animate={{ 
-            width: `${Math.min((userProgress.completedPhases.length / phases.length) * 100, 100)}%` 
-          }}
-          transition={{ duration: 1, ease: "easeOut" }}
-        />
-        
-        {/* Phase Markers */}
-        <div className="flex justify-between relative z-10">
-          {phases.map((phase, index) => {
-            const isCompleted = userProgress.completedPhases.includes(index);
-            const isCurrent = index === currentPhase;
-            const isLocked = index > userProgress.completedPhases.length;
-            
-            return (
-              <motion.div 
-                key={phase.id}
-                className="flex flex-col items-center"
-                whileHover={{ scale: isLoading ? 1 : 1.05 }}
-                onClick={() => !isLocked && !isLoading && handlePhaseChange(index)}
-              >
-                {/* Phase Circle */}
-                <motion.div 
-                  className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    isLoading ? 'cursor-wait' : 'cursor-pointer'
-                  } ${
-                    isCompleted 
-                      ? 'bg-gradient-primary text-white' 
-                      : isCurrent 
-                        ? 'bg-gradient-primary text-white animate-pulse' 
-                        : 'bg-white/10 text-white/50'
-                  }`}
-                  whileTap={{ scale: isLoading ? 1 : 0.95 }}
-                >
-                  {isLoading && isCurrent ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  ) : isCompleted ? '✓' : index + 1}
-                </motion.div>
-                
-                {/* Phase Title */}
-                <div className={`text-sm font-medium mt-2 ${isLocked ? 'opacity-50' : ''}`}>
+        return (
+          <div
+            key={phase.id || index}
+            className={`flex items-start ${!isLocked && onPhaseChange ? 'cursor-pointer' : 'cursor-default'}`}
+            onClick={() => !isLocked && onPhaseChange && onPhaseChange(index)}
+          >
+            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors
+              ${isActive
+                ? 'bg-accent-cyan/20 text-accent-cyan ring-2 ring-accent-cyan/50'
+                : isCompleted
+                  ? 'bg-green-500/20 text-green-400'
+                  : 'bg-white/5 text-white/30'}`}
+            >
+              {isActive ? <PlayCircle size={16} /> : isCompleted ? <CheckCircle2 size={16} /> : <Lock size={16} />}
+            </div>
+            <div className="ml-3 flex-1 min-w-0 pt-1">
+              <div className="flex items-baseline justify-between">
+                <h4 className={`text-sm font-medium ${isActive ? 'text-accent-cyan' : isCompleted ? 'text-green-400' : 'text-white/50'}`}>
                   {phase.title}
-                </div>
-                
-                {/* XP Reward */}
-                <div className={`text-xs opacity-60 ${isLocked ? 'opacity-30' : ''}`}>
-                  {phase.xpReward} XP
-                </div>
-              </motion.div>
-            );
-          })}
+                </h4>
+              </div>
+              <p className="text-xs text-white/40 mt-1 truncate">{phase.description}</p>
+            </div>
+          </div>
+        );
+      })}
+
+      <div className="mt-4 pt-4 border-t border-white/10">
+        <div className="flex justify-between text-xs text-white/40">
+          <span>Progress</span>
+          <span>{Math.min(currentPhase, phases.length)}/{phases.length}</span>
         </div>
-      </motion.div>
+        <div className="mt-2 w-full bg-white/5 rounded-full h-1.5">
+          <div
+            className="bg-gradient-to-r from-accent-cyan to-accent-purple h-1.5 rounded-full transition-all duration-500"
+            style={{ width: `${(Math.min(currentPhase, phases.length) / phases.length) * 100}%` }}
+          ></div>
+        </div>
+      </div>
     </div>
   );
-};
-
-export default JourneyTimeline;
+}

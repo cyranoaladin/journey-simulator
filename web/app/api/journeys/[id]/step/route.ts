@@ -56,23 +56,23 @@ export async function POST(req: NextRequest, ctx: { params: { id: string } }) {
         language,
         mode,
         tone: 'pedagogical',
-        title: 'Étape de démonstration',
-        summary: 'Exemple de rendu UI Blocks pour intégration front.',
+        title: 'Demo Step',
+        summary: 'Example UI Blocks render for frontend integration.',
       },
       ui_blocks: [
         {
           kind: 'text_block',
           id: 'tb_intro',
-          title: 'Bienvenue',
-          body_markdown: 'Cette étape est un exemple. ID: ' + id,
+          title: 'Welcome',
+          body_markdown: 'This step is an example. ID: ' + id,
         },
         {
           kind: 'action_suggestions_block',
           id: 'asb_next',
-          title: 'Que souhaitez-vous faire ?',
+          title: 'What would you like to do?',
           suggestions: [
-            { label: 'Continuer', action_id: 'go_next' },
-            { label: 'Voir ressources', action_id: 'open_resources' },
+            { label: 'Continue', action_id: 'go_next' },
+            { label: 'View resources', action_id: 'open_resources' },
           ],
         },
         {
@@ -82,15 +82,16 @@ export async function POST(req: NextRequest, ctx: { params: { id: string } }) {
           gained_xp: 5,
           next_level_xp: 50,
           title: 'Progression',
-          comment: 'Démo',
+          comment: 'Demo',
         },
       ],
       agent_actions: [{ agent_name: 'Zyno', reason: 'stub', action: 'none', parameters: {} }],
       next_state: { phase_id: phaseId, completed_missions: [], xp_delta: 5, notes: 'demo' },
     }
     try {
-      await setJourneyState(id, (resp as any).next_state, (resp as any).metadata, 'demo_user')
+      await setJourneyState(id, (resp as any).next_state, (resp as any).metadata)
       await pushAgentLog({
+        ts: Date.now(),
         journeyId: id,
         agent: 'Zyno',
         action: 'step',
@@ -120,8 +121,9 @@ export async function POST(req: NextRequest, ctx: { params: { id: string } }) {
     if (!ok) return NextResponse.json({ error: 'schema_validation_failed' }, { status: 500 })
     // persist state and log
     try {
-      await setJourneyState(id, out.next_state, out.metadata, 'demo_user')
+      await setJourneyState(id, out.next_state, out.metadata)
       await pushAgentLog({
+        ts: Date.now(),
         journeyId: id,
         agent: 'Zyno',
         action: 'step',
@@ -149,6 +151,7 @@ export async function POST(req: NextRequest, ctx: { params: { id: string } }) {
   } catch (e: any) {
     try {
       await pushAgentLog({
+        ts: Date.now(),
         journeyId: id,
         agent: 'Zyno',
         action: 'step_error',

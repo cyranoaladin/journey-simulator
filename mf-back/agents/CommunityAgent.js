@@ -1,32 +1,66 @@
-const { getRagSnippets } = require('../rag/ragClient');
-const { createAgentResponse } = require('./telemetryUtils');
+const BaseAgent = require('./BaseAgent');
 
-module.exports = async function CommunityAgent(agentInput = {}, context = {}) {
-  const user = agentInput.user || context.user || { id: 'demo_user' };
-  const phase = agentInput.phase || context.phase || 'Community';
-  const intent = context.intent || agentInput.intent || null;
-  const objective =
-    agentInput.objective || context.objective || agentInput.input || context.input || 'strategie communaute';
+class CommunityAgent extends BaseAgent {
+  constructor() {
+    super("CommunityAgent");
+  }
 
-  const snippets = await getRagSnippets({ query: objective, userContext: user });
+  buildSystemPrompt(ctx) {
+    return `You are the **CommunityAgent**, a community manager and growth strategist.
+Your goal is to help the user build and engage their community.
 
-  return createAgentResponse('CommunityAgent', {
-    phase,
-    intent,
-    objective,
-    prompt: `Construire une strategie communautaire pour "${objective}"`,
-    reasoning:
-      'Analyse la cible et les canaux historiques pour proposer une feuille de route communautaire coherent.',
-    action: 'Lancer les salons prioritaire et activer le programme ambassadeurs.',
-    summary: 'Strategie communaute proposee',
-    outcome: 'Structure Discord et moderation definies',
-    payload: {
-      output: 'Plan de community management pret',
-      nextSteps: ['Ouverture des salons', 'Lancement ambassadeurs'],
-    },
-    snippets,
-    metrics: { confidence: 0.83, success: true, impact: 'medium' },
-    user,
-  });
-};
+Your responsibilities:
+1. Advise on community platforms (Discord, Twitter/X, Telegram).
+2. Help with engagement strategies (AMAs, quests, content).
+3. Review community guidelines and moderation plans.
+4. Discuss incentive alignment for members.
 
+Tone: Engaging, social, empathetic.`;
+  }
+
+  buildUserPrompt(ctx) {
+    return `User Input: "${ctx.submission || ctx.lastInput}"
+
+Review the community strategy or content.`;
+  }
+
+  async run(ctx) {
+    const EVALUATION_SCHEMA = {
+      type: "json_schema",
+      json_schema: {
+        name: "CommunityResponse",
+        strict: true,
+        schema: {
+          type: "object",
+          required: ["global_score", "feedback", "axes"],
+          properties: {
+            global_score: { type: "number" },
+            feedback: { type: "string" },
+            axes: {
+              type: "array",
+              items: {
+                type: "object",
+                required: ["name", "score", "max_score", "comment"],
+                properties: {
+                  name: { type: "string" },
+                  score: { type: "number" },
+                  max_score: { type: "number" },
+                  comment: { type: "string" },
+                },
+                additionalProperties: false,
+              },
+            },
+          },
+          additionalProperties: false,
+        },
+      },
+    };
+
+    return super.run(ctx, {
+      response_format: EVALUATION_SCHEMA,
+      temperature: 0.6,
+    });
+  }
+}
+
+module.exports = CommunityAgent;

@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useThemeStore } from './store/themeStore';
 import { WalletContextProvider } from './contexts/WalletContext';
 import { AuthProvider } from './contexts/AuthContext';
+import { TutorialProvider } from './contexts/TutorialContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
@@ -28,6 +29,8 @@ const ProtectedLayout = () => (
 
 const DebugMint = lazy(() => import('./pages/DebugMint'));
 
+
+
 function App() {
   const { isDark } = useThemeStore();
 
@@ -45,42 +48,46 @@ function App() {
   }, [isDark]);
 
   return (
-    <AuthProvider>
-      <WalletContextProvider>
-        <div
-          className={`min-h-screen transition-colors duration-300 ${
-            isDark
+    <WalletContextProvider>
+      <AuthProvider>
+        <TutorialProvider>
+
+          <div
+            className={`min-h-screen transition-colors duration-300 ${isDark
+              // ... existing code ...
               ? 'bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 text-white'
               : 'bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 text-gray-900'
-          }`}
-        >
-          <div
-            id="particles-js"
-            className="pointer-events-none fixed inset-0 -z-10"
-            aria-hidden="true"
-          />
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+              }`}
+          >
+            <div
+              id="particles-js"
+              className="pointer-events-none fixed inset-0 -z-10"
+              aria-hidden="true"
+            />
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
 
-            <Route element={<ProtectedLayout />}>
-              <Route path="debug/mint" element={<Suspense fallback={<div>Loading…</div>}><DebugMint /></Suspense>} />
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route path="journeys" element={<Journey />} />
-              <Route path="journeys/completed" element={<JourneyCompleted />} />
-              <Route path="playground" element={<Playground />} />
-              <Route path="dao" element={<Dao />} />
-              <Route path="resources" element={<Resources />} />
-              <Route path="support" element={<Support />} />
-              <Route path="zyno" element={<Zyno />} />
-            </Route>
+              <Route element={<ProtectedLayout />}>
+                <Route path="debug/mint" element={<Suspense fallback={<div>Loading…</div>}><DebugMint /></Suspense>} />
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="journeys" element={<Journey />} />
+                <Route path="journeys/:journeyId" element={<Journey />} />
+                <Route path="journeys/completed" element={<JourneyCompleted />} />
+                <Route path="playground" element={<Playground />} />
+                <Route path="dao" element={<Dao />} />
+                <Route path="resources" element={<Resources />} />
+                <Route path="support" element={<Support />} />
+                <Route path="zyno" element={<Zyno />} />
+              </Route>
 
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </div>
-      </WalletContextProvider>
-    </AuthProvider>
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </div>
+        </TutorialProvider>
+      </AuthProvider>
+    </WalletContextProvider>
   );
 }
 

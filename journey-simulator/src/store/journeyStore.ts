@@ -41,6 +41,7 @@ interface JourneyState {
   viewNFTOnExplorer: (tokenId: string) => string
   completeMission: () => void
   loadUserProgress: () => Promise<void>
+  setUserProgress: (progress: UserProgress) => void
 }
 
 const initialUserProgress: UserProgress = {
@@ -116,8 +117,8 @@ export const useJourneyStore = create<JourneyState>()(
       uiTone: 'pedagogical',
       isStepLoading: false,
 
-      setSelectedPersona: (persona) => set({ 
-        selectedPersona: persona, 
+      setSelectedPersona: (persona) => set({
+        selectedPersona: persona,
         currentPhase: 0,
         userProgress: {
           ...get().userProgress,
@@ -125,7 +126,7 @@ export const useJourneyStore = create<JourneyState>()(
           completedPhases: [] // Reset completed phases when changing persona
         }
       }),
-      
+
       setCurrentPhase: (phase) => set({ currentPhase: phase }),
 
       setUiMode: (mode) => set({ uiMode: mode }),
@@ -147,15 +148,15 @@ export const useJourneyStore = create<JourneyState>()(
           phaseId,
           trackId,
           userInput,
-          language: 'fr' as const,
+          language: 'en' as const,
           mode: uiMode,
           tone: uiTone,
           journeyState: { xp: get().userProgress.totalXP, completed: get().userProgress.completedPhases }
         }
         const base = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:3000'
-        try{
+        try {
           set({ isStepLoading: true })
-          const resp = await fetch(`${base}/api/journeys/${id}/step`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+          const resp = await fetch(`${base}/journey/${id}/step`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
           if (!resp.ok) throw new Error(`step failed: ${resp.status}`)
           const json = await resp.json()
           set({ lastStep: json })
@@ -169,11 +170,11 @@ export const useJourneyStore = create<JourneyState>()(
         const state = get()
         const newTotalXP = state.userProgress.totalXP + xp
         const newMfaiTokens = state.userProgress.mfaiTokens + mfai
-        
+
         // Determine new pass level based on XP and achievements
         const totalNFTs = state.userProgress.nfts.length + nfts.length
         const newPassLevel = derivePassLevel(undefined, newTotalXP, totalNFTs)
-        
+
         const updatedProgress = {
           ...state.userProgress,
           totalXP: newTotalXP,
@@ -200,11 +201,11 @@ export const useJourneyStore = create<JourneyState>()(
           console.error('Failed to sync progress with backend:', error)
         }
       },
-      
+
       openModal: (content) => set({ isModalOpen: true, modalContent: content }),
-      
+
       closeModal: () => set({ isModalOpen: false, modalContent: null }),
-      
+
       completePhase: async (phaseIndex, options = {}) => {
         const state = get()
 
@@ -236,7 +237,7 @@ export const useJourneyStore = create<JourneyState>()(
           throw error
         }
       },
-      
+
       updateStaking: (amount) => set((state) => ({
         userProgress: {
           ...state.userProgress,
@@ -245,7 +246,7 @@ export const useJourneyStore = create<JourneyState>()(
           votingPower: state.userProgress.votingPower + Math.floor(amount * 2), // 2 voting power per staked MFAI
         }
       })),
-      
+
       updateVotingPower: (newPower) => set((state) => ({
         userProgress: {
           ...state.userProgress,
@@ -343,26 +344,26 @@ export const useJourneyStore = create<JourneyState>()(
           }
         }
       },
-      
+
       downloadNFT: async (nftName: string) => {
         // Simulate download process and log the requested NFT name for analytics
         await new Promise(resolve => setTimeout(resolve, 1000))
         console.info(`Simulated download for NFT: ${nftName}`)
         return true
       },
-      
+
       viewNFTOnExplorer: (tokenId: string) => {
         // Generate explorer URL
         const explorerUrl = `https://explorer.solana.com/address/${tokenId}?cluster=devnet`
         return explorerUrl
       },
-      
+
       completeMission: () => set((state) => {
         // Award XP, tokens, and potentially an NFT for completing a mission
         const xpReward = 50;
         const mfaiReward = 25;
         const nftReward = Math.random() > 0.5 ? ["Mission Completion NFT"] : [];
-        
+
         return {
           userProgress: {
             ...state.userProgress,
@@ -452,7 +453,9 @@ export const useJourneyStore = create<JourneyState>()(
         } catch (error) {
           console.error('Failed to load user progress from backend:', error)
         }
-      }
+      },
+
+      setUserProgress: (progress) => set({ userProgress: progress })
     }),
     {
       name: 'mfai-journey-storage',

@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=/home/alaeddine/journey-simulator/web
+WorkingDirectory=/home/alaeddine/Documents/journey_mfai_back_front/web
 ExecStart=/usr/bin/npm start --silent
 Environment=NODE_ENV=production
 Restart=always

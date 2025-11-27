@@ -1,4 +1,4 @@
-// 📦 agentFeedbackLog.js — Modèle Mongoose pour journaliser les exécutions agents
+// 📦 agentFeedbackLog.js — Mongoose model to log agent executions
 const mongoose = require('mongoose');
 
 const AgentLogSchema = new mongoose.Schema({

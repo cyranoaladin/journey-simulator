@@ -1,36 +1,66 @@
-const { getRagSnippets } = require('../rag/ragClient');
-const { createAgentResponse } = require('./telemetryUtils');
+const BaseAgent = require('./BaseAgent');
 
-module.exports = async function BuilderAgent(agentInput = {}, context = {}) {
-  const user = agentInput.user || context.user || { id: 'anonymous' };
-  const phase = agentInput.phase || context.phase || 'Build';
-  const intent = context.intent || agentInput.intent || null;
-  const objective =
-    agentInput.objective || context.objective || agentInput.input || context.input || 'prototype web3';
+class BuilderAgent extends BaseAgent {
+  constructor() {
+    super("BuilderAgent");
+  }
 
-  const snippets = await getRagSnippets({ query: objective, userContext: user });
+  buildSystemPrompt(ctx) {
+    return `You are the **BuilderAgent**, a technical mentor for Solana development.
+Your goal is to help the user write code, understand smart contracts (programs), and use the Solana CLI/SDKs.
 
-  return createAgentResponse('BuilderAgent', {
-    phase,
-    intent,
-    objective,
-    prompt: `Elaborer un plan de construction pour "${objective}"`,
-    reasoning:
-      'Croise les references techniques et les contraintes de mission pour definir les sprints critiques du MVP.',
-    action: 'Valider le backlog propose et assigner un owner par lot critique.',
-    summary: 'Plan de construction genere',
-    outcome: 'Architecture technique validee',
-    payload: {
-      sprintBacklog: [
-        'Configurer les environnements et comptes developpeur',
-        'Initialiser le depot et la CI/CD',
-        'Developper le smart contract principal',
-        'Preparer les scenarios de tests et audits',
-      ],
-      recommendedStack: ['Solana', 'Anchor', 'TypeScript', 'Jest'],
-    },
-    snippets,
-    metrics: { confidence: 0.92, success: true, impact: 'high' },
-    user,
-  });
-};
+Your responsibilities:
+1. Review code snippets (Rust/Anchor, TypeScript).
+2. Explain technical concepts (Accounts, PDAs, CPIs).
+3. Debug errors.
+4. Suggest best practices for development.
+
+Tone: Technical, precise, encouraging, "developer-to-developer".`;
+  }
+
+  buildUserPrompt(ctx) {
+    return `User Input/Code: "${ctx.submission || ctx.lastInput}"
+
+Review the code or answer the technical question. Provide a score based on correctness and quality.`;
+  }
+
+  async run(ctx) {
+    const EVALUATION_SCHEMA = {
+      type: "json_schema",
+      json_schema: {
+        name: "BuilderResponse",
+        strict: true,
+        schema: {
+          type: "object",
+          required: ["global_score", "feedback", "axes"],
+          properties: {
+            global_score: { type: "number" },
+            feedback: { type: "string" },
+            axes: {
+              type: "array",
+              items: {
+                type: "object",
+                required: ["name", "score", "max_score", "comment"],
+                properties: {
+                  name: { type: "string" },
+                  score: { type: "number" },
+                  max_score: { type: "number" },
+                  comment: { type: "string" },
+                },
+                additionalProperties: false,
+              },
+            },
+          },
+          additionalProperties: false,
+        },
+      },
+    };
+
+    return super.run(ctx, {
+      response_format: EVALUATION_SCHEMA,
+      temperature: 0.2,
+    });
+  }
+}
+
+module.exports = BuilderAgent;

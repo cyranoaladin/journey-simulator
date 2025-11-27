@@ -52,34 +52,34 @@ export async function POST(req: NextRequest, ctx: { params: { id: string } }) {
         language,
         mode,
         tone,
-        title: 'Évaluation de mission (démo)',
+        title: 'Mission Evaluation (Demo)',
       },
       ui_blocks: [
         {
           kind: 'evaluation_block',
           id: 'eval_' + missionId,
-          title: 'Feedback de votre mission',
+          title: 'Your Mission Feedback',
           global_score: quality,
           max_score: 100,
-          feedback: 'Bonne proposition pour un mode démo.',
+          feedback: 'Good proposal for a demo mode.',
           axes: [
             {
-              name: 'Pertinence',
+              name: 'Relevance',
               score: Math.round(quality * 0.35),
               max_score: 35,
-              comment: 'Alignement global satisfaisant.',
+              comment: 'Overall alignment satisfactory.',
             },
             {
-              name: 'Qualité',
+              name: 'Quality',
               score: Math.round(quality * 0.35),
               max_score: 35,
-              comment: 'Structure et clarté convenables.',
+              comment: 'Structure and clarity suitable.',
             },
             {
-              name: 'Exécution',
+              name: 'Execution',
               score: Math.round(quality * 0.3),
               max_score: 30,
-              comment: 'Livrable exploitable.',
+              comment: 'Deliverable usable.',
             },
           ],
         },
@@ -128,8 +128,9 @@ export async function POST(req: NextRequest, ctx: { params: { id: string } }) {
     const ok = out && out.metadata && out.ui_blocks && out.agent_actions && out.next_state
     if (!ok) return NextResponse.json({ error: 'schema_validation_failed' }, { status: 500 })
     try {
-      await setJourneyState(id, out.next_state, out.metadata, 'demo_user')
+      await setJourneyState(id, out.next_state, out.metadata)
       await pushAgentLog({
+        ts: Date.now(),
         journeyId: id,
         agent: 'Zyno',
         action: 'submit',
@@ -155,6 +156,7 @@ export async function POST(req: NextRequest, ctx: { params: { id: string } }) {
   } catch (e: any) {
     try {
       await pushAgentLog({
+        ts: Date.now(),
         journeyId: id,
         agent: 'Zyno',
         action: 'submit_error',

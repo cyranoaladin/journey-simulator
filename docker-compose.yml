@@ -14,7 +14,7 @@ services:
       MONGO_URI: mongodb://mongo:27017/journey
       ADMIN_API_KEY: change-me
     ports:
-      - "3000:3000"
+      - "3002:3000"
     volumes:
       - ./mf-back:/usr/src/app
       - api-node-modules:/usr/src/app/node_modules
@@ -26,11 +26,11 @@ services:
     image: mongo:6
     restart: unless-stopped
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
       - mongo-data:/data/db
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      test: [ "CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -44,11 +44,11 @@ services:
       POSTGRES_USER: prisma
       POSTGRES_PASSWORD: prisma
     ports:
-      - "5432:5432"
+      - "5435:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "prisma"]
+      test: [ "CMD", "pg_isready", "-U", "prisma" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -56,24 +56,14 @@ services:
 
   journey-web:
     build:
-      context: ./journey-simulator/web
+      context: ./journey-simulator
       dockerfile: Dockerfile
-    command: npm run dev
     environment:
-      NODE_ENV: development
-      NEXT_TELEMETRY_DISABLED: "1"
-      DATABASE_PROVIDER: postgresql
-      DATABASE_URL: postgresql://prisma:prisma@postgres:5432/prisma?schema=public
-      NEXT_PUBLIC_SOLANA_RPC_URL: https://api.devnet.solana.com
-      SOLANA_RPC_URL: https://api.devnet.solana.com
+      VITE_API_BASE_URL: http://localhost:3002
     ports:
-      - "3001:3000"
-    volumes:
-      - ./journey-simulator/web:/app
-      - web-node-modules:/app/node_modules
+      - "3003:80"
     depends_on:
-      postgres:
-        condition: service_healthy
+      - api
 
 volumes:
   mongo-data:

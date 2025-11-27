@@ -156,7 +156,7 @@ export type EvaluateInput = {
 function buildEvalSystemPrompt(): string {
   return [
     'Tu es Zyno, évaluateur des missions du Journey Simulator.',
-    'Tu dois RENVOYER UNIQUEMENT un JSON strict conforme au schema JourneyStepResponse.',
+    'You must RETURN ONLY a strict JSON conforming to the JourneyStepResponse schema.',
     '- Inclure au moins un evaluation_block (global_score/100, feedback, axes: Pertinence, Qualité, Exécution).',
     '- Inclure un xp_block avec gained_xp cohérent avec la qualité (0–50).',
     '- next_state.xp_delta doit refléter les points XP gagnés.',

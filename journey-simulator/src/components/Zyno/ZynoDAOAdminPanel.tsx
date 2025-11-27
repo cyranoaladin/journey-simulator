@@ -32,7 +32,7 @@ export default function ZynoDAOAdminPanel() {
   const voterSelectId = useId();
   const voterHelpTextId = `${voterSelectId}-hint`;
   const voterLabelId = `${voterSelectId}-label`;
-  const voterSelectLabel = 'Voter en tant que';
+  const voterSelectLabel = 'Vote as';
 
   const loadData = useCallback(async () => {
     setFetchState({ loading: true, error: null });
@@ -51,7 +51,7 @@ export default function ZynoDAOAdminPanel() {
       console.error('Failed to load DAO data:', error);
       setFetchState({
         loading: false,
-        error: error instanceof Error ? error.message : 'Chargement impossible'
+        error: error instanceof Error ? error.message : 'Unable to load'
       });
     }
   }, [selectedVoter]);
@@ -64,17 +64,17 @@ export default function ZynoDAOAdminPanel() {
     if (!config) {
       return '';
     }
-    return `${config.quorumPercent}% de quorum • Puissance totale ${config.totalVotingPower}`;
+    return `${config.quorumPercent}% quorum • Total Power ${config.totalVotingPower}`;
   }, [config]);
 
   const handleCreateProposal = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!apiKey) {
-      setFetchState((prev) => ({ ...prev, error: 'Clé API admin requise pour créer une proposition.' }));
+      setFetchState((prev) => ({ ...prev, error: 'Admin API key required to create a proposal.' }));
       return;
     }
     if (!newProposal.title.trim()) {
-      setFetchState((prev) => ({ ...prev, error: 'Le titre de la proposition est requis.' }));
+      setFetchState((prev) => ({ ...prev, error: 'Proposal title is required.' }));
       return;
     }
 
@@ -94,7 +94,7 @@ export default function ZynoDAOAdminPanel() {
       console.error('Failed to create DAO proposal:', error);
       setFetchState((prev) => ({
         ...prev,
-        error: error instanceof Error ? error.message : 'Création impossible'
+        error: error instanceof Error ? error.message : 'Creation impossible'
       }));
     } finally {
       setCreating(false);
@@ -103,7 +103,7 @@ export default function ZynoDAOAdminPanel() {
 
   const submitVote = async (proposalId: string, support: 'yes' | 'no') => {
     if (!selectedVoter) {
-      setFetchState((prev) => ({ ...prev, error: 'Sélectionnez un votant avant de voter.' }));
+      setFetchState((prev) => ({ ...prev, error: 'Select a voter before voting.' }));
       return;
     }
 
@@ -128,7 +128,7 @@ export default function ZynoDAOAdminPanel() {
 
   const closeProposal = async (proposalId: string) => {
     if (!apiKey) {
-      setFetchState((prev) => ({ ...prev, error: 'Clé API admin requise pour clôturer.' }));
+      setFetchState((prev) => ({ ...prev, error: 'Admin API key required to close.' }));
       return;
     }
 
@@ -141,7 +141,7 @@ export default function ZynoDAOAdminPanel() {
       console.error('Failed to close proposal:', error);
       setFetchState((prev) => ({
         ...prev,
-        error: error instanceof Error ? error.message : 'Clôture impossible'
+        error: error instanceof Error ? error.message : 'Closing impossible'
       }));
     } finally {
       setClosing((prev) => ({ ...prev, [proposalId]: false }));
@@ -165,8 +165,8 @@ export default function ZynoDAOAdminPanel() {
             <ShieldCheck size={20} />
           </div>
           <div>
-            <h3 className="text-lg font-semibold">Console DAO Zyno</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Suivi des propositions, quorum et votes pondérés</p>
+            <h3 className="text-lg font-semibold">Zyno DAO Console</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Track proposals, quorum, and weighted votes</p>
           </div>
         </div>
         <button
@@ -176,7 +176,7 @@ export default function ZynoDAOAdminPanel() {
           className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-slate-400/60"
         >
           <RefreshCw size={16} className={fetchState.loading ? 'animate-spin' : ''} />
-          Rafraîchir
+          Refresh
         </button>
       </header>
 
@@ -188,22 +188,22 @@ export default function ZynoDAOAdminPanel() {
 
       {config && (
         <div className="grid gap-2 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-900 dark:bg-emerald-500/10 dark:text-emerald-200">
-          <p className="font-medium">Paramètres DAO</p>
+          <p className="font-medium">DAO Settings</p>
           <p>{quorumSummary}</p>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="w-full sm:max-w-xs">
-                <label
-                  className="text-xs font-semibold uppercase tracking-wider"
-                  htmlFor={adminKeyInputId}
-                >
-                Clé API admin
+              <label
+                className="text-xs font-semibold uppercase tracking-wider"
+                htmlFor={adminKeyInputId}
+              >
+                Admin API Key
               </label>
               <input
                 id={adminKeyInputId}
                 type="password"
-                  value={apiKey}
-                  onChange={(event) => setApiKey(event.target.value)}
-                placeholder="Utilisée pour créer / clôturer"
+                value={apiKey}
+                onChange={(event) => setApiKey(event.target.value)}
+                placeholder="Used to create / close"
                 className="mt-1 w-full rounded-md border border-emerald-200 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-400 dark:border-emerald-500/40 dark:bg-slate-900"
               />
             </div>
@@ -216,7 +216,7 @@ export default function ZynoDAOAdminPanel() {
                 {voterSelectLabel}
               </label>
               <p id={voterHelpTextId} className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
-                Choisissez un profil votant avant de soumettre un vote.
+                Choose a voter profile before submitting a vote.
               </p>
               <select
                 id={voterSelectId}
@@ -229,7 +229,7 @@ export default function ZynoDAOAdminPanel() {
                 title={voterSelectLabel}
                 className="mt-2 w-full rounded-md border border-emerald-200 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-400 dark:border-emerald-500/40 dark:bg-slate-900"
               >
-                <option value="">Sélectionner un votant</option>
+                <option value="">Select a voter</option>
                 {config.voters.map(renderVoterOption)}
               </select>
             </div>
@@ -240,19 +240,19 @@ export default function ZynoDAOAdminPanel() {
       <form onSubmit={handleCreateProposal} className="space-y-3 rounded-xl border border-slate-200 p-4 dark:border-slate-700/60">
         <div className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
           <Plus size={16} />
-          Nouvelle proposition
+          New Proposal
         </div>
         <input
           type="text"
           value={newProposal.title}
           onChange={(event) => setNewProposal((prev) => ({ ...prev, title: event.target.value }))}
-          placeholder="Titre (ex: Emission de tokens MVP)"
+          placeholder="Title (ex: MVP Token Issuance)"
           className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-400 dark:border-slate-600 dark:bg-slate-900"
         />
         <textarea
           value={newProposal.description}
           onChange={(event) => setNewProposal((prev) => ({ ...prev, description: event.target.value }))}
-          placeholder="Description / contexte"
+          placeholder="Description / context"
           rows={3}
           className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-400 dark:border-slate-600 dark:bg-slate-900"
         />
@@ -261,14 +261,14 @@ export default function ZynoDAOAdminPanel() {
           disabled={creating}
           className="inline-flex items-center gap-2 rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-slate-400/60"
         >
-          {creating ? 'Création…' : 'Créer la proposition'}
+          {creating ? 'Creating…' : 'Create Proposal'}
         </button>
       </form>
 
       <div className="space-y-3">
         {proposals.length === 0 && !fetchState.loading && (
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Aucune proposition active pour l’instant.
+            No active proposals at the moment.
           </p>
         )}
 
@@ -296,29 +296,29 @@ export default function ZynoDAOAdminPanel() {
                   )}
                 </div>
                 <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusBadgeClass}`}>
-                  {proposal.status === 'active' ? 'Active' : 'Clôturée'}
+                  {proposal.status === 'active' ? 'Active' : 'Closed'}
                 </span>
               </header>
 
               <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
                 <div className="rounded-lg bg-slate-100 p-3 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
-                  <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">Votes Oui</p>
+                  <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">Votes Yes</p>
                   <p className="text-lg font-semibold text-emerald-600 dark:text-emerald-300">{proposal.votes.yes}</p>
                 </div>
                 <div className="rounded-lg bg-slate-100 p-3 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
-                  <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">Votes Non</p>
+                  <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">Votes No</p>
                   <p className="text-lg font-semibold text-red-500 dark:text-red-300">{proposal.votes.no}</p>
                 </div>
                 <div className="rounded-lg bg-slate-100 p-3 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
                   <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">Quorum</p>
                   <p className="text-lg font-semibold">
-                    {proposal.quorumMet ? 'Atteint' : 'En cours'}
+                    {proposal.quorumMet ? 'Reached' : 'In Progress'}
                   </p>
                 </div>
                 <div className="rounded-lg bg-slate-100 p-3 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
-                  <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">Résultat</p>
+                  <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">Outcome</p>
                   <p className="text-lg font-semibold">
-                    {proposal.outcome ? proposal.outcome : 'En délibération'}
+                    {proposal.outcome ? proposal.outcome : 'Deliberating'}
                   </p>
                 </div>
               </div>
@@ -331,7 +331,7 @@ export default function ZynoDAOAdminPanel() {
                   className="inline-flex items-center gap-2 rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-slate-400/60"
                 >
                   <ThumbsUp size={16} />
-                  Oui ({selectedVoter || '---'})
+                  Yes ({selectedVoter || '---'})
                 </button>
                 <button
                   type="button"
@@ -340,7 +340,7 @@ export default function ZynoDAOAdminPanel() {
                   className="inline-flex items-center gap-2 rounded-md bg-red-500 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-red-400 disabled:cursor-not-allowed disabled:bg-slate-400/60"
                 >
                   <ThumbsDown size={16} />
-                  Non
+                  No
                 </button>
                 <button
                   type="button"
@@ -349,21 +349,21 @@ export default function ZynoDAOAdminPanel() {
                   className="inline-flex items-center gap-2 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:border-emerald-500 hover:text-emerald-600 dark:border-slate-600 dark:text-slate-300 dark:hover:border-emerald-500 dark:hover:text-emerald-300"
                 >
                   <Lock size={16} />
-                  Clôturer
+                  Close
                 </button>
               </div>
 
               {proposal.status === 'closed' && proposal.outcome === 'accepted' && (
                 <p className="flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
                   <CheckCircle2 size={16} />
-                  Décision acceptée — mise en œuvre recommandée.
+                  Decision accepted — implementation recommended.
                 </p>
               )}
 
               {proposal.status === 'closed' && proposal.outcome === 'rejected' && (
                 <p className="flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-500/10 dark:text-red-300">
                   <ThumbsDown size={16} />
-                  Proposition rejetée — revoir la stratégie.
+                  Proposal rejected — revise strategy.
                 </p>
               )}
             </article>

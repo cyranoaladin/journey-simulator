@@ -1,32 +1,66 @@
-const { getRagSnippets } = require('../rag/ragClient');
-const { createAgentResponse } = require('./telemetryUtils');
+const BaseAgent = require('./BaseAgent');
 
-module.exports = async function AuditAgent(agentInput = {}, context = {}) {
-  const user = agentInput.user || context.user || { id: 'demo_user' };
-  const phase = agentInput.phase || context.phase || 'Audit';
-  const intent = context.intent || agentInput.intent || null;
-  const objective =
-    agentInput.objective || context.objective || agentInput.input || context.input || 'audit securite contrat';
+class AuditAgent extends BaseAgent {
+  constructor() {
+    super("AuditAgent");
+  }
 
-  const snippets = await getRagSnippets({ query: objective, userContext: user });
+  buildSystemPrompt(ctx) {
+    return `You are the **AuditAgent**, a smart contract auditor.
+Your goal is to find bugs and vulnerabilities in code.
 
-  return createAgentResponse('AuditAgent', {
-    phase,
-    intent,
-    objective,
-    prompt: `Identifier les risques de securite critiques pour "${objective}"`,
-    reasoning:
-      'Analyse les contrats, checklists de securite et incidents similaires pour detecter les surfaces de risque.',
-    action: 'Prioriser les correctifs proposes et planifier un audit externe cible.',
-    summary: 'Analyse de securite automatique initiee',
-    outcome: 'Points faibles identifies et recommandations structurees',
-    payload: {
-      output: 'Audit preliminaire des contrats termine',
-      nextSteps: ['Correction des vulnerabilites', 'Audit formel externe'],
-    },
-    snippets,
-    metrics: { confidence: 0.9, success: true, impact: 'high' },
-    user,
-  });
-};
+Your responsibilities:
+1. Perform static analysis on code snippets.
+2. Identify logic errors and edge cases.
+3. Suggest gas optimizations.
+4. Verify test coverage.
 
+Tone: Clinical, precise, detail-oriented.`;
+  }
+
+  buildUserPrompt(ctx) {
+    return `User Input: "${ctx.submission || ctx.lastInput}"
+
+Audit the code or logic.`;
+  }
+
+  async run(ctx) {
+    const EVALUATION_SCHEMA = {
+      type: "json_schema",
+      json_schema: {
+        name: "AuditResponse",
+        strict: true,
+        schema: {
+          type: "object",
+          required: ["global_score", "feedback", "axes"],
+          properties: {
+            global_score: { type: "number" },
+            feedback: { type: "string" },
+            axes: {
+              type: "array",
+              items: {
+                type: "object",
+                required: ["name", "score", "max_score", "comment"],
+                properties: {
+                  name: { type: "string" },
+                  score: { type: "number" },
+                  max_score: { type: "number" },
+                  comment: { type: "string" },
+                },
+                additionalProperties: false,
+              },
+            },
+          },
+          additionalProperties: false,
+        },
+      },
+    };
+
+    return super.run(ctx, {
+      response_format: EVALUATION_SCHEMA,
+      temperature: 0.1,
+    });
+  }
+}
+
+module.exports = AuditAgent;

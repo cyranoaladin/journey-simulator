@@ -995,6 +995,7 @@ VITE_ENABLE_REAL_BLOCKCHAIN=false
 # API endpoints
 VITE_API_BASE_URL=https://api.moneyfactory.ai
 VITE_ZYNO_API_URL=https://zyno.moneyfactory.ai
+VITE_SOLANA_API_BASE_URL=http://127.0.0.1:3001
 
 # Knowledge base distribution
 VITE_RESOURCE_LIBRARY_BASE_URL=https://cdn.moneyfactory.ai/knowledge-vault

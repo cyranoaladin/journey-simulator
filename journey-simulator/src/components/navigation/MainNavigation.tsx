@@ -6,7 +6,6 @@ import {
   X,
   Sun,
   Moon,
-  LogOut,
   Crown,
   Sparkles,
   Waypoints,
@@ -24,6 +23,7 @@ import WalletButton from '../WalletButton'
 import { useThemeStore } from '../../store/themeStore'
 import { useAuth } from '../../contexts/AuthContext'
 import { useJourneyStore } from '../../store/journeyStore'
+import UserMetricsPanel from './UserMetricsPanel'
 
 type NavItem = {
   label: string
@@ -209,15 +209,17 @@ const MainNavigation = () => {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className={`fixed inset-x-0 top-0 z-50 border-b backdrop-blur-2xl shadow-glass ${headerTone}`}
+      role="banner"
     >
       <div className="flex w-full flex-col gap-3 px-2 py-3 sm:px-3 lg:px-4">
         <div className="flex items-center justify-between gap-3">
           <button
             onClick={() => handleNavigate(NAV_ITEMS[0])}
-            className="flex items-center gap-3 text-left focus:outline-none"
+            className="flex items-center gap-3 text-left focus:outline-none focus:ring-2 focus:ring-accent-cyan rounded-lg p-2"
+            aria-label="Return to home page"
           >
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-accent shadow-lg shadow-primary-500/30">
-              <img src="/images/logo_mfai.png" alt="MFAI" className="h-8 w-8" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-accent shadow-lg shadow-primary-500/30" aria-hidden="true">
+              <img src="/images/logo_mfai.png" alt="Logo Money Factory AI" className="h-8 w-8" />
             </div>
             <div className="flex flex-col">
               <span className="font-space text-lg font-semibold tracking-wide">Money Factory AI</span>
@@ -227,125 +229,66 @@ const MainNavigation = () => {
             </div>
           </button>
 
-          <div className="hidden flex-1 items-center justify-center gap-6 lg:flex">
-            {NAV_ITEMS.map((item) => {
-              const Icon = item.icon
-              const isActive = !item.disabled && location.pathname === item.href
-              return (
-                <motion.button
-                  key={item.label}
-                  whileHover={{ y: -2 }}
-                  type="button"
-                  onClick={() => handleNavigate(item)}
-                  className={`relative flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold transition-colors ${
-                    isActive
-                      ? navActiveTone
-                      : item.disabled
-                        ? `${navDisabledTone} cursor-not-allowed`
-                        : navDefaultTone
-                  }`}
-                  disabled={item.disabled}
-                >
-                  <Icon size={16} className="opacity-80" />
-                  {item.label}
-                  {item.badge && (
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${getBadgeClasses(item.badge)}`}>
-                      {item.badge}
-                    </span>
-                  )}
-                  {isActive && (
-                    <motion.span
-                      layoutId="nav-indicator"
-                      className="absolute -bottom-2 left-1/2 h-0.5 w-10 -translate-x-1/2 rounded-full bg-gradient-accent"
-                    />
-                  )}
-                </motion.button>
-              )
-            })}
-          </div>
+          <nav aria-label="Navigation principale" className="hidden flex-1 items-center justify-center gap-6 lg:flex">
+            <ul className="flex gap-1">
+              {NAV_ITEMS.map((item) => {
+                const Icon = item.icon
+                const isActive = !item.disabled && location.pathname === item.href
+                return (
+                  <li key={item.label}>
+                    <motion.button
+                      whileHover={{ y: -2 }}
+                      type="button"
+                      onClick={() => handleNavigate(item)}
+                      className={`relative flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold transition-colors ${isActive
+                        ? navActiveTone
+                        : item.disabled
+                          ? `${navDisabledTone} cursor-not-allowed`
+                          : navDefaultTone
+                        }`}
+                      disabled={item.disabled}
+                      aria-current={isActive ? "page" : undefined}
+                      aria-label={item.disabled ? `${item.label} (indisponible)` : item.label}
+                    >
+                      <Icon size={16} className="opacity-80" aria-hidden="true" />
+                      <span>{item.label}</span>
+                      {item.badge && (
+                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${getBadgeClasses(item.badge)}`}
+                          aria-label={`Badge ${item.badge}`}>
+                          {item.badge}
+                        </span>
+                      )}
+                      {isActive && (
+                        <motion.span
+                          layoutId="nav-indicator"
+                          className="absolute -bottom-2 left-1/2 h-0.5 w-10 -translate-x-1/2 rounded-full bg-gradient-accent"
+                          aria-hidden="true"
+                        />
+                      )}
+                    </motion.button>
+                  </li>
+                )
+              })}
+            </ul>
+          </nav>
 
           <div className="flex items-center gap-3">
-            <div className="hidden items-center gap-3 lg:flex">
-              <div className="glass-effect flex items-center gap-3 rounded-2xl px-4 py-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-accent/30 text-accent-neon">
-                  <Crown size={18} />
-                </div>
-                <div className="flex flex-col">
-                  <span className={`text-[10px] uppercase tracking-[0.3em] ${mutedCaptionClass}`}>Pass Level</span>
-                  <span className={`mt-1 inline-flex items-center self-start rounded-full px-3 py-1 text-xs font-semibold shadow-inner-glow ${passBadgeStyles}`}>
-                    {userProgress.passLevel}
-                  </span>
-                </div>
-              </div>
-
-              <ul className="flex flex-wrap items-center gap-3">
-                {metrics.map((metric) => {
-                  const Icon = metric.icon
-                  return (
-                    <li
-                      key={metric.id}
-                      className="glass-effect flex min-w-[160px] flex-col gap-1 rounded-2xl px-4 py-3"
-                    >
-                      <span className={`flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.3em] ${metricLabelClass}`}>
-                        <Icon size={14} className="text-accent-neon" />
-                        {metric.label}
-                      </span>
-                      <span className={`font-mono text-sm ${metricValueClass}`}>
-                        {metric.value.toLocaleString()}
-                      </span>
-                      <span className={`text-[11px] ${metricHintClass}`}>
-                        {metric.hint}
-                      </span>
-                    </li>
-                  )
-                })}
-                <li className="glass-effect flex min-w-[160px] flex-col gap-2 rounded-2xl px-4 py-3">
-                  <div className={`flex items-center justify-between text-[11px] font-medium uppercase tracking-[0.3em] ${metricLabelClass}`}>
-                    <span>Journey</span>
-                    <span>{completionRate}%</span>
-                  </div>
-                  <div className="h-2 rounded-full bg-white/10">
-                    <motion.div
-                      initial={false}
-                      animate={{ width: `${completionRate}%` }}
-                      transition={{ duration: 0.6, ease: 'easeOut' }}
-                      className="h-full rounded-full bg-gradient-accent"
-                    />
-                  </div>
-                  <span className={`text-[11px] ${metricHintClass}`}>
-                    {completedPhases}/{totalPhases || '—'} phases
-                  </span>
-                </li>
-              </ul>
+            <div className="hidden lg:flex">
+              <UserMetricsPanel />
             </div>
 
             <WalletButton />
 
-            {user && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={logout}
-                className={`hidden rounded-full border p-2 transition-colors lg:inline-flex ${
-                  isDark
-                    ? 'border-white/10 text-white/70 hover:text-white'
-                    : 'border-surface-200 text-surface-500 hover:text-surface-900'
-                }`}
-                aria-label="Log out"
-              >
-                <LogOut size={18} />
-              </motion.button>
-            )}
+            {/* Logout button removed - handled by WalletButton */}
 
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={toggleTheme}
-              className={`rounded-full border p-2 transition-colors ${
-                isDark
-                  ? 'border-white/10 text-white'
-                  : 'border-surface-200 text-surface-600 hover:text-surface-900'
-              }`}
+              className={`rounded-full border p-2 transition-colors ${isDark
+                ? 'border-white/10 text-white'
+                : 'border-surface-200 text-surface-600 hover:text-surface-900'
+                }`}
               aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {isDark ? <Sun size={18} /> : <Moon size={18} />}
@@ -355,11 +298,10 @@ const MainNavigation = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-              className={`inline-flex rounded-full border p-2 lg:hidden ${
-                isDark
-                  ? 'border-white/10 text-white'
-                  : 'border-surface-200 text-surface-600'
-              }`}
+              className={`inline-flex rounded-full border p-2 lg:hidden ${isDark
+                ? 'border-white/10 text-white'
+                : 'border-surface-200 text-surface-600'
+                }`}
               aria-label={isMobileMenuOpen ? 'Close navigation' : 'Open navigation'}
             >
               {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -367,9 +309,9 @@ const MainNavigation = () => {
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-3 lg:hidden">
+        <div className="flex items-center justify-between gap-3 lg:hidden" aria-label="Progression du parcours mobile">
           <div className="glass-effect flex items-center gap-3 rounded-2xl px-4 py-3">
-            <Crown size={16} className="text-accent-neon" />
+            <Crown size={16} className="text-accent-neon" aria-hidden="true" />
             <div className="flex flex-col">
               <span className={`text-[10px] uppercase tracking-[0.2em] ${mutedCaptionClass}`}>Pass Level</span>
               <span className={`mt-1 inline-flex items-center self-start rounded-full px-2 py-0.5 text-xs font-semibold ${passBadgeStyles}`}>
@@ -380,12 +322,16 @@ const MainNavigation = () => {
 
           <div className="flex w-36 flex-col gap-1">
             <span className={`text-[10px] uppercase tracking-[0.2em] ${metricLabelClass}`}>Journey</span>
-            <div className="h-2 rounded-full bg-white/10">
+            <div className="h-2 rounded-full bg-white/10" aria-label={`Barre de progression: ${completionRate}%`}>
               <motion.div
                 initial={false}
                 animate={{ width: `${completionRate}%` }}
                 transition={{ duration: 0.6, ease: 'easeOut' }}
                 className="h-full rounded-full bg-gradient-accent"
+                role="progressbar"
+                aria-valuenow={completionRate}
+                aria-valuemin={0}
+                aria-valuemax={100}
               />
             </div>
             <span className={`text-[11px] ${metricHintClass}`}>{completionRate}% complete</span>
@@ -411,13 +357,12 @@ const MainNavigation = () => {
                     key={item.label}
                     type="button"
                     onClick={() => handleNavigate(item)}
-                    className={`flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold transition-colors ${
-                      isActive
-                        ? mobileItemActive
-                        : item.disabled
-                          ? mobileItemDisabled
-                          : mobileItemDefault
-                    }`}
+                    className={`flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold transition-colors ${isActive
+                      ? mobileItemActive
+                      : item.disabled
+                        ? mobileItemDisabled
+                        : mobileItemDefault
+                      }`}
                     disabled={item.disabled}
                   >
                     <span className="flex items-center gap-2">
@@ -468,9 +413,8 @@ const MainNavigation = () => {
             </div>
 
             {user && (
-              <div className={`mt-6 rounded-2xl p-4 text-sm ${
-                isDark ? 'bg-white/5 text-white/70' : 'bg-surface-100 text-surface-600'
-              }`}>
+              <div className={`mt-6 rounded-2xl p-4 text-sm ${isDark ? 'bg-white/5 text-white/70' : 'bg-surface-100 text-surface-600'
+                }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex flex-col">
                     <span className={`text-xs uppercase tracking-[0.2em] ${isDark ? 'text-white/40' : 'text-surface-400'}`}>Signed in as</span>
@@ -478,11 +422,10 @@ const MainNavigation = () => {
                   </div>
                   <button
                     onClick={logout}
-                    className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide transition-colors ${
-                      isDark
-                        ? 'border-white/20 text-white/60 hover:text-white'
-                        : 'border-surface-300 text-surface-500 hover:text-surface-900'
-                    }`}
+                    className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide transition-colors ${isDark
+                      ? 'border-white/20 text-white/60 hover:text-white'
+                      : 'border-surface-300 text-surface-500 hover:text-surface-900'
+                      }`}
                   >
                     Log out
                   </button>

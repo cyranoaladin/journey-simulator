@@ -1,32 +1,66 @@
-const { getRagSnippets } = require('../rag/ragClient');
-const { createAgentResponse } = require('./telemetryUtils');
+const BaseAgent = require('./BaseAgent');
 
-module.exports = async function PitchAgent(agentInput = {}, context = {}) {
-  const user = agentInput.user || context.user || { id: 'demo_user' };
-  const phase = agentInput.phase || context.phase || 'Pitch';
-  const intent = context.intent || agentInput.intent || null;
-  const objective =
-    agentInput.objective || context.objective || agentInput.input || context.input || 'preparation pitch';
+class PitchAgent extends BaseAgent {
+  constructor() {
+    super("PitchAgent");
+  }
 
-  const snippets = await getRagSnippets({ query: objective, userContext: user });
+  buildSystemPrompt(ctx) {
+    return `You are the **PitchAgent**, a fundraising and storytelling coach.
+Your goal is to help the user refine their pitch deck and narrative.
 
-  return createAgentResponse('PitchAgent', {
-    phase,
-    intent,
-    objective,
-    prompt: `Structurer un pitch pour "${objective}"`,
-    reasoning:
-      'Selectionne les arguments clefs et exemples marche pour articuler un pitch coherent en 10 slides.',
-    action: 'Iterer sur le pitch draft et preparer une rehearsal avec CoachAgent.',
-    summary: 'Pitch structure genere',
-    outcome: 'Prototype de pitch pret a usage',
-    payload: {
-      output: 'Voici votre pitch deck : [draft]',
-      nextSteps: ['Valider ou ameliorer le contenu'],
-    },
-    snippets,
-    metrics: { confidence: 0.85, success: true, impact: 'medium' },
-    user,
-  });
-};
+Your responsibilities:
+1. Review pitch decks (structure, clarity, design).
+2. Critique the narrative flow and value proposition.
+3. Help anticipate investor questions.
+4. Polish the "ask" and financial projections.
 
+Tone: Critical (constructive), persuasive, polished.`;
+  }
+
+  buildUserPrompt(ctx) {
+    return `User Input: "${ctx.submission || ctx.lastInput}"
+
+Review the pitch or narrative.`;
+  }
+
+  async run(ctx) {
+    const EVALUATION_SCHEMA = {
+      type: "json_schema",
+      json_schema: {
+        name: "PitchResponse",
+        strict: true,
+        schema: {
+          type: "object",
+          required: ["global_score", "feedback", "axes"],
+          properties: {
+            global_score: { type: "number" },
+            feedback: { type: "string" },
+            axes: {
+              type: "array",
+              items: {
+                type: "object",
+                required: ["name", "score", "max_score", "comment"],
+                properties: {
+                  name: { type: "string" },
+                  score: { type: "number" },
+                  max_score: { type: "number" },
+                  comment: { type: "string" },
+                },
+                additionalProperties: false,
+              },
+            },
+          },
+          additionalProperties: false,
+        },
+      },
+    };
+
+    return super.run(ctx, {
+      response_format: EVALUATION_SCHEMA,
+      temperature: 0.4,
+    });
+  }
+}
+
+module.exports = PitchAgent;

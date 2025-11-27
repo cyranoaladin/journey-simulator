@@ -16,7 +16,7 @@ export const demoSteps = [
       {
         kind: 'text_block',
         id: 'tb1',
-        title: 'Bienvenue',
+        title: 'Welcome',
         body_markdown: 'Découvrez les fondamentaux de Solana.',
       },
       {

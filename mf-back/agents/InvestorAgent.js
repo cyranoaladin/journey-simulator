@@ -1,32 +1,66 @@
-const { getRagSnippets } = require('../rag/ragClient');
-const { createAgentResponse } = require('./telemetryUtils');
+const BaseAgent = require('./BaseAgent');
 
-module.exports = async function InvestorAgent(agentInput = {}, context = {}) {
-  const user = agentInput.user || context.user || { id: 'demo_user' };
-  const phase = agentInput.phase || context.phase || 'Invest';
-  const intent = context.intent || agentInput.intent || null;
-  const objective =
-    agentInput.objective || context.objective || agentInput.input || context.input || 'recherche investisseurs';
+class InvestorAgent extends BaseAgent {
+  constructor() {
+    super("InvestorAgent");
+  }
 
-  const snippets = await getRagSnippets({ query: objective, userContext: user });
+  buildSystemPrompt(ctx) {
+    return `You are the **InvestorAgent**, representing a Venture Capitalist or Angel Investor.
+Your goal is to evaluate the investment potential of the user's project.
 
-  return createAgentResponse('InvestorAgent', {
-    phase,
-    intent,
-    objective,
-    prompt: `Identifier les investisseurs pertinents pour "${objective}"`,
-    reasoning:
-      'Croise maturite du projet, theses web3 et deals recents pour proposer des cibles prioritaires.',
-    action: 'Contacter les fonds recommandes et joindre le pitch deck adapte.',
-    summary: 'Liste dinvestisseurs strategiques proposee',
-    outcome: 'Preparation au pitch investisseur reussie',
-    payload: {
-      output: 'Liste VCs, angels et fonds cibles generee',
-      nextSteps: ['Prise de contact', 'Envoi de pitch decks'],
-    },
-    snippets,
-    metrics: { confidence: 0.81, success: true, impact: 'medium' },
-    user,
-  });
-};
+Your responsibilities:
+1. Analyze the business model and monetization strategy.
+2. Evaluate market size and competition.
+3. Assess the team and execution capability.
+4. Decide on "investment" (simulated) or provide rejection feedback.
 
+Tone: Professional, skeptical, business-focused, "shark tank".`;
+  }
+
+  buildUserPrompt(ctx) {
+    return `User Input: "${ctx.submission || ctx.lastInput}"
+
+Evaluate the investment opportunity.`;
+  }
+
+  async run(ctx) {
+    const EVALUATION_SCHEMA = {
+      type: "json_schema",
+      json_schema: {
+        name: "InvestorResponse",
+        strict: true,
+        schema: {
+          type: "object",
+          required: ["global_score", "feedback", "axes"],
+          properties: {
+            global_score: { type: "number" },
+            feedback: { type: "string" },
+            axes: {
+              type: "array",
+              items: {
+                type: "object",
+                required: ["name", "score", "max_score", "comment"],
+                properties: {
+                  name: { type: "string" },
+                  score: { type: "number" },
+                  max_score: { type: "number" },
+                  comment: { type: "string" },
+                },
+                additionalProperties: false,
+              },
+            },
+          },
+          additionalProperties: false,
+        },
+      },
+    };
+
+    return super.run(ctx, {
+      response_format: EVALUATION_SCHEMA,
+      temperature: 0.3,
+    });
+  }
+}
+
+module.exports = InvestorAgent;

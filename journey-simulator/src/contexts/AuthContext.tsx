@@ -1,3 +1,4 @@
+
 import {
   createContext,
   useContext,
@@ -5,6 +6,8 @@ import {
   useEffect,
   ReactNode,
   FC,
+  useMemo,
+  useCallback,
 } from "react";
 import { useNavigate } from "react-router-dom";
 import api, { LoginResponse } from "../utils/api";
@@ -18,6 +21,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
+  loginWithWallet: (wallet_address: string) => Promise<boolean>;
   register: (userData: {
     name: string;
     email: string;
@@ -45,53 +49,14 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
+  console.log("AuthProvider: render");
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-  const { loadUserProgress, resetProgress } = useJourneyStore();
+  const loadUserProgress = useJourneyStore((state) => state.loadUserProgress);
+  const resetProgress = useJourneyStore((state) => state.resetProgress);
 
-  // Check authentication status on app load
-  useEffect(() => {
-    checkAuthStatus();
-  }, []);
-
-  const checkAuthStatus = async () => {
-    const token = localStorage.getItem("accessToken");
-
-    if (token) {
-      try {
-        // Verify token with backend
-        const data = await api.verifyToken();
-        setUser(data.user);
-        try {
-          localStorage.setItem("userId", data.user.id);
-        } catch (storageError) {
-          console.warn(
-            "Unable to persist userId after auth check",
-            storageError,
-          );
-        }
-        // Load user progress from backend
-        await loadUserProgress();
-      } catch (error) {
-        console.error("Auth check failed:", error);
-        // Token is invalid, try to refresh
-        const refreshed = await refreshToken();
-        if (!refreshed) {
-          // Refresh failed, clear everything
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
-          setUser(null);
-          await resetProgress();
-        }
-      }
-    } else {
-      await resetProgress();
-    }
-    setIsLoading(false);
-  };
-
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
     try {
       const data = await api.login(email, password);
 
@@ -108,16 +73,54 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       }
       // Clear any lingering progress from a previous session
       await resetProgress();
-      // Load user progress from backend
-      await loadUserProgress();
+
+      // Load user progress from backend with timeout protection
+      try {
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('User progress load timeout')), 10000); // 10 second timeout
+        });
+
+        const progressPromise = loadUserProgress();
+
+        // Race the API call with a timeout to prevent hanging
+        await Promise.race([progressPromise, timeoutPromise]);
+      } catch (progressError) {
+        console.error("Failed to load user progress:", progressError);
+        // Continue with default progress instead of blocking the UI
+      }
+
       return true;
     } catch (error) {
       console.error("Login error:", error);
       return false;
     }
-  };
+  }, [loadUserProgress, resetProgress]);
 
-  const register = async (userData: {
+  const loginWithWallet = useCallback(async (wallet_address: string): Promise<boolean> => {
+    try {
+      const data = await api.loginWithWallet(wallet_address);
+
+      // Store tokens
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
+
+      // Set user
+      setUser(data.user);
+      try {
+        localStorage.setItem("userId", data.user.id);
+      } catch (storageError) {
+        console.warn("Unable to persist userId after login", storageError);
+      }
+      await resetProgress();
+      await loadUserProgress();
+      return true;
+    } catch (error) {
+      console.error("Wallet login error:", error);
+      return false;
+    }
+  }, [loadUserProgress, resetProgress]);
+
+  const register = useCallback(async (userData: {
     name: string;
     email: string;
     password: string;
@@ -149,9 +152,9 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       console.error("Registration error:", error);
       return false;
     }
-  };
+  }, [loadUserProgress, resetProgress]);
 
-  const refreshToken = async (): Promise<boolean> => {
+  const refreshToken = useCallback(async (): Promise<boolean> => {
     try {
       const data = await api.refreshToken();
       localStorage.setItem("accessToken", data.accessToken);
@@ -163,9 +166,9 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       console.error("Token refresh failed:", error);
       return false;
     }
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       // Call logout endpoint to invalidate refresh token
       await api.logout();
@@ -184,23 +187,114 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       await resetProgress();
       navigate("/login");
     }
-  };
+  }, [navigate, resetProgress]);
 
-  const checkAuth = (): boolean => {
+  const checkAuth = useCallback((): boolean => {
     const token = localStorage.getItem("accessToken");
     return !!token && !!user;
+  }, [user]);
+
+  const checkAuthStatus = async () => {
+    console.log("AuthContext: checkAuthStatus started");
+    const token = localStorage.getItem("accessToken");
+    const refreshTokenValue = localStorage.getItem("refreshToken");
+    console.log("AuthContext: token present?", !!token, "refresh token present?", !!refreshTokenValue);
+
+    if (token) {
+      try {
+        // Verify token with backend
+        const data = await api.verifyToken();
+        setUser(data.user);
+        try {
+          localStorage.setItem("userId", data.user.id);
+        } catch (storageError) {
+          console.warn(
+            "Unable to persist userId after auth check",
+            storageError,
+          );
+        }
+
+        // Load user progress from backend with timeout protection
+        try {
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('User progress load timeout')), 10000); // 10 second timeout
+          });
+
+          const progressPromise = loadUserProgress();
+
+          // Race the API call with a timeout to prevent hanging
+          await Promise.race([progressPromise, timeoutPromise]);
+        } catch (progressError) {
+          console.error("Failed to load user progress:", progressError);
+          // Continue with default progress instead of blocking the UI
+        }
+      } catch (verifyError) {
+        console.error("Token verification failed:", verifyError);
+        // Token is invalid, try to refresh only if refresh token exists
+        if (refreshTokenValue) {
+          try {
+            const refreshResult = await refreshToken();
+            if (refreshResult) {
+              // Retry the verification after refresh
+              try {
+                const data = await api.verifyToken();
+                setUser(data.user);
+
+                // Load user progress
+                try {
+                  const timeoutPromise = new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error('User progress load timeout')), 10000);
+                  });
+
+                  const progressPromise = loadUserProgress();
+                  await Promise.race([progressPromise, timeoutPromise]);
+                } catch (progressError) {
+                  console.error("Failed to load user progress after refresh:", progressError);
+                }
+                return; // Successfully refreshed and verified
+              } catch (retryError) {
+                console.error("Token still invalid after refresh:", retryError);
+              }
+            }
+          } catch (refreshError) {
+            console.error("Token refresh failed:", refreshError);
+          }
+        }
+
+        // If refresh failed or no refresh token, clear everything
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("userId");
+        setUser(null);
+        await resetProgress();
+      }
+    } else {
+      await resetProgress();
+    }
+    console.log("AuthContext: setting isLoading false");
+    setIsLoading(false);
   };
 
-  const value: AuthContextType = {
+  // Check authentication status on app load
+  useEffect(() => {
+    const initAuth = async () => {
+      await checkAuthStatus();
+    };
+
+    initAuth();
+  }, []);
+
+  const value = useMemo(() => ({
     user,
-    isAuthenticated: !!user,
-    isLoading,
     login,
+    loginWithWallet,
     register,
     logout,
+    isAuthenticated: !!user,
+    isLoading,
     checkAuth,
-    refreshToken,
-  };
+    refreshToken
+  }), [user, isLoading, login, loginWithWallet, register, logout, checkAuth, refreshToken]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

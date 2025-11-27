@@ -5,19 +5,101 @@ import { test, expect } from '@playwright/test'
  */
 
 test.describe('Journey submit mission flow', () => {
-  test('step + submit shows evaluation and logs', async ({ page }) => {
-    // Mock auth-related endpoints to keep page happy
+  const testPersona = {
+    id: 'e2e-persona',
+    name: 'e2e-persona',
+    title: 'E2E Persona',
+    description: 'Synthetic persona used for mission submission automation.',
+    icon: '🧪',
+    color: 'from-indigo-500 to-purple-500',
+    targetProfile: 'QA automation',
+    motivation: 'Validate mission submission flows end-to-end.',
+    passType: 'Test Pass',
+    phases: [
+      {
+        id: 'e2e-phase',
+        title: 'E2E Phase',
+        description: 'Instrumentation phase for automation.',
+        mission: 'Trigger the Zyno pipeline in a controlled environment.',
+        duration: '1 day',
+        xpReward: 10,
+        mfaiReward: 1,
+        nftReward: 'E2E Proof',
+        tools: ['Automation harness'],
+        outcomes: ['Validated UI flow'],
+        zynoTip: 'Leverage deterministic inputs for consistent outputs.',
+      },
+    ],
+  }
+
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript((persona) => {
+      window.localStorage.setItem('accessToken', 'e2e-access-token')
+      window.localStorage.setItem('refreshToken', 'e2e-refresh-token')
+      const persisted = {
+        state: {
+          selectedPersona: persona,
+          userProgress: {
+            totalXP: 0,
+            nfts: [],
+            nftMints: [],
+            passLevel: 'Free',
+            mfaiTokens: 0,
+            stakedMfai: 0,
+            walletConnected: false,
+            completedPhases: [],
+            currentPersona: persona.id,
+            votingPower: 0,
+            daoProposals: 0,
+            testnetAirdropClaimed: false,
+            socialShareCount: 0,
+            shareHistory: [],
+          },
+        },
+        version: 0,
+      }
+      window.localStorage.setItem('mfai-journey-storage', JSON.stringify(persisted))
+    }, testPersona)
+
     await page.route('**/user/profile', async (route) => {
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ user: { id: 'e2e-user', name: 'E2E', email: 'e2e@mfai.com', role: 'user', wallet_address: 'w1' } }) })
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ user: { id: 'e2e-user', name: 'E2E', email: 'e2e@mfai.com', role: 'user', wallet_address: 'w1' } }),
+      })
     })
+
+    await page.route('**/user/update-profile', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true }) })
+    })
+
     await page.route('**/journey/user-progress', async (route) => {
       if(route.request().method()==='GET'){
-        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, progress: { total_xp: 0, completed_phases: 0, nft_certificates: [] } }) })
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            total_xp: 0,
+            current_level: 1,
+            completed_phases: [],
+            currentPersona: 'e2e-persona'
+          })
+        })
       }else{
         await route.fulfill({ status: 204 })
       }
     })
 
+    await page.route('**/journey/reset-progress', async (route) => {
+      await route.fulfill({ status: 204 })
+    })
+
+    await page.route('**/user/tokens', async (route) => {
+      await route.fulfill({ status: 204 })
+    })
+  })
+
+  test('step + submit shows evaluation and logs', async ({ page }) => {
     // Intercept step + submit + logs
     await page.route('**/api/journeys/*/step', async (route) => {
       const body = {
@@ -55,12 +137,10 @@ test.describe('Journey submit mission flow', () => {
     })
 
     await page.goto('/journeys')
-
-    // Select first journey
-    await page.getByRole('button', { name: 'Launch with Zyno' }).first().click()
+    await expect(page.getByRole('heading', { name: /Current Phase/i })).toBeVisible()
 
     // Scroll to Current Phase and run step
-    await page.getByRole('button', { name: 'Lancer l’étape' }).click()
+    await page.getByRole('button', { name: 'Lancer l’étape' }).click({ force: true })
 
     // Fill mission input (link) and submit
     const input = page.locator('input[placeholder="https://..."]').first()

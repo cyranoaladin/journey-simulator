@@ -1,32 +1,66 @@
-const { getRagSnippets } = require('../rag/ragClient');
-const { createAgentResponse } = require('./telemetryUtils');
+const BaseAgent = require('./BaseAgent');
 
-module.exports = async function DAOAgent(agentInput = {}, context = {}) {
-  const user = agentInput.user || context.user || { id: 'demo_user' };
-  const phase = agentInput.phase || context.phase || 'DAO';
-  const intent = context.intent || agentInput.intent || null;
-  const objective =
-    agentInput.objective || context.objective || agentInput.input || context.input || 'structure de gouvernance';
+class DAOAgent extends BaseAgent {
+  constructor() {
+    super("DAOAgent");
+  }
 
-  const snippets = await getRagSnippets({ query: objective, userContext: user });
+  buildSystemPrompt(ctx) {
+    return `You are the **DAOAgent**, a governance architect for decentralized organizations.
+Your goal is to help the user design and manage their DAO.
 
-  return createAgentResponse('DAOAgent', {
-    phase,
-    intent,
-    objective,
-    prompt: `Designer une gouvernance DAO pour "${objective}"`,
-    reasoning:
-      'Compare les modeles de gouvernance, quorum et roles observes dans les references RAG pour suggerer une structure resilient.',
-    action: 'Configurer le module de vote propose et valider la matrice de roles.',
-    summary: 'Structure de gouvernance DAO proposee',
-    outcome: 'Regles de vote et roles definis',
-    payload: {
-      output: 'DAO configuree avec quorum, roles et vote system',
-      nextSteps: ['Deploiement du module DAO', 'Integration Snapshot ou Realms'],
-    },
-    snippets,
-    metrics: { confidence: 0.84, success: true, impact: 'high' },
-    user,
-  });
-};
+Your responsibilities:
+1. Advise on governance models (token-based, multisig, council).
+2. Help with tooling selection (Realms, Squads).
+3. Review proposal structures and voting parameters.
+4. Discuss decentralization roadmaps.
 
+Tone: Diplomatic, structural, thoughtful.`;
+  }
+
+  buildUserPrompt(ctx) {
+    return `User Input: "${ctx.submission || ctx.lastInput}"
+
+Review the governance structure or proposal.`;
+  }
+
+  async run(ctx) {
+    const EVALUATION_SCHEMA = {
+      type: "json_schema",
+      json_schema: {
+        name: "DAOResponse",
+        strict: true,
+        schema: {
+          type: "object",
+          required: ["global_score", "feedback", "axes"],
+          properties: {
+            global_score: { type: "number" },
+            feedback: { type: "string" },
+            axes: {
+              type: "array",
+              items: {
+                type: "object",
+                required: ["name", "score", "max_score", "comment"],
+                properties: {
+                  name: { type: "string" },
+                  score: { type: "number" },
+                  max_score: { type: "number" },
+                  comment: { type: "string" },
+                },
+                additionalProperties: false,
+              },
+            },
+          },
+          additionalProperties: false,
+        },
+      },
+    };
+
+    return super.run(ctx, {
+      response_format: EVALUATION_SCHEMA,
+      temperature: 0.3,
+    });
+  }
+}
+
+module.exports = DAOAgent;

@@ -1,6 +1,9 @@
 // API base URL - configurable via environment variable for different deployments
 export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:3000';
+  import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:3002';
+
+export const SOLANA_API_BASE_URL =
+  import.meta.env.VITE_SOLANA_API_BASE_URL || 'http://127.0.0.1:3001';
 
 // API response interfaces
 export interface AgentScoreboardEntry {
@@ -199,6 +202,36 @@ const request = async <T>(
   return handleResponse<T>(response);
 };
 
+const solanaRequest = async <T>(
+  path: string,
+  options: RequestInit = {}
+): Promise<T> => {
+  const response = await fetch(`${SOLANA_API_BASE_URL}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+    },
+  });
+
+  if (!response.ok) {
+    let message = `Solana API request failed (status ${response.status})`;
+    try {
+      const errorData: ApiError = await response.json();
+      if (errorData?.message) {
+        message = errorData.message;
+      } else if (errorData?.error) {
+        message = errorData.error;
+      }
+    } catch (parseError) {
+      console.error('Failed to parse Solana API error response:', parseError);
+    }
+    throw new Error(message);
+  }
+
+  return response.json() as Promise<T>;
+};
+
 // Helper function to handle API responses
 const handleResponse = async <T>(response: Response): Promise<T> => {
   if (!response.ok) {
@@ -219,6 +252,14 @@ export const api = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
+    }, false);
+  },
+
+  loginWithWallet: async (wallet_address: string): Promise<LoginResponse> => {
+    return request<LoginResponse>('/user/login-wallet', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ wallet_address }),
     }, false);
   },
 
@@ -312,6 +353,15 @@ export const api = {
     return request<any>('/journey/user-progress', {
       method: 'GET',
       headers: getAuthHeaders(),
+    });
+  },
+
+  // Load demo state for a persona
+  loadDemoState: async (personaId: string): Promise<any> => {
+    return request<any>('/journey/load-demo', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ personaId }),
     });
   },
 
@@ -429,20 +479,21 @@ export const api = {
 
   // Solana minting (Next.js API)
   solanaMintSimulate: async (payload: { recipient: string; name: string; symbol: string; uri: string }): Promise<{ ok: boolean; sim: { ok: boolean; estFeeLamports: number; riskScore: number; network: string } }> => {
-    return request(`/api/mint/simulate`, {
+    return solanaRequest(`/api/mint/simulate`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-    }, false)
+    });
   },
 
   solanaMintExecute: async (sim: { ok: boolean; estFeeLamports: number; riskScore: number; network: string }): Promise<{ ok: boolean; tx: { txSig: string } }> => {
     const userId = (typeof window !== 'undefined') ? window.localStorage.getItem('userId') : null
-    return request(`/api/mint/execute`, {
+    return solanaRequest(`/api/mint/execute`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...(userId ? { 'x-user-id': userId } : {}) },
+      headers: {
+        ...(userId ? { 'x-user-id': userId } : {}),
+      },
       body: JSON.stringify({ sim }),
-    }, false)
+    });
   },
 
   getAgentScoreboard: async (adminApiKey: string): Promise<AgentScoreboardResponse> => {

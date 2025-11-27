@@ -18,9 +18,9 @@ describe('TxPage', () => {
     const mod = await import('../../app/tx/page')
     const Component = mod.default
     render(<Component />)
-    const button = screen.getByRole('button', { name: /préparer et envoyer/i })
+    const button = screen.getByRole('button', { name: /prepare and send/i })
     fireEvent.click(button)
-    const msgs = await screen.findAllByText(/connectez un wallet/i)
+    const msgs = await screen.findAllByText(/connect a wallet/i)
     expect(msgs.length).toBeGreaterThan(0)
   })
 })

@@ -89,7 +89,7 @@ describe('WalletContextProvider integration', () => {
     })
 
     expect(adapters).toEqual(
-      expect.arrayContaining(['Phantom', 'Solflare', 'Torus'])
+      expect.arrayContaining(['Solflare', 'Torus'])
     )
 
     const globals = window as Window & {

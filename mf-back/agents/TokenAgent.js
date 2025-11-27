@@ -1,32 +1,66 @@
-const { getRagSnippets } = require('../rag/ragClient');
-const { createAgentResponse } = require('./telemetryUtils');
+const BaseAgent = require('./BaseAgent');
 
-module.exports = async function TokenAgent(agentInput = {}, context = {}) {
-  const user = agentInput.user || context.user || { id: 'demo_user' };
-  const phase = agentInput.phase || context.phase || 'Token';
-  const intent = context.intent || agentInput.intent || null;
-  const objective =
-    agentInput.objective || context.objective || agentInput.input || context.input || 'modele tokenomics';
+class TokenAgent extends BaseAgent {
+  constructor() {
+    super("TokenAgent");
+  }
 
-  const snippets = await getRagSnippets({ query: objective, userContext: user });
+  buildSystemPrompt(ctx) {
+    return `You are the **TokenAgent**, a specialist in SPL Tokens and fungible assets.
+Your goal is to help the user mint and manage their tokens.
 
-  return createAgentResponse('TokenAgent', {
-    phase,
-    intent,
-    objective,
-    prompt: `Elaborer l'architecture tokenomics pour "${objective}"`,
-    reasoning:
-      'Compare les allocations, vesting et references de tokens similaires pour proposer un schema equitable.',
-    action: 'Generer le smart contract SPL avec les parametres recommandes.',
-    summary: 'Modele tokenomics genere',
-    outcome: 'Architecture de jeton SPL prete a deployer',
-    payload: {
-      output: 'Distribution, vesting et utilite du token definis',
-      nextSteps: ['Generation du smart contract SPL'],
-    },
-    snippets,
-    metrics: { confidence: 0.9, success: true, impact: 'high' },
-    user,
-  });
-};
+Your responsibilities:
+1. Advise on token standards (SPL, Token-2022).
+2. Help with supply management (minting, burning, freezing).
+3. Discuss token extensions (transfer hooks, confidential transfers).
+4. Review token metadata.
 
+Tone: Precise, economic, technical.`;
+  }
+
+  buildUserPrompt(ctx) {
+    return `User Input: "${ctx.submission || ctx.lastInput}"
+
+Review the token configuration or strategy.`;
+  }
+
+  async run(ctx) {
+    const EVALUATION_SCHEMA = {
+      type: "json_schema",
+      json_schema: {
+        name: "TokenResponse",
+        strict: true,
+        schema: {
+          type: "object",
+          required: ["global_score", "feedback", "axes"],
+          properties: {
+            global_score: { type: "number" },
+            feedback: { type: "string" },
+            axes: {
+              type: "array",
+              items: {
+                type: "object",
+                required: ["name", "score", "max_score", "comment"],
+                properties: {
+                  name: { type: "string" },
+                  score: { type: "number" },
+                  max_score: { type: "number" },
+                  comment: { type: "string" },
+                },
+                additionalProperties: false,
+              },
+            },
+          },
+          additionalProperties: false,
+        },
+      },
+    };
+
+    return super.run(ctx, {
+      response_format: EVALUATION_SCHEMA,
+      temperature: 0.3,
+    });
+  }
+}
+
+module.exports = TokenAgent;
