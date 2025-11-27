@@ -471,7 +471,7 @@ const GuidePage = () => {
                                 <h3 className="text-2xl font-bold text-white mb-6 text-center">The Launch Lifecycle</h3>
                                 <div className="relative">
                                     {/* Connecting Line */}
-                                    <div className="absolute left-[15px] top-8 h-[calc(100%-60px)] w-0.5 bg-gradient-to-b from-indigo-500 to-pink-500 md:left-1/2 md:-ml-0.5 md:h-0.5 md:w-full md:top-[15px]"></div>
+                                    <div className="absolute left-[15px] top-8 h-[calc(100%-60px)] w-0.5 bg-gradient-to-b from-indigo-500 to-pink-500 md:left-0 md:h-0.5 md:w-full md:top-[15px]"></div>
 
                                     <div className="grid gap-8 md:grid-cols-4">
                                         {[
