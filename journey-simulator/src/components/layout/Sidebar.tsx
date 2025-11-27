@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Compass, Cpu, Gauge, Home, Layers, LifeBuoy, Network, Rocket } from 'lucide-react';
+import { Compass, Cpu, Gauge, Home, Layers, LifeBuoy, Network, Rocket, Book } from 'lucide-react';
 import { useJourneyStore } from '../../store/journeyStore';
 
 const navItems = [
@@ -10,6 +10,7 @@ const navItems = [
   { to: '/playground', label: 'Playground', icon: Rocket },
   { to: '/dao', label: 'DAO Hub', icon: Network },
   { to: '/resources', label: 'Resources', icon: Layers },
+  { to: '/guide', label: 'Platform Guide', icon: Book },
   { to: '/support', label: 'Help Center', icon: LifeBuoy },
 ];
 

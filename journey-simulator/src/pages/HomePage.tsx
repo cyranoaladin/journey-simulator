@@ -75,6 +75,7 @@ const navLinks = [
   { label: 'Missions', to: '#journeys' },
   { label: 'Command Console', to: '#console' },
   { label: 'Playground', to: '#playground' },
+  { label: 'Platform Guide', to: '/guide' },
   { label: 'Authenticate', to: '/login' }
 ] as const
 
@@ -377,11 +378,10 @@ const HomePage = () => {
                         key={label}
                         type="button"
                         onClick={() => setPhaseIndex(index)}
-                        className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
-                          isActive
+                        className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${isActive
                             ? 'border-white/40 bg-white/15 text-white'
                             : 'border-white/10 bg-transparent text-white/60 hover:border-white/30 hover:text-white'
-                        }`}
+                          }`}
                       >
                         {label}
                       </button>

@@ -18,6 +18,7 @@ import Support from './pages/Support';
 import Zyno from './pages/Zyno';
 import JourneyCompleted from './pages/JourneyCompleted';
 import HomePage from './pages/HomePage';
+import GuidePage from './pages/GuidePage';
 
 const ProtectedLayout = () => (
   <ProtectedRoute>
@@ -80,6 +81,8 @@ function App() {
                 <Route path="resources" element={<Resources />} />
                 <Route path="support" element={<Support />} />
                 <Route path="zyno" element={<Zyno />} />
+                <Route path="zyno" element={<Zyno />} />
+                <Route path="guide" element={<GuidePage />} />
               </Route>
 
               <Route path="*" element={<Navigate to="/" replace />} />
