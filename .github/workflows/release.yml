@@ -12,14 +12,6 @@ jobs:
     defaults:
       run:
         working-directory: web
-    env:
-      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-      DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -36,6 +28,22 @@ jobs:
         run: npx playwright install --with-deps
       - name: Run E2E tests
         run: npm run test:e2e
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: ../journey-simulator
+
+      - name: Build Storybook bundle
+        run: npm run build-storybook
+        working-directory: ../journey-simulator
+
+      - name: Install Playwright Browsers (journey-simulator)
+        run: npx playwright install --with-deps
+        working-directory: ../journey-simulator
+
+      - name: Run E2E tests (journey-simulator)
+        run: npm run test:e2e
+        working-directory: ../journey-simulator
 
       - name: Upload coverage artifact (lcov)
         if: always()
@@ -61,8 +69,32 @@ jobs:
           path: web/playwright-report
           if-no-files-found: ignore
 
+      - name: Upload Storybook bundle (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-static
+          path: journey-simulator/storybook-static
+          if-no-files-found: ignore
+
+      - name: Upload Playwright report (journey-simulator, always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-journey-simulator
+          path: journey-simulator/playwright-report
+          if-no-files-found: ignore
+
+      - name: Upload Playwright test-results (journey-simulator, always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results-journey-simulator
+          path: journey-simulator/test-results
+          if-no-files-found: ignore
+
       - name: Create Sentry release + upload sourcemaps (optional)
-        if: env.SENTRY_AUTH_TOKEN != '' && env.SENTRY_ORG != '' && env.SENTRY_PROJECT != ''
+        if: secrets.SENTRY_AUTH_TOKEN != '' && secrets.SENTRY_ORG != '' && secrets.SENTRY_PROJECT != ''
         uses: getsentry/action-release@v1
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
@@ -71,21 +103,65 @@ jobs:
         with:
           environment: production
           version: ${{ github.ref_name }}
-          projects: ${{ env.SENTRY_PROJECT }}
+          projects: ${{ secrets.SENTRY_PROJECT }}
           sourcemaps: './web/.next'
 
       - name: Log in to Docker registry (optional)
-        if: env.DOCKER_REGISTRY != '' && env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' && env.DOCKER_IMAGE != ''
+        if: secrets.DOCKER_REGISTRY != '' && secrets.DOCKER_USERNAME != '' && secrets.DOCKER_PASSWORD != '' && secrets.DOCKER_IMAGE != ''
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.DOCKER_REGISTRY }}
-          username: ${{ env.DOCKER_USERNAME }}
-          password: ${{ env.DOCKER_PASSWORD }}
+          registry: ${{ secrets.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push Docker image (optional)
-        if: env.DOCKER_REGISTRY != '' && env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' && env.DOCKER_IMAGE != ''
+        if: secrets.DOCKER_REGISTRY != '' && secrets.DOCKER_USERNAME != '' && secrets.DOCKER_PASSWORD != '' && secrets.DOCKER_IMAGE != ''
         uses: docker/build-push-action@v6
         with:
           context: ./web
           push: true
-          tags: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE }}:${{ github.ref_name }}
+          tags: ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_IMAGE }}:${{ github.ref_name }}
+
+  deploy-migrate:
+    runs-on: ubuntu-latest
+    needs: release
+    defaults:
+      run:
+        working-directory: web
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - name: Run Prisma migrate deploy (prod)
+        if: ${{ env.DATABASE_URL != '' }}
+        run: npm run migrate:deploy
+
+  post-deploy-health:
+    runs-on: ubuntu-latest
+    needs: deploy-migrate
+    env:
+      HEALTHCHECK_BASE_URL: ${{ secrets.HEALTHCHECK_BASE_URL }}
+      ADMIN_API_KEY: ${{ secrets.ADMIN_API_KEY }}
+    steps:
+      - name: Check /api/healthz
+        if: ${{ env.HEALTHCHECK_BASE_URL != '' }}
+        run: |
+          set -euo pipefail
+          echo "Checking $HEALTHCHECK_BASE_URL/api/healthz"
+          body=$(curl -fsSL "$HEALTHCHECK_BASE_URL/api/healthz")
+          echo "$body"
+          echo "$body" | grep -q '"ok"' || (echo "healthz missing ok" && exit 1)
+      - name: Smoke test /admin/state (x-api-key)
+        if: ${{ env.HEALTHCHECK_BASE_URL != '' && env.ADMIN_API_KEY != '' }}
+        run: |
+          set -euo pipefail
+          echo "Checking $HEALTHCHECK_BASE_URL/admin/state"
+          html=$(curl -fsSL -H "x-api-key: $ADMIN_API_KEY" "$HEALTHCHECK_BASE_URL/admin/state")
+          echo "$html" | head -c 5000
+          echo "$html" | grep -qi 'JourneyState' || (echo "admin state did not render" && exit 1)

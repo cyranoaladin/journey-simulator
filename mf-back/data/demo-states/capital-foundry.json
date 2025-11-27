@@ -1,0 +1,97 @@
+{
+    "persona_id": "capital-foundry",
+    "demo_name": "DeFi Protocol Builder Demo",
+    "current_phase_index": 4,
+    "completed_phases": [
+        0,
+        1,
+        2,
+        3
+    ],
+    "total_xp": 3800,
+    "current_level": 4,
+    "journey_state": {
+        "completed_missions": [
+            "tokenomics_design",
+            "liquidity_pool_setup",
+            "yield_optimization",
+            "risk_assessment",
+            "protocol_launch_prep"
+        ],
+        "unlocked_features": [
+            "advanced_defi_tools",
+            "investor_network",
+            "audit_access"
+        ],
+        "context": {
+            "user_project": "Automated Yield Optimizer on Solana",
+            "focus_area": "DeFi protocols and tokenomics",
+            "experience_level": "advanced",
+            "investment_thesis": "Sustainable yield generation through algorithmic strategies"
+        }
+    },
+    "nft_certificates": [
+        {
+            "phase": 1,
+            "title": "Tokenomics Architect",
+            "description": "Designed comprehensive tokenomics model with sustainable incentives",
+            "mint_address": "DEMO_NFT_CF_1",
+            "score": 9.8,
+            "rarity": "legendary",
+            "mint_date": "2025-01-10T09:00:00Z"
+        },
+        {
+            "phase": 2,
+            "title": "Liquidity Master",
+            "description": "Implemented efficient liquidity pool mechanisms",
+            "mint_address": "DEMO_NFT_CF_2",
+            "score": 9.3,
+            "rarity": "epic",
+            "mint_date": "2025-01-25T11:20:00Z"
+        },
+        {
+            "phase": 3,
+            "title": "Yield Strategist",
+            "description": "Created advanced yield optimization strategies",
+            "mint_address": "DEMO_NFT_CF_3",
+            "score": 9.5,
+            "rarity": "epic",
+            "mint_date": "2025-02-08T15:30:00Z"
+        },
+        {
+            "phase": 4,
+            "title": "Risk Commander",
+            "description": "Comprehensive risk assessment and mitigation plan",
+            "mint_address": "DEMO_NFT_CF_4",
+            "score": 9.0,
+            "rarity": "epic",
+            "mint_date": "2025-02-20T13:45:00Z"
+        }
+    ],
+    "agent_history": [
+        {
+            "agent": "TokenomicsAgent",
+            "action": "Evaluated token utility, supply model, and incentive mechanisms",
+            "timestamp": "2025-01-10T09:00:00Z",
+            "feedback": "Exceptional economic design with long-term sustainability"
+        },
+        {
+            "agent": "ProtocolAgent",
+            "action": "Reviewed DeFi protocol architecture and scalability",
+            "timestamp": "2025-01-25T11:20:00Z",
+            "feedback": "Highly optimized for Solana's throughput"
+        },
+        {
+            "agent": "SecurityAgent",
+            "action": "Conducted security audit and risk analysis",
+            "timestamp": "2025-02-20T13:45:00Z",
+            "feedback": "Robust security measures implemented"
+        }
+    ],
+    "demo_highlights": [
+        "Completed 4 phases with exceptional scores (avg 9.4/10)",
+        "Earned 4 NFT certificates (1 legendary, 3 epic)",
+        "Designed sustainable DeFi protocol",
+        "Ready for investor pitch and mainnet launch"
+    ]
+}

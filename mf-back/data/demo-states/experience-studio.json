@@ -1,0 +1,80 @@
+{
+    "persona_id": "experience-studio",
+    "demo_name": "NFT Metaverse Creator Demo",
+    "current_phase_index": 3,
+    "completed_phases": [
+        0,
+        1,
+        2
+    ],
+    "total_xp": 2900,
+    "current_level": 3,
+    "journey_state": {
+        "completed_missions": [
+            "ux_design",
+            "nft_collection_design",
+            "gamification_mechanics",
+            "community_engagement"
+        ],
+        "unlocked_features": [
+            "design_tools",
+            "creator_network",
+            "marketplace_access"
+        ],
+        "context": {
+            "user_project": "Interactive NFT Collection with Utility",
+            "focus_area": "UX design and creative direction",
+            "experience_level": "intermediate",
+            "creative_vision": "Blend art, utility, and community engagement"
+        }
+    },
+    "nft_certificates": [
+        {
+            "phase": 1,
+            "title": "UX Visionary",
+            "description": "Created exceptional user experience for NFT platform",
+            "mint_address": "DEMO_NFT_ES_1",
+            "score": 9.0,
+            "rarity": "epic",
+            "mint_date": "2025-01-18T11:00:00Z"
+        },
+        {
+            "phase": 2,
+            "title": "NFT Artist",
+            "description": "Designed compelling NFT collection with strong narrative",
+            "mint_address": "DEMO_NFT_ES_2",
+            "score": 8.8,
+            "rarity": "rare",
+            "mint_date": "2025-02-02T15:30:00Z"
+        },
+        {
+            "phase": 3,
+            "title": "Gamification Master",
+            "description": "Implemented engaging gamification mechanics",
+            "mint_address": "DEMO_NFT_ES_3",
+            "score": 9.2,
+            "rarity": "epic",
+            "mint_date": "2025-02-15T13:45:00Z"
+        }
+    ],
+    "agent_history": [
+        {
+            "agent": "DesignAgent",
+            "action": "Evaluated UX flow and visual aesthetics",
+            "timestamp": "2025-01-18T11:00:00Z",
+            "feedback": "Delightful user experience with strong brand identity"
+        },
+        {
+            "agent": "GrowthAgent",
+            "action": "Reviewed community engagement and marketing strategy",
+            "timestamp": "2025-02-15T13:45:00Z",
+            "feedback": "Strong viral mechanics and retention hooks"
+        }
+    ],
+    "demo_highlights": [
+        "Completed 3 phases with creative excellence (avg 9.0/10)",
+        "Earned 3 NFT certificates (2 epic, 1 rare)",
+        "Designed interactive NFT collection",
+        "Ready for marketplace launch"
+    ]
+}

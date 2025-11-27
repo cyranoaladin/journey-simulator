@@ -78,7 +78,7 @@ export function AgentScoreboardProvider({ children }: AgentScoreboardProviderPro
       console.error('Failed to load agent scoreboard:', error)
       setState({
         loading: false,
-        error: error instanceof Error ? error.message : 'Chargement impossible',
+        error: error instanceof Error ? error.message : 'Unable to load',
         lastUpdated: null,
         data: []
       })

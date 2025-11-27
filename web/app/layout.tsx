@@ -7,13 +7,11 @@ export const metadata: Metadata = {
   description: 'Premium dashboard front (Next.js) — browser-first',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }){
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
       <body>
-        <WalletProvider>
-          {children}
-        </WalletProvider>
+        <WalletProvider>{children}</WalletProvider>
       </body>
     </html>
   )

@@ -23,26 +23,26 @@ interface FaqItem {
 const faqs: FaqItem[] = [
   {
     id: 'dao-quorum',
-    question: 'Comment atteindre rapidement le quorum DAO ?',
-    answer: 'Active ton staking MFAI, attribue du voting power aux comptes opérationnels clés et programme un rappel Zyno pour relancer les votants qui n\'ont pas signé. Utilise la console DAO pour suivre le pourcentage d\'atteinte en direct.',
+    question: 'How to quickly reach DAO quorum?',
+    answer: 'Activate your MFAI staking, assign voting power to key operational accounts, and schedule a Zyno reminder to nudge voters who haven\'t signed. Use the DAO console to track achievement percentage live.',
     category: 'DAO'
   },
   {
     id: 'resources-sync',
-    question: 'Où trouver les templates AEPO / AECO ?',
-    answer: 'Rends-toi dans la section Resources et filtre par tag "Analytics". Télécharge le playbook Mission Feedback Loops puis connecte-le au module d\'ingestion RAG pour propulser les agents.',
+    question: 'Where to find AEPO / AECO templates?',
+    answer: 'Go to the Resources section and filter by "Analytics" tag. Download the Mission Feedback Loops playbook then connect it to the RAG ingestion module to power the agents.',
     category: 'Resources'
   },
   {
     id: 'support-wallet',
-    question: 'Je n\'arrive pas à connecter mon wallet.',
-    answer: 'Vérifie les autorisations Phantom/Torus dans ton navigateur, puis réinitialise la session via Wallet Connection Banner. Si le problème persiste, ouvre un ticket support avec la console Zyno (type "wallet" + capture).',
+    question: 'I cannot connect my wallet.',
+    answer: 'Check Phantom/Torus permissions in your browser, then reset the session via Wallet Connection Banner. If the issue persists, open a support ticket with the Zyno console (type "wallet" + screenshot).',
     category: 'Support'
   },
   {
     id: 'mission-reset',
-    question: 'Puis-je relancer un parcours depuis zéro ?',
-    answer: 'Oui, utilise le bouton Reset dans Journeys pour effacer ta progression locale, puis demande à Zyno un nouveau script de missions en sélectionnant la persona souhaitée. Les XP et NFTs resteront archivés dans ton profil.',
+    question: 'Can I restart a journey from scratch?',
+    answer: 'Yes, use the Reset button in Journeys to clear your local progress, then ask Zyno for a new mission script by selecting the desired persona. XP and NFTs will remain archived in your profile.',
     category: 'Support'
   }
 ]
@@ -69,11 +69,11 @@ const SupportCenter = () => {
               Support & QA Hub
             </span>
             <h1 className="text-3xl font-semibold lg:text-4xl">
-              Obtiens de l\'aide en temps réel et partage tes feedbacks avec Zyno
+              Get real-time help and share your feedback with Zyno
             </h1>
             <p className="text-sm text-white/75 lg:text-base">
-              Les builders ne devraient jamais être bloqués. Déploie la knowledge base, contacte un agent humain ou
-              lance un diagnostic automatique sur ton parcours.
+              Builders should never be stuck. Deploy the knowledge base, contact a human agent, or
+              run an automatic diagnostic on your journey.
             </p>
           </div>
           <motion.div
@@ -83,21 +83,21 @@ const SupportCenter = () => {
             className="glass-effect flex max-w-sm flex-col gap-3 rounded-2xl border border-white/10 bg-white/10 p-6"
           >
             <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-white/70">
-              <span>Modes d\'assistance</span>
+              <span>Assistance Modes</span>
               <Sparkles size={16} className="text-accent-neon" />
             </div>
             <div className="space-y-3 text-sm text-white/75">
               <div className="flex items-center gap-3">
                 <Bot size={18} />
-                <span>Requêtes guidées via Zyno</span>
+                <span>Guided queries via Zyno</span>
               </div>
               <div className="flex items-center gap-3">
                 <Headphones size={18} />
-                <span>Escalade vers l'équipe MFAI (24h)</span>
+                <span>Escalation to MFAI team (24h)</span>
               </div>
               <div className="flex items-center gap-3">
                 <ShieldAlert size={18} />
-                <span>Alertes incidents critiques</span>
+                <span>Critical incident alerts</span>
               </div>
             </div>
           </motion.div>
@@ -108,16 +108,16 @@ const SupportCenter = () => {
         <article className="glass-effect flex h-full flex-col gap-4 rounded-3xl border border-white/10 bg-white/5 p-6 text-white">
           <div className="inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.3em] text-white/60">
             <MessageSquare size={18} />
-            Chat Zyno
+            Zyno Chat
           </div>
           <p className="text-sm text-white/70">
-            Laisse Zyno contextualiser ton blocage et obtenir des recommandations étape par étape. Utilise la commande « aide moi » dans la console.
+            Let Zyno contextualize your blocker and get step-by-step recommendations. Use the "help me" command in the console.
           </p>
           <button
             type="button"
             className="mt-auto inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-white/20"
           >
-            Ouvrir la console
+            Open Console
             <ArrowRight size={14} />
           </button>
         </article>
@@ -125,16 +125,16 @@ const SupportCenter = () => {
         <article className="glass-effect flex h-full flex-col gap-4 rounded-3xl border border-white/10 bg-white/5 p-6 text-white">
           <div className="inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.3em] text-white/60">
             <Mail size={18} />
-            Email mission control
+            Mission Control Email
           </div>
           <p className="text-sm text-white/70">
-            Décris ton problème avec captures, wallet et mission. Nous répondons sous 24h UTC avec un plan d\'action.
+            Describe your issue with screenshots, wallet, and mission. We respond within 24h UTC with an action plan.
           </p>
           <a
             href="mailto:support@moneyfactory.ai"
             className="mt-auto inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white/80 transition hover:bg-white/20"
           >
-            Envoyer un email
+            Send Email
             <ArrowRight size={14} />
           </a>
         </article>
@@ -145,13 +145,13 @@ const SupportCenter = () => {
             QA Checklist
           </div>
           <p className="text-sm text-white/70">
-            Passe en revue l\'audit responsive, connectivité wallet et synchronisation backend avant chaque démo.
+            Review the responsive audit, wallet connectivity, and backend synchronization before each demo.
           </p>
           <button
             type="button"
             className="mt-auto inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-white/20"
           >
-            Télécharger la checklist
+            Download Checklist
             <ArrowRight size={14} />
           </button>
         </article>
@@ -160,14 +160,14 @@ const SupportCenter = () => {
       <section className="space-y-6">
         <header className="flex flex-wrap items-center justify-between gap-3 text-white">
           <div>
-            <h2 className="text-xl font-semibold">FAQ pilotée</h2>
+            <h2 className="text-xl font-semibold">Guided FAQ</h2>
             <p className="text-sm text-white/60">
-              Filtre par thématique et ouvre un ticket si une réponse manque.
+              Filter by topic and open a ticket if an answer is missing.
             </p>
           </div>
           <div className="inline-flex items-center gap-2 rounded-full border border-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white/60">
             <UserCheck size={14} />
-            {displayedFaqs.length} résultats
+            {displayedFaqs.length} results
           </div>
         </header>
 
@@ -179,11 +179,10 @@ const SupportCenter = () => {
                 key={category}
                 type="button"
                 onClick={() => setActiveCategory(category)}
-                className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] transition ${
-                  isActive
-                    ? 'bg-gradient-accent text-white shadow-glow'
-                    : 'bg-white/5 text-white/60 hover:bg-white/10'
-                }`}
+                className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] transition ${isActive
+                  ? 'bg-gradient-accent text-white shadow-glow'
+                  : 'bg-white/5 text-white/60 hover:bg-white/10'
+                  }`}
               >
                 {category}
               </button>

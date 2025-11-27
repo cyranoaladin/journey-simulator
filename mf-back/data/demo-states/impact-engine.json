@@ -1,0 +1,95 @@
+{
+    "persona_id": "impact-engine",
+    "demo_name": "Social Impact DAO Demo",
+    "current_phase_index": 4,
+    "completed_phases": [
+        0,
+        1,
+        2,
+        3
+    ],
+    "total_xp": 3500,
+    "current_level": 4,
+    "journey_state": {
+        "completed_missions": [
+            "dao_design",
+            "governance_model",
+            "impact_measurement",
+            "community_building",
+            "grant_proposal"
+        ],
+        "unlocked_features": [
+            "dao_tools",
+            "governance_framework",
+            "impact_metrics"
+        ],
+        "context": {
+            "user_project": "Climate Action DAO for Carbon Credits",
+            "focus_area": "Governance and social impact",
+            "experience_level": "advanced",
+            "impact_goals": [
+                "Transparent governance",
+                "Measurable impact",
+                "Community alignment"
+            ]
+        }
+    },
+    "nft_certificates": [
+        {
+            "phase": 1,
+            "title": "DAO Architect",
+            "description": "Designed equitable and transparent DAO structure",
+            "mint_address": "DEMO_NFT_IE_1",
+            "score": 9.7,
+            "rarity": "legendary",
+            "mint_date": "2025-01-14T09:30:00Z"
+        },
+        {
+            "phase": 2,
+            "title": "Governance Expert",
+            "description": "Created robust governance model with sybil resistance",
+            "mint_address": "DEMO_NFT_IE_2",
+            "score": 9.4,
+            "rarity": "epic",
+            "mint_date": "2025-01-30T12:00:00Z"
+        },
+        {
+            "phase": 3,
+            "title": "Impact Measurer",
+            "description": "Implemented comprehensive impact tracking system",
+            "mint_address": "DEMO_NFT_IE_3",
+            "score": 9.1,
+            "rarity": "epic",
+            "mint_date": "2025-02-12T14:30:00Z"
+        },
+        {
+            "phase": 4,
+            "title": "Community Steward",
+            "description": "Built engaged and aligned community",
+            "mint_address": "DEMO_NFT_IE_4",
+            "score": 8.9,
+            "rarity": "rare",
+            "mint_date": "2025-02-25T16:00:00Z"
+        }
+    ],
+    "agent_history": [
+        {
+            "agent": "GovernanceAgent",
+            "action": "Evaluated DAO structure and voting mechanisms",
+            "timestamp": "2025-01-14T09:30:00Z",
+            "feedback": "Exceptional governance design with strong alignment"
+        },
+        {
+            "agent": "TokenomicsAgent",
+            "action": "Reviewed token utility and incentive alignment",
+            "timestamp": "2025-01-30T12:00:00Z",
+            "feedback": "Sustainable tokenomics supporting long-term impact"
+        }
+    ],
+    "demo_highlights": [
+        "Completed 4 phases with impact focus (avg 9.3/10)",
+        "Earned 4 NFT certificates (1 legendary, 2 epic, 1 rare)",
+        "Designed climate action DAO",
+        "Ready for grant applications and community launch"
+    ]
+}

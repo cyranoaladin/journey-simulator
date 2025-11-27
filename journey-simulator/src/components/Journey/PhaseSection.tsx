@@ -1,6 +1,8 @@
 import type { FC } from 'react';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { JourneyPhase } from '../../types/journey';
+import type { AgentTimelineEntry } from '../Zyno/types';
 import {
   CheckCircle,
   Trophy,
@@ -23,6 +25,10 @@ import {
 } from 'lucide-react';
 import { getProofType } from '../../data/proofsData';
 import { useJourneyStore } from '../../store/journeyStore';
+import PhaseInteractionBlock from './PhaseInteractionBlock';
+import UIBlocksRenderer from '../UIBlocks/UIBlocksRenderer';
+import MintCelebrationBanner from '../MintCelebrationBanner';
+import type { JourneyStepResponse } from '../../types/uiBlocks';
 
 interface PhaseSectionProps {
   phase: JourneyPhase;
@@ -34,6 +40,8 @@ interface PhaseSectionProps {
   onStake?: () => void;
   onVote?: () => void;
   isProcessing?: boolean;
+  activeStep?: AgentTimelineEntry | null;
+  onFeedbackRequest?: (step: AgentTimelineEntry) => void;
 }
 
 const PhaseSection: FC<PhaseSectionProps> = ({
@@ -46,8 +54,11 @@ const PhaseSection: FC<PhaseSectionProps> = ({
   onStake,
   onVote,
   isProcessing = false,
+  activeStep,
+  onFeedbackRequest,
 }) => {
-  const { selectedPersona } = useJourneyStore();
+  const { selectedPersona, lastStep, runInteractiveStep, uiMode, uiTone, setUiMode, setUiTone, openModal, isStepLoading } = useJourneyStore();
+  const [stepError, setStepError] = useState<string | null>(null);
 
   const highlightText = (text: string) =>
     text.replace(
@@ -126,22 +137,20 @@ const PhaseSection: FC<PhaseSectionProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`border-2 rounded-xl p-6 transition-all duration-300 ${
-        isCompleted
-          ? 'border-green-500 bg-green-500/10'
-          : isCurrent
+      className={`border-2 rounded-xl p-6 transition-all duration-300 ${isCompleted
+        ? 'border-green-500 bg-green-500/10'
+        : isCurrent
           ? 'border-primary-500 bg-primary-500/10'
           : isLocked
-          ? 'border-gray-600 bg-gray-600/10'
-          : 'border-gray-500 bg-gray-500/10'
-      }`}
+            ? 'border-gray-600 bg-gray-600/10'
+            : 'border-gray-500 bg-gray-500/10'
+        }`}
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
           <div
-            className={`p-2 rounded-lg ${
-              isCompleted ? 'bg-green-500' : isCurrent ? 'bg-primary-500' : 'bg-gray-600'
-            }`}
+            className={`p-2 rounded-lg ${isCompleted ? 'bg-green-500' : isCurrent ? 'bg-primary-500' : 'bg-gray-600'
+              }`}
           >
             {getPhaseIcon()}
           </div>
@@ -171,6 +180,14 @@ const PhaseSection: FC<PhaseSectionProps> = ({
       </div>
 
       <p className="text-sm opacity-90 mb-4">{phase.description}</p>
+
+      <div className="mb-4">
+        <PhaseInteractionBlock
+          phaseId={phase.id}
+          currentStep={activeStep ?? null}
+          onFeedback={onFeedbackRequest}
+        />
+      </div>
 
       <div className="bg-white/5 rounded-lg p-3 mb-4">
         <h4 className="font-semibold text-sm mb-2">Mission</h4>
@@ -211,6 +228,101 @@ const PhaseSection: FC<PhaseSectionProps> = ({
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Interactive UI Blocks (Zyno) */}
+      <div className="mb-4 space-y-2">
+        <div className="flex items-center justify-between">
+          <h4 className="font-semibold text-sm">Interactive Phase (Zyno)</h4>
+          <div className="flex items-center gap-2 text-xs">
+            <select
+              value={uiMode}
+              onChange={(e) => setUiMode(e.target.value as any)}
+              className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white rounded px-2 py-1 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              <option value="discovery">Discovery</option>
+              <option value="builder">Builder</option>
+              <option value="expert">Expert</option>
+            </select>
+            <select
+              value={uiTone}
+              onChange={(e) => setUiTone(e.target.value as any)}
+              className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white rounded px-2 py-1 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              <option value="pedagogical">Pedagogical</option>
+              <option value="investor_pitch">Investor Pitch</option>
+              <option value="critical">Critical</option>
+            </select>
+            <button
+              className="px-3 py-1.5 rounded bg-gradient-primary text-white"
+              onClick={async () => {
+                try {
+                  setStepError(null)
+                  await runInteractiveStep({ phaseId: phase.id, trackId: selectedPersona?.id || 'track' })
+                } catch (e: any) {
+                  setStepError(e?.message || 'Error loading phase.')
+                }
+              }}
+              disabled={isProcessing || isStepLoading}
+            >
+              {isStepLoading ? <Loader2 size={14} className="animate-spin" /> : 'Launch Step'}
+            </button>
+          </div>
+        </div>
+        {stepError && (
+          <div className="mb-2 rounded-lg border border-red-500/40 bg-red-600/15 text-red-200 text-xs px-3 py-2">
+            {stepError}
+          </div>
+        )}
+        {lastStep && (
+          <>
+            {/* Mint celebration banner when evaluation score is high */}
+            {(() => {
+              try {
+                const evalBlock = (lastStep as any)?.ui_blocks?.find((b: any) => b.kind === 'evaluation_block')
+                if (!evalBlock) return null
+                const score = Number(evalBlock.global_score || 0)
+                const maxScore = Number(evalBlock.max_score || 100)
+                const threshold = Math.max(70, Math.round(maxScore * 0.6))
+                if (score < threshold) return null
+                const phaseId = (lastStep as any)?.metadata?.phase_id || 'phase'
+                return (
+                  <div className="mb-2">
+                    <MintCelebrationBanner
+                      score={score}
+                      maxScore={maxScore}
+                      phaseId={phaseId}
+                      onMint={() => {
+                        const cert = {
+                          id: `proof-${phaseId}`,
+                          name: `Proof-of-Skill™: ${phaseId}`,
+                          description: evalBlock.feedback || 'Skill certification',
+                          imageUrl: '',
+                          attributes: [
+                            { trait_type: 'Score', value: `${score}/${maxScore}` },
+                            { trait_type: 'Phase', value: phaseId },
+                          ]
+                        }
+                        openModal({ type: 'certification', certification: cert })
+                      }}
+                    />
+                  </div>
+                )
+              } catch { return null }
+            })()}
+            {isStepLoading ? (
+              <div className="rounded-xl border border-white/10 p-4">
+                <div className="animate-pulse space-y-3">
+                  <div className="h-4 bg-white/10 rounded w-1/3" />
+                  <div className="h-24 bg-white/10 rounded" />
+                  <div className="h-4 bg-white/10 rounded w-1/2" />
+                </div>
+              </div>
+            ) : (
+              <UIBlocksRenderer response={lastStep as JourneyStepResponse} />
+            )}
+          </>
+        )}
       </div>
 
       <div className="mb-4">
@@ -287,11 +399,10 @@ const PhaseSection: FC<PhaseSectionProps> = ({
         whileTap={{ scale: buttonState.disabled ? 1 : 0.98 }}
         onClick={handlePhaseCompletion}
         disabled={buttonState.disabled}
-        className={`w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 ${
-          buttonState.disabled
-            ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-            : 'bg-gradient-primary text-white hover:shadow-lg'
-        }`}
+        className={`w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 ${buttonState.disabled
+          ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+          : 'bg-gradient-primary text-white hover:shadow-lg'
+          }`}
       >
         {buttonState.icon}
         <span>{buttonState.text}</span>
@@ -316,11 +427,10 @@ const PhaseSection: FC<PhaseSectionProps> = ({
             whileTap={{ scale: 0.98 }}
             onClick={onStake}
             disabled={isLocked || isProcessing}
-            className={`py-2 px-4 rounded-lg transition-all flex items-center justify-center space-x-2 ${
-              isLocked || isProcessing
-                ? 'border border-gray-600 text-gray-500 cursor-not-allowed'
-                : 'border border-accent-cyan text-accent-cyan hover:bg-accent-cyan hover:text-black'
-            }`}
+            className={`py-2 px-4 rounded-lg transition-all flex items-center justify-center space-x-2 ${isLocked || isProcessing
+              ? 'border border-gray-600 text-gray-500 cursor-not-allowed'
+              : 'border border-accent-cyan text-accent-cyan hover:bg-accent-cyan hover:text-black'
+              }`}
           >
             <Coins size={16} />
             <span>Stake $MFAI</span>
@@ -333,11 +443,10 @@ const PhaseSection: FC<PhaseSectionProps> = ({
             whileTap={{ scale: 0.98 }}
             onClick={onVote}
             disabled={isLocked || isProcessing}
-            className={`py-2 px-4 rounded-lg transition-all flex items-center justify-center space-x-2 ${
-              isLocked || isProcessing
-                ? 'border border-gray-600 text-gray-500 cursor-not-allowed'
-                : 'border border-accent-purple text-accent-purple hover:bg-accent-purple hover:text-white'
-            }`}
+            className={`py-2 px-4 rounded-lg transition-all flex items-center justify-center space-x-2 ${isLocked || isProcessing
+              ? 'border border-gray-600 text-gray-500 cursor-not-allowed'
+              : 'border border-accent-purple text-accent-purple hover:bg-accent-purple hover:text-white'
+              }`}
           >
             <Vote size={16} />
             <span>DAO Vote</span>

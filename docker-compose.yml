@@ -14,7 +14,7 @@ services:
       MONGO_URI: mongodb://mongo:27017/journey
       ADMIN_API_KEY: change-me
     ports:
-      - "3000:3000"
+      - "3002:3000"
     volumes:
       - ./mf-back:/usr/src/app
       - api-node-modules:/usr/src/app/node_modules
@@ -26,16 +26,47 @@ services:
     image: mongo:6
     restart: unless-stopped
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
       - mongo-data:/data/db
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      test: [ "CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')" ]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
 
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: prisma
+      POSTGRES_USER: prisma
+      POSTGRES_PASSWORD: prisma
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "prisma" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  journey-web:
+    build:
+      context: ./journey-simulator
+      dockerfile: Dockerfile
+    environment:
+      VITE_API_BASE_URL: http://localhost:3002
+    ports:
+      - "3003:80"
+    depends_on:
+      - api
+
 volumes:
   mongo-data:
   api-node-modules:
+  postgres-data:
+  web-node-modules:

@@ -1,0 +1,84 @@
+{
+    "persona_id": "system-architect",
+    "demo_name": "High-Performance Infrastructure Demo",
+    "current_phase_index": 3,
+    "completed_phases": [
+        0,
+        1,
+        2
+    ],
+    "total_xp": 3200,
+    "current_level": 4,
+    "journey_state": {
+        "completed_missions": [
+            "architecture_design",
+            "performance_optimization",
+            "state_compression",
+            "compute_efficiency"
+        ],
+        "unlocked_features": [
+            "advanced_profiling",
+            "infrastructure_tools",
+            "technical_mentorship"
+        ],
+        "context": {
+            "user_project": "DePIN Network for IoT Data Aggregation",
+            "focus_area": "Scalable infrastructure and performance",
+            "experience_level": "advanced",
+            "technical_goals": [
+                "Maximize TPS",
+                "Minimize latency",
+                "Optimize compute units"
+            ]
+        }
+    },
+    "nft_certificates": [
+        {
+            "phase": 1,
+            "title": "Architecture Master",
+            "description": "Designed scalable DePIN architecture on Solana",
+            "mint_address": "DEMO_NFT_SA_1",
+            "score": 9.6,
+            "rarity": "legendary",
+            "mint_date": "2025-01-12T10:30:00Z"
+        },
+        {
+            "phase": 2,
+            "title": "Performance Optimizer",
+            "description": "Achieved exceptional throughput and low latency",
+            "mint_address": "DEMO_NFT_SA_2",
+            "score": 9.4,
+            "rarity": "epic",
+            "mint_date": "2025-01-28T14:00:00Z"
+        },
+        {
+            "phase": 3,
+            "title": "Compression Expert",
+            "description": "Implemented state compression for cost efficiency",
+            "mint_address": "DEMO_NFT_SA_3",
+            "score": 9.1,
+            "rarity": "epic",
+            "mint_date": "2025-02-10T16:20:00Z"
+        }
+    ],
+    "agent_history": [
+        {
+            "agent": "ProtocolAgent",
+            "action": "Evaluated architecture for scalability and performance",
+            "timestamp": "2025-01-12T10:30:00Z",
+            "feedback": "Exceptional use of Solana's parallel processing"
+        },
+        {
+            "agent": "SecurityAgent",
+            "action": "Reviewed infrastructure security and resilience",
+            "timestamp": "2025-02-10T16:20:00Z",
+            "feedback": "Robust security with minimal attack surface"
+        }
+    ],
+    "demo_highlights": [
+        "Completed 3 phases with high technical scores (avg 9.4/10)",
+        "Earned 3 NFT certificates (1 legendary, 2 epic)",
+        "Built high-performance DePIN infrastructure",
+        "Optimized for Solana mainnet deployment"
+    ]
+}

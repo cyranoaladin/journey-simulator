@@ -11,5 +11,5 @@
     "PitchAgent",
     "InvestorAgent"
   ],
-  "generatedText": "Le parcours utilisateur a permis de générer un projet Web3 complet structuré autour d'une DAO gouvernée par token. Le whitepaper, le pitch deck et les paramètres de tokenomics ont été validés via les agents spécialisés. L'utilisateur est prêt à présenter son projet à un Launchpad Solana.\n\nRecommandations :\n- Finaliser l'audit smart contract via AuditAgent\n- Améliorer l'engagement Discord (via CommunityAgent)\n- Prévoir une itération de feedback avec ReflectionAgent."
+  "generatedText": "The user journey has generated a complete Web3 project structured around a token-governed DAO. The whitepaper, pitch deck, and tokenomics parameters have been validated via specialized agents. The user is ready to present their project to a Solana Launchpad.\n\nRecommendations:\n- Finalize the smart contract audit via AuditAgent\n- Improve Discord engagement (via CommunityAgent)\n- Plan a feedback iteration with ReflectionAgent."
 }

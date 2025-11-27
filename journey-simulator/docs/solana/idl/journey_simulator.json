@@ -1,0 +1,26 @@
+{
+  "version": "0.1.0",
+  "name": "journey_simulator",
+  "instructions": [
+    {
+      "name": "initializeJourney",
+      "accounts": [],
+      "args": [
+        { "name": "journeyId", "type": "string" },
+        { "name": "metadataHash", "type": "bytes" }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "JourneyAccount",
+      "type": { "kind": "struct", "fields": [
+        { "name": "owner", "type": "publicKey" },
+        { "name": "journeyId", "type": "string" }
+      ] }
+    }
+  ],
+  "events": [
+    { "name": "JourneyCompleted", "fields": [ { "name": "journeyId", "type": "string", "index": false } ] }
+  ]
+}

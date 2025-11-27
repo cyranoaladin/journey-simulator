@@ -1,0 +1,84 @@
+{
+    "persona_id": "resilience-master",
+    "demo_name": "Security Audit Expert Demo",
+    "current_phase_index": 3,
+    "completed_phases": [
+        0,
+        1,
+        2
+    ],
+    "total_xp": 3100,
+    "current_level": 4,
+    "journey_state": {
+        "completed_missions": [
+            "security_fundamentals",
+            "vulnerability_assessment",
+            "audit_methodology",
+            "penetration_testing"
+        ],
+        "unlocked_features": [
+            "audit_tools",
+            "security_network",
+            "bug_bounty_access"
+        ],
+        "context": {
+            "user_project": "Security Audit Service for Solana Protocols",
+            "focus_area": "Smart contract security and auditing",
+            "experience_level": "advanced",
+            "security_focus": [
+                "Vulnerability detection",
+                "Exploit prevention",
+                "Best practices"
+            ]
+        }
+    },
+    "nft_certificates": [
+        {
+            "phase": 1,
+            "title": "Security Fundamentals Master",
+            "description": "Mastered Solana security principles and common vulnerabilities",
+            "mint_address": "DEMO_NFT_RM_1",
+            "score": 9.5,
+            "rarity": "epic",
+            "mint_date": "2025-01-16T10:00:00Z"
+        },
+        {
+            "phase": 2,
+            "title": "Vulnerability Hunter",
+            "description": "Identified and mitigated critical security vulnerabilities",
+            "mint_address": "DEMO_NFT_RM_2",
+            "score": 9.8,
+            "rarity": "legendary",
+            "mint_date": "2025-02-01T13:30:00Z"
+        },
+        {
+            "phase": 3,
+            "title": "Audit Professional",
+            "description": "Conducted comprehensive security audit with detailed report",
+            "mint_address": "DEMO_NFT_RM_3",
+            "score": 9.3,
+            "rarity": "epic",
+            "mint_date": "2025-02-18T15:45:00Z"
+        }
+    ],
+    "agent_history": [
+        {
+            "agent": "SecurityAgent",
+            "action": "Evaluated security assessment methodology",
+            "timestamp": "2025-01-16T10:00:00Z",
+            "feedback": "Thorough understanding of Solana security landscape"
+        },
+        {
+            "agent": "ProtocolAgent",
+            "action": "Reviewed technical implementation of security measures",
+            "timestamp": "2025-02-18T15:45:00Z",
+            "feedback": "Excellent technical depth and practical application"
+        }
+    ],
+    "demo_highlights": [
+        "Completed 3 phases with security excellence (avg 9.5/10)",
+        "Earned 3 NFT certificates (1 legendary, 2 epic)",
+        "Developed security audit expertise",
+        "Ready for professional audit engagements"
+    ]
+}

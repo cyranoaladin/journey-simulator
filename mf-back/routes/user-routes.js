@@ -6,6 +6,7 @@ const { protect, adminOnly } = require('../middleware/auth');
 /* Authentication routes */
 router.post('/register', userController.registerUser);
 router.post('/login', userController.loginUser);
+router.post('/login-wallet', userController.loginWithWallet);
 router.post('/logout', userController.logoutUser);
 router.post('/refresh', userController.refreshToken);
 

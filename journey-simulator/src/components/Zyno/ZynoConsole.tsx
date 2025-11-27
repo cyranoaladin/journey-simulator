@@ -25,26 +25,27 @@ import AgentFeedbackForm from './AgentFeedbackForm';
 import { API_BASE_URL } from '../../utils/api';
 import { AgentScoreboardProvider } from './AgentScoreboardContext';
 import ResourceUploader from './ResourceUploader';
+import ZynoDecisionPanel from './ZynoDecisionPanel';
 
 const quickIntents = [
   {
-    label: 'Pitch deck synthèse',
-    value: 'Analyse ma mission actuelle et génère un pitch deck investisseur prêt pour la Synaptic DAO.',
+    label: 'Pitch deck synthesis',
+    value: 'Analyze my current mission and generate an investor pitch deck ready for Synaptic DAO.',
     icon: Rocket,
   },
   {
-    label: 'Audit Tokenomics',
-    value: 'Évalue la viabilité de mon token en identifiant faiblesses, risques de dilution et scénarios de rétention.',
+    label: 'Tokenomics Audit',
+    value: 'Evaluate the viability of my token by identifying weaknesses, dilution risks, and retention scenarios.',
     icon: Activity,
   },
   {
-    label: 'Plan DAO',
-    value: 'Construis un plan de vote DAO avec quorum, niveaux de pouvoir et suivi AEPO/AECO.',
+    label: 'DAO Plan',
+    value: 'Build a DAO voting plan with quorum, power levels, and AEPO/AECO tracking.',
     icon: Target,
   },
   {
-    label: 'Mémo investisseur',
-    value: 'Produit un mémo investisseur clair avec traction, roadmap et besoins de liquidité.',
+    label: 'Investor Memo',
+    value: 'Produce a clear investor memo with traction, roadmap, and liquidity needs.',
     icon: Lightbulb,
   },
 ] as const;
@@ -79,7 +80,7 @@ interface ZynoConsoleProps {
   onMissionUpdate?: (summary: MissionSummary | null) => void;
 }
 
-export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
+export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
   const [userInput, setUserInput] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [result, setResult] = useState<OrchestrationResult | null>(null);
@@ -90,22 +91,23 @@ export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
   const shouldReduceMotion = useReducedMotion();
 
   const buildSummaryFromResult = (payload: OrchestrationResult): MissionSummary => {
-    const activationLevels = payload.executedAgents
-      .map((agentName: string) => payload.results[agentName]?.activationLevel ?? null)
+    const timeline = payload.timeline ?? [];
+    const agentScores = timeline
+      .map((entry) => entry.feedback?.aepo ?? payload.results[entry.agent]?.feedback?.aepo ?? null)
       .filter((value): value is number => typeof value === 'number');
 
-    const aepoScore = activationLevels.length
-      ? Math.round(
-          (activationLevels.reduce((sum: number, value: number) => sum + value, 0) /
-            activationLevels.length) *
-            100,
+    const aepoScore = agentScores.length
+      ? Math.min(
+        100,
+        Math.round(
+          agentScores.reduce((sum, value) => sum + value, 0) / agentScores.length
         )
+      )
       : 50;
 
-    const generatedTextLines = payload.executedAgents.map((agentName: string) => {
-      const agentResult = payload.results[agentName];
-      const summaryText = agentResult?.ae_summary ?? 'Résumé indisponible';
-      return `• ${agentName} → ${summaryText}`;
+    const generatedTextLines = timeline.map((entry) => {
+      const reasoning = entry.reasoning ?? payload.results[entry.agent]?.feedback?.ae_summary ?? 'Summary unavailable';
+      return `• ${entry.agent} → ${reasoning}`;
     });
 
     return {
@@ -113,8 +115,8 @@ export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
       timestamp: new Date().toISOString(),
       aepoScore,
       aecoPhase: payload.intent,
-      agents: payload.executedAgents,
-      generatedText: `Synthèse générée automatiquement :\n${generatedTextLines.join('\n')}`,
+      agents: timeline.length ? timeline.map((entry) => entry.agent) : payload.executedAgents,
+      generatedText: `Automatically generated synthesis:\n${generatedTextLines.join('\n')}`,
     };
   };
 
@@ -196,6 +198,9 @@ export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
     };
   }, [missionSummary]);
 
+  const currentTimeline = result?.timeline ?? [];
+  const currentStep = result?.currentStep ?? null;
+
   return (
     <AgentScoreboardProvider>
       <motion.section
@@ -216,14 +221,14 @@ export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
                   Zyno Mission Control
                 </p>
                 <h2 className="mt-1 text-2xl font-semibold text-slate-900 dark:text-mfai-text md:text-3xl">
-                  Console agentique interactive
+                  Interactive Agentic Console
                 </h2>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3 text-sm text-slate-600 dark:text-mfai-text/80 sm:grid-cols-3">
               <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
                 <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">
-                  Score AEPO
+                  AEPO Score
                 </span>
                 <p className="mt-1 text-lg font-semibold text-accent">
                   {missionHighlights.aepo || '—'}
@@ -231,7 +236,7 @@ export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
               </div>
               <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
                 <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">
-                  Agents activés
+                  Agents Activated
                 </span>
                 <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-mfai-text">
                   {missionHighlights.agents}
@@ -239,17 +244,17 @@ export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
               </div>
               <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
                 <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">
-                  Dernière synchronisation
+                  Last Sync
                 </span>
                 <p className="mt-1 text-xs text-slate-600 dark:text-mfai-text/70">
-                  {missionHighlights.timestamp ?? 'Jamais'}
+                  {missionHighlights.timestamp ?? 'Never'}
                 </p>
               </div>
             </div>
           </div>
           <p className="max-w-3xl text-sm text-slate-600 dark:text-mfai-text/80 md:text-base">
-            Décrivez vos missions, relancez des agents ou déclenchez des exports DAO. Les templates rapides ci-dessous
-            accélèrent les interactions et garantissent un guidage complet pour votre parcours Web3.
+            Describe your missions, relaunch agents, or trigger DAO exports. The quick templates below
+            accelerate interactions and ensure complete guidance for your Web3 journey.
           </p>
         </header>
 
@@ -267,19 +272,19 @@ export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
                 className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-mfai-text/80"
               >
                 <Sparkles size={16} className="text-accent" />
-                Entrée mission / intention
+                Mission Input / Intent
               </label>
               <textarea
                 id="zyno-console-input"
                 className="min-h-[140px] w-full rounded-3xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm text-slate-900 shadow-inner-glow focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/40 dark:border-mfai-border/60 dark:bg-mfai-surfaceAlt/50 dark:text-mfai-text"
-                placeholder="Ex : Orchestrer la roadmap de lancement pour mon protocole DeFi et identifier les risques critiques."
+                placeholder="Ex: Orchestrate the launch roadmap for my DeFi protocol and identify critical risks."
                 value={userInput}
                 onChange={(event) => setUserInput(event.target.value)}
               />
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3 text-xs text-slate-600 dark:text-mfai-text/70">
                   <ClipboardList size={14} />
-                  <span>Historique stocké localement — vos prompts restent privés.</span>
+                  <span>History stored locally — your prompts remain private.</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <motion.button
@@ -291,21 +296,20 @@ export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
                     className="inline-flex items-center gap-2 rounded-2xl border border-slate-200/70 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600 transition hover:border-accent/40 hover:text-accent dark:border-mfai-border/60 dark:text-mfai-text/70"
                   >
                     <TimerReset size={14} />
-                    Réinitialiser
+                    Reset
                   </motion.button>
                   <motion.button
                     type="submit"
                     whileHover={shouldReduceMotion || status === 'loading' ? undefined : { scale: 1.03 }}
                     whileTap={shouldReduceMotion || status === 'loading' ? undefined : { scale: 0.97 }}
                     disabled={status === 'loading'}
-                    className={`inline-flex items-center gap-2 rounded-2xl px-5 py-2 text-sm font-semibold transition duration-300 ease-out-quart focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
-                      status === 'loading'
-                        ? 'cursor-wait border border-slate-200/70 bg-slate-100 text-slate-500 dark:border-mfai-border/60 dark:bg-mfai-surfaceMuted dark:text-mfai-text/50'
-                        : 'bg-gradient-accent text-white shadow-neon-ring'
-                    }`}
+                    className={`inline-flex items-center gap-2 rounded-2xl px-5 py-2 text-sm font-semibold transition duration-300 ease-out-quart focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${status === 'loading'
+                      ? 'cursor-wait border border-slate-200/70 bg-slate-100 text-slate-500 dark:border-mfai-border/60 dark:bg-mfai-surfaceMuted dark:text-mfai-text/50'
+                      : 'bg-gradient-accent text-white shadow-neon-ring'
+                      }`}
                   >
                     {status === 'loading' ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                    {status === 'loading' ? 'Analyse en cours…' : 'Lancer la simulation'}
+                    {status === 'loading' ? 'Analyzing...' : 'Start Simulation'}
                   </motion.button>
                 </div>
               </div>
@@ -313,7 +317,7 @@ export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
 
             <div className="mfai-console-panel space-y-3">
               <p className="text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-mfai-text/60">
-                Templates rapides
+                Quick Templates
               </p>
               <div className="flex flex-wrap gap-2">
                 {quickIntents.map((intent) => (
@@ -339,19 +343,19 @@ export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
               <header className="flex items-center justify-between text-sm text-slate-600 dark:text-mfai-text/70">
                 <div className="flex items-center gap-2">
                   <History size={16} />
-                  Historique des requêtes
+                  Request History
                 </div>
                 <button
                   type="button"
                   className="text-xs text-accent underline-offset-4 hover:underline"
                   onClick={() => setHistory([])}
                 >
-                  Effacer
+                  Clear
                 </button>
               </header>
               {history.length === 0 ? (
                 <p className="text-sm text-slate-600 dark:text-mfai-text/60">
-                  Aucune mission enregistrée pour le moment.
+                  No missions recorded yet.
                 </p>
               ) : (
                 <ul className="flex flex-col gap-3">
@@ -363,17 +367,16 @@ export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
                       <div className="flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-mfai-text/60">
                         <span>{new Date(entry.createdAt).toLocaleTimeString()}</span>
                         <span
-                          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
-                            entry.status === 'success'
-                              ? 'bg-success/15 text-success'
-                              : entry.status === 'error'
-                                ? 'bg-danger/15 text-danger'
-                                : 'bg-info/15 text-info'
-                          }`}
+                          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${entry.status === 'success'
+                            ? 'bg-success/15 text-success'
+                            : entry.status === 'error'
+                              ? 'bg-danger/15 text-danger'
+                              : 'bg-info/15 text-info'
+                            }`}
                         >
-                          {entry.status === 'success' && 'Terminé'}
-                          {entry.status === 'error' && 'Erreur'}
-                          {entry.status === 'pending' && 'En cours'}
+                          {entry.status === 'success' && 'Completed'}
+                          {entry.status === 'error' && 'Error'}
+                          {entry.status === 'pending' && 'Pending'}
                         </span>
                       </div>
                       <p className="mt-2 text-sm font-medium text-slate-800 dark:text-mfai-text">{entry.text}</p>
@@ -385,7 +388,7 @@ export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
                           className="rounded-full border border-slate-200/70 px-3 py-1 text-xs text-slate-600 hover:border-accent/60 hover:text-accent dark:border-mfai-border/60 dark:text-mfai-text/70"
                           onClick={() => setUserInput(entry.text)}
                         >
-                          Réutiliser
+                          Reuse
                         </motion.button>
                         <motion.button
                           type="button"
@@ -394,7 +397,7 @@ export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
                           className="rounded-full border border-accent/40 px-3 py-1 text-xs text-accent hover:bg-accent/10"
                           onClick={() => handleRunSimulation(entry.text)}
                         >
-                          Relancer
+                          Relaunch
                         </motion.button>
                       </div>
                     </li>
@@ -405,6 +408,8 @@ export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
           </div>
 
           <div className="flex flex-col gap-5">
+            <ZynoDecisionPanel currentStep={currentStep} timeline={currentTimeline} />
+
             <MissionFeedbackSummary summary={missionSummary} />
 
             {result ? (
@@ -412,10 +417,10 @@ export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
                 <header className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-mfai-text/80">
                     <ScanLine size={16} className="text-accent" />
-                    Flux de mission
+                    Mission Flow
                   </div>
                   <span className="text-xs uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/60">
-                    Mode {result.mode}
+                    {result.mode} Mode
                   </span>
                 </header>
                 <ZynoMissionFlow
@@ -427,7 +432,7 @@ export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
               </div>
             ) : (
               <div className="mfai-console-panel text-sm text-slate-600 dark:text-mfai-text/60">
-                Lancer une simulation pour visualiser l&apos;enchaînement des agents et leurs livrables.
+                Launch a simulation to visualize agent sequencing and deliverables.
               </div>
             )}
 
@@ -435,10 +440,10 @@ export default function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
               <div className="mfai-console-panel space-y-3">
                 <header className="space-y-1">
                   <h3 className="text-base font-semibold text-slate-800 dark:text-mfai-text">
-                    Partagez votre expérience agentique
+                    Share your agentic experience
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-mfai-text/70">
-                    Donnez une note AECO à chaque agent pour affiner les recommandations futures.
+                    Give an AECO rating to each agent to refine future recommendations.
                   </p>
                 </header>
                 <div className="grid gap-4 md:grid-cols-2">

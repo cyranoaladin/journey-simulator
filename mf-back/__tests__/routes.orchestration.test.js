@@ -79,10 +79,15 @@ describe('Zyno orchestration route', () => {
     expect(response.body.results.NFTAgent.payload.output).toBe('Prototype ready');
 
     expect(AgentLog.create).toHaveBeenCalledTimes(2);
-    expect(AgentLog.create).toHaveBeenCalledWith(expect.objectContaining({
-      userId: 'user-77',
-      agentName: 'NFTAgent',
-      payload: { output: 'Prototype ready' }
-    }));
+    expect(AgentLog.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId: 'user-77',
+        agentName: 'NFTAgent',
+        payload: expect.objectContaining({
+          agent: 'NFTAgent',
+          payload: expect.objectContaining({ output: 'Prototype ready' }),
+        }),
+      })
+    );
   });
 });

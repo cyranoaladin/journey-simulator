@@ -1,0 +1,23 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="missionFlowGradient" x1="20" y1="20" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6366F1" />
+      <stop offset="1" stop-color="#A855F7" />
+    </linearGradient>
+    <linearGradient id="missionFlowGlow" x1="10" y1="10" x2="110" y2="110" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity="0.3" />
+      <stop offset="1" stop-color="#6366F1" stop-opacity="0.1" />
+    </linearGradient>
+  </defs>
+  <rect x="6" y="6" width="108" height="108" rx="24" fill="url(#missionFlowGlow)" />
+  <g filter="url(#shadow)">
+    <path d="M40 36H80C85.5228 36 90 40.4772 90 46V74C90 79.5228 85.5228 84 80 84H40C34.4772 84 30 79.5228 30 74V46C30 40.4772 34.4772 36 40 36Z" stroke="url(#missionFlowGradient)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M40 52L54 64L40 76" stroke="#A855F7" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M60 76H78" stroke="#60A5FA" stroke-width="6" stroke-linecap="round" />
+  </g>
+  <defs>
+    <filter id="shadow" x="0" y="0" width="120" height="120" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+    </filter>
+  </defs>
+</svg>

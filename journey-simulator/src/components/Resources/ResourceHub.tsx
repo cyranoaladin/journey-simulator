@@ -30,7 +30,7 @@ const resourceLibrary: Resource[] = [
   {
     id: 'mfai-blueprint',
     title: 'MFAI System Blueprint',
-    summary: 'Architecture complète du protocole Money Factory AI et des agents Zyno.',
+    summary: 'Complete architecture of the Money Factory AI protocol and Zyno agents.',
     tags: ['Architecture', 'Protocol', 'Foundations'],
     format: 'PDF',
     slug: 'mfai-system-blueprint.pdf',
@@ -39,7 +39,7 @@ const resourceLibrary: Resource[] = [
   {
     id: 'protocol-paper',
     title: 'Protocol Whitepaper (EN)',
-    summary: 'Vision stratégique, primitives économiques et roadmaps de déploiement MFAI.',
+    summary: 'Strategic vision, economic primitives, and MFAI deployment roadmaps.',
     tags: ['Strategy', 'Tokenomics', 'Protocol'],
     format: 'PDF',
     slug: 'mfai-protocol-whitepaper-en.pdf',
@@ -48,7 +48,7 @@ const resourceLibrary: Resource[] = [
   {
     id: 'web3-transformation',
     title: 'Web2 ➝ Web3 Activation Guide',
-    summary: 'Parcours détaillé pour transformer une équipe Web2 en builders Web3 autonomes.',
+    summary: 'Detailed pathway to transform a Web2 team into autonomous Web3 builders.',
     tags: ['Onboarding', 'Execution', 'Playbook'],
     format: 'Guide',
     slug: 'web2-to-web3-activation-guide.pdf',
@@ -57,7 +57,7 @@ const resourceLibrary: Resource[] = [
   {
     id: 'token-activation',
     title: 'Token Strategy Sprint Template',
-    summary: 'Template Notion pour cadrer supply, utilité et scénarios de distribution token.',
+    summary: 'Notion template to frame supply, utility, and token distribution scenarios.',
     tags: ['Tokenomics', 'Templates'],
     format: 'Template',
     slug: 'token-strategy-sprint-template.zip',
@@ -66,7 +66,7 @@ const resourceLibrary: Resource[] = [
   {
     id: 'dao-starter',
     title: 'DAO Launch Starter Kit',
-    summary: 'Checklist opérationnelle pour enregistrer les électeurs, quorum et rôles DAO.',
+    summary: 'Operational checklist to register voters, quorum, and DAO roles.',
     tags: ['DAO', 'Governance', 'Execution'],
     format: 'Playbook',
     slug: 'dao-launch-starter-kit.pdf',
@@ -75,7 +75,7 @@ const resourceLibrary: Resource[] = [
   {
     id: 'pitch-deck',
     title: 'Pitch Deck Narrative Framework',
-    summary: 'Structure slide-by-slide pour mettre en scène l’impact MFAI et les KPIs agents.',
+    summary: 'Slide-by-slide structure to showcase MFAI impact and agent KPIs.',
     tags: ['Fundraising', 'Storytelling'],
     format: 'Template',
     slug: 'pitch-deck-narrative-framework.pptx',
@@ -84,7 +84,7 @@ const resourceLibrary: Resource[] = [
   {
     id: 'rag-ingestion',
     title: 'RAG Ingestion Playbook',
-    summary: 'Procédure pour préparer, vectoriser et alimenter les documents du cognitive mesh.',
+    summary: 'Procedure to prepare, vectorize, and feed cognitive mesh documents.',
     tags: ['RAG', 'Agents', 'Data'],
     format: 'Guide',
     slug: 'rag-ingestion-playbook.pdf',
@@ -93,7 +93,7 @@ const resourceLibrary: Resource[] = [
   {
     id: 'mission-feedback',
     title: 'Mission Feedback Loops',
-    summary: 'Cadre AEPO/AECO pour capturer, scorer et recycler les retours builders.',
+    summary: 'AEPO/AECO framework to capture, score, and recycle builder feedback.',
     tags: ['Analytics', 'Agents', 'Playbook'],
     format: 'Guide',
     slug: 'mission-feedback-loops.pdf',
@@ -126,7 +126,7 @@ const ResourceHub = () => {
       const matchesQuery = query.trim().length === 0
         ? true
         : resource.title.toLowerCase().includes(query.toLowerCase()) ||
-          resource.summary.toLowerCase().includes(query.toLowerCase())
+        resource.summary.toLowerCase().includes(query.toLowerCase())
 
       const matchesTags = activeTags.length === 0
         ? true
@@ -152,11 +152,11 @@ const ResourceHub = () => {
               Knowledge Vault
             </span>
             <h1 className="text-3xl font-semibold lg:text-4xl">
-              Accède aux playbooks MFAI et accélère tes missions
+              Access MFAI playbooks and accelerate your missions
             </h1>
             <p className="text-sm text-white/75 lg:text-base">
-              Tutoriaux, checklists, templates et cadres stratégiques testés avec Zyno pour gagner du temps
-              et synchroniser toute l&apos;équipe produit, gouvernance et tokenomics.
+              Tutorials, checklists, templates, and strategic frameworks tested with Zyno to save time
+              and synchronize the entire product, governance, and tokenomics team.
             </p>
           </div>
           <motion.div
@@ -166,21 +166,21 @@ const ResourceHub = () => {
             className="glass-effect flex max-w-sm flex-col gap-4 rounded-2xl border border-white/10 bg-white/10 p-6 text-white"
           >
             <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-white/70">
-              <span>Raccourcis</span>
+              <span>Shortcuts</span>
               <Sparkles size={16} className="text-accent-neon" />
             </div>
             <div className="space-y-3 text-sm text-white/75">
               <div className="flex items-center gap-3">
                 <BrainCircuit size={18} />
-                <span>Templates AEPO/AECO prêts à l&apos;emploi</span>
+                <span>Ready-to-use AEPO/AECO Templates</span>
               </div>
               <div className="flex items-center gap-3">
                 <Layers size={18} />
-                <span>Seamless handoff Produit ⇄ Gouvernance</span>
+                <span>Seamless Product ⇄ Governance handoff</span>
               </div>
               <div className="flex items-center gap-3">
                 <Globe size={18} />
-                <span>Documentations multilingues</span>
+                <span>Multilingual documentation</span>
               </div>
             </div>
           </motion.div>
@@ -194,14 +194,14 @@ const ResourceHub = () => {
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Chercher par mot-clé, ex: tokenomics ou DAO"
+              placeholder="Search by keyword, e.g., tokenomics or DAO"
               className="w-full rounded-full border border-white/10 bg-white/5 py-3 pl-12 pr-6 text-sm text-white placeholder:text-white/50 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
-              aria-label="Filtrer les ressources par mot-clé"
+              aria-label="Filter resources by keyword"
             />
           </div>
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white/60">
             <Filter size={14} />
-            Sélectionne des tags pour affiner
+            Select tags to refine
           </div>
         </div>
 
@@ -213,11 +213,10 @@ const ResourceHub = () => {
                 key={tag}
                 type="button"
                 onClick={() => toggleTag(tag)}
-                className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] transition ${
-                  isActive
-                    ? 'bg-gradient-accent text-white shadow-glow'
-                    : 'bg-white/5 text-white/60 hover:bg-white/10'
-                }`}
+                className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] transition ${isActive
+                  ? 'bg-gradient-accent text-white shadow-glow'
+                  : 'bg-white/5 text-white/60 hover:bg-white/10'
+                  }`}
               >
                 {tag}
               </button>
@@ -229,7 +228,7 @@ const ResourceHub = () => {
               onClick={() => setActiveTags([])}
               className="rounded-full border border-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white/60 transition hover:text-white"
             >
-              Réinitialiser
+              Reset
             </button>
           )}
         </div>
@@ -238,9 +237,9 @@ const ResourceHub = () => {
       <section className="space-y-4">
         <header className="flex flex-wrap items-center justify-between gap-3 text-white">
           <div>
-            <h2 className="text-xl font-semibold">Bibliothèque triée par missions</h2>
+            <h2 className="text-xl font-semibold">Library sorted by missions</h2>
             <p className="text-sm text-white/60">
-              {filteredResources.length} ressources alignées avec le Cognitive Activation Protocol.
+              {filteredResources.length} resources aligned with the Cognitive Activation Protocol.
             </p>
           </div>
           <div className="inline-flex items-center gap-2 rounded-full border border-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white/60">
@@ -251,7 +250,7 @@ const ResourceHub = () => {
 
         {filteredResources.length === 0 ? (
           <div className="rounded-3xl border border-white/10 bg-white/5 px-6 py-10 text-center text-sm text-white/70">
-            Aucun résultat pour « {query} ». Détends les filtres ou explore une autre mission.
+            No results for &quot;{query}&quot;. Relax filters or explore another mission.
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -289,7 +288,7 @@ const ResourceHub = () => {
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white/80 transition hover:bg-white/20"
                 >
-                  Ouvrir la ressource
+                  Open resource
                   <ArrowUpRight size={14} />
                 </a>
               </motion.article>

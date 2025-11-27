@@ -39,6 +39,7 @@ journey_mfai_back_front/
 - Utiliser `npm run test:coverage --prefix mf-back` pour couvrir orchestrateur + agents.
 - Ajouter des specs unitaires dans `mf-back/tests/unit/` et des tests de routes/orchestration dans `mf-back/__tests__/`.
 - Pour l’UI, prévoir des tests React Testing Library (à mettre en place) et valider manuellement les écrans `/zyno`.
+- Lancer `npm run test:e2e` côté frontend pour rejouer le scénario Playwright du wallet modal, puis effectuer un QA manuel Phantom + Torus afin de vérifier la reconnexion et la persistance de session malgré l’avertissement de dépréciation Torus.
 
 ---
 

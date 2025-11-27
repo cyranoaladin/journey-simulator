@@ -5,9 +5,9 @@ test('home loads and links are visible', async ({ page }) => {
   await page.goto('/api/health')
   await page.goto('/')
   await page.goto('/')
-  await expect(page.getByRole('link', { name: /connexion wallet/i })).toBeVisible()
-  await expect(page.getByRole('link', { name: /préparer/i })).toBeVisible()
-  await expect(page.getByRole('link', { name: /explorer/i })).toBeVisible()
+  await expect(page.getByRole('link', { name: /connect wallet/i })).toBeVisible()
+  await expect(page.getByRole('link', { name: /prepare/i })).toBeVisible()
+  await expect(page.getByRole('link', { name: /explore/i })).toBeVisible()
 })
 
 test('wallet page renders', async ({ page }) => {

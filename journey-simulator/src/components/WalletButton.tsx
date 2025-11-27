@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useWalletModal } from '@solana/wallet-adapter-react-ui'
-import { 
-  Wallet, 
-  ChevronDown, 
-  Copy, 
-  ExternalLink, 
-  LogOut, 
+import {
+  Wallet,
+  ChevronDown,
+  Copy,
+  ExternalLink,
+  LogOut,
   CheckCircle,
   AlertCircle,
   Wifi,
@@ -16,6 +16,7 @@ import {
   RefreshCw
 } from 'lucide-react'
 import { useJourneyStore } from '../store/journeyStore'
+import { useAuth } from '../contexts/AuthContext'
 
 const WalletButton = () => {
   const { publicKey, wallet, disconnect, connected, connecting } = useWallet()
@@ -25,20 +26,35 @@ const WalletButton = () => {
   const [isConnecting, setIsConnecting] = useState(false)
   const [connectError, setConnectError] = useState<string | null>(null)
   const { userProgress, updateWalletConnection } = useJourneyStore()
+  const { loginWithWallet, isAuthenticated } = useAuth()
 
   // Update store when connection changes
   useEffect(() => {
-    if (connected && publicKey) {
-      updateWalletConnection(true, publicKey.toString());
-    } else if (!connected) {
-      updateWalletConnection(false, undefined);
-    }
-    
-    // Reset connecting state when connection status changes
-    if (connected || (!connecting && isConnecting)) {
-      setIsConnecting(false)
-    }
-  }, [connected, publicKey, connecting, isConnecting, updateWalletConnection])
+    const handleConnection = async () => {
+      if (connected && publicKey) {
+        updateWalletConnection(true, publicKey.toString());
+
+        // Auto-login if not already authenticated
+        if (!isAuthenticated) {
+          const success = await loginWithWallet(publicKey.toString());
+          if (!success) {
+            // If login fails (e.g. user not found), we might want to redirect to register
+            // or show a notification. For now, we just log it.
+            console.log("Wallet login failed - user might need to register");
+          }
+        }
+      } else if (!connected) {
+        updateWalletConnection(false, undefined);
+      }
+
+      // Reset connecting state when connection status changes
+      if (connected || (!connecting && isConnecting)) {
+        setIsConnecting(false)
+      }
+    };
+
+    handleConnection();
+  }, [connected, publicKey, connecting, isConnecting, updateWalletConnection, isAuthenticated, loginWithWallet])
 
   // Handle connection errors
   useEffect(() => {
@@ -85,8 +101,8 @@ const WalletButton = () => {
   const getWalletIcon = () => {
     if (!wallet?.adapter.icon) return <Wallet size={20} />
     return (
-      <img 
-        src={wallet.adapter.icon} 
+      <img
+        src={wallet.adapter.icon}
         alt={wallet.adapter.name}
         className="w-5 h-5"
       />
@@ -94,25 +110,25 @@ const WalletButton = () => {
   }
 
   const getConnectionStatus = () => {
-    if (connectError) return { 
-      icon: <AlertCircle size={16} className="text-red-400" />, 
-      text: 'Connection failed', 
-      color: 'text-red-400' 
+    if (connectError) return {
+      icon: <AlertCircle size={16} className="text-red-400" />,
+      text: 'Connection failed',
+      color: 'text-red-400'
     }
-    if (connecting || isConnecting) return { 
-      icon: <Loader size={16} className="animate-spin" />, 
-      text: 'Connecting...', 
-      color: 'text-yellow-400' 
+    if (connecting || isConnecting) return {
+      icon: <Loader size={16} className="animate-spin" />,
+      text: 'Connecting...',
+      color: 'text-yellow-400'
     }
-    if (connected) return { 
-      icon: <Wifi size={16} />, 
-      text: 'Connected', 
-      color: 'text-green-400' 
+    if (connected) return {
+      icon: <Wifi size={16} />,
+      text: 'Connected',
+      color: 'text-green-400'
     }
-    return { 
-      icon: <WifiOff size={16} />, 
-      text: 'Disconnected', 
-      color: 'text-gray-400' 
+    return {
+      icon: <WifiOff size={16} />,
+      text: 'Disconnected',
+      color: 'text-gray-400'
     }
   }
 
@@ -138,7 +154,7 @@ const WalletButton = () => {
           )}
           <span>{connecting || isConnecting ? 'Connecting...' : 'Connect Wallet'}</span>
         </motion.button>
-        
+
         {/* Error message */}
         <AnimatePresence>
           {connectError && (
@@ -152,7 +168,7 @@ const WalletButton = () => {
                 <AlertCircle size={16} className="text-red-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-xs text-red-400">{connectError}</p>
-                  <button 
+                  <button
                     onClick={handleRetry}
                     className="text-xs text-blue-400 hover:text-blue-300 mt-1 flex items-center"
                   >
@@ -204,7 +220,7 @@ const WalletButton = () => {
                   <span>{status.text}</span>
                 </div>
               </div>
-              
+
               <div className="bg-white/5 rounded-lg p-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm opacity-80">Address:</span>
@@ -273,7 +289,7 @@ const WalletButton = () => {
                   <ExternalLink size={16} />
                   <span>View on Solana Explorer</span>
                 </button>
-                
+
                 <button
                   onClick={handleDisconnect}
                   className="w-full flex items-center space-x-2 p-2 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors"

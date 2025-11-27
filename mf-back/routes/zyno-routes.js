@@ -25,10 +25,10 @@ router.post('/orchestration', async (req, res) => {
       fileName: template.fileName
     }));
 
-    const { executedAgents = [], results = {} } = orchestrationResult;
+    const { executedAgents = [], results = {}, timeline = [] } = orchestrationResult;
 
     await Promise.all(
-      executedAgents.map(async (agentName) => {
+      executedAgents.map(async (agentName, index) => {
         const data = results[agentName];
         if (!data) {
           return;
@@ -37,10 +37,21 @@ router.post('/orchestration', async (req, res) => {
         await AgentLog.create({
           userId,
           agentName,
-          payload: data.payload,
-          ragSnippets: data.references ?? [],
-          ae_summary: data.ae_summary ?? '',
-          ae_outcome: data.ae_outcome ?? '',
+          intent: orchestrationResult.intent ?? null,
+          phaseId: data.phase ?? null,
+          promptSent: data.prompt ?? null,
+          reasoning: data.reasoning ?? null,
+          actionTaken: data.action ?? null,
+          response: data.response ?? data.output ?? data.raw ?? null,
+          output: data.output ?? null,
+          sources: data.sources ?? [],
+          metrics: data.metrics ?? {},
+          feedback: data.feedback ?? {},
+          timelineIndex: index,
+          payload: data.raw ?? data,
+          ragSnippets: Array.isArray(data.sources) ? data.sources : [],
+          ae_summary: data.feedback?.ae_summary ?? data.ae_summary ?? '',
+          ae_outcome: data.feedback?.ae_outcome ?? data.ae_outcome ?? '',
         });
       })
     );
@@ -53,6 +64,69 @@ router.post('/orchestration', async (req, res) => {
   } catch (error) {
     console.error('Orchestration error:', error);
     res.status(500).json({ error: 'Zyno orchestration failed.' });
+  }
+});
+
+router.get('/orchestration/logs', async (req, res) => {
+  try {
+    const { userId, intent, limit = 50 } = req.query;
+    const filters = {};
+
+    if (userId) {
+      filters.userId = { $regex: userId, $options: 'i' };
+    }
+
+    if (intent) {
+      filters.intent = { $regex: intent, $options: 'i' };
+    }
+
+    const logs = await AgentLog.find(filters)
+      .sort({ timestamp: -1 })
+      .limit(Math.min(Number(limit) || 50, 200));
+
+    res.json({
+      count: logs.length,
+      items: logs,
+    });
+  } catch (error) {
+    console.error('Agent logs fetch error:', error);
+    res.status(500).json({ error: 'Unable to retrieve orchestration logs.' });
+  }
+});
+
+router.get('/orchestration/current-step', async (req, res) => {
+  try {
+    const userId = req.query?.userId ?? 'demo_user';
+
+    const latest = await AgentLog.findOne({ userId })
+      .sort({ timestamp: -1 })
+      .lean();
+
+    if (!latest) {
+      return res.json({ currentStep: null });
+    }
+
+    res.json({
+      currentStep: {
+        agent: latest.agentName,
+        phase: latest.phaseId ?? null,
+        intent: latest.intent ?? null,
+        prompt: latest.promptSent ?? null,
+        reasoning: latest.reasoning ?? latest.ae_summary ?? null,
+        action: latest.actionTaken ?? latest.ae_outcome ?? null,
+        response: latest.response ?? latest.output ?? null,
+        sources: latest.sources ?? latest.ragSnippets ?? [],
+        metrics: latest.metrics ?? null,
+        feedback: latest.feedback ?? {
+          ae_summary: latest.ae_summary ?? null,
+          ae_outcome: latest.ae_outcome ?? null,
+        },
+        timestamp: latest.timestamp,
+      }
+    });
+  } catch (error) {
+    console.error('Current step retrieval error:', error);
+    res.status(500).json({ error: 'Unable to retrieve current step.' });
   }
 });
 

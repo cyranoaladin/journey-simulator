@@ -29,7 +29,7 @@ export default function ZynoAgentScoreboard() {
           <div>
             <h3 className="text-lg font-semibold">Agent AEPO / AECO</h3>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Classement dynamique des profils accompagnés par Zyno
+              Dynamic ranking of profiles guided by Zyno
             </p>
           </div>
         </div>
@@ -40,22 +40,22 @@ export default function ZynoAgentScoreboard() {
           className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-slate-400/60"
         >
           <RefreshCw size={16} className={state.loading ? 'animate-spin' : ''} />
-          Actualiser
+          Refresh
         </button>
       </header>
 
       <div className="grid gap-3 rounded-xl bg-slate-50 p-3 text-sm dark:bg-slate-800">
         <div className="grid grid-cols-3 gap-2 text-center">
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-500">Profils suivis</p>
+            <p className="text-xs uppercase tracking-wide text-slate-500">Tracked Profiles</p>
             <p className="text-xl font-semibold text-slate-900 dark:text-white">{totalAgents}</p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-500">AEPO moyen</p>
+            <p className="text-xs uppercase tracking-wide text-slate-500">Avg AEPO</p>
             <p className="text-xl font-semibold text-indigo-600 dark:text-indigo-300">{averageAepo}</p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-500">AECO moyen</p>
+            <p className="text-xs uppercase tracking-wide text-slate-500">Avg AECO</p>
             <p className="text-xl font-semibold text-emerald-600 dark:text-emerald-300">{averageAeco}</p>
           </div>
         </div>
@@ -72,14 +72,14 @@ export default function ZynoAgentScoreboard() {
           type="password"
           value={apiKey}
           onChange={(event) => setApiKey(event.target.value)}
-          placeholder="Clé API admin"
+          placeholder="Admin API Key"
           className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-600 dark:bg-slate-800"
         />
         <button
           type="submit"
           className="rounded-lg border border-indigo-200 bg-white px-4 py-2 text-sm font-medium text-indigo-600 transition hover:border-indigo-500 hover:text-indigo-700 dark:border-indigo-500/40 dark:bg-indigo-500/10 dark:text-indigo-300"
         >
-          Charger
+          Load
         </button>
       </form>
 
@@ -93,11 +93,11 @@ export default function ZynoAgentScoreboard() {
         <table className="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-700/60">
           <thead className="bg-slate-100 text-xs uppercase tracking-wide text-slate-500 dark:bg-slate-800/80 dark:text-slate-400">
             <tr>
-              <th className="px-3 py-2 text-left">Profil</th>
+              <th className="px-3 py-2 text-left">Profile</th>
               <th className="px-3 py-2">AEPO</th>
               <th className="px-3 py-2">AECO</th>
               <th className="px-3 py-2">Missions</th>
-              <th className="px-3 py-2">Dernière mise à jour</th>
+              <th className="px-3 py-2">Last Update</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 dark:divide-slate-700/40">
@@ -127,7 +127,7 @@ export default function ZynoAgentScoreboard() {
                   className="px-3 py-4 text-center text-sm text-slate-500 dark:text-slate-400"
                   colSpan={5}
                 >
-                  Aucun profil n&apos;est encore suivi.
+                  No profiles tracked yet.
                 </td>
               </tr>
             )}
@@ -138,7 +138,7 @@ export default function ZynoAgentScoreboard() {
                   className="px-3 py-4 text-center text-sm text-slate-500 dark:text-slate-400"
                   colSpan={5}
                 >
-                  Chargement des métriques…
+                  Loading metrics...
                 </td>
               </tr>
             )}

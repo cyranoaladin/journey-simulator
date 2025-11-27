@@ -726,13 +726,14 @@ describe('User Controller', () => {
       _id: 'user-1',
       nft_certificates: [],
     };
+    User.findOne.mockResolvedValueOnce(null);
     User.findByIdAndUpdate.mockReturnValueOnce({
       select: jest.fn().mockResolvedValueOnce(updatedUser),
     });
 
     const req = {
       user: { id: 'user-1' },
-      body: { phase: 1, nft_address: 'mint-1', score: 95 },
+      body: { phase: 1, nft_address: '9'.repeat(44), score: 95, rarity: 'rare', xp_earned: 50 },
     };
     const res = createRes();
 

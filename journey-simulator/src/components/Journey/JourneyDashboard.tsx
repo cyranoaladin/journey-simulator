@@ -1,12 +1,27 @@
-import { useEffect, useState, type FC } from 'react';
-import { motion } from 'framer-motion';
-import { Trophy, Coins, Award, Rocket, Vote, RefreshCw } from 'lucide-react';
-import { useJourneyStore } from '../../store/journeyStore';
+import { useEffect, useState, type FC } from "react";
+import { motion } from "framer-motion";
+import {
+  Trophy,
+  Coins,
+  Award,
+  Rocket,
+  Vote,
+  RefreshCw,
+  ExternalLink,
+} from "lucide-react";
+import { useJourneyStore } from "../../store/journeyStore";
+
+import { API_BASE_URL } from "../../utils/api";
 
 const JourneyDashboard: FC = () => {
   const { userProgress, selectedPersona, loadUserProgress } = useJourneyStore();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [lastMint, setLastMint] = useState<{
+    signature: string;
+    network: string;
+    createdAt: string;
+  } | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -17,8 +32,34 @@ const JourneyDashboard: FC = () => {
         if (isMounted) {
           setLastUpdated(new Date());
         }
+        // Fetch last mint (best-effort)
+        try {
+          const headers: Record<string, string> = {};
+          try {
+            const uid = localStorage.getItem("userId");
+            if (uid) headers["x-user-id"] = uid;
+          } catch (localStorageError) {
+            console.warn(
+              "Unable to read userId from storage",
+              localStorageError,
+            );
+          }
+          const res = await fetch(`${API_BASE_URL}/api/mint/last`, { headers });
+          if (res.ok) {
+            const json = await res.json();
+            if (json?.last) {
+              setLastMint({
+                signature: json.last.signature,
+                network: json.last.network,
+                createdAt: json.last.createdAt,
+              });
+            }
+          }
+        } catch (mintFetchError) {
+          console.warn("Failed to retrieve last mint metadata", mintFetchError);
+        }
       } catch (error) {
-        console.error('Failed to refresh progress:', error);
+        console.error("Failed to refresh progress:", error);
       }
     };
 
@@ -37,7 +78,7 @@ const JourneyDashboard: FC = () => {
       await loadUserProgress();
       setLastUpdated(new Date());
     } catch (error) {
-      console.error('Failed to refresh progress:', error);
+      console.error("Failed to refresh progress:", error);
     } finally {
       setIsRefreshing(false);
     }
@@ -45,22 +86,22 @@ const JourneyDashboard: FC = () => {
 
   const getPassGradient = (level: string) => {
     switch (level) {
-      case 'Gold':
-        return 'bg-gradient-gold';
-      case 'Platinum':
-        return 'bg-gradient-platinum';
-      case 'Diamond':
-        return 'bg-gradient-diamond';
+      case "Gold":
+        return "bg-gradient-gold";
+      case "Platinum":
+        return "bg-gradient-platinum";
+      case "Diamond":
+        return "bg-gradient-diamond";
       default:
-        return 'bg-gradient-primary';
+        return "bg-gradient-primary";
     }
   };
 
   const getVotingPowerColor = (power: number) => {
-    if (power >= 1000) return 'text-purple-400';
-    if (power >= 500) return 'text-blue-400';
-    if (power >= 100) return 'text-green-400';
-    return 'text-gray-400';
+    if (power >= 1000) return "text-purple-400";
+    if (power >= 500) return "text-blue-400";
+    if (power >= 100) return "text-green-400";
+    return "text-gray-400";
   };
 
   return (
@@ -80,7 +121,10 @@ const JourneyDashboard: FC = () => {
             disabled={isRefreshing}
             className="flex items-center space-x-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all disabled:opacity-50"
           >
-            <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
+            <RefreshCw
+              size={16}
+              className={isRefreshing ? "animate-spin" : ""}
+            />
             <span className="text-sm">Refresh</span>
           </motion.button>
         </div>
@@ -102,9 +146,11 @@ const JourneyDashboard: FC = () => {
           <div className="w-full bg-white/10 rounded-full h-2">
             <motion.div
               initial={{ width: 0 }}
-              animate={{ width: `${Math.min((userProgress.totalXP / 2000) * 100, 100)}%` }}
+              animate={{
+                width: `${Math.min((userProgress.totalXP / 2000) * 100, 100)}%`,
+              }}
               className="h-full bg-gradient-primary rounded-full"
-              transition={{ duration: 1, ease: 'easeOut' }}
+              transition={{ duration: 1, ease: "easeOut" }}
             />
           </div>
           <div className="text-sm opacity-60 mt-2">
@@ -129,7 +175,7 @@ const JourneyDashboard: FC = () => {
             Staked: {userProgress.stakedMfai.toFixed(1)} $MFAI
           </div>
           <div className="text-sm text-accent-cyan mt-1">
-            APY: {userProgress.stakedMfai > 0 ? '12.5%' : '0%'}
+            APY: {userProgress.stakedMfai > 0 ? "12.5%" : "0%"}
           </div>
         </motion.div>
 
@@ -143,14 +189,16 @@ const JourneyDashboard: FC = () => {
             <Vote className="text-accent-purple" size={24} />
             <span className="text-base opacity-80">Voting Power</span>
           </div>
-          <div className={`text-2xl font-space font-bold mb-2 ${getVotingPowerColor(userProgress.votingPower)}`}>
+          <div
+            className={`text-2xl font-space font-bold mb-2 ${getVotingPowerColor(userProgress.votingPower)}`}
+          >
             {userProgress.votingPower}
           </div>
           <div className="text-sm opacity-60">
             Proposals: {userProgress.daoProposals}
           </div>
           <div className="text-sm text-accent-cyan mt-1">
-            {userProgress.votingPower >= 100 ? 'Active DAO' : 'Observer'}
+            {userProgress.votingPower >= 100 ? "Active DAO" : "Observer"}
           </div>
         </motion.div>
 
@@ -164,15 +212,60 @@ const JourneyDashboard: FC = () => {
             <Award className="text-accent-gold" size={24} />
             <span className="text-base opacity-80">Access Pass</span>
           </div>
-          <div className={`text-lg font-space font-bold mb-2 ${getPassGradient(userProgress.passLevel)} text-transparent bg-clip-text`}>
+          <div
+            className={`text-lg font-space font-bold mb-2 ${getPassGradient(userProgress.passLevel)} text-transparent bg-clip-text`}
+          >
             {userProgress.passLevel}
           </div>
           <div className="text-sm opacity-60">
             NFTs: {userProgress.nfts.length}
           </div>
           <div className="text-sm text-accent-cyan mt-1">
-            {userProgress.passLevel === 'Free' ? 'Upgrade available' : 'Premium active'}
+            {userProgress.passLevel === "Free"
+              ? "Upgrade available"
+              : "Premium active"}
           </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="card"
+          id="last-mint-card"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <Award className="text-accent-purple" size={22} />
+            <span className="text-base opacity-80">Last Mint</span>
+          </div>
+          {lastMint ? (
+            <>
+              <div className="text-xs opacity-80 mb-1">
+                {new Date(lastMint.createdAt).toLocaleString()}
+              </div>
+              <div className="text-xs break-all opacity-70">
+                {lastMint.signature || "N/A"}
+              </div>
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-xs opacity-70">{lastMint.network}</span>
+                {lastMint.signature && (
+                  <button
+                    onClick={() =>
+                      window.open(
+                        `https://explorer.solana.com/tx/${lastMint.signature}?cluster=devnet`,
+                        "_blank",
+                      )
+                    }
+                    className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white"
+                  >
+                    <ExternalLink size={14} /> Explorer
+                  </button>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="text-sm opacity-60">No recent mint</div>
+          )}
         </motion.div>
 
         {selectedPersona && (
@@ -190,13 +283,15 @@ const JourneyDashboard: FC = () => {
                 </span>
               </div>
               <span className="text-sm opacity-80">
-                {userProgress.completedPhases.length}/{selectedPersona.phases.length} phases
+                {userProgress.completedPhases.length}/
+                {selectedPersona.phases.length} phases
               </span>
             </div>
 
             <div className="grid grid-cols-5 gap-4">
               {selectedPersona.phases.map((phase, index) => {
-                const isCompleted = userProgress.completedPhases.includes(index);
+                const isCompleted =
+                  userProgress.completedPhases.includes(index);
                 const isCurrent = index === userProgress.completedPhases.length;
 
                 return (
@@ -204,16 +299,18 @@ const JourneyDashboard: FC = () => {
                     <div
                       className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2 ${
                         isCompleted
-                          ? 'bg-gradient-primary text-white'
+                          ? "bg-gradient-primary text-white"
                           : isCurrent
-                          ? 'bg-gradient-primary text-white animate-pulse'
-                          : 'bg-white/10 text-white/50'
+                            ? "bg-gradient-primary text-white animate-pulse"
+                            : "bg-white/10 text-white/50"
                       }`}
                     >
-                      {isCompleted ? '✓' : index + 1}
+                      {isCompleted ? "✓" : index + 1}
                     </div>
                     <div className="text-xs font-medium">{phase.title}</div>
-                    <div className="text-xs opacity-60">{phase.xpReward} XP</div>
+                    <div className="text-xs opacity-60">
+                      {phase.xpReward} XP
+                    </div>
                   </div>
                 );
               })}

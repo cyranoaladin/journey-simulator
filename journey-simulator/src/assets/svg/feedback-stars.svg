@@ -1,0 +1,13 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="feedbackGradient" x1="20" y1="20" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A855F7" />
+      <stop offset="1" stop-color="#3B82F6" />
+    </linearGradient>
+  </defs>
+  <rect x="6" y="6" width="108" height="108" rx="24" fill="#14142A" opacity="0.35" />
+  <path d="M60 28L66.4721 44.5279H84.2705L69.8992 54.9442L76.3713 71.4721L60 61.0558L43.6287 71.4721L50.1008 54.9442L35.7295 44.5279H53.5279L60 28Z" fill="url(#feedbackGradient)" />
+  <path d="M36 84L40.4721 94.5279H52.1803L42.8541 100.944L47.3262 111.472L36 104.944L24.6738 111.472L29.1459 100.944L19.8197 94.5279H31.5279L36 84Z" fill="#FDE68A" opacity="0.8" />
+  <path d="M84 84L88.4721 94.5279H100.18L90.8541 100.944L95.3262 111.472L84 104.944L72.6738 111.472L77.1459 100.944L67.8197 94.5279H79.5279L84 84Z" fill="#60A5FA" opacity="0.8" />
+  <circle cx="60" cy="54" r="38" stroke="url(#feedbackGradient)" stroke-width="4" opacity="0.45" />
+</svg>

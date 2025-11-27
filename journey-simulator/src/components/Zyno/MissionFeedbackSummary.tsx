@@ -37,7 +37,7 @@ export default function MissionFeedbackSummary({ summary }: Props) {
   }, [summary?.timestamp]);
 
   if (!summary) {
-    return <p className="text-sm text-slate-500">Aucune synthèse disponible.</p>;
+    return <p className="text-sm text-slate-500">No summary available.</p>;
   }
 
   const handleApiKeyChange = (value: string) => {
@@ -46,7 +46,7 @@ export default function MissionFeedbackSummary({ summary }: Props) {
 
   const exportSummary = async (format: 'pdf' | 'notion') => {
     if (!apiKey) {
-      setError('Renseignez la clé API admin (utilisée aussi par le scoreboard).');
+      setError('Enter the admin API key (also used by the scoreboard).');
       return;
     }
 
@@ -101,10 +101,10 @@ export default function MissionFeedbackSummary({ summary }: Props) {
               actions: summary.actions
             }
           });
-          setSuccessMessage('Synthèse envoyée vers Notion.');
+          setSuccessMessage('Summary sent to Notion.');
         } catch (notionError) {
           console.error('Notion webhook failed:', notionError);
-          const notionMessage = notionError instanceof Error ? notionError.message : 'Envoi vers Notion impossible.';
+          const notionMessage = notionError instanceof Error ? notionError.message : 'Unable to send to Notion.';
           setError(notionMessage);
         }
       }
@@ -119,7 +119,7 @@ export default function MissionFeedbackSummary({ summary }: Props) {
   return (
     <section className="space-y-3 rounded-lg bg-white p-4 shadow dark:bg-slate-900/70">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-xl font-semibold">📊 Synthèse de Mission</h2>
+        <h2 className="text-xl font-semibold">📊 Mission Summary</h2>
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -144,29 +144,29 @@ export default function MissionFeedbackSummary({ summary }: Props) {
 
       <div className="grid gap-1 text-sm">
         <p>
-          <strong>Utilisateur :</strong> {summary.userId}
+          <strong>User:</strong> {summary.userId}
         </p>
         <p>
-          <strong>Date :</strong> {formattedTimestamp}
+          <strong>Date:</strong> {formattedTimestamp}
         </p>
         <p>
-          <strong>Score AEPO :</strong> {summary.aepoScore} / 100
+          <strong>AEPO Score:</strong> {summary.aepoScore} / 100
         </p>
         <p>
-          <strong>Progression AECO :</strong> {summary.aecoPhase}
+          <strong>AECO Progress:</strong> {summary.aecoPhase}
         </p>
         <p>
-          <strong>Agents activés :</strong> {summary.agents.join(', ')}
+          <strong>Activated Agents:</strong> {summary.agents.join(', ')}
         </p>
       </div>
 
       <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-        Clé API admin
+        Admin API Key
         <input
           type="password"
           value={apiKey}
           onChange={(event) => handleApiKeyChange(event.target.value)}
-          placeholder="Saisir la clé x-api-key"
+          placeholder="Enter x-api-key"
           className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-400 dark:border-slate-600 dark:bg-slate-800"
         />
       </label>
@@ -184,7 +184,7 @@ export default function MissionFeedbackSummary({ summary }: Props) {
       )}
 
       <div>
-        <h4 className="text-sm font-semibold">🧠 Résumé généré :</h4>
+        <h4 className="text-sm font-semibold">🧠 Generated Summary:</h4>
         <pre className="mt-2 max-h-64 overflow-y-auto whitespace-pre-wrap rounded-md bg-slate-900 p-3 text-xs text-slate-100">
           {summary.generatedText}
         </pre>

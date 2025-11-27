@@ -5,7 +5,7 @@ export async function exportToPDF(elementId: string, filename = 'journey-summary
 
   const element = document.getElementById(elementId);
   if (!element) {
-    throw new Error('Élément introuvable pour la génération du PDF.');
+    throw new Error('Element not found for PDF generation.');
   }
 
   const [{ default: html2canvas }, jsPdfModule] = await Promise.all([
@@ -16,7 +16,7 @@ export async function exportToPDF(elementId: string, filename = 'journey-summary
   const JsPDFConstructor = (jsPdfModule as any).jsPDF ?? (jsPdfModule as any).default;
 
   if (typeof JsPDFConstructor !== 'function') {
-    throw new Error('Impossible de charger le moteur PDF.');
+    throw new Error('Unable to load PDF engine.');
   }
 
   const canvas = await html2canvas(element, {

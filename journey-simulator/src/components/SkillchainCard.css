@@ -1,0 +1,16 @@
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.skillchain-card-face {
+  min-height: 360px;
+  transform-style: preserve-3d;
+}
+
+.skillchain-card-front {
+  transform: rotateY(0deg);
+}
+
+.skillchain-card-back {
+  transform: rotateY(180deg);
+}

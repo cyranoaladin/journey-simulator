@@ -1,5 +1,6 @@
 const Journey = require('../models/Journeys');
 const User = require('../models/user');
+const mongoose = require('mongoose');
 
 exports.createJourney = async (req, res) => {
     try {
@@ -10,7 +11,7 @@ exports.createJourney = async (req, res) => {
             current_phase,
             completion_percentage,
             phases_status } = req.body;
-        
+
         const journey = new Journey({
             user_id: req.user.id,
             user_wallet,
@@ -20,17 +21,17 @@ exports.createJourney = async (req, res) => {
             completion_percentage,
             phases_status
         });
-        
+
         await journey.save();
         res.status(201).json({
             success: true,
             journey
         });
     } catch (error) {
-        res.status(400).json({ 
-            success: false, 
+        res.status(400).json({
+            success: false,
             message: 'Failed to create journey',
-            error: error.message 
+            error: error.message
         });
     }
 };
@@ -53,10 +54,10 @@ exports.getAllJourney = async (req, res) => {
             journeys
         });
     } catch (error) {
-        res.status(400).json({ 
-            success: false, 
+        res.status(400).json({
+            success: false,
             message: 'Failed to fetch journeys',
-            error: error.message 
+            error: error.message
         });
     }
 };
@@ -69,10 +70,10 @@ exports.getUserJourneys = async (req, res) => {
             journeys
         });
     } catch (error) {
-        res.status(400).json({ 
-            success: false, 
+        res.status(400).json({
+            success: false,
             message: 'Failed to fetch user journeys',
-            error: error.message 
+            error: error.message
         });
     }
 };
@@ -111,7 +112,7 @@ exports.getUserProgress = async (req, res) => {
 exports.updateUserProgress = async (req, res) => {
     try {
         const { total_xp, current_level, completed_phases } = req.body;
-        
+
         const updateData = {};
         if (total_xp !== undefined) updateData.total_xp = total_xp;
         if (current_level !== undefined) updateData.current_level = current_level;
@@ -188,7 +189,7 @@ exports.resetUserProgress = async (req, res) => {
 exports.completePhase = async (req, res) => {
     try {
         const { phase_number, score, nft_address } = req.body;
-        
+
         // Update user progress
         const user = await User.findByIdAndUpdate(
             req.user.id,
@@ -263,4 +264,400 @@ exports.deleteJourney = async (req, res) => {
         res.status(400).json({ success: false, message: error });
     }
 
-};  
+};
+
+// --- AI / Zyno Integration ---
+
+const ZynoAgent = require('../agents/ZynoAgent');
+const TokenomicsAgent = require('../agents/TokenomicsAgent');
+// const GrowthAgent = require('../agents/GrowthAgent'); // Future use
+
+exports.step = async (req, res) => {
+    try {
+        const { journeyId } = req.params;
+        const {
+            userInput,
+            phaseId,
+            trackId,
+            language,
+            journeyState,
+            mode, // discovery, builder, expert
+            tone  // pedagogical, investor_pitch
+        } = req.body;
+
+        const resolvedMode = mode || 'discovery';
+        const resolvedTone = tone || 'pedagogical';
+        const resolvedJourneyState = journeyState || {};
+
+        // In a real app, we might fetch the journey from DB to verify ownership/state
+        // const journey = await Journey.findById(journeyId);
+
+        const zyno = new ZynoAgent();
+        const ctx = {
+            userId: req.user ? req.user.id : 'anonymous',
+            journeyId,
+            phaseId,
+            trackId,
+            language: language || 'en',
+            userProfile: {
+                persona: trackId, // simplistic mapping for now
+                mode: resolvedMode,
+                tone: resolvedTone
+            },
+            lastInput: userInput,
+            journeyState: resolvedJourneyState
+        };
+
+        const result = await zyno.run(ctx);
+
+        // Here we could save the agent logs to DB
+
+        res.status(200).json(result.payload);
+
+    } catch (error) {
+        console.error('Zyno Step Error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to process journey step',
+            error: error.message
+        });
+    }
+};
+
+exports.submit = async (req, res) => {
+    try {
+        const { journeyId } = req.params;
+        const {
+            missionId,
+            submission,
+            inputType,
+            trackId,
+            phaseId
+        } = req.body;
+
+        const userId = req.user ? req.user.id : new mongoose.Types.ObjectId('507f1f77bcf86cd799439011'); // Demo/anonymous user ID
+
+        // Validate required fields
+        if (!missionId || !submission || !trackId || !phaseId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing required fields: missionId, submission, trackId, phaseId'
+            });
+        }
+
+        const AgentFactory = require('../agents/AgentFactory');
+        const MissionSubmission = require('../models/MissionSubmission');
+        const User = require('../models/user');
+        const ZynoAgent = require('../agents/ZynoAgent');
+
+        // 1. Select and run evaluation agent
+        const agent = AgentFactory.getAgentForContext({ trackId, phaseId, missionId });
+        console.log(`[Submit] Selected agent ${agent.name} for mission ${missionId}`);
+
+        const ctx = {
+            userId: userId.toString(),
+            journeyId,
+            phaseId,
+            trackId,
+            missionId,
+            submission,
+            lastInput: submission
+        };
+
+        const result = await agent.run(ctx);
+        const evaluation = result.payload;
+
+        // 2. Calculate rewards
+        const globalScore = evaluation.global_score || 0;
+        const xpDelta = Math.floor(globalScore * 10); // Score 0-10 → XP 0-100
+        const nftEligible = globalScore >= 8.0; // Threshold for NFT eligibility
+
+        console.log(`[Submit] Score: ${globalScore}/10, XP: ${xpDelta}, NFT Eligible: ${nftEligible}`);
+
+        // 3. Persist submission to database
+        const submissionRecord = await MissionSubmission.create({
+            userId,
+            journeyId,
+            missionId,
+            trackId,
+            phaseId,
+            submission,
+            inputType: inputType || 'text',
+            agentName: agent.name,
+            globalScore: globalScore,
+            feedback: evaluation.feedback || 'No feedback available', // Ensure feedback is never empty
+            axes: evaluation.axes || [],
+            xpAwarded: xpDelta,
+            nftEligible: nftEligible,
+            evaluatedAt: new Date(),
+            llmModel: result.metadata?.model || 'gpt-4o',
+            llmTokensUsed: result.metadata?.tokens_used || 0,
+            llmReasoningEffort: result.metadata?.reasoning_effort || 'medium'
+        });
+
+        console.log(`[Submit] Submission saved with ID: ${submissionRecord._id}`);
+
+        // 4. Update user progress
+        if (req.user) {
+            await User.findByIdAndUpdate(userId, {
+                $inc: { total_xp: xpDelta }
+            });
+            console.log(`[Submit] User XP updated: +${xpDelta}`);
+        }
+
+        // 5. Prepare NFT result if eligible
+        let nftResult = null;
+        if (nftEligible) {
+            nftResult = {
+                eligible: true,
+                message: `Congratulations! You scored ${globalScore}/10 and earned a Proof-of-Skill™ NFT`,
+                missionId,
+                score: globalScore,
+                certification: {
+                    name: `${phaseId} - ${missionId}`,
+                    description: `Completed ${missionId} with score ${globalScore}/10`,
+                    rarity: globalScore >= 9.5 ? 'legendary' : globalScore >= 9.0 ? 'epic' : 'rare'
+                }
+            };
+        }
+
+        // 6. Generate next step with Zyno (includes evaluation_block)
+        const zyno = new ZynoAgent();
+        const nextStepCtx = {
+            userId,
+            journeyId,
+            phaseId,
+            trackId,
+            language: 'en',
+            userProfile: {
+                persona: trackId,
+                mode: 'builder', // Could be passed from request
+                tone: 'pedagogical'
+            },
+            lastInput: `Mission ${missionId} completed with score ${globalScore}/10`,
+            journeyState: {
+                last_evaluation: {
+                    mission_id: missionId,
+                    score: globalScore,
+                    feedback: evaluation.feedback,
+                    axes: evaluation.axes,
+                    xp_awarded: xpDelta,
+                    nft_eligible: nftEligible
+                },
+                completed_missions: [missionId]
+            }
+        };
+
+        let nextStep = null;
+        try {
+            const zynoResult = await zyno.run(nextStepCtx);
+            nextStep = zynoResult.payload;
+
+            // Ensure evaluation feedback is shown
+            if (nextStep && nextStep.ui_blocks) {
+                const feedbackBlocks = [
+                    {
+                        id: `eval-${Date.now()}`,
+                        kind: 'evaluation_block', // Using 'kind' to match schema, though 'type' is also used
+                        title: 'Mission Evaluation',
+                        global_score: globalScore,
+                        max_score: 10,
+                        feedback: evaluation.feedback,
+                        axes: evaluation.axes
+                    },
+                    {
+                        id: `xp-${Date.now()}`,
+                        kind: 'xp_block',
+                        title: 'XP Gained',
+                        current_xp: (req.user ? req.user.total_xp : 0) + xpDelta,
+                        next_level_xp: 1000, // simplistic
+                        gained_xp: xpDelta,
+                        message: `You gained ${xpDelta} XP!`
+                    }
+                ];
+                // Prepend feedback blocks
+                console.log('[Submit] Injecting feedback blocks into nextStep');
+                nextStep.ui_blocks = [...feedbackBlocks, ...nextStep.ui_blocks];
+
+                // Ensure ALL blocks have unique IDs
+                nextStep.ui_blocks = nextStep.ui_blocks.map((block, index) => ({
+                    ...block,
+                    id: block.id || `block-${Date.now()}-${index}`
+                }));
+            }
+        } catch (zynoError) {
+            console.error('[Submit] Zyno next step generation failed:', zynoError);
+            // Fallback: create minimal next step
+            nextStep = {
+                metadata: {
+                    mode: 'builder',
+                    tone: 'pedagogical',
+                    phase: phaseId,
+                    track: trackId,
+                    language: 'en',
+                    timestamp: new Date().toISOString()
+                },
+                ui_blocks: [
+                    {
+                        id: `fallback-eval-${Date.now()}`,
+                        type: 'evaluation_block',
+                        title: 'Mission Evaluation',
+                        global_score: globalScore,
+                        feedback: evaluation.feedback,
+                        axes: evaluation.axes
+                    },
+                    {
+                        id: `fallback-xp-${Date.now()}`,
+                        type: 'xp_block',
+                        xp_gained: xpDelta,
+                        message: `You gained ${xpDelta} XP!`
+                    }
+                ],
+                agent_actions: [],
+                next_state: {
+                    xp_delta: xpDelta,
+                    completed_missions: [missionId]
+                }
+            };
+        }
+
+        // 7. Return comprehensive response
+        res.status(200).json({
+            success: true,
+            submission_id: submissionRecord._id,
+            evaluation: {
+                global_score: globalScore,
+                feedback: evaluation.feedback,
+                axes: evaluation.axes
+            },
+            rewards: {
+                xp_delta: xpDelta,
+                nft_eligible: nftEligible,
+                nft_result: nftResult
+            },
+            next_step: nextStep, // Full JourneyStepResponse
+            metadata: {
+                agent_used: agent.name,
+                evaluated_at: submissionRecord.evaluatedAt,
+                submission_id: submissionRecord._id
+            }
+        });
+
+    } catch (error) {
+        console.error('Submission Error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to process submission',
+            error: error.message
+        });
+    }
+};
+
+exports.loadDemoState = async (req, res) => {
+    try {
+        const { personaId } = req.body;
+
+        let userId = req.user ? req.user.id : null;
+        let user = null;
+
+        // Handle anonymous/demo user creation
+        if (!userId) {
+            const demoId = '507f1f77bcf86cd799439011';
+            user = await User.findById(demoId);
+
+            if (!user) {
+                console.log('[LoadDemo] Creating new demo user...');
+                user = await User.create({
+                    _id: demoId,
+                    name: 'Demo User',
+                    email: 'demo@moneyfactory.ai',
+                    password: 'demo_password_123', // Will be hashed by pre-save hook
+                    wallet_address: 'DEMO_WALLET_ADDRESS',
+                    persona: personaId || 'capital-foundry',
+                    role: 'user',
+                    is_active: true,
+                    subscription: 'free plan'
+                });
+            }
+            userId = user._id;
+        } else {
+            user = await User.findById(userId);
+        }
+
+        if (!personaId) {
+            return res.status(400).json({
+                success: false,
+                message: 'personaId is required'
+            });
+        }
+
+        // Load demo state from JSON
+        const fs = require('fs');
+        const path = require('path');
+        const demoPath = path.join(__dirname, '../data/demo-states', `${personaId}.json`);
+
+        if (!fs.existsSync(demoPath)) {
+            return res.status(404).json({
+                success: false,
+                message: `No demo state found for persona: ${personaId}`
+            });
+        }
+
+        const demoState = JSON.parse(fs.readFileSync(demoPath, 'utf8'));
+
+        // Create or update user's journey with demo state
+        const Journey = require('../models/Journeys');
+        const journey = await Journey.findOneAndUpdate(
+            { user_id: userId, journey_type: personaId },
+            {
+                user_id: userId,
+                journey_type: personaId,
+                current_phase: demoState.current_phase_index,
+                completion_percentage: (demoState.completed_phases.length / 5) * 100,
+                phases_status: demoState.completed_phases.map(idx => ({
+                    phase_number: idx,
+                    status: 'completed',
+                    completed_at: new Date()
+                })),
+                demo_mode: true,
+                demo_loaded_at: new Date()
+            },
+            { upsert: true, new: true }
+        );
+
+        // Update user progress
+        const updatedUser = await User.findByIdAndUpdate(userId, {
+            total_xp: demoState.total_xp,
+            current_level: demoState.current_level,
+            completed_phases: demoState.completed_phases.length,
+            persona: personaId,
+            nft_certificates: demoState.nft_certificates || []
+        }, { new: true }).select('-password');
+
+        console.log(`[LoadDemo] Demo state loaded for ${personaId}, user ${userId}`);
+
+        res.status(200).json({
+            success: true,
+            message: 'Demo state loaded successfully',
+            journey,
+            demo_state: demoState,
+            progress: {
+                total_xp: updatedUser.total_xp,
+                current_level: updatedUser.current_level,
+                completed_phases: updatedUser.completed_phases,
+                nft_certificates: updatedUser.nft_certificates,
+                token_transactions: updatedUser.token_transactions,
+                subscription: updatedUser.subscription,
+                persona: updatedUser.persona
+            }
+        });
+
+    } catch (error) {
+        console.error('Load demo state error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to load demo state',
+            error: error.message
+        });
+    }
+};

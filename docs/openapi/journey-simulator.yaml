@@ -1,0 +1,830 @@
+openapi: 3.0.3
+info:
+  title: Money Factory AI — Journey Simulator API
+  version: 0.1.0
+  description: >-
+    Public API for Journey Simulator (frontend Next.js + backend routes). Includes
+    health, journeys, step/submit/state, agents logs, Solana devnet utilities
+    (mint, tx), RAG stubs, SIWS auth stubs, and DAO/Stake simulations.
+servers:
+  - url: https://journey.mfai.app
+    description: Production
+  - url: http://localhost:3000
+    description: Local dev
+tags:
+  - name: Health
+  - name: Metrics
+  - name: Journeys
+  - name: Steps
+  - name: Submissions
+  - name: State
+  - name: Agents
+  - name: AI
+  - name: Mint
+  - name: Transactions
+  - name: RAG
+  - name: Auth
+  - name: DAO
+  - name: Stake
+paths:
+  /api/health:
+    get:
+      tags: [Health]
+      summary: Healthcheck
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /api/healthz:
+    get:
+      tags: [Health]
+      summary: Healthcheck (legacy)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /api/metrics:
+    get:
+      tags: [Metrics]
+      summary: Expose in-memory counters
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  metrics:
+                    type: object
+                    additionalProperties: true
+                  time:
+                    type: string
+                    format: date-time
+  /api/ai/echo:
+    post:
+      tags: [AI]
+      summary: Test echo API
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  text: { type: string }
+                  upper: { type: string }
+                  length: { type: integer }
+                  tags:
+                    type: array
+                    items: { type: string }
+  /api/journeys:
+    get:
+      tags: [Journeys]
+      summary: List last journeys
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  journeys:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Journey'
+    post:
+      tags: [Journeys]
+      summary: Create a journey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateJourneyRequest'
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  journey:
+                    $ref: '#/components/schemas/Journey'
+        '400':
+          description: Bad request
+  /api/journeys/{id}/state:
+    get:
+      tags: [State]
+      summary: Get journey state
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+        - in: query
+          name: userId
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JourneyStateResponse'
+        '404':
+          description: Not found
+  /api/journeys/{id}/step:
+    post:
+      tags: [Steps]
+      summary: Execute a journey step (Zyno orchestrator)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+        - in: query
+          name: llm
+          required: false
+          schema: { type: string, enum: ['0','1'] }
+        - in: query
+          name: replay
+          required: false
+          schema: { type: string, enum: ['0','1'] }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StepRequest'
+      responses:
+        '200':
+          description: OK — JourneyStepResponse
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JourneyStepResponse'
+        '400': { description: Bad request }
+        '500': { description: Orchestrator failed }
+  /api/journeys/{id}/submit:
+    post:
+      tags: [Submissions]
+      summary: Submit a mission for evaluation
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+        - in: query
+          name: llm
+          required: false
+          schema: { type: string, enum: ['0','1'] }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitRequest'
+      responses:
+        '200':
+          description: OK — JourneyStepResponse
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JourneyStepResponse'
+        '400': { description: Bad request }
+        '500': { description: Evaluator failed }
+  /api/agents/logs:
+    get:
+      tags: [Agents]
+      summary: List agent logs
+      parameters:
+        - in: query
+          name: journeyId
+          schema: { type: string }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 200, default: 50 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  logs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AgentLogEntry'
+  /api/mint/simulate:
+    post:
+      tags: [Mint]
+      summary: Simulate NFT mint (devnet)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MintSimulateRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  sim:
+                    $ref: '#/components/schemas/MintSimulation'
+        '400': { description: Bad request }
+  /api/mint/execute:
+    post:
+      tags: [Mint]
+      summary: Execute mint (devnet)
+      parameters:
+        - in: header
+          name: x-user-id
+          required: false
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sim:
+                  $ref: '#/components/schemas/MintSimulationInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  tx:
+                    type: object
+                    properties:
+                      txSig: { type: string }
+        '400': { description: Missing/invalid input or minter key missing }
+        '403': { description: Kill switch enabled }
+        '500': { description: Execution failed }
+  /api/mint/last:
+    get:
+      tags: [Mint]
+      summary: Get last mint for user (optional)
+      parameters:
+        - in: header
+          name: x-user-id
+          required: false
+          schema: { type: string }
+        - in: query
+          name: userId
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  last:
+                    oneOf:
+                      - type: 'null'
+                      - $ref: '#/components/schemas/MintLogRow'
+  /api/tx/prepare:
+    post:
+      tags: [Transactions]
+      summary: Prepare a Solana transaction (devnet)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TxPrepareRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  tx:
+                    type: object
+                    description: Versioned transaction or serialized payload
+                  error: { type: string }
+        '400': { description: Bad request }
+        '500': { description: Server misconfiguration or failure }
+  /api/rag/doc:
+    post:
+      tags: [RAG]
+      summary: Insert a document (MVP stub)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title: { type: string }
+                content: { type: string }
+                tags: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string }
+  /api/rag/ingest:
+    post:
+      tags: [RAG]
+      summary: Ingest a document (MVP stub)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title: { type: string }
+                content: { type: string }
+                tags: { type: string }
+      responses:
+        '200':
+          description: OK
+  /api/rag/ingest-batch:
+    post:
+      tags: [RAG]
+      summary: Ingest batch documents (MVP stub)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      title: { type: string }
+                      content: { type: string }
+                      tags: { type: string }
+      responses:
+        '200':
+          description: OK
+  /api/rag/query:
+    post:
+      tags: [RAG]
+      summary: Query documents (MVP stub)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text: { type: string }
+      responses:
+        '200':
+          description: OK
+  /api/rag/search:
+    post:
+      tags: [RAG]
+      summary: Vector-like search (MVP stub)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                q: { type: string }
+      responses:
+        '200':
+          description: OK
+  /api/auth/siws/challenge:
+    post:
+      tags: [Auth]
+      summary: SIWS challenge (stub)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  challenge: { type: string }
+                  message: { type: string }
+                  expiresAt: { type: string, format: date-time }
+  /api/auth/siws/verify:
+    post:
+      tags: [Auth]
+      summary: Verify SIWS (stub)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                address: { type: string }
+                signature: { type: string }
+                challenge: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string }
+        '400': { description: Bad request }
+  /api/dao/vote/simulate:
+    post:
+      tags: [DAO]
+      summary: Simulate a DAO vote (MVP)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                proposalId: { type: string }
+                support:
+                  oneOf:
+                    - type: boolean
+                    - type: string
+                      enum: ['yes','no']
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  result: { type: string, enum: ['approved','rejected'] }
+                  votes:
+                    type: object
+                    properties:
+                      yes: { type: integer }
+                      no: { type: integer }
+        '400': { description: Bad request }
+  /api/stake/simulate:
+    post:
+      tags: [Stake]
+      summary: Simulate staking (MVP)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount: { type: number }
+                userId: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  staked: { type: number }
+                  votingPowerDelta: { type: integer }
+        '400': { description: Bad request }
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        ok: { type: boolean }
+        time: { type: string, format: date-time }
+    Journey:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        userId: { type: string, nullable: true }
+    CreateJourneyRequest:
+      type: object
+      required: [title]
+      properties:
+        title: { type: string, minLength: 3 }
+        userEmail: { type: string, format: email }
+    JourneyStateResponse:
+      type: object
+      description: Current stored journey state
+      properties:
+        id: { type: string }
+        last_state: { type: object }
+        last_metadata: { type: object, nullable: true }
+        updatedAt: { type: string }
+        userId: { type: string, nullable: true }
+    StepRequest:
+      type: object
+      required: [phaseId, trackId, language, journeyState]
+      properties:
+        phaseId: { type: string }
+        trackId: { type: string }
+        userInput: { type: string }
+        actionId: { type: string }
+        language: { type: string, enum: ['fr','en'] }
+        mode: { type: string, enum: ['discovery','builder','expert'] }
+        journeyState: { type: object }
+    SubmitRequest:
+      type: object
+      required: [missionId, inputType, submission, language]
+      properties:
+        missionId: { type: string }
+        inputType: { type: string, enum: ['text','markdown_document','code_snippet','link','choice'] }
+        submission: { type: string }
+        language: { type: string, enum: ['fr','en'] }
+        mode: { type: string, enum: ['discovery','builder','expert'] }
+        tone: { type: string, enum: ['pedagogical','investor_pitch','critical'] }
+        trackId: { type: string }
+        phaseId: { type: string }
+        journeyState: { type: object }
+    JourneyStepResponse:
+      type: object
+      required: [metadata, ui_blocks, agent_actions, next_state]
+      properties:
+        metadata:
+          type: object
+          required: [persona_id, journey_track, phase_id, language]
+          properties:
+            persona_id: { type: string }
+            journey_track: { type: string }
+            phase_id: { type: string }
+            language: { type: string, enum: ['fr','en'] }
+            title: { type: string }
+            summary: { type: string }
+            mode: { type: string, enum: ['discovery','builder','expert'] }
+            tone: { type: string, enum: ['pedagogical','investor_pitch','critical'] }
+        ui_blocks:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/TextBlock'
+              - $ref: '#/components/schemas/ChecklistBlock'
+              - $ref: '#/components/schemas/QuizBlock'
+              - $ref: '#/components/schemas/MissionBlock'
+              - $ref: '#/components/schemas/ResourceBlock'
+              - $ref: '#/components/schemas/DocumentBlock'
+              - $ref: '#/components/schemas/EvaluationBlock'
+              - $ref: '#/components/schemas/ActionSuggestionsBlock'
+              - $ref: '#/components/schemas/XpBlock'
+        agent_actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgentAction'
+        next_state:
+          $ref: '#/components/schemas/NextState'
+    TextBlock:
+      type: object
+      required: [kind, id, title, body_markdown]
+      properties:
+        kind: { type: string, enum: ['text_block'] }
+        id: { type: string }
+        title: { type: string }
+        body_markdown: { type: string }
+    ChecklistBlock:
+      type: object
+      required: [kind, id, title, items]
+      properties:
+        kind: { type: string, enum: ['checklist_block'] }
+        id: { type: string }
+        title: { type: string }
+        items:
+          type: array
+          items:
+            type: object
+            required: [label]
+            properties:
+              label: { type: string }
+              checked: { type: boolean }
+    QuizBlock:
+      type: object
+      required: [kind, id, title, questions]
+      properties:
+        kind: { type: string, enum: ['quiz_block'] }
+        id: { type: string }
+        title: { type: string }
+        questions:
+          type: array
+          items:
+            type: object
+            required: [id, question, options, correct_option_index, explanation]
+            properties:
+              id: { type: string }
+              question: { type: string }
+              options:
+                type: array
+                items: { type: string }
+              correct_option_index: { type: integer }
+              explanation: { type: string }
+    MissionBlock:
+      type: object
+      required: [kind, id, title, description, mission_type, expected_input_type, xp_reward]
+      properties:
+        kind: { type: string, enum: ['mission_block'] }
+        id: { type: string }
+        title: { type: string }
+        description: { type: string }
+        mission_type: { type: string }
+        expected_input_type: { type: string, enum: ['text','markdown_document','code_snippet','link','choice'] }
+        xp_reward: { type: integer }
+        nft_reward_id: { type: string }
+        is_mandatory: { type: boolean }
+    ResourceBlock:
+      type: object
+      required: [kind, id, title, resources]
+      properties:
+        kind: { type: string, enum: ['resource_block'] }
+        id: { type: string }
+        title: { type: string }
+        resources:
+          type: array
+          items:
+            type: object
+            required: [id, label, resource_type, agent_owner]
+            properties:
+              id: { type: string }
+              label: { type: string }
+              description: { type: string }
+              url: { type: string }
+              resource_type: { type: string, enum: ['article','video','template','code_snippet','checklist','tool_link'] }
+              agent_owner: { type: string }
+    DocumentBlock:
+      type: object
+      required: [kind, id, title, doc_type, content_markdown]
+      properties:
+        kind: { type: string, enum: ['document_block'] }
+        id: { type: string }
+        title: { type: string }
+        doc_type: { type: string }
+        content_markdown: { type: string }
+    EvaluationBlock:
+      type: object
+      required: [kind, id, title, global_score, max_score, feedback, axes]
+      properties:
+        kind: { type: string, enum: ['evaluation_block'] }
+        id: { type: string }
+        title: { type: string }
+        global_score: { type: number }
+        max_score: { type: number }
+        feedback: { type: string }
+        axes:
+          type: array
+          items:
+            type: object
+            required: [name, score, max_score, comment]
+            properties:
+              name: { type: string }
+              score: { type: number }
+              max_score: { type: number }
+              comment: { type: string }
+    ActionSuggestionsBlock:
+      type: object
+      required: [kind, id, title, suggestions]
+      properties:
+        kind: { type: string, enum: ['action_suggestions_block'] }
+        id: { type: string }
+        title: { type: string }
+        suggestions:
+          type: array
+          items:
+            type: object
+            required: [label, action_id]
+            properties:
+              label: { type: string }
+              action_id: { type: string }
+    XpBlock:
+      type: object
+      required: [kind, id, current_xp, gained_xp, next_level_xp]
+      properties:
+        kind: { type: string, enum: ['xp_block'] }
+        id: { type: string }
+        title: { type: string }
+        current_xp: { type: integer }
+        gained_xp: { type: integer }
+        next_level_xp: { type: integer }
+        comment: { type: string }
+    AgentAction:
+      type: object
+      required: [agent_name, reason, action]
+      properties:
+        agent_name: { type: string }
+        reason: { type: string }
+        action: { type: string }
+        parameters: { type: object }
+    NextState:
+      type: object
+      required: [phase_id, completed_missions, xp_delta]
+      properties:
+        phase_id: { type: string }
+        completed_missions:
+          type: array
+          items: { type: string }
+        xp_delta: { type: integer }
+        notes: { type: string }
+    AgentLogEntry:
+      type: object
+      properties:
+        ts: { type: integer, description: epoch ms }
+        journeyId: { type: string }
+        userId: { type: string }
+        agent: { type: string }
+        action: { type: string }
+        details: { type: object }
+    MintSimulateRequest:
+      type: object
+      required: [recipient, name, symbol, uri]
+      properties:
+        recipient: { type: string }
+        name: { type: string }
+        symbol: { type: string }
+        uri: { type: string, format: uri }
+    MintSimulation:
+      type: object
+      properties:
+        ok: { type: boolean }
+        estFeeLamports: { type: number }
+        riskScore: { type: number }
+        txB64: { type: string }
+        network: { type: string, example: devnet }
+    MintSimulationInput:
+      type: object
+      required: [ok, estFeeLamports, riskScore, network]
+      properties:
+        ok: { type: boolean }
+        estFeeLamports: { type: number }
+        riskScore: { type: number }
+        txB64: { type: string }
+        network: { type: string }
+    MintLogRow:
+      type: object
+      properties:
+        signature: { type: string }
+        network: { type: string }
+        createdAt: { type: string }
+        spec: { type: object }
+    TxPrepareRequest:
+      type: object
+      properties:
+        kind:
+          type: string
+          example: transfer
+        params:
+          type: object
+          properties:
+            to: { type: string }
+            lamports: { type: number }
+            payer: { type: string }

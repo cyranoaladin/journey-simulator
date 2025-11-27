@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { ExternalLink, Copy, CheckCircle, Trophy, Coins, Award, Lock, Unlock, AlertCircle } from 'lucide-react'
 import { useJourneyStore } from '../store/journeyStore'
 import { useWallet } from '@solana/wallet-adapter-react'
+import './SkillchainCard.css'
 
 interface SkillchainCardProps {
   className?: string
@@ -233,12 +234,10 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
         animate={{ rotateY: isFlipped ? 180 : 0 }}
         transition={{ duration: 0.6, type: 'spring', damping: 20 }}
         onClick={() => setIsFlipped(!isFlipped)}
-        style={{ transformStyle: 'preserve-3d' }}
       >
         {/* Front of Card */}
         <div 
-          className={`relative w-full ${getPersonaGradient()} rounded-2xl p-6 shadow-2xl border border-white/20 overflow-hidden backface-hidden`}
-          style={{ minHeight: '360px', transform: 'rotateY(0deg)', transformStyle: 'preserve-3d' }}
+          className={`relative w-full ${getPersonaGradient()} rounded-2xl p-6 shadow-2xl border border-white/20 overflow-hidden backface-hidden skillchain-card-face skillchain-card-front`}
         >
           {/* Holographic effect */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 animate-pulse" />
@@ -343,8 +342,7 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
 
         {/* Back of Card */}
         <div 
-          className={`absolute inset-0 w-full ${getPersonaGradient()} rounded-2xl p-6 shadow-2xl border border-white/20 overflow-hidden backface-hidden`}
-          style={{ minHeight: '360px', transform: 'rotateY(180deg)', transformStyle: 'preserve-3d' }}
+          className={`absolute inset-0 w-full ${getPersonaGradient()} rounded-2xl p-6 shadow-2xl border border-white/20 overflow-hidden backface-hidden skillchain-card-face skillchain-card-back`}
         >
           {/* Holographic effect */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 animate-pulse" />

@@ -80,10 +80,16 @@ cd journey-simulator
 # Install dependencies
 npm install
 
-# Start development server
+# Install backend dependencies
+npm install --prefix ../mf-back
+
+# Start backend API (requires MongoDB running locally)
+JWT_SECRET=dev-secret MONGO_URI="mongodb://127.0.0.1:27017/mfai" npm run dev --prefix ../mf-back
+
+# Start frontend development server
 npm run dev
 
-# Open browser to http://localhost:5173
+# Open browser to http://127.0.0.1:5173
 ```
 
 ### Integration with Money Factory AI Website
@@ -989,9 +995,32 @@ VITE_ENABLE_REAL_BLOCKCHAIN=false
 # API endpoints
 VITE_API_BASE_URL=https://api.moneyfactory.ai
 VITE_ZYNO_API_URL=https://zyno.moneyfactory.ai
+VITE_SOLANA_API_BASE_URL=http://127.0.0.1:3001
 
 # Knowledge base distribution
 VITE_RESOURCE_LIBRARY_BASE_URL=https://cdn.moneyfactory.ai/knowledge-vault
+```
+
+### API usage example: trigger next step with actionId
+
+Use actionId to chain the scenario from an ActionSuggestionsBlock. The backend will forward it to Zyno.
+
+```ts
+async function triggerNextStep(journeyId: string, actionId: string){
+  const BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:3000'
+  const body = {
+    phaseId: 'learn',
+    trackId: 'builder',
+    actionId,
+    language: 'fr',
+    journeyState: { /* your persisted state */ }
+  }
+  const res = await fetch(`${BASE}/api/journeys/${journeyId}/step?llm=1`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+  })
+  if(!res.ok) throw new Error(`HTTP ${res.status}`)
+  return res.json()
+}
 ```
 
 ### Tailwind Configuration
@@ -1110,6 +1139,8 @@ npm run test:e2e
 npm run test:all
 ```
 
+> Manual QA: After the automated suite, run the wallet connection journey in a browser with Phantom and Torus to verify the modal flow, reconnect behaviour, and persisted session before marking the build investor-ready.
+
 ---
 
 ## 🚀 Deployment
@@ -1217,7 +1248,15 @@ node server.js
 **Status**: Under investigation
 **Priority**: High
 
-#### 2. Transaction Simulation
+#### 2. Torus Wallet Adapter Deprecation Warning
+
+**Issue**: `@solana/wallet-adapter-torus` currently depends on the deprecated `@toruslabs/solana-embed@2.x`, which emits maintenance warnings at install time
+**Impact**: No functional regression observed, but production rollout should either track the upstream fix or migrate to the new Web3Auth WS Embed SDK
+**Workaround**: Continue using Phantom/Solflare for demos; monitor Solana wallet adapter releases for an updated dependency
+**Status**: Open (tracking with wallet team)
+**Priority**: Medium
+
+#### 3. Transaction Simulation
 
 **Issue**: All blockchain transactions are currently simulated
 **Impact**: No real NFTs or tokens are minted
@@ -1226,14 +1265,14 @@ node server.js
 
 ### Minor Issues
 
-#### 3. Animation Performance
+#### 4. Animation Performance
 
 **Issue**: Complex animations may lag on older devices
 **Workaround**: Reduce motion in accessibility settings
 **Status**: Optimization in progress
 **Priority**: Medium
 
-#### 4. Image Loading
+#### 5. Image Loading
 
 **Issue**: Some persona images may load slowly
 **Workaround**: Images are lazy-loaded

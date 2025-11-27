@@ -208,7 +208,7 @@ const JourneyCompletedPage = () => {
       await exportToPDF('journey-summary', `${summary.personaTitle.replace(/\s+/g, '-')}-completion.pdf`)
     } catch (error) {
       console.error('PDF export failed:', error)
-      setExportError(error instanceof Error ? error.message : 'Export PDF impossible.')
+      setExportError(error instanceof Error ? error.message : 'PDF export impossible.')
     } finally {
       setIsGeneratingPdf(false)
     }
@@ -234,11 +234,11 @@ const JourneyCompletedPage = () => {
         }
       })
       setNotionStatus('success')
-      setNotionMessage('Résumé transmis à Notion.')
+      setNotionMessage('Summary sent to Notion.')
     } catch (error) {
       console.error('Notion export failed:', error)
       setNotionStatus('error')
-      setExportError(error instanceof Error ? error.message : 'Envoi vers Notion impossible.')
+      setExportError(error instanceof Error ? error.message : 'Sending to Notion impossible.')
     }
   }
 
@@ -344,7 +344,7 @@ const JourneyCompletedPage = () => {
             <div className="space-y-4 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
               <h3 className="text-xl font-semibold text-white">Exports & Continuity</h3>
               <p className="text-sm text-white/70">
-                Téléchargez le dossier complet ou synchronisez-le avec votre base Notion pour partager vos preuves de mission.
+                Download the full dossier or sync it with your Notion base to share your mission proofs.
               </p>
 
               <div className="flex flex-col gap-3">
@@ -355,7 +355,7 @@ const JourneyCompletedPage = () => {
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-primary px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <Download size={18} />
-                  {isGeneratingPdf ? 'Export en cours…' : 'Exporter en PDF'}
+                  {isGeneratingPdf ? 'Exporting...' : 'Export to PDF'}
                 </button>
                 <button
                   type="button"
@@ -364,7 +364,7 @@ const JourneyCompletedPage = () => {
                   className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <PenSquare size={18} />
-                  {notionStatus === 'loading' ? 'Envoi vers Notion…' : 'Envoyer vers Notion'}
+                  {notionStatus === 'loading' ? 'Sending to Notion...' : 'Send to Notion'}
                 </button>
                 <button
                   type="button"
@@ -372,7 +372,7 @@ const JourneyCompletedPage = () => {
                   className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
                 >
                   <RefreshCw size={18} />
-                  Recommencer un parcours
+                  Restart a Journey
                 </button>
               </div>
 
@@ -386,9 +386,9 @@ const JourneyCompletedPage = () => {
             <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
               <h3 className="mb-3 text-lg font-semibold text-white">Next Moves</h3>
               <ul className="space-y-3 text-sm text-white/70">
-                <li>→ Lancez un nouveau parcours pour renforcer votre Proof-of-Skill™ stack.</li>
-                <li>→ Partagez votre dossier avec la Sovereign Builders Network pour capter des missions.</li>
-                <li>→ Activez Zyno pour convertir ce rapport en mise à jour DAO ou en pitch investisseur.</li>
+                <li>→ Start a new journey to strengthen your Proof-of-Skill™ stack.</li>
+                <li>→ Share your dossier with the Sovereign Builders Network to capture missions.</li>
+                <li>→ Activate Zyno to convert this report into a DAO update or investor pitch.</li>
               </ul>
             </div>
           </aside>

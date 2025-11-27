@@ -1,0 +1,19 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="agentsGlow" cx="0.5" cy="0.5" r="0.7">
+      <stop offset="0" stop-color="#3B82F6" stop-opacity="0.8" />
+      <stop offset="1" stop-color="#0D0D1A" stop-opacity="0.1" />
+    </radialGradient>
+    <linearGradient id="agentStroke" x1="30" y1="30" x2="90" y2="90" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6366F1" />
+      <stop offset="1" stop-color="#A855F7" />
+    </linearGradient>
+  </defs>
+  <rect x="6" y="6" width="108" height="108" rx="24" fill="url(#agentsGlow)" />
+  <circle cx="60" cy="46" r="22" stroke="url(#agentStroke)" stroke-width="6" />
+  <circle cx="36" cy="78" r="18" stroke="#6366F1" stroke-width="5" opacity="0.7" />
+  <circle cx="84" cy="78" r="18" stroke="#A855F7" stroke-width="5" opacity="0.7" />
+  <path d="M60 68C52 68 46 74 46 82V86H74V82C74 74 68 68 60 68Z" stroke="#FDE68A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.8" />
+  <path d="M36 96C36 86 42 80 48 78" stroke="#60A5FA" stroke-width="4" stroke-linecap="round" opacity="0.7" />
+  <path d="M84 96C84 86 78 80 72 78" stroke="#C084FC" stroke-width="4" stroke-linecap="round" opacity="0.7" />
+</svg>

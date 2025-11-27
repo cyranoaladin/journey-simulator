@@ -11,11 +11,12 @@ interface JourneyCardProps {
 }
 
 const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
-  const { setSelectedPersona, userProgress, loadUserProgress } = useJourneyStore();
+  const { setSelectedPersona, userProgress, loadUserProgress, setUserProgress } = useJourneyStore();
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingDemo, setIsLoadingDemo] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const shouldReduceMotion = useReducedMotion();
-  
+
   const isActivePersona = userProgress.currentPersona === persona.id;
   const completedCount = isActivePersona ? userProgress.completedPhases.length : 0;
   const hasStarted = completedCount > 0;
@@ -42,13 +43,13 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       // Set persona in store
       setSelectedPersona(persona);
-      
+
       // Update user profile with selected persona in backend
       await api.updateUserProfile({ persona: persona.id as any });
-      
+
       // Reload user progress to get latest data
       await loadUserProgress();
 
@@ -58,6 +59,77 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
       setError('Failed to select journey. Please try again.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleLoadDemo = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+
+    try {
+      setIsLoadingDemo(true);
+      setError(null);
+
+      // Load demo state from backend
+      const result = await api.loadDemoState(persona.id);
+
+      if (result.success) {
+        // Set persona FIRST to initialize the workspace (this resets progress in store)
+        setSelectedPersona(persona);
+
+        if (result.progress) {
+          // Map backend progress to frontend UserProgress directly
+          const backendProgress = result.progress;
+
+          const completedCount = typeof backendProgress.completed_phases === 'number'
+            ? backendProgress.completed_phases
+            : 0;
+
+          const completedPhases = Array.from({ length: completedCount }, (_, index) => index);
+
+          const rawCertificates = Array.isArray(backendProgress.nft_certificates)
+            ? backendProgress.nft_certificates
+            : [];
+
+          const mappedNfts = rawCertificates.map((certificate: any) => {
+            return certificate?.title || certificate?.nft_address || `Phase ${certificate?.phase} NFT`;
+          });
+
+          const mappedProgress = {
+            ...userProgress, // Note: this might be stale if we just called setSelectedPersona, but we are overwriting the important parts
+            totalXP: backendProgress.total_xp || 0,
+            nfts: mappedNfts,
+            mfaiTokens: backendProgress.token_transactions?.mfai_tokens || 0,
+            completedPhases,
+            currentPersona: persona.id,
+            votingPower: Math.floor((backendProgress.total_xp || 0) / 10),
+            // Preserve client-side only state
+            walletConnected: userProgress.walletConnected,
+            walletAddress: userProgress.walletAddress,
+          };
+
+          // Update progress (overwriting the reset state from setSelectedPersona)
+          setUserProgress(mappedProgress);
+
+          // Update current phase to match progress
+          const { setCurrentPhase } = useJourneyStore.getState();
+          setCurrentPhase(completedCount);
+        } else {
+          // Fallback to standard reload if no progress returned
+          await loadUserProgress();
+        }
+
+        // Show success message
+        console.log('Demo state loaded:', result.demo_state);
+
+        onSelected?.();
+      } else {
+        setError('Failed to load demo state');
+      }
+    } catch (error) {
+      console.error('Failed to load demo:', error);
+      setError('Failed to load demo. Please try again.');
+    } finally {
+      setIsLoadingDemo(false);
     }
   };
 
@@ -88,9 +160,8 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
       viewport={shouldReduceMotion ? undefined : { once: true, margin: '-80px' }}
       whileHover={shouldReduceMotion ? undefined : { y: -8, rotateX: -1.8 }}
       whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
-      className={`neon-border card-surface-layer relative flex flex-col gap-6 overflow-hidden p-6 text-left transition-transform duration-500 ease-out-quart motion-safe:hover:shadow-neon-ring ${
-        isActivePersona ? 'ring-2 ring-accent-neon ring-offset-2 ring-offset-white dark:ring-offset-mfai-surface' : ''
-      }`}
+      className={`neon-border card-surface-layer relative flex flex-col gap-6 overflow-hidden p-6 text-left transition-transform duration-500 ease-out-quart motion-safe:hover:shadow-neon-ring ${isActivePersona ? 'ring-2 ring-accent-neon ring-offset-2 ring-offset-white dark:ring-offset-mfai-surface' : ''
+        }`}
     >
       <div className="flex flex-col gap-6 lg:flex-row">
         <div className="flex flex-1 flex-col gap-5">
@@ -164,7 +235,7 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
                   {upcomingPhase?.title ?? 'Select to reveal roadmap'}
                 </p>
                 <p className="mt-1 text-xs text-slate-700 dark:text-white/70">
-                  {upcomingPhase?.mission ?? 'Start this journey to unlock Zyno’s activation pipeline.'}
+                  {upcomingPhase?.mission ?? "Start this journey to unlock Zyno's activation pipeline."}
                 </p>
               </div>
               <div className="mfai-divider" />
@@ -204,36 +275,56 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
             </p>
           </div>
 
-          <motion.button
-            type="button"
-            whileHover={{ scale: isLoading ? 1 : 1.03 }}
-            whileTap={{ scale: isLoading ? 1 : 0.97 }}
-            onClick={handlePersonaSelection}
-            disabled={isLoading}
-            className={`relative inline-flex items-center justify-center overflow-hidden rounded-2xl px-6 py-3 text-sm font-semibold transition-all duration-300 ease-out-quart focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
-              isLoading
+          <div className="space-y-2">
+            <motion.button
+              type="button"
+              whileHover={{ scale: isLoading ? 1 : 1.03 }}
+              whileTap={{ scale: isLoading ? 1 : 0.97 }}
+              onClick={handlePersonaSelection}
+              disabled={isLoading}
+              className={`relative inline-flex w-full items-center justify-center overflow-hidden rounded-2xl px-6 py-3 text-sm font-semibold transition-all duration-300 ease-out-quart focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${isLoading
                 ? 'cursor-wait bg-mfai-surfaceMuted text-slate-500 dark:text-mfai-text/50'
                 : isActivePersona
                   ? 'bg-gradient-accent text-white shadow-neon-ring'
                   : 'border border-accent/40 bg-transparent text-accent hover:bg-accent/10'
-            }`}
-          >
-            <span className="relative z-10 flex items-center gap-2">
-              {isLoading ? <RefreshCw size={16} className="animate-spin" /> : <Sparkles size={16} />}
-              {isLoading
-                ? 'Syncing with Zyno...'
-                : isActivePersona
-                  ? hasStarted
-                    ? 'Continue journey'
-                    : 'Resume onboarding'
-                  : 'Launch with Zyno'}
-            </span>
-            {!isLoading && (
-              <span
-                className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(197,148,255,0.25),transparent_60%)] opacity-0 transition-opacity duration-300 hover:opacity-100"
-              />
-            )}
-          </motion.button>
+                }`}
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                {isLoading ? <RefreshCw size={16} className="animate-spin" /> : <Sparkles size={16} />}
+                {isLoading
+                  ? 'Syncing with Zyno...'
+                  : isActivePersona
+                    ? hasStarted
+                      ? 'Continue journey'
+                      : 'Resume onboarding'
+                    : 'Launch with Zyno'}
+              </span>
+              {!isLoading && (
+                <span
+                  className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(197,148,255,0.25),transparent_60%)] opacity-0 transition-opacity duration-300 hover:opacity-100"
+                />
+              )}
+            </motion.button>
+
+            {/* Load Demo Button */}
+            <motion.button
+              type="button"
+              whileHover={{ scale: isLoadingDemo ? 1 : 1.03 }}
+              whileTap={{ scale: isLoadingDemo ? 1 : 0.97 }}
+              onClick={handleLoadDemo}
+              disabled={isLoadingDemo}
+              className={`relative inline-flex w-full items-center justify-center overflow-hidden rounded-2xl border px-4 py-2 text-xs font-medium transition-all duration-300 ease-out-quart focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${isLoadingDemo
+                ? 'cursor-wait border-mfai-border bg-mfai-surfaceMuted text-slate-500 dark:text-mfai-text/50'
+                : 'border-yellow-500/40 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/20'
+                }`}
+              title="Load pre-populated demo state for investor presentations"
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                {isLoadingDemo ? <RefreshCw size={14} className="animate-spin" /> : '🎬'}
+                {isLoadingDemo ? 'Loading Demo...' : 'Load Demo State'}
+              </span>
+            </motion.button>
+          </div>
 
           {error && (
             <div
