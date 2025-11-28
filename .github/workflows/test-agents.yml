@@ -33,11 +33,5 @@ jobs:
         CI: true
 
     - name: Check RAG Connection (Optional)
-      run: |
-        if [ -n "$RAG_TOKEN" ]; then
-          node scripts/check-rag-connection.js
-        else
-          echo "RAG_TOKEN not set, skipping."
-        fi
-      env:
-        RAG_TOKEN: ${{ secrets.RAG_TOKEN }}
+      if: secrets.RAG_TOKEN != ''
+      run: node scripts/check-rag-connection.js
