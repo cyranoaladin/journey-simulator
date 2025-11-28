@@ -9,11 +9,11 @@ on:
 jobs:
   test-backend:
     runs-on: ubuntu-latest
-    
+
     defaults:
       run:
         working-directory: ./mf-back
-    
+
     steps:
     - uses: actions/checkout@v4
 
