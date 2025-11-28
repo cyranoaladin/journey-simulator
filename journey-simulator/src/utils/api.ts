@@ -201,7 +201,9 @@ const request = async <T>(
           success: true,
           progress: {
             total_xp: state.xp,
-            mfai_tokens: state.tokens,
+            token_transactions: {
+              mfai_tokens: state.tokens
+            },
             completed_phases: state.completedPhases.length,
             persona: "cognitive-activation-hub",
             nft_certificates: state.nfts.map((t: string) => ({ title: t })),
@@ -236,23 +238,33 @@ const request = async <T>(
 
       if (!state.completedPhases.includes(phaseIndex)) {
         // Calculate rewards based on phase
-        let xpReward = 0;
-        let tokenReward = 0;
+        let xpReward = body.xp_reward || 0;
+        let tokenReward = body.mfai_reward || 0;
+        let nftReward = body.nft_reward || null;
 
-        // Phase 1 (Activation)
-        if (phaseIndex === 0) { xpReward = 60; tokenReward = 6; }
-        // Phase 2 (Staking)
-        else if (phaseIndex === 1) { xpReward = 80; tokenReward = 8; }
-        // Phase 3 (Governance)
-        else if (phaseIndex === 2) { xpReward = 90; tokenReward = 9; }
-        // Default
-        else { xpReward = 50; tokenReward = 5; }
+        // Fallback if not provided (legacy behavior)
+        if (!body.xp_reward && !body.mfai_reward) {
+          // Phase 1 (Activation)
+          if (phaseIndex === 0) { xpReward = 60; tokenReward = 6; nftReward = "Proof-of-Skill™: Activation"; }
+          // Phase 2 (Staking)
+          else if (phaseIndex === 1) { xpReward = 80; tokenReward = 8; nftReward = "Solana Fluency Patch"; }
+          // Phase 3 (Governance)
+          else if (phaseIndex === 2) { xpReward = 90; tokenReward = 9; nftReward = "Tokenomics Architect Badge"; }
+          // Default
+          else { xpReward = 50; tokenReward = 5; }
+        }
 
-        updateDemoState({
+        const updates: any = {
           completedPhases: [...state.completedPhases, phaseIndex],
           xp: state.xp + xpReward,
           tokens: state.tokens + tokenReward
-        });
+        };
+
+        if (nftReward) {
+          updates.nfts = [...state.nfts, nftReward];
+        }
+
+        updateDemoState(updates);
       }
       return { success: true } as unknown as T;
     }
@@ -600,6 +612,9 @@ export const api = {
     phase_number: number;
     score?: number;
     nft_address?: string;
+    xp_reward?: number;
+    mfai_reward?: number;
+    nft_reward?: string;
   }): Promise<any> => {
     return request<any>('/journey/complete-phase', {
       method: 'POST',

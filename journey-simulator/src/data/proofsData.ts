@@ -72,7 +72,12 @@ export const getPersonaProofData = (
   const uniqueId = `${personaId}-${phaseId}-${Date.now()}`;
 
   const getImageUrl = () => {
-    // Dynamic image based on phase and persona
+    // Use local high-quality NFTs for the Cognitive Activation Hub
+    if (personaId === 'cognitive-activation-hub') {
+      return `/images/nfts/${personaId}/${phaseId}.png`;
+    }
+
+    // Fallback to dynamic placeholders for other journeys until assets are generated
     const bgColor = personaId === 'cognitive-activation-hub' ? '00f0ff' : '7000ff';
     const textColor = 'ffffff';
     const text = encodeURIComponent(`${proofType}\n${phase}`);

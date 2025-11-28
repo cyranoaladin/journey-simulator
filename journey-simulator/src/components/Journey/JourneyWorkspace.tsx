@@ -22,6 +22,11 @@ import { getProofType, getPersonaProofData } from '../../data/proofsData';
 import { resources, getResourceIcon } from '../../data/resources';
 import PhaseDetails from './PhaseDetails';
 
+import StakingModal from '../StakingModal';
+import DAOVoteModal from '../DAOVoteModal';
+
+import JourneyCompletedPage from '../JourneyCompletedPage';
+
 const JourneyWorkspace = () => {
   console.log('[JourneyWorkspace] RENDERED');
   const {
@@ -46,10 +51,18 @@ const JourneyWorkspace = () => {
   const [proofModalData, setProofModalData] = useState<any>(null);
   const [showLeftPanel, setShowLeftPanel] = useState(true);
   const [showRightPanel, setShowRightPanel] = useState(true);
+  const [showStakingModal, setShowStakingModal] = useState(false);
+  const [showVoteModal, setShowVoteModal] = useState(false);
 
   if (!selectedPersona) return null;
 
   const activePhaseIndex = currentPhaseIndex ?? userProgress.completedPhases.length;
+
+  // Check if journey is completed
+  if (activePhaseIndex >= selectedPersona.phases.length) {
+    return <JourneyCompletedPage />;
+  }
+
   const activePhase = selectedPersona.phases[activePhaseIndex] || selectedPersona.phases[0];
 
   const handleCompletePhase = () => {
@@ -73,7 +86,12 @@ const JourneyWorkspace = () => {
     // });
 
     // Call the actual store action
-    completePhase(activePhaseIndex, { score: 100, phaseNumber: activePhaseIndex + 1 });
+    completePhase(activePhaseIndex, {
+      score: 100,
+      phaseNumber: activePhaseIndex + 1,
+      xpReward: activePhase.xpReward,
+      mfaiReward: activePhase.mfaiReward
+    });
 
     // Show modal after a short delay with CAPTURED data
     setTimeout(() => {
@@ -246,46 +264,48 @@ const JourneyWorkspace = () => {
               {!userProgress.completedPhases.includes(activePhaseIndex) && (
                 <button
                   onClick={() => {
-                    // 1. Handle NFT Reward (Minting)
-                    if (activePhase.nftReward) {
-                      handleCompletePhase(); // Opens NFT Modal
+                    // 1. Handle Staking
+                    if (activePhase.stakingRequired) {
+                      setShowStakingModal(true);
                     }
                     // 2. Handle DAO Vote
                     else if (activePhase.daoVoteRequired) {
-                      // Simulate Vote Success
-                      completePhase(activePhaseIndex, { score: 100, phaseNumber: activePhaseIndex + 1 });
-                      // Optional: You could add a specific Vote Modal here if available
+                      setShowVoteModal(true);
                     }
-                    // 3. Handle Staking
-                    else if (activePhase.stakingRequired) {
-                      // Simulate Staking Success
-                      completePhase(activePhaseIndex, { score: 100, phaseNumber: activePhaseIndex + 1 });
+                    // 3. Handle NFT Reward (Minting)
+                    else if (activePhase.nftReward) {
+                      handleCompletePhase(); // Opens NFT Modal
                     }
                     // 4. Default Completion
                     else {
-                      completePhase(activePhaseIndex, { score: 100, phaseNumber: activePhaseIndex + 1 });
+                      completePhase(activePhaseIndex, {
+                        score: 100,
+                        phaseNumber: activePhaseIndex + 1,
+                        xpReward: activePhase.xpReward,
+                        mfaiReward: activePhase.mfaiReward
+                      });
                     }
                   }}
                   className="btn-primary text-sm px-4 py-2 flex items-center gap-2 bg-gradient-to-r from-accent-gold to-orange-500 hover:from-accent-gold/80 hover:to-orange-500/80 border-none text-black font-bold shadow-[0_0_15px_rgba(255,215,0,0.3)]"
                 >
-                  {activePhase.nftReward ? (
-                    <>
-                      <Award size={16} />
-                      <span>Validate & Mint NFT</span>
-                    </>
-                  ) : activePhase.daoVoteRequired ? (
-                    <>
-                      <Trophy size={16} /> {/* Using Trophy as generic Vote icon if Vote not imported */}
-                      <span>Validate & Vote</span>
-                    </>
-                  ) : activePhase.stakingRequired ? (
+                  {activePhase.stakingRequired ? (
                     <>
                       <Coins size={16} />
                       <span>Validate & Stake</span>
                     </>
+                  ) : activePhase.daoVoteRequired ? (
+                    <>
+                      <Trophy size={16} />
+                      <span>Validate & Vote</span>
+                    </>
+                  ) : activePhase.nftReward ? (
+                    <>
+                      <Award size={16} />
+                      <span>Validate & Mint NFT</span>
+                    </>
                   ) : (
                     <>
-                      <Loader2 size={16} /> {/* Generic icon */}
+                      <Loader2 size={16} />
                       <span>Validate Phase</span>
                     </>
                   )}
@@ -328,20 +348,32 @@ const JourneyWorkspace = () => {
                 <div className="mt-8 flex justify-center">
                   <button
                     onClick={() => {
-                      if (activePhase.nftReward) handleCompletePhase();
-                      else completePhase(activePhaseIndex, { score: 100, phaseNumber: activePhaseIndex + 1 });
+                      if (activePhase.stakingRequired) {
+                        setShowStakingModal(true);
+                      } else if (activePhase.daoVoteRequired) {
+                        setShowVoteModal(true);
+                      } else if (activePhase.nftReward) {
+                        handleCompletePhase();
+                      } else {
+                        completePhase(activePhaseIndex, {
+                          score: 100,
+                          phaseNumber: activePhaseIndex + 1,
+                          xpReward: activePhase.xpReward,
+                          mfaiReward: activePhase.mfaiReward
+                        });
+                      }
                     }}
                     className="btn-primary text-sm px-8 py-3 flex items-center gap-2 bg-gradient-to-r from-accent-gold to-orange-500 hover:from-accent-gold/80 hover:to-orange-500/80 border-none text-black font-bold shadow-[0_0_20px_rgba(255,215,0,0.2)] transform hover:scale-105 transition-all"
                   >
-                    {activePhase.daoVoteRequired ? (
-                      <>
-                        <Trophy size={18} />
-                        <span className="text-base">Validate & Vote</span>
-                      </>
-                    ) : activePhase.stakingRequired ? (
+                    {activePhase.stakingRequired ? (
                       <>
                         <Coins size={18} />
                         <span className="text-base">Validate & Stake</span>
+                      </>
+                    ) : activePhase.daoVoteRequired ? (
+                      <>
+                        <Trophy size={18} />
+                        <span className="text-base">Validate & Vote</span>
                       </>
                     ) : activePhase.nftReward ? (
                       <>
@@ -432,6 +464,52 @@ const JourneyWorkspace = () => {
           />
         )
       }
+
+      {/* Staking Modal */}
+      {showStakingModal && (
+        <StakingModal
+          availableAmount={1000} // Mock available amount
+          currentStaked={0}
+          onClose={() => setShowStakingModal(false)}
+          onStake={(_amount) => {
+            setShowStakingModal(false);
+            // After staking, proceed to complete phase (and show NFT if applicable)
+            if (activePhase.nftReward) {
+              handleCompletePhase();
+            } else {
+              completePhase(activePhaseIndex, {
+                score: 100,
+                phaseNumber: activePhaseIndex + 1,
+                xpReward: activePhase.xpReward,
+                mfaiReward: activePhase.mfaiReward
+              });
+            }
+          }}
+        />
+      )}
+
+      {/* DAO Vote Modal */}
+      {showVoteModal && (
+        <DAOVoteModal
+          phase={activePhase}
+          votingPower={50} // Mock voting power
+          onClose={() => setShowVoteModal(false)}
+          onVote={(_vote) => {
+            setShowVoteModal(false);
+            // After voting, proceed to complete phase (and show NFT if applicable)
+            if (activePhase.nftReward) {
+              handleCompletePhase();
+            } else {
+              completePhase(activePhaseIndex, {
+                score: 100,
+                phaseNumber: activePhaseIndex + 1,
+                xpReward: activePhase.xpReward,
+                mfaiReward: activePhase.mfaiReward
+              });
+            }
+          }}
+        />
+      )}
     </div >
   );
 };

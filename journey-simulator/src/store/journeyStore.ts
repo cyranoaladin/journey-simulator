@@ -29,7 +29,7 @@ interface JourneyState {
   updateProgress: (xp: number, nfts?: string[], mfai?: number) => Promise<void>
   openModal: (content: any) => void
   closeModal: () => void
-  completePhase: (phaseIndex: number, options?: { score?: number; nftAddress?: string; phaseNumber?: number }) => Promise<void>
+  completePhase: (phaseIndex: number, options?: { score?: number; nftAddress?: string; phaseNumber?: number; xpReward?: number; mfaiReward?: number }) => Promise<void>
   updateStaking: (amount: number) => void
   updateVotingPower: (newPower: number) => void
   updateWalletConnection: (connected: boolean, address?: string) => void
@@ -208,20 +208,44 @@ export const useJourneyStore = create<JourneyState>()(
       closeModal: () => set({ isModalOpen: false, modalContent: null }),
 
       completePhase: async (phaseIndex, options = {}) => {
+        console.log('[Store] completePhase called', { phaseIndex, options });
         const state = get()
 
         if (state.userProgress.completedPhases.includes(phaseIndex)) {
+          console.log('[Store] Phase already completed', phaseIndex);
           return
         }
 
         const phaseNumber = options.phaseNumber ?? phaseIndex + 1
 
         try {
+          console.log('[Store] Calling api.completePhase', { phaseNumber, ...options });
+          // Get rewards for the current phase
+          const currentPersona = state.selectedPersona;
+          const personaData = currentPersona ? personas.find(p => p.id === currentPersona.id) : null;
+          const phases = personaData ? personaData.phases : [];
+          const currentPhaseData = phases[phaseNumber - 1]; // phaseNumber is 1-based
+
+          const xpReward = currentPhaseData?.xpReward || 0;
+          const mfaiReward = currentPhaseData?.mfaiReward || 0;
+          const nftReward = currentPhaseData?.nftReward || undefined;
+
+          // Validate phase index
+          if (phaseIndex >= phases.length) {
+            console.warn('[Store] Attempted to complete non-existent phase', phaseIndex);
+            return;
+          }
+
+          // Call API to complete phase with rewards
           await api.completePhase({
             phase_number: phaseNumber,
-            score: options.score ?? 0,
-            ...(options.nftAddress ? { nft_address: options.nftAddress } : {})
-          })
+            score: 100, // Default score
+            nft_address: '0x' + Math.random().toString(16).substr(2, 40), // Mock address
+            xp_reward: xpReward,
+            mfai_reward: mfaiReward,
+            nft_reward: nftReward
+          });
+          console.log('[Store] api.completePhase success');
 
           const updatedPhases = Array.from(
             new Set([...state.userProgress.completedPhases, phaseIndex])
@@ -235,7 +259,9 @@ export const useJourneyStore = create<JourneyState>()(
           })
 
           // Reload progress to get updated XP/Tokens from backend
+          console.log('[Store] Reloading user progress...');
           await get().loadUserProgress()
+          console.log('[Store] User progress reloaded', get().userProgress);
         } catch (error) {
           console.error('Failed to sync phase completion with backend:', error)
           throw error
