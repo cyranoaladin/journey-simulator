@@ -42,6 +42,7 @@ interface JourneyState {
   completeMission: () => void
   loadUserProgress: () => Promise<void>
   setUserProgress: (progress: UserProgress) => void
+  setDemoMode: (enabled: boolean) => void
 }
 
 const initialUserProgress: UserProgress = {
@@ -232,6 +233,9 @@ export const useJourneyStore = create<JourneyState>()(
               completedPhases: updatedPhases,
             }
           })
+
+          // Reload progress to get updated XP/Tokens from backend
+          await get().loadUserProgress()
         } catch (error) {
           console.error('Failed to sync phase completion with backend:', error)
           throw error
@@ -455,7 +459,27 @@ export const useJourneyStore = create<JourneyState>()(
         }
       },
 
-      setUserProgress: (progress) => set({ userProgress: progress })
+      setUserProgress: (progress) => set({ userProgress: progress }),
+
+      setDemoMode: (enabled: boolean) => {
+        if (enabled) {
+          const demoPersona = personas[0]; // Cognitive Activation Hub
+          set({
+            selectedPersona: demoPersona,
+            currentPhase: 0, // Start at Phase 1
+            userProgress: {
+              ...initialUserProgress,
+              totalXP: 0,
+              mfaiTokens: 0,
+              completedPhases: [], // No phases completed
+              currentPersona: demoPersona.id,
+              nfts: [],
+              passLevel: 'Free',
+              votingPower: 0
+            }
+          });
+        }
+      }
     }),
     {
       name: 'mfai-journey-storage',

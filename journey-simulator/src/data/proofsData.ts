@@ -71,7 +71,13 @@ export const getPersonaProofData = (
   // Generate a unique ID
   const uniqueId = `${personaId}-${phaseId}-${Date.now()}`;
 
-  const getImageUrl = () => LOGO_IMAGE_PATH;
+  const getImageUrl = () => {
+    // Dynamic image based on phase and persona
+    const bgColor = personaId === 'cognitive-activation-hub' ? '00f0ff' : '7000ff';
+    const textColor = 'ffffff';
+    const text = encodeURIComponent(`${proofType}\n${phase}`);
+    return `https://placehold.co/600x400/${bgColor}/${textColor}/png?text=${text}&font=roboto`;
+  };
 
   // Get rarity based on phase
   const getRarity = () => {
@@ -105,12 +111,12 @@ export const getProofType = (personaId: string, phaseId: string): ProofType => {
   if (phaseId && phaseProofTypeMap[phaseId]) {
     return phaseProofTypeMap[phaseId];
   }
-  
+
   // Otherwise use the persona's default proof type
   if (personaId && personaProofTypeMap[personaId]) {
     return personaProofTypeMap[personaId];
   }
-  
+
   // Default fallback
   return 'Skill';
 };
@@ -125,7 +131,7 @@ export const getNFTMetadata = (
   phase: string
 ) => {
   const proofType = getProofType(personaId, phaseId);
-  
+
   return {
     name: title,
     description: description,

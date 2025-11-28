@@ -37,6 +37,7 @@ export const personas: Persona[] = [
         tools: ['Solana Explorer Missions', 'Runtime simulators', 'Validator dashboards'],
         outcomes: ['Clarity on Solana advantages', 'Hands-on transaction analysis', 'Performance benchmarking notes'],
         zynoTip: 'Speed and parallelism fuel Solana. Learn to wield them and latency becomes a design choice, not a constraint.',
+        stakingRequired: 50,
       },
       {
         id: 'token-design-lab',
@@ -50,6 +51,7 @@ export const personas: Persona[] = [
         tools: ['Incentive simulation board', 'Governance scenario engine', 'Zyno economics copilot'],
         outcomes: ['Draft incentive flywheel', 'Governance escalation plan', 'Community metrics baseline'],
         zynoTip: 'Token design is economic storytelling. Craft incentives that make everyone a protagonist in value creation.',
+        daoVoteRequired: true,
       },
       {
         id: 'identity-proofing',

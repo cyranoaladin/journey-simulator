@@ -32,6 +32,7 @@ interface AuthContextType {
   logout: () => void;
   checkAuth: () => boolean;
   refreshToken: () => Promise<boolean>;
+  loginAsDemo: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -293,7 +294,25 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     isAuthenticated: !!user,
     isLoading,
     checkAuth,
-    refreshToken
+    refreshToken,
+    loginAsDemo: async () => {
+      const demoUser = {
+        id: "demo-user-id",
+        email: "demo@moneyfactory.ai",
+        name: "Demo User",
+        role: "user" as const,
+        wallet_address: "DemoWalletAddress123",
+        persona: "cognitive-activation-hub" as const
+      };
+      setUser(demoUser);
+      localStorage.setItem("accessToken", "demo-token");
+      localStorage.setItem("refreshToken", "demo-refresh-token");
+      localStorage.setItem("userId", demoUser.id);
+      await resetProgress();
+      // Mock loading progress for demo
+      useJourneyStore.getState().setDemoMode(true);
+      return true;
+    }
   }), [user, isLoading, login, loginWithWallet, register, logout, checkAuth, refreshToken]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
