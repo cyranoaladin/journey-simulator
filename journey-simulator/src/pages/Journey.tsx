@@ -16,11 +16,15 @@ const Journey = () => {
   const { journeyId } = useParams();
 
   useEffect(() => {
-    if (journeyId && !selectedPersona) {
+    if (journeyId) {
       const persona = personas.find(p => p.id === journeyId);
-      if (persona) {
+      if (persona && persona.id !== selectedPersona?.id) {
         setSelectedPersona(persona);
       }
+    } else if (selectedPersona) {
+      // If no journeyId in URL but we have a selected persona, clear it
+      // This ensures /journeys route always shows the list
+      setSelectedPersona(null);
     }
   }, [journeyId, selectedPersona, setSelectedPersona]);
 

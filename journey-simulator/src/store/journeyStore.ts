@@ -237,7 +237,7 @@ export const useJourneyStore = create<JourneyState>()(
           }
 
           // Call API to complete phase with rewards
-          await api.completePhase({
+          const response = await api.completePhase({
             phase_number: phaseNumber,
             score: 100, // Default score
             nft_address: '0x' + Math.random().toString(16).substr(2, 40), // Mock address
@@ -245,7 +245,15 @@ export const useJourneyStore = create<JourneyState>()(
             mfai_reward: mfaiReward,
             nft_reward: nftReward
           });
-          console.log('[Store] api.completePhase success');
+          console.log('[Store] api.completePhase success', response);
+
+          // If the response contains UI blocks (e.g. from an agent evaluation), display them
+          if (response && response.ui_blocks) {
+            set({ lastStep: response });
+          } else {
+            // Clear last step if no blocks returned, to show the next phase details
+            set({ lastStep: null });
+          }
 
           const updatedPhases = Array.from(
             new Set([...state.userProgress.completedPhases, phaseIndex])
@@ -259,9 +267,7 @@ export const useJourneyStore = create<JourneyState>()(
           })
 
           // Reload progress to get updated XP/Tokens from backend
-          console.log('[Store] Reloading user progress...');
           await get().loadUserProgress()
-          console.log('[Store] User progress reloaded', get().userProgress);
         } catch (error) {
           console.error('Failed to sync phase completion with backend:', error)
           throw error

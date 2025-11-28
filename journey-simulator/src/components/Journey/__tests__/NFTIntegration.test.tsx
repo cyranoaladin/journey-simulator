@@ -39,7 +39,7 @@ describe('NFT Integration in JourneyWorkspace', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        (useJourneyStore as any).mockReturnValue({
+        const mockState = {
             selectedPersona: {
                 id: 'cognitive-activation-hub',
                 title: 'Cognitive Activation Hub',
@@ -77,6 +77,11 @@ describe('NFT Integration in JourneyWorkspace', () => {
             setCurrentPhase: mockSetCurrentPhase,
             uiMode: 'discovery',
             uiTone: 'pedagogical',
+            ensureApiJourneyId: vi.fn().mockReturnValue('mock-journey-id'),
+        };
+
+        (useJourneyStore as any).mockImplementation((selector: any) => {
+            return selector ? selector(mockState) : mockState;
         });
     });
 
@@ -84,7 +89,7 @@ describe('NFT Integration in JourneyWorkspace', () => {
         render(<JourneyWorkspace />);
 
         // Find and click the Complete Phase button
-        const completeButton = screen.getByText('✓ Complete Phase');
+        const completeButton = screen.getAllByText('Validate & Mint NFT')[0];
         fireEvent.click(completeButton);
 
         // Expect completePhase to be called

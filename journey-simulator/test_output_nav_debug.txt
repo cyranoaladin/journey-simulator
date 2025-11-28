@@ -1,0 +1,159 @@
+
+Running 10 tests using 8 workers
+
+  ✘   3 [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:61:5 › Journey Navigation Workflow › should navigate back from workspace to persona selection (18.2s)
+  ✓   2 [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:115:5 › Journey Navigation Workflow › should allow switching between different journeys (19.2s)
+  ✘   4 [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:41:5 › Journey Navigation Workflow › should navigate from persona selection to workspace (20.1s)
+  ✓   5 [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:78:5 › Journey Navigation Workflow › should maintain journey state when navigating between routes (21.7s)
+  ✘   1 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:61:5 › Journey Navigation Workflow › should navigate back from workspace to persona selection (20.3s)
+  ✘   6 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:41:5 › Journey Navigation Workflow › should navigate from persona selection to workspace (21.5s)
+  ✓   8 [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:132:5 › Journey Navigation Workflow › should handle browser back/forward navigation (23.8s)
+  ✓   7 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:78:5 › Journey Navigation Workflow › should maintain journey state when navigating between routes (27.5s)
+  ✓   9 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:115:5 › Journey Navigation Workflow › should allow switching between different journeys (13.4s)
+  ✓  10 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:132:5 › Journey Navigation Workflow › should handle browser back/forward navigation (20.2s)
+
+
+  1) [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:41:5 › Journey Navigation Workflow › should navigate from persona selection to workspace 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=The Capital Foundry')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=The Capital Foundry')[22m
+
+
+      56 |         // Verify we're now in the workspace
+      57 |         await expect(page.getByRole('button', { name: /Back to all journeys/i })).toBeVisible({ timeout: 10000 });
+    > 58 |         await expect(page.locator('text=The Capital Foundry')).toBeVisible();
+         |                                                                ^
+      59 |     });
+      60 |
+      61 |     test('should navigate back from workspace to persona selection', async ({ page }) => {
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/journey-navigation-workflow.spec.ts:58:64
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-bc6cf-sona-selection-to-workspace-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-bc6cf-sona-selection-to-workspace-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/journey-navigation-workflo-bc6cf-sona-selection-to-workspace-chromium/error-context.md
+
+  2) [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:61:5 › Journey Navigation Workflow › should navigate back from workspace to persona selection 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).not.[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator:  getByRole('button', { name: /Back to all journeys/i })
+    Expected: not visible
+    Received: visible
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "not toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('button', { name: /Back to all journeys/i })[22m
+    [2m    8 × locator resolved to <button tabindex="0" class="btn-secondary text-sm flex items-center gap-2">…</button>[22m
+    [2m      - unexpected value "visible"[22m
+
+
+      73 |
+      74 |         // Verify the "Back to all journeys" button is no longer visible
+    > 75 |         await expect(page.getByRole('button', { name: /Back to all journeys/i })).not.toBeVisible();
+         |                                                                                       ^
+      76 |     });
+      77 |
+      78 |     test('should maintain journey state when navigating between routes', async ({ page }) => {
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/journey-navigation-workflow.spec.ts:75:87
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-4caed-kspace-to-persona-selection-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-4caed-kspace-to-persona-selection-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/journey-navigation-workflo-4caed-kspace-to-persona-selection-chromium/error-context.md
+
+  3) [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:41:5 › Journey Navigation Workflow › should navigate from persona selection to workspace 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=The Capital Foundry')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=The Capital Foundry')[22m
+
+
+      56 |         // Verify we're now in the workspace
+      57 |         await expect(page.getByRole('button', { name: /Back to all journeys/i })).toBeVisible({ timeout: 10000 });
+    > 58 |         await expect(page.locator('text=The Capital Foundry')).toBeVisible();
+         |                                                                ^
+      59 |     });
+      60 |
+      61 |     test('should navigate back from workspace to persona selection', async ({ page }) => {
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/journey-navigation-workflow.spec.ts:58:64
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-bc6cf-sona-selection-to-workspace-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-bc6cf-sona-selection-to-workspace-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/journey-navigation-workflo-bc6cf-sona-selection-to-workspace-firefox/error-context.md
+
+  4) [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:61:5 › Journey Navigation Workflow › should navigate back from workspace to persona selection 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).not.[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator:  getByRole('button', { name: /Back to all journeys/i })
+    Expected: not visible
+    Received: visible
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "not toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('button', { name: /Back to all journeys/i })[22m
+    [2m    8 × locator resolved to <button tabindex="0" class="btn-secondary text-sm flex items-center gap-2">…</button>[22m
+    [2m      - unexpected value "visible"[22m
+
+
+      73 |
+      74 |         // Verify the "Back to all journeys" button is no longer visible
+    > 75 |         await expect(page.getByRole('button', { name: /Back to all journeys/i })).not.toBeVisible();
+         |                                                                                       ^
+      76 |     });
+      77 |
+      78 |     test('should maintain journey state when navigating between routes', async ({ page }) => {
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/journey-navigation-workflow.spec.ts:75:87
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-4caed-kspace-to-persona-selection-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-4caed-kspace-to-persona-selection-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/journey-navigation-workflo-4caed-kspace-to-persona-selection-firefox/error-context.md
+
+  4 failed
+    [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:41:5 › Journey Navigation Workflow › should navigate from persona selection to workspace 
+    [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:61:5 › Journey Navigation Workflow › should navigate back from workspace to persona selection 
+    [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:41:5 › Journey Navigation Workflow › should navigate from persona selection to workspace 
+    [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:61:5 › Journey Navigation Workflow › should navigate back from workspace to persona selection 
+  6 passed (43.9s)
+
+[36m  Serving HTML report at http://localhost:41475. Press Ctrl+C to quit.[39m

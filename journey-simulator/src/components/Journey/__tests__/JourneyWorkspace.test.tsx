@@ -38,14 +38,20 @@ describe('JourneyWorkspace', () => {
                 title: 'Phase 1',
                 description: 'Description 1',
                 xpReward: 100,
-                mfaiReward: 50
+                mfaiReward: 50,
+                mission: 'Mission 1',
+                tools: [],
+                outcomes: []
             },
             {
                 id: 'phase-2',
                 title: 'Phase 2',
                 description: 'Description 2',
                 xpReward: 200,
-                mfaiReward: 100
+                mfaiReward: 100,
+                mission: 'Mission 2',
+                tools: [],
+                outcomes: []
             }
         ]
     }
@@ -140,7 +146,7 @@ describe('JourneyWorkspace', () => {
         } as any)
 
         render(<JourneyWorkspace />)
-        expect(screen.getByText('✓ Complete Phase')).toBeInTheDocument()
+        expect(screen.getAllByText('Validate Phase')[0]).toBeInTheDocument()
     })
 
     it('calls completePhase when Complete Phase button is clicked', () => {
@@ -159,7 +165,7 @@ describe('JourneyWorkspace', () => {
 
         render(<JourneyWorkspace />)
 
-        const completeButton = screen.getByText('✓ Complete Phase')
+        const completeButton = screen.getAllByText('Validate Phase')[0]
         fireEvent.click(completeButton)
 
         expect(mockCompletePhase).toHaveBeenCalledWith(0, expect.objectContaining({ score: 100, phaseNumber: 1 }))

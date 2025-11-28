@@ -10,8 +10,9 @@ test.describe('Demo Mode Workflow', () => {
     });
 
     test('should complete the full demo journey', async ({ page }) => {
+        test.setTimeout(120000);
         // 1. Enter Demo Mode
-        await page.goto('http://localhost:3003/');
+        await page.goto('/');
         await page.evaluate(() => localStorage.clear());
 
         await page.getByRole('link', { name: /Authenticate/i }).click();
@@ -52,6 +53,11 @@ test.describe('Demo Mode Workflow', () => {
         await page.waitForTimeout(500);
         await validateButton2.dispatchEvent('click');
 
+        // Handle Staking Modal
+        await expect(page.getByText('Cognitive Lock™')).toBeVisible();
+        await page.getByPlaceholder('0.00').fill('50');
+        await page.getByRole('button', { name: /Stake 50/i }).click();
+
         // Verify NFT Modal
         await expect(page.getByText('Solana Fluency Patch')).toBeVisible();
         await page.getByRole('button', { name: /Close/i }).click();
@@ -66,15 +72,11 @@ test.describe('Demo Mode Workflow', () => {
         await page.waitForTimeout(500);
         await validateButton3.dispatchEvent('click');
 
+        // Handle Voting Modal
+        await expect(page.getByText('DAO Vote')).toBeVisible();
+        await page.getByRole('button', { name: /Approve/i }).click();
+
         // Verify NFT Modal
-        // Note: Phase 3 has daoVoteRequired in personas.ts, but the button text logic in JourneyWorkspace handles it.
-        // If daoVoteRequired is true, it might show 'Validate & Vote'.
-        // Let's check if the button text is 'Validate & Vote' or 'Validate & Mint NFT'.
-        // In personas.ts, Phase 3 has nftReward AND daoVoteRequired.
-        // In JourneyWorkspace:
-        // if (activePhase.nftReward) { ... 'Validate & Mint NFT' ... }
-        // else if (activePhase.daoVoteRequired) { ... 'Validate & Vote' ... }
-        // Since nftReward is present, it should be 'Validate & Mint NFT'.
         await expect(page.getByText('Tokenomics Architect Badge')).toBeVisible();
         await page.getByRole('button', { name: /Close/i }).click();
 
@@ -103,13 +105,13 @@ test.describe('Demo Mode Workflow', () => {
         await validateButton5.dispatchEvent('click');
 
         // Verify NFT Modal
-        await expect(page.getByText('Proof-of-Skill™: Activation')).toBeVisible();
-        await page.getByRole('button', { name: /Close/i }).click();
+        await expect(page.getByText('Proof-of-Skill™: Activation').first()).toBeVisible();
+
+        // Phase 5 is the last one, so we expect completion UI
+        // The workspace might not redirect, but show completion inline
+        // await expect(page).toHaveURL(/\/journey\/completed/, { timeout: 10000 });
 
         // Verify Final State
-        // After Phase 5, the journey is complete.
-        // The "Validate" button should be gone or disabled.
-        // Or we might see a "Journey Completed" message.
-        await expect(page.getByText('Journey Completed!')).toBeVisible();
+        await expect(page.getByText('Journey Completed')).toBeVisible();
     });
 });

@@ -1,0 +1,111 @@
+
+Running 1 test using 1 worker
+
+[1A[2K[1/1] [chromium] › tests/e2e/demo-mode.spec.ts:12:5 › Demo Mode Workflow › should complete the full demo journey
+[1A[2K[chromium] › tests/e2e/demo-mode.spec.ts:12:5 › Demo Mode Workflow › should complete the full demo journey
+[BROWSER] AuthProvider: render
+
+[1A[2K[BROWSER] AuthContext: checkAuthStatus started
+
+[1A[2K[BROWSER] AuthContext: token present? false refresh token present? false
+
+[1A[2K[BROWSER] AuthContext: setting isLoading false
+
+[1A[2K[BROWSER] AuthProvider: render
+
+[1A[2K[BROWSER] AuthProvider: render
+
+[1A[2K[BROWSER] AuthContext: checkAuthStatus started
+
+[1A[2K[BROWSER] AuthContext: token present? false refresh token present? false
+
+[1A[2K[BROWSER] AuthContext: setting isLoading false
+
+[1A[2K[BROWSER] AuthProvider: render
+
+[1A[2K[BROWSER] AuthProvider: render
+
+[1A[2K[BROWSER] LoginPage: render {isAuthenticated: false, isLoading: false}
+
+[1A[2K[BROWSER] [Demo Mode] Mocking request to /journey/reset-progress
+
+[1A[2K[BROWSER] AuthProvider: render
+
+[1A[2K[BROWSER] LoginPage: render {isAuthenticated: true, isLoading: false}
+
+[1A[2K[BROWSER] LoginPage: render {isAuthenticated: true, isLoading: false}
+
+[1A[2K[BROWSER] AuthProvider: render
+
+[1A[2K[BROWSER] ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys}
+
+[1A[2K[BROWSER] ProtectedRoute: rendering children
+
+[1A[2K[BROWSER] Layout: render
+
+[1A[2K[BROWSER] Sidebar: render {selectedPersonaId: cognitive-activation-hub, completedPhases: 0}
+
+[1A[2K[BROWSER] [JourneyWorkspace] RENDERED
+
+[1A[2K[BROWSER] [JourneyWorkspace] MOUNTED
+
+[1A[2K[BROWSER] JourneysPage: useEffect triggered
+
+[1A[2K[BROWSER] JourneysPage: loading progress...
+
+[1A[2K[BROWSER] [Demo Mode] Mocking request to /journey/user-progress
+
+[1A[2K[BROWSER] Sidebar: render {selectedPersonaId: cognitive-activation-hub, completedPhases: 0}
+
+[1A[2K[BROWSER] [JourneyWorkspace] RENDERED
+
+[1A[2K[BROWSER] Sidebar: render {selectedPersonaId: cognitive-activation-hub, completedPhases: 0}
+
+[1A[2K[BROWSER] [JourneyWorkspace] RENDERED
+
+[1A[2K[BROWSER] JourneysPage: progress loaded successfully
+
+[1A[2K[BROWSER] [JourneyWorkspace] TEST BUTTON CLICKED
+
+[1A[2K[TEST] Clicked TEST BUTTON
+
+[1A[2K[TEST] Button HTML: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-award"><circle cx="12" cy="8" r="6"></circle><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"></path></svg><span class="text-base">Validate &amp; Mint NFT</span>
+
+[1A[2K[TEST] Clicked button
+
+[1A[2K  1) [chromium] › tests/e2e/demo-mode.spec.ts:12:5 › Demo Mode Workflow › should complete the full demo journey 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText('Proof-of-Skill™: Web3 Orientation')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText('Proof-of-Skill™: Web3 Orientation')[22m
+
+
+      48 |
+      49 |         // Verify NFT Modal
+    > 50 |         await expect(page.getByText('Proof-of-Skill™: Web3 Orientation')).toBeVisible();
+         |                                                                           ^
+      51 |         await page.getByRole('button', { name: /Close/i }).click();
+      52 |
+      53 |         // --- PHASE 2: Solana Systems Lab ---
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/demo-mode.spec.ts:50:75
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/demo-mode-Demo-Mode-Workfl-1befa-plete-the-full-demo-journey-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/demo-mode-Demo-Mode-Workfl-1befa-plete-the-full-demo-journey-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/demo-mode-Demo-Mode-Workfl-1befa-plete-the-full-demo-journey-chromium/error-context.md
+
+
+[1A[2K  1 failed
+    [chromium] › tests/e2e/demo-mode.spec.ts:12:5 › Demo Mode Workflow › should complete the full demo journey 

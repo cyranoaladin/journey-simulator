@@ -1,4 +1,5 @@
 import { useState, useEffect, type FC } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import MessageDisplay from "../components/shared/MessageDisplay";
 import { useJourneyStore } from "../store/journeyStore";
@@ -74,10 +75,13 @@ const JourneysPage: FC = () => {
     }
   };
 
+  const navigate = useNavigate();
+
   const handleBackToPersonas = () => {
     setSelectedPersona(null);
     setError(null);
     setSuccessMessage(null);
+    navigate('/journeys');
   };
 
   if (isLoading && !selectedPersona) {
@@ -212,7 +216,10 @@ const JourneysPage: FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 * index }}
                 >
-                  <JourneyCard persona={persona} />
+                  <JourneyCard
+                    persona={persona}
+                    onSelected={() => navigate(`/journeys/${persona.id}`)}
+                  />
                 </motion.div>
               ))}
             </div>

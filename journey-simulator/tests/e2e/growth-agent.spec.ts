@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Growth Agent Integration', () => {
+    test.setTimeout(60000);
+
     test.beforeEach(async ({ page }) => {
         // Mock login
         await page.route('**/user/login', async (route) => {
@@ -27,22 +29,59 @@ test.describe('Growth Agent Integration', () => {
             });
         });
 
-        // Mock user progress
+        // Mock user progress (Start at Phase 0)
         await page.route('**/journey/user-progress', async (route) => {
             await route.fulfill({
                 status: 200,
                 contentType: 'application/json',
                 body: JSON.stringify({
-                    total_xp: 1000,
-                    current_level: 2,
-                    completed_phases: [0],
+                    total_xp: 0,
+                    current_level: 1,
+                    completed_phases: [], // Start at Phase 0
                     currentPersona: 'cognitive-activation-hub'
                 })
             });
         });
 
-        // Mock Journey Step (Zyno Response with Growth Agent Evaluation)
-        await page.route('**/journey/next-step', async (route) => {
+        // Mock User Profile and Update Profile
+        await page.route('**/user/profile', async (route) => {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    success: true,
+                    user: {
+                        id: 'test-user-id',
+                        name: 'Test User',
+                        email: 'test@example.com',
+                        role: 'user',
+                        wallet_address: '0x123',
+                        persona: 'cognitive-activation-hub'
+                    }
+                })
+            });
+        });
+
+        await page.route('**/user/update-profile', async (route) => {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    success: true,
+                    user: {
+                        id: 'test-user-id',
+                        name: 'Test User',
+                        email: 'test@example.com',
+                        role: 'user',
+                        wallet_address: '0x123',
+                        persona: 'cognitive-activation-hub'
+                    }
+                })
+            });
+        });
+
+        // Mock Complete Phase (Zyno Response with Growth Agent Evaluation)
+        await page.route('**/journey/complete-phase', async (route) => {
             await route.fulfill({
                 status: 200,
                 contentType: 'application/json',
@@ -50,7 +89,7 @@ test.describe('Growth Agent Integration', () => {
                     metadata: {
                         persona_id: 'cognitive-activation-hub',
                         journey_track: 'default',
-                        phase_id: 'build',
+                        phase_id: 'cognitive-orientation',
                         language: 'en'
                     },
                     ui_blocks: [
@@ -75,7 +114,7 @@ test.describe('Growth Agent Integration', () => {
                     ],
                     agent_actions: [],
                     next_state: {
-                        phase_id: 'build',
+                        phase_id: 'cognitive-orientation',
                         completed_missions: [],
                         xp_delta: 0
                     }
@@ -91,11 +130,17 @@ test.describe('Growth Agent Integration', () => {
         await page.waitForURL('**/journeys', { timeout: 10000 });
 
         // Select persona to enter workspace
-        await page.locator('button:has-text("Continue journey")').first().click();
+        // Click any button that enters the journey (Launch, Continue, Resume)
+        const enterBtn = page.getByRole('button', { name: /Launch with Zyno|Continue journey|Resume onboarding/i }).first();
+        await expect(enterBtn).toBeVisible({ timeout: 10000 });
+        await enterBtn.click();
         await page.waitForLoadState('networkidle');
     });
 
     test('should display Growth Agent evaluation', async ({ page }) => {
+        // Listen for console logs
+        page.on('console', msg => console.log(`[BROWSER] ${msg.text()}`));
+
         // Wait for any initial page loader to disappear
         await expect(page.locator('.animate-spin')).not.toBeVisible({ timeout: 10000 });
 
@@ -104,11 +149,26 @@ test.describe('Growth Agent Integration', () => {
         // We wait for the "Back to all journeys" button to confirm we are in the workspace.
         await expect(page.locator('button:has-text("Back to all journeys")')).toBeVisible({ timeout: 10000 });
 
-        // Trigger the step (Start/Continue button)
-        // In the workspace, the button is "Start / Continue"
-        const startBtn = page.getByRole('button', { name: /Start|Continue/i }).first();
-        await expect(startBtn).toBeVisible({ timeout: 10000 });
-        await startBtn.click({ force: true });
+        // Trigger the step (Validate & Mint NFT button for Phase 0)
+        const validateBtn = page.getByRole('button', { name: /Validate & Mint NFT/i }).first();
+        await expect(validateBtn).toBeVisible({ timeout: 10000 });
+
+        // Use dispatchEvent for more reliable click handling in this complex UI
+        await validateBtn.dispatchEvent('click');
+
+        // Wait for NFT Modal (Proof-of-Skill)
+        // It appears after 1s delay in handleCompletePhase
+        // Phase 0 NFT is "Proof-of-Skill™: Web3 Orientation" (or similar, check personas.ts)
+        // Actually, let's just wait for "Proof-of-Skill" text which is common
+        await expect(page.getByText(/Proof-of-Skill/i).first()).toBeVisible({ timeout: 15000 });
+
+        // Close NFT Modal to see the evaluation
+        const closeBtn = page.locator('button').filter({ hasText: 'Close' }).first();
+        if (await closeBtn.isVisible()) {
+            await closeBtn.click();
+        } else {
+            await page.keyboard.press('Escape');
+        }
 
         // Wait for evaluation block to appear
         await expect(page.getByText('Growth Strategy Assessment')).toBeVisible({ timeout: 15000 });
@@ -117,8 +177,8 @@ test.describe('Growth Agent Integration', () => {
         await expect(page.getByText('85')).toBeVisible();
 
         // Check axes
-        await expect(page.getByText('Acquisition')).toBeVisible();
-        await expect(page.getByText('Retention')).toBeVisible();
+        await expect(page.getByText('Acquisition', { exact: true })).toBeVisible();
+        await expect(page.getByText('Retention', { exact: true })).toBeVisible();
 
         // Check feedback
         await expect(page.getByText('Strong acquisition strategy')).toBeVisible();

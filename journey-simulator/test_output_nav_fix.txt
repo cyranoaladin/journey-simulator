@@ -1,0 +1,1526 @@
+
+Running 10 tests using 8 workers
+
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: [vite] connected.
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: [vite] connected.
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: [vite] connected.
+BROWSER LOG: [vite] connected.
+BROWSER LOG: [vite] connected.
+BROWSER LOG: [vite] connected.
+BROWSER LOG: [vite] connected.
+BROWSER LOG: [vite] connected.
+BROWSER LOG: %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+BROWSER LOG: %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+BROWSER LOG: %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys}
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys}
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys/cognitive-activation-hub}
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys/cognitive-activation-hub}
+BROWSER LOG: %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys}
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys}
+BROWSER LOG: %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys/capital-foundry}
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys/capital-foundry}
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys/capital-foundry}
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys/capital-foundry}
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys/cognitive-activation-hub}
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys/cognitive-activation-hub}
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys/cognitive-activation-hub}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys/cognitive-activation-hub}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys}
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys}
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys}
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys}
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys/capital-foundry}
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys/capital-foundry}
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys/capital-foundry}
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys/capital-foundry}
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys/capital-foundry}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys/capital-foundry}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: cognitive-activation-hub selectedPersona: undefined
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys/capital-foundry}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys/capital-foundry}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: cognitive-activation-hub selectedPersona: undefined
+BROWSER LOG: Sidebar: render {selectedPersonaId: cognitive-activation-hub, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: cognitive-activation-hub, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Journey Effect: journeyId: cognitive-activation-hub selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: undefined
+BROWSER LOG: Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Failed to load user progress from backend: TypeError: Failed to fetch
+BROWSER LOG: Failed to load user progress from backend: TypeError: Failed to fetch
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: undefined
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: undefined
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+BROWSER LOG: [vite] connected.
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: undefined
+BROWSER LOG: Sidebar: render {selectedPersonaId: capital-foundry, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: capital-foundry, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: capital-foundry
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: undefined
+BROWSER LOG: Sidebar: render {selectedPersonaId: capital-foundry, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: capital-foundry, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Failed to load user progress from backend: TypeError: Failed to fetch
+BROWSER LOG: Failed to load user progress from backend: TypeError: Failed to fetch
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: [vite] connected.
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: cognitive-activation-hub selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Sidebar: render {selectedPersonaId: cognitive-activation-hub, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: cognitive-activation-hub, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Journey Effect: journeyId: cognitive-activation-hub selectedPersona: cognitive-activation-hub
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Sidebar: render {selectedPersonaId: cognitive-activation-hub, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: cognitive-activation-hub, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: cognitive-activation-hub
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Sidebar: render {selectedPersonaId: capital-foundry, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: capital-foundry, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: capital-foundry
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Sidebar: render {selectedPersonaId: capital-foundry, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: capital-foundry, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: capital-foundry
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+  ✓   6 [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:66:5 › Journey Navigation Workflow › should navigate back from workspace to persona selection (11.3s)
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: [vite] connected.
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: undefined
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: cognitive-activation-hub selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: cognitive-activation-hub selectedPersona: undefined
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: undefined
+BROWSER LOG: Journey Effect: journeyId: cognitive-activation-hub selectedPersona: cognitive-activation-hub
+BROWSER LOG: [JavaScript Warning: "“127.0.0.1” has been classified as a bounce tracker. If it does not receive user activation within the next 3,600 seconds it will have its state purged."]
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: undefined
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: [JavaScript Warning: "“127.0.0.1” has been classified as a bounce tracker. If it does not receive user activation within the next 3,600 seconds it will have its state purged."]
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JavaScript Warning: "“127.0.0.1” has been classified as a bounce tracker. If it does not receive user activation within the next 3,600 seconds it will have its state purged."]
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys/capital-foundry}
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys/capital-foundry}
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: [vite] connected.
+BROWSER LOG: %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /dashboard}
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /dashboard}
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys/capital-foundry}
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys/capital-foundry}
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys/capital-foundry}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys/capital-foundry}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Sidebar: render {selectedPersonaId: cognitive-activation-hub, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: cognitive-activation-hub, completedPhases: 0}
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: cognitive-activation-hub
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Sidebar: render {selectedPersonaId: capital-foundry, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: capital-foundry, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: capital-foundry
+BROWSER LOG: %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Failed to load resource: the server responded with a status of 401 (Unauthorized)
+BROWSER LOG: Failed to select persona: Error: Token is not valid.
+    at request (http://127.0.0.1:5173/src/utils/api.ts:247:13)
+    at async handlePersonaSelection (http://127.0.0.1:5173/src/components/Journey/JourneyCard.tsx:60:7)
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: cognitive-activation-hub
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys/cognitive-activation-hub}
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys/cognitive-activation-hub}
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Failed to load user progress from backend: TypeError: Failed to fetch
+BROWSER LOG: Failed to load user progress from backend: TypeError: Failed to fetch
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /dashboard}
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /dashboard}
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /dashboard}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /dashboard}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Sidebar: render {selectedPersonaId: capital-foundry, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: capital-foundry, completedPhases: 0}
+BROWSER LOG: Failed to select persona: Error
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: [vite] connected.
+BROWSER LOG: Sidebar: render {selectedPersonaId: capital-foundry, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: capital-foundry, completedPhases: 0}
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: [vite] connected.
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys/cognitive-activation-hub}
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys/cognitive-activation-hub}
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys/cognitive-activation-hub}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys/cognitive-activation-hub}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: cognitive-activation-hub selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: cognitive-activation-hub selectedPersona: undefined
+BROWSER LOG: Sidebar: render {selectedPersonaId: cognitive-activation-hub, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: cognitive-activation-hub, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Journey Effect: journeyId: cognitive-activation-hub selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: cognitive-activation-hub selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Journey Effect: journeyId: cognitive-activation-hub selectedPersona: cognitive-activation-hub
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: cognitive-activation-hub
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+  ✓   5 [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:123:5 › Journey Navigation Workflow › should allow switching between different journeys (18.8s)
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+  ✓   7 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:66:5 › Journey Navigation Workflow › should navigate back from workspace to persona selection (18.3s)
+BROWSER LOG: [vite] connected.
+BROWSER LOG: %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys}
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys}
+BROWSER LOG: Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys}
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys}
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys}
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys}
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Sidebar: render {selectedPersonaId: capital-foundry, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: capital-foundry, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: capital-foundry
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys}
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys}
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Sidebar: render {selectedPersonaId: capital-foundry, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: capital-foundry, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Failed to load user progress from backend: TypeError: Failed to fetch
+BROWSER LOG: Failed to load user progress from backend: TypeError: Failed to fetch
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: capital-foundry
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: [vite] connected.
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+  ✓   4 [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:86:5 › Journey Navigation Workflow › should maintain journey state when navigating between routes (22.2s)
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: [JavaScript Error: "downloadable font: download failed (font-family: "Space Grotesk" style:normal weight:500 stretch:100 src index:0): status=2152398850 source: https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff2"]
+BROWSER LOG: [JavaScript Error: "downloadable font: download failed (font-family: "DM Sans" style:normal weight:700 stretch:100 src index:0): status=2152398850 source: https://fonts.gstatic.com/s/dmsans/v17/rP2Yp2ywxg089UriI5-g4vlH9VoD8Cmcqbu0-K6z8GXhnU0.woff2"]
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: [vite] connected.
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: undefined
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys/capital-foundry}
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys/capital-foundry}
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: [vite] connected.
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys/capital-foundry}
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys/capital-foundry}
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys/capital-foundry}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys/capital-foundry}
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: undefined
+BROWSER LOG: Sidebar: render {selectedPersonaId: capital-foundry, completedPhases: 0}
+BROWSER LOG: Sidebar: render {selectedPersonaId: capital-foundry, completedPhases: 0}
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+  ✓   2 [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:140:5 › Journey Navigation Workflow › should handle browser back/forward navigation (25.7s)
+BROWSER LOG: Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+  ✘   1 [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:45:5 › Journey Navigation Workflow › should navigate from persona selection to workspace (26.3s)
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: capital-foundry
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: capital-foundry
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: [vite] connected.
+  ✘   8 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:45:5 › Journey Navigation Workflow › should navigate from persona selection to workspace (25.6s)
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: undefined
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: capital-foundry
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: [vite] connected.
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+BROWSER LOG: Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+  ✘   3 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:86:5 › Journey Navigation Workflow › should maintain journey state when navigating between routes (30.5s)
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: cognitive-activation-hub selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: cognitive-activation-hub selectedPersona: undefined
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Journey Effect: journeyId: cognitive-activation-hub selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+  ✓   9 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:123:5 › Journey Navigation Workflow › should allow switching between different journeys (18.7s)
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: undefined
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: [vite] connected.
+BROWSER LOG: Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: capital-foundry
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: [vite] connecting...
+BROWSER LOG: [vite] connected.
+BROWSER LOG: Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthContext: checkAuthStatus started
+BROWSER LOG: AuthContext: token present? true refresh token present? false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthContext: setting isLoading false
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: AuthProvider: render
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: ProtectedRoute: render JSHandle@object
+BROWSER LOG: ProtectedRoute: rendering children
+BROWSER LOG: Layout: render
+BROWSER LOG: Layout: render
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: JourneysPage Render: selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: undefined
+BROWSER LOG: Fetching platform stats from backend...
+BROWSER LOG: JourneysPage: useEffect triggered
+BROWSER LOG: JourneysPage: loading progress...
+BROWSER LOG: Fetching access pass holders from backend...
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: undefined
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: Sidebar: render JSHandle@object
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: Journey Effect: journeyId: capital-foundry selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage: progress loaded successfully
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: JourneysPage Render: selectedPersona: capital-foundry
+BROWSER LOG: [JourneyWorkspace] RENDERED
+BROWSER LOG: [JourneyWorkspace] RENDERED
+  ✓  10 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:140:5 › Journey Navigation Workflow › should handle browser back/forward navigation (22.0s)
+
+
+  1) [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:45:5 › Journey Navigation Workflow › should navigate from persona selection to workspace 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('button', { name: /Back to all journeys/i })
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for getByRole('button', { name: /Back to all journeys/i })[22m
+
+
+      59 |
+      60 |         // Verify we're now in the workspace
+    > 61 |         await expect(page.getByRole('button', { name: /Back to all journeys/i })).toBeVisible({ timeout: 10000 });
+         |                                                                                   ^
+      62 |         // "The Capital Foundry Journey" might be transparent due to bg-clip-text, so check for "Current Phase" instead which is always visible
+      63 |         await expect(page.getByRole('heading', { name: 'Current Phase' })).toBeVisible();
+      64 |     });
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/journey-navigation-workflow.spec.ts:61:83
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-bc6cf-sona-selection-to-workspace-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-bc6cf-sona-selection-to-workspace-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/journey-navigation-workflo-bc6cf-sona-selection-to-workspace-chromium/error-context.md
+
+  2) [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:45:5 › Journey Navigation Workflow › should navigate from persona selection to workspace 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('button', { name: /Back to all journeys/i })
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for getByRole('button', { name: /Back to all journeys/i })[22m
+
+
+      59 |
+      60 |         // Verify we're now in the workspace
+    > 61 |         await expect(page.getByRole('button', { name: /Back to all journeys/i })).toBeVisible({ timeout: 10000 });
+         |                                                                                   ^
+      62 |         // "The Capital Foundry Journey" might be transparent due to bg-clip-text, so check for "Current Phase" instead which is always visible
+      63 |         await expect(page.getByRole('heading', { name: 'Current Phase' })).toBeVisible();
+      64 |     });
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/journey-navigation-workflow.spec.ts:61:83
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-bc6cf-sona-selection-to-workspace-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-bc6cf-sona-selection-to-workspace-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/journey-navigation-workflo-bc6cf-sona-selection-to-workspace-firefox/error-context.md
+
+  3) [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:86:5 › Journey Navigation Workflow › should maintain journey state when navigating between routes 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('button', { name: /Back to all journeys/i })
+    Expected: visible
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for getByRole('button', { name: /Back to all journeys/i })[22m
+
+
+      117 |         // So `selectedPersona` remains whatever it was in the store.
+      118 |         // So it SHOULD show the workspace.
+    > 119 |         await expect(page.getByRole('button', { name: /Back to all journeys/i })).toBeVisible({ timeout: 10000 });
+          |                                                                                   ^
+      120 |         await expect(page.locator('text=The Capital Foundry')).toBeVisible();
+      121 |     });
+      122 |
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/journey-navigation-workflow.spec.ts:119:83
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-980a2-n-navigating-between-routes-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-980a2-n-navigating-between-routes-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/journey-navigation-workflo-980a2-n-navigating-between-routes-firefox/error-context.md
+
+  3 failed
+    [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:45:5 › Journey Navigation Workflow › should navigate from persona selection to workspace 
+    [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:45:5 › Journey Navigation Workflow › should navigate from persona selection to workspace 
+    [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:86:5 › Journey Navigation Workflow › should maintain journey state when navigating between routes 
+  7 passed (44.8s)
+
+[36m  Serving HTML report at http://localhost:43129. Press Ctrl+C to quit.[39m

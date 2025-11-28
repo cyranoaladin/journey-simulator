@@ -58,6 +58,8 @@ const JourneyWorkspace = () => {
 
   const activePhaseIndex = currentPhaseIndex ?? userProgress.completedPhases.length;
 
+
+
   // Check if journey is completed
   if (activePhaseIndex >= selectedPersona.phases.length) {
     return <JourneyCompletedPage />;
@@ -76,14 +78,6 @@ const JourneyWorkspace = () => {
       phase: activePhase.title,
       phaseNumber: activePhaseIndex + 1
     };
-
-    // Trigger confetti
-    // confetti({
-    //   particleCount: 100,
-    //   spread: 70,
-    //   origin: { y: 0.6 },
-    //   colors: ['#00f0ff', '#7000ff', '#ffffff']
-    // });
 
     // Call the actual store action
     completePhase(activePhaseIndex, {
