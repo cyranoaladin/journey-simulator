@@ -146,7 +146,11 @@ const request = async <T>(
   // Mock response for demo mode
   const token = localStorage.getItem('accessToken');
   console.log(`[API] Requesting: ${path} (Base: ${API_BASE_URL})`);
-  if (token === 'demo-token') {
+
+  // CRITICAL: Allow real backend calls for AI agents even in demo mode
+  const isAIAgentCall = path.includes('/step') || path.includes('/submit');
+
+  if (token === 'demo-token' && !isAIAgentCall) {
     console.log(`[Demo Mode] Mocking request to ${path}`);
 
     // Helper to simulate backend state
