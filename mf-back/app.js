@@ -62,7 +62,9 @@ const corsOptions = {
     'http://127.0.0.1:5174',
     'http://127.0.0.1:3000',
     'http://127.0.0.1:3002',
-    'http://127.0.0.1:3003'
+    'http://127.0.0.1:3003',
+    'https://journey.mfai.app',
+    'http://journey.mfai.app'
   ],
   credentials: true,
   optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
