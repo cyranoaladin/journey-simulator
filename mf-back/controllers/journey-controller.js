@@ -676,3 +676,52 @@ exports.loadDemoState = async (req, res) => {
         });
     }
 };
+/**
+ * Get Journey Schema
+ * Exposes the structure of all available journeys dynamically
+ */
+exports.getJourneySchema = async (req, res) => {
+  try {
+    const schema = {
+      personas: [
+        {
+          id: 'cognitive-activation-hub',
+          name: 'Cognitive Activation Hub',
+          description: 'Structured learning path for Web3 builders',
+          phases: [
+            { id: 'foundations', name: 'Solana Systems Lab', order: 1 },
+            { id: 'tokenomics', name: 'Token Design Studio', order: 2 },
+            { id: 'dao', name: 'DAO Architecture Lab', order: 3 }
+          ]
+        },
+        {
+          id: 'capital-foundry',
+          name: 'Capital Foundry',
+          description: 'Investor readiness and fundraising',
+          phases: [
+            { id: 'discovery', name: 'Protocol Discovery Sprint', order: 1 },
+            { id: 'validation', name: 'Market Validation Lab', order: 2 },
+            { id: 'pitch', name: 'Investor Pitch Studio', order: 3 }
+          ]
+        }
+      ],
+      agents: [
+        { id: 'ZynoAgent', name: 'Zyno', role: 'Guide & Orchestrator' },
+        { id: 'CoachAgent', name: 'Coach', role: 'Coaching & Guidance' },
+        { id: 'BuilderAgent', name: 'Builder', role: 'Technical Architecture' },
+        { id: 'GrowthAgent', name: 'Growth', role: 'Marketing & Growth' },
+        { id: 'DAOAgent', name: 'DAO', role: 'Governance Design' },
+        { id: 'TokenomicsAgent', name: 'Tokenomics', role: 'Token Economics' }
+      ],
+      metadata: {
+        version: '1.0',
+        lastUpdated: new Date().toISOString()
+      }
+    };
+
+    res.status(200).json(schema);
+  } catch (error) {
+    console.error('Error fetching journey schema:', error);
+    res.status(500).json({ error: 'Failed to fetch journey schema' });
+  }
+};

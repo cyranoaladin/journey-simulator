@@ -26,4 +26,8 @@ router.post('/:journeyId/submit', journeyController.submit);
 // Demo mode route
 router.post('/load-demo', journeyController.loadDemoState);
 
+// Schema endpoint - expose journey structure
+router.get('/schema', journeyController.getJourneySchema);
+
 module.exports = router;
+
