@@ -11,31 +11,31 @@ interface AgentLogItem {
   details?: Record<string, any>
 }
 
-export default function AgentActivityFeed(){
-  const ensureApiJourneyId = useJourneyStore(s=>s.ensureApiJourneyId)
+export default function AgentActivityFeed() {
+  const ensureApiJourneyId = useJourneyStore(s => s.ensureApiJourneyId)
   const [logs, setLogs] = useState<AgentLogItem[]>([])
   const [loading, setLoading] = useState(false)
 
   const fetchLogs = async () => {
     const id = ensureApiJourneyId()
-    try{
+    try {
       setLoading(true)
-      const res = await fetch(`${API_BASE_URL}/api/agents/logs?journeyId=${encodeURIComponent(id)}&limit=20`)
-      if(res.ok){
+      const res = await fetch(`${API_BASE_URL}/agents/logs?journeyId=${encodeURIComponent(id)}&limit=20`)
+      if (res.ok) {
         const json = await res.json()
         setLogs(Array.isArray(json.logs) ? json.logs : [])
       }
-    }catch{
+    } catch {
       /* noop */
-    }finally{
+    } finally {
       setLoading(false)
     }
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchLogs()
     const t = setInterval(fetchLogs, 10000)
-    return ()=>clearInterval(t)
+    return () => clearInterval(t)
   }, [])
 
   return (
@@ -43,12 +43,12 @@ export default function AgentActivityFeed(){
       <div className="flex items-center justify-between mb-2">
         <h4 className="text-sm font-semibold">Agent Activity</h4>
         <button className="text-xs opacity-70 hover:opacity-100" onClick={fetchLogs} disabled={loading}>
-          {loading? '…' : 'Refresh'}
+          {loading ? '…' : 'Refresh'}
         </button>
       </div>
       <div className="space-y-2 max-h-64 overflow-auto">
-        {logs.length===0 && <div className="text-xs opacity-70">No recent activity</div>}
-        {logs.map((l, i)=>{
+        {logs.length === 0 && <div className="text-xs opacity-70">No recent activity</div>}
+        {logs.map((l, i) => {
           const date = new Date(l.ts)
           const time = date.toLocaleTimeString()
           return (

@@ -255,8 +255,8 @@ const JourneyWorkspace = () => {
                 {isStepLoading ? <Loader2 size={16} className="animate-spin" /> : 'Start / Continue'}
               </button>
 
-              {/* Demo Mode Action Button */}
-              {!userProgress.completedPhases.includes(activePhaseIndex) && (
+              {/* Demo Mode Action Button - Only show after Zyno provides content */}
+              {lastStep?.ui_blocks && lastStep.ui_blocks.length > 0 && !userProgress.completedPhases.includes(activePhaseIndex) && (
                 <button
                   onClick={() => {
                     // 1. Handle Staking
@@ -300,8 +300,8 @@ const JourneyWorkspace = () => {
                     </>
                   ) : (
                     <>
-                      <Loader2 size={16} />
-                      <span>Validate Phase</span>
+                      <Trophy size={16} />
+                      <span>Complete Phase</span>
                     </>
                   )}
                 </button>
