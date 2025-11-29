@@ -11,10 +11,32 @@ model User {
   id        String   @id @default(cuid())
   email     String   @unique
   name      String?
+  wallet    String?  @unique
   createdAt DateTime @default(now())
   journeys  Journey[]
   achievements Achievement[]
+  nftMints  NftMint[]
 }
+
+model NftMint {
+  id          String   @id @default(cuid())
+  userId      String
+  wallet      String
+  mintAddress String   @unique
+  txId        String   @unique
+  type        String   // "access_pass", "completion_badge", "proof_of_skill"
+  journeyId   String?
+  phaseId     String?
+  metadata    Json?    // Additional metadata (score, rarity, etc.)
+  timestamp   DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id])
+  
+  @@index([userId])
+  @@index([wallet])
+  @@index([type])
+}
+
 
 model Journey {
   id        String   @id @default(cuid())
