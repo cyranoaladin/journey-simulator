@@ -21,8 +21,8 @@ const llmCache = new LRUCache({
   ttl: 1000 * 60 * 60 * 24,
 });
 
-const DEFAULT_LLM_MODEL = process.env.LLM_MODEL_NAME || "gpt-5.1";
-const GPT_MINI_MODEL = "gpt-5.1-mini"; // Cost-effective model for simpler tasks
+const DEFAULT_LLM_MODEL = process.env.LLM_MODEL_NAME || "gpt-4o";
+const GPT_MINI_MODEL = "gpt-4o-mini"; // Cost-effective model for simpler tasks
 const DEFAULT_LLM_TEMPERATURE = Number(process.env.LLM_TEMPERATURE ?? 0.4) || 0.4;
 const DEFAULT_LLM_MAX_OUTPUT_TOKENS = Number(process.env.LLM_MAX_OUTPUT_TOKENS ?? 1500) || 1500;
 
