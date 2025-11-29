@@ -55,7 +55,9 @@ Tests: `npm test`
 
 ## Deployment
 
-Use `docker-compose.yml` for local full-stack runs (`./start_dev.sh`). Production deployments rely on `scripts/deploy.sh`, which installs dependencies for all three packages, builds the Vite and Next.js front-ends, applies Prisma migrations, and reloads the PM2 ecosystem defined in `ecosystem.config.cjs`.
+Use `docker-compose.yml` for local full-stack runs (`./start_dev.sh`).
+
+For production deployments on dedicated servers (e.g., `journey.mfai.app`), please refer to the [Deployment Guide](DEPLOY.md) (`DEPLOY.md`). It uses `docker-compose.deploy.yml` to ensure isolation and avoid port conflicts.
 
 ## Conventions
 
