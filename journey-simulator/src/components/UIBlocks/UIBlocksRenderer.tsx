@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useJourneyStore } from "../../store/journeyStore";
+import { API_BASE_URL } from '../../utils/api';
 // TEMPORARILY DISABLED - import { useFavoritesStore } from "../../store/favoritesStore";
 import type {
   JourneyStepResponse,
@@ -122,8 +123,6 @@ function Quiz({ block }: { block: QuizBlock }) {
       setSubmitting(true);
       setError(null);
       const id = ensureApiJourneyId();
-      const base =
-        (import.meta as any).env?.VITE_API_BASE_URL || "http://127.0.0.1:3000";
 
       const body = {
         missionId: block.id, // Using block ID as mission ID for quiz
@@ -142,7 +141,7 @@ function Quiz({ block }: { block: QuizBlock }) {
         journeyState: useJourneyStore.getState().userProgress,
       };
 
-      const resp = await fetch(`${base}/api/journeys/${id}/submit`, {
+      const resp = await fetch(`${API_BASE_URL}/journey/${id}/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -312,8 +311,6 @@ function Mission({ block }: { block: MissionBlock }) {
       setSubmitting(true);
       setError(null);
       const id = ensureApiJourneyId();
-      const base =
-        (import.meta as any).env?.VITE_API_BASE_URL || "http://127.0.0.1:3000";
       const body = {
         missionId: block.id,
         inputType: block.expected_input_type,
@@ -325,7 +322,7 @@ function Mission({ block }: { block: MissionBlock }) {
         phaseId: lastStep?.metadata?.phase_id,
         journeyState: useJourneyStore.getState().userProgress,
       };
-      const resp = await fetch(`${base}/api/journeys/${id}/submit`, {
+      const resp = await fetch(`${API_BASE_URL}/journey/${id}/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

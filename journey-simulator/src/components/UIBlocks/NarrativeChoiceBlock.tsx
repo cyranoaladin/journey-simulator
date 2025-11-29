@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useJourneyStore } from '../../store/journeyStore';
+import { API_BASE_URL } from '../../utils/api';
 
 interface NarrativeChoiceBlock {
   kind: 'narrative_choice_block';
@@ -38,9 +39,8 @@ export default function NarrativeChoice({ block }: NarrativeChoiceBlockProps) {
 
     try {
       const id = ensureApiJourneyId();
-      const base = (import.meta as any).env?.VITE_API_BASE_URL || "http://127.0.0.1:3000";
 
-      const response = await fetch(`${base}/api/journeys/${id}/step`, {
+      const response = await fetch(`${API_BASE_URL}/journey/${id}/step`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
