@@ -412,6 +412,39 @@ const request = async <T>(
       } as unknown as T;
     }
 
+    // Mock agent logs endpoints
+    if (path.includes('/agents/logs') || path.includes('/admin/agent-logs')) {
+      return {
+        logs: [
+          {
+            id: '1',
+            timestamp: new Date().toISOString(),
+            agentId: 'analyst',
+            message: 'Market analysis completed',
+            level: 'info',
+            journeyId: 'demo-journey'
+          },
+          {
+            id: '2',
+            timestamp: new Date().toISOString(),
+            agentId: 'trader',
+            message: 'Portfolio optimization in progress',
+            level: 'info',
+            journeyId: 'demo-journey'
+          }
+        ]
+      } as unknown as T;
+    }
+
+    // Mock orchestration endpoint
+    if (path.includes('/orchestration')) {
+      return {
+        status: 'active',
+        activeAgents: ['analyst', 'trader', 'governance'],
+        queuedTasks: 0
+      } as unknown as T;
+    }
+
     // Default success for other endpoints in demo mode
     return { success: true } as unknown as T;
   }
