@@ -56,25 +56,57 @@ export const mintProofOfSkill = async (
       throw new Error('Wallet not connected');
     }
 
-    // Simulate asynchronous metadata upload and minting delay
-    await new Promise((resolve) => setTimeout(resolve, 1200));
+    const apiBaseUrl = import.meta.env.VITE_SOLANA_API_BASE_URL || 'http://localhost:3000';
 
-    const normalizedAttributes = metadata.attributes.map((attribute) => ({
-      ...attribute,
-      value: String(attribute.value),
-    }));
-    console.debug('Simulated metadata upload for Proof-of-Skill NFT', {
-      name: metadata.name,
-      attributes: normalizedAttributes,
+    // 1. Simulate Mint (Prepare)
+    const simResponse = await fetch(`${apiBaseUrl}/api/mint/simulate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        recipient: publicKey.toBase58(),
+        name: metadata.name,
+        uri: 'https://example.com/placeholder-metadata.json' // In real app, upload metadata to Arweave/IPFS first
+      })
     });
 
-    const simulatedMint = Keypair.generate().publicKey.toBase58();
+    if (!simResponse.ok) {
+      throw new Error(`Simulation failed: ${simResponse.statusText}`);
+    }
+
+    const simData = await simResponse.json();
+    if (!simData.ok) {
+      throw new Error(simData.error || 'Simulation returned error');
+    }
+
+    // 2. Execute Mint (Sign & Send on Server)
+    const execResponse = await fetch(`${apiBaseUrl}/api/mint/execute`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-id': publicKey.toBase58() // Simple tracking for now
+      },
+      body: JSON.stringify({
+        sim: simData
+      })
+    });
+
+    if (!execResponse.ok) {
+      const errText = await execResponse.text();
+      throw new Error(`Execution failed: ${errText}`);
+    }
+
+    const execData = await execResponse.json();
+
+    if (!execData.ok) {
+      throw new Error(execData.error || 'Execution returned error');
+    }
 
     return {
       success: true,
-      signature: `simulated_mint_${Date.now()}`,
-      mintAddress: simulatedMint,
+      signature: execData.tx.txSig,
+      mintAddress: 'pending_on_chain', // We'd get this from the tx logs in a full implementation
     };
+
   } catch (error) {
     console.error('Error minting NFT:', error);
     const message = error instanceof Error ? error.message : String(error);
@@ -149,7 +181,7 @@ export const getWalletNFTs = async (publicKey: PublicKey): Promise<any[]> => {
     // 1. Query the Solana blockchain for token accounts owned by the wallet
     // 2. Filter for NFTs (tokens with supply of 1)
     // 3. Fetch metadata for each NFT
-    
+
     // For simulation purposes, we'll just return an empty array
     return [];
   } catch (error) {

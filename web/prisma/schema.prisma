@@ -8,16 +8,85 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  wallet    String?  @unique
-  createdAt DateTime @default(now())
-  journeys  Journey[]
-  achievements Achievement[]
-  nftMints  NftMint[]
+  id             String        @id @default(cuid())
+  email          String?       @unique
+  name           String?
+  wallet         String?       @unique // Legacy field, keeping for backward compatibility
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  wallets        Wallet[]
+  journeys       Journey[]
+  achievements   Achievement[]
+  nftMints       NftMint[]
 }
 
+model Wallet {
+  id             String    @id @default(cuid())
+  user           User      @relation(fields: [userId], references: [id])
+  userId         String
+
+  address        String    @unique
+  chain          String    // e.g. "solana"
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Cache for pass status
+  hasActivePass  Boolean   @default(false)
+  lastPassCheck  DateTime?
+
+  accessRecords  JourneyAccess[]
+  nftPasses      NftPass[]
+}
+
+model NftPass {
+  id             String   @id @default(cuid())
+  wallet         Wallet   @relation(fields: [walletId], references: [id])
+  walletId       String
+
+  mintAddress    String   @unique
+  collectionMint String   // mint of the collection
+  tier           String   // "BUILDER" | "GROWTH" | "DAO" | ...
+  isActive       Boolean  @default(true)
+
+  firstSeenAt    DateTime @default(now())
+  lastCheckedAt  DateTime @default(now())
+
+  accessGrants   JourneyAccess[]
+}
+
+model Journey {
+  id             String       @id @default(cuid())
+  user           User         @relation(fields: [userId], references: [id])
+  userId         String
+
+  title          String?      // Optional title
+  type           String       // e.g. "MVP_LAUNCH", "TOKEN_DESIGN", ...
+  status         String       @default("planned") // "draft" | "in_progress" | "completed"
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  // Gating
+  requiredTier   String?      // e.g. "BUILDER" | "GROWTH" | "DAO" | null for free
+  accessRecords  JourneyAccess[]
+}
+
+model JourneyAccess {
+  id             String   @id @default(cuid())
+  journey        Journey  @relation(fields: [journeyId], references: [id])
+  journeyId      String
+
+  wallet         Wallet   @relation(fields: [walletId], references: [id])
+  walletId       String
+
+  nftPass        NftPass? @relation(fields: [nftPassId], references: [id])
+  nftPassId      String?
+
+  grantedAt      DateTime @default(now())
+  tierUsed       String?  // Tier read at verification time
+}
+
+// Legacy model for minting history (kept for compatibility)
 model NftMint {
   id          String   @id @default(cuid())
   userId      String
@@ -35,16 +104,6 @@ model NftMint {
   @@index([userId])
   @@index([wallet])
   @@index([type])
-}
-
-
-model Journey {
-  id        String   @id @default(cuid())
-  title     String
-  status    String   @default("planned")
-  user      User?    @relation(fields: [userId], references: [id])
-  userId    String?
-  createdAt DateTime @default(now())
 }
 
 model Achievement {
