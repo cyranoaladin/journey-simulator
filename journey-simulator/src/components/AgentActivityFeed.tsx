@@ -25,8 +25,9 @@ export default function AgentActivityFeed() {
         const json = await res.json()
         setLogs(Array.isArray(json.logs) ? json.logs : [])
       }
-    } catch {
-      /* noop */
+      // Silently ignore 404 - logs endpoint may not exist yet
+    } catch (err) {
+      // Silently ignore fetch errors to keep console clean
     } finally {
       setLoading(false)
     }
