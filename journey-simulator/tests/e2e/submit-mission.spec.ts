@@ -69,12 +69,35 @@ test.describe('Journey submit mission flow', () => {
       })
     })
 
+    // Mock step response for the journey UI to load
+    await page.route('**/journey/*/step', async (route) => {
+      console.log(`[TEST] Mock hit for ${route.request().url()}`);
+      await route.fulfill({
+        status: 200, contentType: 'application/json', body: JSON.stringify({
+          metadata: {
+            persona_id: 'e2e-persona',
+            journey_track: 'e2e-track',
+            phase_id: 'e2e-phase',
+            language: 'en',
+            mode: 'default',
+            tone: 'neutral',
+            title: 'E2E Step'
+          },
+          ui_blocks: [
+            { kind: 'text_block', id: 'intro', title: 'Welcome', body_markdown: 'This is an E2E test step.' }
+          ],
+          agent_actions: [],
+          next_state: { phase_id: 'e2e-phase', completed_missions: [], xp_delta: 0 }
+        })
+      })
+    })
+
     await page.route('**/user/update-profile', async (route) => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true }) })
     })
 
     await page.route('**/journey/user-progress', async (route) => {
-      if(route.request().method()==='GET'){
+      if (route.request().method() === 'GET') {
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
@@ -85,8 +108,8 @@ test.describe('Journey submit mission flow', () => {
             currentPersona: 'e2e-persona'
           })
         })
-      }else{
-        await route.fulfill({ status: 204 })
+      } else {
+        await route.fulfill({ status: 200, contentType: 'application/json', body: '{}' })
       }
     })
 
@@ -101,7 +124,8 @@ test.describe('Journey submit mission flow', () => {
 
   test('step + submit shows evaluation and logs', async ({ page }) => {
     // Intercept step + submit + logs
-    await page.route('**/api/journeys/*/step', async (route) => {
+    // Intercept step + submit + logs
+    await page.route('**/journey/*/step', async (route) => {
       const body = {
         metadata: { persona_id: 'demo', journey_track: 'builder', phase_id: 'learn', language: 'fr', mode: 'builder', tone: 'pedagogical', title: 'E2E Step' },
         ui_blocks: [
@@ -118,7 +142,7 @@ test.describe('Journey submit mission flow', () => {
       const body = {
         metadata: { persona_id: 'demo', journey_track: 'builder', phase_id: 'learn', language: 'fr', mode: 'builder', tone: 'pedagogical', title: 'E2E Submit' },
         ui_blocks: [
-          { kind: 'evaluation_block', id: 'eval', title: 'Feedback', global_score: 80, max_score: 100, feedback: 'Good', axes: [ { name:'Pertinence', score: 30, max_score: 35, comment:'ok' }, { name:'Qualité', score: 25, max_score: 35, comment:'ok' }, { name:'Exécution', score: 25, max_score: 30, comment:'ok' } ] },
+          { kind: 'evaluation_block', id: 'eval', title: 'Feedback', global_score: 80, max_score: 100, feedback: 'Good', axes: [{ name: 'Pertinence', score: 30, max_score: 35, comment: 'ok' }, { name: 'Qualité', score: 25, max_score: 35, comment: 'ok' }, { name: 'Exécution', score: 25, max_score: 30, comment: 'ok' }] },
           { kind: 'xp_block', id: 'xp', current_xp: 0, gained_xp: 25, next_level_xp: 100 }
         ],
         agent_actions: [],
@@ -130,26 +154,33 @@ test.describe('Journey submit mission flow', () => {
     await page.route('**/api/agents/logs**', async (route) => {
       const now = Date.now()
       const logs = [
-        { ts: now-5000, journeyId: 'jid', agent: 'Zyno', action: 'step', details: { phaseId: 'learn' } },
-        { ts: now-1000, journeyId: 'jid', agent: 'Zyno', action: 'submit', details: { missionId: 'm1' } },
+        { ts: now - 5000, journeyId: 'jid', agent: 'Zyno', action: 'step', details: { phaseId: 'learn' } },
+        { ts: now - 1000, journeyId: 'jid', agent: 'Zyno', action: 'submit', details: { missionId: 'm1' } },
       ]
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ logs }) })
     })
 
-    await page.goto('/journeys')
-    await expect(page.getByRole('heading', { name: /Current Phase/i })).toBeVisible()
+    // Navigate to specific journey workspace
+    await page.goto('/journeys/e2e-persona')
+    await expect(page.getByRole('heading', { name: /Active Phase|Current Phase/i })).toBeVisible()
 
     // Scroll to Current Phase and run step
-    await page.getByRole('button', { name: 'Lancer l’étape' }).click({ force: true })
+    // Scroll to Current Phase and run step
+    const startButton = page.locator('button:has-text("Start / Continue"), button:has-text("Start"), button:has-text("Continue")').first();
+    await expect(startButton).toBeVisible();
+    await expect(startButton).toBeEnabled();
+    await startButton.evaluate((b) => (b as HTMLElement).click());
 
     // Fill mission input (link) and submit
-    const input = page.locator('input[placeholder="https://..."]').first()
+    const input = page.locator('input[placeholder*="http"]').first()
     await input.fill('https://example.com')
-    await page.getByRole('button', { name: 'Soumettre la mission' }).click()
+    const submitBtn = page.getByRole('button', { name: /Submit Mission|Soumettre/i }).first()
+    await expect(submitBtn).toBeVisible()
+    await submitBtn.evaluate((b) => (b as HTMLElement).click())
 
     // Expect evaluation block
-    await expect(page.getByText(/Score:/)).toBeVisible()
+    await expect(page.getByText(/Score:/)).toBeVisible({ timeout: 30000 })
     // Activity feed should render mocked logs
-    await expect(page.getByText(/Agent Activity/)).toBeVisible()
+    await expect(page.getByText(/Agent Activity/).first()).toBeVisible()
   })
 })

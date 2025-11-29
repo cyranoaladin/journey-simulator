@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      args:
+        INSTALL_DEV: "false"
+    command: npm start
+    environment:
+      NODE_ENV: production

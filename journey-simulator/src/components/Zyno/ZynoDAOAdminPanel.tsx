@@ -42,8 +42,8 @@ export default function ZynoDAOAdminPanel() {
         api.getDaoProposals()
       ]);
       setConfig(daoConfig);
-      setProposals(daoProposals.proposals);
-      if (!selectedVoter && daoConfig.voters.length > 0) {
+      setProposals(daoProposals?.proposals || []);
+      if (!selectedVoter && daoConfig?.voters?.length > 0) {
         setSelectedVoter(daoConfig.voters[0].id);
       }
       setFetchState({ loading: false, error: null });
@@ -230,7 +230,7 @@ export default function ZynoDAOAdminPanel() {
                 className="mt-2 w-full rounded-md border border-emerald-200 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-400 dark:border-emerald-500/40 dark:bg-slate-900"
               >
                 <option value="">Select a voter</option>
-                {config.voters.map(renderVoterOption)}
+                {config.voters?.map(renderVoterOption)}
               </select>
             </div>
           </div>

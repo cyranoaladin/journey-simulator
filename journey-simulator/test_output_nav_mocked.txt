@@ -1,0 +1,21 @@
+SyntaxError: /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/journey-navigation-workflow.spec.ts: Unexpected token (178:0)
+
+  176 |         });
+  177 |     });
+> 178 |
+      | ^
+
+   at journey-navigation-workflow.spec.ts:178
+
+  176 |         });
+  177 |     });
+> 178 |
+Error: No tests found.
+Make sure that arguments are regular expressions matching test files.
+You may need to escape symbols like "$" or "*" and quote the arguments.
+
+
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report tests/e2e-report[39m
+[36m[39m

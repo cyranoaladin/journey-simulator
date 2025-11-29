@@ -1,0 +1,151 @@
+
+Running 4 tests using 4 workers
+
+Minting Error: Logout
+Minting Error: Logout
+  ✘  1 [chromium] › tests/e2e/submit-mission.spec.ts:102:3 › Journey submit mission flow › step + submit shows evaluation and logs (9.8s)
+  ✘  3 [chromium] › tests/e2e/mint-debug.spec.ts:89:3 › Mint flow (frontend debug) › simulate and execute show tx signature and explorer link (10.2s)
+  ✘  2 [firefox] › tests/e2e/mint-debug.spec.ts:89:3 › Mint flow (frontend debug) › simulate and execute show tx signature and explorer link (12.6s)
+  ✘  4 [firefox] › tests/e2e/submit-mission.spec.ts:102:3 › Journey submit mission flow › step + submit shows evaluation and logs (12.6s)
+
+
+  1) [chromium] › tests/e2e/mint-debug.spec.ts:89:3 › Mint flow (frontend debug) › simulate and execute show tx signature and explorer link 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/Transaction Signature/)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/Transaction Signature/)[22m
+
+
+      108 |
+      109 |     // Ensure we see the tx signature
+    > 110 |     await expect(page.getByText(/Transaction Signature/)).toBeVisible()
+          |                                                           ^
+      111 |     await expect(page.getByTestId('mint-tx-signature')).toHaveText('SIG_E2E')
+      112 |
+      113 |     // Open explorer link
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/mint-debug.spec.ts:110:59
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/mint-debug-Mint-flow-front-5fbc1-signature-and-explorer-link-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/mint-debug-Mint-flow-front-5fbc1-signature-and-explorer-link-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/mint-debug-Mint-flow-front-5fbc1-signature-and-explorer-link-chromium/error-context.md
+
+  2) [chromium] › tests/e2e/submit-mission.spec.ts:102:3 › Journey submit mission flow › step + submit shows evaluation and logs 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('heading', { name: /Active Phase|Current Phase/i })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('heading', { name: /Active Phase|Current Phase/i })[22m
+
+
+      138 |
+      139 |     await page.goto('/journeys')
+    > 140 |     await expect(page.getByRole('heading', { name: /Active Phase|Current Phase/i })).toBeVisible()
+          |                                                                                      ^
+      141 |
+      142 |     // Scroll to Current Phase and run step
+      143 |     // Use dispatchEvent to bypass potential overlay issues
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/submit-mission.spec.ts:140:86
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-chromium/error-context.md
+
+  3) [firefox] › tests/e2e/mint-debug.spec.ts:89:3 › Mint flow (frontend debug) › simulate and execute show tx signature and explorer link 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/Transaction Signature/)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/Transaction Signature/)[22m
+
+
+      108 |
+      109 |     // Ensure we see the tx signature
+    > 110 |     await expect(page.getByText(/Transaction Signature/)).toBeVisible()
+          |                                                           ^
+      111 |     await expect(page.getByTestId('mint-tx-signature')).toHaveText('SIG_E2E')
+      112 |
+      113 |     // Open explorer link
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/mint-debug.spec.ts:110:59
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/mint-debug-Mint-flow-front-5fbc1-signature-and-explorer-link-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/mint-debug-Mint-flow-front-5fbc1-signature-and-explorer-link-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/mint-debug-Mint-flow-front-5fbc1-signature-and-explorer-link-firefox/error-context.md
+
+  4) [firefox] › tests/e2e/submit-mission.spec.ts:102:3 › Journey submit mission flow › step + submit shows evaluation and logs 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('heading', { name: /Active Phase|Current Phase/i })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('heading', { name: /Active Phase|Current Phase/i })[22m
+
+
+      138 |
+      139 |     await page.goto('/journeys')
+    > 140 |     await expect(page.getByRole('heading', { name: /Active Phase|Current Phase/i })).toBeVisible()
+          |                                                                                      ^
+      141 |
+      142 |     // Scroll to Current Phase and run step
+      143 |     // Use dispatchEvent to bypass potential overlay issues
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/submit-mission.spec.ts:140:86
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-firefox/error-context.md
+
+  4 failed
+    [chromium] › tests/e2e/mint-debug.spec.ts:89:3 › Mint flow (frontend debug) › simulate and execute show tx signature and explorer link 
+    [chromium] › tests/e2e/submit-mission.spec.ts:102:3 › Journey submit mission flow › step + submit shows evaluation and logs 
+    [firefox] › tests/e2e/mint-debug.spec.ts:89:3 › Mint flow (frontend debug) › simulate and execute show tx signature and explorer link 
+    [firefox] › tests/e2e/submit-mission.spec.ts:102:3 › Journey submit mission flow › step + submit shows evaluation and logs 
+
+[36m  Serving HTML report at http://localhost:42135. Press Ctrl+C to quit.[39m
+Terminated

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission Feedback Loops</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+    <div class="max-w-4xl mx-auto p-8 bg-white shadow-lg min-h-screen my-8">
+        <header class="border-b border-slate-200 pb-6 mb-8">
+            <h1 class="text-3xl font-bold text-slate-900 mb-2">Mission Feedback Loops</h1>
+            <p class="text-slate-600">AEPO/AECO framework to capture, score, and recycle builder feedback.</p>
+        </header>
+
+        <main class="space-y-8">
+            <section>
+                <h2 class="text-2xl font-semibold text-slate-800 mb-4">The AEPO Framework</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="border p-4 rounded bg-blue-50 border-blue-200">
+                        <h3 class="font-bold text-blue-900">A - Acquisition</h3>
+                        <p class="text-sm text-blue-800">How did the user discover the mission?</p>
+                    </div>
+                    <div class="border p-4 rounded bg-green-50 border-green-200">
+                        <h3 class="font-bold text-green-900">E - Engagement</h3>
+                        <p class="text-sm text-green-800">Did they complete the core actions?</p>
+                    </div>
+                    <div class="border p-4 rounded bg-purple-50 border-purple-200">
+                        <h3 class="font-bold text-purple-900">P - Proficiency</h3>
+                        <p class="text-sm text-purple-800">Did they demonstrate skill mastery?</p>
+                    </div>
+                    <div class="border p-4 rounded bg-orange-50 border-orange-200">
+                        <h3 class="font-bold text-orange-900">O - Outcome</h3>
+                        <p class="text-sm text-orange-800">What value was created for the ecosystem?</p>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-semibold text-slate-800 mb-4">Feedback Collection</h2>
+                <p class="text-slate-700 mb-4">Feedback is collected at three distinct touchpoints:</p>
+                <ul class="list-disc list-inside space-y-2 text-slate-700 ml-4">
+                    <li><strong>In-Mission:</strong> Real-time validation of inputs (e.g., code syntax check).</li>
+                    <li><strong>Post-Mission:</strong> User sentiment survey (NPS) and difficulty rating.</li>
+                    <li><strong>Long-term:</strong> Retention tracking (did they return for the next mission?).</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-semibold text-slate-800 mb-4">Closing the Loop</h2>
+                <div class="bg-slate-100 p-6 rounded-lg">
+                    <p class="text-slate-700 leading-relaxed">
+                        Data collected from these loops is fed back into the <strong>Zyno Agent</strong> training set.
+                        If 30% of users fail a specific step, the agent automatically flags the documentation for review
+                        and suggests simplifying the instructions. This creates a self-improving educational protocol.
+                    </p>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>

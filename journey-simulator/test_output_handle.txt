@@ -1,0 +1,84 @@
+
+Running 2 tests using 2 workers
+
+[BROWSER] [API] Request: /journey/user-progress Token: null
+last-step-present NOT visible
+phase-details IS visible
+  ✘  1 [chromium] › tests/e2e/growth-agent.spec.ts:138:5 › Growth Agent Integration › should display Growth Agent evaluation (14.2s)
+last-step-present NOT visible
+phase-details IS visible
+  ✘  2 [firefox] › tests/e2e/growth-agent.spec.ts:138:5 › Growth Agent Integration › should display Growth Agent evaluation (15.2s)
+
+
+  1) [chromium] › tests/e2e/growth-agent.spec.ts:138:5 › Growth Agent Integration › should display Growth Agent evaluation 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('last-step-present')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('last-step-present')[22m
+
+
+      170 |         // Debug: check if last-step-present is visible
+      171 |         try {
+    > 172 |             await expect(page.getByTestId('last-step-present')).toBeVisible({ timeout: 5000 });
+          |                                                                 ^
+      173 |         } catch (e) {
+      174 |             console.log('last-step-present NOT visible');
+      175 |             if (await page.getByTestId('phase-details').isVisible()) {
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/growth-agent.spec.ts:172:65
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/growth-agent-Growth-Agent--8f154-lay-Growth-Agent-evaluation-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/growth-agent-Growth-Agent--8f154-lay-Growth-Agent-evaluation-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/growth-agent-Growth-Agent--8f154-lay-Growth-Agent-evaluation-chromium/error-context.md
+
+  2) [firefox] › tests/e2e/growth-agent.spec.ts:138:5 › Growth Agent Integration › should display Growth Agent evaluation 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('last-step-present')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('last-step-present')[22m
+
+
+      170 |         // Debug: check if last-step-present is visible
+      171 |         try {
+    > 172 |             await expect(page.getByTestId('last-step-present')).toBeVisible({ timeout: 5000 });
+          |                                                                 ^
+      173 |         } catch (e) {
+      174 |             console.log('last-step-present NOT visible');
+      175 |             if (await page.getByTestId('phase-details').isVisible()) {
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/growth-agent.spec.ts:172:65
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/growth-agent-Growth-Agent--8f154-lay-Growth-Agent-evaluation-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/growth-agent-Growth-Agent--8f154-lay-Growth-Agent-evaluation-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/growth-agent-Growth-Agent--8f154-lay-Growth-Agent-evaluation-firefox/error-context.md
+
+  2 failed
+    [chromium] › tests/e2e/growth-agent.spec.ts:138:5 › Growth Agent Integration › should display Growth Agent evaluation 
+    [firefox] › tests/e2e/growth-agent.spec.ts:138:5 › Growth Agent Integration › should display Growth Agent evaluation 
+
+[36m  Serving HTML report at http://localhost:45973. Press Ctrl+C to quit.[39m
+Terminated

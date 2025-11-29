@@ -1,0 +1,199 @@
+
+Running 2 tests using 2 workers
+
+[BROWSER] [vite] connecting...
+[BROWSER] [vite] connected.
+[BROWSER] [vite] connecting...
+[BROWSER] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys/e2e-persona}
+[BROWSER] ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys/e2e-persona}
+[BROWSER] AuthContext: checkAuthStatus started
+[BROWSER] AuthContext: token present? true refresh token present? true
+[BROWSER] AuthContext: checkAuthStatus started
+[BROWSER] AuthContext: token present? true refresh token present? true
+[BROWSER] [vite] connected.
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys/e2e-persona}
+[BROWSER] ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys/e2e-persona}
+[BROWSER] AuthContext: setting isLoading false
+[BROWSER] AuthContext: setting isLoading false
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys/e2e-persona}
+[BROWSER] ProtectedRoute: rendering children
+[BROWSER] ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys/e2e-persona}
+[BROWSER] ProtectedRoute: rendering children
+[BROWSER] Layout: render
+[BROWSER] Layout: render
+[BROWSER] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[BROWSER] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+[BROWSER] [JourneyWorkspace] MOUNTED
+[BROWSER] JourneysPage: useEffect triggered
+[BROWSER] JourneysPage: loading progress...
+[BROWSER] [JourneyWorkspace] MOUNTED
+[BROWSER] JourneysPage: useEffect triggered
+[BROWSER] JourneysPage: loading progress...
+[BROWSER] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[BROWSER] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+[BROWSER] JourneysPage: progress loaded successfully
+[BROWSER] JourneysPage: progress loaded successfully
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+Waiting for Start button...
+Found 1 Start buttons.
+Clicking Start button via JS...
+[BROWSER] [JourneyWorkspace] handleRunInteractiveStep called {isStepLoading: false, activePhase: e2e-phase}
+[BROWSER] [Store] Fetching step from http://127.0.0.1:3000/journey/98ba0c90-bf20-4b14-ba14-643d3b9ad9a8/step
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+Clicked Start button.
+[BROWSER] [Store] runInteractiveStep response: {"metadata":{"persona_id":"demo","journey_track":"builder","phase_id":"learn","language":"fr","mode":"builder","tone":"pedagogical","title":"E2E Step"},"ui_blocks":[{"kind":"text_block","id":"tb","title":"Intro","body_markdown":"Hello"},{"kind":"mission_block","id":"m1","title":"Submit link","description":"Provide a link","mission_type":"url","expected_input_type":"link","xp_reward":25}],"agent_actions":[],"next_state":{"phase_id":"learn","completed_missions":[],"xp_delta":0}}
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+[BROWSER] [UIBlocksRenderer] Rendering blocks: 2
+[BROWSER] [UIBlocksRenderer] Rendering blocks: 2
+[BROWSER] Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] ProtectedRoute: render JSHandle@object
+[BROWSER] ProtectedRoute: render JSHandle@object
+[BROWSER] AuthContext: checkAuthStatus started
+[BROWSER] AuthContext: token present? true refresh token present? true
+[BROWSER] AuthContext: checkAuthStatus started
+[BROWSER] AuthContext: token present? true refresh token present? true
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] ProtectedRoute: render JSHandle@object
+[BROWSER] ProtectedRoute: render JSHandle@object
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] ProtectedRoute: render JSHandle@object
+[BROWSER] ProtectedRoute: render JSHandle@object
+[BROWSER] AuthContext: setting isLoading false
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] ProtectedRoute: render JSHandle@object
+[BROWSER] ProtectedRoute: rendering children
+[BROWSER] ProtectedRoute: render JSHandle@object
+[BROWSER] ProtectedRoute: rendering children
+[BROWSER] Layout: render
+[BROWSER] Layout: render
+[BROWSER] Sidebar: render JSHandle@object
+[BROWSER] Sidebar: render JSHandle@object
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+[BROWSER] [JourneyWorkspace] MOUNTED
+[BROWSER] JourneysPage: useEffect triggered
+[BROWSER] JourneysPage: loading progress...
+[BROWSER] [JourneyWorkspace] MOUNTED
+[BROWSER] JourneysPage: useEffect triggered
+[BROWSER] JourneysPage: loading progress...
+[BROWSER] Sidebar: render JSHandle@object
+[BROWSER] Sidebar: render JSHandle@object
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+[BROWSER] AuthContext: setting isLoading false
+[BROWSER] JourneysPage: progress loaded successfully
+[BROWSER] JourneysPage: progress loaded successfully
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+Waiting for Start button...
+Found 1 Start buttons.
+Clicking Start button via JS...
+[BROWSER] [JourneyWorkspace] handleRunInteractiveStep called JSHandle@object
+[BROWSER] [Store] Fetching step from http://127.0.0.1:3000/journey/2db22832-6512-442b-b93e-8d4a12404523/step
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+Clicked Start button.
+[BROWSER] [Store] runInteractiveStep response: {"metadata":{"persona_id":"demo","journey_track":"builder","phase_id":"learn","language":"fr","mode":"builder","tone":"pedagogical","title":"E2E Step"},"ui_blocks":[{"kind":"text_block","id":"tb","title":"Intro","body_markdown":"Hello"},{"kind":"mission_block","id":"m1","title":"Submit link","description":"Provide a link","mission_type":"url","expected_input_type":"link","xp_reward":25}],"agent_actions":[],"next_state":{"phase_id":"learn","completed_missions":[],"xp_delta":0}}
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+[BROWSER] [JourneyWorkspace] Rendering phase: E2E Phase
+[BROWSER] [UIBlocksRenderer] Rendering blocks: 2
+[BROWSER] [UIBlocksRenderer] Rendering blocks: 2
+  ✘  1 [chromium] › tests/e2e/submit-mission.spec.ts:125:3 › Journey submit mission flow › step + submit shows evaluation and logs (10.3s)
+  ✘  2 [firefox] › tests/e2e/submit-mission.spec.ts:125:3 › Journey submit mission flow › step + submit shows evaluation and logs (12.6s)
+
+
+  1) [chromium] › tests/e2e/submit-mission.spec.ts:125:3 › Journey submit mission flow › step + submit shows evaluation and logs 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/Score:/)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/Score:/)[22m
+
+
+      186 |
+      187 |     // Expect evaluation block
+    > 188 |     await expect(page.getByText(/Score:/)).toBeVisible()
+          |                                            ^
+      189 |     // Activity feed should render mocked logs
+      190 |     await expect(page.getByText(/Agent Activity/)).toBeVisible()
+      191 |   })
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/submit-mission.spec.ts:188:44
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-chromium/error-context.md
+
+  2) [firefox] › tests/e2e/submit-mission.spec.ts:125:3 › Journey submit mission flow › step + submit shows evaluation and logs 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/Score:/)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/Score:/)[22m
+
+
+      186 |
+      187 |     // Expect evaluation block
+    > 188 |     await expect(page.getByText(/Score:/)).toBeVisible()
+          |                                            ^
+      189 |     // Activity feed should render mocked logs
+      190 |     await expect(page.getByText(/Agent Activity/)).toBeVisible()
+      191 |   })
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/submit-mission.spec.ts:188:44
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-firefox/error-context.md
+
+  2 failed
+    [chromium] › tests/e2e/submit-mission.spec.ts:125:3 › Journey submit mission flow › step + submit shows evaluation and logs 
+    [firefox] › tests/e2e/submit-mission.spec.ts:125:3 › Journey submit mission flow › step + submit shows evaluation and logs 
+
+[36m  Serving HTML report at http://localhost:44865. Press Ctrl+C to quit.[39m
+Terminated

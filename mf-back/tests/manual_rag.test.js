@@ -49,7 +49,10 @@ describe("BaseAgent RAG Integration", () => {
         console.log("--- Starting RAG Integration Test ---");
 
         // Mock retrieveRagContext to return fake context
-        jest.spyOn(agent, 'retrieveRagContext').mockResolvedValue("Fake RAG Content for Testing");
+        jest.spyOn(agent, 'retrieveRagContext').mockResolvedValue({
+            context: "Fake RAG Content for Testing",
+            hits: [{ title: 'mock', content: 'Fake RAG Content for Testing' }]
+        });
 
         await agent.run(ctx);
 

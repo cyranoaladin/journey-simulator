@@ -11,6 +11,15 @@ jest.mock('../rag/ragClient', () => ({
   ingestDocumentsIfNeeded: jest.fn().mockResolvedValue([])
 }));
 
+jest.mock('../utils/openaiClient', () => ({
+  callGpt5: jest.fn().mockResolvedValue({
+    message: { content: JSON.stringify({ global_score: 10, feedback: "Mock feedback", axes: [], reasoning: "Mock reasoning" }) }
+  }),
+  DEFAULT_LLM_MODEL: 'gpt-mock',
+  DEFAULT_LLM_TEMPERATURE: 0,
+  DEFAULT_LLM_MAX_OUTPUT_TOKENS: 100
+}));
+
 const ragClient = require('../rag/ragClient');
 const { orchestrateZyno } = require('../orchestration/zynoOrchestrator');
 

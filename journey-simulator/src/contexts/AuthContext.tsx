@@ -32,6 +32,7 @@ interface AuthContextType {
   logout: () => void;
   checkAuth: () => boolean;
   refreshToken: () => Promise<boolean>;
+  loginAsDemo: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -202,8 +203,10 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
     if (token) {
       try {
+        console.log("AuthContext: Verifying token...");
         // Verify token with backend
         const data = await api.verifyToken();
+        console.log("AuthContext: Token verified successfully", data);
         setUser(data.user);
         try {
           localStorage.setItem("userId", data.user.id);
@@ -216,6 +219,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
         // Load user progress from backend with timeout protection
         try {
+          console.log("AuthContext: Loading user progress...");
           const timeoutPromise = new Promise((_, reject) => {
             setTimeout(() => reject(new Error('User progress load timeout')), 10000); // 10 second timeout
           });
@@ -224,6 +228,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
           // Race the API call with a timeout to prevent hanging
           await Promise.race([progressPromise, timeoutPromise]);
+          console.log("AuthContext: User progress loaded");
         } catch (progressError) {
           console.error("Failed to load user progress:", progressError);
           // Continue with default progress instead of blocking the UI
@@ -233,8 +238,10 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         // Token is invalid, try to refresh only if refresh token exists
         if (refreshTokenValue) {
           try {
+            console.log("AuthContext: Attempting token refresh...");
             const refreshResult = await refreshToken();
             if (refreshResult) {
+              console.log("AuthContext: Token refresh successful");
               // Retry the verification after refresh
               try {
                 const data = await api.verifyToken();
@@ -251,10 +258,14 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
                 } catch (progressError) {
                   console.error("Failed to load user progress after refresh:", progressError);
                 }
+                console.log("AuthContext: setting isLoading false (after refresh success)");
+                setIsLoading(false);
                 return; // Successfully refreshed and verified
               } catch (retryError) {
                 console.error("Token still invalid after refresh:", retryError);
               }
+            } else {
+              console.log("AuthContext: Token refresh returned false");
             }
           } catch (refreshError) {
             console.error("Token refresh failed:", refreshError);
@@ -262,6 +273,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         }
 
         // If refresh failed or no refresh token, clear everything
+        console.log("AuthContext: Clearing auth state");
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("userId");
@@ -269,9 +281,10 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         await resetProgress();
       }
     } else {
+      console.log("AuthContext: No token found, resetting progress");
       await resetProgress();
     }
-    console.log("AuthContext: setting isLoading false");
+    console.log("AuthContext: setting isLoading false (final)");
     setIsLoading(false);
   };
 
@@ -293,7 +306,25 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     isAuthenticated: !!user,
     isLoading,
     checkAuth,
-    refreshToken
+    refreshToken,
+    loginAsDemo: async () => {
+      const demoUser = {
+        id: "demo-user-id",
+        email: "demo@moneyfactory.ai",
+        name: "Demo User",
+        role: "user" as const,
+        wallet_address: "DemoWalletAddress123",
+        persona: "cognitive-activation-hub" as const
+      };
+      setUser(demoUser);
+      localStorage.setItem("accessToken", "demo-token");
+      localStorage.setItem("refreshToken", "demo-refresh-token");
+      localStorage.setItem("userId", demoUser.id);
+      await resetProgress();
+      // Mock loading progress for demo
+      useJourneyStore.getState().setDemoMode(true);
+      return true;
+    }
   }), [user, isLoading, login, loginWithWallet, register, logout, checkAuth, refreshToken]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

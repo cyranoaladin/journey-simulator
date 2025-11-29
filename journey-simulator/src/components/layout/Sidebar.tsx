@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Compass, Cpu, Gauge, Home, Layers, LifeBuoy, Network, Rocket, Book } from 'lucide-react';
+import { Compass, Cpu, Gauge, Home, Layers, LifeBuoy, Network, Rocket, Book, LogOut } from 'lucide-react';
 import { useJourneyStore } from '../../store/journeyStore';
+import { useAuth } from '../../contexts/AuthContext';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: Home },
@@ -15,6 +16,7 @@ const navItems = [
 ];
 
 const Sidebar = () => {
+  const { logout } = useAuth();
   const selectedPersona = useJourneyStore((state) => state.selectedPersona);
   const userProgress = useJourneyStore((state) => state.userProgress);
   console.log("Sidebar: render", { selectedPersonaId: selectedPersona?.id, completedPhases: userProgress.completedPhases.length });
@@ -105,7 +107,20 @@ const Sidebar = () => {
           </ul>
         </>
       )}
-    </aside>
+
+
+
+      <div className="mt-auto pt-4 border-t border-indigo-500/20">
+        <button
+          onClick={logout}
+          className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-colors text-red-400 hover:bg-red-500/10 hover:text-red-300 w-full ${!expanded && 'justify-center px-2'}`}
+          title={!expanded ? 'Logout' : undefined}
+        >
+          <LogOut size={18} className="shrink-0" />
+          {expanded ? <span>Logout</span> : null}
+        </button>
+      </div>
+    </aside >
   );
 };
 

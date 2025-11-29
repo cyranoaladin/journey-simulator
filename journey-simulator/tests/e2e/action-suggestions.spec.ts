@@ -73,7 +73,9 @@ test.describe('ActionSuggestions flow', () => {
 
       window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
         const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
-        if (typeof url === 'string' && url.includes('/api/journeys/') && url.endsWith('/step')) {
+        // console.log('[E2E Fetch Patch] Request:', url)
+        if (typeof url === 'string' && (url.includes('/api/journeys/') || url.includes('/journey/')) && url.endsWith('/step')) {
+          // console.log('[E2E Fetch Patch] Intercepting step request:', url)
           const config = (window as any).__e2eJourneyStepConfig
           if (config) {
             try {
@@ -84,6 +86,7 @@ test.describe('ActionSuggestions flow', () => {
                   : init?.body
                     ? JSON.stringify(init.body)
                     : ''
+              // console.log('[E2E Fetch Patch] Request Body:', bodyText)
               let payload: any = {}
               if (bodyText) {
                 try {
@@ -101,7 +104,10 @@ test.describe('ActionSuggestions flow', () => {
               }
 
               const actionId = extractActionId(payload)
+              // console.log('[E2E Fetch Patch] Extracted Action ID:', actionId)
+
               if (actionId && config.actions?.[actionId]) {
+                // console.log('[E2E Fetch Patch] Returning mock action:', actionId)
                 const mock = config.actions[actionId]
                 return new Response(JSON.stringify(mock.body), {
                   status: mock.status ?? 200,
@@ -110,6 +116,7 @@ test.describe('ActionSuggestions flow', () => {
               }
 
               if (config.initial) {
+                // console.log('[E2E Fetch Patch] Returning mock initial step')
                 return new Response(JSON.stringify(config.initial.body), {
                   status: config.initial.status ?? 200,
                   headers: { 'Content-Type': 'application/json' },
@@ -124,6 +131,8 @@ test.describe('ActionSuggestions flow', () => {
                 })
               }
             }
+          } else {
+            // console.log('[E2E Fetch Patch] No config found!')
           }
         }
         return originalFetch(input, init)
@@ -191,12 +200,17 @@ test.describe('ActionSuggestions flow', () => {
       (window as any).__e2eJourneyStepConfig = config
     }, { initial: { status: 200, body: initial }, actions: { go_next: { status: 200, body: success } } })
 
-    await page.goto('/journeys')
+    await page.goto('/journeys/e2e-persona')
     await expect(page.getByRole('heading', { name: /Current Phase/i })).toBeVisible()
-    await page.getByRole('button', { name: 'Launch Step' }).click({ force: true })
+    await page.waitForTimeout(1000); // Wait for hydration/stability
+    const startButton = page.getByRole('button', { name: 'Start / Continue' });
+    await startButton.waitFor({ state: 'visible' });
+    await startButton.dispatchEvent('click');
 
     // Click the suggestion
-    await page.getByRole('button', { name: 'Continue' }).click({ force: true })
+    const continueButton = page.getByRole('button', { name: 'Continue', exact: true });
+    await continueButton.waitFor({ state: 'visible' });
+    await continueButton.dispatchEvent('click');
 
     // Assert UI updated
     await expect(page.getByText('Action OK')).toBeVisible()
@@ -207,7 +221,6 @@ test.describe('ActionSuggestions flow', () => {
 
     page.on('console', (msg) => {
       if (msg.type() === 'error') {
-        console.log('[browser:error]', msg.text())
         if (msg.text().includes('ActionSuggestions step failed')) {
           failureLogged = true
         }
@@ -237,12 +250,17 @@ test.describe('ActionSuggestions flow', () => {
       },
     })
 
-    await page.goto('/journeys')
+    await page.goto('/journeys/e2e-persona')
     await expect(page.getByRole('heading', { name: /Current Phase/i })).toBeVisible()
-    await page.getByRole('button', { name: 'Launch Step' }).click({ force: true })
+    await page.waitForTimeout(1000);
+    const startButton = page.getByRole('button', { name: 'Start / Continue' });
+    await startButton.waitFor({ state: 'visible' });
+    await startButton.dispatchEvent('click');
 
     // Click the failing suggestion
-    await page.getByRole('button', { name: 'Trigger an error' }).click({ force: true })
+    const errorButton = page.getByRole('button', { name: 'Trigger an error' });
+    await errorButton.waitFor({ state: 'visible' });
+    await errorButton.dispatchEvent('click');
 
     // Assert failure handler ran and UI recovered
     await expect.poll(() => failureLogged).toBeTruthy()

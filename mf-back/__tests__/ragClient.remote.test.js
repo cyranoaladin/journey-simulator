@@ -44,11 +44,13 @@ describe('ragClient remote success paths', () => {
     expect(axios.post).toHaveBeenCalledWith(
       'http://remote/search',
       {
-        query: 'launch dao',
+        q: 'launch dao',
         collection: 'remote-collection',
+        k: 5,
+        include_documents: true,
         metadata: { user: 'user-99' }
       },
-      { headers: { 'x-api-key': 'remote-key' } }
+      { headers: { 'x-api-key': 'remote-key' }, timeout: 5000 }
     );
     expect(results).toEqual([{ title: 'remote doc', content: 'From API' }]);
   });

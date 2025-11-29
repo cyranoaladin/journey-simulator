@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Ingestion Playbook</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+    <div class="max-w-4xl mx-auto p-8 bg-white shadow-lg min-h-screen my-8">
+        <header class="border-b border-slate-200 pb-6 mb-8">
+            <h1 class="text-3xl font-bold text-slate-900 mb-2">RAG Ingestion Playbook</h1>
+            <p class="text-slate-600">Procedure to prepare, vectorize, and feed cognitive mesh documents.</p>
+        </header>
+
+        <main class="space-y-8">
+            <section>
+                <h2 class="text-2xl font-semibold text-slate-800 mb-4">1. Data Preparation</h2>
+                <p class="text-slate-700 mb-4">Before ingestion, data must be cleaned and structured to maximize
+                    retrieval accuracy.</p>
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                    <p class="font-bold text-yellow-800">Supported Formats</p>
+                    <p class="text-sm text-yellow-700">Markdown (.md), PDF (text-based), JSON (structured logs).</p>
+                </div>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-semibold text-slate-800 mb-4">2. Chunking Strategy</h2>
+                <p class="text-slate-700 mb-4">Optimal chunk size depends on the embedding model (e.g., OpenAI
+                    text-embedding-3-small).</p>
+                <table class="w-full text-left border-collapse border border-slate-200">
+                    <thead class="bg-slate-100">
+                        <tr>
+                            <th class="p-3 border border-slate-200">Content Type</th>
+                            <th class="p-3 border border-slate-200">Chunk Size</th>
+                            <th class="p-3 border border-slate-200">Overlap</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="p-3 border border-slate-200">Technical Docs</td>
+                            <td class="p-3 border border-slate-200">512 tokens</td>
+                            <td class="p-3 border border-slate-200">50 tokens</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border border-slate-200">Code Snippets</td>
+                            <td class="p-3 border border-slate-200">256 tokens</td>
+                            <td class="p-3 border border-slate-200">20 tokens</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border border-slate-200">General Prose</td>
+                            <td class="p-3 border border-slate-200">1024 tokens</td>
+                            <td class="p-3 border border-slate-200">100 tokens</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-semibold text-slate-800 mb-4">3. Vectorization Pipeline</h2>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-slate-200 rounded-full w-8 h-8 flex items-center justify-center font-bold">1
+                        </div>
+                        <div class="flex-1 bg-slate-50 p-3 rounded border"><strong>Embed:</strong> Convert chunks to
+                            vectors using the embedding API.</div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="bg-slate-200 rounded-full w-8 h-8 flex items-center justify-center font-bold">2
+                        </div>
+                        <div class="flex-1 bg-slate-50 p-3 rounded border"><strong>Index:</strong> Store vectors in
+                            Pinecone/Milvus with metadata (source, date, author).</div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="bg-slate-200 rounded-full w-8 h-8 flex items-center justify-center font-bold">3
+                        </div>
+                        <div class="flex-1 bg-slate-50 p-3 rounded border"><strong>Retrieve:</strong> Test retrieval
+                            with sample queries to verify relevance.</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>

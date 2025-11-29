@@ -1,0 +1,759 @@
+
+Running 46 tests using 8 workers
+
+[BROWSER] [vite] connecting...
+[BROWSER] [vite] connected.
+[BROWSER] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] AuthContext: checkAuthStatus started
+[BROWSER] AuthContext: token present? false refresh token present? false
+[BROWSER] AuthContext: checkAuthStatus started
+[BROWSER] AuthContext: token present? false refresh token present? false
+[BROWSER] AuthContext: setting isLoading false
+[BROWSER] AuthContext: setting isLoading false
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] [vite] connecting...
+[BROWSER] [vite] connected.
+[BROWSER] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] AuthContext: checkAuthStatus started
+[BROWSER] AuthContext: token present? false refresh token present? false
+[BROWSER] AuthContext: checkAuthStatus started
+[BROWSER] AuthContext: token present? false refresh token present? false
+[BROWSER] AuthContext: setting isLoading false
+[BROWSER] AuthContext: setting isLoading false
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+  ✓   1 [chromium] › tests/e2e/deep-linking.spec.ts:41:5 › Deep Linking Functionality › should navigate directly to a specific journey via URL (9.7s)
+  ✓   6 [chromium] › tests/e2e/deep-linking.spec.ts:53:5 › Deep Linking Functionality › should handle invalid journey IDs gracefully (9.8s)
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] LoginPage: render {isAuthenticated: false, isLoading: false}
+[BROWSER] LoginPage: render {isAuthenticated: false, isLoading: false}
+[BROWSER] [Demo Mode] Mocking request to /journey/reset-progress
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] LoginPage: render {isAuthenticated: true, isLoading: false}
+[BROWSER] LoginPage: render {isAuthenticated: true, isLoading: false}
+[BROWSER] LoginPage: render {isAuthenticated: true, isLoading: false}
+[BROWSER] LoginPage: render {isAuthenticated: true, isLoading: false}
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys}
+[BROWSER] ProtectedRoute: rendering children
+[BROWSER] ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys}
+[BROWSER] ProtectedRoute: rendering children
+[BROWSER] Layout: render
+[BROWSER] Layout: render
+[BROWSER] Sidebar: render {selectedPersonaId: cognitive-activation-hub, completedPhases: 0}
+[BROWSER] Sidebar: render {selectedPersonaId: cognitive-activation-hub, completedPhases: 0}
+[BROWSER] [JourneyWorkspace] RENDERED
+[BROWSER] [JourneyWorkspace] RENDERED
+[BROWSER] JourneysPage: useEffect triggered
+[BROWSER] JourneysPage: loading progress...
+[BROWSER] [Demo Mode] Mocking request to /journey/user-progress
+[BROWSER] JourneysPage: useEffect triggered
+[BROWSER] JourneysPage: loading progress...
+[BROWSER] [Demo Mode] Mocking request to /journey/user-progress
+[BROWSER] Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+[BROWSER] Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+[BROWSER] Fetching platform stats from backend...
+[BROWSER] Fetching access pass holders from backend...
+[BROWSER] Fetching platform stats from backend...
+[BROWSER] Fetching access pass holders from backend...
+[BROWSER] Sidebar: render {selectedPersonaId: cognitive-activation-hub, completedPhases: 0}
+[BROWSER] Sidebar: render {selectedPersonaId: cognitive-activation-hub, completedPhases: 0}
+[BROWSER] [JourneyWorkspace] RENDERED
+[BROWSER] [JourneyWorkspace] RENDERED
+[BROWSER] Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+[BROWSER] Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+[BROWSER] Fetching platform stats from backend...
+[BROWSER] Fetching access pass holders from backend...
+[BROWSER] Fetching platform stats from backend...
+[BROWSER] Fetching access pass holders from backend...
+[BROWSER] JourneysPage: progress loaded successfully
+[BROWSER] JourneysPage: progress loaded successfully
+  ✓   3 [chromium] › tests/e2e/dao-governance.spec.ts:129:5 › DAO Governance › should display proposals list (16.1s)
+  ✘   8 [chromium] › tests/e2e/demo-mode.spec.ts:12:5 › Demo Mode Workflow › should complete the full demo journey (18.2s)
+✓ Successfully clicked launch button
+  ✘   2 [chromium] › tests/e2e/dao-governance.spec.ts:180:5 › DAO Governance › should allow voting on a proposal (21.8s)
+  ✘   7 [chromium] › tests/e2e/dao-governance.spec.ts:138:5 › DAO Governance › should allow creating a new proposal (21.9s)
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys/cognitive-activation-hub}
+[BROWSER] ProtectedRoute: rendering children
+[BROWSER] ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys/cognitive-activation-hub}
+[BROWSER] ProtectedRoute: rendering children
+[BROWSER] Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+[BROWSER] Sidebar: render {selectedPersonaId: undefined, completedPhases: 0}
+✓ Test completed - journey selection interaction verified
+[BROWSER] Sidebar: render {selectedPersonaId: cognitive-activation-hub, completedPhases: 0}
+[BROWSER] Sidebar: render {selectedPersonaId: cognitive-activation-hub, completedPhases: 0}
+[BROWSER] [JourneyWorkspace] RENDERED
+[BROWSER] [JourneyWorkspace] RENDERED
+[BROWSER] [JourneyWorkspace] RENDERED
+[BROWSER] [JourneyWorkspace] RENDERED
+[BROWSER] [Store] completePhase called {phaseIndex: 0, options: Object}
+[BROWSER] [Store] Calling api.completePhase {phaseNumber: 1, score: 100, xpReward: 60, mfaiReward: 6}
+[BROWSER] [Store] api.completePhase success {metadata: Object, ui_blocks: Array(2), agent_actions: Array(0), next_state: Object}
+[BROWSER] Sidebar: render {selectedPersonaId: cognitive-activation-hub, completedPhases: 1}
+[BROWSER] Sidebar: render {selectedPersonaId: cognitive-activation-hub, completedPhases: 1}
+[BROWSER] [JourneyWorkspace] RENDERED
+[BROWSER] [JourneyWorkspace] RENDERED
+  ✓  10 [chromium] › tests/e2e/journey-flow.spec.ts:72:5 › Journey Flow › User can select a journey (13.8s)
+  ✓   9 [chromium] › tests/e2e/growth-agent.spec.ts:140:5 › Growth Agent Integration › should display Growth Agent evaluation (14.3s)
+  ✓  12 [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:85:5 › Journey Navigation Workflow › should navigate back from workspace to persona selection (7.9s)
+  ✓  11 [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:64:5 › Journey Navigation Workflow › should navigate from persona selection to workspace (11.9s)
+  ✘   5 [chromium] › tests/e2e/action-suggestions.spec.ts:205:3 › ActionSuggestions flow › shows error toast when suggestion fails (30.6s)
+  ✘   4 [chromium] › tests/e2e/action-suggestions.spec.ts:166:3 › ActionSuggestions flow › successfully triggers next step and updates UI (30.6s)
+  ✓  16 [chromium] › tests/e2e/login-success.spec.ts:8:3 › Login Flow › redirects after successful authentication (7.3s)
+  ✓  17 [chromium] › tests/e2e/login.spec.ts:7:3 › Login Page › allows typing into credentials fields (6.3s)
+  ✓  14 [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:142:5 › Journey Navigation Workflow › should allow switching between different journeys (15.6s)
+  ✘  18 [chromium] › tests/e2e/mint-debug.spec.ts:89:3 › Mint flow (frontend debug) › simulate and execute show tx signature and explorer link (12.4s)
+  ✓  13 [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:105:5 › Journey Navigation Workflow › should maintain journey state when navigating between routes (18.8s)
+  ✓  19 [chromium] › tests/e2e/resource-validation.spec.ts:159:5 › Resource Validation in Journey Steps › should allow copying resource information even without URL (11.1s)
+  ✓  20 [chromium] › tests/e2e/resource-validation.spec.ts:99:5 › Resource Validation in Journey Steps › should handle resources with invalid URLs gracefully (11.7s)
+  ✓  21 [chromium] › tests/e2e/resource-validation.spec.ts:41:5 › Resource Validation in Journey Steps › should display resources with valid URLs (12.0s)
+  ✓  23 [chromium] › tests/e2e/wallet-modal.spec.ts:4:3 › Wallet Modal › exposes configured wallets and devnet endpoint (8.3s)
+  ✓  15 [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:159:5 › Journey Navigation Workflow › should handle browser back/forward navigation (24.2s)
+  ✘  24 [firefox] › tests/e2e/action-suggestions.spec.ts:166:3 › ActionSuggestions flow › successfully triggers next step and updates UI (16.3s)
+  ✓  29 [firefox] › tests/e2e/deep-linking.spec.ts:41:5 › Deep Linking Functionality › should navigate directly to a specific journey via URL (11.7s)
+  ✘  25 [firefox] › tests/e2e/action-suggestions.spec.ts:205:3 › ActionSuggestions flow › shows error toast when suggestion fails (16.9s)
+  ✓  30 [firefox] › tests/e2e/deep-linking.spec.ts:53:5 › Deep Linking Functionality › should handle invalid journey IDs gracefully (12.5s)
+[BROWSER] [vite] connecting...
+  ✘  22 [chromium] › tests/e2e/submit-mission.spec.ts:102:3 › Journey submit mission flow › step + submit shows evaluation and logs (30.4s)
+[BROWSER] [vite] connected.
+  ✓  26 [firefox] › tests/e2e/dao-governance.spec.ts:129:5 › DAO Governance › should display proposals list (21.6s)
+[BROWSER] Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] AuthContext: checkAuthStatus started
+[BROWSER] AuthContext: token present? false refresh token present? false
+[BROWSER] AuthContext: checkAuthStatus started
+[BROWSER] AuthContext: token present? false refresh token present? false
+[BROWSER] AuthContext: setting isLoading false
+[BROWSER] AuthContext: setting isLoading false
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] [vite] connecting...
+[BROWSER] [vite] connected.
+[BROWSER] Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+  ✘  27 [firefox] › tests/e2e/dao-governance.spec.ts:138:5 › DAO Governance › should allow creating a new proposal (27.6s)
+  ✘  28 [firefox] › tests/e2e/dao-governance.spec.ts:180:5 › DAO Governance › should allow voting on a proposal (27.5s)
+  ✓  33 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:64:5 › Journey Navigation Workflow › should navigate from persona selection to workspace (13.2s)
+✓ Successfully clicked launch button
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] AuthContext: checkAuthStatus started
+[BROWSER] AuthContext: token present? false refresh token present? false
+[BROWSER] AuthContext: checkAuthStatus started
+[BROWSER] AuthContext: token present? false refresh token present? false
+[BROWSER] AuthContext: setting isLoading false
+[BROWSER] AuthContext: setting isLoading false
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] ProtectedRoute: render JSHandle@object
+[BROWSER] ProtectedRoute: rendering children
+[BROWSER] ProtectedRoute: render JSHandle@object
+[BROWSER] ProtectedRoute: rendering children
+[BROWSER] Sidebar: render JSHandle@object
+[BROWSER] Sidebar: render JSHandle@object
+[BROWSER] Sidebar: render JSHandle@object
+[BROWSER] Sidebar: render JSHandle@object
+[BROWSER] [JourneyWorkspace] RENDERED
+[BROWSER] [JourneyWorkspace] RENDERED
+[BROWSER] [JourneyWorkspace] RENDERED
+[BROWSER] [JourneyWorkspace] RENDERED
+[BROWSER] [Store] completePhase called JSHandle@object
+[BROWSER] [Store] Calling api.completePhase JSHandle@object
+[BROWSER] [Store] api.completePhase success JSHandle@object
+[BROWSER] Sidebar: render JSHandle@object
+[BROWSER] Sidebar: render JSHandle@object
+[BROWSER] [JourneyWorkspace] RENDERED
+[BROWSER] [JourneyWorkspace] RENDERED
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] LoginPage: render JSHandle@object
+[BROWSER] LoginPage: render JSHandle@object
+  ✓  31 [firefox] › tests/e2e/growth-agent.spec.ts:140:5 › Growth Agent Integration › should display Growth Agent evaluation (17.5s)
+[BROWSER] [Demo Mode] Mocking request to /journey/reset-progress
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] LoginPage: render JSHandle@object
+[BROWSER] LoginPage: render JSHandle@object
+  ✓  35 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:85:5 › Journey Navigation Workflow › should navigate back from workspace to persona selection (13.0s)
+[BROWSER] LoginPage: render JSHandle@object
+[BROWSER] LoginPage: render JSHandle@object
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] ProtectedRoute: render JSHandle@object
+[BROWSER] ProtectedRoute: rendering children
+[BROWSER] ProtectedRoute: render JSHandle@object
+[BROWSER] ProtectedRoute: rendering children
+[BROWSER] Layout: render
+[BROWSER] Layout: render
+[BROWSER] Sidebar: render JSHandle@object
+[BROWSER] Sidebar: render JSHandle@object
+[BROWSER] [JourneyWorkspace] RENDERED
+[BROWSER] [JourneyWorkspace] RENDERED
+[BROWSER] JourneysPage: useEffect triggered
+[BROWSER] JourneysPage: loading progress...
+[BROWSER] [Demo Mode] Mocking request to /journey/user-progress
+[BROWSER] JourneysPage: useEffect triggered
+[BROWSER] JourneysPage: loading progress...
+[BROWSER] [Demo Mode] Mocking request to /journey/user-progress
+[BROWSER] Sidebar: render JSHandle@object
+[BROWSER] Sidebar: render JSHandle@object
+✓ Test completed - journey selection interaction verified
+[BROWSER] Fetching platform stats from backend...
+[BROWSER] Fetching access pass holders from backend...
+[BROWSER] Fetching platform stats from backend...
+[BROWSER] Fetching access pass holders from backend...
+  ✓  34 [firefox] › tests/e2e/journey-flow.spec.ts:72:5 › Journey Flow › User can select a journey (16.9s)
+[BROWSER] Sidebar: render JSHandle@object
+[BROWSER] Sidebar: render JSHandle@object
+[BROWSER] [JourneyWorkspace] RENDERED
+[BROWSER] [JourneyWorkspace] RENDERED
+[BROWSER] Sidebar: render JSHandle@object
+[BROWSER] Sidebar: render JSHandle@object
+[BROWSER] Fetching platform stats from backend...
+[BROWSER] Fetching access pass holders from backend...
+[BROWSER] Fetching platform stats from backend...
+[BROWSER] Fetching access pass holders from backend...
+[BROWSER] JourneysPage: progress loaded successfully
+[BROWSER] JourneysPage: progress loaded successfully
+  ✘  32 [firefox] › tests/e2e/demo-mode.spec.ts:12:5 › Demo Mode Workflow › should complete the full demo journey (24.0s)
+  ✓  38 [firefox] › tests/e2e/login-success.spec.ts:8:3 › Login Flow › redirects after successful authentication (12.5s)
+  ✓  40 [firefox] › tests/e2e/login.spec.ts:7:3 › Login Page › allows typing into credentials fields (10.8s)
+  ✓  42 [firefox] › tests/e2e/resource-validation.spec.ts:41:5 › Resource Validation in Journey Steps › should display resources with valid URLs (14.6s)
+  ✘  41 [firefox] › tests/e2e/mint-debug.spec.ts:89:3 › Mint flow (frontend debug) › simulate and execute show tx signature and explorer link (16.8s)
+  ✘  36 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:105:5 › Journey Navigation Workflow › should maintain journey state when navigating between routes (31.3s)
+  ✓  44 [firefox] › tests/e2e/resource-validation.spec.ts:159:5 › Resource Validation in Journey Steps › should allow copying resource information even without URL (12.7s)
+  ✓  43 [firefox] › tests/e2e/resource-validation.spec.ts:99:5 › Resource Validation in Journey Steps › should handle resources with invalid URLs gracefully (13.4s)
+  ✓  37 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:142:5 › Journey Navigation Workflow › should allow switching between different journeys (26.5s)
+  ✘  45 [firefox] › tests/e2e/submit-mission.spec.ts:102:3 › Journey submit mission flow › step + submit shows evaluation and logs (15.4s)
+  ✓  46 [firefox] › tests/e2e/wallet-modal.spec.ts:4:3 › Wallet Modal › exposes configured wallets and devnet endpoint (10.4s)
+  ✘  39 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:159:5 › Journey Navigation Workflow › should handle browser back/forward navigation (33.4s)
+
+
+  1) [chromium] › tests/e2e/action-suggestions.spec.ts:166:3 › ActionSuggestions flow › successfully triggers next step and updates UI 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Launch Step' })[22m
+
+
+      194 |     await page.goto('/journeys')
+      195 |     await expect(page.getByRole('heading', { name: /Current Phase/i })).toBeVisible()
+    > 196 |     await page.getByRole('button', { name: 'Launch Step' }).click({ force: true })
+          |                                                             ^
+      197 |
+      198 |     // Click the suggestion
+      199 |     await page.getByRole('button', { name: 'Continue' }).click({ force: true })
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/action-suggestions.spec.ts:196:61
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-a1d66-rs-next-step-and-updates-UI-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-a1d66-rs-next-step-and-updates-UI-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/action-suggestions-ActionS-a1d66-rs-next-step-and-updates-UI-chromium/error-context.md
+
+  2) [chromium] › tests/e2e/action-suggestions.spec.ts:205:3 › ActionSuggestions flow › shows error toast when suggestion fails 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Launch Step' })[22m
+
+
+      240 |     await page.goto('/journeys')
+      241 |     await expect(page.getByRole('heading', { name: /Current Phase/i })).toBeVisible()
+    > 242 |     await page.getByRole('button', { name: 'Launch Step' }).click({ force: true })
+          |                                                             ^
+      243 |
+      244 |     // Click the failing suggestion
+      245 |     await page.getByRole('button', { name: 'Trigger an error' }).click({ force: true })
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/action-suggestions.spec.ts:242:61
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-4e7a4-toast-when-suggestion-fails-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-4e7a4-toast-when-suggestion-fails-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/action-suggestions-ActionS-4e7a4-toast-when-suggestion-fails-chromium/error-context.md
+
+  3) [chromium] › tests/e2e/dao-governance.spec.ts:138:5 › DAO Governance › should allow creating a new proposal 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('input[type="password"]')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('input[type="password"]')[22m
+
+
+      151 |         // Wait for panel to appear
+      152 |         const apiKeyInput = page.locator('input[type="password"]');
+    > 153 |         await expect(apiKeyInput).toBeVisible({ timeout: 5000 });
+          |                                   ^
+      154 |
+      155 |         // Fill API Key
+      156 |         await apiKeyInput.fill('admin-secret-key');
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/dao-governance.spec.ts:153:35
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dao-governance-DAO-Governa-a4cce-low-creating-a-new-proposal-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/dao-governance-DAO-Governa-a4cce-low-creating-a-new-proposal-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dao-governance-DAO-Governa-a4cce-low-creating-a-new-proposal-chromium/error-context.md
+
+  4) [chromium] › tests/e2e/dao-governance.spec.ts:180:5 › DAO Governance › should allow voting on a proposal 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('select[name="dao-voter"]')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('select[name="dao-voter"]')[22m
+
+
+      193 |         // Select a voter
+      194 |         const voterSelect = page.locator('select[name="dao-voter"]');
+    > 195 |         await expect(voterSelect).toBeVisible();
+          |                                   ^
+      196 |         await voterSelect.selectOption({ index: 1 });
+      197 |
+      198 |         // Verify voter selection updated the UI (button text changes)
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/dao-governance.spec.ts:195:35
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dao-governance-DAO-Governa-8d3fd--allow-voting-on-a-proposal-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/dao-governance-DAO-Governa-8d3fd--allow-voting-on-a-proposal-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dao-governance-DAO-Governa-8d3fd--allow-voting-on-a-proposal-chromium/error-context.md
+
+  5) [chromium] › tests/e2e/demo-mode.spec.ts:12:5 › Demo Mode Workflow › should complete the full demo journey 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('heading', { name: 'The Cognitive Activation Hub Journey' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('heading', { name: 'The Cognitive Activation Hub Journey' })[22m
+
+
+      27 |         // Verify redirection to journey workspace
+      28 |         await expect(page).toHaveURL(/\/journey/);
+    > 29 |         await expect(page.getByRole('heading', { name: 'The Cognitive Activation Hub Journey' })).toBeVisible();
+         |                                                                                                   ^
+      30 |
+      31 |         // --- PHASE 1: Cognition Ignition ---
+      32 |         await expect(page.getByRole('heading', { name: 'Cognition Ignition', level: 2 })).toBeVisible();
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/demo-mode.spec.ts:29:99
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/demo-mode-Demo-Mode-Workfl-1befa-plete-the-full-demo-journey-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/demo-mode-Demo-Mode-Workfl-1befa-plete-the-full-demo-journey-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/demo-mode-Demo-Mode-Workfl-1befa-plete-the-full-demo-journey-chromium/error-context.md
+
+  6) [chromium] › tests/e2e/mint-debug.spec.ts:89:3 › Mint flow (frontend debug) › simulate and execute show tx signature and explorer link 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/Transaction Signature/)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/Transaction Signature/)[22m
+
+
+      101 |
+      102 |     // Ensure we see the tx signature
+    > 103 |     await expect(page.getByText(/Transaction Signature/)).toBeVisible()
+          |                                                           ^
+      104 |     await expect(page.getByTestId('mint-tx-signature')).toHaveText('SIG_E2E')
+      105 |
+      106 |     // Open explorer link
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/mint-debug.spec.ts:103:59
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/mint-debug-Mint-flow-front-5fbc1-signature-and-explorer-link-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/mint-debug-Mint-flow-front-5fbc1-signature-and-explorer-link-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/mint-debug-Mint-flow-front-5fbc1-signature-and-explorer-link-chromium/error-context.md
+
+  7) [chromium] › tests/e2e/submit-mission.spec.ts:102:3 › Journey submit mission flow › step + submit shows evaluation and logs 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Lancer l’étape' })[22m
+
+
+      141 |
+      142 |     // Scroll to Current Phase and run step
+    > 143 |     await page.getByRole('button', { name: 'Lancer l’étape' }).click({ force: true })
+          |                                                                ^
+      144 |
+      145 |     // Fill mission input (link) and submit
+      146 |     const input = page.locator('input[placeholder="https://..."]').first()
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/submit-mission.spec.ts:143:64
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-chromium/error-context.md
+
+  8) [firefox] › tests/e2e/action-suggestions.spec.ts:166:3 › ActionSuggestions flow › successfully triggers next step and updates UI 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('heading', { name: /Current Phase/i })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('heading', { name: /Current Phase/i })[22m
+
+
+      193 |
+      194 |     await page.goto('/journeys')
+    > 195 |     await expect(page.getByRole('heading', { name: /Current Phase/i })).toBeVisible()
+          |                                                                         ^
+      196 |     await page.getByRole('button', { name: 'Launch Step' }).click({ force: true })
+      197 |
+      198 |     // Click the suggestion
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/action-suggestions.spec.ts:195:73
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-a1d66-rs-next-step-and-updates-UI-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-a1d66-rs-next-step-and-updates-UI-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/action-suggestions-ActionS-a1d66-rs-next-step-and-updates-UI-firefox/error-context.md
+
+  9) [firefox] › tests/e2e/action-suggestions.spec.ts:205:3 › ActionSuggestions flow › shows error toast when suggestion fails 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('heading', { name: /Current Phase/i })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('heading', { name: /Current Phase/i })[22m
+
+
+      239 |
+      240 |     await page.goto('/journeys')
+    > 241 |     await expect(page.getByRole('heading', { name: /Current Phase/i })).toBeVisible()
+          |                                                                         ^
+      242 |     await page.getByRole('button', { name: 'Launch Step' }).click({ force: true })
+      243 |
+      244 |     // Click the failing suggestion
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/action-suggestions.spec.ts:241:73
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-4e7a4-toast-when-suggestion-fails-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-4e7a4-toast-when-suggestion-fails-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/action-suggestions-ActionS-4e7a4-toast-when-suggestion-fails-firefox/error-context.md
+
+  10) [firefox] › tests/e2e/dao-governance.spec.ts:138:5 › DAO Governance › should allow creating a new proposal 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('input[type="password"]')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('input[type="password"]')[22m
+
+
+      151 |         // Wait for panel to appear
+      152 |         const apiKeyInput = page.locator('input[type="password"]');
+    > 153 |         await expect(apiKeyInput).toBeVisible({ timeout: 5000 });
+          |                                   ^
+      154 |
+      155 |         // Fill API Key
+      156 |         await apiKeyInput.fill('admin-secret-key');
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/dao-governance.spec.ts:153:35
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dao-governance-DAO-Governa-a4cce-low-creating-a-new-proposal-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/dao-governance-DAO-Governa-a4cce-low-creating-a-new-proposal-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dao-governance-DAO-Governa-a4cce-low-creating-a-new-proposal-firefox/error-context.md
+
+  11) [firefox] › tests/e2e/dao-governance.spec.ts:180:5 › DAO Governance › should allow voting on a proposal 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('select[name="dao-voter"]')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('select[name="dao-voter"]')[22m
+
+
+      193 |         // Select a voter
+      194 |         const voterSelect = page.locator('select[name="dao-voter"]');
+    > 195 |         await expect(voterSelect).toBeVisible();
+          |                                   ^
+      196 |         await voterSelect.selectOption({ index: 1 });
+      197 |
+      198 |         // Verify voter selection updated the UI (button text changes)
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/dao-governance.spec.ts:195:35
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dao-governance-DAO-Governa-8d3fd--allow-voting-on-a-proposal-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/dao-governance-DAO-Governa-8d3fd--allow-voting-on-a-proposal-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dao-governance-DAO-Governa-8d3fd--allow-voting-on-a-proposal-firefox/error-context.md
+
+  12) [firefox] › tests/e2e/demo-mode.spec.ts:12:5 › Demo Mode Workflow › should complete the full demo journey 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('heading', { name: 'The Cognitive Activation Hub Journey' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('heading', { name: 'The Cognitive Activation Hub Journey' })[22m
+
+
+      27 |         // Verify redirection to journey workspace
+      28 |         await expect(page).toHaveURL(/\/journey/);
+    > 29 |         await expect(page.getByRole('heading', { name: 'The Cognitive Activation Hub Journey' })).toBeVisible();
+         |                                                                                                   ^
+      30 |
+      31 |         // --- PHASE 1: Cognition Ignition ---
+      32 |         await expect(page.getByRole('heading', { name: 'Cognition Ignition', level: 2 })).toBeVisible();
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/demo-mode.spec.ts:29:99
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/demo-mode-Demo-Mode-Workfl-1befa-plete-the-full-demo-journey-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/demo-mode-Demo-Mode-Workfl-1befa-plete-the-full-demo-journey-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/demo-mode-Demo-Mode-Workfl-1befa-plete-the-full-demo-journey-firefox/error-context.md
+
+  13) [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:105:5 › Journey Navigation Workflow › should maintain journey state when navigating between routes 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('button', { name: /Back to all journeys/i })
+    Expected: visible
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for getByRole('button', { name: /Back to all journeys/i })[22m
+
+
+      136 |         // So `selectedPersona` remains whatever it was in the store.
+      137 |         // So it SHOULD show the workspace.
+    > 138 |         await expect(page.getByRole('button', { name: /Back to all journeys/i })).toBeVisible({ timeout: 10000 });
+          |                                                                                   ^
+      139 |         await expect(page.locator('text=The Capital Foundry')).toBeVisible();
+      140 |     });
+      141 |
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/journey-navigation-workflow.spec.ts:138:83
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-980a2-n-navigating-between-routes-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-980a2-n-navigating-between-routes-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/journey-navigation-workflo-980a2-n-navigating-between-routes-firefox/error-context.md
+
+  14) [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:159:5 › Journey Navigation Workflow › should handle browser back/forward navigation 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-edbce-ser-back-forward-navigation-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-edbce-ser-back-forward-navigation-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/journey-navigation-workflo-edbce-ser-back-forward-navigation-firefox/error-context.md
+
+  15) [firefox] › tests/e2e/mint-debug.spec.ts:89:3 › Mint flow (frontend debug) › simulate and execute show tx signature and explorer link 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/Transaction Signature/)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/Transaction Signature/)[22m
+
+
+      101 |
+      102 |     // Ensure we see the tx signature
+    > 103 |     await expect(page.getByText(/Transaction Signature/)).toBeVisible()
+          |                                                           ^
+      104 |     await expect(page.getByTestId('mint-tx-signature')).toHaveText('SIG_E2E')
+      105 |
+      106 |     // Open explorer link
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/mint-debug.spec.ts:103:59
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/mint-debug-Mint-flow-front-5fbc1-signature-and-explorer-link-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/mint-debug-Mint-flow-front-5fbc1-signature-and-explorer-link-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/mint-debug-Mint-flow-front-5fbc1-signature-and-explorer-link-firefox/error-context.md
+
+  16) [firefox] › tests/e2e/submit-mission.spec.ts:102:3 › Journey submit mission flow › step + submit shows evaluation and logs 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('heading', { name: /Current Phase/i })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('heading', { name: /Current Phase/i })[22m
+
+
+      138 |
+      139 |     await page.goto('/journeys')
+    > 140 |     await expect(page.getByRole('heading', { name: /Current Phase/i })).toBeVisible()
+          |                                                                         ^
+      141 |
+      142 |     // Scroll to Current Phase and run step
+      143 |     await page.getByRole('button', { name: 'Lancer l’étape' }).click({ force: true })
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/submit-mission.spec.ts:140:73
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-firefox/error-context.md
+
+  16 failed
+    [chromium] › tests/e2e/action-suggestions.spec.ts:166:3 › ActionSuggestions flow › successfully triggers next step and updates UI 
+    [chromium] › tests/e2e/action-suggestions.spec.ts:205:3 › ActionSuggestions flow › shows error toast when suggestion fails 
+    [chromium] › tests/e2e/dao-governance.spec.ts:138:5 › DAO Governance › should allow creating a new proposal 
+    [chromium] › tests/e2e/dao-governance.spec.ts:180:5 › DAO Governance › should allow voting on a proposal 
+    [chromium] › tests/e2e/demo-mode.spec.ts:12:5 › Demo Mode Workflow › should complete the full demo journey 
+    [chromium] › tests/e2e/mint-debug.spec.ts:89:3 › Mint flow (frontend debug) › simulate and execute show tx signature and explorer link 
+    [chromium] › tests/e2e/submit-mission.spec.ts:102:3 › Journey submit mission flow › step + submit shows evaluation and logs 
+    [firefox] › tests/e2e/action-suggestions.spec.ts:166:3 › ActionSuggestions flow › successfully triggers next step and updates UI 
+    [firefox] › tests/e2e/action-suggestions.spec.ts:205:3 › ActionSuggestions flow › shows error toast when suggestion fails 
+    [firefox] › tests/e2e/dao-governance.spec.ts:138:5 › DAO Governance › should allow creating a new proposal 
+    [firefox] › tests/e2e/dao-governance.spec.ts:180:5 › DAO Governance › should allow voting on a proposal 
+    [firefox] › tests/e2e/demo-mode.spec.ts:12:5 › Demo Mode Workflow › should complete the full demo journey 
+    [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:105:5 › Journey Navigation Workflow › should maintain journey state when navigating between routes 
+    [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:159:5 › Journey Navigation Workflow › should handle browser back/forward navigation 
+    [firefox] › tests/e2e/mint-debug.spec.ts:89:3 › Mint flow (frontend debug) › simulate and execute show tx signature and explorer link 
+    [firefox] › tests/e2e/submit-mission.spec.ts:102:3 › Journey submit mission flow › step + submit shows evaluation and logs 
+  30 passed (1.9m)
+
+[36m  Serving HTML report at http://localhost:36613. Press Ctrl+C to quit.[39m
+Terminated

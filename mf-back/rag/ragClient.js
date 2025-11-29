@@ -26,17 +26,24 @@ const readLocalFallback = (query = '') => {
         title: path.basename(file, path.extname(file)),
         content
       };
-    })
-    .filter((snippet) => {
-      if (!normalized) {
-        return true;
-      }
-      return (
-        snippet.title.toLowerCase().includes(normalized) ||
-        snippet.content.toLowerCase().includes(normalized)
-      );
-    })
-    .slice(0, 5);
+    });
+
+  const filtered = allFiles.filter((snippet) => {
+    if (!normalized) {
+      return true;
+    }
+    // Relaxed matching: check if any keyword from query exists in title/content
+    // Or just return true if query is very long (likely a full prompt)
+    if (normalized.length > 50) return true;
+
+    return (
+      snippet.title.toLowerCase().includes(normalized) ||
+      snippet.content.toLowerCase().includes(normalized)
+    );
+  });
+
+  // If strict filter returns nothing, return all files (fallback to ensure context)
+  return (filtered.length > 0 ? filtered : allFiles).slice(0, 5);
 };
 
 module.exports.getRagSnippets = async (options = {}) => {
@@ -48,8 +55,8 @@ module.exports.getRagSnippets = async (options = {}) => {
   try {
     const res = await axios.post(
       RAG_SEARCH_URL,
-      { query: normalizedQuery, collection: RAG_COLLECTION, metadata: { user: authorId } },
-      { headers: { 'x-api-key': RAG_API_KEY } }
+      { q: normalizedQuery, collection: RAG_COLLECTION, k: 5, include_documents: true, metadata: { user: authorId } },
+      { headers: { 'x-api-key': RAG_API_KEY }, timeout: 5000 }
     );
     return res.data.snippets || [];
   } catch (e) {
@@ -127,9 +134,9 @@ module.exports.ingestDocument = async (content, metadata = {}) => {
   return remoteDocuments.length > 0
     ? remoteDocuments
     : [
-        {
-          title: metadata.title || 'uploaded-document',
-          content,
-        },
-      ];
+      {
+        title: metadata.title || 'uploaded-document',
+        content,
+      },
+    ];
 };

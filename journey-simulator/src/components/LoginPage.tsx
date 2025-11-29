@@ -7,7 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isAuthenticated, isLoading } = useAuth();
+  const { login, loginAsDemo, isAuthenticated, isLoading } = useAuth();
   console.log("LoginPage: render", { isAuthenticated, isLoading });
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -45,7 +45,7 @@ const LoginPage: React.FC = () => {
     setError('');
 
     try {
-      const success = await login('demo@mfai.com', 'demo123');
+      const success = await loginAsDemo();
       if (!success) {
         setError('Demo login failed. Please try again.');
       }
@@ -92,9 +92,13 @@ const LoginPage: React.FC = () => {
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="mx-auto h-16 w-16 bg-gradient-to-br from-accent-cyan to-accent-purple rounded-2xl flex items-center justify-center mb-6"
+              className="mx-auto h-24 flex items-center justify-center mb-6"
             >
-              <span className="text-2xl font-bold text-white">M</span>
+              <img
+                src="/images/logo_mfai.png"
+                alt="Money Factory AI"
+                className="h-full w-auto object-contain drop-shadow-[0_0_15px_rgba(0,240,255,0.3)]"
+              />
             </motion.div>
 
             <motion.h2

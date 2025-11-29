@@ -165,7 +165,8 @@ async function triggerAgents(agentNames, mode, context, intent) {
 
     const startedAt = Date.now();
     try {
-      const agentResult = await agent(buildAgentInput(), context);
+      const agentInstance = new agent();
+      const agentResult = await agentInstance.run(buildAgentInput(), context);
       const durationMs = Date.now() - startedAt;
       const errorCount = Array.isArray(agentResult?.errors)
         ? agentResult.errors.length

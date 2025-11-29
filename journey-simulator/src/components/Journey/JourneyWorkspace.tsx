@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import JourneyTimeline from './JourneyTimeline';
 import AgentActivityFeed from '../AgentActivityFeed';
 import UIBlocksRenderer from '../UIBlocks/UIBlocksRenderer';
@@ -16,8 +16,16 @@ import {
   Minimize2
 } from 'lucide-react';
 import type { JourneyStepResponse } from '../../types/uiBlocks';
-import confetti from 'canvas-confetti';
+// import confetti from 'canvas-confetti';
 import NFTProofModal from '../NFTProofModal';
+import { getProofType, getPersonaProofData } from '../../data/proofsData';
+import { resources, getResourceIcon } from '../../data/resources';
+import PhaseDetails from './PhaseDetails';
+
+import StakingModal from '../StakingModal';
+import DAOVoteModal from '../DAOVoteModal';
+
+import JourneyCompletedPage from '../JourneyCompletedPage';
 
 const JourneyWorkspace = () => {
   const {
@@ -35,48 +43,58 @@ const JourneyWorkspace = () => {
     setUiTone
   } = useJourneyStore();
 
-  const [showProofModal, setShowProofModal] = useState(false);
+  useEffect(() => {
+    console.log('[JourneyWorkspace] MOUNTED');
+  }, []);
+
+  const [proofModalData, setProofModalData] = useState<any>(null);
   const [showLeftPanel, setShowLeftPanel] = useState(true);
   const [showRightPanel, setShowRightPanel] = useState(true);
-
-  const canCompletePhase = useMemo(() => {
-    if (!lastStep) return false;
-    const evalBlock = lastStep.ui_blocks?.find((block: any) =>
-      block.kind === 'evaluation_block' || block.kind === 'evaluation'
-    );
-    if (!evalBlock) return false;
-    // @ts-expect-error - global_score might be string
-    const score = Number(evalBlock.global_score || 0);
-    // @ts-expect-error - max_score might be string
-    const maxScore = Number(evalBlock.max_score || 100);
-    const threshold = Math.max(70, Math.round(maxScore * 0.6));
-    return score >= threshold;
-  }, [lastStep]);
+  const [showStakingModal, setShowStakingModal] = useState(false);
+  const [showVoteModal, setShowVoteModal] = useState(false);
 
   if (!selectedPersona) return null;
 
   const activePhaseIndex = currentPhaseIndex ?? userProgress.completedPhases.length;
+
+
+
+  // Check if journey is completed
+  if (activePhaseIndex >= selectedPersona.phases.length) {
+    return <JourneyCompletedPage />;
+  }
+
   const activePhase = selectedPersona.phases[activePhaseIndex] || selectedPersona.phases[0];
+  console.log('[JourneyWorkspace] Rendering phase:', activePhase?.title);
 
   const handleCompletePhase = () => {
-    // Trigger confetti
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors: ['#00f0ff', '#7000ff', '#ffffff']
-    });
+    // Capture current phase data BEFORE updating state
+    const completedPhaseData = {
+      proofType: getProofType(selectedPersona.id, activePhase.id),
+      title: activePhase.nftReward || `Proof-of-${getProofType(selectedPersona.id, activePhase.id)}™`,
+      description: `Successfully completed the ${activePhase.title} phase.`,
+      imageUrl: getPersonaProofData(selectedPersona.id, activePhase.id, getProofType(selectedPersona.id, activePhase.id), activePhase.xpReward, activePhase.title, activePhaseIndex + 1).imageUrl,
+      xpEarned: activePhase.xpReward,
+      phase: activePhase.title,
+      phaseNumber: activePhaseIndex + 1
+    };
 
     // Call the actual store action
-    completePhase(activePhaseIndex, { score: 100, phaseNumber: activePhaseIndex + 1 });
+    completePhase(activePhaseIndex, {
+      score: 100,
+      phaseNumber: activePhaseIndex + 1,
+      xpReward: activePhase.xpReward,
+      mfaiReward: activePhase.mfaiReward
+    });
 
-    // Show modal after a short delay
+    // Show modal after a short delay with CAPTURED data
     setTimeout(() => {
-      setShowProofModal(true);
+      setProofModalData(completedPhaseData);
     }, 1000);
   };
 
   const handleRunInteractiveStep = async () => {
+    if (isStepLoading) return;
     if (!activePhase) return;
 
     try {
@@ -237,12 +255,73 @@ const JourneyWorkspace = () => {
                 {isStepLoading ? <Loader2 size={16} className="animate-spin" /> : 'Start / Continue'}
               </button>
 
-              {activePhaseIndex === userProgress.completedPhases.length && canCompletePhase && (
+              {/* Demo Mode Action Button */}
+              {!userProgress.completedPhases.includes(activePhaseIndex) && (
                 <button
-                  onClick={handleCompletePhase}
-                  className="btn-secondary text-sm px-4 py-2 flex items-center gap-2 border-green-500/50 text-green-400 hover:bg-green-500/10 ml-2"
+                  onClick={() => {
+                    // 1. Handle Staking
+                    if (activePhase.stakingRequired) {
+                      setShowStakingModal(true);
+                    }
+                    // 2. Handle DAO Vote
+                    else if (activePhase.daoVoteRequired) {
+                      setShowVoteModal(true);
+                    }
+                    // 3. Handle NFT Reward (Minting)
+                    else if (activePhase.nftReward) {
+                      handleCompletePhase(); // Opens NFT Modal
+                    }
+                    // 4. Default Completion
+                    else {
+                      completePhase(activePhaseIndex, {
+                        score: 100,
+                        phaseNumber: activePhaseIndex + 1,
+                        xpReward: activePhase.xpReward,
+                        mfaiReward: activePhase.mfaiReward
+                      });
+                    }
+                  }}
+                  className="btn-primary text-sm px-4 py-2 flex items-center gap-2 bg-gradient-to-r from-accent-gold to-orange-500 hover:from-accent-gold/80 hover:to-orange-500/80 border-none text-black font-bold shadow-[0_0_15px_rgba(255,215,0,0.3)]"
                 >
-                  ✓ Complete Phase
+                  {activePhase.stakingRequired ? (
+                    <>
+                      <Coins size={16} />
+                      <span>Validate & Stake</span>
+                    </>
+                  ) : activePhase.daoVoteRequired ? (
+                    <>
+                      <Trophy size={16} />
+                      <span>Validate & Vote</span>
+                    </>
+                  ) : activePhase.nftReward ? (
+                    <>
+                      <Award size={16} />
+                      <span>Validate & Mint NFT</span>
+                    </>
+                  ) : (
+                    <>
+                      <Loader2 size={16} />
+                      <span>Validate Phase</span>
+                    </>
+                  )}
+                </button>
+              )}
+
+              {userProgress.completedPhases.includes(activePhaseIndex) && activePhase.nftReward && (
+                <button
+                  onClick={() => setProofModalData({
+                    proofType: getProofType(selectedPersona.id, activePhase.id),
+                    title: activePhase.nftReward || `Proof-of-${getProofType(selectedPersona.id, activePhase.id)}™`,
+                    description: `Successfully completed the ${activePhase.title} phase.`,
+                    imageUrl: getPersonaProofData(selectedPersona.id, activePhase.id, getProofType(selectedPersona.id, activePhase.id), activePhase.xpReward, activePhase.title, activePhaseIndex + 1).imageUrl,
+                    xpEarned: activePhase.xpReward,
+                    phase: activePhase.title,
+                    phaseNumber: activePhaseIndex + 1
+                  })}
+                  className="btn-secondary text-sm px-4 py-2 flex items-center gap-2 border-accent-purple/50 text-accent-purple hover:bg-accent-purple/10 ml-2"
+                >
+                  <Award size={16} />
+                  View Proof-of-{getProofType(selectedPersona.id, activePhase.id)}™
                 </button>
               )}
             </div>
@@ -254,10 +333,59 @@ const JourneyWorkspace = () => {
               <p className="text-white/60">Zyno is orchestrating your session...</p>
             </div>
           ) : lastStep ? (
-            <UIBlocksRenderer response={lastStep as JourneyStepResponse} />
+            <>
+              <UIBlocksRenderer response={lastStep as JourneyStepResponse} />
+            </>
           ) : (
-            <div className="text-center py-20 opacity-60">
-              <p>Click "Start" to begin this phase with Zyno.</p>
+            <div className="animate-fadeIn">
+              <PhaseDetails phase={activePhase} />
+
+              {/* Bottom Action Button for convenience */}
+              {!userProgress.completedPhases.includes(activePhaseIndex) && (
+                <div className="mt-8 flex justify-center">
+                  <button
+                    onClick={() => {
+                      if (activePhase.stakingRequired) {
+                        setShowStakingModal(true);
+                      } else if (activePhase.daoVoteRequired) {
+                        setShowVoteModal(true);
+                      } else if (activePhase.nftReward) {
+                        handleCompletePhase();
+                      } else {
+                        completePhase(activePhaseIndex, {
+                          score: 100,
+                          phaseNumber: activePhaseIndex + 1,
+                          xpReward: activePhase.xpReward,
+                          mfaiReward: activePhase.mfaiReward
+                        });
+                      }
+                    }}
+                    className="btn-primary text-sm px-8 py-3 flex items-center gap-2 bg-gradient-to-r from-accent-gold to-orange-500 hover:from-accent-gold/80 hover:to-orange-500/80 border-none text-black font-bold shadow-[0_0_20px_rgba(255,215,0,0.2)] transform hover:scale-105 transition-all"
+                  >
+                    {activePhase.stakingRequired ? (
+                      <>
+                        <Coins size={18} />
+                        <span className="text-base">Validate & Stake</span>
+                      </>
+                    ) : activePhase.daoVoteRequired ? (
+                      <>
+                        <Trophy size={18} />
+                        <span className="text-base">Validate & Vote</span>
+                      </>
+                    ) : activePhase.nftReward ? (
+                      <>
+                        <Award size={18} />
+                        <span className="text-base">Validate & Mint NFT</span>
+                      </>
+                    ) : (
+                      <>
+                        <Loader2 size={18} />
+                        <span className="text-base">Validate Phase</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -275,50 +403,111 @@ const JourneyWorkspace = () => {
           </div>
 
           <div className="glass-effect rounded-2xl p-6 h-1/2">
-            <h4 className="font-semibold mb-3">Resources</h4>
-            <div className="space-y-2 text-sm opacity-80">
-              <a
-                href="https://github.com/topics/whitepaper"
-                target="_blank"
-                rel="noreferrer"
-                className="block p-3 bg-white/5 rounded-lg hover:bg-white/10 cursor-pointer transition-colors"
-              >
-                📄 Whitepaper Examples
-              </a>
-              <a
-                href="https://solana.com/docs"
-                target="_blank"
-                rel="noreferrer"
-                className="block p-3 bg-white/5 rounded-lg hover:bg-white/10 cursor-pointer transition-colors"
-              >
-                📊 Solana Documentation
-              </a>
-              <a
-                href="https://solana.com/developers"
-                target="_blank"
-                rel="noreferrer"
-                className="block p-3 bg-white/5 rounded-lg hover:bg-white/10 cursor-pointer transition-colors"
-              >
-                🔗 Solana Developers
-              </a>
+            <h4 className="font-semibold mb-3 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-accent-gold animate-pulse" />
+              Library
+            </h4>
+            <div className="space-y-3 overflow-y-auto pr-2 custom-scrollbar" style={{ maxHeight: 'calc(100% - 40px)' }}>
+              {resources.map((resource) => {
+                const Icon = getResourceIcon(resource.type);
+                return (
+                  <a
+                    key={resource.id}
+                    href={resource.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block p-3 bg-white/5 rounded-xl hover:bg-white/10 cursor-pointer transition-all border border-white/5 hover:border-accent-cyan/30 group"
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-white/5 text-accent-cyan group-hover:text-white transition-colors">
+                          <Icon size={14} />
+                        </div>
+                        <span className="text-xs font-medium text-accent-cyan/80 uppercase tracking-wider">{resource.type}</span>
+                      </div>
+                      <span className="text-[10px] opacity-60 bg-black/20 px-2 py-0.5 rounded-full">{resource.duration}</span>
+                    </div>
+
+                    <h5 className="font-medium text-sm mb-1 group-hover:text-accent-cyan transition-colors line-clamp-1">{resource.title}</h5>
+                    <p className="text-xs opacity-70 mb-2 line-clamp-2 leading-relaxed">{resource.description}</p>
+
+                    <div className="flex flex-wrap gap-1.5">
+                      {resource.tags.map(tag => (
+                        <span key={tag} className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-white/60">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </a>
+                );
+              })}
             </div>
           </div>
         </div>
       </div>
 
       {/* NFT Proof Modal */}
-      {showProofModal && (
-        <NFTProofModal
-          proofType="Skill"
-          title={activePhase.title}
-          description={`Successfully completed the ${activePhase.title} phase.`}
-          xpEarned={activePhase.xpReward}
-          phase={activePhase.title}
-          phaseNumber={activePhaseIndex + 1}
-          onClose={() => setShowProofModal(false)}
+      {
+        proofModalData && (
+          <NFTProofModal
+            proofType={proofModalData.proofType}
+            title={proofModalData.title}
+            description={proofModalData.description}
+            imageUrl={proofModalData.imageUrl}
+            xpEarned={proofModalData.xpEarned}
+            phase={proofModalData.phase}
+            phaseNumber={proofModalData.phaseNumber}
+            onClose={() => setProofModalData(null)}
+          />
+        )
+      }
+
+      {/* Staking Modal */}
+      {showStakingModal && (
+        <StakingModal
+          availableAmount={1000} // Mock available amount
+          currentStaked={0}
+          onClose={() => setShowStakingModal(false)}
+          onStake={(_amount) => {
+            setShowStakingModal(false);
+            // After staking, proceed to complete phase (and show NFT if applicable)
+            if (activePhase.nftReward) {
+              handleCompletePhase();
+            } else {
+              completePhase(activePhaseIndex, {
+                score: 100,
+                phaseNumber: activePhaseIndex + 1,
+                xpReward: activePhase.xpReward,
+                mfaiReward: activePhase.mfaiReward
+              });
+            }
+          }}
         />
       )}
-    </div>
+
+      {/* DAO Vote Modal */}
+      {showVoteModal && (
+        <DAOVoteModal
+          phase={activePhase}
+          votingPower={50} // Mock voting power
+          onClose={() => setShowVoteModal(false)}
+          onVote={(_vote) => {
+            setShowVoteModal(false);
+            // After voting, proceed to complete phase (and show NFT if applicable)
+            if (activePhase.nftReward) {
+              handleCompletePhase();
+            } else {
+              completePhase(activePhaseIndex, {
+                score: 100,
+                phaseNumber: activePhaseIndex + 1,
+                xpReward: activePhase.xpReward,
+                mfaiReward: activePhase.mfaiReward
+              });
+            }
+          }}
+        />
+      )}
+    </div >
   );
 };
 

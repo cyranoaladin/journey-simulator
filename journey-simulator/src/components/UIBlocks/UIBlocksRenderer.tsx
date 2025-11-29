@@ -681,7 +681,7 @@ function ActionSuggestions({ block }: { block: ActionSuggestionsBlock }) {
         journeyState: useJourneyStore.getState().userProgress,
       };
       setIsStepLoading(true);
-      const resp = await fetch(`${base}/api/journeys/${id}/step`, {
+      const resp = await fetch(`${base}/journey/${id}/step`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -870,19 +870,8 @@ function ProjectSelection({ block }: { block: ProjectSelectionBlock }) {
   );
 }
 
-export default function UIBlocksRenderer({
-  response,
-}: {
-  response: JourneyStepResponse;
-}) {
-  // Safety check
-  if (!response || !response.ui_blocks || !Array.isArray(response.ui_blocks)) {
-    return (
-      <div className="bg-white/5 rounded-xl p-4 text-center">
-        <p className="text-slate-400">Aucun contenu à afficher</p>
-      </div>
-    );
-  }
+export default function UIBlocksRenderer({ response }: { response: JourneyStepResponse }) {
+  if (!response || !response.ui_blocks) return null;
 
   const render = (b: UIBlock) => {
     switch (b.kind) {

@@ -40,7 +40,7 @@ test.describe('Resource Validation in Journey Steps', () => {
 
     test('should display resources with valid URLs', async ({ page }) => {
         // Mock a journey step response with valid resources
-        await page.route('**/api/journeys/*/step', async (route) => {
+        await page.route('**/journey/*/step', async (route) => {
             await route.fulfill({
                 status: 200,
                 contentType: 'application/json',
@@ -84,19 +84,21 @@ test.describe('Resource Validation in Journey Steps', () => {
 
         // Navigate to journey and trigger a step
         await page.goto('/journeys/capital-foundry');
+        await page.locator('button:has-text("Start / Continue")').click();
 
         // Wait for resources to load
         await expect(page.locator('text=Ressources recommandées')).toBeVisible({ timeout: 10000 });
 
         // Verify valid URLs are displayed and clickable
-        const solanaLink = page.locator('a:has-text("Ouvrir")').first();
+        // Verify valid URLs are displayed and clickable
+        const solanaLink = page.locator('a:has-text("Open")').first();
         await expect(solanaLink).toBeVisible();
         await expect(solanaLink).toHaveAttribute('href', 'https://docs.solana.com');
     });
 
     test('should handle resources with invalid URLs gracefully', async ({ page }) => {
         // Mock a journey step response with sanitized resources (invalid URLs removed)
-        await page.route('**/api/journeys/*/step', async (route) => {
+        await page.route('**/journey/*/step', async (route) => {
             await route.fulfill({
                 status: 200,
                 contentType: 'application/json',
@@ -139,6 +141,7 @@ test.describe('Resource Validation in Journey Steps', () => {
         });
 
         await page.goto('/journeys/capital-foundry');
+        await page.locator('button:has-text("Start / Continue")').click();
 
         // Wait for resources to load
         await expect(page.locator('text=Ressources recommandées')).toBeVisible({ timeout: 10000 });
@@ -148,14 +151,14 @@ test.describe('Resource Validation in Journey Steps', () => {
         await expect(resourceBlocks).toBeVisible();
 
         // The "Ouvrir" button should not be present for the invalid resource
-        // We should only have one "Ouvrir" button (for the valid resource)
-        const openButtons = page.locator('a:has-text("Ouvrir")');
+        // We should only have one "Open" button (for the valid resource)
+        const openButtons = page.locator('a:has-text("Open")');
         await expect(openButtons).toHaveCount(1);
     });
 
     test('should allow copying resource information even without URL', async ({ page }) => {
         // Mock a journey step response
-        await page.route('**/api/journeys/*/step', async (route) => {
+        await page.route('**/journey/*/step', async (route) => {
             await route.fulfill({
                 status: 200,
                 contentType: 'application/json',
@@ -190,12 +193,14 @@ test.describe('Resource Validation in Journey Steps', () => {
         });
 
         await page.goto('/journeys/capital-foundry');
+        await page.locator('button:has-text("Start / Continue")').click();
 
         // Wait for resources to load
         await expect(page.locator('text=Ressources')).toBeVisible({ timeout: 10000 });
 
         // Verify the copy button is still present
-        const copyButton = page.locator('button:has-text("Copier")');
+        // Verify the copy button is still present
+        const copyButton = page.locator('button:has-text("Copy")');
         await expect(copyButton).toBeVisible();
     });
 });

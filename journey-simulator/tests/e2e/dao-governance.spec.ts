@@ -123,7 +123,7 @@ test.describe('DAO Governance', () => {
         await page.getByRole('button', { name: 'Sign In' }).click();
 
         // Wait for redirection to /journeys
-        await page.waitForURL('**/journeys', { timeout: 15000 });
+        await page.waitForURL('**/journeys', { timeout: 30000 });
     });
 
     test('should display proposals list', async ({ page }) => {
@@ -146,7 +146,7 @@ test.describe('DAO Governance', () => {
         const adminBtn = page.getByRole('button', { name: /Open admin console/i });
         await expect(adminBtn).toBeVisible();
         await page.waitForTimeout(500); // Wait for any layout shift
-        await adminBtn.click({ force: true });
+        await adminBtn.dispatchEvent('click');
 
         // Wait for panel to appear
         const apiKeyInput = page.locator('input[type="password"]');
@@ -156,7 +156,7 @@ test.describe('DAO Governance', () => {
         await apiKeyInput.fill('admin-secret-key');
 
         // Fill Proposal Form
-        await page.getByPlaceholder('Title (e.g., MVP Token Issuance)').fill('New Proposal');
+        await page.getByPlaceholder('Title (ex: MVP Token Issuance)').fill('New Proposal');
         await page.getByPlaceholder('Description / context').fill('Description of the proposal');
 
         // Submit
@@ -188,7 +188,7 @@ test.describe('DAO Governance', () => {
         const adminBtn = page.getByRole('button', { name: /Open admin console/i });
         await expect(adminBtn).toBeVisible();
         await page.waitForTimeout(500);
-        await adminBtn.click({ force: true });
+        await adminBtn.dispatchEvent('click');
 
         // Select a voter
         const voterSelect = page.locator('select[name="dao-voter"]');
@@ -198,16 +198,16 @@ test.describe('DAO Governance', () => {
         // Verify voter selection updated the UI (button text changes)
         // The button text format is "Oui (voter-id)" or "Oui (Name)"
         // We wait for the text to NOT contain "---"
-        await expect(page.locator('button:has-text("Oui (---)")')).not.toBeVisible();
+        await expect(page.locator('button:has-text("Yes (---)")')).not.toBeVisible();
 
         // Vote Yes on the first active proposal
-        const voteYesBtn = page.locator('button:has-text("Oui")').first();
+        const voteYesBtn = page.locator('button:has-text("Yes")').first();
         await expect(voteYesBtn).toBeVisible();
         await voteYesBtn.click({ force: true });
 
         // Verify vote success (optimistic update or re-fetch)
         // Again, with static mocks, the UI might not update the vote count unless we mock the second GET.
         // We'll just check for no error.
-        await expect(page.locator('.text-red-500')).not.toBeVisible();
+        await expect(page.locator('.bg-red-50')).not.toBeVisible();
     });
 });

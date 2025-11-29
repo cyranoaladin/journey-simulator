@@ -1,6 +1,5 @@
 // API base URL - configurable via environment variable for different deployments
-export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:3002';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://journey.mfai.app/api';
 
 export const SOLANA_API_BASE_URL =
   import.meta.env.VITE_SOLANA_API_BASE_URL || 'http://127.0.0.1:3001';
@@ -91,7 +90,7 @@ export interface LoginResponse {
     email: string;
     role: 'admin' | 'user';
     wallet_address: string;
-    persona?: 'student' | 'entrepreneur' | 'developer' | 'creator';
+    persona?: 'student' | 'entrepreneur' | 'developer' | 'creator' | 'cognitive-activation-hub';
     total_xp?: number;
     current_level?: number;
     completed_phases?: number;
@@ -111,7 +110,7 @@ export interface RegisterResponse {
     email: string;
     role: 'admin' | 'user';
     wallet_address: string;
-    persona?: 'student' | 'entrepreneur' | 'developer' | 'creator';
+    persona?: 'student' | 'entrepreneur' | 'developer' | 'creator' | 'cognitive-activation-hub';
     total_xp?: number;
     current_level?: number;
     completed_phases?: number;
@@ -144,12 +143,286 @@ const request = async <T>(
   options: RequestInit = {},
   retryOnUnauthorized: boolean = true
 ): Promise<T> => {
+  // Mock response for demo mode
+  const token = localStorage.getItem('accessToken');
+  console.log(`[API] Requesting: ${path} (Base: ${API_BASE_URL})`);
+  if (token === 'demo-token') {
+    console.log(`[Demo Mode] Mocking request to ${path}`);
+
+    // Helper to simulate backend state
+    const getDemoState = () => {
+      const stored = localStorage.getItem('demo_mock_db');
+      return stored ? JSON.parse(stored) : {
+        xp: 0,
+        tokens: 0,
+        completedPhases: [],
+        nfts: []
+      };
+    };
+
+    const updateDemoState = (updates: any) => {
+      const current = getDemoState();
+      const newState = { ...current, ...updates };
+      localStorage.setItem('demo_mock_db', JSON.stringify(newState));
+      return newState;
+    };
+
+    if (path === '/user/profile' || path === '/user/verify') {
+      return {
+        success: true,
+        user: {
+          id: "demo-user-id",
+          name: "Demo User",
+          email: "demo@moneyfactory.ai",
+          role: "user",
+          wallet_address: "DemoWalletAddress123",
+          persona: "cognitive-activation-hub"
+        }
+      } as unknown as T;
+    }
+
+    if (path === '/user/refresh') {
+      return {
+        success: true,
+        accessToken: "demo-token",
+        refreshToken: "demo-refresh-token"
+      } as unknown as T;
+    }
+
+    if (path === '/journey/reset-progress') {
+      localStorage.removeItem('demo_mock_db');
+      return { success: true } as unknown as T;
+    }
+
+    if (path === '/journey/user-progress') {
+      if (options.method === 'GET') {
+        const state = getDemoState();
+        return {
+          success: true,
+          progress: {
+            total_xp: state.xp,
+            token_transactions: {
+              mfai_tokens: state.tokens
+            },
+            completed_phases: state.completedPhases.length,
+            persona: "cognitive-activation-hub",
+            nft_certificates: state.nfts.map((t: string) => ({ title: t })),
+            subscription: 'gold'
+          }
+        } as unknown as T;
+      }
+      if (options.method === 'PUT') {
+        const body = JSON.parse(options.body as string);
+        updateDemoState({
+          xp: body.total_xp,
+          // If completed_phases is sent as a count, we might need to adjust logic, 
+          // but usually completePhase handles the array. 
+          // Here we just trust the frontend sends total_xp.
+        });
+        return { success: true } as unknown as T;
+      }
+    }
+
+    if (path === '/user/tokens') {
+      if (options.method === 'PUT') {
+        const body = JSON.parse(options.body as string);
+        updateDemoState({ tokens: body.mfai_tokens });
+        return { success: true } as unknown as T;
+      }
+    }
+
+    if (path === '/journey/complete-phase') {
+      const body = JSON.parse(options.body as string);
+      const state = getDemoState();
+      const phaseIndex = body.phase_number - 1;
+
+      if (!state.completedPhases.includes(phaseIndex)) {
+        // Calculate rewards based on phase
+        let xpReward = body.xp_reward || 0;
+        let tokenReward = body.mfai_reward || 0;
+        let nftReward = body.nft_reward || null;
+
+        // Fallback if not provided (legacy behavior)
+        if (!body.xp_reward && !body.mfai_reward) {
+          // Phase 1 (Activation)
+          if (phaseIndex === 0) { xpReward = 60; tokenReward = 6; nftReward = "Proof-of-Skill™: Activation"; }
+          // Phase 2 (Staking)
+          else if (phaseIndex === 1) { xpReward = 80; tokenReward = 8; nftReward = "Solana Fluency Patch"; }
+          // Phase 3 (Governance)
+          else if (phaseIndex === 2) { xpReward = 90; tokenReward = 9; nftReward = "Tokenomics Architect Badge"; }
+          // Default
+          else { xpReward = 50; tokenReward = 5; }
+        }
+
+        const updates: any = {
+          completedPhases: [...state.completedPhases, phaseIndex],
+          xp: state.xp + xpReward,
+          tokens: state.tokens + tokenReward
+        };
+
+        if (nftReward) {
+          updates.nfts = [...state.nfts, nftReward];
+        }
+
+        updateDemoState(updates);
+      }
+      return { success: true } as unknown as T;
+    }
+
+    if (path === '/user/nft-certificates') {
+      const body = JSON.parse(options.body as string);
+      const state = getDemoState();
+      // Extract title from body or generate one
+      const title = body.title || `Phase ${body.phase} NFT`;
+      updateDemoState({ nfts: [...state.nfts, title] });
+      return { success: true } as unknown as T;
+    }
+
+    if (path.includes('/step')) {
+      const body = JSON.parse(options.body as string);
+      const phaseId = body.phaseId || 'unknown';
+      const state = getDemoState();
+      const phaseIndex = state.completedPhases.length;
+
+      // Dynamic content based on phase
+      let blocks: any[] = [];
+
+      if (phaseIndex === 0 || phaseId.includes('activation')) {
+        blocks = [
+          {
+            id: "b1",
+            kind: "text_block",
+            title: "Phase 1: Activation",
+            body_markdown: "## Welcome to Money Factory AI\n\nYour journey begins here. In this phase, you will activate your cognitive hub and prove your readiness.\n\n### Objectives\n- Connect your wallet\n- Understand the ecosystem\n- Mint your first Proof-of-Skill"
+          },
+          {
+            id: "b2",
+            kind: "mission_block",
+            title: "Activation Mission",
+            description: "Submit a brief statement about your goals for this journey.",
+            expected_input_type: "text",
+            xp_reward: 100,
+            nft_reward_id: "Proof-of-Skill™: Activation"
+          }
+        ];
+      } else if (phaseIndex === 1 || phaseId.includes('staking')) {
+        blocks = [
+          {
+            id: "b1",
+            kind: "text_block",
+            title: "Phase 2: Staking & Investment",
+            body_markdown: "## Capital Foundry\n\nTo participate in the ecosystem, you must stake your $MFAI tokens. This demonstrates your commitment and unlocks governance rights."
+          },
+          {
+            id: "b2",
+            kind: "indicator_block",
+            title: "Your Wallet",
+            value: `${state.tokens} $MFAI`,
+            trend: "+50",
+            trend_direction: "up"
+          },
+          {
+            id: "b3",
+            kind: "action_suggestions_block",
+            title: "Staking Actions",
+            suggestions: [
+              { action_id: "stake_50", label: "Stake 50 $MFAI" },
+              { action_id: "stake_max", label: "Stake Max" }
+            ]
+          }
+        ];
+      } else if (phaseIndex === 2 || phaseId.includes('governance')) {
+        blocks = [
+          {
+            id: "b1",
+            kind: "text_block",
+            title: "Phase 3: Governance",
+            body_markdown: "## DAO Participation\n\nAs a stakeholder, you have the right to vote on ecosystem proposals. Your voting power is determined by your staked tokens and reputation."
+          },
+          {
+            id: "b2",
+            kind: "dao_dashboard_block",
+            title: "Active Proposals",
+            votingPower: 150,
+            proposals: [
+              { id: "p1", title: "CIP-12: Increase Staking Rewards", status: "active", votes: { yes: 65, no: 12 }, deadline: "24h" },
+              { id: "p2", title: "CIP-13: New Persona Integration", status: "active", votes: { yes: 40, no: 5 }, deadline: "48h" }
+            ]
+          }
+        ];
+      } else {
+        // Default / Expansion phase
+        blocks = [
+          {
+            id: "b1",
+            kind: "text_block",
+            title: `Phase ${phaseIndex + 1}: Expansion`,
+            body_markdown: "## Ecosystem Expansion\n\nSelect a project to fund or contribute to. Your choices will shape the future of the Money Factory ecosystem."
+          },
+          {
+            id: "b2",
+            kind: "project_selection_block",
+            title: "Available Projects",
+            projects: [
+              { id: "proj1", name: "DeFi Aggregator", description: "A unified interface for all DeFi protocols.", currentFunding: 50000, fundingGoal: 100000, tags: ["DeFi", "Infrastructure"] },
+              { id: "proj2", name: "NFT Marketplace", description: "Next-gen marketplace for dynamic NFTs.", currentFunding: 25000, fundingGoal: 50000, tags: ["NFT", "Consumer"] }
+            ]
+          }
+        ];
+      }
+
+      return {
+        ui_blocks: blocks
+      } as unknown as T;
+    }
+
+    if (path.includes('/admin/agent-logs') || path.includes('/api/agents/logs')) {
+      return {
+        logs: [
+          { id: '1', timestamp: new Date().toISOString(), agentId: 'zyno', message: 'System initialized', level: 'info' },
+          { id: '2', timestamp: new Date().toISOString(), agentId: 'zyno', message: 'Monitoring active', level: 'info' }
+        ]
+      } as unknown as T;
+    }
+
+    if (path.includes('/dao/config')) {
+      return {
+        quorumPercent: 66,
+        totalVotingPower: 10000,
+        voters: [
+          { id: 'v1', name: 'Alice', weight: 100 },
+          { id: 'v2', name: 'Bob', weight: 50 }
+        ]
+      } as unknown as T;
+    }
+
+    if (path.includes('/dao/proposals')) {
+      return {
+        proposals: [
+          {
+            id: 'p1',
+            title: 'Demo Proposal 1',
+            description: 'This is a demo proposal',
+            status: 'active',
+            votes: { yes: 10, no: 2 },
+            quorumMet: false,
+            voterDetails: {}
+          }
+        ]
+      } as unknown as T;
+    }
+
+    // Default success for other endpoints in demo mode
+    return { success: true } as unknown as T;
+  }
+
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
     headers: {
       ...(options.headers || {}),
     },
   });
+  console.log(`[API] Response for ${path}: ${response.status}`);
 
   if (response.status === 401 && retryOnUnauthorized) {
     // Attempt token refresh once
@@ -163,6 +436,12 @@ const request = async <T>(
     }
 
     // Refresh token
+    // Handle demo refresh token specifically
+    if (storedRefreshToken === 'demo-refresh-token') {
+      localStorage.setItem('accessToken', 'demo-token');
+      return request<T>(path, options, false);
+    }
+
     const refreshResp = await fetch(`${API_BASE_URL}/user/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -370,6 +649,9 @@ export const api = {
     phase_number: number;
     score?: number;
     nft_address?: string;
+    xp_reward?: number;
+    mfai_reward?: number;
+    nft_reward?: string;
   }): Promise<any> => {
     return request<any>('/journey/complete-phase', {
       method: 'POST',

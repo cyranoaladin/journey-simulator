@@ -188,22 +188,37 @@ exports.resetUserProgress = async (req, res) => {
 
 exports.completePhase = async (req, res) => {
     try {
-        const { phase_number, score, nft_address } = req.body;
+        const { phase_number, score, nft_address, xp_reward, mfai_reward } = req.body;
 
-        // Update user progress
+        // Create the new certificate object
+        const newCertificate = {
+            phase_number,
+            completion_date: new Date(),
+            score: score || 0,
+            nft_address: nft_address || "0x...", // Placeholder if not provided
+            xp_earned: xp_reward || 0 // Store the XP earned for this specific phase
+        };
+
+        // Prepare the update object
+        const update = {
+            $inc: {
+                completed_phases: 1,
+                total_xp: xp_reward || 0 // Increment total XP
+            },
+            $push: {
+                nft_certificates: newCertificate
+            }
+        };
+
+        // If there is an MFAI reward, increment the token balance
+        if (mfai_reward) {
+            update.$inc["token_transactions.mfai_tokens"] = mfai_reward;
+            update.$set = { "token_transactions.last_updated": new Date() };
+        }
+
         const user = await User.findByIdAndUpdate(
             req.user.id,
-            {
-                $inc: { completed_phases: 1 },
-                $push: {
-                    nft_certificates: {
-                        phase: phase_number,
-                        nft_address: nft_address || '',
-                        score: score || 0,
-                        mint_date: new Date()
-                    }
-                }
-            },
+            update,
             { new: true }
         ).select('-password');
 

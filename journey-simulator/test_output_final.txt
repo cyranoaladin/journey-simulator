@@ -1,0 +1,87 @@
+
+Running 2 tests using 2 workers
+
+  ✘  1 [firefox] › tests/e2e/growth-agent.spec.ts:138:5 › Growth Agent Integration › should display Growth Agent evaluation (30.2s)
+  ✘  2 [chromium] › tests/e2e/growth-agent.spec.ts:138:5 › Growth Agent Integration › should display Growth Agent evaluation (31.3s)
+
+
+  1) [chromium] › tests/e2e/growth-agent.spec.ts:138:5 › Growth Agent Integration › should display Growth Agent evaluation 
+
+    [31mTest timeout of 30000ms exceeded while running "beforeEach" hook.[39m
+
+      2 |
+      3 | test.describe('Growth Agent Integration', () => {
+    > 4 |     test.beforeEach(async ({ page }) => {
+        |          ^
+      5 |         // Mock login
+      6 |         await page.route('**/user/login', async (route) => {
+      7 |             await route.fulfill({
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/growth-agent.spec.ts:4:10
+
+    Error: locator.fill: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[name="email"]')[22m
+
+
+      123 |         // Login and navigate to workspace
+      124 |         await page.goto('/login');
+    > 125 |         await page.locator('input[name="email"]').fill('test@example.com');
+          |                                                   ^
+      126 |         await page.locator('input[name="password"]').fill('password');
+      127 |         await page.getByRole('button', { name: 'Sign In' }).click();
+      128 |         await page.waitForURL('**/journeys', { timeout: 10000 });
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/growth-agent.spec.ts:125:51
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/growth-agent-Growth-Agent--8f154-lay-Growth-Agent-evaluation-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/growth-agent-Growth-Agent--8f154-lay-Growth-Agent-evaluation-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/growth-agent-Growth-Agent--8f154-lay-Growth-Agent-evaluation-chromium/error-context.md
+
+  2) [firefox] › tests/e2e/growth-agent.spec.ts:138:5 › Growth Agent Integration › should display Growth Agent evaluation 
+
+    [31mTest timeout of 30000ms exceeded while running "beforeEach" hook.[39m
+
+      2 |
+      3 | test.describe('Growth Agent Integration', () => {
+    > 4 |     test.beforeEach(async ({ page }) => {
+        |          ^
+      5 |         // Mock login
+      6 |         await page.route('**/user/login', async (route) => {
+      7 |             await route.fulfill({
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/growth-agent.spec.ts:4:10
+
+    Error: locator.fill: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[name="email"]')[22m
+
+
+      123 |         // Login and navigate to workspace
+      124 |         await page.goto('/login');
+    > 125 |         await page.locator('input[name="email"]').fill('test@example.com');
+          |                                                   ^
+      126 |         await page.locator('input[name="password"]').fill('password');
+      127 |         await page.getByRole('button', { name: 'Sign In' }).click();
+      128 |         await page.waitForURL('**/journeys', { timeout: 10000 });
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/growth-agent.spec.ts:125:51
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/growth-agent-Growth-Agent--8f154-lay-Growth-Agent-evaluation-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/growth-agent-Growth-Agent--8f154-lay-Growth-Agent-evaluation-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/growth-agent-Growth-Agent--8f154-lay-Growth-Agent-evaluation-firefox/error-context.md
+
+  2 failed
+    [chromium] › tests/e2e/growth-agent.spec.ts:138:5 › Growth Agent Integration › should display Growth Agent evaluation 
+    [firefox] › tests/e2e/growth-agent.spec.ts:138:5 › Growth Agent Integration › should display Growth Agent evaluation 
+
+[36m  Serving HTML report at http://localhost:33067. Press Ctrl+C to quit.[39m
+Terminated

@@ -29,7 +29,7 @@ interface JourneyState {
   updateProgress: (xp: number, nfts?: string[], mfai?: number) => Promise<void>
   openModal: (content: any) => void
   closeModal: () => void
-  completePhase: (phaseIndex: number, options?: { score?: number; nftAddress?: string; phaseNumber?: number }) => Promise<void>
+  completePhase: (phaseIndex: number, options?: { score?: number; nftAddress?: string; phaseNumber?: number; xpReward?: number; mfaiReward?: number }) => Promise<void>
   updateStaking: (amount: number) => void
   updateVotingPower: (newPower: number) => void
   updateWalletConnection: (connected: boolean, address?: string) => void
@@ -42,6 +42,7 @@ interface JourneyState {
   completeMission: () => void
   loadUserProgress: () => Promise<void>
   setUserProgress: (progress: UserProgress) => void
+  setDemoMode: (enabled: boolean) => void
 }
 
 const initialUserProgress: UserProgress = {
@@ -153,10 +154,10 @@ export const useJourneyStore = create<JourneyState>()(
           tone: uiTone,
           journeyState: { xp: get().userProgress.totalXP, completed: get().userProgress.completedPhases }
         }
-        const base = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:3000'
+        const base = import.meta.env.VITE_API_BASE_URL || 'https://journey.mfai.app/api'
         try {
           set({ isStepLoading: true })
-          const resp = await fetch(`${base}/journey/${id}/step`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+          const resp = await window.fetch(`${base}/journey/${id}/step`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
           if (!resp.ok) throw new Error(`step failed: ${resp.status}`)
           const json = await resp.json()
           set({ lastStep: json })
@@ -207,20 +208,52 @@ export const useJourneyStore = create<JourneyState>()(
       closeModal: () => set({ isModalOpen: false, modalContent: null }),
 
       completePhase: async (phaseIndex, options = {}) => {
+        console.log('[Store] completePhase called', { phaseIndex, options });
         const state = get()
 
         if (state.userProgress.completedPhases.includes(phaseIndex)) {
+          console.log('[Store] Phase already completed', phaseIndex);
           return
         }
 
         const phaseNumber = options.phaseNumber ?? phaseIndex + 1
 
         try {
-          await api.completePhase({
+          console.log('[Store] Calling api.completePhase', { phaseNumber, ...options });
+          // Get rewards for the current phase
+          const currentPersona = state.selectedPersona;
+          const personaData = currentPersona ? personas.find(p => p.id === currentPersona.id) : null;
+          const phases = personaData ? personaData.phases : [];
+          const currentPhaseData = phases[phaseNumber - 1]; // phaseNumber is 1-based
+
+          const xpReward = currentPhaseData?.xpReward || 0;
+          const mfaiReward = currentPhaseData?.mfaiReward || 0;
+          const nftReward = currentPhaseData?.nftReward || undefined;
+
+          // Validate phase index
+          if (phaseIndex >= phases.length) {
+            console.warn('[Store] Attempted to complete non-existent phase', phaseIndex);
+            return;
+          }
+
+          // Call API to complete phase with rewards
+          const response = await api.completePhase({
             phase_number: phaseNumber,
-            score: options.score ?? 0,
-            ...(options.nftAddress ? { nft_address: options.nftAddress } : {})
-          })
+            score: 100, // Default score
+            nft_address: '0x' + Math.random().toString(16).substr(2, 40), // Mock address
+            xp_reward: xpReward,
+            mfai_reward: mfaiReward,
+            nft_reward: nftReward
+          });
+          console.log('[Store] api.completePhase success', response);
+
+          // If the response contains UI blocks (e.g. from an agent evaluation), display them
+          if (response && response.ui_blocks) {
+            set({ lastStep: response });
+          } else {
+            // Clear last step if no blocks returned, to show the next phase details
+            set({ lastStep: null });
+          }
 
           const updatedPhases = Array.from(
             new Set([...state.userProgress.completedPhases, phaseIndex])
@@ -232,6 +265,9 @@ export const useJourneyStore = create<JourneyState>()(
               completedPhases: updatedPhases,
             }
           })
+
+          // Reload progress to get updated XP/Tokens from backend
+          await get().loadUserProgress()
         } catch (error) {
           console.error('Failed to sync phase completion with backend:', error)
           throw error
@@ -455,7 +491,27 @@ export const useJourneyStore = create<JourneyState>()(
         }
       },
 
-      setUserProgress: (progress) => set({ userProgress: progress })
+      setUserProgress: (progress) => set({ userProgress: progress }),
+
+      setDemoMode: (enabled: boolean) => {
+        if (enabled) {
+          const demoPersona = personas[0]; // Cognitive Activation Hub
+          set({
+            selectedPersona: demoPersona,
+            currentPhase: 0, // Start at Phase 1
+            userProgress: {
+              ...initialUserProgress,
+              totalXP: 0,
+              mfaiTokens: 0,
+              completedPhases: [], // No phases completed
+              currentPersona: demoPersona.id,
+              nfts: [],
+              passLevel: 'Free',
+              votingPower: 0
+            }
+          });
+        }
+      }
     }),
     {
       name: 'mfai-journey-storage',

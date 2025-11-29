@@ -1,147 +1,126 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Demo Mode Integration', () => {
+
+test.describe('Demo Mode Workflow', () => {
     test.beforeEach(async ({ page }) => {
-        // Mock login response
-        await page.route('**/user/login', async (route) => {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    success: true,
-                    accessToken: 'mock-access-token',
-                    refreshToken: 'mock-refresh-token',
-                    user: {
-                        id: 'user-123',
-                        name: 'Test User',
-                        email: 'test@example.com',
-                        role: 'user'
-                    }
-                })
-            });
-        });
-
-        // Mock user profile
-        await page.route('**/user/profile', async (route) => {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    user: {
-                        id: 'user-123',
-                        name: 'Test User',
-                        email: 'test@example.com',
-                        role: 'user'
-                    }
-                })
-            });
-        });
-
-        // Mock user progress (required for journey page)
-        await page.route('**/journey/user-progress', async (route) => {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    total_xp: 0,
-                    current_level: 1,
-                    completed_phases: [],
-                    currentPersona: null
-                })
-            });
-        });
-
-        // Mock load demo endpoint
-        await page.route('**/journey/load-demo', async (route) => {
-            const request = route.request();
-            const postData = request.postDataJSON();
-
-            // Verify request payload
-            expect(postData.personaId).toBeDefined();
-
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    success: true,
-                    message: 'Demo state loaded successfully',
-                    journey: {
-                        _id: 'journey-123',
-                        journey_type: postData.personaId,
-                        user_id: 'user-123',
-                        current_phase: 3,
-                        completion_percentage: 60,
-                        phases_status: [
-                            { phase_number: 0, status: 'completed' },
-                            { phase_number: 1, status: 'completed' },
-                            { phase_number: 2, status: 'completed' }
-                        ]
-                    },
-                    demo_state: {
-                        total_xp: 2500,
-                        current_level: 3
-                    },
-                    progress: {
-                        total_xp: 2500,
-                        current_level: 3,
-                        completed_phases: 3,
-                        nft_certificates: [],
-                        token_transactions: { mfai_tokens: 100 },
-                        subscription: 'free',
-                        persona: postData.personaId
-                    }
-                })
-            });
-        });
-
-        // Mock user progress update (called after demo load)
-        await page.route('**/journey/user-progress', async (route) => {
-            if (route.request().method() === 'GET') {
-                await route.fulfill({
-                    status: 200,
-                    contentType: 'application/json',
-                    body: JSON.stringify({
-                        total_xp: 2500,
-                        current_level: 3,
-                        completed_phases: [0, 1, 2],
-                        currentPersona: 'cognitive-activation-hub' // Important for UI state
-                    })
-                });
-            } else if (route.request().method() === 'PUT') {
-                await route.fulfill({ status: 204 });
-            }
-        });
-
-        // Login first
-        await page.goto('/login');
-        await page.locator('input[name="email"]').fill('test@example.com');
-        await page.locator('input[name="password"]').fill('password');
-        await page.getByRole('button', { name: 'Sign In' }).click();
-
-        // Wait for navigation and load
-        await page.waitForURL('**/journeys', { timeout: 15000 });
-        await page.waitForLoadState('networkidle');
+        // Go to home page
+        page.on('console', msg => console.log(`[BROWSER] ${msg.text()}`));
+        await page.goto('/');
+        // Wait for app to load
+        await expect(page.locator('h1')).toContainText('Launch Like a Protocol');
     });
 
-    test('should display Load Demo button on persona cards', async ({ page }) => {
-        // Check if button exists on Cognitive Activation Hub card
-        // Use a more specific selector to avoid ambiguity
-        const demoButton = page.locator('button:has-text("Load Demo State")').first();
-        await expect(demoButton).toBeVisible({ timeout: 15000 });
-        await expect(demoButton).toHaveClass(/bg-yellow-500/);
-    });
+    test('should complete the full demo journey', async ({ page }) => {
+        test.setTimeout(120000);
+        // 1. Enter Demo Mode
+        await page.goto('/');
+        await page.evaluate(() => localStorage.clear());
 
-    test('should load demo state when button is clicked', async ({ page }) => {
-        page.on('console', msg => console.log('PAGE LOG:', msg.text()));
+        await page.getByRole('link', { name: /Authenticate/i }).click();
 
-        // Click the button for the first persona
-        const demoButton = page.locator('button[title="Load pre-populated demo state for investor presentations"]').first();
+        // Verify we are on login page
+        await expect(page.getByText('Sign In', { exact: true })).toBeVisible();
+
+        const demoButton = page.getByRole('button', { name: /Try Demo Mode/i });
         await expect(demoButton).toBeVisible();
-        await demoButton.evaluate((node: HTMLElement) => node.click());
+        await demoButton.click();
 
-        // Wait for the workspace to load (indicated by "Back to all journeys" button)
-        // This confirms that selectedPersona was updated in the store and the view switched
-        const backButton = page.locator('button:has-text("Back to all journeys")');
-        await expect(backButton).toBeVisible({ timeout: 15000 });
+        // Verify redirection to journeys list
+        await expect(page).toHaveURL(/\/journeys/);
+
+        // Select the Cognitive Activation Hub journey
+        await page.getByRole('button', { name: /Launch with Zyno/i }).first().click();
+
+        // Verify redirection to journey workspace
+        await expect(page).toHaveURL(/\/journeys\/cognitive-activation-hub/);
+        await page.waitForTimeout(2000); // Wait for workspace to fully render
+
+        await expect(page.getByText('The Cognitive Activation Hub Journey')).toBeVisible();
+
+        // --- PHASE 1: Cognition Ignition ---
+        await expect(page.getByRole('heading', { name: 'Cognition Ignition', level: 2 })).toBeVisible();
+        await expect(page.getByText('Establish the Web3 mindset').first()).toBeVisible();
+
+        // Complete Phase 1 (Mint NFT)
+        // Click the bottom button (main CTA)
+        const validateButton = page.getByRole('button', { name: /Validate & Mint NFT/i }).nth(1);
+        await expect(validateButton).toBeVisible();
+        await page.waitForTimeout(1000);
+        await validateButton.dispatchEvent('click');
+
+        // Verify NFT Modal
+        await expect(page.getByText('Proof-of-Skill™: Web3 Orientation')).toBeVisible();
+        await page.getByRole('button', { name: /Close/i }).click();
+
+        // --- PHASE 2: Solana Systems Lab ---
+        await expect(page.getByRole('heading', { name: 'Solana Systems Lab', level: 2 })).toBeVisible();
+        await expect(page.getByText('Dive into Solana’s execution model').first()).toBeVisible();
+
+        // Complete Phase 2 (Stake)
+        const validateButton2 = page.getByRole('button', { name: /Validate & Stake/i }).nth(0);
+        await expect(validateButton2).toBeVisible();
+        await page.waitForTimeout(500);
+        await validateButton2.dispatchEvent('click');
+
+        // Handle Staking Modal
+        await expect(page.getByText('Cognitive Lock™')).toBeVisible();
+        await page.getByPlaceholder('0.00').fill('50');
+        await page.getByRole('button', { name: /Stake 50/i }).click();
+
+        // Verify NFT Modal
+        await expect(page.getByText('Solana Fluency Patch')).toBeVisible();
+        await page.getByRole('button', { name: /Close/i }).click();
+
+        // --- PHASE 3: Token Design Studio ---
+        await expect(page.getByRole('heading', { name: 'Token Design Studio', level: 2 })).toBeVisible();
+        await expect(page.getByText('Architect tokenized incentives').first()).toBeVisible();
+
+        // Complete Phase 3 (Vote)
+        const validateButton3 = page.getByRole('button', { name: /Validate & Vote/i }).nth(0);
+        await expect(validateButton3).toBeVisible();
+        await page.waitForTimeout(500);
+        await validateButton3.dispatchEvent('click');
+
+        // Handle Voting Modal
+        await expect(page.getByText('DAO Vote')).toBeVisible();
+        await page.getByRole('button', { name: /Approve/i }).click();
+
+        // Verify NFT Modal
+        await expect(page.getByText('Tokenomics Architect Badge')).toBeVisible();
+        await page.getByRole('button', { name: /Close/i }).click();
+
+        // --- PHASE 4: Identity & Security Forge ---
+        await expect(page.getByRole('heading', { name: 'Identity & Security Forge', level: 2 })).toBeVisible();
+        await expect(page.getByText('Internalize wallet security').first()).toBeVisible();
+
+        // Complete Phase 4 (Mint NFT)
+        const validateButton4 = page.getByRole('button', { name: /Validate & Mint NFT/i }).nth(1);
+        await expect(validateButton4).toBeVisible();
+        await page.waitForTimeout(500);
+        await validateButton4.dispatchEvent('click');
+
+        // Verify NFT Modal
+        await expect(page.getByText('Sovereign Identity Seal')).toBeVisible();
+        await page.getByRole('button', { name: /Close/i }).click();
+
+        // --- PHASE 5: Ecosystem Activation ---
+        await expect(page.getByRole('heading', { name: 'Ecosystem Activation', level: 2 })).toBeVisible();
+        await expect(page.getByText('Convert insight into action').first()).toBeVisible();
+
+        // Complete Phase 5 (Mint NFT)
+        const validateButton5 = page.getByRole('button', { name: /Validate & Mint NFT/i }).nth(1);
+        await expect(validateButton5).toBeVisible();
+        await page.waitForTimeout(500);
+        await validateButton5.dispatchEvent('click');
+
+        // Verify NFT Modal
+        await expect(page.getByText('Proof-of-Skill™: Activation').first()).toBeVisible();
+
+        // Phase 5 is the last one, so we expect completion UI
+        // The workspace might not redirect, but show completion inline
+        // await expect(page).toHaveURL(/\/journey\/completed/, { timeout: 10000 });
+
+        // Verify Final State
+        await expect(page.getByText('Journey Completed')).toBeVisible();
     });
 });

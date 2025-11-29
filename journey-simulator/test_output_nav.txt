@@ -1,0 +1,290 @@
+
+Running 10 tests using 8 workers
+
+  ✘   2 [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:78:5 › Journey Navigation Workflow › should maintain journey state when navigating between routes (16.0s)
+  ✘   7 [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:61:5 › Journey Navigation Workflow › should navigate back from workspace to persona selection (16.1s)
+  ✘   8 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:61:5 › Journey Navigation Workflow › should navigate back from workspace to persona selection (20.3s)
+  ✘   4 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:78:5 › Journey Navigation Workflow › should maintain journey state when navigating between routes (23.3s)
+  ✓   3 [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:112:5 › Journey Navigation Workflow › should handle browser back/forward navigation (25.8s)
+  ✘   5 [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:95:5 › Journey Navigation Workflow › should allow switching between different journeys (28.0s)
+  ✘   1 [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:41:5 › Journey Navigation Workflow › should navigate from persona selection to workspace (30.3s)
+  ✘   6 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:41:5 › Journey Navigation Workflow › should navigate from persona selection to workspace (30.6s)
+  ✓  10 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:112:5 › Journey Navigation Workflow › should handle browser back/forward navigation (23.9s)
+  ✘   9 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:95:5 › Journey Navigation Workflow › should allow switching between different journeys (26.6s)
+
+
+  1) [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:41:5 › Journey Navigation Workflow › should navigate from persona selection to workspace 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button:has-text("Start Journey")').first()[22m
+
+
+      52 |         // Find and click the "Start Journey" or similar button within the card
+      53 |         const startButton = page.locator('button:has-text("Start Journey")').first();
+    > 54 |         await startButton.click();
+         |                           ^
+      55 |
+      56 |         // Verify we're now in the workspace
+      57 |         await expect(page.locator('button:has-text("Back to all journeys")')).toBeVisible({ timeout: 10000 });
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/journey-navigation-workflow.spec.ts:54:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-bc6cf-sona-selection-to-workspace-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-bc6cf-sona-selection-to-workspace-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/journey-navigation-workflo-bc6cf-sona-selection-to-workspace-chromium/error-context.md
+
+  2) [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:61:5 › Journey Navigation Workflow › should navigate back from workspace to persona selection 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).not.[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator:  locator('button:has-text("Back to all journeys")')
+    Expected: not visible
+    Received: visible
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "not toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('button:has-text("Back to all journeys")')[22m
+    [2m    9 × locator resolved to <button tabindex="0" class="btn-secondary text-sm flex items-center gap-2">…</button>[22m
+    [2m      - unexpected value "visible"[22m
+
+
+      73 |
+      74 |         // Verify the "Back to all journeys" button is no longer visible
+    > 75 |         await expect(page.locator('button:has-text("Back to all journeys")')).not.toBeVisible();
+         |                                                                                   ^
+      76 |     });
+      77 |
+      78 |     test('should maintain journey state when navigating between routes', async ({ page }) => {
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/journey-navigation-workflow.spec.ts:75:83
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-4caed-kspace-to-persona-selection-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-4caed-kspace-to-persona-selection-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/journey-navigation-workflo-4caed-kspace-to-persona-selection-chromium/error-context.md
+
+  3) [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:78:5 › Journey Navigation Workflow › should maintain journey state when navigating between routes 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Dashboard').or(locator('text=Welcome'))
+    Expected: visible
+    Error: strict mode violation: locator('text=Dashboard').or(locator('text=Welcome')) resolved to 3 elements:
+        1) <span>Dashboard</span> aka getByRole('link', { name: 'Dashboard' })
+        2) <span>Open the Journey Dashboard</span> aka getByRole('button', { name: 'Open the Journey Dashboard' })
+        3) <p class="text-base opacity-70">Preview every mission, reward, and agent support …</p> aka getByText('Preview every mission, reward')
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for locator('text=Dashboard').or(locator('text=Welcome'))[22m
+
+
+      83 |         // Navigate to dashboard
+      84 |         await page.goto('/dashboard');
+    > 85 |         await expect(page.locator('text=Dashboard').or(page.locator('text=Welcome'))).toBeVisible({ timeout: 10000 });
+         |                                                                                       ^
+      86 |
+      87 |         // Navigate back to journeys
+      88 |         await page.goto('/journeys');
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/journey-navigation-workflow.spec.ts:85:87
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-980a2-n-navigating-between-routes-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-980a2-n-navigating-between-routes-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/journey-navigation-workflo-980a2-n-navigating-between-routes-chromium/error-context.md
+
+  4) [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:95:5 › Journey Navigation Workflow › should allow switching between different journeys 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=The Cognitive Activation Hub')
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for locator('text=The Cognitive Activation Hub')[22m
+
+
+      104 |         // Select a different journey via deep link
+      105 |         await page.goto('/journeys/cognitive-activation-hub');
+    > 106 |         await expect(page.locator('text=The Cognitive Activation Hub')).toBeVisible({ timeout: 10000 });
+          |                                                                         ^
+      107 |
+      108 |         // Verify we're in the new workspace
+      109 |         await expect(page.locator('button:has-text("Back to all journeys")')).toBeVisible();
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/journey-navigation-workflow.spec.ts:106:73
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-68299--between-different-journeys-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-68299--between-different-journeys-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/journey-navigation-workflo-68299--between-different-journeys-chromium/error-context.md
+
+  5) [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:41:5 › Journey Navigation Workflow › should navigate from persona selection to workspace 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button:has-text("Start Journey")').first()[22m
+
+
+      52 |         // Find and click the "Start Journey" or similar button within the card
+      53 |         const startButton = page.locator('button:has-text("Start Journey")').first();
+    > 54 |         await startButton.click();
+         |                           ^
+      55 |
+      56 |         // Verify we're now in the workspace
+      57 |         await expect(page.locator('button:has-text("Back to all journeys")')).toBeVisible({ timeout: 10000 });
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/journey-navigation-workflow.spec.ts:54:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-bc6cf-sona-selection-to-workspace-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-bc6cf-sona-selection-to-workspace-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/journey-navigation-workflo-bc6cf-sona-selection-to-workspace-firefox/error-context.md
+
+  6) [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:61:5 › Journey Navigation Workflow › should navigate back from workspace to persona selection 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).not.[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator:  locator('button:has-text("Back to all journeys")')
+    Expected: not visible
+    Received: visible
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "not toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('button:has-text("Back to all journeys")')[22m
+    [2m    8 × locator resolved to <button tabindex="0" class="btn-secondary text-sm flex items-center gap-2">…</button>[22m
+    [2m      - unexpected value "visible"[22m
+
+
+      73 |
+      74 |         // Verify the "Back to all journeys" button is no longer visible
+    > 75 |         await expect(page.locator('button:has-text("Back to all journeys")')).not.toBeVisible();
+         |                                                                                   ^
+      76 |     });
+      77 |
+      78 |     test('should maintain journey state when navigating between routes', async ({ page }) => {
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/journey-navigation-workflow.spec.ts:75:83
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-4caed-kspace-to-persona-selection-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-4caed-kspace-to-persona-selection-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/journey-navigation-workflo-4caed-kspace-to-persona-selection-firefox/error-context.md
+
+  7) [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:78:5 › Journey Navigation Workflow › should maintain journey state when navigating between routes 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Dashboard').or(locator('text=Welcome'))
+    Expected: visible
+    Error: strict mode violation: locator('text=Dashboard').or(locator('text=Welcome')) resolved to 3 elements:
+        1) <span>Dashboard</span> aka getByRole('link', { name: 'Dashboard' })
+        2) <span>Open the Journey Dashboard</span> aka getByRole('button', { name: 'Open the Journey Dashboard' })
+        ...
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for locator('text=Dashboard').or(locator('text=Welcome'))[22m
+
+
+      83 |         // Navigate to dashboard
+      84 |         await page.goto('/dashboard');
+    > 85 |         await expect(page.locator('text=Dashboard').or(page.locator('text=Welcome'))).toBeVisible({ timeout: 10000 });
+         |                                                                                       ^
+      86 |
+      87 |         // Navigate back to journeys
+      88 |         await page.goto('/journeys');
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/journey-navigation-workflow.spec.ts:85:87
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-980a2-n-navigating-between-routes-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-980a2-n-navigating-between-routes-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/journey-navigation-workflo-980a2-n-navigating-between-routes-firefox/error-context.md
+
+  8) [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:95:5 › Journey Navigation Workflow › should allow switching between different journeys 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=The Cognitive Activation Hub')
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for locator('text=The Cognitive Activation Hub')[22m
+
+
+      104 |         // Select a different journey via deep link
+      105 |         await page.goto('/journeys/cognitive-activation-hub');
+    > 106 |         await expect(page.locator('text=The Cognitive Activation Hub')).toBeVisible({ timeout: 10000 });
+          |                                                                         ^
+      107 |
+      108 |         // Verify we're in the new workspace
+      109 |         await expect(page.locator('button:has-text("Back to all journeys")')).toBeVisible();
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/journey-navigation-workflow.spec.ts:106:73
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-68299--between-different-journeys-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-68299--between-different-journeys-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/journey-navigation-workflo-68299--between-different-journeys-firefox/error-context.md
+
+  8 failed
+    [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:41:5 › Journey Navigation Workflow › should navigate from persona selection to workspace 
+    [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:61:5 › Journey Navigation Workflow › should navigate back from workspace to persona selection 
+    [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:78:5 › Journey Navigation Workflow › should maintain journey state when navigating between routes 
+    [chromium] › tests/e2e/journey-navigation-workflow.spec.ts:95:5 › Journey Navigation Workflow › should allow switching between different journeys 
+    [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:41:5 › Journey Navigation Workflow › should navigate from persona selection to workspace 
+    [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:61:5 › Journey Navigation Workflow › should navigate back from workspace to persona selection 
+    [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:78:5 › Journey Navigation Workflow › should maintain journey state when navigating between routes 
+    [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:95:5 › Journey Navigation Workflow › should allow switching between different journeys 
+  2 passed (47.0s)
+
+[36m  Serving HTML report at http://localhost:35995. Press Ctrl+C to quit.[39m
+Terminated

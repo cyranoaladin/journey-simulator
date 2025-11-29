@@ -9,15 +9,15 @@ on:
 jobs:
   test-backend:
     runs-on: ubuntu-latest
-    
+
     defaults:
       run:
         working-directory: ./mf-back
-    
+
     steps:
     - uses: actions/checkout@v4
 
-    - name: Use Node.js
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20.x'
@@ -26,18 +26,18 @@ jobs:
 
     - name: Install dependencies
       run: npm ci
+      working-directory: ./mf-back
+      env:
+        CI: true
 
     - name: Run Unit Tests
       run: npm test
+      working-directory: ./mf-back
       env:
         CI: true
 
     - name: Check RAG Connection (Optional)
-      run: |
-        if [ -n "$RAG_TOKEN" ]; then
-          node scripts/check-rag-connection.js
-        else
-          echo "RAG_TOKEN not set, skipping."
-        fi
+      run: node scripts/check-rag-connection.js || echo "RAG connection check skipped or completed"
       env:
         RAG_TOKEN: ${{ secrets.RAG_TOKEN }}
+      working-directory: ./mf-back

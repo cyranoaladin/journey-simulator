@@ -1,4 +1,5 @@
 const axios = require("axios");
+const { getRagSnippets } = require("../rag/ragClient");
 const {
     callGpt5,
     DEFAULT_LLM_MODEL,
@@ -94,52 +95,40 @@ class BaseAgent {
      * @returns {Promise<string>}
      */
     async retrieveRagContext(query, ctx) {
-        const ragUrl = process.env.RAG_SEARCH_URL || "https://rag-api.nexusreussite.academy/rag/query";
-        const token = process.env.RAG_API_KEY || "MoneyFactory_2025_Secure_Token_X9";
-        const domain = process.env.RAG_DOMAIN || this.getRagDomain(ctx);
+        if (!query) return { context: "", hits: [] };
+
+        const domain = ctx.trackId || "general";
 
         try {
             console.log(`[${this.name}] Querying RAG with: "${query.substring(0, 50)}..." (Domain: ${domain})`);
 
-            const response = await axios.post(
-                ragUrl,
-                {
-                    query: query,
-                    top_k: 5,
-                    filters: {
-                        domain: domain,
-                    },
-                },
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`,
-                    },
-                    timeout: 10000, // 10s timeout
-                }
-            );
+            const hits = await getRagSnippets({
+                query: query,
+                userContext: { id: ctx.userId },
+                // We might want to pass domain/collection if ragClient supports it, 
+                // but ragClient currently uses env RAG_COLLECTION. 
+                // For now, we rely on ragClient's logic.
+            });
 
-            const hits = response.data.hits || [];
             if (hits.length === 0) {
                 console.log(`[${this.name}] RAG returned 0 hits.`);
-                return "";
+                return { context: "", hits: [] };
             }
 
             const contextParts = hits.map((hit, index) => {
-                return `[Document ${index + 1}]\n${hit.document}`;
+                // ragClient returns { title, content }
+                return `[Document ${index + 1} - ${hit.title}]\n${hit.content}`;
             });
 
-            return contextParts.join("\n\n");
+            return {
+                context: contextParts.join("\n\n"),
+                hits: hits
+            };
 
         } catch (error) {
             console.error(`[${this.name}] RAG Error:`, error.message);
-            if (error.response) {
-                console.error("RAG Response Status:", error.response.status);
-                console.error("RAG Response Data:", error.response.data);
-            }
-            // RELAXED REQUIREMENT: Proceed without RAG if unavailable (for demo/local stability)
-            console.warn("Knowledge service unavailable. Continuing without RAG context.");
-            return "";
+            // ragClient handles fallback, so if we get here, it's a critical error
+            return { context: "", hits: [] };
         }
     }
 
@@ -153,9 +142,12 @@ class BaseAgent {
         // 1. Retrieve RAG Context
         const ragQuery = this.getRagQuery(ctx);
         let ragContext = "";
+        let ragSources = [];
 
         try {
-            ragContext = await this.retrieveRagContext(ragQuery, ctx);
+            const ragResult = await this.retrieveRagContext(ragQuery, ctx);
+            ragContext = ragResult.context;
+            ragSources = ragResult.hits;
         } catch (err) {
             // Propagate the error to block execution
             throw err;
@@ -211,6 +203,8 @@ class BaseAgent {
         return {
             rawMessage: message,
             payload,
+            sources: ragSources,
+            ...(typeof payload === 'object' && payload !== null ? payload : {})
         };
     }
 }

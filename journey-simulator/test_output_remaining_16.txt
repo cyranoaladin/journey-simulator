@@ -1,0 +1,12 @@
+
+Running 2 tests using 2 workers
+
+  ✓  2 [chromium] › tests/e2e/submit-mission.spec.ts:125:3 › Journey submit mission flow › step + submit shows evaluation and logs (4.3s)
+  ✓  1 [firefox] › tests/e2e/submit-mission.spec.ts:125:3 › Journey submit mission flow › step + submit shows evaluation and logs (6.7s)
+
+  2 passed (9.1s)
+
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report tests/e2e-report[39m
+[36m[39m

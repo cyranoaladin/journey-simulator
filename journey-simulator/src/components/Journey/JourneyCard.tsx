@@ -44,14 +44,24 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
       setIsLoading(true);
       setError(null);
 
-      // Set persona in store
-      setSelectedPersona(persona);
+      // Set persona in store only if no callback provided (otherwise let parent/URL handle it)
+      if (!onSelected) {
+        setSelectedPersona(persona);
+      }
 
       // Update user profile with selected persona in backend
-      await api.updateUserProfile({ persona: persona.id as any });
+      try {
+        await api.updateUserProfile({ persona: persona.id as any });
+      } catch (profileError) {
+        console.error('Failed to update user profile:', profileError);
+      }
 
       // Reload user progress to get latest data
-      await loadUserProgress();
+      try {
+        await loadUserProgress();
+      } catch (progressError) {
+        console.error('Failed to reload user progress:', progressError);
+      }
 
       onSelected?.();
     } catch (error) {

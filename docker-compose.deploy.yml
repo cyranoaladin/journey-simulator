@@ -1,0 +1,79 @@
+version: "3.9"
+
+services:
+  mfai-api:
+    container_name: mfai-api
+    build:
+      context: ./mf-back
+      dockerfile: Dockerfile
+      args:
+        INSTALL_DEV: "false"
+    command: npm start
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+      MONGO_URI: mongodb://mfai-mongo:27017/journey
+      API_BASE_URL: https://journey.mfai.app/api
+    env_file:
+      - .deploy.env
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./mf-back:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      mfai-mongo:
+        condition: service_healthy
+    restart: always
+
+  mfai-mongo:
+    container_name: mfai-mongo
+    image: mongo:6
+    restart: always
+    ports:
+      - "27018:27017"
+    volumes:
+      - mfai-mongo-data:/data/db
+    healthcheck:
+      test: [ "CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  mfai-postgres:
+    container_name: mfai-postgres
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: prisma
+      POSTGRES_USER: prisma
+      POSTGRES_PASSWORD: prisma
+    ports:
+      - "5435:5432"
+    volumes:
+      - mfai-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "prisma" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  mfai-web:
+    container_name: mfai-web
+    build:
+      context: ./journey-simulator
+      dockerfile: Dockerfile
+    environment:
+      VITE_API_BASE_URL: https://journey.mfai.app/api
+      VITE_RESOURCE_LIBRARY_BASE_URL: /documents
+    ports:
+      - "3003:80"
+    depends_on:
+      - mfai-api
+    restart: always
+
+volumes:
+  mfai-mongo-data:
+  mfai-postgres-data:
