@@ -28,7 +28,6 @@ import DAOVoteModal from '../DAOVoteModal';
 import JourneyCompletedPage from '../JourneyCompletedPage';
 
 const JourneyWorkspace = () => {
-  console.log('[JourneyWorkspace] RENDERED');
   const {
     selectedPersona,
     userProgress,
@@ -45,7 +44,7 @@ const JourneyWorkspace = () => {
   } = useJourneyStore();
 
   useEffect(() => {
-    // console.log('[JourneyWorkspace] MOUNTED');
+    console.log('[JourneyWorkspace] MOUNTED');
   }, []);
 
   const [proofModalData, setProofModalData] = useState<any>(null);
@@ -66,6 +65,7 @@ const JourneyWorkspace = () => {
   }
 
   const activePhase = selectedPersona.phases[activePhaseIndex] || selectedPersona.phases[0];
+  console.log('[JourneyWorkspace] Rendering phase:', activePhase?.title);
 
   const handleCompletePhase = () => {
     // Capture current phase data BEFORE updating state
@@ -94,6 +94,7 @@ const JourneyWorkspace = () => {
   };
 
   const handleRunInteractiveStep = async () => {
+    if (isStepLoading) return;
     if (!activePhase) return;
 
     try {
@@ -103,7 +104,7 @@ const JourneyWorkspace = () => {
         userInput: ''
       });
     } catch (error) {
-      // console.error('Error running interactive step:', error);
+      console.error('Error running interactive step:', error);
     }
   };
 
@@ -332,7 +333,9 @@ const JourneyWorkspace = () => {
               <p className="text-white/60">Zyno is orchestrating your session...</p>
             </div>
           ) : lastStep ? (
-            <UIBlocksRenderer response={lastStep as JourneyStepResponse} />
+            <>
+              <UIBlocksRenderer response={lastStep as JourneyStepResponse} />
+            </>
           ) : (
             <div className="animate-fadeIn">
               <PhaseDetails phase={activePhase} />

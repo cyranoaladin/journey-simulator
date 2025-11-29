@@ -32,7 +32,7 @@ interface FavoritesState {
     isFavorite: (resourceId: string) => boolean;
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:3002';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://journey.mfai.app/api';
 
 export const useFavoritesStore = create<FavoritesState>()(
     persist(

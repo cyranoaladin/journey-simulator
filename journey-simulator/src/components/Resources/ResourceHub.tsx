@@ -14,7 +14,7 @@ import {
 
 const KNOWLEDGE_BASE_URL =
   import.meta.env.VITE_RESOURCE_LIBRARY_BASE_URL ??
-  'https://cdn.moneyfactory.ai/knowledge-vault'
+  '/documents'
 
 interface Resource {
   id: string
@@ -33,7 +33,7 @@ const resourceLibrary: Resource[] = [
     summary: 'Complete architecture of the Money Factory AI protocol and Zyno agents.',
     tags: ['Architecture', 'Protocol', 'Foundations'],
     format: 'PDF',
-    slug: 'mfai-system-blueprint.pdf',
+    slug: 'mfai-system-blueprint.html',
     minutes: 18
   },
   {
@@ -42,7 +42,7 @@ const resourceLibrary: Resource[] = [
     summary: 'Strategic vision, economic primitives, and MFAI deployment roadmaps.',
     tags: ['Strategy', 'Tokenomics', 'Protocol'],
     format: 'PDF',
-    slug: 'mfai-protocol-whitepaper-en.pdf',
+    slug: 'mfai-protocol-whitepaper-en.html',
     minutes: 22
   },
   {
@@ -51,7 +51,7 @@ const resourceLibrary: Resource[] = [
     summary: 'Detailed pathway to transform a Web2 team into autonomous Web3 builders.',
     tags: ['Onboarding', 'Execution', 'Playbook'],
     format: 'Guide',
-    slug: 'web2-to-web3-activation-guide.pdf',
+    slug: 'web2-to-web3-activation-guide.html',
     minutes: 14
   },
   {
@@ -60,7 +60,7 @@ const resourceLibrary: Resource[] = [
     summary: 'Notion template to frame supply, utility, and token distribution scenarios.',
     tags: ['Tokenomics', 'Templates'],
     format: 'Template',
-    slug: 'token-strategy-sprint-template.zip',
+    slug: 'token-strategy-sprint-template.html',
     minutes: 9
   },
   {
@@ -69,7 +69,7 @@ const resourceLibrary: Resource[] = [
     summary: 'Operational checklist to register voters, quorum, and DAO roles.',
     tags: ['DAO', 'Governance', 'Execution'],
     format: 'Playbook',
-    slug: 'dao-launch-starter-kit.pdf',
+    slug: 'dao-launch-starter-kit.html',
     minutes: 11
   },
   {
@@ -78,7 +78,7 @@ const resourceLibrary: Resource[] = [
     summary: 'Slide-by-slide structure to showcase MFAI impact and agent KPIs.',
     tags: ['Fundraising', 'Storytelling'],
     format: 'Template',
-    slug: 'pitch-deck-narrative-framework.pptx',
+    slug: 'pitch-deck-narrative-framework.html',
     minutes: 8
   },
   {
@@ -87,7 +87,7 @@ const resourceLibrary: Resource[] = [
     summary: 'Procedure to prepare, vectorize, and feed cognitive mesh documents.',
     tags: ['RAG', 'Agents', 'Data'],
     format: 'Guide',
-    slug: 'rag-ingestion-playbook.pdf',
+    slug: 'rag-ingestion-playbook.html',
     minutes: 16
   },
   {
@@ -96,7 +96,7 @@ const resourceLibrary: Resource[] = [
     summary: 'AEPO/AECO framework to capture, score, and recycle builder feedback.',
     tags: ['Analytics', 'Agents', 'Playbook'],
     format: 'Guide',
-    slug: 'mission-feedback-loops.pdf',
+    slug: 'mission-feedback-loops.html',
     minutes: 7
   }
 ]

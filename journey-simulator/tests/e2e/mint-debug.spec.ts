@@ -84,6 +84,8 @@ test.describe('Mint flow (frontend debug)', () => {
     await page.route('**/journey/reset-progress', async (route) => {
       await route.fulfill({ status: 204 })
     })
+
+    page.on('console', msg => console.log(`[BROWSER] ${msg.text()}`));
   })
 
   test('simulate and execute show tx signature and explorer link', async ({ page }) => {
@@ -94,10 +96,21 @@ test.describe('Mint flow (frontend debug)', () => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, tx: { txSig: 'SIG_E2E' } }) })
     })
 
+    await page.route('**/user/nft-certificates', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true }) })
+    })
+
     await page.goto('/debug/mint')
 
     // Click mint button
-    await page.getByRole('button', { name: 'Mint Proof-of-Skill™ NFT' }).click()
+    // Click mint button
+    await page.getByRole('button', { name: 'Mint Proof-of-Skill™ NFT' }).dispatchEvent('click')
+
+    // Check for potential error
+    const errorMsg = page.locator('.text-red-400');
+    if (await errorMsg.isVisible()) {
+      console.log('Minting Error:', await errorMsg.textContent());
+    }
 
     // Ensure we see the tx signature
     await expect(page.getByText(/Transaction Signature/)).toBeVisible()

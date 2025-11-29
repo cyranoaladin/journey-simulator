@@ -120,3 +120,4 @@ Running 10 tests using 8 workers
   7 passed (42.0s)
 
 [36m  Serving HTML report at http://localhost:38441. Press Ctrl+C to quit.[39m
+Terminated

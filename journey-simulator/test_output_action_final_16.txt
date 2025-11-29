@@ -1,0 +1,191 @@
+
+Running 4 tests using 4 workers
+
+[browser] [vite] connecting...
+[browser] [vite] connecting...
+[browser] [vite] connected.
+[browser] [vite] connected.
+[browser] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[browser] AuthProvider: render
+[browser] AuthProvider: render
+[browser] ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys/e2e-persona}
+[browser] ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys/e2e-persona}
+[browser] AuthContext: checkAuthStatus started
+[browser] AuthContext: token present? true refresh token present? true
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/user/profile
+[browser] AuthContext: checkAuthStatus started
+[browser] AuthContext: token present? true refresh token present? true
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/user/profile
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/user-progress
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/user-progress
+[browser] AuthProvider: render
+[browser] AuthProvider: render
+[browser] ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys/e2e-persona}
+[browser] ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys/e2e-persona}
+[browser] AuthContext: setting isLoading false
+[browser] AuthContext: setting isLoading false
+[browser] AuthProvider: render
+[browser] AuthProvider: render
+[browser] ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys/e2e-persona}
+[browser] ProtectedRoute: rendering children
+[browser] ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys/e2e-persona}
+[browser] ProtectedRoute: rendering children
+[browser] Layout: render
+[browser] Layout: render
+[browser] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[browser] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/api/agents/logs?journeyId=4475864f-3102-47e3-bf54-236431cc8c63&limit=20
+[browser] JourneysPage: useEffect triggered
+[browser] JourneysPage: loading progress...
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/user-progress
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/api/agents/logs?journeyId=4475864f-3102-47e3-bf54-236431cc8c63&limit=20
+[browser] JourneysPage: useEffect triggered
+[browser] JourneysPage: loading progress...
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/user-progress
+[browser] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[browser] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[browser] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] JourneysPage: progress loaded successfully
+[browser] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[browser] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] JourneysPage: progress loaded successfully
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+[browser] [JourneyWorkspace] handleRunInteractiveStep called
+[browser] [JourneyWorkspace] Calling runInteractiveStepDebug {phaseId: e2e-phase, trackId: e2e-persona}
+[browser] [Store] runInteractiveStepDebug START
+[browser] [Store] Fetching step: http://127.0.0.1:3000/journey/4475864f-3102-47e3-bf54-236431cc8c63/step
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/4475864f-3102-47e3-bf54-236431cc8c63/step
+[browser] [E2E Fetch Patch] Intercepting step request: http://127.0.0.1:3000/journey/4475864f-3102-47e3-bf54-236431cc8c63/step
+[browser] [E2E Fetch Patch] Request Body: {"phaseId":"e2e-phase","trackId":"e2e-persona","userInput":"","language":"en","mode":"discovery","tone":"pedagogical","journeyState":{"xp":0,"completed":[]}}
+[browser] [E2E Fetch Patch] Extracted Action ID: null
+[browser] [E2E Fetch Patch] Returning mock initial step
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] runInteractiveStepDebug completed
+[browser] [ActionSuggestions] onChoose called go_next
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/4475864f-3102-47e3-bf54-236431cc8c63/step
+[browser] [E2E Fetch Patch] Intercepting step request: http://127.0.0.1:3000/journey/4475864f-3102-47e3-bf54-236431cc8c63/step
+[browser] [E2E Fetch Patch] Request Body: {"phaseId":"learn","trackId":"e2e-persona","userInput":"action_id=go_next","actionId":"go_next","language":"fr","mode":"builder","tone":"pedagogical","journeyState":{"totalXP":0,"nfts":[],"nftMints":[],"passLevel":"Free","mfaiTokens":0,"stakedMfai":0,"walletConnected":false,"completedPhases":[],"currentPersona":"e2e-persona","votingPower":0,"daoProposals":0,"testnetAirdropClaimed":false,"socialShareCount":0,"shareHistory":[]}}
+[browser] [E2E Fetch Patch] Extracted Action ID: go_next
+[browser] [E2E Fetch Patch] Returning mock action: go_next
+[browser:error] ActionSuggestions step failed Error: step failed: 500
+    at onChoose (http://127.0.0.1:5174/src/components/UIBlocks/UIBlocksRenderer.tsx:1006:15)
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+  ✓  3 [chromium] › tests/e2e/action-suggestions.spec.ts:175:3 › ActionSuggestions flow › successfully triggers next step and updates UI (5.9s)
+  ✓  4 [chromium] › tests/e2e/action-suggestions.spec.ts:220:3 › ActionSuggestions flow › shows error toast when suggestion fails (5.9s)
+[browser] AuthProvider: render
+[browser] AuthProvider: render
+[browser] ProtectedRoute: render JSHandle@object
+[browser] ProtectedRoute: render JSHandle@object
+[browser] AuthContext: checkAuthStatus started
+[browser] AuthContext: token present? true refresh token present? true
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/user/profile
+[browser] AuthContext: checkAuthStatus started
+[browser] AuthContext: token present? true refresh token present? true
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/user/profile
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/user-progress
+[browser] AuthProvider: render
+[browser] AuthProvider: render
+[browser] ProtectedRoute: render JSHandle@object
+[browser] ProtectedRoute: render JSHandle@object
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/user-progress
+[browser] AuthProvider: render
+[browser] AuthProvider: render
+[browser] ProtectedRoute: render JSHandle@object
+[browser] ProtectedRoute: render JSHandle@object
+[browser] AuthContext: setting isLoading false
+[browser] AuthProvider: render
+[browser] AuthProvider: render
+[browser] ProtectedRoute: render JSHandle@object
+[browser] ProtectedRoute: rendering children
+[browser] ProtectedRoute: render JSHandle@object
+[browser] ProtectedRoute: rendering children
+[browser] Layout: render
+[browser] Layout: render
+[browser] Sidebar: render JSHandle@object
+[browser] Sidebar: render JSHandle@object
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/api/agents/logs?journeyId=70173902-ed26-43a7-a97c-08a74d26b2ad&limit=20
+[browser] JourneysPage: useEffect triggered
+[browser] JourneysPage: loading progress...
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/user-progress
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/api/agents/logs?journeyId=70173902-ed26-43a7-a97c-08a74d26b2ad&limit=20
+[browser] JourneysPage: useEffect triggered
+[browser] JourneysPage: loading progress...
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/user-progress
+[browser] Sidebar: render JSHandle@object
+[browser] Sidebar: render JSHandle@object
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] Sidebar: render JSHandle@object
+[browser] Sidebar: render JSHandle@object
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] AuthContext: setting isLoading false
+[browser] Sidebar: render JSHandle@object
+[browser] Sidebar: render JSHandle@object
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] JourneysPage: progress loaded successfully
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] Sidebar: render JSHandle@object
+[browser] Sidebar: render JSHandle@object
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] JourneysPage: progress loaded successfully
+[browser] [JourneyWorkspace] handleRunInteractiveStep called
+[browser] [JourneyWorkspace] Calling runInteractiveStepDebug JSHandle@object
+[browser] [Store] runInteractiveStepDebug START
+[browser] [Store] Fetching step: http://127.0.0.1:3000/journey/70173902-ed26-43a7-a97c-08a74d26b2ad/step
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/70173902-ed26-43a7-a97c-08a74d26b2ad/step
+[browser] [E2E Fetch Patch] Intercepting step request: http://127.0.0.1:3000/journey/70173902-ed26-43a7-a97c-08a74d26b2ad/step
+[browser] [E2E Fetch Patch] Request Body: {"phaseId":"e2e-phase","trackId":"e2e-persona","userInput":"","language":"en","mode":"discovery","tone":"pedagogical","journeyState":{"xp":0,"completed":[]}}
+[browser] [E2E Fetch Patch] Extracted Action ID: null
+[browser] [E2E Fetch Patch] Returning mock initial step
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] runInteractiveStepDebug completed
+[browser:error] ActionSuggestions step failed Error
+[browser] [ActionSuggestions] onChoose called go_next
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/70173902-ed26-43a7-a97c-08a74d26b2ad/step
+[browser] [E2E Fetch Patch] Intercepting step request: http://127.0.0.1:3000/journey/70173902-ed26-43a7-a97c-08a74d26b2ad/step
+[browser] [E2E Fetch Patch] Request Body: {"phaseId":"learn","trackId":"e2e-persona","userInput":"action_id=go_next","actionId":"go_next","language":"fr","mode":"builder","tone":"pedagogical","journeyState":{"totalXP":0,"nfts":[],"nftMints":[],"passLevel":"Free","mfaiTokens":0,"stakedMfai":0,"walletConnected":false,"completedPhases":[],"currentPersona":"e2e-persona","votingPower":0,"daoProposals":0,"testnetAirdropClaimed":false,"socialShareCount":0,"shareHistory":[]}}
+[browser] [E2E Fetch Patch] Extracted Action ID: go_next
+[browser] [E2E Fetch Patch] Returning mock action: go_next
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+  ✓  1 [firefox] › tests/e2e/action-suggestions.spec.ts:220:3 › ActionSuggestions flow › shows error toast when suggestion fails (8.8s)
+  ✓  2 [firefox] › tests/e2e/action-suggestions.spec.ts:175:3 › ActionSuggestions flow › successfully triggers next step and updates UI (8.6s)
+
+  4 passed (11.5s)
+
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report tests/e2e-report[39m
+[36m[39m

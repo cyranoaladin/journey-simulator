@@ -1,0 +1,49 @@
+
+Running 5 tests using 5 workers
+
+  ✓  1 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:85:5 › Journey Navigation Workflow › should navigate back from workspace to persona selection (10.5s)
+  ✓  5 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:64:5 › Journey Navigation Workflow › should navigate from persona selection to workspace (13.0s)
+  ✓  2 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:147:5 › Journey Navigation Workflow › should allow switching between different journeys (16.7s)
+  ✓  4 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:164:5 › Journey Navigation Workflow › should handle browser back/forward navigation (24.9s)
+  ✘  3 [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:105:5 › Journey Navigation Workflow › should maintain journey state when navigating between routes (28.9s)
+
+
+  1) [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:105:5 › Journey Navigation Workflow › should maintain journey state when navigating between routes 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('button', { name: /Back to all journeys/i })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('button', { name: /Back to all journeys/i })[22m
+
+
+      142 |         // 5. Re-select the persona and verify state is maintained (e.g. still in workspace)
+      143 |         await page.locator('text=The Capital Foundry').click();
+    > 144 |         await expect(page.getByRole('button', { name: /Back to all journeys/i })).toBeVisible();
+          |                                                                                   ^
+      145 |     });
+      146 |
+      147 |     test('should allow switching between different journeys', async ({ page }) => {
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/journey-navigation-workflow.spec.ts:144:83
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-980a2-n-navigating-between-routes-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/journey-navigation-workflo-980a2-n-navigating-between-routes-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/journey-navigation-workflo-980a2-n-navigating-between-routes-firefox/error-context.md
+
+  1 failed
+    [firefox] › tests/e2e/journey-navigation-workflow.spec.ts:105:5 › Journey Navigation Workflow › should maintain journey state when navigating between routes 
+  4 passed (32.5s)
+
+[36m  Serving HTML report at http://localhost:35171. Press Ctrl+C to quit.[39m
+Terminated

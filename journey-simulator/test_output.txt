@@ -76,3 +76,4 @@ Running 2 tests using 2 workers
     [firefox] › tests/e2e/growth-agent.spec.ts:138:5 › Growth Agent Integration › should display Growth Agent evaluation 
 
 [36m  Serving HTML report at http://localhost:37389. Press Ctrl+C to quit.[39m
+Terminated

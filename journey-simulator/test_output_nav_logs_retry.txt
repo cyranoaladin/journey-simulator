@@ -1438,3 +1438,4 @@ BROWSER LOG: JourneysPage: progress loaded successfully
   8 passed (43.4s)
 
 [36m  Serving HTML report at http://localhost:36187. Press Ctrl+C to quit.[39m
+Terminated

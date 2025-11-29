@@ -119,3 +119,4 @@ Button enabled: [33mtrue[39m
     [firefox] › tests/e2e/growth-agent.spec.ts:138:5 › Growth Agent Integration › should display Growth Agent evaluation 
 
 [36m  Serving HTML report at http://localhost:37487. Press Ctrl+C to quit.[39m
+Terminated

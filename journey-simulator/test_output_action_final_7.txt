@@ -1,0 +1,151 @@
+
+Running 4 tests using 4 workers
+
+[browser] [vite] connecting...
+[browser:error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[browser] Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[browser] [vite] connected.
+[browser] [vite] connecting...
+[browser] [vite] connected.
+  ✘  3 [chromium] › tests/e2e/action-suggestions.spec.ts:215:3 › ActionSuggestions flow › shows error toast when suggestion fails (7.8s)
+  ✘  2 [chromium] › tests/e2e/action-suggestions.spec.ts:175:3 › ActionSuggestions flow › successfully triggers next step and updates UI (7.9s)
+  ✘  1 [firefox] › tests/e2e/action-suggestions.spec.ts:175:3 › ActionSuggestions flow › successfully triggers next step and updates UI (9.9s)
+  ✘  4 [firefox] › tests/e2e/action-suggestions.spec.ts:215:3 › ActionSuggestions flow › shows error toast when suggestion fails (9.6s)
+
+
+  1) [chromium] › tests/e2e/action-suggestions.spec.ts:175:3 › ActionSuggestions flow › successfully triggers next step and updates UI 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('heading', { name: /Current Phase/i })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('heading', { name: /Current Phase/i })[22m
+
+
+      203 |
+      204 |     await page.goto('/journeys/e2e-persona')
+    > 205 |     await expect(page.getByRole('heading', { name: /Current Phase/i })).toBeVisible()
+          |                                                                         ^
+      206 |     await page.getByRole('button', { name: 'Start / Continue' }).click({ force: true })
+      207 |
+      208 |     // Click the suggestion
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/action-suggestions.spec.ts:205:73
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-a1d66-rs-next-step-and-updates-UI-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-a1d66-rs-next-step-and-updates-UI-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/action-suggestions-ActionS-a1d66-rs-next-step-and-updates-UI-chromium/error-context.md
+
+  2) [chromium] › tests/e2e/action-suggestions.spec.ts:215:3 › ActionSuggestions flow › shows error toast when suggestion fails 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('heading', { name: /Current Phase/i })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('heading', { name: /Current Phase/i })[22m
+
+
+      249 |
+      250 |     await page.goto('/journeys/e2e-persona')
+    > 251 |     await expect(page.getByRole('heading', { name: /Current Phase/i })).toBeVisible()
+          |                                                                         ^
+      252 |     await page.getByRole('button', { name: 'Start / Continue' }).click({ force: true })
+      253 |
+      254 |     // Click the failing suggestion
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/action-suggestions.spec.ts:251:73
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-4e7a4-toast-when-suggestion-fails-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-4e7a4-toast-when-suggestion-fails-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/action-suggestions-ActionS-4e7a4-toast-when-suggestion-fails-chromium/error-context.md
+
+  3) [firefox] › tests/e2e/action-suggestions.spec.ts:175:3 › ActionSuggestions flow › successfully triggers next step and updates UI 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('heading', { name: /Current Phase/i })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('heading', { name: /Current Phase/i })[22m
+
+
+      203 |
+      204 |     await page.goto('/journeys/e2e-persona')
+    > 205 |     await expect(page.getByRole('heading', { name: /Current Phase/i })).toBeVisible()
+          |                                                                         ^
+      206 |     await page.getByRole('button', { name: 'Start / Continue' }).click({ force: true })
+      207 |
+      208 |     // Click the suggestion
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/action-suggestions.spec.ts:205:73
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-a1d66-rs-next-step-and-updates-UI-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-a1d66-rs-next-step-and-updates-UI-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [firefox] › tests/e2e/action-suggestions.spec.ts:215:3 › ActionSuggestions flow › shows error toast when suggestion fails 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('heading', { name: /Current Phase/i })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('heading', { name: /Current Phase/i })[22m
+
+
+      249 |
+      250 |     await page.goto('/journeys/e2e-persona')
+    > 251 |     await expect(page.getByRole('heading', { name: /Current Phase/i })).toBeVisible()
+          |                                                                         ^
+      252 |     await page.getByRole('button', { name: 'Start / Continue' }).click({ force: true })
+      253 |
+      254 |     // Click the failing suggestion
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/action-suggestions.spec.ts:251:73
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-4e7a4-toast-when-suggestion-fails-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-4e7a4-toast-when-suggestion-fails-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4 failed
+    [chromium] › tests/e2e/action-suggestions.spec.ts:175:3 › ActionSuggestions flow › successfully triggers next step and updates UI 
+    [chromium] › tests/e2e/action-suggestions.spec.ts:215:3 › ActionSuggestions flow › shows error toast when suggestion fails 
+    [firefox] › tests/e2e/action-suggestions.spec.ts:175:3 › ActionSuggestions flow › successfully triggers next step and updates UI 
+    [firefox] › tests/e2e/action-suggestions.spec.ts:215:3 › ActionSuggestions flow › shows error toast when suggestion fails 
+
+[36m  Serving HTML report at http://localhost:36227. Press Ctrl+C to quit.[39m
+Terminated

@@ -1,6 +1,5 @@
 // API base URL - configurable via environment variable for different deployments
-export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:3002';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://journey.mfai.app/api';
 
 export const SOLANA_API_BASE_URL =
   import.meta.env.VITE_SOLANA_API_BASE_URL || 'http://127.0.0.1:3001';
@@ -146,6 +145,7 @@ const request = async <T>(
 ): Promise<T> => {
   // Mock response for demo mode
   const token = localStorage.getItem('accessToken');
+  console.log(`[API] Requesting: ${path} (Base: ${API_BASE_URL})`);
   if (token === 'demo-token') {
     console.log(`[Demo Mode] Mocking request to ${path}`);
 
@@ -376,6 +376,42 @@ const request = async <T>(
       } as unknown as T;
     }
 
+    if (path.includes('/admin/agent-logs') || path.includes('/api/agents/logs')) {
+      return {
+        logs: [
+          { id: '1', timestamp: new Date().toISOString(), agentId: 'zyno', message: 'System initialized', level: 'info' },
+          { id: '2', timestamp: new Date().toISOString(), agentId: 'zyno', message: 'Monitoring active', level: 'info' }
+        ]
+      } as unknown as T;
+    }
+
+    if (path.includes('/dao/config')) {
+      return {
+        quorumPercent: 66,
+        totalVotingPower: 10000,
+        voters: [
+          { id: 'v1', name: 'Alice', weight: 100 },
+          { id: 'v2', name: 'Bob', weight: 50 }
+        ]
+      } as unknown as T;
+    }
+
+    if (path.includes('/dao/proposals')) {
+      return {
+        proposals: [
+          {
+            id: 'p1',
+            title: 'Demo Proposal 1',
+            description: 'This is a demo proposal',
+            status: 'active',
+            votes: { yes: 10, no: 2 },
+            quorumMet: false,
+            voterDetails: {}
+          }
+        ]
+      } as unknown as T;
+    }
+
     // Default success for other endpoints in demo mode
     return { success: true } as unknown as T;
   }
@@ -386,6 +422,7 @@ const request = async <T>(
       ...(options.headers || {}),
     },
   });
+  console.log(`[API] Response for ${path}: ${response.status}`);
 
   if (response.status === 401 && retryOnUnauthorized) {
     // Attempt token refresh once

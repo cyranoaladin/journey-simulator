@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 
+
 test.describe('Demo Mode Workflow', () => {
     test.beforeEach(async ({ page }) => {
         // Go to home page
@@ -24,9 +25,17 @@ test.describe('Demo Mode Workflow', () => {
         await expect(demoButton).toBeVisible();
         await demoButton.click();
 
+        // Verify redirection to journeys list
+        await expect(page).toHaveURL(/\/journeys/);
+
+        // Select the Cognitive Activation Hub journey
+        await page.getByRole('button', { name: /Launch with Zyno/i }).first().click();
+
         // Verify redirection to journey workspace
-        await expect(page).toHaveURL(/\/journey/);
-        await expect(page.getByRole('heading', { name: 'The Cognitive Activation Hub Journey' })).toBeVisible();
+        await expect(page).toHaveURL(/\/journeys\/cognitive-activation-hub/);
+        await page.waitForTimeout(2000); // Wait for workspace to fully render
+
+        await expect(page.getByText('The Cognitive Activation Hub Journey')).toBeVisible();
 
         // --- PHASE 1: Cognition Ignition ---
         await expect(page.getByRole('heading', { name: 'Cognition Ignition', level: 2 })).toBeVisible();

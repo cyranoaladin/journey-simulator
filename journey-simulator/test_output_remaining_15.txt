@@ -1,0 +1,46 @@
+
+Running 2 tests using 2 workers
+
+  ✓  1 [chromium] › tests/e2e/submit-mission.spec.ts:125:3 › Journey submit mission flow › step + submit shows evaluation and logs (5.6s)
+  ✘  2 [firefox] › tests/e2e/submit-mission.spec.ts:125:3 › Journey submit mission flow › step + submit shows evaluation and logs (17.4s)
+
+
+  1) [firefox] › tests/e2e/submit-mission.spec.ts:125:3 › Journey submit mission flow › step + submit shows evaluation and logs 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/Score:/)
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for getByText(/Score:/)[22m
+
+
+      178 |
+      179 |     // Expect evaluation block
+    > 180 |     await expect(page.getByText(/Score:/)).toBeVisible({ timeout: 10000 })
+          |                                            ^
+      181 |     // Activity feed should render mocked logs
+      182 |     await expect(page.getByText(/Agent Activity/).first()).toBeVisible()
+      183 |   })
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/submit-mission.spec.ts:180:44
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-firefox/error-context.md
+
+  1 failed
+    [firefox] › tests/e2e/submit-mission.spec.ts:125:3 › Journey submit mission flow › step + submit shows evaluation and logs 
+  1 passed (19.8s)
+
+[36m  Serving HTML report at http://localhost:37199. Press Ctrl+C to quit.[39m
+Terminated

@@ -1,0 +1,203 @@
+
+Running 4 tests using 4 workers
+
+[BROWSER] [vite] connecting...
+[BROWSER] [vite] connected.
+[BROWSER] [vite] connecting...
+[BROWSER] [vite] connected.
+[BROWSER] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /debug/mint}
+[BROWSER] ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /debug/mint}
+[BROWSER] AuthContext: checkAuthStatus started
+[BROWSER] AuthContext: token present? true refresh token present? true
+[BROWSER] AuthContext: checkAuthStatus started
+[BROWSER] AuthContext: token present? true refresh token present? true
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /debug/mint}
+[BROWSER] ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /debug/mint}
+[BROWSER] AuthContext: setting isLoading false
+[BROWSER] AuthContext: setting isLoading false
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /debug/mint}
+[BROWSER] ProtectedRoute: rendering children
+[BROWSER] ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /debug/mint}
+[BROWSER] ProtectedRoute: rendering children
+[BROWSER] Layout: render
+[BROWSER] Layout: render
+[BROWSER] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[BROWSER] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[BROWSER] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[BROWSER] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+Minting Error: Logout
+[BROWSER] Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] ProtectedRoute: render JSHandle@object
+[BROWSER] ProtectedRoute: render JSHandle@object
+[BROWSER] AuthContext: checkAuthStatus started
+[BROWSER] AuthContext: token present? true refresh token present? true
+[BROWSER] AuthContext: checkAuthStatus started
+[BROWSER] AuthContext: token present? true refresh token present? true
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] ProtectedRoute: render JSHandle@object
+[BROWSER] ProtectedRoute: render JSHandle@object
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] ProtectedRoute: render JSHandle@object
+[BROWSER] ProtectedRoute: render JSHandle@object
+[BROWSER] AuthContext: setting isLoading false
+[BROWSER] AuthContext: setting isLoading false
+[BROWSER] AuthProvider: render
+[BROWSER] AuthProvider: render
+[BROWSER] ProtectedRoute: render JSHandle@object
+[BROWSER] ProtectedRoute: rendering children
+[BROWSER] ProtectedRoute: render JSHandle@object
+[BROWSER] ProtectedRoute: rendering children
+[BROWSER] Layout: render
+[BROWSER] Layout: render
+[BROWSER] Sidebar: render JSHandle@object
+[BROWSER] Sidebar: render JSHandle@object
+[BROWSER] Sidebar: render JSHandle@object
+[BROWSER] Sidebar: render JSHandle@object
+Minting Error: Logout
+  ✘  4 [chromium] › tests/e2e/mint-debug.spec.ts:91:3 › Mint flow (frontend debug) › simulate and execute show tx signature and explorer link (10.2s)
+  ✘  1 [firefox] › tests/e2e/mint-debug.spec.ts:91:3 › Mint flow (frontend debug) › simulate and execute show tx signature and explorer link (13.2s)
+  ✘  2 [chromium] › tests/e2e/submit-mission.spec.ts:102:3 › Journey submit mission flow › step + submit shows evaluation and logs (30.2s)
+  ✘  3 [firefox] › tests/e2e/submit-mission.spec.ts:102:3 › Journey submit mission flow › step + submit shows evaluation and logs (30.3s)
+
+
+  1) [chromium] › tests/e2e/mint-debug.spec.ts:91:3 › Mint flow (frontend debug) › simulate and execute show tx signature and explorer link 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/Transaction Signature/)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/Transaction Signature/)[22m
+
+
+      110 |
+      111 |     // Ensure we see the tx signature
+    > 112 |     await expect(page.getByText(/Transaction Signature/)).toBeVisible()
+          |                                                           ^
+      113 |     await expect(page.getByTestId('mint-tx-signature')).toHaveText('SIG_E2E')
+      114 |
+      115 |     // Open explorer link
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/mint-debug.spec.ts:112:59
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/mint-debug-Mint-flow-front-5fbc1-signature-and-explorer-link-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/mint-debug-Mint-flow-front-5fbc1-signature-and-explorer-link-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/mint-debug-Mint-flow-front-5fbc1-signature-and-explorer-link-chromium/error-context.md
+
+  2) [chromium] › tests/e2e/submit-mission.spec.ts:102:3 › Journey submit mission flow › step + submit shows evaluation and logs 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.fill: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[placeholder*="http"]').first()[22m
+
+
+      147 |     // Fill mission input (link) and submit
+      148 |     const input = page.locator('input[placeholder*="http"]').first()
+    > 149 |     await input.fill('https://example.com')
+          |                 ^
+      150 |     await page.getByRole('button', { name: /Submit Mission|Soumettre/i }).click()
+      151 |
+      152 |     // Expect evaluation block
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/submit-mission.spec.ts:149:17
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-chromium/error-context.md
+
+  3) [firefox] › tests/e2e/mint-debug.spec.ts:91:3 › Mint flow (frontend debug) › simulate and execute show tx signature and explorer link 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/Transaction Signature/)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByText(/Transaction Signature/)[22m
+
+
+      110 |
+      111 |     // Ensure we see the tx signature
+    > 112 |     await expect(page.getByText(/Transaction Signature/)).toBeVisible()
+          |                                                           ^
+      113 |     await expect(page.getByTestId('mint-tx-signature')).toHaveText('SIG_E2E')
+      114 |
+      115 |     // Open explorer link
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/mint-debug.spec.ts:112:59
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/mint-debug-Mint-flow-front-5fbc1-signature-and-explorer-link-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/mint-debug-Mint-flow-front-5fbc1-signature-and-explorer-link-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/mint-debug-Mint-flow-front-5fbc1-signature-and-explorer-link-firefox/error-context.md
+
+  4) [firefox] › tests/e2e/submit-mission.spec.ts:102:3 › Journey submit mission flow › step + submit shows evaluation and logs 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.fill: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[placeholder*="http"]').first()[22m
+
+
+      147 |     // Fill mission input (link) and submit
+      148 |     const input = page.locator('input[placeholder*="http"]').first()
+    > 149 |     await input.fill('https://example.com')
+          |                 ^
+      150 |     await page.getByRole('button', { name: /Submit Mission|Soumettre/i }).click()
+      151 |
+      152 |     // Expect evaluation block
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/submit-mission.spec.ts:149:17
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/submit-mission-Journey-sub-5f382-t-shows-evaluation-and-logs-firefox/error-context.md
+
+  4 failed
+    [chromium] › tests/e2e/mint-debug.spec.ts:91:3 › Mint flow (frontend debug) › simulate and execute show tx signature and explorer link 
+    [chromium] › tests/e2e/submit-mission.spec.ts:102:3 › Journey submit mission flow › step + submit shows evaluation and logs 
+    [firefox] › tests/e2e/mint-debug.spec.ts:91:3 › Mint flow (frontend debug) › simulate and execute show tx signature and explorer link 
+    [firefox] › tests/e2e/submit-mission.spec.ts:102:3 › Journey submit mission flow › step + submit shows evaluation and logs 
+
+[36m  Serving HTML report at http://localhost:36505. Press Ctrl+C to quit.[39m
+Terminated

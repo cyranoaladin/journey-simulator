@@ -54,7 +54,7 @@ export default function ZynoChat({ className = '' }: ZynoChatProps) {
 
     try {
       const id = ensureApiJourneyId();
-      const base = (import.meta as any).env?.VITE_API_BASE_URL || "http://127.0.0.1:3000";
+      const base = (import.meta as any).env?.VITE_API_BASE_URL || "https://journey.mfai.app/api";
 
       const response = await fetch(`${base}/api/journeys/${id}/step`, {
         method: 'POST',

@@ -203,7 +203,8 @@ BROWSER LOG: Fetching access pass holders from backend...
 BROWSER LOG: Journey Effect: journeyId: undefined selectedPersona: undefined
 BROWSER LOG: JourneysPage: progress loaded successfully
 BROWSER LOG: JourneysPage: progress loaded successfully
-BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
+BROWSER LOG: JourneysPage Render: selectedPersona: cognitivTerminated
+n-hub
 BROWSER LOG: JourneysPage Render: selectedPersona: cognitive-activation-hub
 BROWSER LOG: [JourneyWorkspace] RENDERED
 BROWSER LOG: [JourneyWorkspace] RENDERED
@@ -1524,3 +1525,4 @@ BROWSER LOG: [JourneyWorkspace] RENDERED
   7 passed (44.8s)
 
 [36m  Serving HTML report at http://localhost:43129. Press Ctrl+C to quit.[39m
+Terminated

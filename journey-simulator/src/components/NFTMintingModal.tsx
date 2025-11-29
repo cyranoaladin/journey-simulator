@@ -220,9 +220,8 @@ const NFTMintingModal: FC<NFTMintingModalProps> = ({
         </div>
 
         <div
-          className={`relative border-2 rounded-xl p-4 mb-6 bg-gradient-to-br ${
-            personaStyle.bgGradient || "from-blue-400 to-cyan-500"
-          } border-white/20`}
+          className={`relative border-2 rounded-xl p-4 mb-6 bg-gradient-to-br ${personaStyle.bgGradient || "from-blue-400 to-cyan-500"
+            } border-white/20`}
         >
           <div className="w-full h-48 bg-black/20 rounded-lg mb-4 flex items-center justify-center">
             {certification.imageUrl ? (
@@ -233,9 +232,8 @@ const NFTMintingModal: FC<NFTMintingModalProps> = ({
               />
             ) : (
               <div
-                className={`w-16 h-16 ${
-                  personaStyle.iconBg || "bg-blue-500"
-                } rounded-full flex items-center justify-center`}
+                className={`w-16 h-16 ${personaStyle.iconBg || "bg-blue-500"
+                  } rounded-full flex items-center justify-center`}
               >
                 <Award size={32} className="text-white" />
               </div>
@@ -349,9 +347,8 @@ const NFTMintingModal: FC<NFTMintingModalProps> = ({
               whileTap={{ scale: 0.98 }}
               onClick={handleMintNFT}
               disabled={isMinting || (!publicKey && !debugRecipient)}
-              className={`w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 bg-gradient-to-r ${
-                personaStyle.bgGradient || "from-blue-400 to-cyan-500"
-              } text-white disabled:opacity-50 disabled:cursor-not-allowed`}
+              className={`w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 bg-gradient-to-r ${personaStyle.bgGradient || "from-blue-400 to-cyan-500"
+                } text-white disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               <Award size={16} />
               <span>Mint Proof-of-Skill™ NFT</span>

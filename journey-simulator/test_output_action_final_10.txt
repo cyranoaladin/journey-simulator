@@ -1,0 +1,281 @@
+
+Running 4 tests using 4 workers
+
+[browser] [vite] connecting...
+[browser] [vite] connected.
+[browser] [vite] connecting...
+[browser] [vite] connected.
+[browser] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[browser] AuthProvider: render
+[browser] AuthProvider: render
+[browser] ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys/e2e-persona}
+[browser] ProtectedRoute: render {isAuthenticated: false, isLoading: true, path: /journeys/e2e-persona}
+[browser] AuthContext: checkAuthStatus started
+[browser] AuthContext: token present? true refresh token present? true
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/user/profile
+[browser] AuthContext: checkAuthStatus started
+[browser] AuthContext: token present? true refresh token present? true
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/user/profile
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/user-progress
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/user-progress
+[browser] AuthProvider: render
+[browser] AuthProvider: render
+[browser] ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys/e2e-persona}
+[browser] ProtectedRoute: render {isAuthenticated: true, isLoading: true, path: /journeys/e2e-persona}
+[browser] AuthContext: setting isLoading false
+[browser] AuthContext: setting isLoading false
+[browser] AuthProvider: render
+[browser] AuthProvider: render
+[browser] ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys/e2e-persona}
+[browser] ProtectedRoute: rendering children
+[browser] ProtectedRoute: render {isAuthenticated: true, isLoading: false, path: /journeys/e2e-persona}
+[browser] ProtectedRoute: rendering children
+[browser] Layout: render
+[browser] Layout: render
+[browser] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[browser] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/api/agents/logs?journeyId=5260ca70-6707-4758-b9db-b2dbbecdd7d1&limit=20
+[browser] JourneysPage: useEffect triggered
+[browser] JourneysPage: loading progress...
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/user-progress
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/api/agents/logs?journeyId=5260ca70-6707-4758-b9db-b2dbbecdd7d1&limit=20
+[browser] JourneysPage: useEffect triggered
+[browser] JourneysPage: loading progress...
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/user-progress
+[browser] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[browser] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[browser] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] JourneysPage: progress loaded successfully
+[browser] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[browser] Sidebar: render {selectedPersonaId: e2e-persona, completedPhases: 0}
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] JourneysPage: progress loaded successfully
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+[browser] [JourneyWorkspace] handleRunInteractiveStep called
+[browser] [JourneyWorkspace] Calling runInteractiveStepDebug {phaseId: e2e-phase, trackId: e2e-persona}
+[browser] [Store] runInteractiveStepDebug START
+[browser] [Store] Fetching step: http://127.0.0.1:3000/journey/5260ca70-6707-4758-b9db-b2dbbecdd7d1/step
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/5260ca70-6707-4758-b9db-b2dbbecdd7d1/step
+[browser] [E2E Fetch Patch] Intercepting step request: http://127.0.0.1:3000/journey/5260ca70-6707-4758-b9db-b2dbbecdd7d1/step
+[browser] [E2E Fetch Patch] Request Body: {"phaseId":"e2e-phase","trackId":"e2e-persona","userInput":"","language":"en","mode":"discovery","tone":"pedagogical","journeyState":{"xp":0,"completed":[]}}
+[browser] [E2E Fetch Patch] Extracted Action ID: null
+[browser] [E2E Fetch Patch] Returning mock initial step
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] runInteractiveStepDebug completed
+  ✘  4 [chromium] › tests/e2e/action-suggestions.spec.ts:175:3 › ActionSuggestions flow › successfully triggers next step and updates UI (6.2s)
+[browser] AuthProvider: render
+[browser] AuthProvider: render
+[browser] ProtectedRoute: render JSHandle@object
+[browser] ProtectedRoute: render JSHandle@object
+[browser] AuthContext: checkAuthStatus started
+[browser] AuthContext: token present? true refresh token present? true
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/user/profile
+[browser] AuthContext: checkAuthStatus started
+[browser] AuthContext: token present? true refresh token present? true
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/user/profile
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/user-progress
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/user-progress
+[browser] AuthProvider: render
+[browser] AuthProvider: render
+[browser] ProtectedRoute: render JSHandle@object
+[browser] ProtectedRoute: render JSHandle@object
+[browser] AuthContext: setting isLoading false
+[browser] AuthProvider: render
+[browser] AuthProvider: render
+[browser] ProtectedRoute: render JSHandle@object
+[browser] ProtectedRoute: rendering children
+[browser] ProtectedRoute: render JSHandle@object
+[browser] ProtectedRoute: rendering children
+[browser] Layout: render
+[browser] Layout: render
+[browser] Sidebar: render JSHandle@object
+[browser] Sidebar: render JSHandle@object
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/api/agents/logs?journeyId=2f5e9dc0-ce1c-42c5-834d-7f16ffbafce2&limit=20
+[browser] JourneysPage: useEffect triggered
+[browser] JourneysPage: loading progress...
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/user-progress
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/api/agents/logs?journeyId=2f5e9dc0-ce1c-42c5-834d-7f16ffbafce2&limit=20
+[browser] JourneysPage: useEffect triggered
+[browser] JourneysPage: loading progress...
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/user-progress
+[browser] Sidebar: render JSHandle@object
+[browser] Sidebar: render JSHandle@object
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] Sidebar: render JSHandle@object
+[browser] Sidebar: render JSHandle@object
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] AuthContext: setting isLoading false
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] Sidebar: render JSHandle@object
+[browser] Sidebar: render JSHandle@object
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] JourneysPage: progress loaded successfully
+[browser] Sidebar: render JSHandle@object
+[browser] Sidebar: render JSHandle@object
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] JourneysPage: progress loaded successfully
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] handleRunInteractiveStep called
+[browser] [JourneyWorkspace] Calling runInteractiveStepDebug JSHandle@object
+[browser] [Store] runInteractiveStepDebug START
+[browser] [Store] Fetching step: http://127.0.0.1:3000/journey/2f5e9dc0-ce1c-42c5-834d-7f16ffbafce2/step
+[browser] [E2E Fetch Patch] Request: http://127.0.0.1:3000/journey/2f5e9dc0-ce1c-42c5-834d-7f16ffbafce2/step
+[browser] [E2E Fetch Patch] Intercepting step request: http://127.0.0.1:3000/journey/2f5e9dc0-ce1c-42c5-834d-7f16ffbafce2/step
+[browser] [E2E Fetch Patch] Request Body: {"phaseId":"e2e-phase","trackId":"e2e-persona","userInput":"","language":"en","mode":"discovery","tone":"pedagogical","journeyState":{"xp":0,"completed":[]}}
+[browser] [E2E Fetch Patch] Extracted Action ID: null
+[browser] [E2E Fetch Patch] Returning mock initial step
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] RENDERED
+[browser] [JourneyWorkspace] runInteractiveStepDebug completed
+  ✘  2 [firefox] › tests/e2e/action-suggestions.spec.ts:175:3 › ActionSuggestions flow › successfully triggers next step and updates UI (9.1s)
+  ✘  1 [chromium] › tests/e2e/action-suggestions.spec.ts:218:3 › ActionSuggestions flow › shows error toast when suggestion fails (30.3s)
+  ✘  3 [firefox] › tests/e2e/action-suggestions.spec.ts:218:3 › ActionSuggestions flow › shows error toast when suggestion fails (30.3s)
+
+
+  1) [chromium] › tests/e2e/action-suggestions.spec.ts:175:3 › ActionSuggestions flow › successfully triggers next step and updates UI 
+
+    Error: locator.click: Error: strict mode violation: getByRole('button', { name: 'Continue' }) resolved to 2 elements:
+        1) <button class="btn-primary text-sm px-4 py-2 flex items-center gap-2">Start / Continue</button> aka getByRole('button', { name: 'Start / Continue' })
+        2) <button class="px-3 py-2 rounded-md bg-gradient-primary text-white text-xs ">Continue</button> aka getByRole('button', { name: 'Continue', exact: true })
+
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Continue' })[22m
+
+
+      210 |
+      211 |     // Click the suggestion
+    > 212 |     await page.getByRole('button', { name: 'Continue' }).click({ force: true })
+          |                                                          ^
+      213 |
+      214 |     // Assert UI updated
+      215 |     await expect(page.getByText('Action OK')).toBeVisible()
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/action-suggestions.spec.ts:212:58
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-a1d66-rs-next-step-and-updates-UI-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-a1d66-rs-next-step-and-updates-UI-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/action-suggestions-ActionS-a1d66-rs-next-step-and-updates-UI-chromium/error-context.md
+
+  2) [chromium] › tests/e2e/action-suggestions.spec.ts:218:3 › ActionSuggestions flow › shows error toast when suggestion fails 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Trigger an error' })[22m
+
+
+      256 |
+      257 |     // Click the failing suggestion
+    > 258 |     await page.getByRole('button', { name: 'Trigger an error' }).click({ force: true })
+          |                                                                  ^
+      259 |
+      260 |     // Assert failure handler ran and UI recovered
+      261 |     await expect.poll(() => failureLogged).toBeTruthy()
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/action-suggestions.spec.ts:258:66
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-4e7a4-toast-when-suggestion-fails-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-4e7a4-toast-when-suggestion-fails-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/action-suggestions-ActionS-4e7a4-toast-when-suggestion-fails-chromium/error-context.md
+
+  3) [firefox] › tests/e2e/action-suggestions.spec.ts:175:3 › ActionSuggestions flow › successfully triggers next step and updates UI 
+
+    Error: locator.click: Error: strict mode violation: getByRole('button', { name: 'Continue' }) resolved to 2 elements:
+        1) <button class="btn-primary text-sm px-4 py-2 flex items-center gap-2">Start / Continue</button> aka getByRole('button', { name: 'Start / Continue' })
+        2) <button class="px-3 py-2 rounded-md bg-gradient-primary text-white text-xs ">Continue</button> aka getByRole('button', { name: 'Continue', exact: true })
+
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Continue' })[22m
+
+
+      210 |
+      211 |     // Click the suggestion
+    > 212 |     await page.getByRole('button', { name: 'Continue' }).click({ force: true })
+          |                                                          ^
+      213 |
+      214 |     // Assert UI updated
+      215 |     await expect(page.getByText('Action OK')).toBeVisible()
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/action-suggestions.spec.ts:212:58
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-a1d66-rs-next-step-and-updates-UI-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-a1d66-rs-next-step-and-updates-UI-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/action-suggestions-ActionS-a1d66-rs-next-step-and-updates-UI-firefox/error-context.md
+
+  4) [firefox] › tests/e2e/action-suggestions.spec.ts:218:3 › ActionSuggestions flow › shows error toast when suggestion fails 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Trigger an error' })[22m
+
+
+      256 |
+      257 |     // Click the failing suggestion
+    > 258 |     await page.getByRole('button', { name: 'Trigger an error' }).click({ force: true })
+          |                                                                  ^
+      259 |
+      260 |     // Assert failure handler ran and UI recovered
+      261 |     await expect.poll(() => failureLogged).toBeTruthy()
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/action-suggestions.spec.ts:258:66
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-4e7a4-toast-when-suggestion-fails-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/action-suggestions-ActionS-4e7a4-toast-when-suggestion-fails-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/action-suggestions-ActionS-4e7a4-toast-when-suggestion-fails-firefox/error-context.md
+
+  4 failed
+    [chromium] › tests/e2e/action-suggestions.spec.ts:175:3 › ActionSuggestions flow › successfully triggers next step and updates UI 
+    [chromium] › tests/e2e/action-suggestions.spec.ts:218:3 › ActionSuggestions flow › shows error toast when suggestion fails 
+    [firefox] › tests/e2e/action-suggestions.spec.ts:175:3 › ActionSuggestions flow › successfully triggers next step and updates UI 
+    [firefox] › tests/e2e/action-suggestions.spec.ts:218:3 › ActionSuggestions flow › shows error toast when suggestion fails 
+
+[36m  Serving HTML report at http://localhost:35075. Press Ctrl+C to quit.[39m
+Terminated

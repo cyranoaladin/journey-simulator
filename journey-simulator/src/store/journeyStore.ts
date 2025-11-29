@@ -154,10 +154,10 @@ export const useJourneyStore = create<JourneyState>()(
           tone: uiTone,
           journeyState: { xp: get().userProgress.totalXP, completed: get().userProgress.completedPhases }
         }
-        const base = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:3000'
+        const base = import.meta.env.VITE_API_BASE_URL || 'https://journey.mfai.app/api'
         try {
           set({ isStepLoading: true })
-          const resp = await fetch(`${base}/journey/${id}/step`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+          const resp = await window.fetch(`${base}/journey/${id}/step`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
           if (!resp.ok) throw new Error(`step failed: ${resp.status}`)
           const json = await resp.json()
           set({ lastStep: json })

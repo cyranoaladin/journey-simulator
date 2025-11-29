@@ -1,0 +1,16 @@
+
+Running 6 tests using 6 workers
+
+  ✓  2 [chromium] › tests/e2e/dao-governance.spec.ts:129:5 › DAO Governance › should display proposals list (13.1s)
+  ✓  1 [chromium] › tests/e2e/dao-governance.spec.ts:180:5 › DAO Governance › should allow voting on a proposal (13.7s)
+  ✓  6 [chromium] › tests/e2e/dao-governance.spec.ts:138:5 › DAO Governance › should allow creating a new proposal (13.9s)
+  ✓  3 [firefox] › tests/e2e/dao-governance.spec.ts:129:5 › DAO Governance › should display proposals list (17.5s)
+  ✓  4 [firefox] › tests/e2e/dao-governance.spec.ts:138:5 › DAO Governance › should allow creating a new proposal (18.1s)
+  ✓  5 [firefox] › tests/e2e/dao-governance.spec.ts:180:5 › DAO Governance › should allow voting on a proposal (17.7s)
+
+  6 passed (21.1s)
+
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report tests/e2e-report[39m
+[36m[39m

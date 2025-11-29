@@ -287,3 +287,4 @@ Running 10 tests using 8 workers
   2 passed (47.0s)
 
 [36m  Serving HTML report at http://localhost:35995. Press Ctrl+C to quit.[39m
+Terminated
