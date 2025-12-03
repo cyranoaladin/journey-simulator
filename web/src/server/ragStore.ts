@@ -65,7 +65,9 @@ export function queryDocs(limit: number, query: string) {
   const q = query.toLowerCase()
   return store.docs
     .filter((doc) =>
-      [doc.title, doc.content, doc.tags].filter(Boolean).some((field) => field!.toLowerCase().includes(q))
+      [doc.title, doc.content, doc.tags]
+        .filter(Boolean)
+        .some((field) => field!.toLowerCase().includes(q))
     )
     .slice(0, limit)
     .map((doc) => ({
