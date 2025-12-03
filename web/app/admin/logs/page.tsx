@@ -9,7 +9,8 @@ const toPositiveNumber = (value: unknown): number => {
   return Number.isFinite(coerced) ? coerced : 0
 }
 
-const extractTokenSummary = (details: any | null): TokenSummary | null => { // Changed Prisma.JsonValue to any
+const extractTokenSummary = (details: any | null): TokenSummary | null => {
+  // Changed Prisma.JsonValue to any
   if (!details || typeof details !== 'object' || Array.isArray(details)) return null
   const perf = (details as Record<string, unknown>).perf
   if (!perf || typeof perf !== 'object' || Array.isArray(perf)) return null
@@ -23,7 +24,8 @@ const extractTokenSummary = (details: any | null): TokenSummary | null => { // C
   }
 }
 
-const isErrorLevel = (details: any | null): boolean => { // Changed Prisma.JsonValue to any
+const isErrorLevel = (details: any | null): boolean => {
+  // Changed Prisma.JsonValue to any
   if (!details || typeof details !== 'object' || Array.isArray(details)) return false
   const level = (details as Record<string, unknown>).level
   return typeof level === 'string' && level.toLowerCase() === 'error'
@@ -32,22 +34,26 @@ const isErrorLevel = (details: any | null): boolean => { // Changed Prisma.JsonV
 export default async function AdminLogsPage({ searchParams }: Props) {
   const journeyId = searchParams?.journeyId
   const userId = searchParams?.userId
-  
-  const queryParams = new URLSearchParams();
-  if (userId) queryParams.append('user_id', userId);
-  queryParams.append('limit', '50'); // Equivalent to take: 50
+
+  const queryParams = new URLSearchParams()
+  if (userId) queryParams.append('user_id', userId)
+  queryParams.append('limit', '50') // Equivalent to take: 50
   // orderBy: { ts: 'desc' } is handled by default in FastAPI endpoint
 
-  const response = await fetch(`http://localhost:8000/agent_logs/?${queryParams.toString()}`, { // TODO: Replace with actual FastAPI URL
+  const response = await fetch(`http://localhost:8000/agent_logs/?${queryParams.toString()}`, {
+    // TODO: Replace with actual FastAPI URL
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
     },
-    cache: 'no-store'
+    cache: 'no-store',
   })
   const logs = await response.json()
   if (!response.ok) {
-    return NextResponse.json({ error: logs.detail || 'Failed to fetch agent logs' }, { status: response.status })
+    return NextResponse.json(
+      { error: logs.detail || 'Failed to fetch agent logs' },
+      { status: response.status }
+    )
   }
 
   const tokenTriples = logs
@@ -90,7 +96,8 @@ export default async function AdminLogsPage({ searchParams }: Props) {
         </div>
       </div>
       <div className="grid gap-3">
-        {logs.map((log: any) => { // Changed log type to any
+        {logs.map((log: any) => {
+          // Changed log type to any
           const tokenStats = extractTokenSummary(log.details)
           return (
             <div key={log.id} className="rounded-lg border border-white/10 p-3 bg-bg-mid/40">

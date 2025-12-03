@@ -1,21 +1,23 @@
 export const dynamic = 'force-dynamic'
 
 export default async function AdminUsersPage() {
-  const agentLogsResponse = await fetch('http://localhost:8000/agent_logs/?limit=200', { // TODO: Replace with actual FastAPI URL
+  const agentLogsResponse = await fetch('http://localhost:8000/agent_logs/?limit=200', {
+    // TODO: Replace with actual FastAPI URL
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
     },
-    cache: 'no-store'
+    cache: 'no-store',
   })
   const agentUsers = await agentLogsResponse.json()
 
-  const mintLogsResponse = await fetch('http://localhost:8000/mint/mintlogs/?limit=200', { // TODO: Replace with actual FastAPI URL
+  const mintLogsResponse = await fetch('http://localhost:8000/mint/mintlogs/?limit=200', {
+    // TODO: Replace with actual FastAPI URL
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
     },
-    cache: 'no-store'
+    cache: 'no-store',
   })
   const mintUsers = await mintLogsResponse.json()
 
