@@ -1,3 +1,18 @@
+jest.mock('axios', () => ({
+    head: jest.fn((url) => {
+        if (
+            url.includes('solana.com') ||
+            url.includes('malicious.com') ||
+            url.includes('bad-site.com')
+        ) {
+            return Promise.resolve({ status: 200 });
+        }
+
+        return Promise.reject(new Error('Network Error'));
+    }),
+    get: jest.fn(() => Promise.reject(new Error('Network Error')))
+}));
+
 const request = require('supertest');
 const express = require('express');
 const { validateAndSanitizeResponse } = require('../../utils/resourceValidator');
