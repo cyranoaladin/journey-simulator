@@ -9,9 +9,6 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    env:
-      HAS_SENTRY: ${{ (secrets.SENTRY_AUTH_TOKEN != '' && secrets.SENTRY_ORG != '' && secrets.SENTRY_PROJECT != '') && 'true' || 'false' }}
-      HAS_DOCKER: ${{ (secrets.DOCKER_REGISTRY != '' && secrets.DOCKER_USERNAME != '' && secrets.DOCKER_PASSWORD != '' && secrets.DOCKER_IMAGE != '') && 'true' || 'false' }}
     defaults:
       run:
         working-directory: web
@@ -96,8 +93,21 @@ jobs:
           path: journey-simulator/test-results
           if-no-files-found: ignore
 
+      - name: Detect Sentry configuration
+        id: sentry_config
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        run: |
+          if [ -n "$SENTRY_AUTH_TOKEN" ] && [ -n "$SENTRY_ORG" ] && [ -n "$SENTRY_PROJECT" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create Sentry release + upload sourcemaps (optional)
-        if: ${{ env.HAS_SENTRY == 'true' }}
+        if: ${{ steps.sentry_config.outputs.enabled == 'true' }}
         uses: getsentry/action-release@v1
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
@@ -109,8 +119,22 @@ jobs:
           projects: ${{ secrets.SENTRY_PROJECT }}
           sourcemaps: './web/.next'
 
+      - name: Detect Docker configuration
+        id: docker_config
+        env:
+          DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE }}
+        run: |
+          if [ -n "$DOCKER_REGISTRY" ] && [ -n "$DOCKER_USERNAME" ] && [ -n "$DOCKER_PASSWORD" ] && [ -n "$DOCKER_IMAGE" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Log in to Docker registry (optional)
-        if: ${{ env.HAS_DOCKER == 'true' }}
+        if: ${{ steps.docker_config.outputs.enabled == 'true' }}
         uses: docker/login-action@v3
         with:
           registry: ${{ secrets.DOCKER_REGISTRY }}
@@ -118,7 +142,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push Docker image (optional)
-        if: ${{ env.HAS_DOCKER == 'true' }}
+        if: ${{ steps.docker_config.outputs.enabled == 'true' }}
         uses: docker/build-push-action@v6
         with:
           context: ./web
