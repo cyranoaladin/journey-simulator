@@ -9,9 +9,6 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: web
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -21,32 +18,39 @@ jobs:
           cache-dependency-path: web/package-lock.json
 
       - name: Upgrade npm
+        working-directory: web
         run: npm install -g npm@11
 
       - run: npm ci
+        working-directory: web
       - run: npm run lint
+        working-directory: web
       - run: npm run build
+        working-directory: web
       - run: npm run test:unit
+        working-directory: web
       - name: Install Playwright Browsers
+        working-directory: web
         run: npx playwright install --with-deps
       - name: Run E2E tests
+        working-directory: web
         run: npm run test:e2e
 
       - name: Install frontend dependencies
         run: npm ci
-        working-directory: ../journey-simulator
+        working-directory: journey-simulator
 
       - name: Build Storybook bundle
         run: npm run build-storybook
-        working-directory: ../journey-simulator
+        working-directory: journey-simulator
 
       - name: Install Playwright Browsers (journey-simulator)
         run: npx playwright install --with-deps
-        working-directory: ../journey-simulator
+        working-directory: journey-simulator
 
       - name: Run E2E tests (journey-simulator)
         run: npm run test:e2e
-        working-directory: ../journey-simulator
+        working-directory: journey-simulator
 
       - name: Upload coverage artifact (lcov)
         if: always()
