@@ -23,6 +23,19 @@ describe('Misc API coverage', () => {
   })
 
   it('POST /api/auth/siws/challenge returns challenge', async () => {
+    jest.resetModules()
+    jest.doMock('@/server/siwsStore', () => ({
+      createSiwsChallenge: jest.fn(async () => ({
+        id: 'challenge-id',
+        nonce: 'nonce',
+        message: 'msg',
+        addressHint: undefined,
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 1000,
+        used: false,
+      })),
+    }))
+
     const mod = await import('../../app/api/auth/siws/challenge/route')
     const { POST } = mod as any
     const res = await POST({ json: async () => ({}) } as any)
