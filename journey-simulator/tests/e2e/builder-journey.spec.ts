@@ -1,57 +1,32 @@
-// tests/e2e/builder-journey.spec.ts
 import { test, expect } from '@playwright/test';
+import { setupJourneyMocks, seedDemoUser } from './utils/journeyMocks';
+import { disablePageAnimations } from './utils/pageStability';
 
-test.describe('E2E Builder Journey', () => {
-  test('should allow a user to complete the builder journey and generate artifacts', async ({ page }) => {
-    // Mock wallet connection
-    await page.addInitScript(() => {
-      window.localStorage.setItem('wallet-adapter-mock', 'true');
-    });
+test.describe('Capital Foundry Journey', () => {
+  test.beforeEach(async ({ page }) => {
+    await setupJourneyMocks(page, { personaId: 'capital-foundry' });
+    await seedDemoUser(page, null);
+    await disablePageAnimations(page);
+  });
 
-    // Go to the home page
-    await page.goto('http://localhost:3000');
+  test('lets a builder validate the opening phase via mocked data', async ({ page }) => {
+    await page.goto('/journeys');
 
-    // 1. Select the Builder Persona
-    await page.click('text=Web3 Builder');
-    await expect(page).toHaveURL(/.*\/journey\/phase\/0/);
+    await expect(page.getByText('Choose Your Path to Sovereignty')).toBeVisible();
 
-    // 2. Interact with Zyno to complete phase 1
-    await page.fill('textarea[placeholder*="your thoughts"]', 'My idea is to build a decentralized social network.');
-    await page.click('button:has-text("Start / Continue")');
+    const capitalCard = page.locator('article').filter({ has: page.getByRole('heading', { name: 'The Capital Foundry' }) }).first();
+    await capitalCard.getByRole('button', { name: 'Launch with Zyno' }).click();
 
-    // Mock the API response for the step
-    await page.route('**/api/journey/**', (route) => {
-      route.fulfill({
-        status: 200,
-        body: JSON.stringify({
-          ui_blocks: [{ type: 'text', content: 'Great idea! Here is your business model canvas.' }],
-        }),
-      });
-    });
+    await page.waitForURL('**/journeys/capital-foundry');
+    await expect(page.getByRole('heading', { name: 'Current Phase' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Protocol Discovery Sprint', level: 3 })).toBeVisible();
 
-    // Wait for the response and UI update
-    await page.waitForResponse('**/api/journey/**');
+    await page.getByRole('button', { name: 'Start / Continue' }).click();
+    await expect(page.getByRole('button', { name: 'Validate & Mint NFT' })).toBeVisible();
+    await page.getByRole('button', { name: 'Validate & Mint NFT' }).click();
+    await expect(page.getByRole('heading', { name: /Proof-of-/i })).toBeVisible();
+    await page.getByRole('button', { name: 'Close' }).first().click();
 
-    // 3. Verify Phase 2 is unlocked
-    await expect(page.locator('text=Phase 2')).toHaveClass(/active/);
-
-    // 4. Trigger Artifact Generation
-    // In the test, we assume completing the step automatically triggers the artifact generation logic
-    
-    // 5. Verify Neural Swarm Overlay
-    await expect(page.locator('text=Neural Swarm Active')).toBeVisible({ timeout: 5000 });
-    await expect(page.locator('text=Architect Agent is working...')).toBeVisible();
-    
-    // Wait for the overlay to disappear
-    await expect(page.locator('text=Neural Swarm Active')).not.toBeVisible({ timeout: 5000 });
-
-    // 6. Verify Artifact Modal
-    await expect(page.locator('h3:has-text("Tokenomics Architecture")')).toBeVisible();
-    const iframe = page.frameLocator('iframe[title="Artifact Viewer"]');
-    await expect(iframe.locator('h1')).toHaveText('Tokenomics Simulation');
-
-    // Close the modal
-    await page.click('button[aria-label="Close modal"]');
-    await expect(page.locator('h3:has-text("Tokenomics Architecture")')).not.toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Program Forge Lab', level: 3 })).toBeVisible();
   });
 });
