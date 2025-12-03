@@ -19,9 +19,9 @@ describe('API /api/mint/execute error path', () => {
           type: 'CERT_NFT',
           name: 'Test NFT',
           symbol: 'TEST',
-          uri: 'https://example.com/meta.json'
+          uri: 'https://example.com/meta.json',
         },
-        sim: { ok: true, estFeeLamports: 1, riskScore: 0, network: 'devnet' }
+        sim: { ok: true, estFeeLamports: 1, riskScore: 0, network: 'devnet' },
       }),
     } as any)
     expect(res.status).toBe(500)

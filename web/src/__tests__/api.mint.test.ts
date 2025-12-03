@@ -7,8 +7,8 @@ jest.mock('@/server/db', () => ({
 
 jest.mock('@/server/queue', () => ({
   mintQueue: {
-    add: jest.fn(async () => ({ id: 'job-1' }))
-  }
+    add: jest.fn(async () => ({ id: 'job-1' })),
+  },
 }))
 
 describe('API /api/mint', () => {
@@ -64,9 +64,9 @@ describe('API /api/mint', () => {
           type: 'CERT_NFT',
           name: 'Test NFT',
           symbol: 'TEST',
-          uri: 'https://example.com/meta.json'
+          uri: 'https://example.com/meta.json',
         },
-        sim: { ok: true, estFeeLamports: 1, riskScore: 0, network: 'devnet' }
+        sim: { ok: true, estFeeLamports: 1, riskScore: 0, network: 'devnet' },
       }),
     } as any)
     expect(res.status).toBe(200)

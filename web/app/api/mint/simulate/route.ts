@@ -19,7 +19,8 @@ export async function POST(req: Request) {
 
   // Best-effort logging (optional)
   try {
-    await fetch('http://localhost:8000/mint/mintlogs/', { // TODO: Replace with actual FastAPI URL
+    await fetch('http://localhost:8000/mint/mintlogs/', {
+      // TODO: Replace with actual FastAPI URL
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

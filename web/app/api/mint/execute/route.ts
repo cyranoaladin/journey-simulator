@@ -39,6 +39,8 @@ export async function POST(req: Request) {
   }
 
   const { spec, sim } = parsed.data
+  const rewardSpec: RewardSpec = spec
+  const simResult: SimResult = sim
 
   try {
     let userId: string | null = null
@@ -51,8 +53,8 @@ export async function POST(req: Request) {
 
     // Add job to queue
     const job = await mintQueue.add('mint-nft', {
-      spec,
-      sim,
+      spec: rewardSpec,
+      sim: simResult,
       userId,
     })
 

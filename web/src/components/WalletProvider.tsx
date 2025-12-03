@@ -17,9 +17,7 @@ export default function WalletProvider({ children }: { children: React.ReactNode
     <ConnectionProvider endpoint={endpoint}>
       <WAProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
+          <AuthProvider>{children}</AuthProvider>
         </WalletModalProvider>
       </WAProvider>
     </ConnectionProvider>

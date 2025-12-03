@@ -1,10 +1,7 @@
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
-  content: [
-    './app/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-  ],
+  content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
@@ -29,11 +26,11 @@ const config: Config = {
       },
       boxShadow: {
         default: '0 4px 12px rgba(0,0,0,0.25)',
-        glow: '0 0 12px rgba(6,182,212,0.6)'
+        glow: '0 0 12px rgba(6,182,212,0.6)',
       },
       borderRadius: {
         soft: '16px',
-      }
+      },
     },
   },
   plugins: [],

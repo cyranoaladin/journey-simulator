@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import crypto from 'crypto'
 
 // In a real production app, you might store this in Redis with an expiration
@@ -8,7 +8,7 @@ import crypto from 'crypto'
 // To prevent replay attacks, we should ideally store the nonce associated with the wallet
 // and invalidate it after use.
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   try {
     const nonce = crypto.randomBytes(32).toString('base64')
 

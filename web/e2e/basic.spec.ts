@@ -32,8 +32,13 @@ test('ai echo executes and renders result (resilient)', async ({ page }) => {
   const result = page.getByTestId('ai-echo-result')
 
   const [resp] = await Promise.all([
-    page.waitForResponse(r => r.url().endsWith('/api/ai/echo') && r.status() >= 200 && r.status() < 500, { timeout: 15000 }).catch(() => null),
-    submit.click()
+    page
+      .waitForResponse(
+        (r) => r.url().endsWith('/api/ai/echo') && r.status() >= 200 && r.status() < 500,
+        { timeout: 15000 }
+      )
+      .catch(() => null),
+    submit.click(),
   ])
 
   // Regardless of network success, UI shows a result (fallback on error). Wait until it appears.

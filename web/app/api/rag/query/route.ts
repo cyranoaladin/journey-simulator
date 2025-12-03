@@ -8,17 +8,23 @@ export async function POST(req: Request) {
   const parsed = Body.safeParse(json)
   if (!parsed.success) return NextResponse.json({ error: 'bad_request' }, { status: 400 })
   const q = parsed.data.text
-  
-  const response = await fetch(`http://localhost:8000/documents/?q=${q}&limit=10&order_by=created_at_desc`, { // TODO: Replace with actual FastAPI URL
-    method: 'GET', // Changed to GET as documents endpoint is GET
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+
+  const response = await fetch(
+    `http://localhost:8000/documents/?q=${q}&limit=10&order_by=created_at_desc`,
+    {
+      // TODO: Replace with actual FastAPI URL
+      method: 'GET', // Changed to GET as documents endpoint is GET
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  )
   const docs = await response.json()
   if (!response.ok) {
-    return NextResponse.json({ error: docs.detail || 'Failed to fetch documents' }, { status: response.status })
+    return NextResponse.json(
+      { error: docs.detail || 'Failed to fetch documents' },
+      { status: response.status }
+    )
   }
   return NextResponse.json({ ok: true, count: docs.length, docs })
 }
-

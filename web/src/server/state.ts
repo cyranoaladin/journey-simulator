@@ -21,31 +21,35 @@ const mem = {
 }
 const MAX_LOGS = 200
 
-let forceMemory = process.env.STATE_DRIVER === 'memory'
-
 async function dbAvailable(): Promise<boolean> {
   return false
 }
 
 export async function setJourneyState(journeyId: string, nextState: any, metadata?: any) {
   try {
-    if (await dbAvailable()) { // This will now always be false
+    if (await dbAvailable()) {
+      // This will now always be false
       // Fallback to FastAPI
-      const response = await fetch('http://localhost:8000/journey_states/upsert', { // TODO: Replace with actual FastAPI URL
+      const response = await fetch('http://localhost:8000/journey_states/upsert', {
+        // TODO: Replace with actual FastAPI URL
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ journey_id: journeyId, user_id: 'unknown', last_state: nextState, last_metadata: metadata }), // Assuming user_id is 'unknown' for now
+        body: JSON.stringify({
+          journey_id: journeyId,
+          user_id: 'unknown',
+          last_state: nextState,
+          last_metadata: metadata,
+        }), // Assuming user_id is 'unknown' for now
       })
       if (!response.ok) {
         console.warn('Failed to upsert journey state to FastAPI', await response.json())
       }
       return
     }
-  } catch(e) {
-    console.warn("Error in setJourneyState with FastAPI:", e);
-    forceMemory = true
+  } catch (e) {
+    console.warn('Error in setJourneyState with FastAPI:', e)
   }
   const rec: JourneyStateRecord = {
     journeyId,
@@ -58,22 +62,27 @@ export async function setJourneyState(journeyId: string, nextState: any, metadat
 
 export async function getJourneyState(journeyId: string): Promise<JourneyStateRecord | null> {
   try {
-    if (await dbAvailable()) { // This will now always be false
+    if (await dbAvailable()) {
+      // This will now always be false
       // Fallback to FastAPI
-      const response = await fetch(`http://localhost:8000/journey_states/?journey_id=${journeyId}`, { // TODO: Replace with actual FastAPI URL and fetch by journey_id
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
+      const response = await fetch(
+        `http://localhost:8000/journey_states/?journey_id=${journeyId}`,
+        {
+          // TODO: Replace with actual FastAPI URL and fetch by journey_id
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
       if (!response.ok) {
-        if (response.status === 404) return null; // Not found
+        if (response.status === 404) return null // Not found
         console.warn('Failed to fetch journey state from FastAPI', await response.json())
-        return null;
+        return null
       }
       const row = await response.json()
       if (!row || row.length === 0) return null
-      const firstRow = row[0]; // Assuming journey_id is unique
+      const firstRow = row[0] // Assuming journey_id is unique
       return {
         journeyId: firstRow.journey_id,
         last_state: firstRow.last_state,
@@ -81,18 +90,19 @@ export async function getJourneyState(journeyId: string): Promise<JourneyStateRe
         updatedAt: new Date(firstRow.id).getTime(), // Using id as proxy for updatedAt
       }
     }
-  } catch(e) {
-    console.warn("Error in getJourneyState with FastAPI:", e);
-    forceMemory = true
+  } catch (e) {
+    console.warn('Error in getJourneyState with FastAPI:', e)
   }
   return mem.journeyStates.get(journeyId) ?? null
 }
 
 export async function pushAgentLog(log: AgentLog) {
   try {
-    if (await dbAvailable()) { // This will now always be false
+    if (await dbAvailable()) {
+      // This will now always be false
       // Fallback to FastAPI
-      const response = await fetch('http://localhost:8000/agent_logs/', { // TODO: Replace with actual FastAPI URL
+      const response = await fetch('http://localhost:8000/agent_logs/', {
+        // TODO: Replace with actual FastAPI URL
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,9 +120,8 @@ export async function pushAgentLog(log: AgentLog) {
       }
       return
     }
-  } catch(e) {
-    console.warn("Error in pushAgentLog with FastAPI:", e);
-    forceMemory = true
+  } catch (e) {
+    console.warn('Error in pushAgentLog with FastAPI:', e)
   }
   mem.agentLogs.push({ ...log, ts: Date.now() })
   if (mem.agentLogs.length > MAX_LOGS) {
@@ -126,13 +135,15 @@ export async function listAgentLogs(opts?: {
 }): Promise<AgentLog[]> {
   const limit = Math.max(1, Math.min(opts?.limit ?? 50, 200))
   try {
-    if (await dbAvailable()) { // This will now always be false
+    if (await dbAvailable()) {
+      // This will now always be false
       // Fallback to FastAPI
-      const queryParams = new URLSearchParams();
-      if (opts?.journeyId) queryParams.append('journey_id', opts.journeyId); // FastAPI endpoint only filters by user_id
-      queryParams.append('limit', limit.toString());
+      const queryParams = new URLSearchParams()
+      if (opts?.journeyId) queryParams.append('journey_id', opts.journeyId) // FastAPI endpoint only filters by user_id
+      queryParams.append('limit', limit.toString())
 
-      const response = await fetch(`http://localhost:8000/agent_logs/?${queryParams.toString()}`, { // TODO: Replace with actual FastAPI URL
+      const response = await fetch(`http://localhost:8000/agent_logs/?${queryParams.toString()}`, {
+        // TODO: Replace with actual FastAPI URL
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -152,8 +163,8 @@ export async function listAgentLogs(opts?: {
         details: r.details ?? undefined,
       }))
     }
-  } catch(e) {
-    console.warn("Error in listAgentLogs with FastAPI:", e);
+  } catch (e) {
+    console.warn('Error in listAgentLogs with FastAPI:', e)
     forceMemory = true
   }
   let arr = mem.agentLogs

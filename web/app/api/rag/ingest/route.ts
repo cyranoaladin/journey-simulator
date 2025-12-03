@@ -15,8 +15,9 @@ export async function POST(req: Request) {
   const embedding = embedText(
     `${parsed.data.title} ${parsed.data.content} ${parsed.data.tags ?? ''}`
   )
-  
-  const response = await fetch('http://localhost:8000/documents/', { // TODO: Replace with actual FastAPI URL
+
+  const response = await fetch('http://localhost:8000/documents/', {
+    // TODO: Replace with actual FastAPI URL
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -31,7 +32,10 @@ export async function POST(req: Request) {
   })
   const doc = await response.json()
   if (!response.ok) {
-    return NextResponse.json({ error: doc.detail || 'Failed to create document' }, { status: response.status })
+    return NextResponse.json(
+      { error: doc.detail || 'Failed to create document' },
+      { status: response.status }
+    )
   }
   return NextResponse.json({ ok: true, id: doc.id })
 }

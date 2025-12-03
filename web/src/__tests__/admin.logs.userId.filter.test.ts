@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 jest.mock('../../app/admin/logs/page', () => ({
   __esModule: true,
   default: ({ searchParams }: { searchParams: { userId: string } }) => {
-    return `userId: ${searchParams.userId}`;
+    return `userId: ${searchParams.userId}`
   },
 }))
 

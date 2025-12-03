@@ -11,11 +11,11 @@ globalAny.__rate = store
 
 function isAllowedOrigin(origin: string | null): boolean {
   if (!origin) return false
-  const allowed = new Set<string>([
-    'http://127.0.0.1:5173',
-    'http://localhost:5173',
-  ])
-  const extra = (process.env.ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean)
+  const allowed = new Set<string>(['http://127.0.0.1:5173', 'http://localhost:5173'])
+  const extra = (process.env.ORIGINS || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
   for (const o of extra) allowed.add(o)
   return allowed.has(origin)
 }
@@ -24,7 +24,12 @@ export function middleware(req: Request) {
   const url = new URL(req.url)
   const origin = (req.headers as any).get ? (req as any).headers.get('origin') : null
   const isPreflight = req.method === 'OPTIONS'
-  const isCorsPath = url.pathname.startsWith('/api/') || url.pathname.startsWith('/user/') || url.pathname.startsWith('/journey/') || url.pathname.startsWith('/dao/') || url.pathname.startsWith('/admin/')
+  const isCorsPath =
+    url.pathname.startsWith('/api/') ||
+    url.pathname.startsWith('/user/') ||
+    url.pathname.startsWith('/journey/') ||
+    url.pathname.startsWith('/dao/') ||
+    url.pathname.startsWith('/admin/')
 
   // Handle CORS (including preflight) for relevant paths
   if (isCorsPath) {
@@ -34,7 +39,10 @@ export function middleware(req: Request) {
       res.headers.set('Vary', 'Origin')
       res.headers.set('Access-Control-Allow-Credentials', 'true')
       res.headers.set('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
-      res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-api-key, x-user-id')
+      res.headers.set(
+        'Access-Control-Allow-Headers',
+        'Content-Type, Authorization, x-api-key, x-user-id'
+      )
     }
     if (isPreflight) return res
   }
@@ -72,4 +80,6 @@ export function middleware(req: Request) {
   return NextResponse.next()
 }
 
-export const config = { matcher: ['/api/:path*', '/admin/:path*', '/user/:path*', '/journey/:path*', '/dao/:path*'] }
+export const config = {
+  matcher: ['/api/:path*', '/admin/:path*', '/user/:path*', '/journey/:path*', '/dao/:path*'],
+}

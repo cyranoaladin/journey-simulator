@@ -1,9 +1,7 @@
 import { clusterApiUrl, type Cluster } from '@solana/web3.js'
 import bs58 from 'bs58'
 
-import {
-  createUmi,
-} from '@metaplex-foundation/umi-bundle-defaults'
+import { createUmi } from '@metaplex-foundation/umi-bundle-defaults'
 import {
   publicKey,
   generateSigner,
@@ -53,12 +51,12 @@ function createMinterUmi(): Umi {
     throw new Error('Missing MINTER_SECRET_KEY in environment')
   }
 
-  let secretKeyBytes: Uint8Array;
+  let secretKeyBytes: Uint8Array
   // Support JSON array format
   if (secretBase58.startsWith('[') && secretBase58.endsWith(']')) {
-    secretKeyBytes = Uint8Array.from(JSON.parse(secretBase58));
+    secretKeyBytes = Uint8Array.from(JSON.parse(secretBase58))
   } else {
-    secretKeyBytes = bs58.decode(secretBase58);
+    secretKeyBytes = bs58.decode(secretBase58)
   }
 
   const keypair = umi.eddsa.createKeypairFromSecretKey(secretKeyBytes)
@@ -93,9 +91,7 @@ export async function simulateTx(spec: RewardSpec): Promise<SimResult> {
 
     // On construit la tx signée mais on ne l’envoie pas
     const latest = await umi.rpc.getLatestBlockhash()
-    const tx = await builder
-      .setBlockhash(latest)
-      .buildAndSign(umi)
+    const tx = await builder.setBlockhash(latest).buildAndSign(umi)
 
     const serialized = umi.transactions.serialize(tx)
     const txB64 = bs58.encode(serialized) // base58 du blob binaire (utile log/debug)

@@ -9,18 +9,25 @@ export async function POST(req: Request) {
   const parsed = Body.safeParse(json)
   if (!parsed.success) return NextResponse.json({ error: 'bad_request' }, { status: 400 })
   const qvec = embedText(parsed.data.text)
-  
-  const response = await fetch(`http://localhost:8000/documents/?limit=50&order_by=created_at_desc`, { // TODO: Replace with actual FastAPI URL
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+
+  const response = await fetch(
+    `http://localhost:8000/documents/?limit=50&order_by=created_at_desc`,
+    {
+      // TODO: Replace with actual FastAPI URL
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  )
   const docs = await response.json()
   if (!response.ok) {
-    return NextResponse.json({ error: docs.detail || 'Failed to fetch documents' }, { status: response.status })
+    return NextResponse.json(
+      { error: docs.detail || 'Failed to fetch documents' },
+      { status: response.status }
+    )
   }
-  
+
   type DocRow = { id: string; path: string; meta: { embedding: number[] | unknown } } // Updated type based on FastAPI Document schema
   const ranked = (docs as DocRow[])
     .map((d) => ({

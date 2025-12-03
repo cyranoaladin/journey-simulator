@@ -16,12 +16,12 @@ const customJestConfig = {
     'app/**/*.{ts,tsx}',
     'src/**/*.{ts,tsx}',
     '!**/node_modules/**',
-    '!**/.next/**'
+    '!**/.next/**',
   ],
   // Option A: relax coverage gate during local validation (keep reporting only)
   coverageThreshold: {
-    global: { branches: 0, functions: 0, lines: 0, statements: 0 }
-  }
+    global: { branches: 0, functions: 0, lines: 0, statements: 0 },
+  },
 }
 
 export default createJestConfig(customJestConfig)

@@ -40,26 +40,28 @@ describe('Misc API coverage', () => {
         message: 'msg',
         nonce: 'nonce',
         used: false,
-        expiresAt: Date.now() + 10000
+        expiresAt: Date.now() + 10000,
       })),
-      markSiwsChallengeUsed: jest.fn(async () => { })
+      markSiwsChallengeUsed: jest.fn(async () => {}),
     }))
 
     jest.doMock('tweetnacl', () => ({
-      sign: { detached: { verify: jest.fn(() => true) } }
+      sign: { detached: { verify: jest.fn(() => true) } },
     }))
 
     // Mock PublicKey to avoid validation error
     jest.doMock('@solana/web3.js', () => ({
       PublicKey: class {
-        constructor() { }
-        toBytes() { return new Uint8Array() }
-      }
+        constructor() {}
+        toBytes() {
+          return new Uint8Array()
+        }
+      },
     }))
 
     // Mock bs58
     jest.doMock('bs58', () => ({
-      decode: jest.fn(() => new Uint8Array())
+      decode: jest.fn(() => new Uint8Array()),
     }))
 
     const mod = await import('../../app/api/auth/siws/verify/route')

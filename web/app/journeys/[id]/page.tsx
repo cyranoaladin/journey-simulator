@@ -7,6 +7,14 @@ import { ArtifactModal } from '@/components/Artifacts/ArtifactModal'
 import artifactsData from '@/data/artifacts.json'
 import { toast } from 'sonner'
 
+const DEMO_SCENARIOS: Record<string, Record<number, string>> = {
+  web2_migrator: { 2: 'art-web2-01' },
+  web3_builder: { 3: 'art-003' },
+  learner: { 5: 'art-learn-01' },
+  investor: { 1: 'art-invest-01' },
+  rwa_issuer: { 2: 'art-rwa-01' },
+}
+
 export default function JourneyPage() {
   const params = useParams()
   const journeyId = params?.id as string
@@ -23,10 +31,10 @@ export default function JourneyPage() {
   const [resp, setResp] = useState<any | null>(null)
   const [journeyState, setJourneyState] = useState<any>({})
 
-  const [isThinking, setIsThinking] = useState(false);
-  const [currentTask, setCurrentTask] = useState({ agent: '', task: '' });
-  const [viewingArtifact, setViewingArtifact] = useState<any>(null);
-  const [unlockedArtifacts, setUnlockedArtifacts] = useState<string[]>([]);
+  const [isThinking, setIsThinking] = useState(false)
+  const [currentTask, setCurrentTask] = useState({ agent: '', task: '' })
+  const [viewingArtifact, setViewingArtifact] = useState<any>(null)
+  const [unlockedArtifacts, setUnlockedArtifacts] = useState<string[]>([])
 
   const rightLogHref = useMemo(
     () => `/admin/logs?journeyId=${encodeURIComponent(journeyId || '')}`,
@@ -49,43 +57,34 @@ export default function JourneyPage() {
     })()
   }, [journeyId])
 
-  const DEMO_SCENARIOS: Record<string, Record<number, string>> = {
-    'web2_migrator': { 2: 'art-web2-01' },  // Step 2 -> Migration Blueprint
-    'web3_builder':  { 3: 'art-003' },      // Step 3 -> Tokenomics
-    'learner':       { 5: 'art-learn-01' }, // Step 5 -> Certificate
-    'investor':      { 1: 'art-invest-01' },// Step 1 -> Deal Memo
-    'rwa_issuer':    { 2: 'art-rwa-01' }    // Step 2 -> RWA Sim
-  };
-
   useEffect(() => {
     if (mode === 'demo' && journeyState.currentStep?.status === 'completed') {
-    
-      const personaId = journeyState.persona?.id || 'web3_builder';
-      const currentStepIndex = journeyState.completedPhases?.length + 1;
-      
-      const artifactId = DEMO_SCENARIOS[personaId]?.[currentStepIndex];
-      
+      const personaId = journeyState.persona?.id || 'web3_builder'
+      const currentStepIndex = journeyState.completedPhases?.length + 1
+
+      const artifactId = DEMO_SCENARIOS[personaId]?.[currentStepIndex]
+
       if (artifactId && !unlockedArtifacts.includes(artifactId)) {
-        const artifact = artifactsData.find(a => a.id === artifactId);
-        if (!artifact) return;
-  
-        setCurrentTask({ 
-          agent: artifact.agent.name, 
-          task: `Generating ${artifact.title}...` 
-        });
-        setIsThinking(true);
-  
+        const artifact = artifactsData.find((a) => a.id === artifactId)
+        if (!artifact) return
+
+        setCurrentTask({
+          agent: artifact.agent.name,
+          task: `Generating ${artifact.title}...`,
+        })
+        setIsThinking(true)
+
         setTimeout(() => {
-          setIsThinking(false);
-          setUnlockedArtifacts(prev => [...prev, artifactId]);
-          
-          toast.success("New Artifact Generated!");
-          
-          setViewingArtifact(artifact);
-        }, 3500);
+          setIsThinking(false)
+          setUnlockedArtifacts((prev) => [...prev, artifactId])
+
+          toast.success('New Artifact Generated!')
+
+          setViewingArtifact(artifact)
+        }, 3500)
       }
     }
-  }, [journeyState, mode]);
+  }, [journeyState, mode, unlockedArtifacts])
 
   async function runStep(payload?: any) {
     if (!journeyId) return
@@ -123,13 +122,13 @@ export default function JourneyPage() {
 
   return (
     <div className="grid grid-cols-12 gap-4 p-4">
-       <NeuralOverlay 
-        isVisible={isThinking} 
-        agentName={currentTask.agent} 
-        taskName={currentTask.task} 
+      <NeuralOverlay
+        isVisible={isThinking}
+        agentName={currentTask.agent}
+        taskName={currentTask.task}
       />
-      <ArtifactModal 
-        isOpen={!!viewingArtifact} 
+      <ArtifactModal
+        isOpen={!!viewingArtifact}
         onClose={() => setViewingArtifact(null)}
         fileUrl={viewingArtifact?.fileUrl || ''}
         title={viewingArtifact?.title || ''}
