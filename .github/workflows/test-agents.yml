@@ -38,6 +38,4 @@ jobs:
 
     - name: Check RAG Connection (Optional)
       run: node scripts/check-rag-connection.js || echo "RAG connection check skipped or completed"
-      env:
-        RAG_TOKEN: ${{ secrets.RAG_TOKEN }}
       working-directory: ./mf-back

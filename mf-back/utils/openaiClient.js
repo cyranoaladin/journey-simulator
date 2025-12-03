@@ -5,7 +5,8 @@ if (!process.env.OPENAI_API_KEY) {
   console.warn("WARNING: OPENAI_API_KEY is missing in .env");
 }
 
-const apiKey = process.env.OPENAI_API_KEY || "dummy-key";
+const hasRealApiKey = Boolean(process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.trim());
+const apiKey = hasRealApiKey ? process.env.OPENAI_API_KEY : "dummy-key";
 
 const { LRUCache } = require("lru-cache");
 const hash = require("object-hash");
@@ -54,6 +55,11 @@ async function callGpt5({
   useCache = true,
 } = {}) {
   try {
+    const shouldMockResponse =
+      !hasRealApiKey ||
+      process.env.NODE_ENV === "test" ||
+      process.env.SKIP_OPENAI === "true";
+
     const resolvedMaxTokens =
       Number(maxOutputTokens ?? max_output_tokens ?? maxTokens ?? DEFAULT_LLM_MAX_OUTPUT_TOKENS) ||
       DEFAULT_LLM_MAX_OUTPUT_TOKENS;
@@ -90,6 +96,26 @@ async function callGpt5({
     if (useCache && llmCache.has(cacheKey)) {
       console.log(`[callGpt5] Cache HIT for model ${model}`);
       return llmCache.get(cacheKey);
+    }
+
+    if (shouldMockResponse) {
+      const mockMessage = {
+        role: "assistant",
+        content: "[MOCK] OpenAI response unavailable in current environment.",
+      };
+
+      const mockResult = {
+        message: mockMessage,
+        usage: null,
+        id: `mock-openai-${Date.now()}`,
+        raw: null,
+      };
+
+      if (useCache) {
+        llmCache.set(cacheKey, mockResult);
+      }
+
+      return mockResult;
     }
 
     // Add metadata if provided
