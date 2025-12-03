@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 export default async function AdminUsersPage() {
-  const agentLogsResponse = await fetch('http://localhost:8000/agent_logs/?limit=200', {
+  const agentUsers = await fetch('http://localhost:8000/agent_logs/?limit=200', {
     // TODO: Replace with actual FastAPI URL
     method: 'GET',
     headers: {
@@ -9,9 +9,10 @@ export default async function AdminUsersPage() {
     },
     cache: 'no-store',
   })
-  const agentUsers = await agentLogsResponse.json()
+    .then(async (res) => (res.ok ? res.json() : []))
+    .catch(() => [])
 
-  const mintLogsResponse = await fetch('http://localhost:8000/mint/mintlogs/?limit=200', {
+  const mintUsers = await fetch('http://localhost:8000/mint/mintlogs/?limit=200', {
     // TODO: Replace with actual FastAPI URL
     method: 'GET',
     headers: {
@@ -19,10 +20,11 @@ export default async function AdminUsersPage() {
     },
     cache: 'no-store',
   })
-  const mintUsers = await mintLogsResponse.json()
+    .then(async (res) => (res.ok ? res.json() : []))
+    .catch(() => [])
 
   const map = new Map<string, { userId: string; lastSeen: number; sources: string[] }>()
-  for (const row of agentUsers) {
+  for (const row of Array.isArray(agentUsers) ? agentUsers : []) {
     if (!row.user_id) continue
     const id = row.user_id
     const ts = row.ts instanceof Date ? row.ts.getTime() : new Date(row.ts).getTime()
@@ -35,7 +37,7 @@ export default async function AdminUsersPage() {
       })
     }
   }
-  for (const row of mintUsers) {
+  for (const row of Array.isArray(mintUsers) ? mintUsers : []) {
     if (!row.user_id) continue
     const id = row.user_id
     const ts =

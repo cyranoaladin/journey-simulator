@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { embedText } from '@/server/embeddings'
+import { createDoc } from '@/server/ragStore'
 
 const Body = z.object({
   title: z.string().min(3),
@@ -15,6 +16,11 @@ export async function POST(req: Request) {
   const embedding = embedText(
     `${parsed.data.title} ${parsed.data.content} ${parsed.data.tags ?? ''}`
   )
+
+  if (process.env.DEMO_MODE === 'true') {
+    const doc = createDoc(parsed.data)
+    return NextResponse.json({ ok: true, id: doc.id })
+  }
 
   const response = await fetch('http://localhost:8000/documents/', {
     // TODO: Replace with actual FastAPI URL

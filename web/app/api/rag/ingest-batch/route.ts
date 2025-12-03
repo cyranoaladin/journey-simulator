@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { embedText } from '@/server/embeddings'
+import { batchCreateDocs } from '@/server/ragStore'
 
 const Body = z.object({
   items: z
@@ -18,6 +19,11 @@ export async function POST(req: Request) {
   const json = await req.json().catch(() => null)
   const parsed = Body.safeParse(json)
   if (!parsed.success) return NextResponse.json({ error: 'bad_request' }, { status: 400 })
+
+  if (process.env.DEMO_MODE === 'true') {
+    const created = batchCreateDocs(parsed.data.items)
+    return NextResponse.json({ ok: true, createdCount: created.length })
+  }
 
   const created: string[] = []
   for (const it of parsed.data.items) {

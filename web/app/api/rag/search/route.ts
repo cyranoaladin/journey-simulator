@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { embedText, cosine } from '@/server/embeddings'
+import { rankDocs } from '@/server/ragStore'
 
 const Body = z.object({ text: z.string().min(2) })
 
@@ -9,6 +10,15 @@ export async function POST(req: Request) {
   const parsed = Body.safeParse(json)
   if (!parsed.success) return NextResponse.json({ error: 'bad_request' }, { status: 400 })
   const qvec = embedText(parsed.data.text)
+
+  if (process.env.DEMO_MODE === 'true') {
+    const ranked = rankDocs(10, parsed.data.text)
+    return NextResponse.json({
+      ok: true,
+      count: ranked.length,
+      docs: ranked.map(({ id, path, score }) => ({ id, title: path, score })),
+    })
+  }
 
   const response = await fetch(
     `http://localhost:8000/documents/?limit=50&order_by=created_at_desc`,

@@ -1,158 +1,136 @@
 /** @jest-environment node */
-import { NextResponse } from 'next/server'
+import { POST as queryPost } from '../../app/api/rag/query/route'
+import { POST as docPost } from '../../app/api/rag/doc/route'
+import { POST as ingestPost } from '../../app/api/rag/ingest/route'
+import { POST as ingestBatchPost } from '../../app/api/rag/ingest-batch/route'
+import { POST as searchPost } from '../../app/api/rag/search/route'
+import { createDoc, resetRagStore } from '@/server/ragStore'
 
-const mockDb = {
-  doc: {
-    findMany: jest.fn(async () => [
-      {
-        id: 'd1',
-        title: 'T',
-        content: 'C',
-        embedding: new Array(64).fill(0).map((_, i) => (i === 0 ? 1 : 0)),
-      },
-    ]),
-    create: jest.fn(async (d: any) => ({ id: 'd2', ...d.data })),
+type MockRequest = { json: () => Promise<any> }
+
+const makeRequest = (payload: any): MockRequest => ({ json: async () => payload })
+const makeThrowingRequest = (): MockRequest => ({
+  json: async () => {
+    throw new Error('bad_request')
   },
-}
-jest.mock('../server/db', () => ({ prisma: mockDb }))
+})
 
 describe('API /api/rag', () => {
-  it('query returns docs', async () => {
-    jest.mock('../../app/api/rag/query/route', () => ({
-      __esModule: true,
-      POST: jest.fn(async () => NextResponse.json({ ok: true, count: 1, docs: [{ id: 'd1' }] })),
-    }))
-    const mod = await import('../../app/api/rag/query/route')
-    const { POST } = mod as any
-    const res = await POST({ json: async () => ({ text: 'algebra' }) } as any)
-    expect(res.status).toBe(200)
-    const json = await (res as NextResponse).json()
-    expect(json.ok).toBe(true)
-    expect(json.count).toBeGreaterThan(0)
+  beforeEach(() => {
+    resetRagStore()
+    process.env.DEMO_MODE = 'true'
+    if ((global.fetch as any)?.mockRestore) {
+      ;(global.fetch as jest.Mock).mockRestore()
+    }
+    delete (global as any).fetch
   })
 
-  it('create doc', async () => {
-    jest.mock('../../app/api/rag/doc/route', () => ({
-      __esModule: true,
-      POST: jest.fn(async () => NextResponse.json({ id: 'd2' })),
-    }))
-    const mod = await import('../../app/api/rag/doc/route')
-    const { POST } = mod as any
-    const res = await POST({
-      json: async () => ({ title: 'Algo', content: "Cours d'algo", tags: 'math' }),
-    } as any)
+  it('query returns docs in demo mode', async () => {
+    createDoc({ title: 'Algebra Basics', content: 'Linear algebra intro', tags: 'math' })
+    const res = await queryPost(makeRequest({ text: 'algebra' }) as any)
     expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.ok).toBe(true)
+    expect(body.count).toBeGreaterThan(0)
+    expect(body.docs[0].title.toLowerCase()).toContain('algebra')
   })
-  it('bad request on empty body', async () => {
-    jest.mock('../../app/api/rag/doc/route', () => ({
-      __esModule: true,
-      POST: jest.fn(async () => NextResponse.json({ error: 'bad_request' }, { status: 400 })),
-    }))
-    const mod = await import('../../app/api/rag/doc/route')
-    const { POST } = mod as any
-    const res = await POST({ json: async () => ({}) } as any)
+
+  it('query rejects invalid payload', async () => {
+    const res = await queryPost(makeRequest({}) as any)
     expect(res.status).toBe(400)
   })
 
-  it('ingest stores embedding', async () => {
-    jest.mock('../../app/api/rag/ingest/route', () => ({
-      __esModule: true,
-      POST: jest.fn(async () => NextResponse.json({ id: 'd3' })),
-    }))
-    const mod = await import('../../app/api/rag/ingest/route')
-    const { POST } = mod as any
-    const res = await POST({
-      json: async () => ({ title: 'Vecteur', content: 'Bonding', tags: 'math' }),
-    } as any)
+  it('doc route creates a document', async () => {
+    const res = await docPost(
+      makeRequest({ title: 'Algo', content: "Cours d'algo", tags: 'math' }) as any
+    )
     expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.ok).toBe(true)
+    expect(body.doc).toMatchObject({ title: 'Algo' })
   })
 
-  it('ingest stores embedding without tags', async () => {
-    jest.mock('../../app/api/rag/ingest/route', () => ({
-      __esModule: true,
-      POST: jest.fn(async () => NextResponse.json({ id: 'd4' })),
-    }))
-    const mod = await import('../../app/api/rag/ingest/route')
-    const { POST } = mod as any
-    const res = await POST({
-      json: async () => ({ title: 'Vecteur', content: 'Sans tags' }),
-    } as any)
-    expect(res.status).toBe(200)
-  })
-
-  it('search ranks docs', async () => {
-    jest.mock('../../app/api/rag/search/route', () => ({
-      __esModule: true,
-      POST: jest.fn(async () => NextResponse.json([{ id: 'd1', meta: { embedding: [1, 2, 3] } }])),
-    }))
-    const mod = await import('../../app/api/rag/search/route')
-    const { POST } = mod as any
-    const res = await POST({ json: async () => ({ text: 'TT' }) } as any)
-    expect(res.status).toBe(200)
-  })
-
-  it('search handles docs without embeddings', async () => {
-    jest.mock('../../app/api/rag/search/route', () => ({
-      __esModule: true,
-      POST: jest.fn(async () => NextResponse.json([{ id: 'dX', title: 'NoVec' }])),
-    }))
-    const { prisma } = (await import('../server/db')) as any
-    prisma.doc.findMany.mockResolvedValueOnce([{ id: 'dX', title: 'NoVec' }])
-    const mod = await import('../../app/api/rag/search/route')
-    const { POST } = mod as any
-    const res = await POST({ json: async () => ({ text: 'XX' }) } as any)
-    expect(res.status).toBe(200)
-  })
-
-  it('ingest bad request', async () => {
-    jest.mock('../../app/api/rag/ingest/route', () => ({
-      __esModule: true,
-      POST: jest.fn(async () => NextResponse.json({ error: 'bad_request' }, { status: 400 })),
-    }))
-    const mod = await import('../../app/api/rag/ingest/route')
-    const { POST } = mod as any
-    const res = await POST({ json: async () => ({}) } as any)
+  it('doc route validates payload', async () => {
+    const res = await docPost(makeRequest({}) as any)
     expect(res.status).toBe(400)
   })
 
-  it('ingest handles invalid json', async () => {
-    jest.mock('../../app/api/rag/ingest/route', () => ({
-      __esModule: true,
-      POST: jest.fn(async () => NextResponse.json({ error: 'bad_request' }, { status: 400 })),
-    }))
-    const mod = await import('../../app/api/rag/ingest/route')
-    const { POST } = mod as any
-    const res = await POST({
-      json: async () => {
-        throw new Error('bad')
-      },
-    } as any)
+  it('ingest route stores a document with tags', async () => {
+    const res = await ingestPost(
+      makeRequest({ title: 'Vecteur', content: 'Bonding', tags: 'math' }) as any
+    )
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.ok).toBe(true)
+    expect(body.id).toBeDefined()
+  })
+
+  it('ingest route stores a document without tags', async () => {
+    const res = await ingestPost(makeRequest({ title: 'Vecteur', content: 'Sans tags' }) as any)
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.ok).toBe(true)
+  })
+
+  it('ingest route rejects invalid payload', async () => {
+    const res = await ingestPost(makeRequest({}) as any)
     expect(res.status).toBe(400)
+  })
+
+  it('ingest route handles invalid json', async () => {
+    const res = await ingestPost(makeThrowingRequest() as any)
+    expect(res.status).toBe(400)
+  })
+
+  it('ingest batch creates multiple documents', async () => {
+    const res = await ingestBatchPost(
+      makeRequest({
+        items: [
+          { title: 'Linear Algebra', content: 'Matrix operations', tags: 'math' },
+          { title: 'Graph Theory', content: 'Nodes and edges' },
+        ],
+      }) as any
+    )
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.ok).toBe(true)
+    expect(body.createdCount).toBe(2)
+  })
+
+  it('ingest batch rejects invalid payload', async () => {
+    const res = await ingestBatchPost(makeRequest({}) as any)
+    expect(res.status).toBe(400)
+  })
+
+  it('search ranks docs in demo mode', async () => {
+    createDoc({ title: 'Solana Overview', content: 'Blockchain primer', tags: 'web3' })
+    const res = await searchPost(makeRequest({ text: 'solana' }) as any)
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.ok).toBe(true)
+    expect(body.docs.length).toBeGreaterThan(0)
   })
 
   it('search handles invalid json', async () => {
-    jest.mock('../../app/api/rag/search/route', () => ({
-      __esModule: true,
-      POST: jest.fn(async () => NextResponse.json({ error: 'bad_request' }, { status: 400 })),
-    }))
-    const mod = await import('../../app/api/rag/search/route')
-    const { POST } = mod as any
-    const res = await POST({
-      json: async () => {
-        throw new Error('bad')
-      },
-    } as any)
+    const res = await searchPost(makeThrowingRequest() as any)
     expect(res.status).toBe(400)
   })
 
-  it('query bad request', async () => {
-    jest.mock('../../app/api/rag/query/route', () => ({
-      __esModule: true,
-      POST: jest.fn(async () => NextResponse.json({ error: 'bad_request' }, { status: 400 })),
+  it('search handles remote docs without embeddings', async () => {
+    process.env.DEMO_MODE = 'false'
+    const mockFetch = jest.fn(async () => ({
+      ok: true,
+      json: async () => [
+        { id: 'd1', path: 'Doc 1', meta: {} },
+        { id: 'd2', path: 'Doc 2', meta: { embedding: [0.2, 0.3] } },
+      ],
     }))
-    const mod = await import('../../app/api/rag/query/route')
-    const { POST } = mod as any
-    const res = await POST({ json: async () => ({}) } as any)
-    expect(res.status).toBe(400)
+    global.fetch = mockFetch as any
+    const res = await searchPost(makeRequest({ text: 'doc' }) as any)
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body.ok).toBe(true)
+    expect(body.docs.length).toBe(2)
+    expect(mockFetch).toHaveBeenCalled()
   })
 })
