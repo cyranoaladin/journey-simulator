@@ -4,6 +4,11 @@ import WalletProvider from '@/components/WalletProvider'
 jest.mock('@solana/wallet-adapter-react', () => ({
   ConnectionProvider: ({ children }: any) => <div data-testid="connection">{children}</div>,
   WalletProvider: ({ children }: any) => <div data-testid="wallet">{children}</div>,
+  useWallet: jest.fn(() => ({
+    publicKey: null,
+    connected: false,
+    signMessage: jest.fn(),
+  })),
 }))
 
 jest.mock('@solana/wallet-adapter-react-ui', () => ({

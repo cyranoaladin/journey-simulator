@@ -44,7 +44,7 @@ export interface PhaseModule {
 export interface UserProgress {
   totalXP: number;
   nfts: string[];
-  nftMints?: { name: string; address: string; signature: string }[];
+  nftMints?: { name: string; address: string; signature: string; imageUrl?: string }[];
   passLevel: 'Free' | 'Gold' | 'Platinum' | 'Diamond';
   mfaiTokens: number;
   stakedMfai: number;
@@ -60,6 +60,18 @@ export interface UserProgress {
   socialShareCount?: number;
   lastSharedPlatform?: string;
   shareHistory?: { platform: string; timestamp: string }[];
+  collaterizeSimulation?: {
+    accepted: boolean
+    eligibilityScore: number
+    tier: 'CORE' | 'EXPERIMENTAL' | 'REJECTED'
+    targetRaiseUSD: number
+    softCapUSD: number
+    hardCapUSD: number
+    liquidityUSD: number
+    initialPriceUSD: number
+    notes: string[]
+    simulatedLaunchUrl: string
+  };
 }
 
 export interface AccessPassHolder {

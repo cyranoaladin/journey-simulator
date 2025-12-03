@@ -26,25 +26,27 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Extract phase number from certification ID
+  // Extract phase number from persona phases and certification metadata
   const getPhaseNumber = () => {
-    if (!certification.id) return 1;
-    
-    // Try to extract phase number from ID
-    const matches = certification.id.match(/phase-(\d+)/);
-    if (matches && matches[1]) {
-      return parseInt(matches[1], 10);
+    if (!selectedPersona) return 1
+
+    if (certification.phaseId) {
+      const index = selectedPersona.phases.findIndex((phase) => phase.id === certification.phaseId)
+      if (index !== -1) {
+        return index + 1
+      }
     }
-    
-    // Fallback: check if ID contains phase names
-    if (certification.id.includes('learn')) return 1;
-    if (certification.id.includes('build')) return 2;
-    if (certification.id.includes('prove')) return 3;
-    if (certification.id.includes('activate')) return 4;
-    if (certification.id.includes('scale')) return 5;
-    
-    return 1;
-  };
+
+    // Fallback to legacy ID parsing when phaseId is unavailable
+    if (certification.id) {
+      const matches = certification.id.match(/phase-(\d+)/)
+      if (matches && matches[1]) {
+        return parseInt(matches[1], 10)
+      }
+    }
+
+    return 1
+  }
 
   const phaseNumber = getPhaseNumber();
 
@@ -128,7 +130,7 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
   // Get proof type based on persona and certification
   const getProofTypeForCert = () => {
     if (!selectedPersona) return 'Skill';
-    return getProofType(selectedPersona.id, certification.id);
+    return getProofType(selectedPersona.id, certification.phaseId || certification.id);
   };
 
   const proofType = getProofTypeForCert();
@@ -202,6 +204,8 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
       <AnimatePresence>
         {showProofModal ? (
           <NFTProofModal
+            personaId={selectedPersona?.id}
+            phaseId={certification.phaseId}
             proofType={proofType}
             title={certification.name}
             description={certification.description}

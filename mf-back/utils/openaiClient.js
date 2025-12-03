@@ -27,7 +27,7 @@ const DEFAULT_LLM_TEMPERATURE = Number(process.env.LLM_TEMPERATURE ?? 0.4) || 0.
 const DEFAULT_LLM_MAX_OUTPUT_TOKENS = Number(process.env.LLM_MAX_OUTPUT_TOKENS ?? 1500) || 1500;
 
 /**
- * Call GPT-5.1 via the Chat Completions API with optional structured output.
+ * Call GPT-3.5-turbo via the Chat Completions API with optional structured output.
  * @param {Object} params
  * @param {string} [params.model]
  * @param {Array} [params.messages]

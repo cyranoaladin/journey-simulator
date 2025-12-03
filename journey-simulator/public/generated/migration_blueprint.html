@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Web2 to Solana Migration Blueprint</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { background: #0A0A1F; color: #E0E0E0; font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .arrow-right { position: relative; }
+        .arrow-right::after { content: '→'; position: absolute; right: -20px; top: 50%; transform: translateY(-50%); color: #A020F0; font-weight: bold; }
+        .glass-panel { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="p-8 h-screen flex flex-col">
+    <header class="mb-8 border-b border-white/10 pb-4">
+        <div class="flex items-center gap-2 text-blue-400 mb-2 font-mono text-xs">
+            <i data-lucide="database" class="w-4 h-4"></i> ARCHITECT AGENT // MIGRATION PLAN
+        </div>
+        <h1 class="text-3xl font-bold text-white font-[Space_Grotesk]">Legacy SQL to Solana Program Mapping</h1>
+        <p class="text-gray-400 mt-1">Loyalty Points System Migration Strategy</p>
+    </header>
+
+    <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-12 items-center justify-center">
+        <div class="glass-panel p-6 rounded-xl relative border-l-4 border-gray-500">
+            <div class="absolute -top-3 left-4 bg-gray-700 text-white text-xs px-2 py-1 rounded">CURRENT STATE (PostgreSQL)</div>
+            <div class="space-y-4 font-mono text-sm">
+                <div class="p-3 bg-black/40 rounded border border-gray-700">
+                    <span class="text-blue-400">TABLE</span> users {<br>
+                    &nbsp;&nbsp;id: UUID (PK)<br>
+                    &nbsp;&nbsp;email: VARCHAR<br>
+                    &nbsp;&nbsp;points_balance: INT<br>
+                    }
+                </div>
+                <div class="flex justify-center text-gray-500 text-xs">⛔ Centralized Ledger</div>
+                <div class="flex justify-center text-gray-500 text-xs">⛔ Non-interoperable</div>
+            </div>
+            <div class="hidden md:block absolute top-1/2 -right-8 transform -translate-y-1/2 z-10">
+                <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center shadow-[0_0_15px_#A020F0]">
+                    <i data-lucide="arrow-right" class="text-white w-5 h-5"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-panel p-6 rounded-xl border-l-4 border-green-400 relative">
+            <div class="absolute -top-3 left-4 bg-green-900 text-green-100 text-xs px-2 py-1 rounded">TARGET STATE (Solana PDA)</div>
+            <div class="space-y-4 font-mono text-sm">
+                <div class="p-3 bg-green-900/10 rounded border border-green-500/30">
+                    <span class="text-purple-400">STRUCT</span> UserLoyaltyAccount {<br>
+                    &nbsp;&nbsp;authority: Pubkey,<br>
+                    &nbsp;&nbsp;mint: Pubkey ($LOYAL),<br>
+                    &nbsp;&nbsp;amount: u64,<br>
+                    &nbsp;&nbsp;bump: u8<br>
+                    }
+                </div>
+                <div class="flex justify-center text-green-400 text-xs">✅ Compressed NFTs for Tiers</div>
+                <div class="flex justify-center text-green-400 text-xs">✅ Tradeable on DEX</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-8 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+        <h3 class="text-blue-400 font-bold text-sm mb-2 flex items-center gap-2">
+            <i data-lucide="code-2" class="w-4 h-4"></i> Zyno Implementation Plan
+        </h3>
+        <p class="text-xs text-gray-300">
+            Zyno will deploy a <strong>Anchor Program</strong> utilizing Metaplex for asset issuance. User emails will be mapped to generated non-custodial wallets via Web3Auth integration, ensuring seamless UX for existing customers.
+        </p>
+    </div>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>

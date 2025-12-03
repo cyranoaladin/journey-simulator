@@ -73,6 +73,18 @@ const journeySchema = new mongoose.Schema({
             },
         }
     ],
+    collaterizeSimulation: {
+        accepted: Boolean,
+        eligibilityScore: Number,
+        tier: String,
+        targetRaiseUSD: Number,
+        softCapUSD: Number,
+        hardCapUSD: Number,
+        liquidityUSD: Number,
+        initialPriceUSD: Number,
+        notes: [String],
+        simulatedLaunchUrl: String,
+    }
 });
 
 const Journey = mongoose.model('Journey', journeySchema);

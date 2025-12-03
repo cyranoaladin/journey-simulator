@@ -71,7 +71,7 @@ describe('Journey Component - Deep Linking', () => {
     it('should not auto-select if persona is already selected', async () => {
         // Mock with already selected persona
         (useJourneyStore as any).mockReturnValue({
-            selectedPersona: personas[0],
+            selectedPersona: personas[1],
             setSelectedPersona: mockSetSelectedPersona
         });
 

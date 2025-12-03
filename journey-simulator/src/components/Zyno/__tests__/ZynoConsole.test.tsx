@@ -96,6 +96,7 @@ describe('ZynoConsole', () => {
 
   afterEach(() => {
     vi.clearAllMocks();
+    vi.useRealTimers();
   });
 
   it('enables mission launch and renders mission feedback after success', async () => {
@@ -121,5 +122,28 @@ describe('ZynoConsole', () => {
         method: 'POST',
       })
     );
+  });
+
+  it('should display a timeout error immediately if fetch rejects with AbortError', async () => {
+    // Mock global.fetch ONLY for this test to immediately reject with AbortError
+    global.fetch = vi.fn(() => Promise.reject(new DOMException('Aborted', 'AbortError'))) as unknown as typeof fetch;
+
+    const { ZynoConsole } = await import('../ZynoConsole');
+    render(<ZynoConsole />);
+
+    const textarea = screen.getByLabelText('Mission Input / Intent');
+    await userEvent.type(textarea, 'A prompt that will immediately time out');
+
+    const launchButton = screen.getByRole('button', { name: 'Start Simulation' });
+    await userEvent.click(launchButton);
+    
+    // Now, the error message should be displayed because the fetch mock immediately rejected
+    await waitFor(() => {
+      const errorLi = screen.getByText(/Request timed out\. Please try again\./i);
+      expect(errorLi).toBeInTheDocument();
+    });
+    
+    // And the button should be re-enabled
+    expect(screen.getByRole('button', { name: 'Start Simulation' })).toBeEnabled();
   });
 });

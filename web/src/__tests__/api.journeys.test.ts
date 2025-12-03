@@ -12,6 +12,17 @@ jest.mock('../server/db', () => ({
 }))
 
 describe('API /api/journeys', () => {
+  beforeEach(() => {
+    jest.spyOn(global, 'fetch').mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({}),
+    } as any)
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
   it('GET returns list', async () => {
     const mod = await import('../../app/api/journeys/route')
     const { GET } = mod as any

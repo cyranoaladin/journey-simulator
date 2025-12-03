@@ -64,7 +64,7 @@ export function AgentScoreboardProvider({ children }: AgentScoreboardProviderPro
     setState((prev) => ({ ...prev, loading: true, error: null }))
 
     try {
-      const response = await api.getAgentScoreboard(keyToUse)
+      const response = await api.getAgentScoreboard()
       setState({
         loading: false,
         error: null,

@@ -33,7 +33,7 @@ const ResourceUploader = () => {
 
     setFetchState({ loading: true, error: null });
     try {
-      const response = await api.listRagDocuments(apiKey!.trim());
+      const response = await api.listRagDocuments();
       setDocuments(response.documents);
       setFetchState({ loading: false, error: null });
     } catch (error) {
@@ -76,7 +76,13 @@ const ResourceUploader = () => {
 
     try {
       setUploading(true);
-      await api.uploadRagDocument(selectedFile, apiKey!.trim());
+      // Read the file content and call uploadDocument with title, content and tags
+      const fileContent = await selectedFile.text();
+      await api.uploadDocument({
+        title: selectedFile.name,
+        content: fileContent,
+        tags: 'rag,document,' + selectedFile.type
+      });
       setUploadMessage(`✅ ${selectedFile.name} successfully ingested.`);
       setSelectedFile(null);
       await loadDocuments();

@@ -1,14 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { AgentLogEntry } from './types';
-import { API_BASE_URL } from '../../utils/api';
+import { api } from '../../utils/api';
 
 const fetchAgentLogs = async (): Promise<AgentLogEntry[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/admin/agent-logs`);
-    if (!response.ok) {
-      throw new Error(`Unable to fetch agent logs: ${response.status}`);
-    }
-    return await response.json();
+    const logs = await api.getAgentLogs();
+    return Array.isArray(logs) ? logs : [];
   } catch (error) {
     console.error(error);
     return [];

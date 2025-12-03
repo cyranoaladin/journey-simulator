@@ -1,8 +1,14 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Compass, Cpu, Gauge, Home, Layers, LifeBuoy, Network, Rocket, Book, LogOut } from 'lucide-react';
+import { Compass, Cpu, Gauge, Home, Layers, LifeBuoy, Network, Rocket, Book, LogOut, X } from 'lucide-react';
 import { useJourneyStore } from '../../store/journeyStore';
 import { useAuth } from '../../contexts/AuthContext';
+import clsx from 'clsx';
+
+type SidebarProps = {
+  variant?: 'docked' | 'overlay';
+  onClose?: () => void;
+};
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: Home },
@@ -15,12 +21,19 @@ const navItems = [
   { to: '/support', label: 'Help Center', icon: LifeBuoy },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({ variant = 'docked', onClose }: SidebarProps) => {
   const { logout } = useAuth();
   const selectedPersona = useJourneyStore((state) => state.selectedPersona);
   const userProgress = useJourneyStore((state) => state.userProgress);
-  console.log("Sidebar: render", { selectedPersonaId: selectedPersona?.id, completedPhases: userProgress.completedPhases.length });
+  console.log('Sidebar: render', { selectedPersonaId: selectedPersona?.id, completedPhases: userProgress.completedPhases.length, variant });
+  const isOverlay = variant === 'overlay';
   const [expanded, setExpanded] = useState(true);
+
+  useEffect(() => {
+    if (isOverlay) {
+      setExpanded(true);
+    }
+  }, [isOverlay]);
 
   const completion = useMemo(() => {
     const total = selectedPersona?.phases?.length ?? 0;
@@ -41,20 +54,45 @@ const Sidebar = () => {
     [userProgress.mfaiTokens, userProgress.nfts.length, userProgress.totalXP, userProgress.votingPower]
   );
 
+  const containerClasses = clsx(
+    'flex flex-col gap-6 rounded-3xl border border-indigo-500/20 bg-indigo-950/20 p-6 shadow-inner transition-all duration-300 overflow-hidden backdrop-blur-lg',
+    {
+      'sticky top-24 hidden h-[calc(100vh-6rem)] xl:flex': !isOverlay,
+      'w-80': !isOverlay && expanded,
+      'w-24': !isOverlay && !expanded,
+      'relative h-full w-full max-h-[calc(100vh-3rem)] overflow-y-auto bg-indigo-950/95 shadow-2xl': isOverlay,
+    }
+  );
+
   return (
-    <aside
-      className={`sticky top-24 hidden h-[calc(100vh-6rem)] flex-col gap-6 rounded-3xl border border-indigo-500/20 bg-indigo-950/20 p-6 shadow-inner lg:flex ${expanded ? 'w-80' : 'w-24'
-        } transition-all duration-300 overflow-hidden`}
-      aria-label="Dashboard navigation"
-    >
-      <button
-        type="button"
-        onClick={() => setExpanded((value) => !value)}
-        className="flex items-center justify-between rounded-2xl border border-indigo-500/30 bg-indigo-500/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-200"
-      >
-        {expanded && <span>Journey Pulse</span>}
-        <Gauge size={16} className={`text-indigo-300 ${!expanded && 'mx-auto'}`} />
-      </button>
+    <aside className={containerClasses} aria-label="Dashboard navigation">
+      <div className="flex items-center justify-between gap-3">
+        <button
+          type="button"
+          onClick={() => setExpanded((value) => !value)}
+          className={clsx(
+            'flex items-center rounded-2xl border border-indigo-500/30 bg-indigo-500/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-200 transition-colors',
+            {
+              'justify-between': !isOverlay,
+              'justify-center w-full': isOverlay,
+            }
+          )}
+          disabled={isOverlay}
+        >
+          {expanded && !isOverlay && <span>Journey Pulse</span>}
+          <Gauge size={16} className={clsx('text-indigo-300', { 'mx-auto': !expanded || isOverlay })} />
+        </button>
+        {isOverlay && onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full border border-white/20 p-2 text-white/70 transition hover:text-white"
+            aria-label="Close navigation panel"
+          >
+            <X size={16} />
+          </button>
+        )}
+      </div>
 
       <div className="space-y-2">
         {navItems.map(({ to, label, icon: Icon }) => (

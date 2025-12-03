@@ -29,5 +29,8 @@ router.post('/load-demo', journeyController.loadDemoState);
 // Schema endpoint - expose journey structure
 router.get('/schema', journeyController.getJourneySchema);
 
+// Artifacts endpoint - expose unlocked artifacts based on user progress
+router.get('/artifacts', protect, journeyController.getUserArtifacts);
+
 module.exports = router;
 

@@ -120,8 +120,31 @@ model MintLog {
   userId     String?
   spec       Json
   signature  String?
+  mintAddress String?
   network    String   @default("devnet")
+  status     String   @default("PENDING") // PENDING, SUCCESS, FAILED
+  error      String?
   createdAt  DateTime @default(now())
+}
+
+model CollaterizeSimulationLog {
+  id                 String   @id @default(cuid())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  userWallet         String
+  journeyId          String?
+  tier               String
+  accepted           Boolean
+  eligibilityScore   Int
+  fundraisingGoalUSD Float
+  softCapUSD         Float
+  hardCapUSD         Float
+  liquidityUSD       Float
+  initialPriceUSD    Float
+
+  rawInput           Json
+  rawOutput          Json
 }
 
 model Doc {

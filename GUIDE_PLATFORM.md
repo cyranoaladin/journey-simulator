@@ -136,12 +136,16 @@ The platform uses a dynamic UI block system orchestrated by Zyno:
 ### Wallet Integration
 - **Supported Wallets**: Phantom, Solflare, Torus
 - **Network**: Solana devnet for test interactions
-- **Connection**: SIWS (Sign-In With Solana) authentication
+- **Connection**: **SIWS (Sign-In With Solana)** authentication
+  - **Security**: Nonce-based challenges stored in **Redis** with TTL.
+  - **Verification**: Cryptographic signature verification using TweetNaCl.
 - **Balance Tracking**: Real-time SOL balance display
 
 ### NFT Minting
 - **Proof-of-Skill™ System**: Achievement-based NFTs for completed phases
-- **Minting Process**: Solana devnet transactions with simulation
+- **Minting Process**:
+  - **Standard**: Uses **@metaplex-foundation/umi** for robust token creation.
+  - **Queue System**: Minting jobs are offloaded to a **Redis-backed Queue** (BullMQ) to handle high concurrency and prevent timeouts.
 - **Metadata**: Dynamic metadata generation based on achievement
 - **Verification**: Blockchain verification of minted NFTs
 

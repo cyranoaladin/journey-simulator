@@ -85,8 +85,7 @@ export default function ZynoDAOAdminPanel() {
         {
           title: newProposal.title.trim(),
           description: newProposal.description.trim() || undefined
-        },
-        apiKey
+        }
       );
       setNewProposal({ title: '', description: '' });
       await loadData();
@@ -110,10 +109,7 @@ export default function ZynoDAOAdminPanel() {
     setVoteSubmitting((prev) => ({ ...prev, [proposalId]: true }));
     setFetchState((prev) => ({ ...prev, error: null }));
     try {
-      await api.castDaoVote(proposalId, {
-        voterId: selectedVoter,
-        support
-      });
+      await api.castDaoVote(proposalId, support);
       await loadData();
     } catch (error) {
       console.error('Failed to vote on proposal:', error);
@@ -135,7 +131,7 @@ export default function ZynoDAOAdminPanel() {
     setClosing((prev) => ({ ...prev, [proposalId]: true }));
     setFetchState((prev) => ({ ...prev, error: null }));
     try {
-      await api.closeDaoProposal(proposalId, apiKey);
+      await api.closeDaoProposal(proposalId);
       await loadData();
     } catch (error) {
       console.error('Failed to close proposal:', error);

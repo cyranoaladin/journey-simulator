@@ -1,25 +1,59 @@
-import { ArrowUpRight, MessageCircle, Sparkles, PanelRightClose, PanelRightOpen } from 'lucide-react'
+import { ArrowUpRight, MessageCircle, Sparkles, PanelRightClose, PanelRightOpen, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useJourneyStore } from '../../store/journeyStore'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import clsx from 'clsx'
 
-const ZynoChatSidebar = () => {
+type ZynoSidebarProps = {
+  variant?: 'docked' | 'overlay'
+  onClose?: () => void
+}
+
+const ZynoChatSidebar = ({ variant = 'docked', onClose }: ZynoSidebarProps) => {
   const navigate = useNavigate()
   const userProgress = useJourneyStore((state) => state.userProgress)
+  const isOverlay = variant === 'overlay'
   const [expanded, setExpanded] = useState(true)
 
+  useEffect(() => {
+    if (isOverlay) {
+      setExpanded(true)
+    }
+  }, [isOverlay])
+
+  const containerClasses = clsx(
+    'zyno-sidebar flex shrink-0 flex-col self-start overflow-hidden border-l border-white/10 bg-surface-900/60 text-white backdrop-blur-2xl transition-all duration-300',
+    {
+      'hidden xl:flex': !isOverlay,
+      'w-80 px-6 py-8': !isOverlay && expanded,
+      'w-16 items-center px-2 py-8': !isOverlay && !expanded,
+      'relative flex h-full w-full max-h-[calc(100vh-3rem)] overflow-y-auto px-6 py-8 shadow-2xl': isOverlay,
+    }
+  )
+
   return (
-    <aside
-      className={`zyno-sticky-sidebar zyno-sidebar hidden shrink-0 flex-col self-start overflow-hidden border-l border-white/10 bg-surface-900/60 text-white backdrop-blur-2xl xl:flex transition-all duration-300 ${expanded ? 'w-80 px-6 py-8' : 'w-16 py-8 px-2 items-center'
-        }`}
-    >
+    <aside className={containerClasses}>
       <button
         onClick={() => setExpanded(!expanded)}
-        className="mb-6 p-2 hover:bg-white/10 rounded-lg transition-colors text-white/50 hover:text-white self-start"
-        title={expanded ? "Réduire le panneau" : "Agrandir le panneau"}
+        className={clsx('mb-6 self-start rounded-lg p-2 text-white/50 transition-colors hover:bg-white/10 hover:text-white', {
+          'pointer-events-none opacity-40': isOverlay,
+        })}
+        title={expanded ? 'Réduire le panneau' : 'Agrandir le panneau'}
+        disabled={isOverlay}
       >
         {expanded ? <PanelRightClose size={20} /> : <PanelRightOpen size={20} />}
       </button>
+
+      {isOverlay && onClose && (
+        <button
+          onClick={onClose}
+          className="absolute right-6 top-6 rounded-full border border-white/20 p-2 text-white/70 transition hover:text-white"
+          aria-label="Close insights panel"
+          type="button"
+        >
+          <X size={16} />
+        </button>
+      )}
 
       <div className={`flex items-center gap-3 ${!expanded && 'flex-col'}`}>
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-primary/80">

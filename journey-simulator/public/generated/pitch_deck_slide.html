@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Money Factory AI · Series A Pitch Snapshot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #050512;
+            --panel: rgba(16, 22, 48, 0.82);
+            --stroke: rgba(99, 102, 241, 0.4);
+            --accent: #8B5CF6;
+            --highlight: #14F195;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #080820, #06061a 60%, #050512 100%);
+            color: #F8FAFC;
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+        .slide {
+            width: min(960px, 100%);
+            background: var(--panel);
+            border-radius: 24px;
+            border: 1px solid var(--stroke);
+            -webkit-backdrop-filter: blur(18px);
+            backdrop-filter: blur(18px);
+            padding: 48px;
+            box-shadow: 0 30px 80px rgba(8, 8, 32, 0.6);
+            display: grid;
+            gap: 32px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: clamp(2.2rem, 4vw, 2.8rem);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+        header p {
+            margin: 12px 0 0;
+            color: rgba(203, 213, 225, 0.9);
+            font-size: 1rem;
+        }
+        .grid {
+            display: grid;
+            gap: 24px;
+        }
+        @media (min-width: 960px) {
+            .grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+            .grid .wide {
+                grid-column: span 3;
+            }
+        }
+        .card {
+            background: rgba(2, 8, 28, 0.9);
+            border-radius: 18px;
+            border: 1px solid rgba(148, 163, 255, 0.22);
+            padding: 22px;
+            position: relative;
+            min-height: 160px;
+        }
+        .card h2 {
+            margin: 0 0 16px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: rgba(165, 180, 252, 0.9);
+        }
+        .card ul {
+            margin: 0;
+            padding-left: 18px;
+            color: rgba(224, 231, 255, 0.92);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        .metric {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.95rem;
+        }
+        .metric strong {
+            font-size: 1.6rem;
+            color: var(--highlight);
+        }
+        footer {
+            font-size: 0.85rem;
+            color: rgba(148, 163, 184, 0.7);
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <article class="slide">
+        <header>
+            <h1>Series A Snapshot &ndash; Money Factory AI</h1>
+            <p>AI-orchestrated venture engine delivering production-grade companies on Solana. The Zyno agent collective compresses diligence, compliance, and launch execution into a single programmable workflow.</p>
+        </header>
+
+        <section class="grid">
+            <div class="card">
+                <h2>Traction</h2>
+                <ul>
+                    <li>1,120 builders onboarded · 78% AEPO mission completion rate.</li>
+                    <li>12 launches on Collaterize with $42M aggregate committed capital.</li>
+                    <li>Average 26-day cycle from brief to investor-ready data room.</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>Why Now</h2>
+                <ul>
+                    <li>Solana infra costs unlock scalable on-chain proof generation.</li>
+                    <li>VCs demand telemetry-rich diligence; AI agents deliver standardized packets.</li>
+                    <li>Regulatory clarity for tokenized launches improves capital appetite.</li>
+                </ul>
+            </div>
+
+            <div class="card metric">
+                <h2>Fundraise</h2>
+                <div>
+                    <span>Round</span>
+                    <strong>$18M Series A</strong>
+                </div>
+                <div>
+                    <span>Use of funds</span>
+                    <span>40% R&amp;D · 35% Go-To-Market · 25% Liquidity alliance</span>
+                </div>
+            </div>
+
+            <div class="card wide">
+                <h2>Product Rollout Roadmap</h2>
+                <ul>
+                    <li><strong>Q1:</strong> Launch AEPO autonomous mentor; integrate walletless onboarding.</li>
+                    <li><strong>Q2:</strong> Release treasury risk engine syncing with Solana DeFi protocols.</li>
+                    <li><strong>Q3:</strong> Expand Collaterize partnership into global compliance coverage.</li>
+                    <li><strong>Q4:</strong> Open Zyno marketplace for third-party agent extensions.</li>
+                </ul>
+            </div>
+        </section>
+
+        <footer>Confidential &middot; Prepared for investor diligence &middot; December 2025</footer>
+    </article>
+</body>
+</html>

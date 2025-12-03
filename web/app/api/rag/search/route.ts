@@ -9,29 +9,29 @@ export async function POST(req: Request) {
   const parsed = Body.safeParse(json)
   if (!parsed.success) return NextResponse.json({ error: 'bad_request' }, { status: 400 })
   const qvec = embedText(parsed.data.text)
-  type PrismaDoc = {
-    prisma: {
-      doc: {
-        findMany: (args: {
-          take?: number
-          orderBy?: unknown
-        }) => Promise<{ id: string; title: string; embedding: unknown | null }[]>
-      }
-    }
+  
+  const response = await fetch(`http://localhost:8000/documents/?limit=50&order_by=created_at_desc`, { // TODO: Replace with actual FastAPI URL
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+  const docs = await response.json()
+  if (!response.ok) {
+    return NextResponse.json({ error: docs.detail || 'Failed to fetch documents' }, { status: response.status })
   }
-  const db = (await import('@/server/db')) as unknown as PrismaDoc
-  const docs = await db.prisma.doc.findMany({ take: 50, orderBy: { createdAt: 'desc' } })
-  type DocRow = { id: string; title: string; embedding: unknown | null }
+  
+  type DocRow = { id: string; path: string; meta: { embedding: number[] | unknown } } // Updated type based on FastAPI Document schema
   const ranked = (docs as DocRow[])
     .map((d) => ({
       d,
-      score: Array.isArray(d.embedding) ? cosine(qvec, d.embedding as number[]) : 0,
+      score: Array.isArray(d.meta?.embedding) ? cosine(qvec, d.meta.embedding as number[]) : 0,
     }))
     .sort((a, b) => b.score - a.score)
     .slice(0, 10)
   return NextResponse.json({
     ok: true,
     count: ranked.length,
-    docs: ranked.map(({ d, score }) => ({ id: d.id, title: d.title, score })),
+    docs: ranked.map(({ d, score }) => ({ id: d.id, title: d.path, score })), // Using path as title for now
   })
 }

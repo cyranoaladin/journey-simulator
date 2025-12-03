@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Money Factory AI · Litepaper (Preview)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #050512;
+            --panel: rgba(19, 21, 46, 0.85);
+            --stroke: rgba(99, 102, 241, 0.35);
+            --muted: #CBD5F5;
+            --accent: #6366F1;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: linear-gradient(135deg, #040422, #0f163d 45%, #070712 100%);
+            color: #F8FAFC;
+            padding: 48px 20px 72px;
+        }
+        header {
+            max-width: 960px;
+            margin: 0 auto 32px;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0 0 10px;
+            font-size: clamp(2rem, 4vw, 2.75rem);
+            letter-spacing: 0.045em;
+            text-transform: uppercase;
+        }
+        header p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        .grid {
+            display: grid;
+            gap: 24px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        @media (min-width: 1024px) {
+            .grid {
+                grid-template-columns: 1.3fr 0.7fr;
+            }
+            .grid .full {
+                grid-column: span 2;
+            }
+        }
+        section {
+            background: var(--panel);
+            border-radius: 20px;
+            border: 1px solid var(--stroke);
+            padding: 28px;
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.45);
+        }
+        h2 {
+            margin: 0 0 16px;
+            font-size: 1.1rem;
+            letter-spacing: 0.08em;
+            color: var(--accent);
+            text-transform: uppercase;
+        }
+        p, li {
+            color: #E0E7FF;
+            line-height: 1.7;
+            font-size: 0.98rem;
+        }
+        ul {
+            padding-left: 20px;
+            margin: 0;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: rgba(99, 102, 241, 0.2);
+            color: #C7D2FE;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-weight: 600;
+        }
+        .matrix {
+            display: grid;
+            gap: 16px;
+        }
+        .matrix-item {
+            padding: 18px;
+            border-radius: 16px;
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(148, 163, 255, 0.25);
+        }
+        footer {
+            max-width: 960px;
+            margin: 40px auto 0;
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="badge">Version 0.5 // Preview for Demo Missions</div>
+        <h1>Money Factory AI Litepaper</h1>
+        <p>This excerpt outlines the mission, architecture, and economic design of Money Factory AI. The full litepaper contains extended compliance analysis, formal proofs, and technical appendices.</p>
+    </header>
+
+    <main class="grid">
+        <section>
+            <h2>1 · Mission &amp; Thesis</h2>
+            <p>Money Factory AI orchestrates venture creation on Solana through the Cognitive Activation Protocol™. We combine individualized AEPO journeys with cohort-scale AECO orchestration to activate teams, capital, and liquidity in weeks instead of quarters.</p>
+            <ul>
+                <li><strong>Activation:</strong> transform async learning into staged proof-of-skill credentials anchored on-chain.</li>
+                <li><strong>Acceleration:</strong> deploy the Zyno multi-agent mesh to compress diligence, token design, and go-to-market loops.</li>
+                <li><strong>Capitalization:</strong> channel qualified projects into the Collaterize launchpad for programmable fundraising.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Key Metrics</h2>
+            <div class="matrix">
+                <div class="matrix-item">
+                    <strong>AEPO Completion</strong>
+                    <p>82% of builders complete Phase 2 missions within 18 days. Proof-of-Skill NFTs certify progress.</p>
+                </div>
+                <div class="matrix-item">
+                    <strong>Capital Velocity</strong>
+                    <p>Collaterize simulations show a 28% reduction in time-to-liquidity once a project enters the launch queue.</p>
+                </div>
+                <div class="matrix-item">
+                    <strong>Agent Efficiency</strong>
+                    <p>17 specialized AI agents handle 63% of diligence tasks, freeing mentors for strategic interventions.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="full">
+            <h2>2 · Architecture Overview</h2>
+            <ul>
+                <li><strong>Journey Layer:</strong> React/Vite client with Zustand state, zk-enabled proof issuance, and wallet orchestration.</li>
+                <li><strong>Orchestration Layer:</strong> Node/Express backend with Mongo persistence, agent routing, and RAG knowledge vault.</li>
+                <li><strong>Agent Fabric:</strong> Zyno agents covering venture, technical, compliance, and community functions with AEPO telemetry.</li>
+                <li><strong>Capital Layer:</strong> Collaterize integration for bonding curves, liquidity bootstrapping, and treasury governance.</li>
+            </ul>
+        </section>
+
+        <section class="full">
+            <h2>3 · Economic Design</h2>
+            <p>$MFAI aligns builders, contributors, and capital providers.</p>
+            <ul>
+                <li><strong>Utility:</strong> staking unlocks premium missions, cross-cohort governance, and fee rebates on launch events.</li>
+                <li><strong>Flows:</strong> protocol revenues (launch fees, AI agent marketplace, licensing) funnel into buy-and-make reserves.</li>
+                <li><strong>Stability:</strong> bonding curve parameters adapt based on AECO health scores and Collaterize liquidity depth.</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        Prepared for demo distribution · For full documentation visit docs.mfai.app
+    </footer>
+</body>
+</html>

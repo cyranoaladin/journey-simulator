@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 import { checkPassOnChain } from '@/lib/solana/checkPassOnChain';
 
 const PASS_COLLECTION_MINT = process.env.NEXT_PUBLIC_PASS_COLLECTION_MINT;

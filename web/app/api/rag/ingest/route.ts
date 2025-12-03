@@ -15,16 +15,23 @@ export async function POST(req: Request) {
   const embedding = embedText(
     `${parsed.data.title} ${parsed.data.content} ${parsed.data.tags ?? ''}`
   )
-  type PrismaDoc = {
-    prisma: {
-      doc: {
-        create: (args: {
-          data: { title: string; content: string; tags?: string; embedding?: unknown }
-        }) => Promise<{ id: string }>
-      }
-    }
+  
+  const response = await fetch('http://localhost:8000/documents/', { // TODO: Replace with actual FastAPI URL
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      source: 'ingest', // Assuming 'ingest' as source for now
+      path: parsed.data.title, // Using title as path for now
+      version: 'v1', // Default version
+      meta: { tags: parsed.data.tags, embedding: embedding }, // Embeddings as meta
+      content: parsed.data.content, // Content for chunk
+    }),
+  })
+  const doc = await response.json()
+  if (!response.ok) {
+    return NextResponse.json({ error: doc.detail || 'Failed to create document' }, { status: response.status })
   }
-  const db = (await import('@/server/db')) as unknown as PrismaDoc
-  const doc = await db.prisma.doc.create({ data: { ...parsed.data, embedding } })
   return NextResponse.json({ ok: true, id: doc.id })
 }

@@ -1,66 +1,50 @@
-# Money Factory AI — Journey Simulator Monorepo
 
-This repository now hosts the three maintained packages that power the Journey Simulator experience:
+# Money Factory AI Journey Simulator
 
-- `journey-simulator/` — Vite + React front-end for the Cognitive Activation Protocol™, Zustand stores, Playwright/Vitest test suites, Storybook, and wallet integrations.
-- `web/` — Next.js 14 companion portal exposing Solana minting, Prisma-backed admin tooling, and server-rendered utility flows.
-- `mf-back/` — Express + MongoDB API that handles authentication, journey progress, agent orchestration, and analytics.
+## Présentation
+Plateforme d’apprentissage Web3 gamifiée, orchestrée par des agents IA (Zyno), intégrant la blockchain (NFT, staking, DAO) et la gestion de parcours personnalisés.
 
-Key documentation lives under `docs/` (cahiers des charges, architecture notes, OpenAPI specs, demo scripts, etc.).
+## Architecture
+- **Frontend** : React/TypeScript (journey-simulator)
+- **Backend** : Node.js/Express, MongoDB (mf-back)
+- **Landing** : Next.js (web)
+- **Orchestration IA** : Zyno multi-agent, RAG
 
-## Quickstart
+## Fonctionnalités principales
+- Authentification sécurisée (JWT)
+- Suivi de progression, XP, NFT, tokens
+- Mint NFT, staking, vote DAO, collaterize
+- Orchestration multi-agent, recherche documentaire RAG
+- UI moderne, responsive
 
-### React Journey Simulator (Vite)
-
+## Installation
 ```bash
-cd journey-simulator
-npm ci
-cp .env.example .env
-npm run dev
+./start_dev.sh # Docker (recommandé)
+# ou
+cd mf-back && npm run dev
+cd journey-simulator && npm run dev
 ```
 
-Run tests and linting:
+## Tests
+- **Backend** : `make test` (Jest)
+- **Frontend** : Cypress e2e dans `journey-simulator/cypress/e2e/`
 
-- `npm run test` (Vitest)
-- `npm run test:e2e` (Playwright)
-- `npm run lint`
+## Documentation technique
+- **Endpoints API** : voir `mf-back/routes/`
+- **Schémas DB** : `mf-back/models/`
+- **Agents Zyno** : `mf-back/agents/`, orchestration dans `mf-back/orchestration/`
+- **Workflows blockchain** : `src/utils/blockchain.ts`, roadmap dans `docs/blockchain_integration_plan.md`
 
-### Next.js Companion Portal
+## Démo investisseur
+1. Création de compte
+2. Navigation parcours, phases
+3. Mint NFT, staking, vote DAO
+4. Orchestration IA (console Zyno)
 
-```bash
-cd web
-npm ci
-cp .env.example .env   # set SOLANA_RPC_URL, NEXT_PUBLIC_SOLANA_RPC_URL, DATABASE_URL, etc.
-npx prisma db push
-npm run dev
-```
+## Pitch
+- Plateforme scalable, modulaire, extensible
+- IA multi-agent, RAG, blockchain intégrée
+- UX gamifiée, traçabilité, sécurité
 
-Useful scripts:
-
-- `npm run test:unit`
-- `npm run test:e2e`
-- `npm run verify` (lint + build + tests)
-- `npm run migrate:deploy`
-
-### Express API
-
-```bash
-cd mf-back
-npm ci
-cp .env.example .env   # configure MONGO_URI, JWT_SECRET, ADMIN_API_KEY, OPENAI_API_KEY, LLM_* defaults
-npm run dev
-```
-
-Tests: `npm test`
-
-## Deployment
-
-Use `docker-compose.yml` for local full-stack runs (`./start_dev.sh`).
-
-For production deployments on dedicated servers (e.g., `journey.mfai.app`), please refer to the [Deployment Guide](DEPLOY.md) (`DEPLOY.md`). It uses `docker-compose.deploy.yml` to ensure isolation and avoid port conflicts.
-
-## Conventions
-
-- Keep secrets in environment files only; never commit credentials.
-- Follow the lint/test pipelines before opening pull requests.
-- Refer to the cahiers des charges in `docs/` to validate feature scope and UX expectations.
+---
+Pour plus de détails, consultez les docs dans `docs/` et les README de chaque sous-projet.

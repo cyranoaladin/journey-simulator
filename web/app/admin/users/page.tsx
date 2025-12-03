@@ -1,25 +1,28 @@
 export const dynamic = 'force-dynamic'
-import { prisma } from '@/server/db'
 
 export default async function AdminUsersPage() {
-  // Fetch latest users from AgentLog and MintLog
-  const agentUsers = await prisma.agentLog.findMany({
-    where: { userId: { not: null } },
-    select: { userId: true, ts: true },
-    orderBy: { ts: 'desc' },
-    take: 200,
+  const agentLogsResponse = await fetch('http://localhost:8000/agent_logs/?limit=200', { // TODO: Replace with actual FastAPI URL
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    cache: 'no-store'
   })
-  const mintUsers = await prisma.mintLog.findMany({
-    where: { userId: { not: null } },
-    select: { userId: true, createdAt: true },
-    orderBy: { createdAt: 'desc' },
-    take: 200,
+  const agentUsers = await agentLogsResponse.json()
+
+  const mintLogsResponse = await fetch('http://localhost:8000/mint/mintlogs/?limit=200', { // TODO: Replace with actual FastAPI URL
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    cache: 'no-store'
   })
+  const mintUsers = await mintLogsResponse.json()
 
   const map = new Map<string, { userId: string; lastSeen: number; sources: string[] }>()
   for (const row of agentUsers) {
-    if (!row.userId) continue
-    const id = row.userId
+    if (!row.user_id) continue
+    const id = row.user_id
     const ts = row.ts instanceof Date ? row.ts.getTime() : new Date(row.ts).getTime()
     const cur = map.get(id)
     if (!cur || ts > cur.lastSeen) {
@@ -31,10 +34,10 @@ export default async function AdminUsersPage() {
     }
   }
   for (const row of mintUsers) {
-    if (!row.userId) continue
-    const id = row.userId
+    if (!row.user_id) continue
+    const id = row.user_id
     const ts =
-      row.createdAt instanceof Date ? row.createdAt.getTime() : new Date(row.createdAt).getTime()
+      row.created_at instanceof Date ? row.created_at.getTime() : new Date(row.created_at).getTime()
     const cur = map.get(id)
     if (!cur || ts > cur.lastSeen) {
       map.set(id, {

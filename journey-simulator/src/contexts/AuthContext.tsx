@@ -10,7 +10,7 @@ import {
   useCallback,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import api, { LoginResponse } from "../utils/api";
+import { api, LoginResponse } from "../utils/api";
 import { useJourneyStore } from "../store/journeyStore";
 
 // User interface matching your backend schema

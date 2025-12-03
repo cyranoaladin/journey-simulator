@@ -1,17 +1,33 @@
 export const dynamic = 'force-dynamic'
-import { prisma } from '@/server/db'
 
 export default async function AdminStatePage({
   searchParams,
 }: {
   searchParams?: { journeyId?: string }
 }) {
-  const where = searchParams?.journeyId ? { journeyId: searchParams.journeyId } : {}
-  const states = await prisma.journeyState.findMany({
-    where,
-    orderBy: { updatedAt: 'desc' },
-    take: 50,
+  const journeyId = searchParams?.journeyId
+  
+  const queryParams = new URLSearchParams();
+  if (journeyId) queryParams.append('journey_id', journeyId);
+  queryParams.append('limit', '50'); // Equivalent to take: 50
+  // orderBy: { updatedAt: 'desc' } will be approximated by ordering by id desc if no specific order_by is implemented in FastAPI
+
+  const response = await fetch(`http://localhost:8000/journey_states/?${queryParams.toString()}`, { // TODO: Replace with actual FastAPI URL
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    cache: 'no-store'
   })
+  const states = await response.json()
+  if (!response.ok) {
+    return (
+      <main className="min-h-screen p-8 lg:p-12">
+        <p className="text-red-500">Error fetching journey states: {states.detail || 'Unknown error'}</p>
+      </main>
+    )
+  }
+
   return (
     <main className="min-h-screen p-8 lg:p-12">
       <div className="flex items-center justify-between mb-4">
@@ -37,14 +53,14 @@ export default async function AdminStatePage({
         </button>
       </form>
       <div className="grid gap-4">
-        {states.map((s) => (
-          <div key={s.journeyId} className="rounded-xl border border-white/10 p-4 bg-bg-mid/40">
-            <div className="text-sm opacity-80 mb-1">journeyId: {s.journeyId}</div>
-            <div className="text-xs opacity-60 mb-2">updatedAt: {s.updatedAt.toISOString()}</div>
-            <div className="text-xs mb-2">userId: {s.userId ?? '—'}</div>
+        {states.map((s: any) => ( // Changed s type to any
+          <div key={s.id} className="rounded-xl border border-white/10 p-4 bg-bg-mid/40">
+            <div className="text-sm opacity-80 mb-1">journeyId: {s.journey_id}</div>
+            <div className="text-xs opacity-60 mb-2">updatedAt: {new Date(s.id).toISOString()}</div> {/* Assuming id is used as updated_at proxy */}
+            <div className="text-xs mb-2">userId: {s.user_id ?? '—'}</div>
             <a
               className="text-xs underline"
-              href={`/admin/logs?journeyId=${encodeURIComponent(s.journeyId)}`}
+              href={`/admin/logs?journeyId=${encodeURIComponent(s.journey_id)}`}
             >
               View logs for this journey
             </a>

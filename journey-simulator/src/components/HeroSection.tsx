@@ -171,9 +171,9 @@ const HeroSection = () => {
               className="mt-8 flex justify-center lg:justify-start"
             >
               <img
-                src="/images/activation_loop.png"
-                alt="The Activation Loop™"
-                className="max-w-full h-auto max-h-[150px] rounded-lg shadow-lg"
+                src="/images/activation_loop.svg?v=2"
+                alt="Activation loop showing Discover, Design, Launch, and Learn phases"
+                className="max-w-full h-auto max-h-[180px] rounded-lg shadow-lg"
               />
             </motion.div>
             <motion.div

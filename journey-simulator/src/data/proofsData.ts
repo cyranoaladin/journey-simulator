@@ -2,6 +2,48 @@ import { Certification } from '../types/journey';
 
 const LOGO_IMAGE_PATH = '/images/logo_mfai.png';
 
+const personaImageConfigs: Record<string, {
+  extension: string;
+  phaseOverrides?: Record<string, string>;
+}> = {
+  'cognitive-activation-hub': {
+    extension: 'png',
+    phaseOverrides: {
+      'launch-collaterize': 'launch_collaterize'
+    }
+  },
+  'capital-foundry': {
+    extension: 'png',
+    phaseOverrides: {
+      'launch-collaterize': 'launch-collaterize'
+    }
+  },
+  'system-architect': {
+    extension: 'png',
+    phaseOverrides: {
+      'launch-collaterize': 'launch-collaterize'
+    }
+  },
+  'experience-studio': {
+    extension: 'png',
+    phaseOverrides: {
+      'launch-collaterize': 'launch-collaterize'
+    }
+  },
+  'impact-engine': {
+    extension: 'png',
+    phaseOverrides: {
+      'launch-collaterize': 'launch-collaterize'
+    }
+  },
+  'resilience-master': {
+    extension: 'png',
+    phaseOverrides: {
+      'launch-collaterize': 'launch-collaterize'
+    }
+  }
+};
+
 // Define proof types
 export type ProofType = 'Skill' | 'Vision' | 'Yield' | 'Build' | 'Creation' | 'Orchestration' | 'Design' | 'Invest' | 'Security';
 
@@ -72,16 +114,12 @@ export const getPersonaProofData = (
   const uniqueId = `${personaId}-${phaseId}-${Date.now()}`;
 
   const getImageUrl = () => {
-    // Use local high-quality NFTs for the Cognitive Activation Hub
-    if (personaId === 'cognitive-activation-hub') {
-      return `/images/nfts/${personaId}/${phaseId}.png`;
-    }
+    // Use persona-specific configuration to resolve filenames consistently across mixed asset formats.
+    const config = personaImageConfigs[personaId];
+    const fileExtension = config?.extension ?? 'svg';
+    const phaseFile = config?.phaseOverrides?.[phaseId] ?? phaseId;
 
-    // Fallback to dynamic placeholders for other journeys until assets are generated
-    const bgColor = personaId === 'cognitive-activation-hub' ? '00f0ff' : '7000ff';
-    const textColor = 'ffffff';
-    const text = encodeURIComponent(`${proofType}\n${phase}`);
-    return `https://placehold.co/600x400/${bgColor}/${textColor}/png?text=${text}&font=roboto`;
+    return `/images/nfts/${personaId}/${phaseFile}.${fileExtension}`;
   };
 
   // Get rarity based on phase
@@ -133,14 +171,23 @@ export const getNFTMetadata = (
   title: string,
   description: string,
   xpEarned: number,
-  phase: string
+  phase: string,
+  phaseNumber?: number
 ) => {
   const proofType = getProofType(personaId, phaseId);
+  const proofData = getPersonaProofData(
+    personaId,
+    phaseId,
+    proofType,
+    xpEarned,
+    phase,
+    phaseNumber ?? 1
+  );
 
   return {
-    name: title,
-    description: description,
-    image: LOGO_IMAGE_PATH,
+    name: proofData.name || title,
+    description: proofData.description || description,
+    image: proofData.imageUrl || LOGO_IMAGE_PATH,
     attributes: [
       { trait_type: "Proof Type", value: `Proof-of-${proofType}™` },
       { trait_type: "XP Earned", value: xpEarned },
@@ -151,8 +198,8 @@ export const getNFTMetadata = (
     properties: {
       files: [
         {
-          uri: LOGO_IMAGE_PATH,
-          type: "image/png"
+          uri: proofData.imageUrl || LOGO_IMAGE_PATH,
+          type: fileExtensionFromUrl(proofData.imageUrl || LOGO_IMAGE_PATH)
         }
       ],
       category: "image",
@@ -164,6 +211,21 @@ export const getNFTMetadata = (
       ]
     }
   };
+};
+
+const fileExtensionFromUrl = (url: string) => {
+  const extension = url.split('.').pop()?.toLowerCase() || 'png';
+  switch (extension) {
+    case 'svg':
+      return 'image/svg+xml';
+    case 'jpg':
+    case 'jpeg':
+      return 'image/jpeg';
+    case 'webp':
+      return 'image/webp';
+    default:
+      return 'image/png';
+  }
 };
 
 // Get explorer URL for NFT

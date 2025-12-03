@@ -30,7 +30,7 @@ const daoProposalSchema = new mongoose.Schema({
 });
 
 // Indexes for efficient queries
-daoProposalSchema.index({ proposalId: 1 });
+
 daoProposalSchema.index({ status: 1 });
 daoProposalSchema.index({ createdAt: -1 });
 

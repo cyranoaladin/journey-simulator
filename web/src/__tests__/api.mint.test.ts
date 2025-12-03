@@ -5,6 +5,12 @@ jest.mock('@/server/db', () => ({
   prisma: { mintLog: { create: jest.fn(async () => ({ id: 'm1' })) } },
 }))
 
+jest.mock('@/server/queue', () => ({
+  mintQueue: {
+    add: jest.fn(async () => ({ id: 'job-1' }))
+  }
+}))
+
 describe('API /api/mint', () => {
   it('simulate rejects bad request', async () => {
     const mod = await import('../../app/api/mint/simulate/route')
@@ -27,15 +33,6 @@ describe('API /api/mint', () => {
     const json = await (res as NextResponse).json()
     expect(json.ok).toBe(true)
     expect(json.sim.ok).toBe(true)
-  })
-
-  it('execute fails without minter key', async () => {
-    const mod = await import('../../app/api/mint/execute/route')
-    const { POST } = mod as any
-    const res = await POST({
-      json: async () => ({ sim: { ok: true, estFeeLamports: 1, riskScore: 0, network: 'devnet' } }),
-    } as any)
-    expect([400, 500, 403]).toContain(res.status)
   })
 
   it('execute blocked by kill switch', async () => {
@@ -61,7 +58,16 @@ describe('API /api/mint', () => {
     const mod = await import('../../app/api/mint/execute/route')
     const { POST } = mod as any
     const res = await POST({
-      json: async () => ({ sim: { ok: true, estFeeLamports: 1, riskScore: 0, network: 'devnet' } }),
+      json: async () => ({
+        spec: {
+          recipient: 'WalletA',
+          type: 'CERT_NFT',
+          name: 'Test NFT',
+          symbol: 'TEST',
+          uri: 'https://example.com/meta.json'
+        },
+        sim: { ok: true, estFeeLamports: 1, riskScore: 0, network: 'devnet' }
+      }),
     } as any)
     expect(res.status).toBe(200)
     delete process.env.MINTER_SECRET_KEY

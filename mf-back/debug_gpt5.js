@@ -15,13 +15,13 @@ const SIMPLE_SCHEMA = {
 };
 
 async function testGpt5() {
-    console.log("🚀 Testing GPT-5.1 Responses API...");
+    console.log("🚀 Testing GPT-3.5-turbo Responses API...");
 
     // Test 3: Structure aplatie avec 'schema' direct
     console.log("\n--- Test 3: Flattened with 'schema' property ---");
     try {
         const response = await openai.responses.create({
-            model: "gpt-5.1",
+            model: "gpt-3.5-turbo",
             input: "Say hello in JSON",
             text: {
                 verbosity: "medium",
@@ -43,7 +43,7 @@ async function testGpt5() {
     console.log("\n--- Test 4: Flattened without strict ---");
     try {
         const response = await openai.responses.create({
-            model: "gpt-5.1",
+            model: "gpt-3.5-turbo",
             input: "Say hello in JSON",
             text: {
                 verbosity: "medium",

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 import nacl from 'tweetnacl';
 import bs58 from 'bs58';
 import { cookies } from 'next/headers';

@@ -1,20 +1,31 @@
 /** @jest-environment node */
 
-jest.mock('agents/tools/solana', () => ({
-  executeReward: jest.fn(async () => {
-    throw new Error('boom')
-  }),
+jest.mock('../../src/server/queue', () => ({
+  mintQueue: {
+    add: jest.fn(async () => {
+      throw new Error('Queue error')
+    }),
+  },
 }))
 
 describe('API /api/mint/execute error path', () => {
-  it('returns 500 when executeReward throws', async () => {
-    process.env.MINTER_SECRET_KEY = 'x'
+  it('returns 500 when queue.add throws', async () => {
     const mod = await import('../../app/api/mint/execute/route')
     const { POST } = mod as any
     const res = await POST({
-      json: async () => ({ sim: { ok: true, estFeeLamports: 1, riskScore: 0, network: 'devnet' } }),
+      json: async () => ({
+        spec: {
+          recipient: 'WalletA',
+          type: 'CERT_NFT',
+          name: 'Test NFT',
+          symbol: 'TEST',
+          uri: 'https://example.com/meta.json'
+        },
+        sim: { ok: true, estFeeLamports: 1, riskScore: 0, network: 'devnet' }
+      }),
     } as any)
     expect(res.status).toBe(500)
-    delete process.env.MINTER_SECRET_KEY
+    const json = await res.json()
+    expect(json.error).toBe('queue_failed')
   })
 })

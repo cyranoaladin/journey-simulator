@@ -2,18 +2,16 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 
 export async function GET() {
-  type PrismaJourney = {
-    prisma: {
-      journey: {
-        findMany: (args: {
-          take?: number
-          orderBy?: unknown
-        }) => Promise<{ id: string; title: string; userId?: string | null }[]>
-      }
-    }
+  const response = await fetch(`http://localhost:8000/journeys/?limit=20&order_by=created_at_desc`, { // TODO: Replace with actual FastAPI URL
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+  const journeys = await response.json()
+  if (!response.ok) {
+    return NextResponse.json({ error: journeys.detail || 'Failed to fetch journeys' }, { status: response.status })
   }
-  const db = (await import('@/server/db')) as unknown as PrismaJourney
-  const journeys = await db.prisma.journey.findMany({ take: 20, orderBy: { createdAt: 'desc' } })
   return NextResponse.json({ ok: true, journeys })
 }
 
@@ -23,30 +21,33 @@ export async function POST(req: Request) {
   const parsed = Create.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: 'bad_request' }, { status: 400 })
   const { title, userEmail } = parsed.data
-  type PrismaJ = {
-    prisma: {
-      user: {
-        upsert: (args: {
-          where: { email: string }
-          update: Record<string, never>
-          create: { email: string }
-        }) => Promise<{ id: string; email: string }>
-      }
-      journey: {
-        create: (args: {
-          data: { title: string; userId?: string | null }
-        }) => Promise<{ id: string }>
-      }
+  
+  let userId: string | null = null;
+  if (userEmail) {
+    const userUpsertResponse = await fetch('http://localhost:8000/users/upsert', { // TODO: Replace with actual FastAPI URL
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: userEmail, hashed_password: "temp_password", role: "student" }), // Assuming default password and role
+    })
+    const user = await userUpsertResponse.json()
+    if (!userUpsertResponse.ok) {
+      return NextResponse.json({ error: user.detail || 'Failed to upsert user' }, { status: userUpsertResponse.status })
     }
+    userId = user.id;
   }
-  const db = (await import('@/server/db')) as unknown as PrismaJ
-  const user = userEmail
-    ? await db.prisma.user.upsert({
-        where: { email: userEmail },
-        update: {},
-        create: { email: userEmail },
-      })
-    : null
-  const j = await db.prisma.journey.create({ data: { title, userId: user?.id } })
+
+  const journeyCreateResponse = await fetch('http://localhost:8000/journeys/', { // TODO: Replace with actual FastAPI URL
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ title, user_id: userId }),
+  })
+  const j = await journeyCreateResponse.json()
+  if (!journeyCreateResponse.ok) {
+    return NextResponse.json({ error: j.detail || 'Failed to create journey' }, { status: journeyCreateResponse.status })
+  }
   return NextResponse.json({ ok: true, journey: j })
 }

@@ -478,7 +478,7 @@ If the user has recently completed a significant mission, consider including an 
                 payload: sanitizedPayload,
                 raw: result.raw,
                 metadata: {
-                    model: "gpt-5.1",
+                    model: "gpt-3.5-turbo",
                     tokens_used: result.usage,
                     mode,
                     tone,

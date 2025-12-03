@@ -40,11 +40,19 @@ const userSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now,
-    },  
+    },
     wallet_address: {
         type: String,
         required: true,
+        unique: true, // Ensure uniqueness
     },
+    // New field for multi-wallet support
+    wallets: [{
+        address: { type: String, required: true },
+        chain: { type: String, default: 'solana' },
+        connected_at: { type: Date, default: Date.now },
+        is_primary: { type: Boolean, default: false }
+    }],
     persona: {
         type: String,
         enum: personaValues,
@@ -56,7 +64,7 @@ const userSchema = new mongoose.Schema({
         default: 'user',
         required: true,
     },
-    is_active : {
+    is_active: {
         type: Boolean,
         default: true,
     },
@@ -123,12 +131,12 @@ const userSchema = new mongoose.Schema({
         },
     },
 
-    subscription:{
+    subscription: {
         type: String,
-        enum: ['free plan','gold', 'platinum', 'diamond'],
-        default : 'free plan', 
+        enum: ['free plan', 'gold', 'platinum', 'diamond'],
+        default: 'free plan',
     },
-    subscription_date:{
+    subscription_date: {
         type: Date,
         default: null,
     },
@@ -156,7 +164,7 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: null,
     },
-    
+
     // Analytics fields
     analytics: {
         certification_downloads: {
@@ -192,22 +200,22 @@ const userSchema = new mongoose.Schema({
 });
 
 // Hash password before saving
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
-    
+
     try {
-      const salt = await bcrypt.genSalt(10);
-      this.password = await bcrypt.hash(this.password, salt);
-      next();
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+        next();
     } catch (error) {
-      next(error);
+        next(error);
     }
-  });
-  
-  // Method to compare password for login
-  userSchema.methods.comparePassword = async function(candidatePassword) {
+});
+
+// Method to compare password for login
+userSchema.methods.comparePassword = async function (candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
-  };
+};
 
 
 const User = mongoose.model('User', userSchema);

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Award, Lock, CheckCircle, ExternalLink, Download, Share2, Sparkles } from 'lucide-react';
 import { useJourneyStore } from '../store/journeyStore';
 import { Certification } from '../types/journey';
-import { getProofType } from '../data/proofsData';
+import { getProofType, getPersonaProofData } from '../data/proofsData';
 import NFTProofModal from './NFTProofModal';
 
 interface ProofCertificationsProps {
@@ -17,55 +17,59 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
   const [hoveredCertId, setHoveredCertId] = useState<string | null>(null);
 
   // Generate mock certifications based on user progress
+  const personaCertificateImage = selectedPersona ? `/images/certificates/${selectedPersona.id}.png` : '/images/logo_mfai.png';
+
   const getCertifications = () => {
     if (!selectedPersona) return [];
-    
+
+    const personaId = selectedPersona.id;
     const certifications: Certification[] = [];
-    
-    // Add completed phase certifications
-    userProgress.completedPhases.forEach(phaseIndex => {
-      const phase = selectedPersona.phases[phaseIndex];
-      if (phase.nftReward) {
-        const proofType = getProofType(selectedPersona.id, phase.id);
+
+    selectedPersona.phases.forEach((phase, index) => {
+      if (!phase.nftReward) return;
+
+      const phaseNumber = index + 1;
+      const proofType = getProofType(personaId, phase.id);
+      const proofData = getPersonaProofData(
+        personaId,
+        phase.id,
+        proofType,
+        phase.xpReward,
+        phase.title,
+        phaseNumber
+      );
+
+      const baseCertification: Certification = {
+        id: `${personaId}-${phase.id}`,
+        name: proofData.name,
+        description: proofData.description,
+        imageUrl: proofData.imageUrl || personaCertificateImage,
+        rarity: proofData.rarity,
+        phaseId: phase.id,
+        attributes: proofData.attributes,
+      };
+
+      if (userProgress.completedPhases.includes(index)) {
         certifications.push({
-          id: `${selectedPersona.id}-${phase.id}`,
-          name: phase.nftReward,
-          description: `This NFT certifies your mastery of ${phase.title} phase in the ${selectedPersona.title} journey.`,
-          imageUrl: phase.nftDesign || '/images/logo_mfai.png',
-          rarity: phaseIndex === 4 ? 'legendary' : phaseIndex === 3 ? 'epic' : phaseIndex === 2 ? 'rare' : 'common',
-          phaseId: phase.id,
-          attributes: [
-            { trait_type: 'Proof Type', value: `Proof-of-${proofType}™` },
-            { trait_type: 'XP Earned', value: phase.xpReward },
-            { trait_type: 'Phase', value: phase.title },
-            { trait_type: 'Completion Date', value: new Date().toLocaleDateString() }
-          ]
+          ...baseCertification,
+          earnedAt: new Date(),
         });
+        return;
       }
+
+      certifications.push({
+        ...baseCertification,
+        id: `${personaId}-${phase.id}-locked`,
+        description: `Complete the ${phase.title} phase to unlock this certification.`,
+        attributes: [
+          { trait_type: 'Proof Type', value: `Proof-of-${proofType}™` },
+          { trait_type: 'XP Reward', value: phase.xpReward },
+          { trait_type: 'Phase', value: phase.title },
+          { trait_type: 'Status', value: 'Locked' },
+        ],
+      });
     });
-    
-    // Add locked future certifications
-    for (let i = userProgress.completedPhases.length; i < selectedPersona.phases.length; i++) {
-      const phase = selectedPersona.phases[i];
-      if (phase.nftReward) {
-        const proofType = getProofType(selectedPersona.id, phase.id);
-        certifications.push({
-          id: `${selectedPersona.id}-${phase.id}-locked`,
-          name: phase.nftReward,
-          description: `Complete the ${phase.title} phase to unlock this certification.`,
-          imageUrl: phase.nftDesign || '/images/logo_mfai.png',
-          rarity: i === 4 ? 'legendary' : i === 3 ? 'epic' : i === 2 ? 'rare' : 'common',
-          phaseId: phase.id,
-          attributes: [
-            { trait_type: 'Proof Type', value: `Proof-of-${proofType}™` },
-            { trait_type: 'XP Reward', value: phase.xpReward },
-            { trait_type: 'Phase', value: phase.title },
-            { trait_type: 'Status', value: 'Locked' }
-          ]
-        });
-      }
-    }
-    
+
     return certifications;
   };
 
@@ -281,18 +285,51 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
       {/* NFT Proof Modal */}
       <AnimatePresence>
         {showProofModal && selectedCertification && (
+          (() => {
+            const proofType = getProofType(selectedPersona?.id || '', selectedCertification.phaseId || selectedCertification.id)
+            const xpAttribute = selectedCertification.attributes.find((a) => a.trait_type === 'XP Earned')
+            const phaseAttribute = selectedCertification.attributes.find((a) => a.trait_type === 'Phase')
+            const completionAttr = selectedCertification.attributes.find((a) => a.trait_type === 'Completion Date')
+
+            const xpValue = typeof xpAttribute?.value === 'number'
+              ? xpAttribute.value
+              : Number(xpAttribute?.value ?? 0)
+
+            const phaseValue = typeof phaseAttribute?.value === 'string'
+              ? phaseAttribute.value
+              : String(phaseAttribute?.value ?? '')
+
+            const completionValue = typeof completionAttr?.value === 'string'
+              ? completionAttr.value
+              : new Date().toLocaleDateString()
+
+            const phaseNumber = (() => {
+              if (selectedPersona && selectedCertification.phaseId) {
+                const index = selectedPersona.phases.findIndex((phase) => phase.id === selectedCertification.phaseId)
+                if (index !== -1) {
+                  return index + 1
+                }
+              }
+              return 1
+            })()
+
+            return (
           <NFTProofModal
-            proofType={getProofType(selectedPersona?.id || '', selectedCertification.phaseId || selectedCertification.id) as any}
+            personaId={selectedPersona?.id}
+            phaseId={selectedCertification.phaseId}
+            proofType={proofType}
             title={selectedCertification.name}
             description={selectedCertification.description}
             imageUrl={selectedCertification.imageUrl}
-            xpEarned={selectedCertification.attributes.find(a => a.trait_type === 'XP Earned')?.value as number || 0}
-            phase={selectedCertification.attributes.find(a => a.trait_type === 'Phase')?.value as string || ''}
-            phaseNumber={userProgress.completedPhases.findIndex(p => selectedPersona?.phases[p].nftReward === selectedCertification.name) + 1}
-            completionDate={selectedCertification.attributes.find(a => a.trait_type === 'Completion Date')?.value as string || new Date().toLocaleDateString()}
+            xpEarned={xpValue}
+            phase={phaseValue}
+            phaseNumber={phaseNumber}
+            completionDate={completionValue}
             rarity={selectedCertification.rarity}
             onClose={() => setShowProofModal(false)}
           />
+            )
+          })()
         )}
       </AnimatePresence>
     </div>

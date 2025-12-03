@@ -156,7 +156,15 @@ const request = async <T>(
     // Helper to simulate backend state
     const getDemoState = () => {
       const stored = localStorage.getItem('demo_mock_db');
-      return stored ? JSON.parse(stored) : {
+      if (stored) return JSON.parse(stored);
+
+      const seed = localStorage.getItem('demo_mock_db_seed');
+      if (seed) {
+        localStorage.setItem('demo_mock_db', seed);
+        return JSON.parse(seed);
+      }
+
+      return {
         xp: 0,
         tokens: 0,
         completedPhases: [],
@@ -219,8 +227,8 @@ const request = async <T>(
         const body = JSON.parse(options.body as string);
         updateDemoState({
           xp: body.total_xp,
-          // If completed_phases is sent as a count, we might need to adjust logic, 
-          // but usually completePhase handles the array. 
+          // If completed_phases is sent as a count, we might need to adjust logic,
+          // but usually completePhase handles the array.
           // Here we just trust the frontend sends total_xp.
         });
         return { success: true } as unknown as T;
@@ -418,26 +426,24 @@ const request = async <T>(
 
     // Mock agent logs endpoints
     if (path.includes('/agents/logs') || path.includes('/admin/agent-logs')) {
-      return {
-        logs: [
-          {
-            id: '1',
-            timestamp: new Date().toISOString(),
-            agentId: 'analyst',
-            message: 'Market analysis completed',
-            level: 'info',
-            journeyId: 'demo-journey'
-          },
-          {
-            id: '2',
-            timestamp: new Date().toISOString(),
-            agentId: 'trader',
-            message: 'Portfolio optimization in progress',
-            level: 'info',
-            journeyId: 'demo-journey'
-          }
-        ]
-      } as unknown as T;
+      return [
+        {
+          id: '1',
+          timestamp: new Date().toISOString(),
+          agentId: 'analyst',
+          message: 'Market analysis completed',
+          level: 'info',
+          journeyId: 'demo-journey'
+        },
+        {
+          id: '2',
+          timestamp: new Date().toISOString(),
+          agentId: 'trader',
+          message: 'Portfolio optimization in progress',
+          level: 'info',
+          journeyId: 'demo-journey'
+        }
+      ] as unknown as T;
     }
 
     // Mock orchestration endpoint
@@ -446,6 +452,67 @@ const request = async <T>(
         status: 'active',
         activeAgents: ['analyst', 'trader', 'governance'],
         queuedTasks: 0
+      } as unknown as T;
+    }
+
+    // Mock Collaterize simulation with enhanced data
+    if (path.includes('/phases/launch-collaterize/simulate')) {
+      // Generate more realistic simulation based on user progress
+      const state = getDemoState();
+      const baseScore = 60 + (state.xp / 100); // Higher XP = higher base score
+      const riskScore = Math.max(0.05, Math.min(0.95, 0.3 - (state.xp / 2000))); // Lower risk with more XP
+      const communityScore = 60 + Math.min(40, state.xp / 200); // Higher community score with more XP
+
+      const adjustedScore = Math.min(100, Math.max(0, baseScore + (Math.random() * 20 - 10))); // Add some randomness
+
+      let tier: 'CORE' | 'EXPERIMENTAL' | 'REJECTED';
+      if (adjustedScore >= 80) tier = 'CORE';
+      else if (adjustedScore >= 60) tier = 'EXPERIMENTAL';
+      else tier = 'REJECTED';
+
+      return {
+        ok: true,
+        simulation: {
+          accepted: tier !== 'REJECTED',
+          eligibilityScore: Math.round(adjustedScore),
+          tier,
+          targetRaiseUSD: 1000000 + state.xp * 5,
+          softCapUSD: 300000 + state.xp * 2,
+          hardCapUSD: 2000000 + state.xp * 8,
+          liquidityUSD: 400000 + state.xp * 3,
+          initialPriceUSD: 0.05 + (state.xp / 10000),
+          communityScore: Math.round(communityScore),
+          riskScore: parseFloat(riskScore.toFixed(2)),
+          notes: [
+            `Your journey score (${Math.round(state.xp)} XP) contributes ${Math.round(baseScore)} to your eligibility score`,
+            "Tokenomics model shows sustainable growth potential",
+            "Community engagement metrics are positive" + (state.xp > 500 ? " and continue to improve" : ""),
+            tier === 'REJECTED' ? "Consider improving documentation and community presence before simulation" :
+              tier === 'EXPERIMENTAL' ? "Your project shows promise but needs refinement in key areas" :
+                "Strong fundamentals positioned for Core track success"
+          ],
+          simulatedLaunchUrl: 'https://launchpad.collaterize.com/'
+        }
+      } as unknown as T;
+    }
+
+    // Mock artifacts endpoint - return unlocked artifacts based on user progress
+    if (path === '/journey/artifacts') {
+      const state = getDemoState();
+      const currentPhase = state.completedPhases ? state.completedPhases.length : 0;
+
+      // Import static artifacts data for demo mode
+      const staticArtifacts = await import('../data/artifacts.json');
+      const artifacts = staticArtifacts.default.map((artifact: any) => ({
+        ...artifact,
+        // Force unlocked status in demo mode so users can preview assets without gating
+        status: 'unlocked'
+      }));
+
+      return {
+        success: true,
+        artifacts,
+        currentPhase
       } as unknown as T;
     }
 
@@ -516,36 +583,6 @@ const request = async <T>(
   }
 
   return handleResponse<T>(response);
-};
-
-const solanaRequest = async <T>(
-  path: string,
-  options: RequestInit = {}
-): Promise<T> => {
-  const response = await fetch(`${SOLANA_API_BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    },
-  });
-
-  if (!response.ok) {
-    let message = `Solana API request failed (status ${response.status})`;
-    try {
-      const errorData: ApiError = await response.json();
-      if (errorData?.message) {
-        message = errorData.message;
-      } else if (errorData?.error) {
-        message = errorData.error;
-      }
-    } catch (parseError) {
-      console.error('Failed to parse Solana API error response:', parseError);
-    }
-    throw new Error(message);
-  }
-
-  return response.json() as Promise<T>;
 };
 
 // Helper function to handle API responses
@@ -672,6 +709,13 @@ export const api = {
     });
   },
 
+  getJourneyArtifacts: async (): Promise<{ success: boolean; artifacts: any[]; currentPhase?: number; message?: string }> => {
+    return request<{ success: boolean; artifacts: any[]; currentPhase?: number; message?: string }>('/journey/artifacts', {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+  },
+
   // Load demo state for a persona
   loadDemoState: async (personaId: string): Promise<any> => {
     return request<any>('/journey/load-demo', {
@@ -689,6 +733,10 @@ export const api = {
     xp_reward?: number;
     mfai_reward?: number;
     nft_reward?: string;
+    title?: string;
+    description?: string;
+    image_url?: string;
+    rarity?: string;
   }): Promise<any> => {
     return request<any>('/journey/complete-phase', {
       method: 'POST',
@@ -752,6 +800,8 @@ export const api = {
     });
   },
 
+
+
   // Track certification shares
   trackCertificationShare: async (shareData: {
     certification_id: string;
@@ -788,177 +838,217 @@ export const api = {
     });
   },
 
-  // Get platform statistics
-  getPlatformStats: async (): Promise<any> => {
-    return request<any>('/analytics/platform-stats', {
+  // Get DAO proposals
+  getDaoProposals: async (): Promise<DaoProposalsResponse> => {
+    return request<DaoProposalsResponse>('/dao/proposals', {
       method: 'GET',
       headers: getAuthHeaders(),
     });
   },
 
-  // Solana minting (Next.js API)
-  solanaMintSimulate: async (payload: { recipient: string; name: string; symbol: string; uri: string }): Promise<{ ok: boolean; sim: { ok: boolean; estFeeLamports: number; riskScore: number; network: string } }> => {
-    return solanaRequest(`/api/mint/simulate`, {
+  // Cast DAO vote
+  castDaoVote: async (proposalId: string, vote: 'yes' | 'no'): Promise<DaoProposalResponse> => {
+    return request<DaoProposalResponse>('/dao/vote', {
       method: 'POST',
-      body: JSON.stringify(payload),
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ proposalId, vote }),
     });
   },
 
-  solanaMintExecute: async (sim: { ok: boolean; estFeeLamports: number; riskScore: number; network: string }): Promise<{ ok: boolean; tx: { txSig: string } }> => {
-    const userId = (typeof window !== 'undefined') ? window.localStorage.getItem('userId') : null
-    return solanaRequest(`/api/mint/execute`, {
-      method: 'POST',
-      headers: {
-        ...(userId ? { 'x-user-id': userId } : {}),
-      },
-      body: JSON.stringify({ sim }),
-    });
-  },
-
-  getAgentScoreboard: async (adminApiKey: string): Promise<AgentScoreboardResponse> => {
-    return request<AgentScoreboardResponse>('/admin/agent-scoreboard', {
-      method: 'GET',
-      headers: {
-        'x-api-key': adminApiKey,
-      },
-    }, false);
-  },
-
-  listRagDocuments: async (adminApiKey: string): Promise<RagDocumentsResponse> => {
-    return request<RagDocumentsResponse>('/admin/rag/documents', {
-      method: 'GET',
-      headers: {
-        'x-api-key': adminApiKey,
-      },
-    }, false);
-  },
-
-  uploadRagDocument: async (file: File, adminApiKey: string): Promise<RagUploadResponse> => {
-    const formData = new FormData();
-    formData.append('document', file);
-
-    const response = await fetch(`${API_BASE_URL}/admin/rag/upload`, {
-      method: 'POST',
-      headers: {
-        'x-api-key': adminApiKey,
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
-      try {
-        const errorData: ApiError = await response.json();
-        throw new Error(errorData.message || errorData.error || 'Upload failed');
-      } catch (error) {
-        if (error instanceof Error) {
-          throw error;
-        }
-        throw new Error('Upload failed');
-      }
-    }
-
-    return response.json();
-  },
-
-  exportMissionSummary: async (
-    summary: MissionExportPayload,
-    format: 'pdf' | 'notion',
-    adminApiKey: string
-  ): Promise<Blob | string> => {
-    const response = await fetch(`${API_BASE_URL}/admin/export/mission`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': adminApiKey,
-      },
-      body: JSON.stringify({ summary, format }),
-    });
-
-    if (!response.ok) {
-      let message = `Export failed (status ${response.status})`;
-      try {
-        const errorData: ApiError = await response.json();
-        if (errorData?.message) {
-          message = errorData.message;
-        } else if (errorData?.error) {
-          message = errorData.error;
-        }
-      } catch (parseError) {
-        console.error('Failed to parse export error response:', parseError);
-      }
-      throw new Error(message);
-    }
-
-    if (format === 'pdf') {
-      return response.blob();
-    }
-
-    const notionResponse = await response.json();
-    if (!notionResponse?.content) {
-      throw new Error('Invalid export format received');
-    }
-    return notionResponse.content as string;
-  },
-
+  // Get DAO configuration
   getDaoConfig: async (): Promise<DaoConfigResponse> => {
     return request<DaoConfigResponse>('/dao/config', {
       method: 'GET',
+      headers: getAuthHeaders(),
     });
   },
 
-  getDaoProposals: async (): Promise<DaoProposalsResponse> => {
-    return request<DaoProposalsResponse>('/dao/proposals', {
-      method: 'GET',
-    });
-  },
-
-  createDaoProposal: async (
-    payload: { title: string; description?: string; createdBy?: string },
-    adminApiKey: string
-  ): Promise<DaoProposalResponse> => {
-    return request<DaoProposalResponse>(
-      '/dao/proposals',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': adminApiKey,
-        },
-        body: JSON.stringify(payload),
-      },
-      false
-    );
-  },
-
-  castDaoVote: async (
-    proposalId: string,
-    payload: { voterId: string; support: boolean | 'yes' | 'no' }
-  ): Promise<DaoProposalResponse> => {
-    return request<DaoProposalResponse>(`/dao/proposals/${proposalId}/vote`, {
+  // Submit DAO proposal
+  submitDaoProposal: async (proposalData: {
+    title: string;
+    description: string;
+  }): Promise<DaoProposalResponse> => {
+    return request<DaoProposalResponse>('/dao/proposal', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
+      headers: getAuthHeaders(),
+      body: JSON.stringify(proposalData),
     });
   },
 
-  closeDaoProposal: async (
-    proposalId: string,
-    adminApiKey: string
-  ): Promise<DaoProposalResponse> => {
-    return request<DaoProposalResponse>(
-      `/dao/proposals/${proposalId}/close`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': adminApiKey,
-        },
-      },
-      false
-    );
+  // Submit mission for evaluation
+  submitMission: async (missionData: {
+    missionId: string;
+    inputType: string;
+    submission: string;
+    language: string;
+    mode: string;
+    tone: string;
+    trackId: string;
+    phaseId: string;
+    journeyState: any;
+  }): Promise<any> => {
+    return request<any>('/journey/submit', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(missionData),
+    });
+  },
+
+  // Get agent logs
+  getAgentLogs: async (journeyId?: string): Promise<any> => {
+    const query = journeyId ? `?journeyId=${journeyId}` : '';
+    return request<any>(`/admin/agent-logs${query}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+  },
+
+  // Orchestration endpoints
+  getOrchestrationStatus: async (): Promise<any> => {
+    return request<any>('/orchestration', {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+  },
+
+  // RAG endpoints
+  uploadDocument: async (docData: {
+    title: string;
+    content: string;
+    tags: string;
+  }): Promise<RagUploadResponse> => {
+    return request<RagUploadResponse>('/rag/doc', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(docData),
+    });
+  },
+
+  queryDocuments: async (queryData: {
+    text: string;
+  }): Promise<any> => {
+    return request<any>('/rag/query', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(queryData),
+    });
+  },
+
+  // Collaterize Simulation
+  simulateCollaterizeLaunch: async (journeyId: string): Promise<any> => {
+    return request<any>(`/journeys/${journeyId}/phases/launch-collaterize/simulate`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+  },
+
+  // Solana mint functions (simulated)
+  solanaMintSimulate: async (mintData: any): Promise<any> => {
+    // Simulated function for demo mode
+    if (localStorage.getItem('accessToken') === 'demo-token') {
+      return {
+        ok: true,
+        sim: {
+          ok: true,
+          estFeeLamports: 5000,
+          riskScore: 0.0,
+          network: 'devnet'
+        }
+      };
+    }
+    return request<any>('/solana/mint/simulate', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(mintData),
+    });
+  },
+
+  solanaMintExecute: async (mintData: any): Promise<any> => {
+    // Simulated function for demo mode
+    if (localStorage.getItem('accessToken') === 'demo-token') {
+      return {
+        ok: true,
+        jobId: 'demo-job-' + Date.now(),
+        status: 'queued',
+        tx: { mintAddress: 'DemoMintAddress' + Date.now(), txSig: 'DemoTxSig' + Date.now() }
+      };
+    }
+    return request<any>('/solana/mint/execute', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(mintData),
+    });
+  },
+
+  // Agent scoreboard
+  getAgentScoreboard: async (): Promise<any> => {
+    // Simulated function for demo mode
+    if (localStorage.getItem('accessToken') === 'demo-token') {
+      return {
+        users: [
+          { userId: 'demo-user-1', aepo: 95, aeco: 92, historyCount: 15, updatedAt: new Date().toISOString(), profile: {} },
+          { userId: 'demo-user-2', aepo: 87, aeco: 89, historyCount: 12, updatedAt: new Date().toISOString(), profile: {} }
+        ]
+      };
+    }
+    return request<any>('/admin/agent-logs', {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+  },
+
+  // Mission export
+  exportMissionSummary: async (missionData: any): Promise<any> => {
+    // Simulated function
+    return request<any>('/journey/export-mission', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(missionData),
+    });
+  },
+
+  // RAG functions
+  listRagDocuments: async (): Promise<any> => {
+    // Simulated function for demo mode
+    if (localStorage.getItem('accessToken') === 'demo-token') {
+      return {
+        documents: [
+          { name: 'Demo Doc 1', path: '/demo/doc1' },
+          { name: 'Demo Doc 2', path: '/demo/doc2' }
+        ]
+      };
+    }
+    return request<any>('/rag/doc', {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+  },
+
+  // DAO functions
+  createDaoProposal: async (proposalData: any): Promise<any> => {
+    // Simulated function for demo mode
+    if (localStorage.getItem('accessToken') === 'demo-token') {
+      return {
+        proposal: {
+          id: 'demo-proposal-' + Date.now(),
+          title: proposalData.title,
+          description: proposalData.description,
+          status: 'active',
+          votes: { yes: 0, no: 0 }
+        }
+      };
+    }
+    return request<any>('/dao/proposal', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(proposalData),
+    });
+  },
+
+  closeDaoProposal: async (proposalId: string): Promise<any> => {
+    return request<any>(`/dao/proposal/${proposalId}/close`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
   },
 };
-
-export default api; 

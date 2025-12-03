@@ -135,12 +135,18 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
 
     setStatus('loading');
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
+
     try {
       const response = await fetch(`${API_BASE_URL}/orchestration`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ input: trimmed, userId: 'demo_user' }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error(`Request failed with status ${response.status}`);
@@ -160,13 +166,22 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
       if (!prompt) {
         setUserInput('');
       }
-    } catch (error) {
+    } catch (error: any) {
+      clearTimeout(timeoutId);
       console.error('Simulation error:', error);
+
+      let errorMessage = 'An unexpected error occurred.';
+      if (error.name === 'AbortError') {
+        errorMessage = 'Request timed out. Please try again.';
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
       setStatus('error');
       setMissionSummary(null);
       setHistory((prev) =>
         prev.map((entry) =>
-          entry.id === entryId ? { ...entry, status: 'error' } : entry,
+          entry.id === entryId ? { ...entry, status: 'error', text: `${entry.text} (Error: ${errorMessage})` } : entry,
         ),
       );
     }
@@ -300,12 +315,12 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
                   </motion.button>
                   <motion.button
                     type="submit"
-                    whileHover={shouldReduceMotion || status === 'loading' ? undefined : { scale: 1.03 }}
-                    whileTap={shouldReduceMotion || status === 'loading' ? undefined : { scale: 0.97 }}
-                    disabled={status === 'loading'}
-                    className={`inline-flex items-center gap-2 rounded-2xl px-5 py-2 text-sm font-semibold transition duration-300 ease-out-quart focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${status === 'loading'
-                      ? 'cursor-wait border border-slate-200/70 bg-slate-100 text-slate-500 dark:border-mfai-border/60 dark:bg-mfai-surfaceMuted dark:text-mfai-text/50'
-                      : 'bg-gradient-accent text-white shadow-neon-ring'
+                    whileHover={shouldReduceMotion || status === 'loading' || !userInput.trim() ? undefined : { scale: 1.03 }}
+                    whileTap={shouldReduceMotion || status === 'loading' || !userInput.trim() ? undefined : { scale: 0.97 }}
+                    disabled={status === 'loading' || !userInput.trim()}
+                    className={`inline-flex items-center gap-2 rounded-2xl px-5 py-2 text-sm font-semibold transition duration-300 ease-out-quart focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${status === 'loading' || !userInput.trim()
+                        ? 'cursor-not-allowed border border-slate-200/70 bg-slate-100 text-slate-500 dark:border-mfai-border/60 dark:bg-mfai-surfaceMuted dark:text-mfai-text/50 opacity-70'
+                        : 'bg-gradient-accent text-white shadow-neon-ring'
                       }`}
                   >
                     {status === 'loading' ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}

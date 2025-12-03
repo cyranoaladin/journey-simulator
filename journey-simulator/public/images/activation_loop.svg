@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00FFFF;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="200" fill="#12122B" rx="15" />
+  <path d="M 100 100 L 700 100" stroke="url(#grad1)" stroke-width="4" stroke-dasharray="10,5" />
+  <g transform="translate(100, 100)">
+    <circle r="40" fill="#1E1E3F" stroke="#FFD700" stroke-width="3" />
+    <text x="0" y="5" text-anchor="middle" fill="white" font-family="Arial" font-size="12" font-weight="bold">LEARN</text>
+  </g>
+  <g transform="translate(300, 100)">
+    <circle r="40" fill="#1E1E3F" stroke="#00FFFF" stroke-width="3" />
+    <text x="0" y="5" text-anchor="middle" fill="white" font-family="Arial" font-size="12" font-weight="bold">BUILD</text>
+  </g>
+  <g transform="translate(500, 100)">
+    <circle r="40" fill="#1E1E3F" stroke="#FF00FF" stroke-width="3" />
+    <text x="0" y="5" text-anchor="middle" fill="white" font-family="Arial" font-size="12" font-weight="bold">GOVERN</text>
+  </g>
+  <g transform="translate(700, 100)">
+    <circle r="40" fill="#1E1E3F" stroke="#00FF00" stroke-width="3" />
+    <text x="0" y="5" text-anchor="middle" fill="white" font-family="Arial" font-size="12" font-weight="bold">LAUNCH</text>
+  </g>
+</svg>

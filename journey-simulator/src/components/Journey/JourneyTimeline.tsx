@@ -53,12 +53,11 @@ export default function JourneyTimeline({ phases, currentPhase, onPhaseChange }:
           <span>Progress</span>
           <span>{Math.min(currentPhase, phases.length)}/{phases.length}</span>
         </div>
-        <div className="mt-2 w-full bg-white/5 rounded-full h-1.5">
-          <div
-            className="bg-gradient-to-r from-accent-cyan to-accent-purple h-1.5 rounded-full transition-all duration-500"
-            style={{ width: `${(Math.min(currentPhase, phases.length) / phases.length) * 100}%` }}
-          ></div>
-        </div>
+        <progress
+          className="timeline-progress mt-2"
+          value={Math.min(currentPhase, phases.length)}
+          max={phases.length}
+        />
       </div>
     </div>
   );

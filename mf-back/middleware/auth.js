@@ -29,13 +29,39 @@ const protect = async (req, res, next) => {
       });
     }
 
+    // Special handling for demo mode
+    if (token === 'demo-token') {
+      // Create a demo user object for demo mode
+      req.user = {
+        id: '507f1f77bcf86cd799439011', // Consistent demo user ID
+        name: 'Demo User',
+        email: 'demo@moneyfactory.ai',
+        role: 'user',
+        wallet_address: 'DEMO_WALLET_ADDRESS',
+        persona: 'cognitive-activation-hub',
+        is_active: true,
+        total_xp: 0,
+        current_level: 0,
+        completed_phases: 0,
+        nft_certificates: [],
+        token_transactions: {
+          mfai_tokens: 0,
+          last_updated: new Date()
+        },
+        subscription: 'free plan',
+        _id: '507f1f77bcf86cd799439011'
+      };
+      next();
+      return;
+    }
+
     try {
-      // Verify token
+      // Verify real JWT token
       const decoded = jwt.verify(token, JWT_SECRET);
-      
+
       // Get user from token
       const user = await User.findById(decoded.id).select('-password');
-      
+
       if (!user) {
         return res.status(401).json({
           success: false,

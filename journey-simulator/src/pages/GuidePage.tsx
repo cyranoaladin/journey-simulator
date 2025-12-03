@@ -185,7 +185,8 @@ const GuidePage = () => {
                                         { title: '2. Build', desc: 'Develop practical skills and create outputs.' },
                                         { title: '3. Prove', desc: 'Validate knowledge through practical application.' },
                                         { title: '4. Activate', desc: 'Deploy and activate community participation.' },
-                                        { title: '5. Scale', desc: 'Expand governance and scale solutions.' }
+                                        { title: '5. Scale', desc: 'Expand governance and scale solutions.' },
+                                        { title: '6. Launch', desc: 'Simulate mainnet launch via Collaterize and graduate to the Core Track.' }
                                     ].map((phase, idx) => (
                                         <div key={idx} className="relative">
                                             <span className="absolute -left-[41px] flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">
@@ -203,19 +204,20 @@ const GuidePage = () => {
                                         <h3 className="text-xl font-bold text-white">Phase 5: Launch Criteria</h3>
                                     </div>
                                     <p className="text-white/80 mb-4">
-                                        Access to the final <strong>Launch Phase</strong> is restricted to projects that meet strict validation criteria. This ensures quality and safety for the ecosystem.
+                                        Access to the final <strong>Launch Phase</strong> is determined by a rigorous <strong>Eligibility Score</strong> calculated from your performance across all phases.
                                     </p>
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <div className="rounded-lg bg-[#1a1a2e] p-4 border border-white/10">
-                                            <h4 className="font-bold text-white mb-2">1. DAO Approval</h4>
+                                            <h4 className="font-bold text-white mb-2">1. Eligibility Score</h4>
                                             <p className="text-sm text-white/60">
-                                                Must receive a passing vote from the DAO. Voting power is held by $MFAI stakers and Proof-of-Skill™ NFT holders.
+                                                A composite score (0-100) based on Journey Score, Community engagement, Documentation quality, and Risk assessment.
                                             </p>
                                         </div>
                                         <div className="rounded-lg bg-[#1a1a2e] p-4 border border-white/10">
-                                            <h4 className="font-bold text-white mb-2">2. Incubation Score</h4>
+                                            <h4 className="font-bold text-white mb-2">2. Launch Tiers</h4>
                                             <p className="text-sm text-white/60">
-                                                Maintain an average validation score of <strong>8.0+</strong> across all "Build" and "Prove" phase missions.
+                                                <strong>CORE Track</strong> (Score 80+): Premium support & marketing.<br />
+                                                <strong>EXPERIMENTAL Track</strong> (Score 60-79): Standard launch support.
                                             </p>
                                         </div>
                                         <div className="rounded-lg bg-[#1a1a2e] p-4 border border-white/10">
@@ -245,7 +247,7 @@ const GuidePage = () => {
 
                         <div className="space-y-6 text-white/80">
                             <p className="leading-relaxed">
-                                The platform is powered by <strong>Zyno</strong>, the central orchestrator, and a team of 24 specialized agents. Each agent is an expert in a specific domain and will guide you through relevant missions.
+                                The platform is powered by <strong>Zyno</strong>, the central orchestrator, and a team of <strong>23 specialized agents</strong>. Each agent is an expert in a specific domain and will guide you through relevant missions.
                             </p>
 
                             <div className="rounded-2xl border border-indigo-500/30 bg-indigo-500/10 p-6 mb-8">
@@ -524,6 +526,10 @@ const GuidePage = () => {
                                 {
                                     step: '5. Phase Completion',
                                     text: 'Complete all missions in a phase to unlock the Boss Battle or Capstone Project. Mint your NFT upon success.'
+                                },
+                                {
+                                    step: '6. Launch & Graduation',
+                                    text: 'Upon achieving a high Eligibility Score, simulate your mainnet launch via Collaterize. Graduate to the Core Track by reaching market cap targets.'
                                 }
                             ].map((item, idx) => (
                                 <div key={idx} className="relative">

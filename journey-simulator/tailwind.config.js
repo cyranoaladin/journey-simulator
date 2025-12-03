@@ -80,6 +80,7 @@ export default {
           pulse: '#7C3AED',
           glow: '#C485FC',
         },
+        'accent-cyan': '#06B6D4',
         light: '#F9FAFB',
       },
       boxShadow: {

@@ -7,10 +7,6 @@
 var app = require('../app');
 var debug = require('debug')('mf-back:server');
 var http = require('http');
-const dotenv = require('dotenv');
-dotenv.config({
-  quiet: true
-});
 
 
 

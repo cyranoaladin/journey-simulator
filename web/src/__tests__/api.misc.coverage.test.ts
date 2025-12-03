@@ -25,25 +25,56 @@ describe('Misc API coverage', () => {
   it('POST /api/auth/siws/challenge returns challenge', async () => {
     const mod = await import('../../app/api/auth/siws/challenge/route')
     const { POST } = mod as any
-    const res = await POST()
+    const res = await POST({ json: async () => ({}) } as any)
     expect(res.status).toBe(200)
     const json = await (res as NextResponse).json()
-    expect(typeof json.challenge).toBe('string')
+    expect(typeof json.challengeId).toBe('string')
     expect(typeof json.message).toBe('string')
   })
 
   it('POST /api/auth/siws/verify bad then ok', async () => {
+    jest.resetModules()
+    jest.doMock('@/server/siwsStore', () => ({
+      getSiwsChallenge: jest.fn(async () => ({
+        id: '550e8400-e29b-41d4-a716-446655440000',
+        message: 'msg',
+        nonce: 'nonce',
+        used: false,
+        expiresAt: Date.now() + 10000
+      })),
+      markSiwsChallengeUsed: jest.fn(async () => { })
+    }))
+
+    jest.doMock('tweetnacl', () => ({
+      sign: { detached: { verify: jest.fn(() => true) } }
+    }))
+
+    // Mock PublicKey to avoid validation error
+    jest.doMock('@solana/web3.js', () => ({
+      PublicKey: class {
+        constructor() { }
+        toBytes() { return new Uint8Array() }
+      }
+    }))
+
+    // Mock bs58
+    jest.doMock('bs58', () => ({
+      decode: jest.fn(() => new Uint8Array())
+    }))
+
     const mod = await import('../../app/api/auth/siws/verify/route')
     const { POST } = mod as any
     const bad = await POST({ json: async () => ({}) } as any)
     expect(bad.status).toBe(400)
+
     const ok = await POST({
       json: async () => ({
-        address: '11111111111111111111',
+        address: '11111111111111111111111111111111',
         signature: 'abcdef0123456789',
-        challenge: '550e8400-e29b-41d4-a716-446655440000',
+        challengeId: '550e8400-e29b-41d4-a716-446655440000',
       }),
     } as any)
+
     expect(ok.status).toBe(200)
     const json = await (ok as NextResponse).json()
     expect(typeof json.token).toBe('string')

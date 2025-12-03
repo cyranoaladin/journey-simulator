@@ -22,6 +22,21 @@ vi.mock('canvas-confetti', () => ({
     default: vi.fn(),
 }));
 
+const layoutMock = {
+    focusMode: false,
+    leftPanelOpen: true,
+    rightPanelOpen: false,
+    toggleFocusMode: vi.fn(),
+    setLeftPanelOpen: vi.fn(),
+    setRightPanelOpen: vi.fn(),
+    density: 'comfortable',
+    cycleDensity: vi.fn(),
+};
+
+vi.mock('../../../contexts/WorkspaceLayoutContext', () => ({
+    useWorkspaceLayout: () => layoutMock,
+}));
+
 // Mock child components to isolate testing
 vi.mock('../../NFTProofModal', () => ({
     default: ({ title, imageUrl, onClose }: any) => (
@@ -39,6 +54,10 @@ describe('NFT Integration in JourneyWorkspace', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        layoutMock.toggleFocusMode.mockClear();
+        layoutMock.setLeftPanelOpen.mockClear();
+        layoutMock.setRightPanelOpen.mockClear();
+        layoutMock.cycleDensity.mockClear();
         const mockState = {
             selectedPersona: {
                 id: 'cognitive-activation-hub',
@@ -61,6 +80,8 @@ describe('NFT Integration in JourneyWorkspace', () => {
             userProgress: {
                 completedPhases: [],
                 totalXP: 0,
+                mfaiTokens: 0,
+                nfts: [],
             },
             currentPhase: 0,
             lastStep: {

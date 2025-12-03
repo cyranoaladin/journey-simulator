@@ -151,6 +151,23 @@
     appearance: none;
   }
 
+  .timeline-progress {
+    @apply w-full h-1.5 rounded-full bg-white/10;
+    appearance: none;
+  }
+
+  .timeline-progress::-webkit-progress-bar {
+    @apply rounded-full bg-white/10;
+  }
+
+  .timeline-progress::-webkit-progress-value {
+    @apply rounded-full bg-accent-cyan;
+  }
+
+  .timeline-progress::-moz-progress-bar {
+    @apply rounded-full bg-accent-cyan;
+  }
+
   .zyno-sticky-sidebar {
     position: sticky;
     top: calc(var(--header-height, 92px) + var(--skillchain-banner-offset, 0px) + var(--wallet-banner-offset, 0px) + 24px);

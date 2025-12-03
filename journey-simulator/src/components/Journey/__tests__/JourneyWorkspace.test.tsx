@@ -22,6 +22,21 @@ vi.mock('canvas-confetti', () => ({
     default: vi.fn()
 }))
 
+const layoutMock = {
+    focusMode: false,
+    leftPanelOpen: true,
+    rightPanelOpen: false,
+    toggleFocusMode: vi.fn(),
+    setLeftPanelOpen: vi.fn(),
+    setRightPanelOpen: vi.fn(),
+    density: 'comfortable',
+    cycleDensity: vi.fn(),
+}
+
+vi.mock('../../../contexts/WorkspaceLayoutContext', () => ({
+    useWorkspaceLayout: () => layoutMock,
+}))
+
 describe('JourneyWorkspace', () => {
     const mockRunInteractiveStep = vi.fn()
     const mockCompletePhase = vi.fn()
@@ -59,6 +74,11 @@ describe('JourneyWorkspace', () => {
     beforeEach(() => {
         vi.clearAllMocks()
 
+        layoutMock.toggleFocusMode.mockClear()
+        layoutMock.setLeftPanelOpen.mockClear()
+        layoutMock.setRightPanelOpen.mockClear()
+        layoutMock.cycleDensity.mockClear()
+
         // Setup default store state
         useJourneyStore.setState({
             selectedPersona: mockPersona,
@@ -92,7 +112,7 @@ describe('JourneyWorkspace', () => {
     it('renders correctly with selected persona', () => {
         render(<JourneyWorkspace />)
 
-        expect(screen.getByText('Test Persona Journey')).toBeInTheDocument()
+        expect(screen.getByText('Test Persona')).toBeInTheDocument()
         expect(screen.getByText('Phase 1')).toBeInTheDocument()
         expect(screen.getByText('Start / Continue')).toBeInTheDocument()
     })
@@ -135,37 +155,33 @@ describe('JourneyWorkspace', () => {
         useJourneyStore.setState({
             lastStep: {
                 type: 'evaluation',
-                ui_blocks: [
-                    {
-                        kind: 'evaluation_block',
-                        global_score: 80,
-                        max_score: 100
-                    }
-                ]
+                evaluation: {
+                    global_score: 80,
+                    max_score: 100
+                },
+                ui_blocks: [{ kind: 'text', content: 'test' }]
             } as any
         } as any)
 
         render(<JourneyWorkspace />)
-        expect(screen.getAllByText('Validate Phase')[0]).toBeInTheDocument()
+        expect(screen.getAllByText('Complete Phase')[0]).toBeInTheDocument()
     })
 
     it('calls completePhase when Complete Phase button is clicked', () => {
         useJourneyStore.setState({
             lastStep: {
                 type: 'evaluation',
-                ui_blocks: [
-                    {
-                        kind: 'evaluation_block',
-                        global_score: 80,
-                        max_score: 100
-                    }
-                ]
+                evaluation: {
+                    global_score: 80,
+                    max_score: 100
+                },
+                ui_blocks: [{ kind: 'text', content: 'test' }]
             } as any
         } as any)
 
         render(<JourneyWorkspace />)
 
-        const completeButton = screen.getAllByText('Validate Phase')[0]
+        const completeButton = screen.getAllByText('Complete Phase')[0]
         fireEvent.click(completeButton)
 
         expect(mockCompletePhase).toHaveBeenCalledWith(0, expect.objectContaining({ score: 100, phaseNumber: 1 }))

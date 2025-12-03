@@ -1,3 +1,8 @@
+const dotenv = require('dotenv');
+dotenv.config({
+  quiet: true
+});
+
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
@@ -5,11 +10,6 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const dotenv = require('dotenv');
-
-dotenv.config({
-  quiet: true
-});
 const indexRouter = require('./routes/index');
 const userRouter = require('./routes/user-routes');
 const coursRoutes = require('./routes/cours-routes');
@@ -22,6 +22,7 @@ const daoRoutes = require('./routes/dao-routes');
 const agentRoutes = require('./routes/agent-routes');
 const feedbackRoutes = require('./routes/feedback');
 const favoritesRoutes = require('./routes/favorites');
+const solanaRoutes = require('./routes/solana-routes');
 const app = express();
 
 const shouldSkipDbConnection = process.env.SKIP_DB_CONNECTION === 'true';
@@ -93,6 +94,13 @@ app.use('/dao', daoRoutes);
 app.use('/api/agents', agentRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/favorites', favoritesRoutes);
+app.use('/api', solanaRoutes);
+
+const journeyLaunchRoutes = require('./routes/journeyLaunchRoutes');
+app.use('/api', journeyLaunchRoutes);
+
+const authRoutes = require('./routes/auth-routes');
+app.use('/api/auth', authRoutes);
 
 // Auth verification route
 app.get('/auth/verify', (req, res) => {

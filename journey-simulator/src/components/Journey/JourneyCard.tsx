@@ -29,6 +29,7 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
     if (!isActivePersona) return persona.phases[0];
     return persona.phases[Math.min(completedCount, persona.phases.length - 1)];
   }, [completedCount, isActivePersona, persona.phases]);
+  const certificatePreview = useMemo(() => `/images/certificates/${persona.id}.png`, [persona.id]);
 
   const cardVariants = {
     hidden: { opacity: 0, y: 24 },
@@ -264,6 +265,23 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
         </div>
 
         <aside className="flex w-full flex-col justify-between gap-4 rounded-3xl border border-mfai-border/50 bg-mfai-surface/60 p-5 shadow-inner-glow lg:max-w-xs">
+          <figure className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/30">
+            <img
+              src={certificatePreview}
+              alt={`${persona.title} signature Proof-of-Skill NFT`}
+              className="h-full w-full object-cover"
+              loading="lazy"
+              onError={(event) => {
+                const target = event.target as HTMLImageElement;
+                target.onerror = null;
+                target.src = '/images/nfts/default-nft.svg';
+              }}
+            />
+            <figcaption className="absolute inset-x-0 bottom-0 bg-black/60 px-3 py-2 text-xs uppercase tracking-[0.3em] text-white/80">
+              Signature Proof NFT
+            </figcaption>
+          </figure>
+
           <div className="space-y-2">
             <p className="text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-mfai-text/60">Progress</p>
             <div className="flex items-center justify-between text-sm text-slate-900 dark:text-white/85">

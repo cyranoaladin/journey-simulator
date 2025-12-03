@@ -11,16 +11,23 @@ export async function POST(req: Request) {
   const json = await req.json().catch(() => null)
   const parsed = Body.safeParse(json)
   if (!parsed.success) return NextResponse.json({ error: 'bad_request' }, { status: 400 })
-  type PrismaDoc = {
-    prisma: {
-      doc: {
-        create: (args: {
-          data: { title: string; content: string; tags?: string }
-        }) => Promise<{ id: string }>
-      }
-    }
+  
+  const response = await fetch('http://localhost:8000/documents/', { // TODO: Replace with actual FastAPI URL
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      source: 'doc_route', // Assuming 'doc_route' as source for now
+      path: parsed.data.title, // Using title as path for now
+      version: 'v1', // Default version
+      meta: { tags: parsed.data.tags }, 
+      content: parsed.data.content, // Content for chunk
+    }),
+  })
+  const doc = await response.json()
+  if (!response.ok) {
+    return NextResponse.json({ error: doc.detail || 'Failed to create document' }, { status: response.status })
   }
-  const db = (await import('@/server/db')) as unknown as PrismaDoc
-  const doc = await db.prisma.doc.create({ data: parsed.data })
   return NextResponse.json({ ok: true, doc })
 }

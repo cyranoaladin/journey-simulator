@@ -2,10 +2,25 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { Persona, UserProgress, TestnetFeatures } from '../types/journey'
 import { personas } from '../data/personas'
+import { getPersonaProofData, getProofType } from '../data/proofsData'
 import { api } from '../utils/api'
 import { mintProofOfSkill } from '../utils/blockchain'
 
 import type { JourneyStepResponse, Mode, Tone } from '../types/uiBlocks'
+
+
+export type CollaterizeSimulation = {
+  accepted: boolean
+  eligibilityScore: number
+  tier: 'CORE' | 'EXPERIMENTAL' | 'REJECTED'
+  targetRaiseUSD: number
+  softCapUSD: number
+  hardCapUSD: number
+  liquidityUSD: number
+  initialPriceUSD: number
+  notes: string[]
+  simulatedLaunchUrl: string
+}
 
 interface JourneyState {
   selectedPersona: Persona | null
@@ -29,12 +44,26 @@ interface JourneyState {
   updateProgress: (xp: number, nfts?: string[], mfai?: number) => Promise<void>
   openModal: (content: any) => void
   closeModal: () => void
-  completePhase: (phaseIndex: number, options?: { score?: number; nftAddress?: string; phaseNumber?: number; xpReward?: number; mfaiReward?: number }) => Promise<void>
+  completePhase: (phaseIndex: number, options?: {
+    score?: number
+    nftAddress?: string
+    phaseNumber?: number
+    xpReward?: number
+    mfaiReward?: number
+    nftReward?: string
+  }) => Promise<void>
   updateStaking: (amount: number) => void
   updateVotingPower: (newPower: number) => void
   updateWalletConnection: (connected: boolean, address?: string) => void
   claimTestnetAirdrop: () => void
-  mintNFT: (nftName: string, wallet: any) => Promise<{ mintAddress: string; signature: string }>
+  mintNFT: (nftName: string, wallet: any, options?: {
+    personaId?: string
+    phaseId?: string
+    phaseNumber?: number
+    xpEarned?: number
+    imageUrl?: string
+    proofType?: string
+  }) => Promise<{ mintAddress: string; signature: string }>
   shareJourney: (platform: string) => void
   resetProgress: () => Promise<void>
   downloadNFT: (nftName: string) => Promise<boolean>
@@ -43,6 +72,7 @@ interface JourneyState {
   loadUserProgress: () => Promise<void>
   setUserProgress: (progress: UserProgress) => void
   setDemoMode: (enabled: boolean) => void
+  setCollaterizeSimulation: (sim: CollaterizeSimulation | undefined) => void
 }
 
 const initialUserProgress: UserProgress = {
@@ -118,15 +148,21 @@ export const useJourneyStore = create<JourneyState>()(
       uiTone: 'pedagogical',
       isStepLoading: false,
 
-      setSelectedPersona: (persona) => set({
-        selectedPersona: persona,
-        currentPhase: 0,
-        userProgress: {
-          ...get().userProgress,
-          currentPersona: persona?.id || undefined,
-          completedPhases: [] // Reset completed phases when changing persona
-        }
-      }),
+      setSelectedPersona: (persona) => {
+        const state = get()
+        const journeyId = state.apiJourneyId ?? state.ensureApiJourneyId()
+
+        set({
+          selectedPersona: persona,
+          currentPhase: 0,
+          apiJourneyId: journeyId,
+          userProgress: {
+            ...state.userProgress,
+            currentPersona: persona?.id || undefined,
+            completedPhases: [] // Reset completed phases when changing persona
+          }
+        })
+      },
 
       setCurrentPhase: (phase) => set({ currentPhase: phase }),
 
@@ -208,69 +244,111 @@ export const useJourneyStore = create<JourneyState>()(
       closeModal: () => set({ isModalOpen: false, modalContent: null }),
 
       completePhase: async (phaseIndex, options = {}) => {
-        console.log('[Store] completePhase called', { phaseIndex, options });
         const state = get()
 
         if (state.userProgress.completedPhases.includes(phaseIndex)) {
-          console.log('[Store] Phase already completed', phaseIndex);
           return
         }
 
         const phaseNumber = options.phaseNumber ?? phaseIndex + 1
+        const currentPersona = state.selectedPersona
+        const personaData = currentPersona ? personas.find(p => p.id === currentPersona.id) : null
+        const phases = personaData ? personaData.phases : []
+
+        if (phaseIndex >= phases.length) {
+          return
+        }
+
+        const currentPhaseData = phases[phaseNumber - 1]
+        const xpReward = options.xpReward ?? currentPhaseData?.xpReward ?? 0
+        const mfaiReward = options.mfaiReward ?? currentPhaseData?.mfaiReward ?? 0
+        const nftReward = options.nftReward ?? currentPhaseData?.nftReward
+
+        const resolvedPersonaId = currentPersona?.id ?? state.userProgress.currentPersona
+        const resolvedPhaseId = currentPhaseData?.id
+        const resolvedPhaseTitle = currentPhaseData?.title ?? `Phase ${phaseNumber}`
+        let resolvedNftName = nftReward
+
+        let proofData: any = null
+
+        if (resolvedPersonaId && resolvedPhaseId) {
+          try {
+            const proofType = getProofType(resolvedPersonaId, resolvedPhaseId)
+            proofData = getPersonaProofData(
+              resolvedPersonaId,
+              resolvedPhaseId,
+              proofType,
+              xpReward,
+              resolvedPhaseTitle,
+              phaseNumber
+            )
+
+            if (proofData?.name) {
+              resolvedNftName = proofData.name
+            }
+          } catch (metadataError) {
+            console.warn('Failed to derive proof metadata for NFT reward:', metadataError)
+          }
+        }
+
+        const updatedPhases = Array.from(
+          new Set([...state.userProgress.completedPhases, phaseIndex])
+        ).sort((a, b) => a - b)
+
+        const nextPhaseIndex = Math.min(updatedPhases.length, Math.max(phases.length - 1, 0))
+
+        const newTotalXP = state.userProgress.totalXP + xpReward
+        let updatedNFTs = state.userProgress.nfts
+
+        if (resolvedNftName && !updatedNFTs.includes(resolvedNftName)) {
+          updatedNFTs = [...updatedNFTs, resolvedNftName]
+        }
+
+        const updatedPassLevel = derivePassLevel(undefined, newTotalXP, updatedNFTs.length)
+
+        const updatedProgress: UserProgress = {
+          ...state.userProgress,
+          completedPhases: updatedPhases,
+          totalXP: newTotalXP,
+          mfaiTokens: state.userProgress.mfaiTokens + mfaiReward,
+          votingPower: state.userProgress.votingPower + Math.floor(xpReward / 10),
+          nfts: updatedNFTs,
+          passLevel: updatedPassLevel,
+        }
+
+        set({
+          userProgress: updatedProgress,
+          currentPhase: nextPhaseIndex,
+        })
+
+        const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
+        if (!accessToken) {
+          return
+        }
 
         try {
-          console.log('[Store] Calling api.completePhase', { phaseNumber, ...options });
-          // Get rewards for the current phase
-          const currentPersona = state.selectedPersona;
-          const personaData = currentPersona ? personas.find(p => p.id === currentPersona.id) : null;
-          const phases = personaData ? personaData.phases : [];
-          const currentPhaseData = phases[phaseNumber - 1]; // phaseNumber is 1-based
-
-          const xpReward = currentPhaseData?.xpReward || 0;
-          const mfaiReward = currentPhaseData?.mfaiReward || 0;
-          const nftReward = currentPhaseData?.nftReward || undefined;
-
-          // Validate phase index
-          if (phaseIndex >= phases.length) {
-            console.warn('[Store] Attempted to complete non-existent phase', phaseIndex);
-            return;
-          }
-
-          // Call API to complete phase with rewards
           const response = await api.completePhase({
             phase_number: phaseNumber,
-            score: 100, // Default score
-            nft_address: '0x' + Math.random().toString(16).substr(2, 40), // Mock address
+            score: options.score ?? 100,
+            nft_address: options.nftAddress || '0x' + Math.random().toString(16).substr(2, 40),
             xp_reward: xpReward,
             mfai_reward: mfaiReward,
-            nft_reward: nftReward
-          });
-          console.log('[Store] api.completePhase success', response);
-
-          // If the response contains UI blocks (e.g. from an agent evaluation), display them
-          if (response && response.ui_blocks) {
-            set({ lastStep: response });
-          } else {
-            // Clear last step if no blocks returned, to show the next phase details
-            set({ lastStep: null });
-          }
-
-          const updatedPhases = Array.from(
-            new Set([...state.userProgress.completedPhases, phaseIndex])
-          ).sort((a, b) => a - b)
-
-          set({
-            userProgress: {
-              ...state.userProgress,
-              completedPhases: updatedPhases,
-            }
+            nft_reward: resolvedNftName,
+            title: proofData?.name,
+            description: proofData?.description,
+            image_url: proofData?.imageUrl,
+            rarity: proofData?.rarity,
           })
 
-          // Reload progress to get updated XP/Tokens from backend
+          if (response && response.ui_blocks) {
+            set({ lastStep: response })
+          } else {
+            set({ lastStep: null })
+          }
+
           await get().loadUserProgress()
         } catch (error) {
           console.error('Failed to sync phase completion with backend:', error)
-          throw error
         }
       },
 
@@ -307,16 +385,101 @@ export const useJourneyStore = create<JourneyState>()(
         }
       })),
 
-      mintNFT: async (nftName: string, wallet: any) => {
+      mintNFT: async (nftName: string, wallet: any, options = {}) => {
+        const resolveImage = (): string => {
+          if (options.imageUrl) {
+            return options.imageUrl
+          }
+
+          if (options.personaId && options.phaseId) {
+            const proofType = getProofType(options.personaId, options.phaseId)
+            const proof = getPersonaProofData(
+              options.personaId,
+              options.phaseId,
+              proofType,
+              options.xpEarned ?? 0,
+              options.phaseId,
+              options.phaseNumber ?? 1
+            )
+            return proof.imageUrl
+          }
+
+          const normalizedName = nftName.toLowerCase()
+
+          if (
+            normalizedName.includes('proof-of-skill') ||
+            normalizedName.includes('cognitive') ||
+            normalizedName.includes('activation')
+          ) {
+            return '/images/nfts/cognitive-activation-hub/cognitive-orientation.png'
+          }
+
+          if (
+            normalizedName.includes('proof-of-yield') ||
+            normalizedName.includes('capital') ||
+            normalizedName.includes('solana') ||
+            normalizedName.includes('neuro-dividend')
+          ) {
+            return '/images/nfts/capital-foundry/capital-discovery.svg'
+          }
+
+          if (
+            normalizedName.includes('proof-of-build') ||
+            normalizedName.includes('system') ||
+            normalizedName.includes('tokenomics') ||
+            normalizedName.includes('architect')
+          ) {
+            return '/images/nfts/system-architect/architecture-scan.svg'
+          }
+
+          if (
+            normalizedName.includes('proof-of-creation') ||
+            normalizedName.includes('experience') ||
+            normalizedName.includes('creator')
+          ) {
+            return '/images/nfts/experience-studio/experience-discovery.svg'
+          }
+
+          if (
+            normalizedName.includes('proof-of-orchestration') ||
+            normalizedName.includes('impact') ||
+            normalizedName.includes('governance')
+          ) {
+            return '/images/nfts/impact-engine/impact-charter.svg'
+          }
+
+          if (
+            normalizedName.includes('proof-of-security') ||
+            normalizedName.includes('resilience') ||
+            normalizedName.includes('guardian')
+          ) {
+            return '/images/nfts/resilience-master/security-baseline.svg'
+          }
+
+          if (normalizedName.includes('proof-of-design')) {
+            return '/images/nfts/experience-studio/experience-discovery.svg'
+          }
+
+          if (normalizedName.includes('proof-of-invest')) {
+            return '/images/nfts/capital-foundry/capital-discovery.svg'
+          }
+
+          return '/images/logo_mfai.png'
+        }
+
+        const proofTypeTrait = options.proofType ? `Proof-of-${options.proofType}™` : 'Proof-of-Skill'
+
         const metadata = {
           name: nftName,
-          description: `Proof-of-Skill NFT for ${nftName}`,
-          image: 'https://placehold.co/600x400.png',
+          description: `Proof NFT for ${nftName}`,
+          image: resolveImage(),
           attributes: [
             { trait_type: 'App', value: 'Money Factory AI' },
-            { trait_type: 'Type', value: 'Proof-of-Skill' },
+            { trait_type: 'Type', value: proofTypeTrait },
+            ...(options.xpEarned !== undefined ? [{ trait_type: 'XP Earned', value: options.xpEarned }] : []),
+            ...(options.phaseNumber !== undefined ? [{ trait_type: 'Phase', value: options.phaseNumber }] : []),
           ],
-        };
+        }
 
         const result = await mintProofOfSkill(wallet, metadata);
 
@@ -324,16 +487,33 @@ export const useJourneyStore = create<JourneyState>()(
           throw new Error(result.error || 'Mint failed');
         }
 
-        set((state) => ({
-          userProgress: {
-            ...state.userProgress,
-            nfts: [...state.userProgress.nfts, nftName],
-            nftMints: [
-              ...(state.userProgress.nftMints || []),
-              { name: nftName, address: result.mintAddress!, signature: result.signature! },
-            ],
-          },
-        }));
+        set((state) => {
+          const hasNFT = state.userProgress.nfts.includes(nftName)
+          const updatedNFTs = hasNFT
+            ? state.userProgress.nfts
+            : [...state.userProgress.nfts, nftName]
+
+          const updatedPassLevel = derivePassLevel(
+            undefined,
+            state.userProgress.totalXP,
+            updatedNFTs.length
+          )
+
+          const existingMints = state.userProgress.nftMints || []
+          const filteredMints = existingMints.filter((mint) => mint.name !== nftName)
+
+          return {
+            userProgress: {
+              ...state.userProgress,
+              nfts: updatedNFTs,
+              passLevel: updatedPassLevel,
+              nftMints: [
+                ...filteredMints,
+                { name: nftName, address: result.mintAddress!, signature: result.signature!, imageUrl: metadata.image },
+              ],
+            },
+          }
+        })
 
         return { mintAddress: result.mintAddress, signature: result.signature };
       },
@@ -427,7 +607,18 @@ export const useJourneyStore = create<JourneyState>()(
             ? progress.completed_phases
             : 0
 
-          const completedPhases = Array.from({ length: completedCount }, (_, index) => index)
+          const backendPersonaId: string | undefined = progress.persona || currentState.userProgress.currentPersona || undefined
+          const matchedPersona = backendPersonaId
+            ? personas.find((persona) => persona.id === backendPersonaId)
+            : null
+
+          const effectivePersona = currentState.selectedPersona ?? matchedPersona ?? null
+
+          const localCompletedCount = currentState.userProgress.completedPhases.length
+          const resolvedCompletedCount = Math.max(completedCount, localCompletedCount)
+          const personaPhaseCount = effectivePersona?.phases?.length ?? resolvedCompletedCount
+          const safeCompletedCount = Math.min(resolvedCompletedCount, personaPhaseCount)
+          const completedPhases = Array.from({ length: safeCompletedCount }, (_, index) => index)
 
           const rawCertificates: any[] = Array.isArray(progress.nft_certificates)
             ? progress.nft_certificates
@@ -453,37 +644,39 @@ export const useJourneyStore = create<JourneyState>()(
             return 'NFT Certificate'
           })
 
-          const personaId: string | undefined = progress.persona || undefined
-          const matchedPersona = personaId
-            ? personas.find((persona) => persona.id === personaId)
-            : null
+          const dedupedNfts = Array.from(new Set([
+            ...currentState.userProgress.nfts,
+            ...mappedNfts,
+          ]))
 
           const passLevel = derivePassLevel(
             progress.subscription,
             totalXP,
-            mappedNfts.length
+            dedupedNfts.length
           )
 
           const mappedProgress: UserProgress = {
             ...initialUserProgress,
+            ...currentState.userProgress,
             totalXP,
-            nfts: mappedNfts,
+            nfts: dedupedNfts,
             passLevel,
-            mfaiTokens: progress.token_transactions?.mfai_tokens ?? 0,
+            mfaiTokens: progress.token_transactions?.mfai_tokens ?? currentState.userProgress.mfaiTokens,
             stakedMfai: currentState.userProgress.stakedMfai,
             walletConnected: currentState.userProgress.walletConnected,
             walletAddress: currentState.userProgress.walletAddress,
             completedPhases,
-            currentPersona: personaId,
+            currentPersona: backendPersonaId ?? currentState.userProgress.currentPersona,
             votingPower: Math.floor(totalXP / 10),
             daoProposals: currentState.userProgress.daoProposals,
             testnetAirdropClaimed: currentState.userProgress.testnetAirdropClaimed,
             socialShareCount: currentState.userProgress.socialShareCount,
+            nftMints: currentState.userProgress.nftMints,
           }
 
           set({
-            selectedPersona: matchedPersona ?? currentState.selectedPersona ?? null,
-            currentPhase: completedPhases.length,
+            selectedPersona: effectivePersona,
+            currentPhase: safeCompletedCount,
             userProgress: mappedProgress,
           })
         } catch (error) {
@@ -496,9 +689,12 @@ export const useJourneyStore = create<JourneyState>()(
       setDemoMode: (enabled: boolean) => {
         if (enabled) {
           const demoPersona = personas[0]; // Cognitive Activation Hub
+          const state = get()
+          const journeyId = state.apiJourneyId ?? state.ensureApiJourneyId()
           set({
             selectedPersona: demoPersona,
             currentPhase: 0, // Start at Phase 1
+            apiJourneyId: journeyId,
             userProgress: {
               ...initialUserProgress,
               totalXP: 0,
@@ -511,7 +707,14 @@ export const useJourneyStore = create<JourneyState>()(
             }
           });
         }
-      }
+      },
+
+      setCollaterizeSimulation: (sim) => set((state) => ({
+        userProgress: {
+          ...state.userProgress,
+          collaterizeSimulation: sim
+        }
+      }))
     }),
     {
       name: 'mfai-journey-storage',
@@ -526,3 +729,8 @@ export const useJourneyStore = create<JourneyState>()(
     }
   )
 )
+
+// Expose store to window for E2E testing
+if (typeof window !== 'undefined') {
+  (window as any).useJourneyStore = useJourneyStore;
+}

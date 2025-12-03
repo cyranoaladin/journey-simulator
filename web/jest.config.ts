@@ -4,10 +4,12 @@ const createJestConfig = nextJest({ dir: './' })
 
 const customJestConfig = {
   testEnvironment: 'jsdom',
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts', '<rootDir>/src/mocks/setup.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^agents/(.*)$': '<rootDir>/packages/agents/$1',
+    '^msw/node$': '<rootDir>/src/mocks/msw-node.js',
+    '^until-async$': '<rootDir>/src/mocks/until-async.js', // Add this line
   },
   testPathIgnorePatterns: ['/node_modules/', '/e2e/'],
   collectCoverageFrom: [

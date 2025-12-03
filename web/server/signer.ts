@@ -32,13 +32,13 @@ export async function signBase64Transaction(txBase64: string): Promise<string> {
 
     try {
         // Try parsing as VersionedTransaction first (standard for modern apps)
-        const vTx = VersionedTransaction.deserialize(txBuffer);
+        const vTx = VersionedTransaction.deserialize(new Uint8Array(txBuffer));
         vTx.sign([keypair]);
         return bs58.encode(vTx.signatures[0]);
     } catch (e) {
         // Fallback to legacy Transaction
         try {
-            const tx = Transaction.from(txBuffer);
+            const tx = Transaction.from(new Uint8Array(txBuffer));
             tx.partialSign(keypair);
 
             // We assume the transaction is fully signed now or will be sent to client

@@ -66,7 +66,7 @@ export default function MissionFeedbackSummary({ summary }: Props) {
     };
 
     try {
-      const result = await api.exportMissionSummary(payload, format, apiKey);
+      const result = await api.exportMissionSummary({ ...payload, format });
 
       if (format === 'pdf') {
         const blob = result as Blob;

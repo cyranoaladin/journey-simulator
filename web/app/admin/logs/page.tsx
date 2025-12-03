@@ -1,6 +1,4 @@
 export const dynamic = 'force-dynamic'
-import type { Prisma } from '@prisma/client'
-import { prisma } from '@/server/db'
 
 type Props = { searchParams?: { journeyId?: string; userId?: string } }
 
@@ -11,7 +9,7 @@ const toPositiveNumber = (value: unknown): number => {
   return Number.isFinite(coerced) ? coerced : 0
 }
 
-const extractTokenSummary = (details: Prisma.JsonValue | null): TokenSummary | null => {
+const extractTokenSummary = (details: any | null): TokenSummary | null => { // Changed Prisma.JsonValue to any
   if (!details || typeof details !== 'object' || Array.isArray(details)) return null
   const perf = (details as Record<string, unknown>).perf
   if (!perf || typeof perf !== 'object' || Array.isArray(perf)) return null
@@ -25,7 +23,7 @@ const extractTokenSummary = (details: Prisma.JsonValue | null): TokenSummary | n
   }
 }
 
-const isErrorLevel = (details: Prisma.JsonValue | null): boolean => {
+const isErrorLevel = (details: any | null): boolean => { // Changed Prisma.JsonValue to any
   if (!details || typeof details !== 'object' || Array.isArray(details)) return false
   const level = (details as Record<string, unknown>).level
   return typeof level === 'string' && level.toLowerCase() === 'error'
@@ -34,15 +32,28 @@ const isErrorLevel = (details: Prisma.JsonValue | null): boolean => {
 export default async function AdminLogsPage({ searchParams }: Props) {
   const journeyId = searchParams?.journeyId
   const userId = searchParams?.userId
-  const where: Prisma.AgentLogWhereInput = {}
-  if (journeyId) where.journeyId = journeyId
-  if (userId) where.userId = userId
-  const logs = await prisma.agentLog.findMany({ where, orderBy: { ts: 'desc' }, take: 50 })
+  
+  const queryParams = new URLSearchParams();
+  if (userId) queryParams.append('user_id', userId);
+  queryParams.append('limit', '50'); // Equivalent to take: 50
+  // orderBy: { ts: 'desc' } is handled by default in FastAPI endpoint
+
+  const response = await fetch(`http://localhost:8000/agent_logs/?${queryParams.toString()}`, { // TODO: Replace with actual FastAPI URL
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    cache: 'no-store'
+  })
+  const logs = await response.json()
+  if (!response.ok) {
+    return NextResponse.json({ error: logs.detail || 'Failed to fetch agent logs' }, { status: response.status })
+  }
 
   const tokenTriples = logs
-    .map((log) => extractTokenSummary(log.details))
-    .filter((summary): summary is TokenSummary => summary !== null)
-  const maxTotal = tokenTriples.length ? Math.max(...tokenTriples.map((t) => t.total)) : 0
+    .map((log: any) => extractTokenSummary(log.details))
+    .filter((summary: any): summary is TokenSummary => summary !== null)
+  const maxTotal = tokenTriples.length ? Math.max(...tokenTriples.map((t: any) => t.total)) : 0
   const safeMaxTotal = maxTotal > 0 ? maxTotal : 1
 
   return (
@@ -79,7 +90,7 @@ export default async function AdminLogsPage({ searchParams }: Props) {
         </div>
       </div>
       <div className="grid gap-3">
-        {logs.map((log) => {
+        {logs.map((log: any) => { // Changed log type to any
           const tokenStats = extractTokenSummary(log.details)
           return (
             <div key={log.id} className="rounded-lg border border-white/10 p-3 bg-bg-mid/40">
@@ -114,12 +125,12 @@ export default async function AdminLogsPage({ searchParams }: Props) {
                   out:<span className="font-mono ml-1">{tokenStats.output}</span>
                 </div>
               )}
-              {log.userId && (
+              {log.user_id && ( // Changed userId to user_id
                 <div className="mt-1 text-[11px] opacity-70">
-                  userId: <span className="font-mono">{log.userId}</span>{' '}
+                  userId: <span className="font-mono">{log.user_id}</span>{' '}
                   <a
                     className="underline hover:no-underline"
-                    href={`/admin/logs?userId=${encodeURIComponent(log.userId || '')}`}
+                    href={`/admin/logs?userId=${encodeURIComponent(log.user_id || '')}`}
                   >
                     filter by user
                   </a>

@@ -64,23 +64,24 @@ Money Factory AI uses NFTs for:
 sequenceDiagram
     participant User
     participant Frontend
-    participant NextJS
+    participant NextJS_API
+    participant Redis_Queue
+    participant Worker
     participant Solana
     participant DB
 
     User->>Frontend: Click "Mint NFT"
-    Frontend->>User: Request wallet connection
+    Frontend->>User: Request wallet connection (if not connected)
     User->>Frontend: Approve connection
-    Frontend->>NextJS: POST /api/mint
-    NextJS->>NextJS: Prepare transaction
-    NextJS->>Frontend: Return unsigned tx
-    Frontend->>User: Request signature
-    User->>Frontend: Sign transaction
-    Frontend->>Solana: Submit signed tx
-    Solana-->>Frontend: Transaction ID
-    Frontend->>NextJS: POST /api/mint/confirm
-    NextJS->>DB: Store mint record
-    NextJS->>Frontend: Mint confirmed
+    Frontend->>NextJS_API: POST /api/mint/execute
+    NextJS_API->>Redis_Queue: Add Mint Job
+    NextJS_API->>Frontend: Return Job ID
+    Frontend->>Frontend: Poll for Job Status
+    Redis_Queue->>Worker: Process Job
+    Worker->>Solana: Execute Mint (UMI)
+    Solana-->>Worker: Transaction Signature
+    Worker->>DB: Store mint record
+    Worker->>Redis_Queue: Update Job Status (Completed)
     Frontend->>User: Show success + NFT
 ```
 
@@ -90,74 +91,52 @@ sequenceDiagram
 
 ### 1. Mint Endpoint (Next.js API Route)
 
-**File**: `web/app/api/mint/route.ts`
+**File**: `web/app/api/mint/execute/route.ts`
 
 ```typescript
-import { Connection, PublicKey, Transaction } from '@solana/web3.js';
-import { createConnection } from '@/lib/solana-config';
+import { NextResponse } from 'next/server'
+import { mintQueue } from '@/server/queue' // BullMQ Queue
 
-export async function POST(request: Request) {
-  const { walletAddress, nftType, journeyId } = await request.json();
-  
-  // 1. Validate request
-  if (!walletAddress || !nftType) {
-    return Response.json({ error: 'Missing required fields' }, { status: 400 });
-  }
-  
-  // 2. Prepare mint transaction
-  const connection = createConnection();
-  const transaction = await prepareMintTransaction({
-    walletAddress,
-    nftType,
-    journeyId
-  });
-  
-  // 3. Return unsigned transaction
-  return Response.json({
-    transaction: transaction.serialize({ requireAllSignatures: false }),
-    message: 'Sign this transaction to mint your NFT'
-  });
+export async function POST(req: Request) {
+  const { spec, sim } = await req.json()
+
+  // Add job to queue for background processing
+  const job = await mintQueue.add('mint-nft', {
+    spec,
+    sim,
+    userId: req.headers.get('x-user-id'),
+  })
+
+  return NextResponse.json({ ok: true, jobId: job.id, status: 'queued' })
 }
 ```
 
-### 2. Transaction Preparation
+### 2. Worker & UMI Implementation
 
-**Options**:
-
-#### Option A: Candy Machine v3 (Recommended for Collections)
+**File**: `web/packages/agents/tools/solana.ts`
 
 ```typescript
-import { CandyMachine } from '@metaplex-foundation/mpl-candy-machine';
+import { createUmi } from '@metaplex-foundation/umi-bundle-defaults'
+import { createAndMint, TokenStandard } from '@metaplex-foundation/mpl-token-metadata'
 
-async function prepareMintTransaction({ walletAddress, nftType }) {
-  const candyMachineId = getCandyMachineForType(nftType);
-  
-  // Build mint instruction using Metaplex SDK
-  const mintInstruction = await CandyMachine.mint({
-    candyMachine: candyMachineId,
-    payer: new PublicKey(walletAddress)
-  });
-  
-  return new Transaction().add(mintInstruction);
-}
-```
+export async function executeReward(spec: RewardSpec) {
+  const umi = createMinterUmi() // Configured with secret key
+  const mint = generateSigner(umi)
 
-#### Option B: Custom Mint (Flexible)
+  const builder = createAndMint(umi, {
+    mint,
+    authority: umi.identity,
+    name: spec.name,
+    uri: spec.uri,
+    tokenOwner: publicKey(spec.recipient),
+    tokenStandard: TokenStandard.NonFungible,
+  })
 
-```typescript
-import { createMintToInstruction } from '@solana/spl-token';
+  const result = await builder.sendAndConfirm(umi, {
+    confirm: { commitment: 'confirmed' },
+  })
 
-async function prepareMintTransaction({ walletAddress, nftType, journeyId }) {
-  // 1. Create mint account
-  // 2. Create metadata account (Metaplex standard)
-  // 3. Mint token to user
-  // 4. Update metadata with journey-specific data
-  
-  const instructions = [
-    // ... mint instructions
-  ];
-  
-  return new Transaction().add(...instructions);
+  return { txSig: base58.deserialize(result.signature)[0] }
 }
 ```
 

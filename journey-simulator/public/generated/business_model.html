@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Money Factory AI · Business Model Canvas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #070720;
+            --panel: rgba(24, 24, 63, 0.75);
+            --accent: #8B5CF6;
+            --border: rgba(139, 92, 246, 0.35);
+            --muted: #A5B4FC;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: #F9FAFB;
+            background: radial-gradient(circle at top, #0c1037, var(--bg));
+            padding: 48px 24px 64px;
+        }
+        header {
+            max-width: 960px;
+            margin: 0 auto 32px;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0 0 12px;
+            font-size: clamp(2rem, 4vw, 2.75rem);
+            letter-spacing: 0.04em;
+        }
+        header p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 1rem;
+        }
+        .grid {
+            display: grid;
+            gap: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        @media (min-width: 900px) {
+            .grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+            .grid .wide {
+                grid-column: span 3;
+            }
+        }
+        section {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 24px;
+            -webkit-backdrop-filter: blur(18px);
+            backdrop-filter: blur(18px);
+            min-height: 220px;
+        }
+        section h2 {
+            margin: 0 0 16px;
+            font-size: 1.2rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+        }
+        section ul {
+            margin: 0;
+            padding-left: 18px;
+            line-height: 1.6;
+            color: #E0E7FF;
+            font-size: 0.95rem;
+        }
+        footer {
+            max-width: 960px;
+            margin: 40px auto 0;
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Money Factory AI · Business Model Canvas</h1>
+        <p>A Solana-native venture engine that transforms validated ideas into funded, AI-orchestrated companies.</p>
+    </header>
+
+    <main class="grid">
+        <section>
+            <h2>Value Proposition</h2>
+            <ul>
+                <li>AI-guided venture creation with personalized AEPO learning paths.</li>
+                <li>Integrated Solana infrastructure for on-chain proofs, token launches, and liquidity orchestration.</li>
+                <li>Trained multi-agent collective (Zyno) that accelerates due diligence, product shaping, and go-to-market.</li>
+                <li>Outcome-based funding access through the Collaterize launchpad.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Customer Segments</h2>
+            <ul>
+                <li>Web3 builders seeking an accelerated venture studio experience.</li>
+                <li>Protocol teams needing cohort-based activation and community tooling.</li>
+                <li>Investors scouting de-risked, data-backed Solana-native deals.</li>
+                <li>Enterprises migrating from Web2 data stacks to composable Solana rails.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Channels</h2>
+            <ul>
+                <li>Self-serve SaaS journey portal with embedded wallet and staking flows.</li>
+                <li>Strategic partnerships with Solana ecosystem programs and hackathons.</li>
+                <li>Content funnels: documentation hub, litepaper streams, and dev rel workshops.</li>
+                <li>Investor syndicates powered by Collaterize for discovery and launch distribution.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Revenue Streams</h2>
+            <ul>
+                <li>SaaS subscription for journey cohorts and enterprise enablement.</li>
+                <li>Success fee on Collaterize launches and on-chain bonding curves.</li>
+                <li>Revenue share on agent-driven marketplace deliverables.</li>
+                <li>Licensing of AECO orchestration analytics to accelerators and DAOs.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Key Activities</h2>
+            <ul>
+                <li>Maintaining AI agent knowledge base and Solana integration templates.</li>
+                <li>Running cohort missions, validator challenges, and investor readiness sprints.</li>
+                <li>Curating liquidity partnerships for token launches and post-launch support.</li>
+                <li>Monitoring journey telemetry, compliance, and proof-of-progress credentials.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Key Resources</h2>
+            <ul>
+                <li>Zyno multi-agent framework with venture, technical, and legal specialists.</li>
+                <li>Solana devnet and mainnet integrations, mocknet environment, and proof services.</li>
+                <li>RAG knowledge base of venture playbooks, audit standards, and compliance templates.</li>
+                <li>Partner network of market makers, auditors, and capital providers.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Cost Structure</h2>
+            <ul>
+                <li>AI agent training, inference infrastructure, and Solana RPC services.</li>
+                <li>Human capital for venture partners, product mentors, and compliance reviewers.</li>
+                <li>Liquidity provisioning incentives and shared risk pools for launches.</li>
+                <li>Ongoing R&amp;D on tokenomics simulations and regulatory tooling.</li>
+            </ul>
+        </section>
+
+        <section class="wide">
+            <h2>Key Partnerships</h2>
+            <ul>
+                <li>Collaterize launch infrastructure for token bonding and liquidity orchestration.</li>
+                <li>Solana ecosystem programs (Grizzlython, Hyperdrive, Solana Foundation).</li>
+                <li>Auditing and legal partners for KYC/KYB and jurisdictional compliance.</li>
+                <li>Education alliances delivering specialized tracks (DeFi, RWA, gaming).</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        Updated Q4 2025 · Internal use for investor and partner briefings.
+    </footer>
+</body>
+</html>
