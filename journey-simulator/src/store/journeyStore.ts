@@ -730,7 +730,13 @@ export const useJourneyStore = create<JourneyState>()(
   )
 )
 
-// Expose store to window for E2E testing
-if (typeof window !== 'undefined') {
+// Expose store to window for non-production testing helpers
+const shouldExposeStore =
+  typeof window !== 'undefined' &&
+  typeof import.meta !== 'undefined' &&
+  typeof import.meta.env !== 'undefined' &&
+  import.meta.env.MODE !== 'production';
+
+if (shouldExposeStore) {
   (window as any).useJourneyStore = useJourneyStore;
 }

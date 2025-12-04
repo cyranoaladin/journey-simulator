@@ -110,7 +110,12 @@ describe('ZynoConsole', () => {
     const launchButton = screen.getByRole('button', { name: 'Start Simulation' });
     await userEvent.click(launchButton);
 
-    await waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(1));
+    await waitFor(() => {
+      const orchestrationCalls = mockFetch.mock.calls.filter(([url]) =>
+        typeof url === 'string' && url.includes('/orchestration')
+      );
+      expect(orchestrationCalls).toHaveLength(1);
+    });
 
     const missionSummary = await screen.findByTestId('mission-summary');
     expect(missionSummary).toHaveTextContent('50');

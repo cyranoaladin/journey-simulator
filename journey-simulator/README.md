@@ -1132,12 +1132,17 @@ npm run test:watch
 # Coverage report
 npm run test:coverage
 
+# Playwright smoke (fast path)
+npm run test:e2e:smoke
+
 # E2E tests
 npm run test:e2e
 
 # All tests
 npm run test:all
 ```
+
+> `npm run test:e2e:smoke` now covers both the builder journey and the investor demo on Chromium to guard the most common onboarding flows.
 
 > Manual QA: After the automated suite, run the wallet connection journey in a browser with Phantom and Torus to verify the modal flow, reconnect behaviour, and persisted session before marking the build investor-ready.
 

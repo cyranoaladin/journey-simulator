@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   Activity,
@@ -7,6 +7,7 @@ import {
   History,
   Lightbulb,
   Loader2,
+  RefreshCw,
   Rocket,
   ScanLine,
   Send,
@@ -59,6 +60,42 @@ const consoleMotion = {
   },
 } as const;
 
+type ProbeStatus = 'unknown' | 'passing' | 'failing';
+
+interface ProbeState {
+  status: ProbeStatus;
+  latencyMs: number | null;
+  lastChecked: string | null;
+  error: string | null;
+}
+
+const HEALTH_POLL_INTERVAL_MS = 60000;
+
+const probeConfig = {
+  healthz: { label: 'Live', path: '/healthz' },
+  readyz: { label: 'Ready', path: '/readyz' },
+} as const;
+
+type ProbeKey = keyof typeof probeConfig;
+const probeKeys = Object.keys(probeConfig) as ProbeKey[];
+
+const createProbeState = (): ProbeState => ({
+  status: 'unknown',
+  latencyMs: null,
+  lastChecked: null,
+  error: null,
+});
+
+const getProbeBadgeClasses = (status: ProbeStatus) => {
+  if (status === 'passing') {
+    return 'border-emerald-400/50 bg-emerald-500/15 text-emerald-200';
+  }
+  if (status === 'failing') {
+    return 'border-rose-400/50 bg-rose-500/15 text-rose-200';
+  }
+  return 'border-slate-300/60 bg-slate-500/10 text-slate-200';
+};
+
 type Status = 'idle' | 'loading' | 'error';
 type PromptStatus = 'pending' | 'success' | 'error';
 
@@ -88,7 +125,65 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
     sampleMissionSummary as MissionSummary,
   );
   const [history, setHistory] = useState<PromptHistoryEntry[]>([]);
+  const [healthProbes, setHealthProbes] = useState<Record<ProbeKey, ProbeState>>(() => ({
+    healthz: createProbeState(),
+    readyz: createProbeState(),
+  }));
+  const [healthRefreshState, setHealthRefreshState] = useState<'idle' | 'refreshing'>('idle');
   const shouldReduceMotion = useReducedMotion();
+
+  const refreshHealthStatus = useCallback(async () => {
+    setHealthRefreshState('refreshing');
+    try {
+      const updates = await Promise.all(
+        probeKeys.map(async (key) => {
+          const started = typeof performance !== 'undefined' ? performance.now() : Date.now();
+          try {
+            const response = await fetch(`${API_BASE_URL}${probeConfig[key].path}`);
+            const ended = typeof performance !== 'undefined' ? performance.now() : Date.now();
+            const latencyMs = Math.round(ended - started);
+            return [
+              key,
+              {
+                status: response.ok ? 'passing' : 'failing',
+                latencyMs,
+                lastChecked: new Date().toISOString(),
+                error: response.ok ? null : `HTTP ${response.status}`,
+              } as ProbeState,
+            ];
+          } catch (error) {
+            const ended = typeof performance !== 'undefined' ? performance.now() : Date.now();
+            const latencyMs = Math.round(ended - started);
+            return [
+              key,
+              {
+                status: 'failing',
+                latencyMs,
+                lastChecked: new Date().toISOString(),
+                error: error instanceof Error ? error.message : 'Request failed',
+              } as ProbeState,
+            ];
+          }
+        }),
+      );
+
+      setHealthProbes((previous) => {
+        const next = { ...previous };
+        updates.forEach(([key, state]) => {
+          next[key as ProbeKey] = state as ProbeState;
+        });
+        return next;
+      });
+    } finally {
+      setHealthRefreshState('idle');
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshHealthStatus();
+    const interval = setInterval(refreshHealthStatus, HEALTH_POLL_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, [refreshHealthStatus]);
 
   const buildSummaryFromResult = (payload: OrchestrationResult): MissionSummary => {
     const timeline = payload.timeline ?? [];
@@ -213,6 +308,29 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
     };
   }, [missionSummary]);
 
+  const latestHealthCheck = useMemo(() => {
+    const epochs = probeKeys
+      .map((key) => healthProbes[key].lastChecked)
+      .filter((value): value is string => Boolean(value))
+      .map((value) => Date.parse(value));
+
+    if (!epochs.length) {
+      return 'Pending';
+    }
+
+    const freshest = Math.max(...epochs.filter((value) => Number.isFinite(value)));
+    if (!Number.isFinite(freshest)) {
+      return 'Pending';
+    }
+    return new Date(freshest).toLocaleTimeString();
+  }, [healthProbes]);
+
+  const failingProbe = useMemo(() => {
+    return probeKeys
+      .map((key) => healthProbes[key])
+      .find((probe) => probe.status === 'failing');
+  }, [healthProbes]);
+
   const currentTimeline = result?.timeline ?? [];
   const currentStep = result?.currentStep ?? null;
 
@@ -240,7 +358,7 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
                 </h2>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3 text-sm text-slate-600 dark:text-mfai-text/80 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-3 text-sm text-slate-600 dark:text-mfai-text/80 sm:grid-cols-4">
               <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
                 <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">
                   AEPO Score
@@ -264,6 +382,51 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
                 <p className="mt-1 text-xs text-slate-600 dark:text-mfai-text/70">
                   {missionHighlights.timestamp ?? 'Never'}
                 </p>
+              </div>
+              <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">
+                    Stack Health
+                  </span>
+                  <button
+                    type="button"
+                    onClick={refreshHealthStatus}
+                    disabled={healthRefreshState === 'refreshing'}
+                    className="inline-flex items-center rounded-full border border-slate-200/60 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-600 transition hover:border-accent/50 hover:text-accent disabled:opacity-60 dark:border-mfai-border/50 dark:text-mfai-text/70"
+                    title="Refresh health probes"
+                  >
+                    {healthRefreshState === 'refreshing' ? (
+                      <Loader2 size={12} className="animate-spin" />
+                    ) : (
+                      <RefreshCw size={12} />
+                    )}
+                  </button>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {probeKeys.map((key) => {
+                    const probe = healthProbes[key];
+                    const label = probeConfig[key].label;
+                    return (
+                      <span
+                        key={key}
+                        className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-semibold ${getProbeBadgeClasses(probe.status)}`}
+                      >
+                        {label}
+                        <span className="text-[10px] opacity-70">
+                          {typeof probe.latencyMs === 'number' ? `${probe.latencyMs}ms` : '—'}
+                        </span>
+                      </span>
+                    );
+                  })}
+                </div>
+                <p className="mt-2 text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">
+                  Last check: {latestHealthCheck}
+                </p>
+                {failingProbe?.error ? (
+                  <p className="mt-1 text-xs text-rose-400">
+                    {failingProbe.error}
+                  </p>
+                ) : null}
               </div>
             </div>
           </div>

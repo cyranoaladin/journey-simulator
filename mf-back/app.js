@@ -1,8 +1,3 @@
-const dotenv = require('dotenv');
-dotenv.config({
-  quiet: true
-});
-
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
@@ -10,6 +5,9 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const helmet = require('helmet');
+const compression = require('compression');
+const rateLimit = require('express-rate-limit');
 const indexRouter = require('./routes/index');
 const userRouter = require('./routes/user-routes');
 const coursRoutes = require('./routes/cours-routes');
@@ -23,10 +21,12 @@ const agentRoutes = require('./routes/agent-routes');
 const feedbackRoutes = require('./routes/feedback');
 const favoritesRoutes = require('./routes/favorites');
 const solanaRoutes = require('./routes/solana-routes');
+const healthRoutes = require('./routes/health-routes');
+const { env: envConfig, allowedOrigins, rateLimitConfig } = require('./config/env');
 const app = express();
 
-const shouldSkipDbConnection = process.env.SKIP_DB_CONNECTION === 'true';
-const MONGO_URI = process.env.MONGO_URI;
+const shouldSkipDbConnection = envConfig.SKIP_DB_CONNECTION === 'true';
+const MONGO_URI = envConfig.MONGO_URI;
 
 if (!shouldSkipDbConnection) {
   if (!MONGO_URI) {
@@ -35,7 +35,7 @@ if (!shouldSkipDbConnection) {
 
   mongoose.connect(MONGO_URI)
     .then(() => {
-      if (process.env.NODE_ENV !== 'test') {
+      if (envConfig.NODE_ENV !== 'test') {
         console.log('✅ MongoDB Connected - Database is ready');
       }
     })
@@ -49,39 +49,38 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 // CORS middleware
-const isDevelopment = process.env.NODE_ENV !== 'production';
+const isDevelopment = envConfig.NODE_ENV !== 'production';
 
 const corsOptions = {
-  origin: [
-    'http://localhost:5173',
-    'http://localhost:5174',
-    'http://localhost:4173',
-    'http://localhost:3000',
-    'http://localhost:3003',
-    'http://127.0.0.1:4173',
-    'http://127.0.0.1:5173',
-    'http://127.0.0.1:5174',
-    'http://127.0.0.1:3000',
-    'http://127.0.0.1:3002',
-    'http://127.0.0.1:3003',
-    'https://journey.mfai.app',
-    'http://journey.mfai.app'
-  ],
+  origin: allowedOrigins,
   credentials: true,
   optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'x-api-key', 'X-API-KEY', 'x-user-id']
 }
 
+const limiter = rateLimit({
+  windowMs: rateLimitConfig.windowMs,
+  max: rateLimitConfig.max,
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
 // Apply CORS middleware
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
+app.use(limiter);
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' }
+}));
+app.use(compression());
 app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: false, limit: '1mb' }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/', healthRoutes);
 app.use('/user', userRouter);
 app.use('/cours', coursRoutes);
 app.use('/journey', journey);

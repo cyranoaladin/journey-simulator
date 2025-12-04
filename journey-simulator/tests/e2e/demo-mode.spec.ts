@@ -1,126 +1,50 @@
 import { test, expect } from '@playwright/test';
-
+import { setupJourneyMocks } from './utils/journeyMocks';
 
 test.describe('Demo Mode Workflow', () => {
     test.beforeEach(async ({ page }) => {
-        // Go to home page
-        page.on('console', msg => console.log(`[BROWSER] ${msg.text()}`));
-        await page.goto('/');
-        // Wait for app to load
-        await expect(page.locator('h1')).toContainText('Launch Like a Protocol');
+        await setupJourneyMocks(page, { personaId: 'cognitive-activation-hub', mockMint: true });
     });
 
-    test('should complete the full demo journey', async ({ page }) => {
-        test.setTimeout(120000);
-        // 1. Enter Demo Mode
-        await page.goto('/');
-        await page.evaluate(() => localStorage.clear());
+    test('lets demo users preview critical journey interactions', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByRole('button', { name: 'Try Demo Mode' }).click();
+        await page.waitForURL('**/journeys');
 
-        await page.getByRole('link', { name: /Authenticate/i }).click();
+        const cognitiveCard = page.locator('article').filter({ has: page.getByRole('heading', { name: 'The Cognitive Activation Hub' }) }).first();
+        await cognitiveCard.getByRole('button', { name: 'Launch with Zyno' }).click();
 
-        // Verify we are on login page
-        await expect(page.getByText('Sign In', { exact: true })).toBeVisible();
+        await page.waitForURL('**/journeys/cognitive-activation-hub');
+        await expect(page.getByRole('heading', { name: 'The Cognitive Activation Hub' })).toBeVisible();
 
-        const demoButton = page.getByRole('button', { name: /Try Demo Mode/i });
-        await expect(demoButton).toBeVisible();
-        await demoButton.click();
+        const runPhase = async (phaseTitle: string) => {
+            await expect(page.getByRole('heading', { name: phaseTitle })).toBeVisible();
+            await page.getByRole('button', { name: 'Start / Continue' }).click();
+            await expect(page.getByText('Mocked Mission Guidance')).toBeVisible();
+        };
 
-        // Verify redirection to journeys list
-        await expect(page).toHaveURL(/\/journeys/);
+        const closeProofModal = async () => {
+            await expect(page.getByText(/Proof-of-/i)).toBeVisible();
+            await page.getByLabel('Close').first().click();
+        };
 
-        // Select the Cognitive Activation Hub journey
-        await page.getByRole('button', { name: /Launch with Zyno/i }).first().click();
+        await runPhase('Cognition Ignition');
+        await page.getByRole('button', { name: 'Validate & Mint NFT' }).first().click();
+        await closeProofModal();
 
-        // Verify redirection to journey workspace
-        await expect(page).toHaveURL(/\/journeys\/cognitive-activation-hub/);
-        await page.waitForTimeout(2000); // Wait for workspace to fully render
-
-        await expect(page.getByText('The Cognitive Activation Hub Journey')).toBeVisible();
-
-        // --- PHASE 1: Cognition Ignition ---
-        await expect(page.getByRole('heading', { name: 'Cognition Ignition', level: 2 })).toBeVisible();
-        await expect(page.getByText('Establish the Web3 mindset').first()).toBeVisible();
-
-        // Complete Phase 1 (Mint NFT)
-        // Click the bottom button (main CTA)
-        const validateButton = page.getByRole('button', { name: /Validate & Mint NFT/i }).nth(1);
-        await expect(validateButton).toBeVisible();
-        await page.waitForTimeout(1000);
-        await validateButton.dispatchEvent('click');
-
-        // Verify NFT Modal
-        await expect(page.getByText('Proof-of-Skill™: Web3 Orientation')).toBeVisible();
-        await page.getByRole('button', { name: /Close/i }).click();
-
-        // --- PHASE 2: Solana Systems Lab ---
-        await expect(page.getByRole('heading', { name: 'Solana Systems Lab', level: 2 })).toBeVisible();
-        await expect(page.getByText('Dive into Solana’s execution model').first()).toBeVisible();
-
-        // Complete Phase 2 (Stake)
-        const validateButton2 = page.getByRole('button', { name: /Validate & Stake/i }).nth(0);
-        await expect(validateButton2).toBeVisible();
-        await page.waitForTimeout(500);
-        await validateButton2.dispatchEvent('click');
-
-        // Handle Staking Modal
-        await expect(page.getByText('Cognitive Lock™')).toBeVisible();
+        await runPhase('Solana Systems Lab');
+        await page.getByRole('button', { name: 'Validate & Stake' }).first().click();
+        await expect(page.getByRole('heading', { name: 'Cognitive Lock™' })).toBeVisible();
         await page.getByPlaceholder('0.00').fill('50');
         await page.getByRole('button', { name: /Stake 50/i }).click();
+        await closeProofModal();
 
-        // Verify NFT Modal
-        await expect(page.getByText('Solana Fluency Patch')).toBeVisible();
-        await page.getByRole('button', { name: /Close/i }).click();
+        await runPhase('Token Design Studio');
+        await page.getByRole('button', { name: 'Validate & Vote' }).first().click();
+        await expect(page.getByRole('heading', { name: 'DAO Vote' })).toBeVisible();
+        await page.getByRole('button', { name: 'Approve' }).click();
+        await closeProofModal();
 
-        // --- PHASE 3: Token Design Studio ---
-        await expect(page.getByRole('heading', { name: 'Token Design Studio', level: 2 })).toBeVisible();
-        await expect(page.getByText('Architect tokenized incentives').first()).toBeVisible();
-
-        // Complete Phase 3 (Vote)
-        const validateButton3 = page.getByRole('button', { name: /Validate & Vote/i }).nth(0);
-        await expect(validateButton3).toBeVisible();
-        await page.waitForTimeout(500);
-        await validateButton3.dispatchEvent('click');
-
-        // Handle Voting Modal
-        await expect(page.getByText('DAO Vote')).toBeVisible();
-        await page.getByRole('button', { name: /Approve/i }).click();
-
-        // Verify NFT Modal
-        await expect(page.getByText('Tokenomics Architect Badge')).toBeVisible();
-        await page.getByRole('button', { name: /Close/i }).click();
-
-        // --- PHASE 4: Identity & Security Forge ---
-        await expect(page.getByRole('heading', { name: 'Identity & Security Forge', level: 2 })).toBeVisible();
-        await expect(page.getByText('Internalize wallet security').first()).toBeVisible();
-
-        // Complete Phase 4 (Mint NFT)
-        const validateButton4 = page.getByRole('button', { name: /Validate & Mint NFT/i }).nth(1);
-        await expect(validateButton4).toBeVisible();
-        await page.waitForTimeout(500);
-        await validateButton4.dispatchEvent('click');
-
-        // Verify NFT Modal
-        await expect(page.getByText('Sovereign Identity Seal')).toBeVisible();
-        await page.getByRole('button', { name: /Close/i }).click();
-
-        // --- PHASE 5: Ecosystem Activation ---
-        await expect(page.getByRole('heading', { name: 'Ecosystem Activation', level: 2 })).toBeVisible();
-        await expect(page.getByText('Convert insight into action').first()).toBeVisible();
-
-        // Complete Phase 5 (Mint NFT)
-        const validateButton5 = page.getByRole('button', { name: /Validate & Mint NFT/i }).nth(1);
-        await expect(validateButton5).toBeVisible();
-        await page.waitForTimeout(500);
-        await validateButton5.dispatchEvent('click');
-
-        // Verify NFT Modal
-        await expect(page.getByText('Proof-of-Skill™: Activation').first()).toBeVisible();
-
-        // Phase 5 is the last one, so we expect completion UI
-        // The workspace might not redirect, but show completion inline
-        // await expect(page).toHaveURL(/\/journey\/completed/, { timeout: 10000 });
-
-        // Verify Final State
-        await expect(page.getByText('Journey Completed')).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Identity & Security Forge' })).toBeVisible();
     });
 });

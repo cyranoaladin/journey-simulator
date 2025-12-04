@@ -10,6 +10,7 @@ coverage/
 storybook-static/
 playwright-report/
 test-results/
+tests/e2e-report/
 web/cache/
 npm-debug.log*
 yarn-error.log*

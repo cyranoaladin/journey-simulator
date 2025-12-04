@@ -1,372 +1,4 @@
-[
-  {
-    "timestamp": "2025-11-15T06:03:45.079Z",
-    "agentName": "BuilderAgent",
-    "userId": "integration-user",
-    "missionId": "mission-99",
-    "type": "AECO",
-    "value": {
-      "aepoScore": 89,
-      "feedback": {
-        "clarity": 4,
-        "helpfulness": 5,
-        "satisfaction": 4,
-        "comment": "Agent helped clearly define tasks."
-      }
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:03:45.081Z",
-    "agentName": "TokenAgent",
-    "userId": "user-1",
-    "missionId": null,
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 3,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:03:45.082Z",
-    "agentName": "CommunityAgent",
-    "userId": "user-1",
-    "missionId": null,
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 4,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:03:45.089Z",
-    "agentName": "CoachAgent",
-    "userId": "user-2",
-    "missionId": null,
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 0,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:03:45.093Z",
-    "agentName": "BuilderAgent",
-    "userId": "user-3",
-    "missionId": null,
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 1,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:03:45.094Z",
-    "agentName": "ProductAgent",
-    "userId": "user-3",
-    "missionId": null,
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 0,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:03:45.095Z",
-    "agentName": "DevAgent",
-    "userId": "user-3",
-    "missionId": null,
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 0,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:03:45.096Z",
-    "agentName": "AuditAgent",
-    "userId": "user-3",
-    "missionId": null,
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 1,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:03:45.208Z",
-    "agentName": "OnboardingAgent",
-    "userId": "cli-user",
-    "missionId": "mission-1763186625167",
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 37,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:03:45.215Z",
-    "agentName": "GuideAgent",
-    "userId": "cli-user",
-    "missionId": "mission-1763186625167",
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 6,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:03:45.216Z",
-    "agentName": "GuideAgent",
-    "userId": "cli-user",
-    "missionId": "mission-1763186625167",
-    "type": "AECO",
-    "value": {
-      "aepoScore": 100,
-      "feedback": {
-        "clarity": 4,
-        "helpfulness": 4,
-        "satisfaction": 4,
-        "comment": "Auto-feedback for GuideAgent responding to \"simulate onboarding\"."
-      }
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:07:12.674Z",
-    "agentName": "NFTAgent",
-    "userId": "user-1",
-    "missionId": null,
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 1,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:07:12.675Z",
-    "agentName": "TokenAgent",
-    "userId": "user-1",
-    "missionId": null,
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 1,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:07:12.676Z",
-    "agentName": "CommunityAgent",
-    "userId": "user-1",
-    "missionId": null,
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 2,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:07:12.682Z",
-    "agentName": "CoachAgent",
-    "userId": "user-2",
-    "missionId": null,
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 0,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:07:12.686Z",
-    "agentName": "BuilderAgent",
-    "userId": "user-3",
-    "missionId": null,
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 0,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:07:12.687Z",
-    "agentName": "ProductAgent",
-    "userId": "user-3",
-    "missionId": null,
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 0,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:07:12.688Z",
-    "agentName": "DevAgent",
-    "userId": "user-3",
-    "missionId": null,
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 0,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:07:12.689Z",
-    "agentName": "AuditAgent",
-    "userId": "user-3",
-    "missionId": null,
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 0,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:07:12.731Z",
-    "agentName": "BuilderAgent",
-    "userId": "integration-user",
-    "missionId": "mission-99",
-    "type": "AECO",
-    "value": {
-      "aepoScore": 89,
-      "feedback": {
-        "clarity": 4,
-        "helpfulness": 5,
-        "satisfaction": 4,
-        "comment": "Agent helped clearly define tasks."
-      }
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:07:12.832Z",
-    "agentName": "OnboardingAgent",
-    "userId": "cli-user",
-    "missionId": "mission-1763186832804",
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 26,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:07:12.837Z",
-    "agentName": "GuideAgent",
-    "userId": "cli-user",
-    "missionId": "mission-1763186832804",
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 4,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:07:12.838Z",
-    "agentName": "GuideAgent",
-    "userId": "cli-user",
-    "missionId": "mission-1763186832804",
-    "type": "AECO",
-    "value": {
-      "aepoScore": 100,
-      "feedback": {
-        "clarity": 4,
-        "helpfulness": 4,
-        "satisfaction": 4,
-        "comment": "Auto-feedback for GuideAgent responding to \"simulate onboarding\"."
-      }
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:08:00.720Z",
-    "agentName": "BuilderAgent",
-    "userId": "integration-user",
-    "missionId": "mission-99",
-    "type": "AECO",
-    "value": {
-      "aepoScore": 89,
-      "feedback": {
-        "clarity": 4,
-        "helpfulness": 5,
-        "satisfaction": 4,
-        "comment": "Agent helped clearly define tasks."
-      }
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:08:00.850Z",
-    "agentName": "NFTAgent",
-    "userId": "user-1",
-    "missionId": null,
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 1,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:08:00.851Z",
-    "agentName": "TokenAgent",
-    "userId": "user-1",
-    "missionId": null,
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 1,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:08:00.851Z",
-    "agentName": "CommunityAgent",
-    "userId": "user-1",
-    "missionId": null,
-    "type": "AEPO",
-    "value": {
-      "score": 100,
-      "durationMs": 1,
-      "success": true,
-      "errorCount": 0
-    }
-  },
-  {
-    "timestamp": "2025-11-15T06:08:00.855Z",
+[]
     "agentName": "CoachAgent",
     "userId": "user-2",
     "missionId": null,
@@ -10291,6 +9923,304 @@
   },
   {
     "timestamp": "2025-12-02T21:03:33.725Z",
+    "agentName": "BuilderAgent",
+    "userId": "integration-user",
+    "missionId": "mission-99",
+    "type": "AECO",
+    "value": {
+      "aepoScore": 89,
+      "feedback": {
+        "clarity": 4,
+        "helpfulness": 5,
+        "satisfaction": 4,
+        "comment": "Agent helped clearly define tasks."
+      }
+    }
+  },
+  {
+    "timestamp": "2025-12-03T23:19:00.023Z",
+    "agentName": "BuilderAgent",
+    "userId": "user-3",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 65,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-12-03T23:19:00.029Z",
+    "agentName": "ProductAgent",
+    "userId": "user-3",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 4,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-12-03T23:19:00.033Z",
+    "agentName": "DevAgent",
+    "userId": "user-3",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 3,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-12-03T23:19:00.037Z",
+    "agentName": "AuditAgent",
+    "userId": "user-3",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 2,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-12-03T23:19:01.230Z",
+    "agentName": "OnboardingAgent",
+    "userId": "cli-user",
+    "missionId": "mission-1764803941210",
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 18,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-12-03T23:19:01.236Z",
+    "agentName": "GuideAgent",
+    "userId": "cli-user",
+    "missionId": "mission-1764803941210",
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 3,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-12-03T23:19:01.238Z",
+    "agentName": "GuideAgent",
+    "userId": "cli-user",
+    "missionId": "mission-1764803941210",
+    "type": "AECO",
+    "value": {
+      "aepoScore": 100,
+      "feedback": {
+        "clarity": 4,
+        "helpfulness": 4,
+        "satisfaction": 4,
+        "comment": "Auto-feedback for GuideAgent responding to \"simulate onboarding\"."
+      }
+    }
+  },
+  {
+    "timestamp": "2025-12-03T23:19:01.804Z",
+    "agentName": "NFTAgent",
+    "userId": "demo-mission-user",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 4,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-12-03T23:19:01.806Z",
+    "agentName": "TokenAgent",
+    "userId": "demo-mission-user",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 6,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-12-03T23:19:01.808Z",
+    "agentName": "CommunityAgent",
+    "userId": "demo-mission-user",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 8,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-12-03T23:19:02.014Z",
+    "agentName": "BuilderAgent",
+    "userId": "integration-user",
+    "missionId": "mission-99",
+    "type": "AECO",
+    "value": {
+      "aepoScore": 89,
+      "feedback": {
+        "clarity": 4,
+        "helpfulness": 5,
+        "satisfaction": 4,
+        "comment": "Agent helped clearly define tasks."
+      }
+    }
+  },
+  {
+    "timestamp": "2025-12-04T00:00:27.242Z",
+    "agentName": "OnboardingAgent",
+    "userId": "cli-user",
+    "missionId": "mission-1764806427222",
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 19,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-12-04T00:00:27.248Z",
+    "agentName": "GuideAgent",
+    "userId": "cli-user",
+    "missionId": "mission-1764806427222",
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 3,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-12-04T00:00:27.250Z",
+    "agentName": "GuideAgent",
+    "userId": "cli-user",
+    "missionId": "mission-1764806427222",
+    "type": "AECO",
+    "value": {
+      "aepoScore": 100,
+      "feedback": {
+        "clarity": 4,
+        "helpfulness": 4,
+        "satisfaction": 4,
+        "comment": "Auto-feedback for GuideAgent responding to \"simulate onboarding\"."
+      }
+    }
+  },
+  {
+    "timestamp": "2025-12-04T00:00:27.377Z",
+    "agentName": "BuilderAgent",
+    "userId": "user-3",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 67,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-12-04T00:00:27.384Z",
+    "agentName": "ProductAgent",
+    "userId": "user-3",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 4,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-12-04T00:00:27.389Z",
+    "agentName": "DevAgent",
+    "userId": "user-3",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 3,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-12-04T00:00:27.395Z",
+    "agentName": "AuditAgent",
+    "userId": "user-3",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 4,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-12-04T00:00:27.992Z",
+    "agentName": "NFTAgent",
+    "userId": "demo-mission-user",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 2,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-12-04T00:00:27.995Z",
+    "agentName": "TokenAgent",
+    "userId": "demo-mission-user",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 4,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-12-04T00:00:27.997Z",
+    "agentName": "CommunityAgent",
+    "userId": "demo-mission-user",
+    "missionId": null,
+    "type": "AEPO",
+    "value": {
+      "score": 100,
+      "durationMs": 6,
+      "success": true,
+      "errorCount": 0
+    }
+  },
+  {
+    "timestamp": "2025-12-04T00:00:28.158Z",
     "agentName": "BuilderAgent",
     "userId": "integration-user",
     "missionId": "mission-99",

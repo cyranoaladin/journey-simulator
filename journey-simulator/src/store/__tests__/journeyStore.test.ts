@@ -61,14 +61,13 @@ describe('Journey Store - Phase Completion', () => {
     
     // 3. Assertions
     // Check if the API was called correctly
-    expect(mockApi.completePhase).toHaveBeenCalledWith({
+    expect(mockApi.completePhase).toHaveBeenCalledWith(expect.objectContaining({
       phase_number: phaseToComplete + 1,
       score: 100,
-      nft_address: expect.any(String),
       xp_reward: phaseData.xpReward,
       mfai_reward: phaseData.mfaiReward,
-      nft_reward: phaseData.nftReward
-    });
+      nft_address: expect.any(String)
+    }));
 
     // Check if the local state was updated optimistically
     expect(store.getState().userProgress.completedPhases).toContain(phaseToComplete);

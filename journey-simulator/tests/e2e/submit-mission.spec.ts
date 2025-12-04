@@ -69,29 +69,6 @@ test.describe('Journey submit mission flow', () => {
       })
     })
 
-    // Mock step response for the journey UI to load
-    await page.route('**/journey/*/step', async (route) => {
-      console.log(`[TEST] Mock hit for ${route.request().url()}`);
-      await route.fulfill({
-        status: 200, contentType: 'application/json', body: JSON.stringify({
-          metadata: {
-            persona_id: 'e2e-persona',
-            journey_track: 'e2e-track',
-            phase_id: 'e2e-phase',
-            language: 'en',
-            mode: 'default',
-            tone: 'neutral',
-            title: 'E2E Step'
-          },
-          ui_blocks: [
-            { kind: 'text_block', id: 'intro', title: 'Welcome', body_markdown: 'This is an E2E test step.' }
-          ],
-          agent_actions: [],
-          next_state: { phase_id: 'e2e-phase', completed_missions: [], xp_delta: 0 }
-        })
-      })
-    })
-
     await page.route('**/user/update-profile', async (route) => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true }) })
     })
@@ -138,7 +115,7 @@ test.describe('Journey submit mission flow', () => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) })
     })
 
-    await page.route('**/api/journeys/*/submit', async (route) => {
+    await page.route('**/journey/*/submit', async (route) => {
       const body = {
         metadata: { persona_id: 'demo', journey_track: 'builder', phase_id: 'learn', language: 'fr', mode: 'builder', tone: 'pedagogical', title: 'E2E Submit' },
         ui_blocks: [
@@ -151,7 +128,7 @@ test.describe('Journey submit mission flow', () => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) })
     })
 
-    await page.route('**/api/agents/logs**', async (route) => {
+    await page.route('**/admin/agent-logs**', async (route) => {
       const now = Date.now()
       const logs = [
         { ts: now - 5000, journeyId: 'jid', agent: 'Zyno', action: 'step', details: { phaseId: 'learn' } },

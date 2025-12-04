@@ -299,7 +299,10 @@ const JourneyWorkspace = () => {
           <section className="glass-effect rounded-3xl border border-white/10 bg-[#12122B]/70 p-6 shadow-lg">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="max-w-3xl space-y-2">
-                <h2 className="text-2xl font-space font-bold text-white">{activePhase.title}</h2>
+                <h2 className="text-xs font-semibold uppercase tracking-[0.4em] text-white/60">
+                  Current Phase
+                </h2>
+                <h3 className="text-2xl font-space font-bold text-white">{activePhase.title}</h3>
                 <p className="text-sm leading-relaxed text-white/70">{activePhase.description}</p>
               </div>
 
