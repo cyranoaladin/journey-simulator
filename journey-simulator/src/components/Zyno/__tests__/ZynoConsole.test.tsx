@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import React from 'react';
+import { API_BASE_URL } from '../../../utils/api';
 
 vi.mock('../AgentLogViewer', () => ({
   __esModule: true,
@@ -121,12 +122,13 @@ describe('ZynoConsole', () => {
     expect(missionSummary).toHaveTextContent('50');
 
     expect(screen.getByTestId('mission-flow')).toHaveTextContent('launch-dao');
-    expect(mockFetch).toHaveBeenCalledWith(
-      'http://127.0.0.1:3000/orchestration',
-      expect.objectContaining({
-        method: 'POST',
-      })
+
+    const orchestrationCall = mockFetch.mock.calls.find(([url]) =>
+      typeof url === 'string' && url === `${API_BASE_URL}/orchestration`
     );
+
+    expect(orchestrationCall).toBeDefined();
+    expect(orchestrationCall?.[1]).toEqual(expect.objectContaining({ method: 'POST' }));
   });
 
   it('should display a timeout error immediately if fetch rejects with AbortError', async () => {
