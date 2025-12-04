@@ -504,6 +504,10 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Proof-of-${proofType}™ NFT`}
+        data-testid="proof-modal"
         className="bg-primary-900 rounded-2xl p-6 max-w-md w-full border border-white/20 shadow-xl max-h-[90vh] overflow-hidden flex flex-col"
       >
         {/* Header - Fixed at top */}

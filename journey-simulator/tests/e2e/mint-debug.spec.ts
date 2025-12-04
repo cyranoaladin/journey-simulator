@@ -89,10 +89,10 @@ test.describe('Mint flow (frontend debug)', () => {
   })
 
   test('simulate and execute show tx signature and explorer link', async ({ page }) => {
-    await page.route('**/api/mint/simulate', async (route) => {
+    await page.route('**/solana/mint/simulate', async (route) => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, sim: { ok: true, estFeeLamports: 5000, riskScore: 0.12, network: 'devnet' } }) })
     })
-    await page.route('**/api/mint/execute', async (route) => {
+    await page.route('**/solana/mint/execute', async (route) => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, tx: { txSig: 'SIG_E2E' } }) })
     })
 
@@ -102,14 +102,15 @@ test.describe('Mint flow (frontend debug)', () => {
 
     await page.goto('/debug/mint')
 
-    // Click mint button
+    const mintModal = page.getByRole('dialog', { name: 'Mint Proof-of-Skill™ NFT' })
+
     // Click mint button
     await page.getByRole('button', { name: 'Mint Proof-of-Skill™ NFT' }).dispatchEvent('click')
 
     // Check for potential error
-    const errorMsg = page.locator('.text-red-400');
-    if (await errorMsg.isVisible()) {
-      console.log('Minting Error:', await errorMsg.textContent());
+    const errorBanner = mintModal.getByTestId('minting-error-banner');
+    if (await errorBanner.isVisible()) {
+      console.log('Minting Error:', await errorBanner.textContent());
     }
 
     // Ensure we see the tx signature

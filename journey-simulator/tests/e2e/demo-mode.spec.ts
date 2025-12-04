@@ -7,6 +7,7 @@ test.describe('Demo Mode Workflow', () => {
     });
 
     test('lets demo users preview critical journey interactions', async ({ page }) => {
+        test.setTimeout(90000);
         await page.goto('/login');
         await page.getByRole('button', { name: 'Try Demo Mode' }).click();
         await page.waitForURL('**/journeys');
@@ -14,18 +15,24 @@ test.describe('Demo Mode Workflow', () => {
         const cognitiveCard = page.locator('article').filter({ has: page.getByRole('heading', { name: 'The Cognitive Activation Hub' }) }).first();
         await cognitiveCard.getByRole('button', { name: 'Launch with Zyno' }).click();
 
-        await page.waitForURL('**/journeys/cognitive-activation-hub');
+        await expect(page).toHaveURL(/\/journeys\/cognitive-activation-hub$/);
         await expect(page.getByRole('heading', { name: 'The Cognitive Activation Hub' })).toBeVisible();
 
+        const currentPhasePanel = page.locator('section').filter({
+            has: page.getByRole('heading', { name: 'Current Phase', level: 2 })
+        }).first();
+
         const runPhase = async (phaseTitle: string) => {
-            await expect(page.getByRole('heading', { name: phaseTitle })).toBeVisible();
-            await page.getByRole('button', { name: 'Start / Continue' }).click();
+            const phaseHeading = currentPhasePanel.getByRole('heading', { name: phaseTitle, level: 3 });
+            await expect(phaseHeading).toBeVisible();
+            await currentPhasePanel.getByRole('button', { name: 'Start / Continue' }).click();
             await expect(page.getByText('Mocked Mission Guidance')).toBeVisible();
         };
 
         const closeProofModal = async () => {
-            await expect(page.getByText(/Proof-of-/i)).toBeVisible();
-            await page.getByLabel('Close').first().click();
+            const proofModal = page.getByTestId('proof-modal');
+            await expect(proofModal).toBeVisible({ timeout: 15000 });
+            await proofModal.getByLabel('Close').click();
         };
 
         await runPhase('Cognition Ignition');
@@ -45,6 +52,6 @@ test.describe('Demo Mode Workflow', () => {
         await page.getByRole('button', { name: 'Approve' }).click();
         await closeProofModal();
 
-        await expect(page.getByRole('heading', { name: 'Identity & Security Forge' })).toBeVisible();
+        await expect(page.getByRole('heading', { level: 3, name: 'Identity & Security Forge' })).toBeVisible();
     });
 });

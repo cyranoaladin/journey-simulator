@@ -203,6 +203,9 @@ const NFTMintingModal: FC<NFTMintingModalProps> = ({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Mint Proof-of-Skill™ NFT"
         className="bg-primary-900 rounded-2xl p-6 max-w-md w-full border border-white/20"
       >
         <div className="flex items-center justify-between mb-6">
@@ -321,7 +324,10 @@ const NFTMintingModal: FC<NFTMintingModalProps> = ({
         )}
 
         {error && (
-          <div className="mb-6 bg-red-500/20 border border-red-500/30 rounded-lg p-4">
+          <div
+            className="mb-6 bg-red-500/20 border border-red-500/30 rounded-lg p-4"
+            data-testid="minting-error-banner"
+          >
             <div className="flex items-center space-x-2 mb-2">
               <AlertCircle className="text-red-400" size={16} />
               <h3 className="font-semibold text-red-400">Minting Error</h3>

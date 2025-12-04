@@ -154,7 +154,9 @@ test.describe('Growth Agent Integration', () => {
         await expect(validateBtn).toBeVisible({ timeout: 10000 });
 
         // Use dispatchEvent for more reliable click handling in this complex UI
+        const phaseCompletionRequest = page.waitForRequest('**/journey/complete-phase');
         await validateBtn.dispatchEvent('click');
+        await phaseCompletionRequest;
 
         // Wait for NFT Modal (Proof-of-Skill)
         // It appears after 1s delay in handleCompletePhase
