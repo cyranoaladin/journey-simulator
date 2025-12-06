@@ -2,21 +2,20 @@
 
 const axios = require('axios');
 
-const RAG_SEARCH_URL = process.env.RAG_SEARCH_URL || 'http://localhost:8000/kb/search';
-const RAG_INGEST_URL = process.env.RAG_INGEST_URL || 'http://localhost:8000/kb/ingest';
+const RAG_SEARCH_URL = process.env.RAG_SEARCH_URL || 'https://rag-api.nexusreussite.academy/search';
+const RAG_INGEST_URL = process.env.RAG_INGEST_URL || 'https://rag-api.nexusreussite.academy/ingest';
 const RAG_API_KEY = process.env.RAG_API_KEY || '';
 const RAG_COLLECTION = process.env.RAG_COLLECTION || 'mfai-knowledge';
 
 module.exports.getRagSnippets = async (options = {}) => {
   const query = typeof options === 'string' ? options : options.query;
-  const userContext = typeof options === 'string' ? undefined : options.userContext;
+  const topK = typeof options === 'object' && Number.isInteger(options?.k) ? options.k : 3;
   const normalizedQuery = query && query.trim().length > 0 ? query : 'web3 knowledge base';
-  const authorId = userContext?.id || userContext?.userId || 'demo-user';
 
   try {
     const res = await axios.post(
       RAG_SEARCH_URL,
-      { query: normalizedQuery, collection: RAG_COLLECTION, metadata: { user: authorId } },
+      { q: normalizedQuery, collection: RAG_COLLECTION, k: topK },
       { headers: { 'x-api-key': RAG_API_KEY } }
     );
     return res.data.snippets || [];

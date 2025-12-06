@@ -5,6 +5,7 @@ import { personas } from '../data/personas'
 import { getPersonaProofData, getProofType } from '../data/proofsData'
 import { api } from '../utils/api'
 import { mintProofOfSkill } from '../utils/blockchain'
+import { normalizeCompletedPhases } from '../utils/progress'
 
 import type { JourneyStepResponse, Mode, Tone } from '../types/uiBlocks'
 
@@ -41,6 +42,7 @@ interface JourneyState {
   setUiTone: (tone: Tone) => void
   ensureApiJourneyId: () => string
   runInteractiveStep: (args: { phaseId: string; trackId: string; userInput?: string }) => Promise<JourneyStepResponse>
+  runInteractiveStepDebug: (args: { phaseId: string; trackId: string; userInput?: string }) => Promise<JourneyStepResponse>
   updateProgress: (xp: number, nfts?: string[], mfai?: number) => Promise<void>
   openModal: (content: any) => void
   closeModal: () => void
@@ -102,6 +104,102 @@ const initialTestnetFeatures: TestnetFeatures = {
   socialSharing: true,
 }
 
+type DemoPersonaSnapshot = {
+  xp: number
+  tokens: number
+  completedPhases: number[]
+  nfts: string[]
+}
+
+type DemoDatabase = {
+  version: number
+  personas: Record<string, DemoPersonaSnapshot>
+}
+
+const DEMO_DB_KEY = 'demo_mock_db'
+const DEMO_DB_VERSION = 2
+const DEMO_ACTIVE_PERSONA_KEY = 'demo_active_persona'
+
+const createEmptyDemoPersona = (): DemoPersonaSnapshot => ({
+  xp: 0,
+  tokens: 0,
+  completedPhases: [],
+  nfts: [],
+})
+
+const readDemoDatabase = (): DemoDatabase => {
+  if (typeof window === 'undefined') {
+    return { version: DEMO_DB_VERSION, personas: {} }
+  }
+
+  try {
+    const raw = window.localStorage.getItem(DEMO_DB_KEY)
+    if (!raw) {
+      return { version: DEMO_DB_VERSION, personas: {} }
+    }
+
+    const parsed = JSON.parse(raw)
+    if (parsed && typeof parsed === 'object' && parsed.version === DEMO_DB_VERSION && parsed.personas) {
+      return parsed as DemoDatabase
+    }
+  } catch (error) {
+    console.warn('[Demo Mode] Failed to read demo datastore:', error)
+  }
+
+  return { version: DEMO_DB_VERSION, personas: {} }
+}
+
+const writeDemoDatabase = (db: DemoDatabase) => {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  try {
+    window.localStorage.setItem(DEMO_DB_KEY, JSON.stringify(db))
+  } catch (error) {
+    console.warn('[Demo Mode] Failed to persist demo datastore:', error)
+  }
+}
+
+const isDemoSession = (): boolean => {
+  if (typeof window === 'undefined') return false
+  try {
+    return window.localStorage.getItem('accessToken') === 'demo-token'
+  } catch {
+    return false
+  }
+}
+
+const resetDemoPersonaProgress = (personaId: string | undefined | null) => {
+  if (!personaId || typeof window === 'undefined') {
+    return
+  }
+
+  const datastore = readDemoDatabase()
+  datastore.personas[personaId] = createEmptyDemoPersona()
+  writeDemoDatabase(datastore)
+}
+
+const resetEntireDemoDatabase = () => {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  writeDemoDatabase({ version: DEMO_DB_VERSION, personas: {} })
+}
+
+const setActiveDemoPersona = (personaId: string | undefined | null) => {
+  if (!personaId || typeof window === 'undefined') {
+    return
+  }
+
+  try {
+    window.localStorage.setItem(DEMO_ACTIVE_PERSONA_KEY, personaId)
+  } catch (error) {
+    console.warn('[Demo Mode] Failed to set active persona:', error)
+  }
+}
+
 const derivePassLevel = (
   subscription: string | undefined,
   totalXP: number,
@@ -152,6 +250,11 @@ export const useJourneyStore = create<JourneyState>()(
         const state = get()
         const journeyId = state.apiJourneyId ?? state.ensureApiJourneyId()
 
+        if (isDemoSession() && persona?.id) {
+          setActiveDemoPersona(persona.id)
+          resetDemoPersonaProgress(persona.id)
+        }
+
         set({
           selectedPersona: persona,
           currentPhase: 0,
@@ -180,13 +283,13 @@ export const useJourneyStore = create<JourneyState>()(
 
       runInteractiveStep: async ({ phaseId, trackId, userInput }) => {
         const id = get().ensureApiJourneyId()
-        const { uiMode, uiTone } = get()
+        const { uiTone } = get()
         const body = {
           phaseId,
           trackId,
           userInput,
           language: 'en' as const,
-          mode: uiMode,
+          mode: get().uiMode,
           tone: uiTone,
           journeyState: { xp: get().userProgress.totalXP, completed: get().userProgress.completedPhases }
         }
@@ -200,6 +303,18 @@ export const useJourneyStore = create<JourneyState>()(
           return json
         } finally {
           set({ isStepLoading: false })
+        }
+      },
+
+      runInteractiveStepDebug: async ({ phaseId, trackId, userInput }) => {
+        console.debug('[Store] runInteractiveStepDebug START', { phaseId, trackId })
+        try {
+          const response = await get().runInteractiveStep({ phaseId, trackId, userInput })
+          console.debug('[Store] runInteractiveStepDebug COMPLETE')
+          return response
+        } catch (error) {
+          console.error('[Store] runInteractiveStepDebug FAILED', error)
+          throw error
         }
       },
 
@@ -617,9 +732,12 @@ export const useJourneyStore = create<JourneyState>()(
 
           const progress = response.progress || {}
           const totalXP: number = progress.total_xp ?? 0
-          const completedCount: number = typeof progress.completed_phases === 'number'
-            ? progress.completed_phases
-            : 0
+          const normalizedBackend = normalizeCompletedPhases(progress)
+          let backendCompletedPhases = normalizedBackend.completedPhases
+
+          if (backendCompletedPhases.length === 0 && normalizedBackend.completedCount > 0) {
+            backendCompletedPhases = Array.from({ length: normalizedBackend.completedCount }, (_, index) => index)
+          }
 
           const backendPersonaId: string | undefined = progress.persona || currentState.userProgress.currentPersona || undefined
           const matchedPersona = backendPersonaId
@@ -627,12 +745,17 @@ export const useJourneyStore = create<JourneyState>()(
             : null
 
           const effectivePersona = currentState.selectedPersona ?? matchedPersona ?? null
+          const mergedPhaseIndexes = Array.from(new Set([
+            ...backendCompletedPhases,
+            ...currentState.userProgress.completedPhases
+          ])).sort((a, b) => a - b)
 
-          const localCompletedCount = currentState.userProgress.completedPhases.length
-          const resolvedCompletedCount = Math.max(completedCount, localCompletedCount)
-          const personaPhaseCount = effectivePersona?.phases?.length ?? resolvedCompletedCount
-          const safeCompletedCount = Math.min(resolvedCompletedCount, personaPhaseCount)
-          const completedPhases = Array.from({ length: safeCompletedCount }, (_, index) => index)
+          const personaPhaseCount = effectivePersona?.phases?.length
+            ?? Math.max(mergedPhaseIndexes.length, normalizedBackend.completedCount)
+
+          const completedPhases = mergedPhaseIndexes.filter((index) => index < personaPhaseCount)
+
+          const safeCompletedCount = completedPhases.length
 
           const rawCertificates: any[] = Array.isArray(progress.nft_certificates)
             ? progress.nft_certificates
@@ -686,6 +809,7 @@ export const useJourneyStore = create<JourneyState>()(
             testnetAirdropClaimed: currentState.userProgress.testnetAirdropClaimed,
             socialShareCount: currentState.userProgress.socialShareCount,
             nftMints: currentState.userProgress.nftMints,
+            demoModeEnabled: Boolean(progress.demo_mode?.enabled)
           }
 
           set({
@@ -705,6 +829,11 @@ export const useJourneyStore = create<JourneyState>()(
           const demoPersona = personas[0]; // Cognitive Activation Hub
           const state = get()
           const journeyId = state.apiJourneyId ?? state.ensureApiJourneyId()
+
+          resetEntireDemoDatabase()
+          setActiveDemoPersona(demoPersona.id)
+          resetDemoPersonaProgress(demoPersona.id)
+
           set({
             selectedPersona: demoPersona,
             currentPhase: 0, // Start at Phase 1

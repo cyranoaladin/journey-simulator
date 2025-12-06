@@ -16,7 +16,8 @@ import {
   LifeBuoy,
   GaugeCircle,
   Gem,
-  Gavel
+  Gavel,
+  Award
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import WalletButton from '../WalletButton'
@@ -106,6 +107,36 @@ const MainNavigation = () => {
     [userProgress.daoProposals, userProgress.mfaiTokens, userProgress.stakedMfai, userProgress.totalXP, userProgress.votingPower, level]
   )
 
+  const navBadges = useMemo(
+    () => [
+      {
+        id: 'xp',
+        label: 'Skillchain XP',
+        value: `${userProgress.totalXP.toLocaleString()} XP`,
+        icon: GaugeCircle,
+      },
+      {
+        id: 'mfai',
+        label: '$MFAI',
+        value: userProgress.mfaiTokens.toLocaleString(),
+        icon: Gem,
+      },
+      {
+        id: 'nft',
+        label: 'Proof NFTs',
+        value: userProgress.nfts.length.toString(),
+        icon: Award,
+      },
+      {
+        id: 'vote',
+        label: 'Voting Power',
+        value: userProgress.votingPower.toLocaleString(),
+        icon: Gavel,
+      },
+    ],
+    [userProgress.mfaiTokens, userProgress.nfts.length, userProgress.totalXP, userProgress.votingPower]
+  )
+
   const headerTone = isDark
     ? 'border-white/10 bg-background/80 text-white'
     : 'border-surface-200/80 bg-white/85 text-surface-900'
@@ -125,6 +156,12 @@ const MainNavigation = () => {
   const navActiveTone = isDark
     ? 'bg-white/10 text-white shadow-glow'
     : 'bg-surface-200/80 text-surface-900 shadow-glow'
+  const badgeChipBase = isDark
+    ? 'border-white/10 bg-white/10 text-white'
+    : 'border-surface-200 bg-surface-50 text-surface-700'
+  const tickerTone = isDark
+    ? 'border-white/10 bg-white/5 text-white/75'
+    : 'border-surface-200/70 bg-white text-surface-600'
 
   const metricLabelClass = isDark ? 'text-white/50' : 'text-surface-500'
   const metricValueClass = isDark ? 'text-white' : 'text-surface-900'
@@ -142,6 +179,17 @@ const MainNavigation = () => {
   const mobileItemActive = isDark
     ? 'bg-white/15 text-white'
     : 'bg-surface-200 text-surface-900'
+
+  const activePhaseTitle = selectedPersona?.phases?.[
+    Math.min(
+      userProgress.completedPhases.length,
+      Math.max((selectedPersona?.phases?.length ?? 1) - 1, 0)
+    )
+  ]?.title
+
+  const zynoTicker = selectedPersona
+    ? `Zyno says: ${activePhaseTitle || 'Journey ready'} · ${completionRate}% complete`
+    : 'Zyno syncs once you choose a journey.'
 
   const getBadgeClasses = (badge: string) => {
     switch (badge) {
@@ -306,6 +354,27 @@ const MainNavigation = () => {
             >
               {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </motion.button>
+          </div>
+        </div>
+
+        <div className={`hidden items-center justify-between gap-4 rounded-2xl border px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] ${tickerTone} lg:flex`}>
+          <div className="flex items-center gap-2 text-[11px]">
+            <Sparkles size={14} className="text-accent-cyan" aria-hidden="true" />
+            <span className="tracking-normal">{zynoTicker}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            {navBadges.map((badge) => {
+              const Icon = badge.icon
+              return (
+                <span
+                  key={badge.id}
+                  className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-[11px] tracking-normal ${badgeChipBase}`}
+                >
+                  <Icon size={12} aria-hidden="true" />
+                  <span className="font-medium">{badge.value}</span>
+                </span>
+              )
+            })}
           </div>
         </div>
 

@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from 'vitest'
 import JourneyWorkspace from '../JourneyWorkspace'
 import { useJourneyStore } from '../../../store/journeyStore'
 
@@ -38,6 +38,19 @@ vi.mock('../../../contexts/WorkspaceLayoutContext', () => ({
 }))
 
 describe('JourneyWorkspace', () => {
+    let consoleLogSpy: ReturnType<typeof vi.spyOn> | undefined;
+    let consoleErrorSpy: ReturnType<typeof vi.spyOn> | undefined;
+
+    beforeAll(() => {
+        consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => { });
+        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
+    });
+
+    afterAll(() => {
+        consoleLogSpy?.mockRestore();
+        consoleErrorSpy?.mockRestore();
+    });
+
     const mockRunInteractiveStep = vi.fn()
     const mockCompletePhase = vi.fn()
     const mockSetCurrentPhase = vi.fn()

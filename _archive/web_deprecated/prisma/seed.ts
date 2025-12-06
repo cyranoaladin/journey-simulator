@@ -14,10 +14,20 @@ async function main() {
 
   // Demo journeys
   const j1 = await prisma.journey.create({
-    data: { title: 'Builder – Tokenomics', status: 'active', userId: user.id },
+    data: {
+      title: 'Builder – Tokenomics',
+      status: 'active',
+      type: 'MVP_LAUNCH',
+      userId: user.id,
+    },
   })
   const j2 = await prisma.journey.create({
-    data: { title: 'Experience – UX', status: 'planned', userId: user.id },
+    data: {
+      title: 'Experience – UX',
+      status: 'planned',
+      type: 'PRODUCT_EXPERIENCE',
+      userId: user.id,
+    },
   })
 
   // Journey states

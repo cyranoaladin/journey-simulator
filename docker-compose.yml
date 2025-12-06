@@ -5,27 +5,50 @@ services:
     build:
       context: ./mf-back
       dockerfile: Dockerfile
-    command: npm start
-    env_file: .env
+      args:
+        INSTALL_DEV: "true"
+    command: npm run dev
+    env_file:
+      - ./mf-back/.env.production
+    environment:
+      NODE_ENV: development
+      PORT: 3000
     ports:
-      - "127.0.0.1:3002:3000"
+      - "3002:3000"
     volumes:
       - ./mf-back:/usr/src/app
       - api-node-modules:/usr/src/app/node_modules
     depends_on:
       mongo:
         condition: service_healthy
-    restart: unless-stopped
 
   mongo:
     image: mongo:6
     restart: unless-stopped
     ports:
-      - "127.0.0.1:27018:27017"
+      - "27017:27017"
     volumes:
-      - mongo-data:/data/db
+      - ./data/mongo:/data/db
     healthcheck:
       test: [ "CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: prisma
+      POSTGRES_USER: prisma
+      POSTGRES_PASSWORD: prisma
+    ports:
+      - "5435:5432"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "prisma" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -35,13 +58,13 @@ services:
     build:
       context: ./journey-simulator
       dockerfile: Dockerfile
-    env_file: .env
+    environment:
+      VITE_API_BASE_URL: http://localhost:3002
     ports:
-      - "127.0.0.1:3003:80"
+      - "3003:80"
     depends_on:
       - api
-    restart: unless-stopped
 
 volumes:
-  mongo-data:
   api-node-modules:
+  web-node-modules:

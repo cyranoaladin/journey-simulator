@@ -25,6 +25,11 @@ import { saveAs } from 'file-saver';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { getPersonaProofData } from '../data/proofsData';
 
+const normalizePersonaId = (id?: string | null) => {
+  if (!id) return undefined;
+  return id.replace(/_/g, '-').toLowerCase();
+};
+
 interface NFTProofModalProps {
   personaId?: string;
   phaseId?: string;
@@ -75,10 +80,13 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
   const fallbackAttemptedRef = useRef(false);
 
   const computeFallbackImage = useCallback(() => {
-    const personaIdentifier = selectedPersona?.id || personaIdProp;
+    const personaIdentifier = normalizePersonaId(selectedPersona?.id || personaIdProp);
     const phaseIndex = Math.max(0, phaseNumber - 1);
     const personaPhase = selectedPersona?.phases?.[phaseIndex];
-    const fallbackPhaseId = phaseIdProp || personaPhase?.id;
+    const derivedPhaseId = phase
+      ? phase.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
+      : undefined;
+    const fallbackPhaseId = phaseIdProp || personaPhase?.id || derivedPhaseId;
     const fallbackPhaseTitle = personaPhase?.title || phase;
 
     if (!personaIdentifier || !fallbackPhaseId) {
@@ -146,19 +154,6 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
       setImageError(false);
     }
   }, [resolvedImageUrl, computeFallbackImage]);
-
-  // Set a timeout to prevent infinite loading
-  useEffect(() => {
-    if (!imageLoaded && !imageError && resolvedImageUrl) {
-      const timer = setTimeout(() => {
-        if (!imageLoaded) {
-          setImageError(true);
-        }
-      }, 3000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [imageLoaded, imageError, resolvedImageUrl]);
 
   useEffect(() => {
     if (!imageError || fallbackAttemptedRef.current) return;

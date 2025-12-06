@@ -2,8 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, GaugeCircle, Trophy } from 'lucide-react'
-import Lottie from 'lottie-react'
-import galaxyAnimation from '@/assets/lottie/galaxy-reactive.json'
 import missionFlowIcon from '@/assets/svg/mission-flow.svg'
 import multiAgentsIcon from '@/assets/svg/multi-agents.svg'
 import feedbackStarsIcon from '@/assets/svg/feedback-stars.svg'
@@ -94,6 +92,17 @@ const quoteVariants = {
   visible: { opacity: 1, y: 0 }
 }
 
+const AnimatedBackground = () => (
+  <div className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div
+      className="absolute inset-[-35%] rounded-full opacity-50 blur-3xl motion-safe:animate-[spin_60s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,rgba(34,211,238,0.2),rgba(114,9,183,0.35),rgba(14,165,233,0.3),transparent)]"
+      aria-hidden="true"
+    />
+    <div className="absolute inset-0 bg-gradient-to-b from-[#0d0d1a] via-[#14142a] to-[#0d0d1a] opacity-90" aria-hidden="true" />
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(67,97,238,0.35),transparent_65%)] opacity-80" aria-hidden="true" />
+  </div>
+)
+
 const HomePage = () => {
   const [phaseIndex, setPhaseIndex] = useState(0)
   const navigate = useNavigate()
@@ -120,11 +129,7 @@ const HomePage = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#0d0d1a] text-white">
-      <div className="pointer-events-none absolute inset-0 opacity-70 mix-blend-screen">
-        <Lottie animationData={galaxyAnimation} loop autoplay className="h-full w-full" />
-      </div>
-
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0d0d1a] via-[#14142a] to-[#0d0d1a]" aria-hidden="true" />
+      <AnimatedBackground />
 
       <header className="sticky top-0 z-20 bg-white/0 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-6 sm:px-6 lg:px-12">

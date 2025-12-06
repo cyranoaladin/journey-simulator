@@ -19,7 +19,7 @@ import { useJourneyStore } from '../store/journeyStore'
 import { useAuth } from '../contexts/AuthContext'
 
 const WalletButton = () => {
-  const { publicKey, wallet, disconnect, connected, connecting } = useWallet()
+  const { publicKey, wallet, disconnect, connected, connecting, signMessage } = useWallet()
   const { setVisible } = useWalletModal()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -36,7 +36,7 @@ const WalletButton = () => {
 
         // Auto-login if not already authenticated
         if (!isAuthenticated) {
-          const success = await loginWithWallet(publicKey.toString());
+          const success = await loginWithWallet(publicKey.toString(), signMessage);
           if (!success) {
             // If login fails (e.g. user not found), we might want to redirect to register
             // or show a notification. For now, we just log it.

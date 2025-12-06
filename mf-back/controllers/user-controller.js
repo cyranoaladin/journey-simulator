@@ -2,394 +2,757 @@ const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const dotenv = require('dotenv');
-const { verifyTransaction } = require('../utils/solana');
+const nacl = require('tweetnacl');
+// bs58 v6 is ESM-first, so in CJS we access .default
+const bs58 = require('bs58').default || require('bs58');
 
-dotenv.config({ quiet: true });
+dotenv.config({
+  quiet: true
+});
 
 const JWT_SECRET = process.env.JWT_SECRET || (process.env.NODE_ENV === 'test' ? 'test-secret' : null);
-if (!JWT_SECRET) throw new Error('JWT_SECRET environment variable is not defined');
 
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is not defined');
+}
+
+// Generate access token - short lived (15-60 minutes)
 const generateAccessToken = (user) => {
-  return jwt.sign({ id: user._id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
+  return jwt.sign(
+    {
+      id: user._id,
+      email: user.email,
+      role: user.role
+    },
+    JWT_SECRET,
+    { expiresIn: '1h' } // Short-lived token
+  );
 };
 
+// Generate refresh token - longer lived (days/weeks)
 const generateRefreshToken = (user) => {
+  // Create a random token
   const refreshToken = crypto.randomBytes(40).toString('hex');
-  const expiry = new Date();
-  expiry.setDate(expiry.getDate() + 7);
+
+  // Set expiry date - 7 days from now
+  const refreshTokenExpiry = new Date();
+  refreshTokenExpiry.setDate(refreshTokenExpiry.getDate() + 7);
+
+  // Save to user
   user.refreshToken = refreshToken;
-  user.refreshTokenExpiry = expiry;
+  user.refreshTokenExpiry = refreshTokenExpiry;
+
   return refreshToken;
 };
-
-// ... Standard Controller Methods ...
 
 exports.registerUser = async (req, res) => {
   try {
     const { name, email, password, wallet_address, persona } = req.body;
-    const userExists = await User.findOne({ email });
-    if (userExists) return res.status(400).json({ success: false, message: 'User already exists' });
 
-    const user = await User.create({ name, email, password, wallet_address, persona });
+    // Check if user already exists
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ success: false, message: 'User with this email already exists' });
+    }
+
+    // Create user
+    const user = await User.create({
+      name,
+      email,
+      password,
+      wallet_address,
+      persona,
+    });
+
     if (user) {
+      // Generate refresh token
       const refreshToken = generateRefreshToken(user);
-      await user.save();
+      await user.save(); // Save the refresh token to user
+
       res.status(201).json({
         success: true,
-        user: { id: user._id, name: user.name, email: user.email, wallet: user.wallet_address },
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          wallet_address: user.wallet_address,
+          persona: user.persona,
+        },
         accessToken: generateAccessToken(user),
         refreshToken
       });
     } else {
-      res.status(400).json({ success: false, message: 'Invalid data' });
+      res.status(400).json({ success: false, message: 'Invalid user data' });
     }
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Registration failed', error: error.message });
+    res.status(500).json({
+      success: false,
+      message: 'Failed to register user',
+      error: error.message
+    });
+  }
+};
+
+exports.createWalletChallenge = async (req, res) => {
+  try {
+    const { wallet_address } = req.body;
+
+    if (!wallet_address) {
+      return res.status(400).json({ success: false, message: 'Wallet address is required' });
+    }
+
+    const user = await User.findOne({ wallet_address });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Generate nonce
+    const nonce = crypto.randomBytes(32).toString('hex');
+    user.wallet_nonce = nonce;
+    user.wallet_nonce_expiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+    await user.save();
+
+    const message = `Sign this message to log in to Money Factory AI\n\nNonce: ${nonce}`;
+
+    res.status(200).json({
+      success: true,
+      message,
+      nonce
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create wallet challenge',
+      error: error.message
+    });
   }
 };
 
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+    // Find user by email
     const user = await User.findOne({ email });
-    if (!user || !(await user.comparePassword(password))) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    if (!user) {
+      return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
-    if (!user.is_active) return res.status(401).json({ success: false, message: 'Account deactivated' });
 
+    // Check if password is correct
+    const isMatch = await user.comparePassword(password);
+
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: 'Invalid email or password' });
+    }
+
+    // Check if user is active
+    if (!user.is_active) {
+      return res.status(401).json({ success: false, message: 'Your account has been deactivated' });
+    }
+
+    // Generate tokens
     const accessToken = generateAccessToken(user);
+
+    // Create a refresh token
     const refreshToken = crypto.randomBytes(40).toString('hex');
+
+    // Save refresh token to user
     user.refreshToken = refreshToken;
-    user.refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    user.refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
     await user.save();
 
+    // Clear sensitive data
+    const userToReturn = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      wallet_address: user.wallet_address,
+    };
+
+    // Send response with tokens
     res.status(200).json({
       success: true,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role },
+      user: userToReturn,
       accessToken,
       refreshToken
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Login failed', error: error.message });
+    res.status(500).json({
+      success: false,
+      message: 'Failed to login',
+      error: error.message
+    });
   }
 };
 
 exports.loginWithWallet = async (req, res) => {
-  // Basic implementation for tests/stub
   try {
-    const { wallet_address } = req.body;
-    if (!wallet_address) return res.status(400).json({ success: false, message: 'Wallet required' });
+    const { wallet_address, signature, message } = req.body;
 
-    let user = await User.findOne({ wallet_address });
-    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    if (!wallet_address) {
+      return res.status(400).json({ success: false, message: 'Wallet address is required' });
+    }
 
+    // Find user by wallet address
+    const user = await User.findOne({ wallet_address });
+
+    if (!user) {
+      // User not found - Frontend should redirect to registration
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Check if user is active
+    if (!user.is_active) {
+      return res.status(401).json({ success: false, message: 'Your account has been deactivated' });
+    }
+
+    const isStrict = process.env.ENABLE_STRICT_WALLET_LOGIN === 'true';
+    const hasProof = signature && message;
+
+    if (isStrict && !hasProof) {
+      console.warn(`[Auth] Rejected insecure wallet login for ${wallet_address} (Strict Mode ON)`);
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Signature and message required. Insecure login is disabled.' 
+      });
+    }
+
+    if (hasProof) {
+      // Secure Path: Verify signature if provided (regardless of strict mode)
+      
+      // Verify challenge exists and is valid
+      if (!user.wallet_nonce || !user.wallet_nonce_expiry || user.wallet_nonce_expiry < new Date()) {
+        return res.status(401).json({ success: false, message: 'Login challenge expired or invalid. Please request a new challenge.' });
+      }
+
+      // Verify message format
+      const expectedMessage = `Sign this message to log in to Money Factory AI\n\nNonce: ${user.wallet_nonce}`;
+      if (message !== expectedMessage) {
+        return res.status(401).json({ success: false, message: 'Invalid message format or nonce mismatch' });
+      }
+
+      // Verify signature
+      try {
+        const signatureUint8 = bs58.decode(signature);
+        const messageUint8 = new TextEncoder().encode(message);
+        const publicKeyUint8 = bs58.decode(wallet_address);
+
+        const verified = nacl.sign.detached.verify(messageUint8, signatureUint8, publicKeyUint8);
+        if (!verified) {
+          return res.status(401).json({ success: false, message: 'Invalid wallet signature' });
+        }
+      } catch (err) {
+        return res.status(400).json({ success: false, message: 'Cryptographic verification failed', error: err.message });
+      }
+
+      // Clear nonce after successful verification
+      user.wallet_nonce = null;
+      user.wallet_nonce_expiry = null;
+      await user.save();
+    } else {
+      // Legacy Path: Only reached if !isStrict and !hasProof
+      console.warn(`[Security Warning] Insecure wallet login used for ${wallet_address}. Enable ENABLE_STRICT_WALLET_LOGIN=true for production.`);
+    }
+
+    // Generate tokens
     const accessToken = generateAccessToken(user);
-    res.status(200).json({ success: true, accessToken, user: { id: user._id } });
-  } catch (e) {
-    res.status(500).json({ success: false, error: e.message });
+    const refreshToken = crypto.randomBytes(40).toString('hex');
+
+    // Save refresh token
+    user.refreshToken = refreshToken;
+    user.refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    await user.save();
+
+    // Clear sensitive data
+    const userToReturn = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      wallet_address: user.wallet_address,
+    };
+
+    res.status(200).json({
+      success: true,
+      user: userToReturn,
+      accessToken,
+      refreshToken
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to login with wallet',
+      error: error.message
+    });
   }
 };
 
-// ... Other methods simplified for brevity but exist in full file ...
 exports.getUserProfile = async (req, res) => {
   try {
-    if (!req.user) return res.status(401).json({ success: false });
-    res.status(200).json({ success: true, user: req.user });
-  } catch (e) {
-    res.status(500).json({ success: false, error: e.message });
+    console.log("🔍 Get user profile request received");
+
+    // The user object should be attached to req by the protect middleware
+    const user = req.user;
+
+    if (!user) {
+      console.log("❌ No user attached to request");
+      return res.status(401).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    console.log(`✅ Returning profile for user: ${user.email}`);
+
+    // Return user data (excluding sensitive fields)
+    res.status(200).json({
+      success: true,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        wallet_address: user.wallet_address,
+        persona: user.persona,
+      }
+    });
+  } catch (error) {
+    console.error("🚨 Get profile error:", error);
+    res.status(500).json({
+      success: false,
+      message: 'Error retrieving user profile',
+      error: error.message
+    });
   }
 };
 
 exports.updateUserProfile = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.user.id, req.body, { new: true }).select('-password');
-    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
-    res.status(200).json({ success: true, user });
+    // Get user from the auth middleware
+    const userId = req.user.id;
+
+    // Check if a file was uploaded
+    //const image = req.file ? `/uploads/${req.file.filename}` : undefined;
+
+    // Find user and update
+    const user = await User.findByIdAndUpdate(
+      userId,
+      {
+        ...(req.body.name && { name: req.body.name }),
+        ...(req.body.email && { email: req.body.email }),
+        ...(req.body.wallet_address && { wallet_address: req.body.wallet_address }),
+        ...(req.body.persona && { persona: req.body.persona }),
+        updatedAt: Date.now()
+      },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      user
+    });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update profile',
+      error: error.message
+    });
   }
 };
 
 exports.deleteUser = async (req, res) => {
   try {
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ success: false, message: 'Unauthorized' });
+    // Only allow admins or the user themselves to delete their account
+    if (req.user.role !== 'admin' && req.user.id !== req.params.id) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to delete this user'
+      });
     }
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Soft delete - set is_active to false
     user.is_active = false;
+    user.updatedAt = Date.now();
     await user.save();
-    res.status(200).json({ success: true, message: 'User deactivated' });
+
+    res.status(200).json({
+      success: true,
+      message: 'User deactivated successfully'
+    });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete user',
+      error: error.message
+    });
   }
 };
 
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find({}).select('-password');
-    res.status(200).json({ success: true, count: users.length, users });
+
+    res.status(200).json({
+      success: true,
+      count: users.length,
+      users
+    });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch users',
+      error: error.message
+    });
   }
 };
 
 exports.changeUserRole = async (req, res) => {
   try {
-    if (req.user.role !== 'admin') return res.status(403).json({ success: false });
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to change user roles'
+      });
+    }
+
+    const { role } = req.body;
+    if (!role || !['user', 'admin'].includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid role specified'
+      });
+    }
 
     const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ success: false });
 
-    user.role = req.body.role;
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    user.role = role;
+    user.updatedAt = Date.now();
     await user.save();
-    res.status(200).json({ success: true });
+
+    res.status(200).json({
+      success: true,
+      message: `User role updated to ${role}`,
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role
+      }
+    });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({
+      success: false,
+      message: 'Failed to change user role',
+      error: error.message
+    });
   }
 };
 
 exports.subscription = async (req, res) => {
   try {
     const { subscription } = req.body;
-    if (!['free', 'gold', 'platinum'].includes(subscription)) {
-      return res.status(400).json({ success: false, message: 'Invalid subscription' });
+    if (!subscription || !['gold', 'platinum', 'diamond'].includes(subscription)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid subscription specified'
+      });
     }
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ success: false });
+
+    const user = await User.findById(req.params.id)
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
 
     user.subscription = subscription;
+    user.subscription_date = Date.now();
     await user.save();
-    res.status(200).json({ success: true, user });
+
+    res.status(200).json({
+      success: true,
+      message: `User subscription updated to ${subscription}`,
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+        subscription: user.subscription
+      }
+    });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({
+      success: false,
+      message: 'Failed to subscribe user',
+      error: error.message
+    });
   }
+};
+
+exports.debugWhoAmI = async (req, res) => {
+  // Guard: Dev only or Admin
+  if (process.env.NODE_ENV === 'production' && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Debug endpoint not available' });
+  }
+
+  res.status(200).json({
+      success: true,
+      data: {
+          mongoId: req.user._id,
+          email: req.user.email,
+          wallet_address: req.user.wallet_address,
+          role: req.user.role,
+          wallet_nonce_set: !!req.user.wallet_nonce
+      }
+  });
 };
 
 exports.logoutUser = async (req, res) => {
   try {
     const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'Refresh token is required'
+      });
+    }
+
+    // Find user by refresh token and clear it
     const user = await User.findOne({ refreshToken });
     if (user) {
       user.refreshToken = undefined;
+      user.refreshTokenExpiry = undefined;
       await user.save();
     }
-    res.status(200).json({ success: true });
-  } catch (e) {
-    res.status(500).json({ success: false, error: e.message });
+
+    res.status(200).json({
+      success: true,
+      message: 'Logged out successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to logout',
+      error: error.message
+    });
   }
 };
+
 exports.refreshToken = async (req, res) => {
   try {
     const { refreshToken } = req.body;
-    if (!refreshToken) return res.status(400).json({ success: false, message: 'Refresh Token required' });
 
-    const user = await User.findOne({ refreshToken });
-    if (!user) return res.status(403).json({ success: false, message: 'Invalid Refresh Token' });
+    if (!refreshToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'Refresh token is required'
+      });
+    }
 
+    // Find user by refresh token
+    const user = await User.findOne({
+      refreshToken,
+      refreshTokenExpiry: { $gt: new Date() }
+    });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid or expired refresh token'
+      });
+    }
+
+    // Generate new access token
     const accessToken = generateAccessToken(user);
-    res.status(200).json({ success: true, accessToken });
-  } catch (e) {
-    res.status(500).json({ success: false, error: e.message });
+
+    res.status(200).json({
+      success: true,
+      accessToken
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to refresh token',
+      error: error.message
+    });
   }
 };
 
 exports.updateTokenBalance = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.user.id, req.body, { new: true }).select('-password');
-    if (!user) return res.status(404).json({ success: false });
-    res.status(200).json({ success: true });
-  } catch (e) {
-    res.status(500).json({ success: false, error: e.message });
+    const userId = req.user.id;
+    const { mfai_tokens } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      {
+        'token_transactions.mfai_tokens': mfai_tokens,
+        'token_transactions.last_updated': new Date()
+      },
+      { new: true }
+    ).select('-password');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Token balance updated successfully',
+      user: {
+        id: user._id,
+        token_transactions: user.token_transactions
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update token balance',
+      error: error.message
+    });
   }
 };
 
+const { verifyTransaction } = require('../utils/solana');
 
-// --- CRITICAL FIX FOR NFT VERIFICATION ---
 exports.addNFTCertificate = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { nft_address, mint_address } = req.body;
-    const resolvedAddress = (nft_address || mint_address || '').trim();
+    const {
+      phase,
+      nft_address,
+      mint_address,
+      score,
+      title,
+      description,
+      image_url,
+      rarity,
+      xp_earned
+    } = req.body;
+
+    // In the frontend, 'mint_address' is sent as the transaction signature (txSig)
+    // We use this to verify the transaction on-chain.
+    const resolvedAddressRaw = nft_address || mint_address;
+    const resolvedAddress = typeof resolvedAddressRaw === 'string' ? resolvedAddressRaw.trim() : '';
 
     if (!resolvedAddress || resolvedAddress.length < 10) {
-      return res.status(400).json({ success: false, message: 'Valid Address required' });
+      return res.status(400).json({
+        success: false,
+        message: 'Valid NFT mint address/signature is required'
+      });
     }
 
+    // --- SECURITY CHECK: Verify Transaction on Solana ---
+    // Skip verification in test environment if needed, or mock it.
     if (process.env.NODE_ENV !== 'test' || process.env.ENABLE_SOLANA_TESTS === 'true') {
       try {
         await verifyTransaction(resolvedAddress, req.user.wallet_address);
       } catch (verificationError) {
-        // FIX: Single string warning + 'error' field
-        console.warn(`NFT Verification Failed for user ${userId}: ${verificationError.message}`);
+        console.error(`NFT Verification Failed for user ${userId}:`, verificationError.message);
         return res.status(400).json({
           success: false,
-          message: 'NFT Verification Failed',
-          error: verificationError.message // REQUIRED BY TEST
+          message: 'NFT Verification Failed: Invalid transaction or wallet mismatch.',
+          error: verificationError.message
         });
       }
     }
+    // ----------------------------------------------------
+
+    const duplicateCertificate = await User.findOne({
+      'nft_certificates.mint_address': resolvedAddress,
+    });
+
+    if (duplicateCertificate) {
+      return res.status(409).json({
+        success: false,
+        message: 'NFT certificate already recorded',
+      });
+    }
+
+    const allowedRarities = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'mythic', 'unique'];
+
+    const resolvedPhase = Number.isFinite(Number(phase)) ? Number(phase) : undefined;
+
+    const numericXp = Number.isFinite(Number(xp_earned)) ? Math.max(0, Math.min(1000, Number(xp_earned))) : undefined;
+
+    const normalizedRarity = typeof rarity === 'string' && rarity.trim().length > 0
+      ? rarity.trim().toLowerCase()
+      : undefined;
+
+    if (normalizedRarity && !allowedRarities.includes(normalizedRarity)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid rarity provided',
+      });
+    }
+
+    const normalizedTitle = typeof title === 'string' ? title.trim() : undefined;
+    const normalizedDescription = typeof description === 'string' ? description.trim() : undefined;
+    const normalizedImageUrl = typeof image_url === 'string' ? image_url.trim() : undefined;
+
+    const numericScore = Number.isFinite(Number(score)) ? Math.max(0, Math.min(100, Number(score))) : 0;
+
+    const certificatePayload = {
+      ...(resolvedPhase !== undefined && !Number.isNaN(resolvedPhase) && { phase: resolvedPhase }),
+      nft_address: resolvedAddress,
+      mint_address: resolvedAddress,
+      score: numericScore,
+      mint_date: new Date(),
+      ...(normalizedTitle && { title: normalizedTitle }),
+      ...(normalizedDescription && { description: normalizedDescription }),
+      ...(normalizedImageUrl && { image_url: normalizedImageUrl }),
+      ...(normalizedRarity && { rarity: normalizedRarity }),
+      ...(numericXp !== undefined && !Number.isNaN(numericXp) && { xp_earned: numericXp })
+    };
 
     const user = await User.findByIdAndUpdate(
       userId,
-      { $push: { nft_certificates: { mint_address: resolvedAddress, mint_date: new Date() } } },
+      {
+        $push: {
+          nft_certificates: certificatePayload
+        }
+      },
       { new: true }
     ).select('-password');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
 
     res.status(200).json({
       success: true,
       message: 'NFT certificate added successfully',
-      user: { id: user._id, nft_certificates: user.nft_certificates }
+      user: {
+        id: user._id,
+        nft_certificates: user.nft_certificates
+      }
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error', error: error.message });
-  }
-};
-
-/**
- * GET /user/:userId/progress
- * Get user progress
- */
-exports.getUserProgress = async (req, res) => {
-  try {
-    const { userId } = req.params;
-
-    // Verify user is requesting their own progress or is admin
-    if (req.user.id !== userId && req.user.role !== 'admin') {
-      return res.status(403).json({
-        success: false,
-        message: 'Unauthorized to access this user\'s progress'
-      });
-    }
-
-    const user = await User.findById(userId).select('-password');
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      progress: user.progress || {
-        completedPhases: [],
-        currentPhase: null,
-        artifacts: []
-      },
-      tokens: user.tokens || 0,
-      xp: user.xp || 0,
-      persona: user.persona
-    });
-  } catch (error) {
-    console.error('Error getting user progress:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get user progress',
+      message: 'Failed to add NFT certificate',
       error: error.message
     });
   }
 };
-
-/**
- * POST /user/:userId/progress
- * Update user progress
- */
-exports.updateUserProgress = async (req, res) => {
-  try {
-    const { userId } = req.params;
-
-    // Verify user is updating their own progress or is admin
-    if (req.user.id !== userId && req.user.role !== 'admin') {
-      return res.status(403).json({
-        success: false,
-        message: 'Unauthorized to update this user\'s progress'
-      });
-    }
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
-    const { progress, tokens, xp } = req.body;
-
-    if (progress) user.progress = progress;
-    if (tokens !== undefined) user.tokens = tokens;
-    if (xp !== undefined) user.xp = xp;
-
-    await user.save();
-
-    res.status(200).json({
-      success: true,
-      message: 'Progress updated successfully',
-      progress: user.progress,
-      tokens: user.tokens,
-      xp: user.xp
-    });
-  } catch (error) {
-    console.error('Error updating user progress:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to update user progress',
-      error: error.message
-    });
-  }
-};
-
-/**
- * POST /user/:userId/progress/reset
- * Reset user progress
- */
-exports.resetUserProgress = async (req, res) => {
-  try {
-    const { userId } = req.params;
-
-    // Verify user is resetting their own progress or is admin
-    if (req.user.id !== userId && req.user.role !== 'admin') {
-      return res.status(403).json({
-        success: false,
-        message: 'Unauthorized to reset this user\'s progress'
-      });
-    }
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
-    // Reset progress to initial state
-    user.progress = {
-      completedPhases: [],
-      currentPhase: null,
-      artifacts: []
-    };
-    user.tokens = 0;
-    user.xp = 0;
-
-    await user.save();
-
-    res.status(200).json({
-      success: true,
-      message: 'Progress reset successfully',
-      progress: user.progress,
-      tokens: user.tokens,
-      xp: user.xp
-    });
-  } catch (error) {
-    console.error('Error resetting user progress:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to reset user progress',
-      error: error.message
-    });
-  }
-};
-

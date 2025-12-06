@@ -1,0 +1,27 @@
+{
+  "name": "money-factory-ai-monorepo",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Money Factory AI Monorepo - Backend, Simulator, and Web Portal",
+  "scripts": {
+    "dev:back": "npm run dev --prefix mf-back",
+    "dev:simulator": "npm run dev --prefix journey-simulator",
+    "dev:web": "npm run dev --prefix web",
+    "test:back": "npm test --prefix mf-back",
+    "test:simulator": "npm test --prefix journey-simulator",
+    "test:web": "npm run test:unit --prefix web",
+    "test:e2e:simulator": "npm run test:e2e --prefix journey-simulator",
+    "lint:simulator": "npm run lint --prefix journey-simulator",
+    "lint:web": "npm run lint --prefix web",
+    "test:all": "npm run test:back && npm run test:simulator && npm run test:web",
+    "lint:all": "npm run lint:simulator && npm run lint:web",
+    "build:all": "npm run build --prefix journey-simulator && npm run build --prefix web",
+    "install:all": "npm install --prefix mf-back && npm install --prefix journey-simulator && npm install --prefix web"
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

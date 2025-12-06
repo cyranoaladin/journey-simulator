@@ -1,13 +1,13 @@
 # Build stage
-FROM node:18-alpine as build
+FROM node:20-alpine as build
 
 WORKDIR /app
 
-# Copy package files
+# Copy dependency manifests separately to leverage Docker layer caching
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies (cached unless package files change)
+RUN npm ci
 
 # Copy source code
 COPY . .

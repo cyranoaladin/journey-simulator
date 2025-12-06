@@ -140,3 +140,4 @@ vite.config.ts.timestamp-*
 
 # Generated agent memory artifacts
 memory/agent_memory.json
+.env

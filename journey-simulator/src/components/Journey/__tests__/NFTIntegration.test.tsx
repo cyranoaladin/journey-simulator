@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import JourneyWorkspace from '../JourneyWorkspace';
 import { useJourneyStore } from '../../../store/journeyStore';
@@ -51,6 +51,18 @@ vi.mock('../../NFTProofModal', () => ({
 describe('NFT Integration in JourneyWorkspace', () => {
     const mockCompletePhase = vi.fn();
     const mockSetCurrentPhase = vi.fn();
+    let consoleLogSpy: ReturnType<typeof vi.spyOn> | undefined;
+    let consoleErrorSpy: ReturnType<typeof vi.spyOn> | undefined;
+
+    beforeAll(() => {
+        consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => { });
+        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
+    });
+
+    afterAll(() => {
+        consoleLogSpy?.mockRestore();
+        consoleErrorSpy?.mockRestore();
+    });
 
     beforeEach(() => {
         vi.clearAllMocks();

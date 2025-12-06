@@ -72,6 +72,7 @@ export interface UserProgress {
     notes: string[]
     simulatedLaunchUrl: string
   };
+  demoModeEnabled?: boolean;
 }
 
 export interface AccessPassHolder {

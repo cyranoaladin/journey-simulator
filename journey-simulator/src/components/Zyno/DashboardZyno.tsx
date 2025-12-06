@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion, cubicBezier } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import {
   GaugeCircle,
   Trophy,
@@ -17,14 +18,16 @@ interface DashboardZynoProps {
   missionSummary?: MissionSummary | null;
 }
 
-const cardVariants = {
+const cardEase = cubicBezier(0.23, 1, 0.32, 1);
+
+const cardVariants: Variants = {
   hidden: { opacity: 0, y: 16 },
-  visible: (index: number) => ({
+  visible: (custom = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: index * 0.08, duration: 0.45, ease: [0.23, 1, 0.32, 1] },
+    transition: { delay: custom * 0.08, duration: 0.45, ease: cardEase },
   }),
-} as const;
+};
 
 const quickActions = [
   {

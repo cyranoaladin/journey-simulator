@@ -28,6 +28,18 @@ const journeySchema = new mongoose.Schema({
         required: true,
     },
 
+    // New state machine fields
+    state: {
+        type: String,
+        enum: ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED', 'FAILED'],
+        default: 'IN_PROGRESS',
+        index: true
+    },
+    currentStepId: {
+        type: String,
+        default: 'phase-1'
+    },
+
     phases_status: [
         {
             phase_number: {
@@ -85,8 +97,13 @@ const journeySchema = new mongoose.Schema({
         notes: [String],
         simulatedLaunchUrl: String,
     }
-});
+}, { timestamps: true });
+
+// Indexes for performance and data integrity
+journeySchema.index({ user_id: 1 });
+journeySchema.index({ user_wallet: 1 });
+journeySchema.index({ state: 1 });
 
 const Journey = mongoose.model('Journey', journeySchema);
 
-module.exports = Journey;   
+module.exports = Journey;

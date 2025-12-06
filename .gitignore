@@ -1,8 +1,9 @@
 # Global ignores
 node_modules/
- .env
- **/.env
- .env.*
+data/
+.env
+**/.env
+.env.*
 !.env.example
 !.env.sample
 coverage/
@@ -20,6 +21,9 @@ test-results/
 .vscode/
 .idea/
 .serena/
+
+# Solana minter secrets
+web/minter.json
 
 # Prisma artifacts
 prisma/dev.db

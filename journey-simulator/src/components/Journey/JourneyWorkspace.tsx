@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import JourneyTimeline from './JourneyTimeline';
-import AgentActivityFeed from '../AgentActivityFeed';
+import { JourneyProgressBar } from './JourneyProgressBar';
+import { JourneyNextActionsPanel } from './JourneyNextActionsPanel';
+import ZynoSignalSidebar from './ZynoSignalSidebar';
 import UIBlocksRenderer from '../UIBlocks/UIBlocksRenderer';
 import { useJourneyStore } from '../../store/journeyStore';
 import {
@@ -12,7 +14,13 @@ import {
   PanelRight,
   Maximize2,
   Minimize2,
-  LayoutGrid
+  LayoutGrid,
+  ArrowLeft,
+  Target,
+  Briefcase,
+  ArrowRight,
+  CheckCircle2,
+  FileText
 } from 'lucide-react';
 import type { JourneyStepResponse } from '../../types/uiBlocks';
 // import confetti from 'canvas-confetti';
@@ -30,7 +38,6 @@ import { LaunchCollaterizePhase } from './LaunchCollaterizePhase';
 import { NeuralOverlay } from '../Artifacts/NeuralOverlay';
 import { ArtifactModal } from '../Artifacts/ArtifactModal';
 import artifactsData from '../../data/artifacts.json';
-import { ProjectAssets } from '../Artifacts/ProjectAssets';
 import { toast } from 'sonner';
 import { useWorkspaceLayout } from '../../contexts/WorkspaceLayoutContext';
 
@@ -42,12 +49,9 @@ const JourneyWorkspace = () => {
     lastStep,
     isStepLoading,
     runInteractiveStep,
+    runInteractiveStepDebug,
     setCurrentPhase,
-    completePhase,
-    uiMode,
-    setUiMode,
-    uiTone,
-    setUiTone
+    completePhase
   } = useJourneyStore();
 
   const [isThinking, setIsThinking] = useState(false);
@@ -56,6 +60,19 @@ const JourneyWorkspace = () => {
   const [unlockedArtifacts, setUnlockedArtifacts] = useState<string[]>([]);
 
   const DEMO_SCENARIOS: Record<string, Record<number, string>> = {
+    'cognitive-activation-hub': {
+      1: 'art-002', // Surface litepaper on first interactive run for demo flows
+      3: 'art-003', // Tokenomics simulation after Token Design
+      4: 'art-004'
+    },
+    'capital-foundry': {
+      2: 'art-003',
+      4: 'art-004'
+    },
+    'system-architect': {
+      2: 'art-001',
+      3: 'art-003'
+    },
     'web2_migrator': { 2: 'art-web2-01' },  // Step 2 -> Migration Blueprint
     'web3_builder': { 3: 'art-003' },      // Step 3 -> Tokenomics
     'learner': { 5: 'art-learn-01' }, // Step 5 -> Certificate
@@ -68,7 +85,7 @@ const JourneyWorkspace = () => {
     // A more robust implementation would check the step completion status from the store.
     if (lastStep && lastStep.ui_blocks && lastStep.ui_blocks.length > 0) {
       const personaId = selectedPersona?.id || 'web3_builder';
-      const currentStepIndex = (userProgress?.completedPhases?.length ?? 0) + 1;
+      const currentStepIndex = userProgress.completedPhases.length + 1;
       const artifactId = DEMO_SCENARIOS[personaId]?.[currentStepIndex];
 
       if (artifactId && !unlockedArtifacts.includes(artifactId)) {
@@ -91,7 +108,7 @@ const JourneyWorkspace = () => {
         }, 3500);
       }
     }
-  }, [lastStep, selectedPersona, userProgress?.completedPhases, unlockedArtifacts]);
+  }, [lastStep, selectedPersona, userProgress.completedPhases, unlockedArtifacts]);
 
   useEffect(() => {
     console.log('[JourneyWorkspace] MOUNTED');
@@ -113,7 +130,7 @@ const JourneyWorkspace = () => {
 
   if (!selectedPersona) return null;
 
-  const activePhaseIndex = currentPhaseIndex ?? (userProgress?.completedPhases?.length ?? 0);
+  const activePhaseIndex = currentPhaseIndex ?? userProgress.completedPhases.length;
 
 
 
@@ -125,16 +142,15 @@ const JourneyWorkspace = () => {
   const activePhase = selectedPersona.phases[activePhaseIndex] || selectedPersona.phases[0];
   console.log('[JourneyWorkspace] Rendering phase:', activePhase?.title, 'ID:', activePhase?.id);
 
-  const totalPhases = selectedPersona.phases.length;
-  const completedPhases = userProgress?.completedPhases?.length ?? 0;
-  const completionRate = totalPhases === 0 ? 0 : Math.round((completedPhases / totalPhases) * 100);
+  const { completedPhases } = userProgress;
   const activePhaseNumber = activePhaseIndex + 1;
-  const isPhaseCompleted = userProgress?.completedPhases?.includes(activePhaseIndex) ?? false;
+  const isPhaseCompleted = userProgress.completedPhases.includes(activePhaseIndex);
+
+  // UI Helpers
   const densityLabel = density === 'compact' ? 'Compact' : 'Comfortable';
   const focusButtonCopy = focusMode ? 'Exit Focus' : 'Focus Mode';
   const navButtonCopy = leftPanelOpen ? 'Hide Navigation' : 'Navigation';
   const insightsButtonCopy = rightPanelOpen ? 'Hide Insights' : 'Insights';
-  const controlButtonClass = 'inline-flex items-center gap-2 rounded-full border border-white/15 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-white/70 transition hover:border-accent-cyan hover:text-accent-cyan focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan/60';
 
   const handleNavigationToggle = () => {
     if (leftPanelOpen) {
@@ -202,7 +218,9 @@ const JourneyWorkspace = () => {
     if (!activePhase) return;
 
     try {
-      await runInteractiveStep({
+      const isE2EDebug = typeof window !== 'undefined' && Boolean((window as any).__e2eJourneyStepConfig);
+      const runner = isE2EDebug ? runInteractiveStepDebug : runInteractiveStep;
+      await runner({
         phaseId: activePhase.id,
         trackId: selectedPersona.id,
         userInput: ''
@@ -212,8 +230,64 @@ const JourneyWorkspace = () => {
     }
   };
 
+  /* ... inside JourneyWorkspace component ... */
+
+  // Handlers for Interactivity
+  const handleExitDemo = () => {
+    // In a real app, this might clear session or navigate to a dashboard
+    window.location.href = '/';
+  };
+
+  const handleNextActionClick = (actionType: string, actionId: string) => {
+    if (actionType === 'tool') {
+      const toolName = actionId.replace(/-/g, ' ');
+      toast.info(`Launching ${toolName}...`);
+
+      // Simulate loading tool
+      setIsThinking(true);
+      setCurrentTask({ agent: 'System', task: `Initializing ${toolName}` });
+
+      setTimeout(() => {
+        setIsThinking(false);
+        if (actionId === 'launch_readiness' || actionId === 'collaterize_sim') {
+          // For specific tools, we could open a modal or navigate
+          // For now, we simulate a successful "check" or "run"
+          toast.success(`${toolName} activated.`);
+        }
+      }, 2000);
+    } else {
+      toast('Action Logged', { description: 'This action has been added to your journey queue.' });
+    }
+  };
+
+  const handleArtifactClick = (artifactName: string) => {
+    // Mock lookup for artifacts based on string name
+    // In real app, `artifactsData` would be used properly
+    const mockArtifact = {
+      title: artifactName,
+      fileUrl: '', // Would be a real URL in production
+      type: 'document'
+    };
+
+    // If we have a specific mock for it in artifacts.json, use it
+    const realMatch = artifactsData.find(a => a.title.includes(artifactName) || a.id.includes(artifactName.toLowerCase()));
+
+    setViewingArtifact(realMatch || mockArtifact);
+
+    if (!realMatch) {
+      toast.info("Viewing Simulation Artifact", { description: "This is a placeholder for the generated document." });
+    }
+  };
+
+  const handleViewReport = () => {
+    toast.success("Generating Full Report...", {
+      description: "Compiling simulation metrics and risk analysis."
+    });
+    // Could open a modal here in future
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-[#0A0A1F] pb-20 font-sans text-white">
       <NeuralOverlay
         isVisible={isThinking}
         agentName={currentTask.agent}
@@ -226,334 +300,274 @@ const JourneyWorkspace = () => {
         title={viewingArtifact?.title}
       />
 
-      <section className="glass-effect rounded-3xl border border-white/10 bg-white/5 p-6 shadow-lg backdrop-blur">
-        <div className="flex flex-wrap items-center justify-between gap-6">
-          <div className="space-y-2">
-            <p className="text-xs uppercase tracking-[0.3em] text-white/60">Journey Workspace</p>
-            <h1 className="text-3xl font-space font-bold text-white">{selectedPersona.title}</h1>
-            <div className="flex flex-wrap items-center gap-4 text-sm text-white/70">
-              <span>Phase {activePhaseNumber} of {totalPhases}</span>
-              <span className="flex items-center gap-2">
-                <Trophy size={16} className="text-accent-gold" />
-                {(userProgress?.totalXP ?? 0).toLocaleString()} XP
-              </span>
-              <span className="flex items-center gap-2">
-                <Coins size={16} className="text-accent-cyan" />
-                {(userProgress?.mfaiTokens ?? 0).toLocaleString()} $MFAI
-              </span>
+      {/* GLOBAL STICKY HEADER */}
+      <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-white/10 bg-[#0A0A1F]/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-[#0A0A1F]/80">
+        <div className="flex items-center gap-3">
+          <button
+            data-testid="back-to-journeys"
+            onClick={() => window.history.back()}
+            className="group flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 transition hover:bg-white/10 hover:border-white/20"
+          >
+            <ArrowLeft size={14} className="text-white/60 group-hover:text-white" />
+            <span className="text-xs font-medium text-white/60 group-hover:text-white">Back to Journeys</span>
+          </button>
+        </div>
+
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-3">
+          <h1 className="text-sm font-bold uppercase tracking-wider text-white">{selectedPersona.title}</h1>
+          <span className="rounded-full bg-accent-cyan/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-accent-cyan border border-accent-cyan/20">Demo Mode</span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleNavigationToggle}
+            className={`rounded-full p-2 transition ${leftPanelOpen ? 'bg-white/10 text-white' : 'text-white/40 hover:bg-white/10 hover:text-white'}`}
+            title={navButtonCopy}
+          >
+            <PanelLeft size={18} />
+          </button>
+
+          <button
+            onClick={toggleFocusMode}
+            className={`rounded-full p-2 transition ${focusMode ? 'bg-white/10 text-white' : 'text-white/40 hover:bg-white/10 hover:text-white'}`}
+            title={focusButtonCopy}
+          >
+            {focusMode ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+          </button>
+
+          <button
+            onClick={cycleDensity}
+            className="rounded-full p-2 text-white/40 hover:bg-white/10 hover:text-white transition"
+            title={densityLabel}
+          >
+            <LayoutGrid size={18} />
+          </button>
+
+          <button
+            onClick={handleInsightsToggle}
+            className={`rounded-full p-2 transition ${rightPanelOpen ? 'bg-white/10 text-white' : 'text-white/40 hover:bg-white/10 hover:text-white'}`}
+            title={insightsButtonCopy}
+          >
+            <PanelRight size={18} />
+          </button>
+
+          <div className="h-6 w-px bg-white/10 mx-1"></div>
+
+          <button
+            onClick={handleExitDemo}
+            className="rounded-full bg-white text-black px-4 py-1.5 text-xs font-bold hover:bg-gray-200 transition"
+          >
+            Exit Demo
+          </button>
+        </div>
+      </header>
+
+      {/* JOURNEY HEADER & PROGRESS */}
+      <div className="mx-auto mt-8 w-full max-w-[1200px] px-6">
+        <div className="mb-8 text-center space-y-2">
+          <h2 className="text-4xl font-space font-bold text-white">{selectedPersona.title}</h2>
+          <p className="mx-auto max-w-2xl text-base text-white/60">{selectedPersona.description.split('.')[0]}.</p>
+
+          {/* Stats Row Centered */}
+          <div className="mt-4 flex justify-center gap-6 text-sm text-white/70">
+            <div className="flex items-center gap-2">
+              <Trophy size={14} className="text-accent-gold" />
+              <span>{userProgress.totalXP.toLocaleString()} XP</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Coins size={14} className="text-accent-cyan" />
+              <span>{userProgress.mfaiTokens.toLocaleString()} $MFAI</span>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={handleNavigationToggle}
-              className={`${controlButtonClass} ${leftPanelOpen ? 'border-accent-cyan/40 text-accent-cyan' : ''}`}
-            >
-              <PanelLeft size={16} />
-              <span>{navButtonCopy}</span>
-            </button>
-            <button
-              type="button"
-              onClick={toggleFocusMode}
-              className={`${controlButtonClass} ${focusMode ? 'border-accent-cyan/40 text-accent-cyan' : ''}`}
-            >
-              {focusMode ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-              <span>{focusButtonCopy}</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleInsightsToggle}
-              className={`${controlButtonClass} ${rightPanelOpen ? 'border-accent-cyan/40 text-accent-cyan' : ''}`}
-            >
-              <PanelRight size={16} />
-              <span>{insightsButtonCopy}</span>
-            </button>
-            <button
-              type="button"
-              onClick={cycleDensity}
-              className={controlButtonClass}
-            >
-              <LayoutGrid size={16} />
-              <span>{densityLabel}</span>
-            </button>
-          </div>
         </div>
 
-        <div className="mt-6 flex flex-col gap-3">
-          <progress
-            value={completionRate}
-            max={100}
-            aria-label="Journey completion"
-            className="mfai-progress mfai-progress-accent"
-          />
-          <div className="flex flex-wrap items-center gap-4 text-xs text-white/60">
-            <span>{completionRate}% complete</span>
-            <span>{completedPhases}/{totalPhases} phases validated</span>
-            <span>{(userProgress?.nfts?.length ?? 0)} Proof-of-Skill™ badges</span>
-          </div>
-        </div>
-      </section>
+        <JourneyProgressBar
+          personaId={selectedPersona.id}
+          currentStepId={`phase-${activePhaseNumber}`}
+        />
+      </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-        <div className="space-y-6">
-          <section className="glass-effect rounded-3xl border border-white/10 bg-[#12122B]/70 p-6 shadow-lg">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div className="max-w-3xl space-y-2">
-                <h2 className="text-xs font-semibold uppercase tracking-[0.4em] text-white/60">
-                  Current Phase
-                </h2>
-                <h3 className="text-2xl font-space font-bold text-white">{activePhase.title}</h3>
-                <p className="text-sm leading-relaxed text-white/70">{activePhase.description}</p>
+      {/* MAIN GRID LAYOUT */}
+      <div className="mx-auto mt-8 grid max-w-6xl gap-8 px-6 lg:grid-cols-[2fr_1fr] items-start">
+
+        {/* LEFT COLUMN - WORK AREA */}
+        <div className="space-y-8">
+
+          {/* CURRENT PHASE CARD - Primary Focus */}
+          <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#12122B] p-8 shadow-2xl">
+            <div className="absolute top-0 right-0 p-4 opacity-50">
+              <span className="text-[100px] font-bold leading-none text-white/5">{activePhaseNumber}</span>
+            </div>
+
+            <div className="relative z-10 flex flex-col gap-6">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent-cyan text-[10px] font-bold text-black">{activePhaseNumber}</span>
+                  <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-accent-cyan">Current Phase</h3>
+                </div>
+                <h2 className="text-3xl font-space font-bold text-white">{activePhase.title}</h2>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <label className="flex flex-col text-xs uppercase tracking-[0.3em] text-white/80">
-                  Mode
-                  <select
-                    value={uiMode}
-                    onChange={(e) => setUiMode(e.target.value as any)}
-                    className="mt-1 rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white shadow-inner backdrop-blur focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 focus:border-accent-cyan/50"
-                  >
-                    <option value="discovery" className="text-black">Discovery</option>
-                    <option value="builder" className="text-black">Builder</option>
-                    <option value="expert" className="text-black">Expert</option>
-                  </select>
-                </label>
+              <p className="text-base text-white/70 max-w-xl leading-relaxed">
+                {activePhase.description}
+              </p>
 
-                <label className="flex flex-col text-xs uppercase tracking-[0.3em] text-white/80">
-                  Tone
-                  <select
-                    value={uiTone}
-                    onChange={(e) => setUiTone(e.target.value as any)}
-                    className="mt-1 rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white shadow-inner backdrop-blur focus:outline-none focus:ring-2 focus:ring-accent-cyan/60 focus:border-accent-cyan/50"
-                  >
-                    <option value="pedagogical" className="text-black">Pedagogical</option>
-                    <option value="investor_pitch" className="text-black">Investor Pitch</option>
-                    <option value="critical" className="text-black">Critical</option>
-                  </select>
-                </label>
+              {/* Checklist mock */}
+              <div className="space-y-3 rounded-xl bg-white/5 p-5 border border-white/5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-white/40 mb-2">Phase Objectives</h4>
+                {activePhase.mission ? (
+                  <div className="flex items-start gap-2">
+                    <div className="mt-1 h-1.5 w-1.5 rounded-full bg-accent-purple"></div>
+                    <p className="text-sm text-white/80">{activePhase.mission}</p>
+                  </div>
+                ) : (
+                  ['Analyze market requirements', 'Define token utility', 'Draft initial whitepaper'].map((item: string, i: number) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${i === 0 ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-500' : 'border-white/10'}`}>
+                        {i === 0 && <CheckCircle2 size={12} />}
+                      </div>
+                      <span className={`text-sm ${i === 0 ? 'text-white/40 line-through' : 'text-white'}`}>{item}</span>
+                    </div>
+                  ))
+                )}
+              </div>
 
+              {/* Primary CTA */}
+              <div className="pt-2 flex flex-wrap gap-4">
                 <button
                   onClick={handleRunInteractiveStep}
-                  disabled={isStepLoading}
-                  className="inline-flex items-center gap-2 rounded-full bg-accent-cyan/20 px-4 py-2 text-sm font-semibold text-accent-cyan transition hover:bg-accent-cyan/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan/60"
-                  type="button"
+                  className="inline-flex items-center gap-2 rounded-full bg-accent-cyan px-8 py-4 text-base font-bold text-black shadow-lg shadow-accent-cyan/20 transition hover:bg-accent-cyan/90 hover:scale-105 active:scale-95"
                 >
-                  {isStepLoading ? <Loader2 size={16} className="animate-spin" /> : 'Start / Continue'}
+                  {isStepLoading ? <Loader2 size={20} className="animate-spin" /> : 'Run Simulation'}
+                  <ArrowRight size={20} />
                 </button>
 
-                {lastStep?.ui_blocks && lastStep.ui_blocks.length > 0 && !isPhaseCompleted && (
+                {!isPhaseCompleted && (
                   <button
                     onClick={() => {
-                      if (activePhase.stakingRequired) {
-                        setShowStakingModal(true);
-                      } else if (activePhase.daoVoteRequired) {
-                        setShowVoteModal(true);
-                      } else if (activePhase.nftReward) {
-                        handleCompletePhase();
-                      } else {
-                        completePhase(activePhaseIndex, {
-                          score: 100,
-                          phaseNumber: activePhaseNumber,
-                          xpReward: activePhase.xpReward,
-                          mfaiReward: activePhase.mfaiReward
-                        });
-                      }
+                      if (activePhase.stakingRequired) setShowStakingModal(true);
+                      else if (activePhase.daoVoteRequired) setShowVoteModal(true);
+                      else if (activePhase.nftReward) handleCompletePhase();
+                      else completePhase(activePhaseIndex, { score: 100, phaseNumber: activePhaseNumber, xpReward: activePhase.xpReward, mfaiReward: activePhase.mfaiReward });
                     }}
-                    className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-accent-gold to-orange-500 px-4 py-2 text-sm font-semibold text-black shadow-[0_0_15px_rgba(255,215,0,0.3)] transition hover:from-accent-gold/80 hover:to-orange-500/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold/50"
-                    type="button"
+                    className="inline-flex items-center gap-2 rounded-full bg-white/10 px-8 py-4 text-base font-bold text-white border border-white/10 hover:bg-white/20 transition"
                   >
-                    {activePhase.stakingRequired ? (
-                      <>
-                        <Coins size={16} />
-                        <span>Validate & Stake</span>
-                      </>
-                    ) : activePhase.daoVoteRequired ? (
-                      <>
-                        <Trophy size={16} />
-                        <span>Validate & Vote</span>
-                      </>
-                    ) : activePhase.nftReward ? (
-                      <>
-                        <Award size={16} />
-                        <span>Validate & Mint NFT</span>
-                      </>
-                    ) : (
-                      <>
-                        <Trophy size={16} />
-                        <span>Complete Phase</span>
-                      </>
-                    )}
-                  </button>
-                )}
-
-                {isPhaseCompleted && activePhase.nftReward && (
-                  <button
-                    onClick={() =>
-                      setProofModalData({
-                        proofType: getProofType(selectedPersona.id, activePhase.id),
-                        title: activePhase.nftReward || `Proof-of-${getProofType(selectedPersona.id, activePhase.id)}™`,
-                        description: `Successfully completed the ${activePhase.title} phase.`,
-                        imageUrl: getPersonaProofData(
-                          selectedPersona.id,
-                          activePhase.id,
-                          getProofType(selectedPersona.id, activePhase.id),
-                          activePhase.xpReward,
-                          activePhase.title,
-                          activePhaseNumber
-                        ).imageUrl,
-                        xpEarned: activePhase.xpReward,
-                        phase: activePhase.title,
-                        phaseNumber: activePhaseNumber
-                      })
-                    }
-                    className="inline-flex items-center gap-2 rounded-full border border-accent-purple/40 px-4 py-2 text-sm font-semibold text-accent-purple transition hover:bg-accent-purple/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-purple/40"
-                    type="button"
-                  >
-                    <Award size={16} />
-                    View Proof-of-{getProofType(selectedPersona.id, activePhase.id)}™
+                    {activePhase.nftReward ? <Award size={20} className="text-accent-cyan" /> : <CheckCircle2 size={20} />}
+                    <span>{activePhase.nftReward ? 'Mint NFT' : 'Complete'}</span>
                   </button>
                 )}
               </div>
             </div>
 
-            <div className="mt-6 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-center">
-                <div className="flex justify-center">
-                  <Trophy size={20} className="text-accent-gold" />
-                </div>
-                <p className="mt-3 text-xs uppercase tracking-[0.3em] text-white/50">XP Reward</p>
-                <p className="mt-2 text-xl font-semibold text-accent-gold">{activePhase.xpReward}</p>
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-center">
-                <div className="flex justify-center">
-                  <Coins size={20} className="text-accent-cyan" />
-                </div>
-                <p className="mt-3 text-xs uppercase tracking-[0.3em] text-white/50">$MFAI Tokens</p>
-                <p className="mt-2 text-xl font-semibold text-accent-cyan">{activePhase.mfaiReward || 0}</p>
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-center">
-                <div className="flex justify-center">
-                  <Award size={20} className="text-accent-purple" />
-                </div>
-                <p className="mt-3 text-xs uppercase tracking-[0.3em] text-white/50">NFT Reward</p>
-                <p className="mt-2 text-xl font-semibold text-accent-purple">{activePhase.nftReward ? 'Available' : 'Optional'}</p>
-              </div>
-            </div>
-
-            <div className="mt-6">
+            {/* Phase Interaction Render */}
+            <div className="mt-8 border-t border-white/5 pt-8">
               {isStepLoading ? (
-                <div className="flex flex-col items-center justify-center space-y-4 py-16">
-                  <Loader2 size={48} className="animate-spin text-accent-cyan" />
-                  <p className="text-white/60">Zyno is orchestrating your session...</p>
+                <div className="flex flex-col items-center justify-center space-y-4 py-8">
+                  <Loader2 size={32} className="animate-spin text-accent-cyan" />
+                  <p className="text-sm text-white/60 animate-pulse">Processing Agent Interactions...</p>
                 </div>
               ) : activePhase.id === 'launch-collaterize' ? (
                 <LaunchCollaterizePhase />
               ) : lastStep ? (
                 <UIBlocksRenderer response={lastStep as JourneyStepResponse} />
               ) : (
-                <>
-                  <PhaseDetails phase={activePhase} />
-                  {!isPhaseCompleted && (
-                    <div className="mt-8 flex justify-center">
-                      <button
-                        onClick={() => {
-                          if (activePhase.stakingRequired) {
-                            setShowStakingModal(true);
-                          } else if (activePhase.daoVoteRequired) {
-                            setShowVoteModal(true);
-                          } else if (activePhase.nftReward) {
-                            handleCompletePhase();
-                          } else {
-                            completePhase(activePhaseIndex, {
-                              score: 100,
-                              phaseNumber: activePhaseNumber,
-                              xpReward: activePhase.xpReward,
-                              mfaiReward: activePhase.mfaiReward
-                            });
-                          }
-                        }}
-                        className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-accent-gold to-orange-500 px-6 py-3 text-sm font-semibold text-black shadow-[0_0_20px_rgba(255,215,0,0.2)] transition hover:from-accent-gold/80 hover:to-orange-500/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold/40"
-                        type="button"
-                      >
-                        {activePhase.stakingRequired ? (
-                          <>
-                            <Coins size={18} />
-                            <span>Validate & Stake</span>
-                          </>
-                        ) : activePhase.daoVoteRequired ? (
-                          <>
-                            <Trophy size={18} />
-                            <span>Validate & Vote</span>
-                          </>
-                        ) : activePhase.nftReward ? (
-                          <>
-                            <Award size={18} />
-                            <span>Validate & Mint NFT</span>
-                          </>
-                        ) : (
-                          <>
-                            <Loader2 size={18} />
-                            <span>Validate Phase</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  )}
-                </>
+                <PhaseDetails phase={activePhase} />
               )}
             </div>
           </section>
 
-          <section className="glass-effect rounded-3xl border border-white/10 bg-white/5 p-6 shadow-lg">
-            <ProjectAssets />
-          </section>
-        </div>
-
-        <div className="space-y-6">
-          <section className="glass-effect rounded-3xl border border-white/10 bg-white/5 p-6 shadow-lg">
-            <div className="flex items-center justify-between gap-2">
-              <div>
-                <h3 className="text-lg font-semibold text-white">Journey Map</h3>
-                <p className="text-xs text-white/60">Review upcoming phases and revisit completed milestones.</p>
+          {/* SIMULATION RESULTS (New) */}
+          <section className="rounded-2xl border border-white/5 bg-white/5 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <LayoutGrid size={20} className="text-accent-purple" />
+                <h2 className="text-lg font-bold text-white">Simulation Results</h2>
               </div>
               <button
-                type="button"
-                onClick={handleNavigationToggle}
-                className="rounded-full border border-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-white/70 transition hover:border-accent-cyan hover:text-accent-cyan"
+                onClick={handleViewReport}
+                className="text-xs font-bold uppercase tracking-wider text-accent-cyan hover:underline"
               >
-                {leftPanelOpen ? 'Collapse Nav' : 'Open Nav'}
+                View Full Report
               </button>
             </div>
-            <div className="mt-4 max-h-[320px] overflow-y-auto pr-1 custom-scrollbar">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { label: 'Market Fit', value: '84%', color: 'text-emerald-400' },
+                { label: 'Risk Score', value: 'Low', color: 'text-emerald-400' },
+                { label: 'Proj. TVL', value: '$1.2M', color: 'text-white' },
+                { label: 'Sentiment', value: 'Bullish', color: 'text-accent-gold' }
+              ].map((stat, i) => (
+                <div key={i} className="rounded-xl bg-black/20 p-4 border border-white/5">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-1">{stat.label}</p>
+                  <p className={`text-2xl font-mono font-bold ${stat.color}`}>{stat.value}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* KEY ARTIFACTS */}
+          <section className="rounded-2xl border border-white/5 bg-white/5 p-6">
+            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              <Briefcase size={20} className="text-accent-gold" />
+              Project Artifacts
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Artifacts Grid */}
+              {['Litepaper', 'Tokenomics', 'Pitch Deck', 'Legal Opinion', 'Go-to-Market', 'Audit Report'].map((art, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleArtifactClick(art)}
+                  className="w-full text-left group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 p-4 transition hover:bg-white/10 hover:border-white/20 hover:shadow-xl cursor-pointer"
+                >
+                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-accent-purple/10 text-accent-purple group-hover:bg-accent-purple group-hover:text-white transition">
+                    <FileText size={20} />
+                  </div>
+                  <h3 className="font-bold text-white group-hover:text-accent-cyan transition text-sm">{art}</h3>
+                  <p className="text-[10px] text-white/40 mt-1">Version 1.{i}</p>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* JOURNEY MAP */}
+          <section className="rounded-2xl border border-white/5 bg-white/5 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <Target size={20} className="text-accent-cyan" />
+                Journey Map
+              </h2>
+            </div>
+            <div className="max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
               <JourneyTimeline
                 phases={selectedPersona.phases}
-                currentPhase={completedPhases}
+                currentPhase={completedPhases.length}
                 onPhaseChange={setCurrentPhase}
               />
             </div>
           </section>
 
-          <section className="glass-effect rounded-3xl border border-white/10 bg-white/5 p-6 shadow-lg">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-white">Agent Activity</h3>
-              <button
-                type="button"
-                onClick={handleInsightsToggle}
-                className="rounded-full border border-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-white/70 transition hover:border-accent-cyan hover:text-accent-cyan"
-              >
-                {rightPanelOpen ? 'Collapse' : 'Open Panel'}
-              </button>
-            </div>
-            <div className="mt-4 max-h-[280px] overflow-y-auto pr-1 custom-scrollbar">
-              <AgentActivityFeed />
-            </div>
-          </section>
+        </div>
 
-          <section className="glass-effect rounded-3xl border border-white/10 bg-white/5 p-6 shadow-lg">
-            <h3 className="text-lg font-semibold text-white">Reference Library</h3>
-            <div className="mt-4 max-h-[320px] space-y-3 overflow-y-auto pr-2 custom-scrollbar">
-              {resources.map((resource) => {
+        {/* RIGHT COLUMN - CONTEXT & AI (Sticky) */}
+        <div className="space-y-6 lg:sticky lg:top-24">
+
+          {/* NEXT ACTIONS */}
+          <JourneyNextActionsPanel
+            personaId={selectedPersona.id}
+            currentStepId={`phase-${activePhaseNumber}`}
+            journeyId={(userProgress as any)?.journey?._id || (userProgress as any)?.journeyId}
+            onActionClick={handleNextActionClick}
+            className="w-full shadow-xl"
+          />
+
+          {/* AGENT CONSOLE (Replaces Intel & Metrics) */}
+          <ZynoSignalSidebar className="w-full" />
+
+          {/* RESOURCES (Compact) */}
+          <section className="rounded-xl border border-white/10 bg-white/5 p-4">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-3">Quick Reference</h3>
+            <div className="space-y-2">
+              {resources.slice(0, 3).map((resource) => {
                 const Icon = getResourceIcon(resource.type);
                 return (
                   <a
@@ -561,33 +575,20 @@ const JourneyWorkspace = () => {
                     href={resource.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="block rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-accent-cyan/40 hover:bg-white/10"
+                    className="flex items-center gap-2 text-xs text-white/60 hover:text-accent-cyan transition"
                   >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-white/60">
-                        <span className="rounded-lg bg-white/10 p-1.5 text-accent-cyan">
-                          <Icon size={14} />
-                        </span>
-                        {resource.type}
-                      </span>
-                      <span className="text-[10px] text-white/40">{resource.duration}</span>
-                    </div>
-                    <h4 className="mt-2 text-sm font-semibold text-white">{resource.title}</h4>
-                    <p className="mt-1 text-xs leading-relaxed text-white/60">{resource.description}</p>
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {resource.tags.map((tag) => (
-                        <span key={tag} className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/50">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
+                    <Icon size={12} />
+                    <span className="truncate">{resource.title}</span>
                   </a>
                 );
               })}
             </div>
           </section>
+
         </div>
+
       </div>
+
 
       {proofModalData && (
         <NFTProofModal
@@ -604,48 +605,52 @@ const JourneyWorkspace = () => {
         />
       )}
 
-      {showStakingModal && (
-        <StakingModal
-          availableAmount={1000}
-          currentStaked={0}
-          onClose={() => setShowStakingModal(false)}
-          onStake={(_amount) => {
-            setShowStakingModal(false);
-            if (activePhase.nftReward) {
-              handleCompletePhase();
-            } else {
-              completePhase(activePhaseIndex, {
-                score: 100,
-                phaseNumber: activePhaseNumber,
-                xpReward: activePhase.xpReward,
-                mfaiReward: activePhase.mfaiReward
-              });
-            }
-          }}
-        />
-      )}
+      {
+        showStakingModal && (
+          <StakingModal
+            availableAmount={1000}
+            currentStaked={0}
+            onClose={() => setShowStakingModal(false)}
+            onStake={(_amount) => {
+              setShowStakingModal(false);
+              if (activePhase.nftReward) {
+                handleCompletePhase();
+              } else {
+                completePhase(activePhaseIndex, {
+                  score: 100,
+                  phaseNumber: activePhaseNumber,
+                  xpReward: activePhase.xpReward,
+                  mfaiReward: activePhase.mfaiReward
+                });
+              }
+            }}
+          />
+        )
+      }
 
-      {showVoteModal && (
-        <DAOVoteModal
-          phase={activePhase}
-          votingPower={50}
-          onClose={() => setShowVoteModal(false)}
-          onVote={(_vote) => {
-            setShowVoteModal(false);
-            if (activePhase.nftReward) {
-              handleCompletePhase();
-            } else {
-              completePhase(activePhaseIndex, {
-                score: 100,
-                phaseNumber: activePhaseNumber,
-                xpReward: activePhase.xpReward,
-                mfaiReward: activePhase.mfaiReward
-              });
-            }
-          }}
-        />
-      )}
-    </div>
+      {
+        showVoteModal && (
+          <DAOVoteModal
+            phase={activePhase}
+            votingPower={50}
+            onClose={() => setShowVoteModal(false)}
+            onVote={(_vote) => {
+              setShowVoteModal(false);
+              if (activePhase.nftReward) {
+                handleCompletePhase();
+              } else {
+                completePhase(activePhaseIndex, {
+                  score: 100,
+                  phaseNumber: activePhaseNumber,
+                  xpReward: activePhase.xpReward,
+                  mfaiReward: activePhase.mfaiReward
+                });
+              }
+            }}
+          />
+        )
+      }
+    </div >
   );
 };
 

@@ -1,6 +1,6 @@
 import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi, beforeAll, afterAll } from 'vitest'
 import { AuthProvider } from '../../contexts/AuthContext'
 import { MemoryRouter } from 'react-router-dom'
 
@@ -10,6 +10,7 @@ const mocks = vi.hoisted(() => ({
   useAuthMock: {
     user: { name: 'Test User', wallet_address: 'test123' },
     login: vi.fn(),
+    loginWithWallet: vi.fn(),
     logout: vi.fn(),
     isAuthenticated: true,
   }
@@ -30,6 +31,7 @@ vi.mock('@solana/wallet-adapter-react', () => ({
     disconnect: mocks.disconnect,
     connected: false,
     connecting: false,
+    signMessage: vi.fn(),
   }),
 }))
 
@@ -52,6 +54,19 @@ const renderWithAuth = (ui: React.ReactElement, { ...renderOptions }: any = {}) 
 import WalletButton from '../WalletButton'
 
 describe('WalletButton', () => {
+  let consoleLogSpy: ReturnType<typeof vi.spyOn> | undefined;
+  let consoleErrorSpy: ReturnType<typeof vi.spyOn> | undefined;
+
+  beforeAll(() => {
+    consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterAll(() => {
+    consoleLogSpy?.mockRestore();
+    consoleErrorSpy?.mockRestore();
+  });
+
   afterEach(() => {
     mocks.disconnect.mockReset()
     mocks.setVisible.mockReset()

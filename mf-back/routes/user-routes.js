@@ -6,6 +6,7 @@ const { protect, adminOnly } = require('../middleware/auth');
 /* Authentication routes */
 router.post('/register', userController.registerUser);
 router.post('/login', userController.loginUser);
+router.post('/wallet-challenge', userController.createWalletChallenge);
 router.post('/login-wallet', userController.loginWithWallet);
 router.post('/logout', userController.logoutUser);
 router.post('/refresh', userController.refreshToken);
@@ -23,10 +24,5 @@ router.put('/subscription/:id', protect, adminOnly, userController.subscription)
 /* Token and progress routes */
 router.put('/tokens', protect, userController.updateTokenBalance);
 router.post('/nft-certificates', protect, userController.addNFTCertificate);
-
-/* User progress routes */
-router.get('/:userId/progress', protect, userController.getUserProgress);
-router.post('/:userId/progress', protect, userController.updateUserProgress);
-router.post('/:userId/progress/reset', protect, userController.resetUserProgress);
 
 module.exports = router;
