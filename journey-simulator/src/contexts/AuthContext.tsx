@@ -12,6 +12,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { api, LoginResponse } from "../utils/api";
 import { useJourneyStore } from "../store/journeyStore";
+import { loginWithWalletFlow } from "../lib/walletAuth";
 
 // User interface matching your backend schema
 type User = LoginResponse["user"];
@@ -21,7 +22,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
-  loginWithWallet: (wallet_address: string) => Promise<boolean>;
+  loginWithWallet: (wallet_address: string, signMessage?: (message: Uint8Array) => Promise<Uint8Array>) => Promise<boolean>;
   register: (userData: {
     name: string;
     email: string;
@@ -97,9 +98,18 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     }
   }, [loadUserProgress, resetProgress]);
 
-  const loginWithWallet = useCallback(async (wallet_address: string): Promise<boolean> => {
+  const loginWithWallet = useCallback(async (wallet_address: string, signMessage?: (message: Uint8Array) => Promise<Uint8Array>): Promise<boolean> => {
     try {
-      const data = await api.loginWithWallet(wallet_address);
+      let data: LoginResponse;
+
+      if (signMessage) {
+        // Use secure flow with challenge-response
+        data = await loginWithWalletFlow({ walletPublicKey: wallet_address, signMessage });
+      } else {
+        // Legacy flow (insecure)
+        console.warn('[AuthContext] Using insecure wallet login (no signature provided)');
+        data = await api.loginWithWallet(wallet_address);
+      }
 
       // Store tokens
       localStorage.setItem("accessToken", data.accessToken);

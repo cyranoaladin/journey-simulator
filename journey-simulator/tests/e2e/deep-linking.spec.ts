@@ -44,10 +44,10 @@ test.describe('Deep Linking Functionality', () => {
 
         // Verify that the specific persona workspace is loaded
         // We look for the title "The Capital Foundry" which is specific to this persona
-        await expect(page.locator('text=The Capital Foundry')).toBeVisible({ timeout: 15000 });
+        await expect(page.getByRole('heading', { name: 'The Capital Foundry' })).toBeVisible({ timeout: 15000 });
 
         // Verify we are in the workspace view
-        await expect(page.locator('button:has-text("Back to all journeys")')).toBeVisible();
+        await expect(page.getByTestId('back-to-journeys')).toBeVisible();
     });
 
     test('should handle invalid journey IDs gracefully', async ({ page }) => {
@@ -57,6 +57,6 @@ test.describe('Deep Linking Functionality', () => {
         await expect(page.locator('text=Choose Your Path')).toBeVisible({ timeout: 15000 });
 
         // "Back to all journeys" should NOT be visible
-        await expect(page.locator('button:has-text("Back to all journeys")')).not.toBeVisible();
+        await expect(page.getByTestId('back-to-journeys')).not.toBeVisible();
     });
 });

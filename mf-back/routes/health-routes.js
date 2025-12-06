@@ -1,7 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const agentRunController = require('../controllers/agent-run-controller');
 
 const router = express.Router();
+
+router.get('/api/health', agentRunController.getHealth);
 
 router.get('/healthz', (req, res) => {
   res.json({

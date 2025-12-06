@@ -25,6 +25,14 @@ test.describe('Demo Mode Workflow', () => {
         const runPhase = async (phaseTitle: string) => {
             const phaseHeading = currentPhasePanel.getByRole('heading', { name: phaseTitle, level: 3 });
             await expect(phaseHeading).toBeVisible();
+            
+            // Ensure overlay/artifact is gone before clicking start
+            await expect(page.getByTestId('neural-overlay')).not.toBeVisible({ timeout: 20000 });
+            const closeArtifact = page.getByRole('button', { name: 'Close artifact viewer' });
+            if (await closeArtifact.isVisible()) {
+                await closeArtifact.click();
+            }
+
             await currentPhasePanel.getByRole('button', { name: 'Start / Continue' }).click();
             await expect(page.getByText('Mocked Mission Guidance')).toBeVisible();
         };
@@ -36,6 +44,16 @@ test.describe('Demo Mode Workflow', () => {
         };
 
         await runPhase('Cognition Ignition');
+
+        // Wait for Neural Overlay to disappear if present
+        await expect(page.getByTestId('neural-overlay')).not.toBeVisible({ timeout: 30000 });
+
+        // Close any auto-opened artifact (e.g. Litepaper Sim)
+        const closeArtifactBtn = page.getByRole('button', { name: 'Close artifact viewer' });
+        if (await closeArtifactBtn.isVisible()) {
+            await closeArtifactBtn.click();
+        }
+
         await page.getByRole('button', { name: 'Validate & Mint NFT' }).first().click();
         await closeProofModal();
 

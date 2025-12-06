@@ -282,30 +282,105 @@ const request = async <T>(
   if (token === 'demo-token' && !isAIAgentCall) {
     console.log(`[Demo Mode] Mocking request to ${path}`);
 
-    // Helper to simulate backend state
-    const getDemoState = () => {
-      const stored = localStorage.getItem('demo_mock_db');
-      if (stored) return JSON.parse(stored);
+    type DemoPersonaState = {
+      xp: number;
+      tokens: number;
+      completedPhases: number[];
+      nfts: string[];
+    };
 
-      const seed = localStorage.getItem('demo_mock_db_seed');
-      if (seed) {
-        localStorage.setItem('demo_mock_db', seed);
-        return JSON.parse(seed);
+    type DemoDatabase = {
+      version: number;
+      personas: Record<string, DemoPersonaState>;
+    };
+
+    const DEMO_DB_VERSION = 2;
+    const DEMO_DB_KEY = 'demo_mock_db';
+    const DEMO_DB_SEED_KEY = 'demo_mock_db_seed';
+    const DEMO_ACTIVE_PERSONA_KEY = 'demo_active_persona';
+
+    const getActiveDemoPersonaId = () => {
+      try {
+        return localStorage.getItem(DEMO_ACTIVE_PERSONA_KEY) || 'cognitive-activation-hub';
+      } catch {
+        return 'cognitive-activation-hub';
       }
+    };
 
+    const normalizeLegacyDemoState = (candidate?: Partial<DemoPersonaState>): DemoPersonaState => {
+      const candidateCompleted = candidate?.completedPhases;
+      const candidateNfts = candidate?.nfts;
       return {
-        xp: 0,
-        tokens: 0,
-        completedPhases: [],
-        nfts: []
+        xp: typeof candidate?.xp === 'number' ? candidate.xp : 0,
+        tokens: typeof candidate?.tokens === 'number' ? candidate.tokens : 0,
+        completedPhases: Array.isArray(candidateCompleted) ? candidateCompleted : [],
+        nfts: Array.isArray(candidateNfts) ? candidateNfts : [],
       };
     };
 
-    const updateDemoState = (updates: any) => {
+    const readDemoDatabase = (personaId: string): DemoDatabase => {
+      try {
+        let raw = localStorage.getItem(DEMO_DB_KEY);
+        if (!raw) {
+          const seed = localStorage.getItem(DEMO_DB_SEED_KEY);
+          if (seed) {
+            localStorage.setItem(DEMO_DB_KEY, seed);
+            raw = seed;
+          }
+        }
+
+        if (raw) {
+          const parsed: any = JSON.parse(raw);
+          if (parsed?.version === DEMO_DB_VERSION && parsed.personas) {
+            return parsed as DemoDatabase;
+          }
+
+          if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+            return {
+              version: DEMO_DB_VERSION,
+              personas: {
+                [personaId]: normalizeLegacyDemoState(parsed as Partial<DemoPersonaState>)
+              }
+            };
+          }
+        }
+      } catch (error) {
+        console.warn('[Demo Mode] Failed to parse demo datastore:', error);
+      }
+
+      return { version: DEMO_DB_VERSION, personas: {} };
+    };
+
+    const persistDemoDatabase = (db: DemoDatabase) => {
+      try {
+        localStorage.setItem(DEMO_DB_KEY, JSON.stringify(db));
+      } catch (error) {
+        console.warn('[Demo Mode] Failed to persist demo datastore:', error);
+      }
+    };
+
+    const demoPersonaId = getActiveDemoPersonaId();
+    const demoDatabase = readDemoDatabase(demoPersonaId);
+    if (!demoDatabase.personas[demoPersonaId]) {
+      demoDatabase.personas[demoPersonaId] = normalizeLegacyDemoState();
+      persistDemoDatabase(demoDatabase);
+    }
+
+    const getDemoState = (): DemoPersonaState => demoDatabase.personas[demoPersonaId];
+    const setDemoState = (state: DemoPersonaState) => {
+      demoDatabase.personas[demoPersonaId] = state;
+      persistDemoDatabase(demoDatabase);
+    };
+    const updateDemoState = (updates: Partial<DemoPersonaState>) => {
       const current = getDemoState();
-      const newState = { ...current, ...updates };
-      localStorage.setItem('demo_mock_db', JSON.stringify(newState));
-      return newState;
+      const next: DemoPersonaState = {
+        ...current,
+        ...updates,
+        completedPhases: updates.completedPhases ?? current.completedPhases,
+        nfts: updates.nfts ?? current.nfts,
+      };
+      setDemoState(next);
+      return next;
     };
 
     if (path === '/user/profile' || path === '/user/verify') {
@@ -317,7 +392,7 @@ const request = async <T>(
           email: "demo@moneyfactory.ai",
           role: "user",
           wallet_address: "DemoWalletAddress123",
-          persona: "cognitive-activation-hub"
+          persona: demoPersonaId as any
         }
       } as unknown as T;
     }
@@ -346,7 +421,7 @@ const request = async <T>(
               mfai_tokens: state.tokens
             },
             completed_phases: state.completedPhases.length,
-            persona: "cognitive-activation-hub",
+            persona: demoPersonaId,
             nft_certificates: state.nfts.map((t: string) => ({ title: t })),
             subscription: 'gold'
           }
@@ -747,11 +822,19 @@ export const api = {
     }, false);
   },
 
-  loginWithWallet: async (wallet_address: string): Promise<LoginResponse> => {
-    return request<LoginResponse>('/user/login-wallet', {
+  getWalletChallenge: async (wallet_address: string): Promise<{ success: boolean; message: string; nonce: string }> => {
+    return request<{ success: boolean; message: string; nonce: string }>('/user/wallet-challenge', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ wallet_address }),
+    }, false);
+  },
+
+  loginWithWallet: async (wallet_address: string, signature?: string, message?: string): Promise<LoginResponse> => {
+    return request<LoginResponse>('/user/login-wallet', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ wallet_address, signature, message }),
     }, false);
   },
 

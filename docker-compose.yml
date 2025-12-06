@@ -8,11 +8,11 @@ services:
       args:
         INSTALL_DEV: "true"
     command: npm run dev
+    env_file:
+      - ./mf-back/.env.production
     environment:
       NODE_ENV: development
       PORT: 3000
-      MONGO_URI: mongodb://mongo:27017/journey
-      ADMIN_API_KEY: change-me
     ports:
       - "3002:3000"
     volumes:
@@ -26,9 +26,9 @@ services:
     image: mongo:6
     restart: unless-stopped
     ports:
-      - "27018:27017"
+      - "27017:27017"
     volumes:
-      - mongo-data:/data/db
+      - ./data/mongo:/data/db
     healthcheck:
       test: [ "CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')" ]
       interval: 10s
@@ -46,7 +46,7 @@ services:
     ports:
       - "5435:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - ./data/postgres:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "prisma" ]
       interval: 10s
@@ -66,7 +66,5 @@ services:
       - api
 
 volumes:
-  mongo-data:
   api-node-modules:
-  postgres-data:
   web-node-modules:

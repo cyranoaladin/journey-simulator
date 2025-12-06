@@ -35,7 +35,16 @@ test.describe('Investor Demo Flow - Capital Foundry', () => {
 
         await expect(page.getByRole('heading', { name: /Pitch Deck Narrative Framework/i })).toBeVisible();
 
-        await page.getByRole('button', { name: /Back to all journeys/i }).click();
+        // Wait for Neural Overlay to disappear if present
+        await expect(page.getByTestId('neural-overlay')).not.toBeVisible({ timeout: 30000 });
+
+        // Close the artifact viewer if it's open (it covers the back button)
+        const closeArtifactBtn = page.getByRole('button', { name: 'Close artifact viewer' });
+        if (await closeArtifactBtn.isVisible()) {
+            await closeArtifactBtn.click();
+        }
+
+        await page.getByTestId('back-to-journeys').click();
         await page.waitForURL('**/journeys');
         await expect(page.getByText('Choose Your Path to Sovereignty')).toBeVisible();
     });

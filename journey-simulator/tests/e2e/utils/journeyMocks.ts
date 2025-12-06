@@ -299,6 +299,11 @@ export const seedDemoUser = async (page: Page, personaId: string | null = 'cogni
     localStorage.setItem('accessToken', 'demo-token');
     localStorage.setItem('refreshToken', 'demo-refresh-token');
     localStorage.setItem('userId', 'demo-user-id');
+    if (persona) {
+      localStorage.setItem('demo_active_persona', persona);
+    } else {
+      localStorage.removeItem('demo_active_persona');
+    }
 
     const persisted = {
       state: {

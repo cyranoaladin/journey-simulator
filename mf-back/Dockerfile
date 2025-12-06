@@ -12,9 +12,13 @@ RUN npm set fund false \
 
 COPY . .
 
+COPY docker-entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 ENV NODE_ENV=production \
     PORT=3000
 
 EXPOSE 3000
 
+ENTRYPOINT ["entrypoint.sh"]
 CMD ["npm", "start"]

@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi, beforeAll, afterAll } from 'vitest';
 import React from 'react';
 import { API_BASE_URL } from '../../../utils/api';
 
@@ -74,6 +74,15 @@ vi.mock('../ResourceUploader', () => ({
 
 describe('ZynoConsole', () => {
   const mockFetch = vi.fn();
+  let consoleErrorSpy: ReturnType<typeof vi.spyOn> | undefined;
+
+  beforeAll(() => {
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterAll(() => {
+    consoleErrorSpy?.mockRestore();
+  });
 
   beforeEach(() => {
     mockFetch.mockResolvedValue({

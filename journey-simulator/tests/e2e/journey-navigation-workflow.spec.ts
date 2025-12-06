@@ -69,7 +69,7 @@ test.describe('Journey Navigation Workflow', () => {
         await expect(page.locator('text=Choose Your Path')).toBeVisible({ timeout: 10000 });
 
         // Click on a persona card (Capital Foundry)
-        const personaCard = page.locator('text=The Capital Foundry').first();
+        const personaCard = page.locator('article').filter({ has: page.getByRole('heading', { name: 'The Capital Foundry' }) }).first();
         await expect(personaCard).toBeVisible();
 
         // Find and click the "Start Journey" or similar button within the card
@@ -77,7 +77,7 @@ test.describe('Journey Navigation Workflow', () => {
         await startButton.click();
 
         // Verify we're now in the workspace
-        await expect(page.getByRole('button', { name: /Back to all journeys/i })).toBeVisible({ timeout: 10000 });
+        await expect(page.getByTestId('back-to-journeys')).toBeVisible({ timeout: 10000 });
         // "The Capital Foundry Journey" might be transparent due to bg-clip-text, so check for "Current Phase" instead which is always visible
         await expect(page.getByRole('heading', { name: 'Current Phase' })).toBeVisible();
     });
@@ -87,10 +87,10 @@ test.describe('Journey Navigation Workflow', () => {
         await page.goto('/journeys/cognitive-activation-hub');
 
         // Verify we're in the workspace
-        await expect(page.getByRole('button', { name: /Back to all journeys/i })).toBeVisible({ timeout: 10000 });
+        await expect(page.getByTestId('back-to-journeys')).toBeVisible({ timeout: 10000 });
 
         // Click the back button
-        await page.getByRole('button', { name: /Back to all journeys/i }).click();
+        await page.getByTestId('back-to-journeys').click();
 
         // Wait for URL to change to /journeys
         await page.waitForURL('**/journeys', { timeout: 10000 });
@@ -99,13 +99,13 @@ test.describe('Journey Navigation Workflow', () => {
         await expect(page.locator('text=Choose Your Path')).toBeVisible({ timeout: 10000 });
 
         // Verify the "Back to all journeys" button is no longer visible
-        await expect(page.getByRole('button', { name: /Back to all journeys/i })).not.toBeVisible();
+        await expect(page.getByTestId('back-to-journeys')).not.toBeVisible();
     });
 
     test('should maintain journey state when navigating between routes', async ({ page }) => {
         // Navigate to a specific journey
         await page.goto('/journeys/capital-foundry');
-        await expect(page.locator('text=The Capital Foundry')).toBeVisible({ timeout: 10000 });
+        await expect(page.getByRole('heading', { name: 'The Capital Foundry' })).toBeVisible({ timeout: 10000 });
 
         // Navigate to dashboard
         await page.goto('/dashboard');
@@ -136,32 +136,32 @@ test.describe('Journey Navigation Workflow', () => {
         // So `selectedPersona` remains whatever it was in the store.
         // So it SHOULD show the workspace.
         // 4. Verify we are back in the persona list (Journey.tsx clears selection on /journeys)
-        await expect(page.getByRole('button', { name: /Back to all journeys/i })).not.toBeVisible();
-        await expect(page.locator('text=The Capital Foundry')).toBeVisible();
+        await expect(page.getByTestId('back-to-journeys')).not.toBeVisible();
+        await expect(page.getByRole('heading', { name: 'The Capital Foundry' })).toBeVisible();
 
         // 5. Re-select the persona and verify state is maintained (e.g. still in workspace)
         // Clicking the card is flaky in Firefox, so we simulate the navigation directly
         await page.goto('/journeys/capital-foundry');
 
         await page.waitForURL('**/journeys/capital-foundry');
-        await expect(page.getByRole('button', { name: /Back to all journeys/i })).toBeVisible();
+        await expect(page.getByTestId('back-to-journeys')).toBeVisible();
     });
 
     test('should allow switching between different journeys', async ({ page }) => {
         // Start with one journey
         await page.goto('/journeys/capital-foundry');
-        await expect(page.locator('text=The Capital Foundry')).toBeVisible({ timeout: 10000 });
+        await expect(page.getByRole('heading', { name: 'The Capital Foundry' })).toBeVisible({ timeout: 10000 });
 
         // Go back to selection
-        await page.getByRole('button', { name: /Back to all journeys/i }).click();
+        await page.getByTestId('back-to-journeys').click();
         await expect(page.locator('text=Choose Your Path')).toBeVisible({ timeout: 10000 });
 
         // Select a different journey via deep link
         await page.goto('/journeys/cognitive-activation-hub');
-        await expect(page.locator('text=The Cognitive Activation Hub')).toBeVisible({ timeout: 10000 });
+        await expect(page.getByRole('heading', { name: 'The Cognitive Activation Hub' })).toBeVisible({ timeout: 10000 });
 
         // Verify we're in the new workspace
-        await expect(page.getByRole('button', { name: /Back to all journeys/i })).toBeVisible();
+        await expect(page.getByTestId('back-to-journeys')).toBeVisible();
     });
 
     test('should handle browser back/forward navigation', async ({ page }) => {
@@ -171,7 +171,7 @@ test.describe('Journey Navigation Workflow', () => {
 
         // Navigate to a specific journey
         await page.goto('/journeys/capital-foundry');
-        await expect(page.locator('text=The Capital Foundry')).toBeVisible({ timeout: 10000 });
+        await expect(page.getByRole('heading', { name: 'The Capital Foundry' })).toBeVisible({ timeout: 10000 });
 
         // Use browser back button
         await page.goBack();
@@ -179,6 +179,6 @@ test.describe('Journey Navigation Workflow', () => {
 
         // Use browser forward button
         await page.goForward();
-        await expect(page.locator('text=The Capital Foundry')).toBeVisible({ timeout: 10000 });
+        await expect(page.getByRole('heading', { name: 'The Capital Foundry' })).toBeVisible({ timeout: 10000 });
     });
 });

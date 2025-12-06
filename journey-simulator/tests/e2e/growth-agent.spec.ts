@@ -147,7 +147,7 @@ test.describe('Growth Agent Integration', () => {
         // Ensure we are on the workspace view
         // The test setup clicks the persona card, which should trigger the view change.
         // We wait for the "Back to all journeys" button to confirm we are in the workspace.
-        await expect(page.locator('button:has-text("Back to all journeys")')).toBeVisible({ timeout: 10000 });
+        await expect(page.getByTestId('back-to-journeys')).toBeVisible({ timeout: 10000 });
 
         // Trigger the step (Validate & Mint NFT button for Phase 0)
         const validateBtn = page.getByRole('button', { name: /Validate & Mint NFT/i }).first();

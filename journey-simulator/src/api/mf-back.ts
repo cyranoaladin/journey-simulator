@@ -1,0 +1,46 @@
+import createClient from "openapi-fetch";
+import type { paths } from "./mf-back-client"; // Generated types
+import { API_BASE_URL } from "../utils/api";
+
+export const client = createClient<paths>({ baseUrl: API_BASE_URL });
+
+// Add Authorization header if token exists
+client.use({
+  onRequest: async ({ request }) => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      request.headers.set("Authorization", `Bearer ${token}`);
+    }
+    return request;
+  },
+});
+
+// Typed wrappers for critical flows
+export const auth = {
+  getWalletChallenge: async (wallet_address: string) =>
+    client.POST("/user/wallet-challenge", {
+      body: { wallet_address },
+    }),
+
+  loginWithWallet: async (
+    wallet_address: string,
+    message: string,
+    signature: string
+  ) =>
+    client.POST("/user/login-wallet", {
+      body: { wallet_address, message, signature },
+    }),
+};
+
+export const journey = {
+  getUserProgress: async () => client.GET("/journey/user-progress"),
+};
+
+export const agents = {
+  listRuns: async (journeyId?: string) =>
+    client.GET("/agents/runs", {
+      params: {
+        query: journeyId ? { journeyId } : {},
+      },
+    }),
+};

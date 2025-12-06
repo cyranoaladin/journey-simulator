@@ -6,6 +6,8 @@ const {
     DEFAULT_LLM_TEMPERATURE,
     DEFAULT_LLM_MAX_OUTPUT_TOKENS,
 } = require("../utils/openaiClient");
+const AgentRun = require("../models/agent-run");
+const { findOrCreateAgentRun, generateIdempotencyKey } = require("../utils/agent-idempotence");
 
 /**
  * @typedef {Object} AgentContext
@@ -139,6 +141,9 @@ class BaseAgent {
      * @returns {Promise<AgentOutput>}
      */
     async run(ctx, options = {}) {
+        const startTime = Date.now();
+        let agentRun = null;
+
         // 1. Retrieve RAG Context
         const ragQuery = this.getRagQuery(ctx);
         let ragContext = "";
@@ -161,8 +166,6 @@ class BaseAgent {
         if (ragContext) {
             systemPrompt += `\n\n--- RAG CONTEXT ---\n${ragContext}\n--- END CONTEXT ---\n\nYou are an expert. Use EXCLUSIVELY the context above to answer if relevant. If the answer is not there, say so.`;
         } else {
-            // Should we block if no context found? The requirement says "If RAG returns 200 OK: Continue".
-            // So empty hits is fine, but we might want to warn the model.
             systemPrompt += `\n\n(Note: No specific information found in the knowledge base for this query.)`;
         }
 
@@ -170,6 +173,53 @@ class BaseAgent {
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt },
         ];
+
+        // Create AgentRun log with idempotency check
+        try {
+            if (ctx.journeyId && ctx.userId) {
+                const idempotencyKey = options.idempotencyKey || generateIdempotencyKey(ctx.journeyId, ctx.phaseId || 'unknown', this.name, { userId: ctx.userId });
+
+                const { run, isNew } = await findOrCreateAgentRun({
+                    journeyId: ctx.journeyId,
+                    userId: ctx.userId,
+                    stepId: ctx.phaseId || 'unknown',
+                    agentName: this.name,
+                    model: options.model || DEFAULT_LLM_MODEL,
+                    input: {
+                        systemPrompt: systemPrompt.substring(0, 5000),
+                        userPrompt,
+                        ragHits: ragSources.length
+                    },
+                    journeyMode: ctx.userProfile?.mode,
+                    idempotencyKey
+                });
+
+                agentRun = run;
+
+                // Idempotence: If not new and succeeded, return existing output
+                if (!isNew && run.status === 'succeeded' && run.output) {
+                    console.log(`[${this.name}] Returning cached result for ${idempotencyKey}`);
+                    return {
+                        rawMessage: { content: run.output.raw },
+                        payload: run.output.payload,
+                        sources: ragSources,
+                        ...(typeof run.output.payload === 'object' ? run.output.payload : {})
+                    };
+                }
+
+                // If not new but failed, we retry (status was reset to 'started' by findOrCreate if we implemented retry logic there, 
+                // but currently findOrCreate just returns existing failed run? 
+                // Wait, findOrCreate implementation:
+                // if (existing && existing.status !== 'failed') return existing;
+                // else create new.
+                // So if it was failed, it creates a NEW run with same key?
+                // Mongoose might throw error on unique index if we had one.
+                // We didn't add unique index on idempotencyKey yet.
+                // So it creates a duplicate entry for retry. That's fine for logging history.
+            }
+        } catch (logErr) {
+            console.warn(`[${this.name}] Failed to create AgentRun log:`, logErr.message);
+        }
 
         // Merge default options with passed options
         const llmOptions = {
@@ -196,16 +246,35 @@ class BaseAgent {
             useCache: llmOptions.useCache
         });
 
-        const { message } = await callGpt5(llmOptions);
-        const text = message.content || "";
-        const payload = this.parseOutput(text, ctx);
+        try {
+            const { message } = await callGpt5(llmOptions);
+            const text = message.content || "";
+            const payload = this.parseOutput(text, ctx);
 
-        return {
-            rawMessage: message,
-            payload,
-            sources: ragSources,
-            ...(typeof payload === 'object' && payload !== null ? payload : {})
-        };
+            // Update AgentRun log success
+            if (agentRun) {
+                agentRun.status = 'succeeded';
+                agentRun.output = { raw: text, payload };
+                agentRun.durationMs = Date.now() - startTime;
+                await agentRun.save().catch(e => console.warn('Failed to update AgentRun success:', e.message));
+            }
+
+            return {
+                rawMessage: message,
+                payload,
+                sources: ragSources,
+                ...(typeof payload === 'object' && payload !== null ? payload : {})
+            };
+        } catch (error) {
+            // Update AgentRun log failure
+            if (agentRun) {
+                agentRun.status = 'failed';
+                agentRun.error = { message: error.message, stack: error.stack };
+                agentRun.durationMs = Date.now() - startTime;
+                await agentRun.save().catch(e => console.warn('Failed to update AgentRun failure:', e.message));
+            }
+            throw error;
+        }
     }
 }
 

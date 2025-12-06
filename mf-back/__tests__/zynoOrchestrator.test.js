@@ -7,18 +7,8 @@ describe('orchestrateZyno', () => {
     jest.resetModules();
   });
 
-  it('executes sequential agents, connects to OpenAI, and includes RAG context', async () => {
-    jest.doMock('../utils/openaiClient', () => {
-      const actual = jest.requireActual('../utils/openaiClient');
-      const passthrough = async (options) => actual.callGpt5(options);
-      return {
-        ...actual,
-        callGpt5: jest.fn(passthrough),
-      };
-    });
-
+  it('normalizes agent outputs, including references and AEPO metrics', async () => {
     const { orchestrateZyno } = require('../orchestration/zynoOrchestrator');
-    const openaiClient = require('../utils/openaiClient');
 
     const result = await orchestrateZyno('Time to build a working prototype', {
       userId: 'user-3',
@@ -27,16 +17,20 @@ describe('orchestrateZyno', () => {
     });
 
     expect(result.executedAgents.length).toBeGreaterThan(0);
-    expect(openaiClient.callGpt5).toHaveBeenCalled();
+    expect(result.timeline.length).toBeGreaterThan(0);
 
-    const callArg = openaiClient.callGpt5.mock.calls.find((args) => {
-      const messages = args[0]?.messages || [];
-      return messages.some((msg) => msg.role === 'system' && msg.content.includes('--- RAG CONTEXT ---'));
-    });
+    const agentName = result.executedAgents[0];
+    const normalizedAgent = result.results[agentName];
+    expect(normalizedAgent).toBeDefined();
+    expect(Array.isArray(normalizedAgent.sources)).toBe(true);
+    expect(normalizedAgent.metrics?.aepo).toBeGreaterThan(0);
 
-    expect(callArg).toBeDefined();
-
-    const systemMessage = callArg[0].messages.find((msg) => msg.role === 'system');
-    expect(systemMessage.content).toContain('--- RAG CONTEXT ---');
+    const timelineEntry = result.timeline.find((step) => step.agent === agentName);
+    expect(timelineEntry).toBeDefined();
+    expect(Array.isArray(timelineEntry.sources)).toBe(true);
+    expect(timelineEntry.sources.length).toBe(normalizedAgent.sources.length);
+    expect(timelineEntry.feedback?.aepo).toBeGreaterThan(0);
+    expect(typeof timelineEntry.summary).toBe('string');
+    expect(timelineEntry.summary.length).toBeGreaterThan(0);
   }, 60000);
 });

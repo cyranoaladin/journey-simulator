@@ -5,6 +5,7 @@ import MessageDisplay from "../components/shared/MessageDisplay";
 import { useJourneyStore } from "../store/journeyStore";
 import JourneyCard from "./Journey/JourneyCard";
 import ZynoBox from "./Journey/ZynoBox";
+import JourneyOverviewHeader from "./Journey/JourneyOverviewHeader";
 import { personas } from "../data/personas";
 import ResetProgressButton from "./ResetProgressButton";
 import JourneyWorkspace from "./Journey/JourneyWorkspace";
@@ -77,6 +78,9 @@ const JourneysPage: FC = () => {
 
   const navigate = useNavigate();
 
+  const personaId = selectedPersona?.id ?? "none";
+  const personaTips = selectedPersona?.phases?.[userProgress.completedPhases.length]?.zynoTips ?? [];
+
   const handleBackToPersonas = () => {
     setSelectedPersona(null);
     setError(null);
@@ -135,63 +139,67 @@ const JourneysPage: FC = () => {
       </div>
 
       <main className="container mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
-        >
-          <h1 className="text-4xl md:text-6xl font-space font-bold mb-6">
-            <span className="gradient-text">
-              Choose Your Path to Sovereignty
-            </span>
-          </h1>
-          <p className="text-xl opacity-80 max-w-4xl mx-auto mb-8 leading-relaxed">
-            Discover how the{" "}
-            <span className="font-semibold text-accent-cyan">
-              Cognitive Activation Protocol™
-            </span>{" "}
-            transforms your skills into capital based on your unique profile
-          </p>
-          <div className="flex justify-center">
-            <ResetProgressButton />
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          className="mb-16"
-        >
-          <div className="grid md:grid-cols-2 gap-6">
-            {supportHighlights.map((highlight, index) => (
-              <div
-                key={highlight.title}
-                className="glass-effect rounded-2xl p-6 text-left"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-accent-cyan">
-                    {highlight.title}
-                  </h3>
-                  <span className="text-sm text-white/60">
-                    Agent {index + 1}
-                  </span>
-                </div>
-                <p className="text-base text-white/80 mb-4 leading-relaxed">
-                  {highlight.description}
-                </p>
-                <ul className="space-y-2 text-sm text-white/70">
-                  {highlight.bullets.map((bullet) => (
-                    <li key={bullet} className="flex items-start gap-2">
-                      <span className="text-accent-cyan">{">"}</span>
-                      <span>{bullet}</span>
-                    </li>
-                  ))}
-                </ul>
+        {!selectedPersona && (
+          <>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center mb-12"
+            >
+              <h1 className="text-4xl md:text-6xl font-space font-bold mb-6">
+                <span className="gradient-text">
+                  Choose Your Path to Sovereignty
+                </span>
+              </h1>
+              <p className="text-xl opacity-80 max-w-4xl mx-auto mb-8 leading-relaxed">
+                Discover how the{" "}
+                <span className="font-semibold text-accent-cyan">
+                  Cognitive Activation Protocol™
+                </span>{" "}
+                transforms your skills into capital based on your unique profile
+              </p>
+              <div className="flex justify-center">
+                <ResetProgressButton />
               </div>
-            ))}
-          </div>
-        </motion.div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="mb-16"
+            >
+              <div className="grid md:grid-cols-2 gap-6">
+                {supportHighlights.map((highlight, index) => (
+                  <div
+                    key={highlight.title}
+                    className="glass-effect rounded-2xl p-6 text-left"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <h3 className="text-xl font-semibold text-accent-cyan">
+                        {highlight.title}
+                      </h3>
+                      <span className="text-sm text-white/60">
+                        Agent {index + 1}
+                      </span>
+                    </div>
+                    <p className="text-base text-white/80 mb-4 leading-relaxed">
+                      {highlight.description}
+                    </p>
+                    <ul className="space-y-2 text-sm text-white/70">
+                      {highlight.bullets.map((bullet) => (
+                        <li key={bullet} className="flex items-start gap-2">
+                          <span className="text-accent-cyan">{">"}</span>
+                          <span>{bullet}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </>
+        )}
 
         {!selectedPersona && (
           <motion.div
@@ -230,20 +238,12 @@ const JourneysPage: FC = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="h-full"
+            className="h-full space-y-8"
           >
-            <div className="mb-4">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleBackToPersonas}
-                className="btn-secondary text-sm flex items-center gap-2"
-              >
-                <span>← Back to all journeys</span>
-              </motion.button>
+            <JourneyOverviewHeader onBack={handleBackToPersonas} />
+            <div className="w-full">
+              <JourneyWorkspace />
             </div>
-
-            <JourneyWorkspace />
           </motion.div>
         )}
 
@@ -315,14 +315,13 @@ const JourneysPage: FC = () => {
         }
       </main>
 
-      <ZynoBox
-        context={`persona:${selectedPersona?.id || "none"};phase:${userProgress.completedPhases.length}`}
-        tips={
-          selectedPersona?.phases[userProgress.completedPhases.length]
-            ?.zynoTips || []
-        }
-        onPrompt={(msg) => console.log("User asked Zyno:", msg)}
-      />
+      {!selectedPersona && (
+        <ZynoBox
+          context={`persona:${personaId};phase:${userProgress.completedPhases.length}`}
+          tips={personaTips}
+          onPrompt={(msg) => console.log("User asked Zyno:", msg)}
+        />
+      )}
     </div>
   );
 };

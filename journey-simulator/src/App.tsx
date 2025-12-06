@@ -9,16 +9,16 @@ import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 import { initParticles } from './utils/particles';
 import Layout from './components/layout/Layout';
-import Dashboard from './pages/Dashboard';
-import Journey from './pages/Journey';
-import Playground from './pages/Playground';
-import Dao from './pages/Dao';
-import Resources from './pages/Resources';
-import Support from './pages/Support';
-import Zyno from './pages/Zyno';
-import JourneyCompleted from './pages/JourneyCompleted';
-import HomePage from './pages/HomePage';
-import GuidePage from './pages/GuidePage';
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Journey = lazy(() => import('./pages/Journey'));
+const Playground = lazy(() => import('./pages/Playground'));
+const Dao = lazy(() => import('./pages/Dao'));
+const Resources = lazy(() => import('./pages/Resources'));
+const Support = lazy(() => import('./pages/Support'));
+const Zyno = lazy(() => import('./pages/Zyno'));
+const JourneyCompleted = lazy(() => import('./pages/JourneyCompleted'));
+const HomePage = lazy(() => import('./pages/HomePage'));
+const GuidePage = lazy(() => import('./pages/GuidePage'));
 
 const ProtectedLayout = () => (
   <ProtectedRoute>
@@ -29,6 +29,12 @@ const ProtectedLayout = () => (
 );
 
 const DebugMint = lazy(() => import('./pages/DebugMint'));
+
+const RouteSkeleton = () => (
+  <div className="flex min-h-[30vh] items-center justify-center text-sm font-semibold text-slate-600 dark:text-slate-200">
+    Loading experience…
+  </div>
+);
 
 
 
@@ -65,28 +71,29 @@ function App() {
               className="pointer-events-none fixed inset-0 -z-10"
               aria-hidden="true"
             />
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
+            <Suspense fallback={<RouteSkeleton />}>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
 
-              <Route element={<ProtectedLayout />}>
-                <Route path="debug/mint" element={<Suspense fallback={<div>Loading…</div>}><DebugMint /></Suspense>} />
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path="journeys" element={<Journey />} />
-                <Route path="journeys/:journeyId" element={<Journey />} />
-                <Route path="journeys/completed" element={<JourneyCompleted />} />
-                <Route path="playground" element={<Playground />} />
-                <Route path="dao" element={<Dao />} />
-                <Route path="resources" element={<Resources />} />
-                <Route path="support" element={<Support />} />
-                <Route path="zyno" element={<Zyno />} />
-                <Route path="zyno" element={<Zyno />} />
-                <Route path="guide" element={<GuidePage />} />
-              </Route>
+                <Route element={<ProtectedLayout />}>
+                  <Route path="debug/mint" element={<DebugMint />} />
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="journeys" element={<Journey />} />
+                  <Route path="journeys/:journeyId" element={<Journey />} />
+                  <Route path="journeys/completed" element={<JourneyCompleted />} />
+                  <Route path="playground" element={<Playground />} />
+                  <Route path="dao" element={<Dao />} />
+                  <Route path="resources" element={<Resources />} />
+                  <Route path="support" element={<Support />} />
+                  <Route path="zyno" element={<Zyno />} />
+                  <Route path="guide" element={<GuidePage />} />
+                </Route>
 
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
           </div>
         </TutorialProvider>
       </AuthProvider>

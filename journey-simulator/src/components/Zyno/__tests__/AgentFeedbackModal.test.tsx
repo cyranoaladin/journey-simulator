@@ -1,9 +1,15 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useJourneyStore } from '../../../store/journeyStore';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { AgentTimelineEntry } from '../types';
-import { act } from 'react';
+
+const closeModalSpy = vi.hoisted(() => vi.fn());
+
+vi.mock('../../../store/journeyStore', () => ({
+  useJourneyStore: () => ({
+    closeModal: closeModalSpy,
+  }),
+}));
 
 vi.mock('../AgentFeedbackForm', () => ({
   __esModule: true,
@@ -46,22 +52,23 @@ const baseStep: AgentTimelineEntry = {
 };
 
 describe('AgentFeedbackModal', () => {
-  let originalCloseModal: () => void;
-
-  beforeEach(() => {
-    originalCloseModal = useJourneyStore.getState().closeModal;
-  });
-
   afterEach(() => {
     vi.clearAllMocks();
-    useJourneyStore.setState({ closeModal: originalCloseModal });
+    vi.useRealTimers();
   });
 
   it('auto closes the modal shortly after a successful submission', async () => {
-    const closeModalSpy = vi.fn();
-    useJourneyStore.setState({ closeModal: closeModalSpy });
+    const user = userEvent.setup();
+    closeModalSpy.mockClear();
+    const timeoutSpy = vi
+      .spyOn(window, 'setTimeout')
+      .mockImplementation(((callback: TimerHandler, _delay?: number, ...args: any[]) => {
+        if (typeof callback === 'function') {
+          callback(...args);
+        }
 
-    const timeoutSpy = vi.spyOn(window, 'setTimeout');
+        return 1 as unknown as number;
+      }) as typeof window.setTimeout);
 
     const formModule = await import('../AgentFeedbackForm');
     expect(typeof formModule.default).toBe('function');
@@ -72,23 +79,9 @@ describe('AgentFeedbackModal', () => {
 
     const trigger = screen.getByTestId('mock-feedback-form');
     expect(trigger).toBeInTheDocument();
+    await user.click(trigger);
 
-    await act(async () => {
-      await userEvent.click(trigger);
-    });
-
-    expect(timeoutSpy).toHaveBeenCalled();
-    const scheduledCall = (timeoutSpy.mock.calls as unknown as [() => void, number][]).find(
-      ([, delay]) => delay === 1500
-    );
-    expect(scheduledCall).toBeDefined();
-    const [scheduledCallback] = scheduledCall!;
-    expect(closeModalSpy).not.toHaveBeenCalled();
-
-    await act(async () => {
-      scheduledCallback();
-    });
-
+    expect(timeoutSpy).toHaveBeenCalledWith(expect.any(Function), 1500);
     expect(closeModalSpy).toHaveBeenCalledTimes(1);
 
     timeoutSpy.mockRestore();

@@ -86,8 +86,9 @@ test.describe('Resource Validation in Journey Steps', () => {
         await page.goto('/journeys/capital-foundry');
         await page.locator('button:has-text("Start / Continue")').click();
 
-        // Wait for resources to load
-        await expect(page.locator('text=Ressources recommandées')).toBeVisible({ timeout: 10000 });
+        // Wait for resources to load (supports localized titles)
+        const resourcesSection = page.getByTestId('resources-section').first();
+        await expect(resourcesSection).toBeVisible({ timeout: 10000 });
 
         // Verify valid URLs are displayed and clickable
         // Verify valid URLs are displayed and clickable
@@ -143,8 +144,9 @@ test.describe('Resource Validation in Journey Steps', () => {
         await page.goto('/journeys/capital-foundry');
         await page.locator('button:has-text("Start / Continue")').click();
 
-        // Wait for resources to load
-        await expect(page.locator('text=Ressources recommandées')).toBeVisible({ timeout: 10000 });
+        // Wait for resources to load regardless of locale
+        const resourcesSection = page.getByTestId('resources-section').first();
+        await expect(resourcesSection).toBeVisible({ timeout: 10000 });
 
         // Verify the resource with empty URL doesn't have an "Ouvrir" link
         const resourceBlocks = page.locator('text=Invalid Resource');
@@ -195,8 +197,9 @@ test.describe('Resource Validation in Journey Steps', () => {
         await page.goto('/journeys/capital-foundry');
         await page.locator('button:has-text("Start / Continue")').click();
 
-        // Wait for resources to load
-        await expect(page.locator('text=Ressources')).toBeVisible({ timeout: 10000 });
+        // Wait for resources section to resolve in any language
+        const resourcesSection = page.getByTestId('resources-section').first();
+        await expect(resourcesSection).toBeVisible({ timeout: 10000 });
 
         // Verify the copy button is still present
         // Verify the copy button is still present

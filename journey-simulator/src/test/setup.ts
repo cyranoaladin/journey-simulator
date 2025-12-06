@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom/vitest';
+import { vi } from 'vitest';
 
 if (typeof globalThis.IntersectionObserver === 'undefined') {
 	class MockIntersectionObserver implements IntersectionObserver {
@@ -42,3 +43,7 @@ if (typeof globalThis.IntersectionObserver === 'undefined') {
 
 	(globalThis as any).IntersectionObserver = MockIntersectionObserver;
 }
+
+vi.mock('../hooks/useArtifacts', () => ({
+	useArtifacts: () => ({ artifacts: [], loading: false, error: null }),
+}));

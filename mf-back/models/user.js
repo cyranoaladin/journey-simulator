@@ -155,12 +155,41 @@ const userSchema = new mongoose.Schema({
         },
     },
 
+    demo_mode: {
+        enabled: {
+            type: Boolean,
+            default: false,
+        },
+        persona_id: {
+            type: String,
+            default: null,
+        },
+        last_loaded_at: {
+            type: Date,
+            default: null,
+        },
+        completed_phase_indexes: {
+            type: [Number],
+            default: [],
+        },
+    },
+
     // JWT refresh token fields
     refreshToken: {
         type: String,
         default: null,
     },
     refreshTokenExpiry: {
+        type: Date,
+        default: null,
+    },
+
+    // Wallet login nonce
+    wallet_nonce: {
+        type: String,
+        default: null,
+    },
+    wallet_nonce_expiry: {
         type: Date,
         default: null,
     },

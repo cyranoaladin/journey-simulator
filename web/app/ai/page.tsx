@@ -11,11 +11,14 @@ export default function AIPage() {
   async function testApi() {
     setLoading(true)
     setError(null)
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 10_000)
     try {
       const res = await fetch('/api/ai/echo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: 'Hello investors', tags: ['demo'] }),
+        signal: controller.signal,
       })
       const json = await res.json()
       if (!res.ok) throw new Error('API error')
@@ -25,6 +28,7 @@ export default function AIPage() {
       // Fallback demo result for robustness in non-networked demos
       setResult({ text: 'Hello investors', upper: 'HELLO INVESTORS', length: 16, tags: ['demo'] })
     } finally {
+      clearTimeout(timeout)
       setLoading(false)
     }
   }

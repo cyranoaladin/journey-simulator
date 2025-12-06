@@ -20,12 +20,37 @@ import type {
   ProjectSelectionBlock,
   NarrativeChoiceBlock,
 } from "../../types/uiBlocks";
-import mermaid from "mermaid";
 import GovernanceDashboard from "../Governance/GovernanceDashboard";
 import NarrativeChoice from "./NarrativeChoiceBlock";
 import IndicatorBlockComponent, { IndicatorBlock as IndicatorBlockType } from "./IndicatorBlock";
 import InteractiveTemplateComponent, { InteractiveTemplateBlock as InteractiveTemplateBlockType } from "./InteractiveTemplateBlock";
 // TEMPORARILY DISABLED - import { Star } from "lucide-react";
+
+type MermaidModule = typeof import('mermaid');
+type MermaidAPI = MermaidModule & {
+  initialize: (config: Record<string, unknown>) => void;
+  render: (id: string, definition: string) => Promise<{ svg: string }>;
+};
+
+let mermaidModule: MermaidAPI | null = null;
+let mermaidLoader: Promise<MermaidAPI> | null = null;
+let mermaidInitialized = false;
+
+const loadMermaid = async (): Promise<MermaidAPI> => {
+  if (mermaidModule) {
+    return mermaidModule;
+  }
+
+  if (!mermaidLoader) {
+    mermaidLoader = import('mermaid').then((module) => {
+      const resolved = (module.default ?? module) as unknown as MermaidAPI;
+      mermaidModule = resolved;
+      return resolved;
+    });
+  }
+
+  return mermaidLoader;
+};
 
 function StreamingText({ text, speed = 10 }: { text: string; speed?: number }) {
   const [displayed, setDisplayed] = useState("");
@@ -448,15 +473,16 @@ function Resources({ block }: { block: ResourceBlock }) {
   // };
 
   return (
-    <div className="bg-white/5 rounded-xl p-4">
-      <h4 className="font-semibold mb-2">{block.title}</h4>
-      <div className="grid gap-2">
+    <div className="bg-white/5 rounded-xl p-4" data-testid="resources-section">
+      <h4 className="font-semibold mb-2" data-testid="resources-section-title">{block.title}</h4>
+      <div className="grid gap-2" data-testid="resources-list">
         {block.resources.map((r) => {
           // const favorited = isFavorite(r.id);
           return (
             <div
               key={r.id}
               className="border border-white/10 rounded-lg p-3 flex items-center justify-between"
+              data-testid={`resource-item-${r.id}`}
             >
               <div>
                 <div className="font-medium">{r.label}</div>
@@ -792,20 +818,39 @@ function Xp({ block }: { block: XpBlock }) {
 }
 
 function Diagram({ block }: { block: DiagramBlock }) {
-  const [svg, setSvg] = useState<string>("");
+  const [svg, setSvg] = useState<string>(
+    '<div class="text-xs opacity-70">Loading diagram...</div>'
+  );
 
   useEffect(() => {
-    mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose' });
+    let cancelled = false;
+
     const renderDiagram = async () => {
       try {
-        const { svg } = await mermaid.render(`mermaid-${block.id}`, block.content);
-        setSvg(svg);
+        const mermaid = await loadMermaid();
+
+        if (!mermaidInitialized) {
+          mermaid.initialize({ startOnLoad: false, theme: "dark", securityLevel: "loose" });
+          mermaidInitialized = true;
+        }
+
+        const result = await mermaid.render(`mermaid-${block.id}`, block.content);
+        if (!cancelled) {
+          setSvg(result.svg);
+        }
       } catch (e) {
         console.error("Mermaid render error:", e);
-        setSvg(`<div class="text-red-400 text-xs">Failed to render diagram</div>`);
+        if (!cancelled) {
+          setSvg(`<div class="text-red-400 text-xs">Failed to render diagram</div>`);
+        }
       }
     };
+
     renderDiagram();
+
+    return () => {
+      cancelled = true;
+    };
   }, [block.content, block.id]);
 
   return (
@@ -939,9 +984,12 @@ export default function UIBlocksRenderer({ response }: { response: JourneyStepRe
       className="space-y-6"
     >
       <AnimatePresence>
-        {response.ui_blocks.map((b) => (
+        {response.ui_blocks.map((b, index) => {
+          const blockKey = b.id ? `${b.id}` : `${b.kind}-${index}`;
+
+          return (
           <motion.div
-            key={b.id}
+            key={blockKey}
             variants={item}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -951,7 +999,8 @@ export default function UIBlocksRenderer({ response }: { response: JourneyStepRe
           >
             {render(b)}
           </motion.div>
-        ))}
+          );
+        })}
       </AnimatePresence>
     </motion.div>
   );

@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const journeyController = require('../controllers/journey-controller');
+const metricsController = require('../controllers/journey-metrics-controller');
 const { protect } = require('../middleware/auth');
 
 // Public routes
@@ -24,13 +25,17 @@ router.post('/:journeyId/step', journeyController.step);
 router.post('/:journeyId/submit', journeyController.submit);
 
 // Demo mode route
-router.post('/load-demo', journeyController.loadDemoState);
+router.post('/load-demo', protect, journeyController.loadDemoState);
 
 // Schema endpoint - expose journey structure
 router.get('/schema', journeyController.getJourneySchema);
 
 // Artifacts endpoint - expose unlocked artifacts based on user progress
 router.get('/artifacts', protect, journeyController.getUserArtifacts);
+
+// Metrics endpoints
+router.get('/metrics', protect, metricsController.getGlobalMetrics);
+router.get('/:id/metrics', protect, metricsController.getJourneyMetrics);
 
 module.exports = router;
 

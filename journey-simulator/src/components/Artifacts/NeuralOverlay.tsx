@@ -16,11 +16,13 @@ export const NeuralOverlay: React.FC<Props> = ({ isVisible, agentName, taskName 
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm rounded-3xl overflow-hidden"
+          data-testid="neural-overlay"
         >
           {/* Iframe vers le Canvas HTML */}
           <iframe 
             src="/generated/neural_swarm.html" 
             className="w-full h-full absolute inset-0 border-none opacity-80 pointer-events-none"
+            title="Neural Swarm Visualization"
           />
           
           {/* Texte Informatif au premier plan */}
@@ -38,7 +40,7 @@ export const NeuralOverlay: React.FC<Props> = ({ isVisible, agentName, taskName 
             <h3 className="text-2xl font-display font-bold text-white">
               {agentName} is working...
             </h3>
-            <p className="text-gray-400 font-mono text-sm animate-pulse">
+            <p className="text-gray-400 font-mono text-sm animate-pulse" data-testid="neural-overlay-task">
               {'>'} {taskName}
             </p>
           </motion.div>

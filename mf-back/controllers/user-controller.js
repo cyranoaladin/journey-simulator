@@ -2,6 +2,10 @@ const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const dotenv = require('dotenv');
+const nacl = require('tweetnacl');
+// bs58 v6 is ESM-first, so in CJS we access .default
+const bs58 = require('bs58').default || require('bs58');
+
 dotenv.config({
   quiet: true
 });
@@ -89,6 +93,41 @@ exports.registerUser = async (req, res) => {
   }
 };
 
+exports.createWalletChallenge = async (req, res) => {
+  try {
+    const { wallet_address } = req.body;
+
+    if (!wallet_address) {
+      return res.status(400).json({ success: false, message: 'Wallet address is required' });
+    }
+
+    const user = await User.findOne({ wallet_address });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Generate nonce
+    const nonce = crypto.randomBytes(32).toString('hex');
+    user.wallet_nonce = nonce;
+    user.wallet_nonce_expiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+    await user.save();
+
+    const message = `Sign this message to log in to Money Factory AI\n\nNonce: ${nonce}`;
+
+    res.status(200).json({
+      success: true,
+      message,
+      nonce
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create wallet challenge',
+      error: error.message
+    });
+  }
+};
+
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -148,7 +187,7 @@ exports.loginUser = async (req, res) => {
 
 exports.loginWithWallet = async (req, res) => {
   try {
-    const { wallet_address } = req.body;
+    const { wallet_address, signature, message } = req.body;
 
     if (!wallet_address) {
       return res.status(400).json({ success: false, message: 'Wallet address is required' });
@@ -165,6 +204,54 @@ exports.loginWithWallet = async (req, res) => {
     // Check if user is active
     if (!user.is_active) {
       return res.status(401).json({ success: false, message: 'Your account has been deactivated' });
+    }
+
+    const isStrict = process.env.ENABLE_STRICT_WALLET_LOGIN === 'true';
+    const hasProof = signature && message;
+
+    if (isStrict && !hasProof) {
+      console.warn(`[Auth] Rejected insecure wallet login for ${wallet_address} (Strict Mode ON)`);
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Signature and message required. Insecure login is disabled.' 
+      });
+    }
+
+    if (hasProof) {
+      // Secure Path: Verify signature if provided (regardless of strict mode)
+      
+      // Verify challenge exists and is valid
+      if (!user.wallet_nonce || !user.wallet_nonce_expiry || user.wallet_nonce_expiry < new Date()) {
+        return res.status(401).json({ success: false, message: 'Login challenge expired or invalid. Please request a new challenge.' });
+      }
+
+      // Verify message format
+      const expectedMessage = `Sign this message to log in to Money Factory AI\n\nNonce: ${user.wallet_nonce}`;
+      if (message !== expectedMessage) {
+        return res.status(401).json({ success: false, message: 'Invalid message format or nonce mismatch' });
+      }
+
+      // Verify signature
+      try {
+        const signatureUint8 = bs58.decode(signature);
+        const messageUint8 = new TextEncoder().encode(message);
+        const publicKeyUint8 = bs58.decode(wallet_address);
+
+        const verified = nacl.sign.detached.verify(messageUint8, signatureUint8, publicKeyUint8);
+        if (!verified) {
+          return res.status(401).json({ success: false, message: 'Invalid wallet signature' });
+        }
+      } catch (err) {
+        return res.status(400).json({ success: false, message: 'Cryptographic verification failed', error: err.message });
+      }
+
+      // Clear nonce after successful verification
+      user.wallet_nonce = null;
+      user.wallet_nonce_expiry = null;
+      await user.save();
+    } else {
+      // Legacy Path: Only reached if !isStrict and !hasProof
+      console.warn(`[Security Warning] Insecure wallet login used for ${wallet_address}. Enable ENABLE_STRICT_WALLET_LOGIN=true for production.`);
     }
 
     // Generate tokens
@@ -414,6 +501,24 @@ exports.subscription = async (req, res) => {
       error: error.message
     });
   }
+};
+
+exports.debugWhoAmI = async (req, res) => {
+  // Guard: Dev only or Admin
+  if (process.env.NODE_ENV === 'production' && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Debug endpoint not available' });
+  }
+
+  res.status(200).json({
+      success: true,
+      data: {
+          mongoId: req.user._id,
+          email: req.user.email,
+          wallet_address: req.user.wallet_address,
+          role: req.user.role,
+          wallet_nonce_set: !!req.user.wallet_nonce
+      }
+  });
 };
 
 exports.logoutUser = async (req, res) => {

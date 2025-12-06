@@ -4,6 +4,7 @@ import { Sparkles, Compass, Target, RefreshCw } from 'lucide-react';
 import { useJourneyStore } from '../../store/journeyStore';
 import { Persona } from '../../types/journey';
 import { api } from '../../utils/api';
+import { normalizeCompletedPhases } from '../../utils/progress';
 
 interface JourneyCardProps {
   persona: Persona;
@@ -90,12 +91,7 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
         if (result.progress) {
           // Map backend progress to frontend UserProgress directly
           const backendProgress = result.progress;
-
-          const completedCount = typeof backendProgress.completed_phases === 'number'
-            ? backendProgress.completed_phases
-            : 0;
-
-          const completedPhases = Array.from({ length: completedCount }, (_, index) => index);
+          const { completedCount, completedPhases } = normalizeCompletedPhases(backendProgress);
 
           const rawCertificates = Array.isArray(backendProgress.nft_certificates)
             ? backendProgress.nft_certificates
