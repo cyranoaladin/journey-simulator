@@ -5,7 +5,7 @@ import MessageDisplay from "../components/shared/MessageDisplay";
 import { useJourneyStore } from "../store/journeyStore";
 import JourneyCard from "./Journey/JourneyCard";
 import ZynoBox from "./Journey/ZynoBox";
-import JourneyOverviewHeader from "./Journey/JourneyOverviewHeader";
+
 import { personas } from "../data/personas";
 import ResetProgressButton from "./ResetProgressButton";
 import JourneyWorkspace from "./Journey/JourneyWorkspace";
@@ -240,9 +240,8 @@ const JourneysPage: FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="h-full space-y-8"
           >
-            <JourneyOverviewHeader onBack={handleBackToPersonas} />
             <div className="w-full">
-              <JourneyWorkspace />
+              <JourneyWorkspace onBack={handleBackToPersonas} />
             </div>
           </motion.div>
         )}

@@ -4,7 +4,7 @@ import { disablePageAnimations } from './utils/pageStability';
 
 test.describe('Capital Foundry Journey', () => {
   test.beforeEach(async ({ page }) => {
-    await setupJourneyMocks(page, { personaId: 'capital-foundry' });
+    await setupJourneyMocks(page, { personaId: 'capital-foundry', mockMint: true });
     await seedDemoUser(page, null);
     await disablePageAnimations(page);
   });
@@ -14,14 +14,14 @@ test.describe('Capital Foundry Journey', () => {
 
     await expect(page.getByText('Choose Your Path to Sovereignty')).toBeVisible();
 
-    const capitalCard = page.locator('article').filter({ has: page.getByRole('heading', { name: 'The Capital Foundry' }) }).first();
+    const capitalCard = page.locator('article').filter({ has: page.getByRole('heading', { name: 'The Capital Foundry', level: 3 }) }).first();
     await capitalCard.getByRole('button', { name: 'Launch with Zyno' }).click();
 
     await page.waitForURL('**/journeys/capital-foundry');
     await expect(page.getByRole('heading', { name: 'Current Phase' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Protocol Discovery Sprint', level: 2 })).toBeVisible();
 
-    await page.getByRole('button', { name: 'Run Simulation' }).click();
+    await page.getByRole('button', { name: /Run Simulation|Start Journey/i }).click();
     await expect(page.getByRole('button', { name: 'Mint NFT' })).toBeVisible();
     await page.getByRole('button', { name: 'Mint NFT' }).click();
     await expect(page.getByRole('heading', { name: 'DeFi Recon Marker' })).toBeVisible();

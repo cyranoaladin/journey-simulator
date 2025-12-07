@@ -41,7 +41,11 @@ import artifactsData from '../../data/artifacts.json';
 import { toast } from 'sonner';
 import { useWorkspaceLayout } from '../../contexts/WorkspaceLayoutContext';
 
-const JourneyWorkspace = () => {
+interface JourneyWorkspaceProps {
+  onBack?: () => void;
+}
+
+const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
   const {
     selectedPersona,
     userProgress,
@@ -190,7 +194,7 @@ const JourneyWorkspace = () => {
       personaId: selectedPersona.id,
       phaseId: activePhase.id,
       proofType,
-      title: proofData.name || activePhase.nftReward || `Proof-of-${proofType}™`,
+      title: activePhase.nftReward || proofData.name || `Proof-of-${proofType}™`,
       description: proofData.description || `Successfully completed the ${activePhase.title} phase.`,
       imageUrl: proofData.imageUrl,
       xpEarned: activePhase.xpReward,
@@ -305,7 +309,7 @@ const JourneyWorkspace = () => {
         <div className="flex items-center gap-3">
           <button
             data-testid="back-to-journeys"
-            onClick={() => window.history.back()}
+            onClick={() => onBack ? onBack() : window.history.back()}
             className="group flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 transition hover:bg-white/10 hover:border-white/20"
           >
             <ArrowLeft size={14} className="text-white/60 group-hover:text-white" />
