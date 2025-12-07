@@ -31,7 +31,8 @@ export default defineConfig({
     command: 'npm run dev -- --port 5173',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
-    stdout: 'ignore',
-    stderr: 'ignore',
+    stdout: 'pipe',
+    stderr: 'pipe',
+    timeout: 120 * 1000,
   },
 });
