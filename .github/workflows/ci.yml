@@ -24,6 +24,7 @@ jobs:
         cache-dependency-path: |
           mf-back/package-lock.json
           journey-simulator/package-lock.json
+          web/package-lock.json
 
     # --- BACKEND (mf-back) ---
     - name: Install Backend Dependencies
