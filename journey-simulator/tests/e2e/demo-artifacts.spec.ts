@@ -33,7 +33,7 @@ test.describe('Demo Day artifacts', () => {
     });
     console.log(`[test] completedPhases before run: ${completedPhases}`);
 
-    const startButton = page.getByRole('button', { name: 'Start / Continue' });
+    const startButton = page.getByRole('button', { name: /Run Simulation|Start Journey/i }).first();
     await startButton.click();
 
     const overlay = page.getByTestId('neural-overlay');

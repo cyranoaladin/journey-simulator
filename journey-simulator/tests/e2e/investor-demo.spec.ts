@@ -27,13 +27,13 @@ test.describe('Investor Demo Flow - Capital Foundry', () => {
         await expect(page.getByRole('heading', { name: 'The Capital Foundry', level: 2 })).toBeVisible();
         await expect(page.getByRole('heading', { name: 'Protocol Discovery Sprint', level: 2 })).toBeVisible();
 
-        await page.getByRole('button', { name: 'Run Simulation' }).click();
+        await page.getByRole('button', { name: /Run Simulation|Start Journey/i }).click();
         await expect(page.getByRole('button', { name: 'Mint NFT' })).toBeVisible();
         await page.getByRole('button', { name: 'Mint NFT' }).click();
         await expect(page.getByRole('heading', { name: 'DeFi Recon Marker' })).toBeVisible();
         await page.getByRole('button', { name: 'Close' }).first().click();
 
-        await expect(page.getByRole('heading', { name: /Pitch Deck Narrative Framework/i })).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Program Forge Lab', level: 2 })).toBeVisible();
 
         // Wait for Neural Overlay to disappear if present
         await expect(page.getByTestId('neural-overlay')).not.toBeVisible({ timeout: 30000 });
