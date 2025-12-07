@@ -9,6 +9,7 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    environment: production
     env:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
@@ -153,6 +154,7 @@ jobs:
 
   deploy-migrate:
     runs-on: ubuntu-latest
+    environment: production
     needs: release
     defaults:
       run:
@@ -183,6 +185,7 @@ jobs:
 
   post-deploy-health:
     runs-on: ubuntu-latest
+    environment: production
     needs: deploy-migrate
     env:
       HEALTHCHECK_BASE_URL: ${{ secrets.HEALTHCHECK_BASE_URL }}
