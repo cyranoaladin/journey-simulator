@@ -122,7 +122,7 @@ describe('NFT Integration in JourneyWorkspace', () => {
         render(<JourneyWorkspace />);
 
         // Find and click the Complete Phase button
-        const completeButton = screen.getAllByText('Validate & Mint NFT')[0];
+        const completeButton = screen.getAllByText('Mint NFT')[0];
         fireEvent.click(completeButton);
 
         // Expect completePhase to be called

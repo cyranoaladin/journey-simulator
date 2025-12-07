@@ -366,7 +366,7 @@ const JourneyWorkspace = () => {
       <div className="mx-auto mt-8 w-full max-w-[1200px] px-6">
         <div className="mb-8 text-center space-y-2">
           <h2 className="text-4xl font-space font-bold text-white">{selectedPersona.title}</h2>
-          <p className="mx-auto max-w-2xl text-base text-white/60">{selectedPersona.description.split('.')[0]}.</p>
+          <p className="mx-auto max-w-2xl text-base text-white/60">{selectedPersona?.description?.split('.')[0] || "Journey in progress"}.</p>
 
           {/* Stats Row Centered */}
           <div className="mt-4 flex justify-center gap-6 text-sm text-white/70">
