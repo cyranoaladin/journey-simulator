@@ -23,7 +23,9 @@ export default function MetricsDashboard() {
   useEffect(() => {
     async function fetchMetrics() {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/journeys/metrics`)
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/journeys/metrics`
+        )
         if (res.ok) {
           const data = await res.json()
           setMetrics(data)
@@ -50,10 +52,30 @@ export default function MetricsDashboard() {
 
       <div className="space-y-4">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <MetricCard title="Total Journeys" value={metrics?.totalJourneys || 0} icon="📊" sub="All time started" />
-          <MetricCard title="Active Users" value={metrics?.agentRuns.total || 0} icon="🤖" sub="Total agent interactions" />
-          <MetricCard title="Avg Completion" value={`${metrics?.globalCompletionAvg}%`} icon="🎯" sub="Global average progress" />
-          <MetricCard title="Investor Demo Runs" value={metrics?.investorDemoRuns || 0} icon="🚀" sub="Unique demo sessions" />
+          <MetricCard
+            title="Total Journeys"
+            value={metrics?.totalJourneys || 0}
+            icon="📊"
+            sub="All time started"
+          />
+          <MetricCard
+            title="Active Users"
+            value={metrics?.agentRuns.total || 0}
+            icon="🤖"
+            sub="Total agent interactions"
+          />
+          <MetricCard
+            title="Avg Completion"
+            value={`${metrics?.globalCompletionAvg}%`}
+            icon="🎯"
+            sub="Global average progress"
+          />
+          <MetricCard
+            title="Investor Demo Runs"
+            value={metrics?.investorDemoRuns || 0}
+            icon="🚀"
+            sub="Unique demo sessions"
+          />
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
@@ -64,8 +86,18 @@ export default function MetricsDashboard() {
             </div>
             <div className="p-6 pt-0">
               <div className="space-y-8">
-                <StatRow label="Success Rate" value={`${metrics?.agentRuns.successRate}%`} sub="Across all agents" highlight="green" />
-                <StatRow label="Avg Duration" value={`${metrics?.agentRuns.avgDurationMs}ms`} sub="Response time" highlight="blue" />
+                <StatRow
+                  label="Success Rate"
+                  value={`${metrics?.agentRuns.successRate}%`}
+                  sub="Across all agents"
+                  highlight="green"
+                />
+                <StatRow
+                  label="Avg Duration"
+                  value={`${metrics?.agentRuns.avgDurationMs}ms`}
+                  sub="Response time"
+                  highlight="blue"
+                />
               </div>
             </div>
           </div>
@@ -75,7 +107,17 @@ export default function MetricsDashboard() {
   )
 }
 
-function MetricCard({ title, value, icon, sub }: { title: string; value: string | number; icon: string; sub: string }) {
+function MetricCard({
+  title,
+  value,
+  icon,
+  sub,
+}: {
+  title: string
+  value: string | number
+  icon: string
+  sub: string
+}) {
   return (
     <div className="rounded-xl border border-white/10 bg-white/5 text-white shadow-sm">
       <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
@@ -90,7 +132,17 @@ function MetricCard({ title, value, icon, sub }: { title: string; value: string 
   )
 }
 
-function StatRow({ label, value, sub, highlight }: { label: string; value: string | number; sub: string; highlight: 'green' | 'blue' }) {
+function StatRow({
+  label,
+  value,
+  sub,
+  highlight,
+}: {
+  label: string
+  value: string | number
+  sub: string
+  highlight: 'green' | 'blue'
+}) {
   const colorClass = highlight === 'green' ? 'text-green-500' : 'text-blue-500'
   return (
     <div className="flex items-center">
