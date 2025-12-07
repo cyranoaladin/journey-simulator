@@ -19,14 +19,14 @@ test.describe('Capital Foundry Journey', () => {
 
     await page.waitForURL('**/journeys/capital-foundry');
     await expect(page.getByRole('heading', { name: 'Current Phase' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Protocol Discovery Sprint', level: 3 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Protocol Discovery Sprint', level: 2 })).toBeVisible();
 
-    await page.getByRole('button', { name: 'Start / Continue' }).click();
-    await expect(page.getByRole('button', { name: 'Validate & Mint NFT' })).toBeVisible();
-    await page.getByRole('button', { name: 'Validate & Mint NFT' }).click();
-    await expect(page.getByRole('heading', { name: /Proof-of-/i })).toBeVisible();
+    await page.getByRole('button', { name: 'Run Simulation' }).click();
+    await expect(page.getByRole('button', { name: 'Mint NFT' })).toBeVisible();
+    await page.getByRole('button', { name: 'Mint NFT' }).click();
+    await expect(page.getByRole('heading', { name: 'DeFi Recon Marker' })).toBeVisible();
     await page.getByRole('button', { name: 'Close' }).first().click();
 
-    await expect(page.getByRole('heading', { name: 'Program Forge Lab', level: 3 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Program Forge Lab', level: 2 })).toBeVisible();
   });
 });
