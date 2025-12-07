@@ -14,8 +14,8 @@ export async function loginWithWalletFlow({
   try {
     // 1. Get challenge from backend
     const { data: challengeData, error: challengeError } = await auth.getWalletChallenge(walletPublicKey);
-    
-    if (challengeError || !challengeData) {
+
+    if (challengeError || !challengeData || !challengeData.message) {
       throw new Error(challengeError ? 'API Error' : 'Failed to obtain login challenge');
     }
     const { message } = challengeData;
@@ -29,7 +29,7 @@ export async function loginWithWalletFlow({
     const { data: loginData, error: loginError } = await auth.loginWithWallet(walletPublicKey, message, signature);
 
     if (loginError || !loginData) {
-       throw new Error(loginError ? 'Login failed' : 'No data received');
+      throw new Error(loginError ? 'Login failed' : 'No data received');
     }
 
     // Cast to legacy LoginResponse type for compatibility (they share structure)

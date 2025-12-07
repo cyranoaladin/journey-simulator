@@ -125,15 +125,15 @@ describe('JourneyWorkspace', () => {
     it('renders correctly with selected persona', () => {
         render(<JourneyWorkspace />)
 
-        expect(screen.getByText('Test Persona')).toBeInTheDocument()
-        expect(screen.getByText('Phase 1')).toBeInTheDocument()
-        expect(screen.getByText('Start / Continue')).toBeInTheDocument()
+        expect(screen.getAllByText('Test Persona')[0]).toBeInTheDocument()
+        expect(screen.getAllByText('Phase 1')[0]).toBeInTheDocument()
+        expect(screen.getByText('Run Simulation')).toBeInTheDocument()
     })
 
     it('calls runInteractiveStep when Start button is clicked', () => {
         render(<JourneyWorkspace />)
 
-        const startButton = screen.getByText('Start / Continue')
+        const startButton = screen.getByText('Run Simulation')
         fireEvent.click(startButton)
 
         expect(mockRunInteractiveStep).toHaveBeenCalledWith({
@@ -148,7 +148,7 @@ describe('JourneyWorkspace', () => {
         render(<JourneyWorkspace />)
 
         // The button text changes to a loader, so "Start / Continue" should not be there
-        expect(screen.queryByText('Start / Continue')).not.toBeInTheDocument()
+        expect(screen.queryByText('Run Simulation')).not.toBeInTheDocument()
     })
 
     it('renders UIBlocksRenderer when lastStep is present', () => {
@@ -177,7 +177,7 @@ describe('JourneyWorkspace', () => {
         } as any)
 
         render(<JourneyWorkspace />)
-        expect(screen.getAllByText('Complete Phase')[0]).toBeInTheDocument()
+        expect(screen.getAllByText('Complete')[0]).toBeInTheDocument()
     })
 
     it('calls completePhase when Complete Phase button is clicked', () => {
@@ -194,7 +194,7 @@ describe('JourneyWorkspace', () => {
 
         render(<JourneyWorkspace />)
 
-        const completeButton = screen.getAllByText('Complete Phase')[0]
+        const completeButton = screen.getAllByText('Complete')[0]
         fireEvent.click(completeButton)
 
         expect(mockCompletePhase).toHaveBeenCalledWith(0, expect.objectContaining({ score: 100, phaseNumber: 1 }))
