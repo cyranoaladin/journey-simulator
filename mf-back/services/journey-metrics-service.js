@@ -60,7 +60,7 @@ async function getGlobalMetrics() {
         completedJourneys: journeyStats.completedCount || 0,
         journeysByState,
         globalCompletionAvg: Math.round((journeyStats.avgCompletion || 0) * 100) / 100,
-        investorDemoRuns: demoStats.uniqueDemoJourneys || 0,
+        investorDemoRuns: (demoStats && demoStats.uniqueDemoJourneys) || 0,
         agentRuns: {
             total: agentStats.totalRuns || 0,
             avgDurationMs: Math.round(agentStats.avgDuration || 0),
