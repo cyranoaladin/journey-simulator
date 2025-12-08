@@ -115,7 +115,7 @@ exports.castVote = async (req, res) => {
         const proposal = await DaoProposal.findOne({ proposalId: id });
 
         if (!proposal) {
-            console.warn('Proposal not found for ID:', id);
+            console.warn(`Proposal not found for ID: ${id}`);
             // FIX: Add ID to error response for better test debugging
             return res.status(404).json({ error: 'Proposal not found', id });
         }
