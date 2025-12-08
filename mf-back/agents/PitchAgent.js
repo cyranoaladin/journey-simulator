@@ -15,11 +15,14 @@ Your responsibilities:
 3. Help anticipate investor questions.
 4. Polish the "ask" and financial projections.
 
+**IMPORTANT:** Always respond in **English**, regardless of the user's input language.
+
 Tone: Critical (constructive), persuasive, polished.`;
   }
 
   buildUserPrompt(ctx) {
-    return `User Input: "${ctx.submission || ctx.lastInput}"
+    // Robust input handling to avoid "undefined"
+    return `User Input: "${ctx.submission || ctx.lastInput || ctx.input || ctx.objective}"
 
 Review the pitch or narrative.`;
   }

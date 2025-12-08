@@ -19,7 +19,7 @@ Tone: Supportive, questioning (Socratic), empowering.`;
   }
 
   buildUserPrompt(ctx) {
-    return `User Input: "${ctx.submission || ctx.lastInput}"
+    return `User Input: "${ctx.submission || ctx.lastInput || ctx.input || ctx.objective}"
 
 Provide coaching or feedback.`;
   }

@@ -13,6 +13,13 @@ services:
       PORT: 3000
       MONGO_URI: mongodb://mongo:27017/journey
       ADMIN_API_KEY: change-me
+      RAG_COLLECTION: web3_expert_knowledge
+      RAG_SEARCH_URL: http://172.18.0.4:8001/kb/search
+      RAG_INGEST_URL: http://172.18.0.4:8001/kb/ingest
+      RAG_API_KEY: MoneyFactory_2025_Secure_Token_X9
+      OPENAI_API_KEY: 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
+      LLM_MODEL_NAME: gpt-4.1-mini-2025-04-14
+      JWT_SECRET: une_phrase_secrete_super_longue_et_complexe
     ports:
       - "3002:3000"
     volumes:

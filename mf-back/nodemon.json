@@ -1,0 +1,11 @@
+{
+  "verbose": true,
+  "ignore": [
+    "memory/*",
+    "logs/*",
+    "*.test.js",
+    "fixtures/*",
+    "agent_metrics.log.json",
+    "agent_memory.json"
+  ]
+}

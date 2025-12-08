@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useJourneyStore } from "../../store/journeyStore";
 import { API_BASE_URL } from '../../utils/api';
-// TEMPORARILY DISABLED - import { useFavoritesStore } from "../../store/favoritesStore";
 import type {
   JourneyStepResponse,
   UIBlock,
@@ -25,12 +24,12 @@ import GovernanceDashboard from "../Governance/GovernanceDashboard";
 import NarrativeChoice from "./NarrativeChoiceBlock";
 import IndicatorBlockComponent, { IndicatorBlock as IndicatorBlockType } from "./IndicatorBlock";
 import InteractiveTemplateComponent, { InteractiveTemplateBlock as InteractiveTemplateBlockType } from "./InteractiveTemplateBlock";
-// TEMPORARILY DISABLED - import { Star } from "lucide-react";
 
 function StreamingText({ text, speed = 10 }: { text: string; speed?: number }) {
   const [displayed, setDisplayed] = useState("");
 
   useEffect(() => {
+    if (!text) return;
     let i = 0;
     setDisplayed("");
     const timer = setInterval(() => {
@@ -46,7 +45,7 @@ function StreamingText({ text, speed = 10 }: { text: string; speed?: number }) {
 
   return (
     <div
-      className="prose prose-invert text-sm"
+      className="prose prose-invert text-sm max-w-none"
       dangerouslySetInnerHTML={{
         __html: renderBasicMarkdown(displayed),
       }}
@@ -56,9 +55,9 @@ function StreamingText({ text, speed = 10 }: { text: string; speed?: number }) {
 
 function Text({ block }: { block: TextBlock }) {
   return (
-    <div className="bg-white/5 rounded-xl p-4">
-      <h4 className="font-semibold mb-2">{block.title}</h4>
-      <StreamingText text={block.body_markdown} speed={5} />
+    <div className="bg-white/5 rounded-xl p-6 border border-white/10 shadow-sm">
+      <h4 className="font-space font-bold text-accent-cyan mb-4 text-lg">{block.title}</h4>
+      <StreamingText text={block.body_markdown} speed={3} />
     </div>
   );
 }
@@ -125,7 +124,7 @@ function Quiz({ block }: { block: QuizBlock }) {
       const id = ensureApiJourneyId();
 
       const body = {
-        missionId: block.id, // Using block ID as mission ID for quiz
+        missionId: block.id,
         inputType: "quiz_submission",
         submission: JSON.stringify({
           answers,
@@ -149,24 +148,13 @@ function Quiz({ block }: { block: QuizBlock }) {
 
       if (!resp.ok) throw new Error(`submit failed: ${resp.status}`);
       const json = await resp.json();
-
-      // Extract next_step from the response
       const nextStep = json.next_step || json;
-
-      // Update global lastStep so renderer can show evaluation/xp blocks
       useJourneyStore.setState({ lastStep: nextStep });
 
-      // Apply XP delta locally
       const xpDelta = Number(json?.rewards?.xp_delta || json?.next_state?.xp_delta || 0);
-      if (
-        !isNaN(xpDelta) &&
-        xpDelta > 0 &&
-        typeof updateProgress === "function"
-      ) {
+      if (!isNaN(xpDelta) && xpDelta > 0 && typeof updateProgress === "function") {
         await updateProgress(xpDelta);
       }
-
-      // Show explanations after submission
       setShowExplain(true);
 
     } catch (e: any) {
@@ -222,8 +210,6 @@ function Quiz({ block }: { block: QuizBlock }) {
                 const selected = answers[q.id] === idx;
                 const isCorrect = showExplain && idx === q.correct_option_index;
                 const isWrong = showExplain && selected && !isCorrect;
-
-                // In certifying mode, don't show colors until submitted (showExplain is true)
                 const showColors = showExplain;
 
                 return (
@@ -232,7 +218,7 @@ function Quiz({ block }: { block: QuizBlock }) {
                     onClick={() =>
                       setAnswers((prev) => ({ ...prev, [q.id]: idx }))
                     }
-                    disabled={mode === "certifying" && showExplain} // Disable changes after submission
+                    disabled={mode === "certifying" && showExplain}
                     className={`w-full text-left px-3 py-2 rounded-md transition border ${selected
                       ? "border-accent-cyan/60 bg-accent-cyan/10"
                       : "border-white/10 hover:border-white/20"
@@ -329,20 +315,11 @@ function Mission({ block }: { block: MissionBlock }) {
       });
       if (!resp.ok) throw new Error(`submit failed: ${resp.status}`);
       const json = await resp.json();
-
-      // Extract next_step from the response
       const nextStep = json.next_step || json;
-
-      // Update global lastStep so renderer can show evaluation/xp blocks
       useJourneyStore.setState({ lastStep: nextStep });
 
-      // Apply XP delta locally
       const xpDelta = Number(json?.rewards?.xp_delta || json?.next_state?.xp_delta || 0);
-      if (
-        !isNaN(xpDelta) &&
-        xpDelta > 0 &&
-        typeof updateProgress === "function"
-      ) {
+      if (!isNaN(xpDelta) && xpDelta > 0 && typeof updateProgress === "function") {
         await updateProgress(xpDelta);
       }
       setValue("");
@@ -380,8 +357,6 @@ function Mission({ block }: { block: MissionBlock }) {
           offer actionable feedback.
         </div>
       )}
-
-      {/* Submission input */}
       <div className="space-y-2 mb-2">
         {block.expected_input_type === "link" ? (
           <input
@@ -422,37 +397,11 @@ function Resources({ block }: { block: ResourceBlock }) {
     navigator.clipboard.writeText(content);
   };
 
-  // TEMPORARILY DISABLED - Favorites functionality
-  // const { addFavorite, removeFavoriteByResourceId, isFavorite } = useFavoritesStore();
-  // const ensureApiJourneyId = useJourneyStore((s) => s.ensureApiJourneyId);
-
-  // const toggleFavorite = async (r: ResourceItem) => {
-  //   const journeyId = ensureApiJourneyId();
-  //   
-  //   if (isFavorite(r.id)) {
-  //     await removeFavoriteByResourceId(r.id);
-  //   } else {
-  //     await addFavorite({
-  //       userId: 'anonymous',
-  //       journeyId,
-  //       resource: {
-  //         id: r.id,
-  //         label: r.label,
-  //         description: r.description,
-  //         url: r.url,
-  //         resource_type: r.resource_type,
-  //         agent_owner: r.agent_owner,
-  //       },
-  //     });
-  //   }
-  // };
-
   return (
     <div className="bg-white/5 rounded-xl p-4">
       <h4 className="font-semibold mb-2">{block.title}</h4>
       <div className="grid gap-2">
         {block.resources.map((r) => {
-          // const favorited = isFavorite(r.id);
           return (
             <div
               key={r.id}
@@ -495,22 +444,6 @@ function Resources({ block }: { block: ResourceBlock }) {
                     Flashcards
                   </button>
                 )}
-                {/* TEMPORARILY DISABLED - Favorite button
-                <button
-                  className={`px-3 py-1.5 rounded-md text-xs transition-colors ${
-                    favorited
-                      ? "bg-accent-gold/20 border border-accent-gold/50 hover:bg-accent-gold/30"
-                      : "border border-white/10 hover:bg-white/5"
-                  }`}
-                  onClick={() => toggleFavorite(r)}
-                  title={favorited ? "Retirer des favoris" : "Ajouter aux favoris"}
-                >
-                  <Star
-                    size={14}
-                    className={favorited ? "fill-accent-gold text-accent-gold" : ""}
-                  />
-                </button>
-                */}
                 <button
                   className="px-3 py-1.5 rounded-md border border-white/10 text-xs hover:bg-white/5 transition-colors"
                   onClick={() =>
@@ -603,33 +536,33 @@ function Document({ block }: { block: DocumentBlock }) {
 
 function Evaluation({ block }: { block: EvaluationBlock }) {
   return (
-    <div className="bg-white/5 rounded-xl p-4">
-      <div className="flex items-center justify-between mb-2">
-        <h4 className="font-semibold">{block.title}</h4>
-        <div className="text-xs">
+    <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+      <div className="flex items-center justify-between mb-4">
+        <h4 className="font-semibold text-accent-purple">{block.title || "Coach Assessment"}</h4>
+        <div className="text-sm font-bold bg-white/10 px-2 py-1 rounded">
           Score: {block.global_score}/{block.max_score}
         </div>
       </div>
-      <p className="text-sm opacity-90 mb-2">{block.feedback}</p>
-      <div className="grid gap-2">
+      <p className="text-sm opacity-90 mb-4 italic leading-relaxed">"{block.feedback}"</p>
+      <div className="grid gap-3">
         {(block.axes || []).map((ax, i) => {
           const maxScore = Math.max(ax.max_score ?? 0, 1);
           const scoreValue = Math.max(0, Math.min(ax.score ?? 0, maxScore));
           return (
             <div key={i} className="text-xs">
-              <div className="flex items-center justify-between">
-                <span className="font-medium">{ax.name}</span>
-                <span>
+              <div className="flex items-center justify-between mb-1">
+                <span className="font-medium text-white/80">{ax.name}</span>
+                <span className="opacity-60">
                   {ax.score}/{ax.max_score}
                 </span>
               </div>
               <progress
-                className="w-full h-1.5 overflow-hidden rounded bg-white/10 [appearance:none] [&::-webkit-progress-bar]:bg-transparent [&::-webkit-progress-value]:bg-accent-cyan [&::-moz-progress-bar]:bg-accent-cyan"
+                className="w-full h-1.5 overflow-hidden rounded bg-white/10 [appearance:none] [&::-webkit-progress-bar]:bg-transparent [&::-webkit-progress-value]:bg-accent-purple [&::-moz-progress-bar]:bg-accent-purple"
                 value={scoreValue}
                 max={maxScore}
                 aria-label={`Score ${ax.name}`}
               />
-              <div className="opacity-80 mt-1">{ax.comment}</div>
+              <div className="opacity-70 mt-1 pl-1 border-l-2 border-accent-purple/30">{ax.comment}</div>
             </div>
           );
         })}
@@ -868,7 +801,41 @@ function ProjectSelection({ block }: { block: ProjectSelectionBlock }) {
 }
 
 export default function UIBlocksRenderer({ response }: { response: JourneyStepResponse }) {
-  if (!response || !response.ui_blocks) return null;
+  // AUTO-ADAPTER: If no ui_blocks but results exist (Zyno format), convert them to blocks
+  let blocksToRender = response?.ui_blocks ? [...response.ui_blocks] : [];
+
+  if (blocksToRender.length === 0 && (response as any).results) {
+    const results = (response as any).results;
+    Object.values(results).forEach((res: any, index) => {
+      // 1. Convert Text Response to TextBlock
+      if (res.response || res.output) {
+        blocksToRender.push({
+          id: `auto-text-${index}`,
+          kind: 'text_block',
+          title: res.agent || 'Coach',
+          body_markdown: res.response || res.output
+        } as any);
+      }
+
+      // 2. Convert Feedback to EvaluationBlock
+      if (res.feedback && (res.axes || typeof res.feedback === 'string')) {
+         // Handle simple string feedback vs complex object
+         const feedbackText = typeof res.feedback === 'object' ? res.feedback.summary || "Assessment complete" : res.feedback;
+         
+         blocksToRender.push({
+           id: `auto-eval-${index}`,
+           kind: 'evaluation_block',
+           title: 'Assessment',
+           global_score: res.global_score || res.feedback?.global_score || 0,
+           max_score: 100,
+           feedback: feedbackText,
+           axes: res.axes || res.feedback?.axes || []
+         } as any);
+      }
+    });
+  }
+
+  if (!blocksToRender || blocksToRender.length === 0) return null;
 
   const render = (b: UIBlock) => {
     switch (b.kind) {
@@ -939,7 +906,7 @@ export default function UIBlocksRenderer({ response }: { response: JourneyStepRe
       className="space-y-6"
     >
       <AnimatePresence>
-        {response.ui_blocks.map((b) => (
+        {blocksToRender.map((b) => (
           <motion.div
             key={b.id}
             variants={item}
