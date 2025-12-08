@@ -558,7 +558,7 @@ exports.addNFTCertificate = async (req, res) => {
       try {
         await verifyTransaction(resolvedAddress, req.user.wallet_address);
       } catch (verificationError) {
-        console.error(`NFT Verification Failed for user ${userId}:`, verificationError.message);
+        console.warn(`NFT Verification Failed for user ${userId}:`, verificationError.message);
         // FIX: Returned 'error' field instead of 'details' to satisfy unit tests
         return res.status(400).json({
           success: false,
