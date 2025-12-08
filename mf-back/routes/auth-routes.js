@@ -1,8 +1,8 @@
-
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 // Helper to generate JWT
 const generateToken = (user) => {
@@ -13,8 +13,80 @@ const generateToken = (user) => {
     );
 };
 
-// POST /api/auth/connect-wallet
-// Connects a wallet, creates user if not exists, returns JWT
+// --- WEB 2 AUTHENTICATION (Email/Password) ---
+
+// POST /auth/register
+router.post('/register', async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email and password are required' });
+        }
+
+        // Check if user exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ error: 'User already exists' });
+        }
+
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        // Create user
+        const user = new User({
+            name: name || 'New User',
+            email,
+            password: hashedPassword,
+            persona: 'investor',
+            wallet_address: null // No wallet yet
+        });
+
+        await user.save();
+
+        const token = generateToken(user);
+        res.status(201).json({ success: true, token, user: { id: user._id, name: user.name, email: user.email } });
+
+    } catch (error) {
+        console.error('Register Error:', error);
+        res.status(500).json({ error: 'Registration failed' });
+    }
+});
+
+// POST /auth/login
+router.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // Check user
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ error: 'Invalid credentials' });
+        }
+
+        // Check password (if user has one - web3 users might not)
+        if (!user.password) {
+             return res.status(400).json({ error: 'Please login with your Wallet' });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ error: 'Invalid credentials' });
+        }
+
+        const token = generateToken(user);
+        res.json({ success: true, token, user: { id: user._id, name: user.name, email: user.email } });
+
+    } catch (error) {
+        console.error('Login Error:', error);
+        res.status(500).json({ error: 'Login failed' });
+    }
+});
+
+// --- WEB 3 AUTHENTICATION (Wallet) ---
+
+// POST /auth/connect-wallet
 router.post('/connect-wallet', async (req, res) => {
     try {
         const { walletAddress, chain = 'solana', persona = 'investor' } = req.body;
@@ -23,54 +95,39 @@ router.post('/connect-wallet', async (req, res) => {
             return res.status(400).json({ error: 'Wallet address is required' });
         }
 
-        // Find existing user by wallet address
         let user = await User.findOne({ wallet_address: walletAddress });
 
         if (user) {
-            // Update last activity
             user.last_activity = new Date();
-
-            // Ensure wallet is in wallets array
-            const walletExists = user.wallets.some(w => w.address === walletAddress);
-            if (!walletExists) {
-                user.wallets.push({
-                    address: walletAddress,
-                    chain: chain,
-                    is_primary: true
-                });
+            // Ensure wallet is in list
+            if (user.wallets && !user.wallets.some(w => w.address === walletAddress)) {
+                user.wallets.push({ address: walletAddress, chain, is_primary: true });
             }
-
             await user.save();
         } else {
-            // Create new user
             user = new User({
                 name: `User ${walletAddress.slice(0, 6)}`,
-                email: `${walletAddress}@placeholder.mfai`, // Placeholder email
-                password: 'wallet-login-no-password', // Dummy password
+                email: `${walletAddress}@placeholder.mfai`,
+                password: '', // No password for wallet users
                 wallet_address: walletAddress,
                 persona: persona,
-                wallets: [{
-                    address: walletAddress,
-                    chain: chain,
-                    is_primary: true
-                }]
+                wallets: [{ address: walletAddress, chain, is_primary: true }]
             });
             await user.save();
         }
 
         const token = generateToken(user);
-
-        res.json({
-            success: true,
-            token,
-            user: {
-                id: user._id,
-                name: user.name,
+        res.json({ 
+            success: true, 
+            token, 
+            user: { 
+                id: user._id, 
+                name: user.name, 
                 wallet: user.wallet_address,
                 persona: user.persona,
                 xp: user.total_xp,
                 level: user.current_level
-            }
+            } 
         });
 
     } catch (error) {
@@ -79,24 +136,18 @@ router.post('/connect-wallet', async (req, res) => {
     }
 });
 
-// GET /api/auth/me
-// Returns current user profile based on JWT
+// GET /auth/me
 router.get('/me', async (req, res) => {
     try {
         const token = req.headers.authorization?.split(' ')[1];
-        if (!token) {
-            return res.status(401).json({ error: 'No token provided' });
-        }
+        if (!token) return res.status(401).json({ error: 'No token provided' });
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret-key');
         const user = await User.findById(decoded.id).select('-password');
 
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
+        if (!user) return res.status(404).json({ error: 'User not found' });
 
         res.json({ user });
-
     } catch (error) {
         res.status(401).json({ error: 'Invalid token' });
     }

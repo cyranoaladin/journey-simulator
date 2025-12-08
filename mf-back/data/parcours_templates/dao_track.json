@@ -1,12 +1,26 @@
 {
-  "name": "DAO Track",
-  "steps": [
-    "onboarding",
-    "guide",
-    "dao_legal",
-    "governance_setup",
-    "token_design",
-    "vote_simulation",
-    "launch"
+  "track": "DAO Governance",
+  "description": "Learn how to create, manage, and vote in a Decentralized Autonomous Organization on Solana.",
+  "phases": [
+    {
+      "phase": "Formation",
+      "agent": "GovernanceAgent",
+      "objective": "Define the governance structure and tokenomics."
+    },
+    {
+      "phase": "Proposal",
+      "agent": "CommunityAgent",
+      "objective": "Draft and submit the first governance proposal."
+    },
+    {
+      "phase": "Voting",
+      "agent": "DAOAgent",
+      "objective": "Simulate the voting process and quorum validation."
+    },
+    {
+      "phase": "Execution",
+      "agent": "ProtocolAgent",
+      "objective": "Execute the on-chain result of the vote."
+    }
   ]
 }

@@ -31,7 +31,7 @@ const baseStep: AgentTimelineEntry = {
   durationMs: 2000,
   prompt: 'Construire un MVP pour la demo mission',
   reasoning: 'Prioriser les modules critiques du MVP et planifier les sprints.',
-  action: 'Valider la feuille de route et assigner les owners principaux.',
+  action: 'Validate roadmap and assign main owners.',
   summary: 'Plan de construction structure',
   sources: [
     {
