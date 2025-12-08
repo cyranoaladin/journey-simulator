@@ -543,8 +543,6 @@ exports.addNFTCertificate = async (req, res) => {
       xp_earned
     } = req.body;
 
-    // In the frontend, 'mint_address' is sent as the transaction signature (txSig)
-    // We use this to verify the transaction on-chain.
     const resolvedAddressRaw = nft_address || mint_address;
     const resolvedAddress = typeof resolvedAddressRaw === 'string' ? resolvedAddressRaw.trim() : '';
 
@@ -556,16 +554,16 @@ exports.addNFTCertificate = async (req, res) => {
     }
 
     // --- SECURITY CHECK: Verify Transaction on Solana ---
-    // Mock for tests or verify in production
     if (process.env.NODE_ENV !== 'test' || process.env.ENABLE_SOLANA_TESTS === 'true') {
       try {
         await verifyTransaction(resolvedAddress, req.user.wallet_address);
       } catch (verificationError) {
         console.error(`NFT Verification Failed for user ${userId}:`, verificationError.message);
+        // FIX: Returned 'error' field instead of 'details' to satisfy unit tests
         return res.status(400).json({
           success: false,
           message: 'NFT Verification Failed: Invalid transaction or wallet mismatch.',
-          details: verificationError.message // FIX: Add details for easier debugging
+          error: verificationError.message
         });
       }
     }
