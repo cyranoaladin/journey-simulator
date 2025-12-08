@@ -74,13 +74,11 @@ class BaseAgent {
             return ctx.submission;
         }
         // Fallback: might be too long or contain instructions, but better than nothing
-        // In a real scenario, we might want a specific method to extract the core query
         return this.buildUserPrompt(ctx);
     }
 
     /**
      * Returns the RAG domain filter for this agent.
-     * Subclasses can override this to target specific knowledge bases.
      * @param {AgentContext} ctx
      * @returns {string}
      */
@@ -92,7 +90,7 @@ class BaseAgent {
      * Retrieves context from the local RAG.
      * @param {string} query
      * @param {AgentContext} ctx
-     * @returns {Promise<string>}
+     * @returns {Promise<Object>}
      */
     async retrieveRagContext(query, ctx) {
         if (!query) return { context: "", hits: [] };
@@ -105,9 +103,6 @@ class BaseAgent {
             const hits = await getRagSnippets({
                 query: query,
                 userContext: { id: ctx.userId },
-                // We might want to pass domain/collection if ragClient supports it, 
-                // but ragClient currently uses env RAG_COLLECTION. 
-                // For now, we rely on ragClient's logic.
             });
 
             if (hits.length === 0) {
@@ -116,7 +111,6 @@ class BaseAgent {
             }
 
             const contextParts = hits.map((hit, index) => {
-                // ragClient returns { title, content }
                 return `[Document ${index + 1} - ${hit.title}]\n${hit.content}`;
             });
 
@@ -127,7 +121,7 @@ class BaseAgent {
 
         } catch (error) {
             console.error(`[${this.name}] RAG Error:`, error.message);
-            // ragClient handles fallback, so if we get here, it's a critical error
+            // Critical fix: Return empty context on error instead of throwing
             return { context: "", hits: [] };
         }
     }
@@ -149,8 +143,10 @@ class BaseAgent {
             ragContext = ragResult.context;
             ragSources = ragResult.hits;
         } catch (err) {
-            // Propagate the error to block execution
-            throw err;
+            // FIX: Don't block execution if RAG fails entirely (e.g. network down)
+            console.warn(`[${this.name}] RAG completely failed (proceeding without context):`, err.message);
+            ragContext = "";
+            ragSources = [];
         }
 
         // 2. Build Prompts
@@ -161,8 +157,6 @@ class BaseAgent {
         if (ragContext) {
             systemPrompt += `\n\n--- RAG CONTEXT ---\n${ragContext}\n--- END CONTEXT ---\n\nYou are an expert. Use EXCLUSIVELY the context above to answer if relevant. If the answer is not there, say so.`;
         } else {
-            // Should we block if no context found? The requirement says "If RAG returns 200 OK: Continue".
-            // So empty hits is fine, but we might want to warn the model.
             systemPrompt += `\n\n(Note: No specific information found in the knowledge base for this query.)`;
         }
 
