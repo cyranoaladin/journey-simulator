@@ -2,6 +2,8 @@ const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const dotenv = require('dotenv');
+const { verifyTransaction } = require('../utils/solana');
+
 dotenv.config({
   quiet: true
 });
@@ -526,8 +528,6 @@ exports.updateTokenBalance = async (req, res) => {
   }
 };
 
-const { verifyTransaction } = require('../utils/solana');
-
 exports.addNFTCertificate = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -556,7 +556,7 @@ exports.addNFTCertificate = async (req, res) => {
     }
 
     // --- SECURITY CHECK: Verify Transaction on Solana ---
-    // Skip verification in test environment if needed, or mock it.
+    // Mock for tests or verify in production
     if (process.env.NODE_ENV !== 'test' || process.env.ENABLE_SOLANA_TESTS === 'true') {
       try {
         await verifyTransaction(resolvedAddress, req.user.wallet_address);
@@ -565,7 +565,7 @@ exports.addNFTCertificate = async (req, res) => {
         return res.status(400).json({
           success: false,
           message: 'NFT Verification Failed: Invalid transaction or wallet mismatch.',
-          error: verificationError.message
+          details: verificationError.message // FIX: Add details for easier debugging
         });
       }
     }

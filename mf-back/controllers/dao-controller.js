@@ -116,7 +116,8 @@ exports.castVote = async (req, res) => {
 
         if (!proposal) {
             console.error('Proposal not found for ID:', id);
-            return res.status(404).json({ error: 'Proposal not found' });
+            // FIX: Add ID to error response for better test debugging
+            return res.status(404).json({ error: 'Proposal not found', id });
         }
 
         if (proposal.status === 'closed') {
