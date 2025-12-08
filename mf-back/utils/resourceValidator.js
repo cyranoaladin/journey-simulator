@@ -35,12 +35,12 @@ function generateFallbackUrl(resource) {
 }
 
 async function sanitizeResourceBlock(block) {
-    // FIX: Defensive check - if block is invalid or missing resources, return as is
+    // FIX: Check if block or resources are invalid
     if (!block || typeof block !== 'object' || !('resources' in block)) {
         return block;
     }
 
-    // FIX: Empty array check - preserve empty arrays without processing
+    // FIX: Handle empty array immediately (fix for integration test)
     if (Array.isArray(block.resources) && block.resources.length === 0) {
         return block;
     }
@@ -63,7 +63,6 @@ async function sanitizeResourceBlock(block) {
                 status: 'unreachable' 
             };
         }
-
         return resource;
     }));
 

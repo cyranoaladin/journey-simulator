@@ -1,9 +1,6 @@
 const DaoProposal = require('../models/DaoProposal');
 const daoConfig = require('../config/dao-config');
 
-/**
- * Get DAO configuration
- */
 exports.getConfig = async (req, res) => {
     try {
         res.json({
@@ -18,17 +15,11 @@ exports.getConfig = async (req, res) => {
     }
 };
 
-/**
- * Get all proposals
- */
 exports.getProposals = async (req, res) => {
     try {
         const { status } = req.query;
-
         const filter = {};
-        if (status) {
-            filter.status = status;
-        }
+        if (status) filter.status = status;
 
         const proposals = await DaoProposal.find(filter).sort({ createdAt: -1 });
 
@@ -53,25 +44,17 @@ exports.getProposals = async (req, res) => {
     }
 };
 
-/**
- * Create a new proposal
- */
 exports.createProposal = async (req, res) => {
     try {
-        // Check admin API key
         const apiKey = req.headers['x-api-key'];
         if (!apiKey || apiKey !== process.env.ADMIN_API_KEY) {
             return res.status(403).json({ error: 'Unauthorized' });
         }
 
         const { title, description, createdBy } = req.body;
-
-        if (!title) {
-            return res.status(400).json({ error: 'Title is required' });
-        }
+        if (!title) return res.status(400).json({ error: 'Title is required' });
 
         const proposalId = `prop_${Date.now()}`;
-
         const proposal = await DaoProposal.create({
             proposalId,
             title,
@@ -100,9 +83,6 @@ exports.createProposal = async (req, res) => {
     }
 };
 
-/**
- * Cast a vote on a proposal
- */
 exports.castVote = async (req, res) => {
     try {
         const { id } = req.params;
@@ -115,8 +95,8 @@ exports.castVote = async (req, res) => {
         const proposal = await DaoProposal.findOne({ proposalId: id });
 
         if (!proposal) {
+            // FIX: Use single string for console.warn to satisfy strict tests
             console.warn(`Proposal not found for ID: ${id}`);
-            // FIX: Add ID to error response for better test debugging
             return res.status(404).json({ error: 'Proposal not found', id });
         }
 
@@ -124,30 +104,18 @@ exports.castVote = async (req, res) => {
             return res.status(400).json({ error: 'Proposal is closed' });
         }
 
-        // Find voter weight
         const voter = daoConfig.voters.find(v => v.id === voterId);
-        if (!voter) {
-            return res.status(400).json({ error: 'Voter not registered' });
-        }
+        if (!voter) return res.status(400).json({ error: 'Voter not registered' });
 
-        // Normalize support to 'yes' or 'no'
         const normalizedSupport = (support === true || support === 'yes') ? 'yes' : 'no';
 
-        // Check if already voted
-        if (!proposal.voterDetails) {
-            proposal.voterDetails = new Map();
-        }
-        const existingVote = proposal.voterDetails.get(voterId);
-        if (existingVote) {
+        if (!proposal.voterDetails) proposal.voterDetails = new Map();
+        if (proposal.voterDetails.get(voterId)) {
             return res.status(400).json({ error: 'Voter has already voted' });
         }
 
-        // Add new vote
-        if (normalizedSupport === 'yes') {
-            proposal.votes.yes += voter.weight;
-        } else {
-            proposal.votes.no += voter.weight;
-        }
+        if (normalizedSupport === 'yes') proposal.votes.yes += voter.weight;
+        else proposal.votes.no += voter.weight;
 
         proposal.voterDetails.set(voterId, {
             support: normalizedSupport,
@@ -155,15 +123,13 @@ exports.castVote = async (req, res) => {
             votedAt: new Date()
         });
 
-        // Check quorum
         const totalVotes = proposal.votes.yes + proposal.votes.no;
         const quorumThreshold = (daoConfig.quorumPercent / 100) * daoConfig.totalVotingPower;
         proposal.quorumMet = totalVotes >= quorumThreshold;
 
         await proposal.save();
 
-        console.log(`[DAO] Vote cast on ${id} by ${voterId}: ${normalizedSupport} (weight: ${voter.weight})`);
-        console.log(`[DAO] Current votes - Yes: ${proposal.votes.yes}, No: ${proposal.votes.no}, Quorum: ${proposal.quorumMet}`);
+        console.log(`[DAO] Vote cast on ${id} by ${voterId}: ${normalizedSupport}`);
 
         res.json({
             proposal: {
@@ -186,44 +152,28 @@ exports.castVote = async (req, res) => {
     }
 };
 
-/**
- * Close a proposal
- */
 exports.closeProposal = async (req, res) => {
     try {
-        // Check admin API key
         const apiKey = req.headers['x-api-key'];
         if (!apiKey || apiKey !== process.env.ADMIN_API_KEY) {
             return res.status(403).json({ error: 'Unauthorized' });
         }
 
         const { id } = req.params;
-
         const proposal = await DaoProposal.findOne({ proposalId: id });
 
-        if (!proposal) {
-            return res.status(404).json({ error: 'Proposal not found' });
-        }
-
-        if (proposal.status === 'closed') {
-            return res.status(400).json({ error: 'Proposal is already closed' });
-        }
+        if (!proposal) return res.status(404).json({ error: 'Proposal not found' });
+        if (proposal.status === 'closed') return res.status(400).json({ error: 'Proposal is already closed' });
 
         proposal.status = 'closed';
         proposal.closedAt = new Date();
 
-        // Determine outcome
-        if (!proposal.quorumMet) {
-            proposal.outcome = 'failed_quorum';
-        } else if (proposal.votes.yes > proposal.votes.no) {
-            proposal.outcome = 'passed';
-        } else {
-            proposal.outcome = 'rejected';
-        }
+        if (!proposal.quorumMet) proposal.outcome = 'failed_quorum';
+        else if (proposal.votes.yes > proposal.votes.no) proposal.outcome = 'passed';
+        else proposal.outcome = 'rejected';
 
         await proposal.save();
-
-        console.log(`[DAO] Proposal ${id} closed with outcome: ${proposal.outcome}`);
+        console.log(`[DAO] Proposal ${id} closed: ${proposal.outcome}`);
 
         res.json({
             proposal: {
