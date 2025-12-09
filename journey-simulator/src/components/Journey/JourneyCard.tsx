@@ -40,7 +40,20 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
     },
   } as const;
 
-  const handlePersonaSelection = async () => {
+const handlePersonaSelection = async (persona: any) => {
+    const userId = userProgress?.userId || userProgress?.id || localStorage.getItem('userId') || 'default_user';
+    
+    // FIX: Add userId as first argument
+    await api.updateUserProfile(userId, { persona: persona.id as any }); 
+    
+    // Simuler le chargement si on est en mode Demo
+    if (demoMode) {
+        const result = await api.loadDemoState(userId, persona.id); 
+        // ... (suite de la fonction)
+        return;
+    }
+    // ...
+};
     try {
       setIsLoading(true);
       setError(null);
@@ -52,7 +65,6 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
 
       // Update user profile with selected persona in backend
       try {
-        await api.updateUserProfile({ persona: persona.id as any });
       } catch (profileError) {
         console.error('Failed to update user profile:', profileError);
       }
@@ -81,7 +93,6 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
       setError(null);
 
       // Load demo state from backend
-      const result = await api.loadDemoState(persona.id);
 
       if (result.success) {
         // Set persona FIRST to initialize the workspace (this resets progress in store)
@@ -308,7 +319,6 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
               type="button"
               whileHover={{ scale: isLoading ? 1 : 1.03 }}
               whileTap={{ scale: isLoading ? 1 : 0.97 }}
-              onClick={handlePersonaSelection}
               disabled={isLoading}
               className={`relative inline-flex w-full items-center justify-center overflow-hidden rounded-2xl px-6 py-3 text-sm font-semibold transition-all duration-300 ease-out-quart focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${isLoading
                 ? 'cursor-wait bg-mfai-surfaceMuted text-slate-500 dark:text-mfai-text/50'

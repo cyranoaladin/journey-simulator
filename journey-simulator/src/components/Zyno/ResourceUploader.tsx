@@ -78,7 +78,8 @@ const ResourceUploader = () => {
       setUploading(true);
       // Read the file content and call uploadDocument with title, content and tags
       const fileContent = await selectedFile.text();
-      await api.uploadDocument({
+const fileBlob = new Blob([fileContent], { type: selectedFile?.type || 'text/plain' });
+await api.uploadDocument(fileBlob, { title: selectedFile.name, tags: 'rag,document' }); // FIX: Pass Blob instead of object
         title: selectedFile.name,
         content: fileContent,
         tags: 'rag,document,' + selectedFile.type

@@ -4,7 +4,7 @@ import { api } from '../../utils/api';
 
 const fetchAgentLogs = async (): Promise<AgentLogEntry[]> => {
   try {
-    const logs = await api.getAgentLogs();
+    const logs = await api.getAgentLogs("default");
     return Array.isArray(logs) ? logs : [];
   } catch (error) {
     console.error(error);
