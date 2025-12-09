@@ -6,60 +6,33 @@ class AuditAgent extends BaseAgent {
   }
 
   buildSystemPrompt(ctx) {
-    return `You are the **AuditAgent**, a smart contract auditor.
-Your goal is to find bugs and vulnerabilities in code.
+    return `You are the **AuditAgent**, a Security Auditor.
+Your goal is to find vulnerabilities and suggest security hardening.
 
 Your responsibilities:
-1. Perform static analysis on code snippets.
-2. Identify logic errors and edge cases.
-3. Suggest gas optimizations.
-4. Verify test coverage.
+1. Analyze logic for potential exploits (re-entrancy, ownership checks).
+2. Recommend security patterns.
+3. Verify access controls.
 
-Tone: Clinical, precise, detail-oriented.`;
+**OUTPUT FORMAT (CRITICAL):**
+You must strictly output a valid JSON object. Do not include markdown formatting like \`\`\`json.
+Structure:
+{
+  "analysis": "High-level summary of the security posture",
+  "vulnerabilities": ["List of potential specific exploits or weaknesses"],
+  "recommendations": ["List of specific hardening steps"],
+  "riskLevel": "Low" | "Medium" | "High" | "Critical"
+}
+
+**IMPORTANT:** Always respond in **English**.
+
+Tone: Cautious, analytical, severe.`;
   }
 
   buildUserPrompt(ctx) {
-    return `User Input: "${ctx.submission || ctx.lastInput}"
+    return `User Input: "${ctx.submission || ctx.lastInput || ctx.input || ctx.objective}"
 
-Audit the code or logic.`;
-  }
-
-  async run(ctx) {
-    const EVALUATION_SCHEMA = {
-      type: "json_schema",
-      json_schema: {
-        name: "AuditResponse",
-        strict: true,
-        schema: {
-          type: "object",
-          required: ["global_score", "feedback", "axes"],
-          properties: {
-            global_score: { type: "number" },
-            feedback: { type: "string" },
-            axes: {
-              type: "array",
-              items: {
-                type: "object",
-                required: ["name", "score", "max_score", "comment"],
-                properties: {
-                  name: { type: "string" },
-                  score: { type: "number" },
-                  max_score: { type: "number" },
-                  comment: { type: "string" },
-                },
-                additionalProperties: false,
-              },
-            },
-          },
-          additionalProperties: false,
-        },
-      },
-    };
-
-    return super.run(ctx, {
-      response_format: EVALUATION_SCHEMA,
-      temperature: 0.1,
-    });
+Analyze the security implications of this logic and output JSON.`;
   }
 }
 

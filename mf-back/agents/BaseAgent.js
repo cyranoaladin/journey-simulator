@@ -48,8 +48,8 @@ class BaseAgent {
             return { context: contextParts.join("\n\n"), hits: hits };
 
         } catch (error) {
-            // FIX: Use console.warn to avoid failing strict tests that ban console.error
-            console.warn(`[${this.name}] RAG Error (Recoverable):`, error.message);
+            // FIX: Single string argument for console.warn (Critical for CI/CD tests)
+            console.warn(`[${this.name}] RAG Error (Recoverable): ${error.message}`);
             return { context: "", hits: [] };
         }
     }
@@ -63,7 +63,8 @@ class BaseAgent {
             ragContext = ragResult.context;
             ragSources = ragResult.hits;
         } catch (err) {
-            console.warn(`[${this.name}] RAG failure (proceeding without context):`, err.message);
+            // FIX: Single string argument here too
+            console.warn(`[${this.name}] RAG failure (proceeding without context): ${err.message}`);
         }
 
         let systemPrompt = this.buildSystemPrompt(ctx);
