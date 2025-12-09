@@ -82,7 +82,7 @@ const NFTMintingModal: FC<NFTMintingModalProps> = ({
 
       // Step 2: execute
       setCurrentStep(3);
-      const exec = await api.solanaMintExecute(sim.sim);
+      const exec = await api.post</T>('/mint/solana/execute', payload)(sim.sim);
       if (!exec?.ok || !exec?.tx?.txSig) {
         throw new Error("Execution failed");
       }
