@@ -1,4 +1,4 @@
-const handlePersonaSelection = async () => {
+const _handlePersonaSelection = async () => {
   try {
     setIsLoading(true);
     setError(null);
@@ -33,7 +33,7 @@ const handlePersonaSelection = async () => {
   }
 };
 
-const handleLoadDemo = async (e: React.MouseEvent) => {
+const _handleLoadDemo = async (e: React.MouseEvent) => {
   e.stopPropagation(); // Prevent card click
 
   try {
