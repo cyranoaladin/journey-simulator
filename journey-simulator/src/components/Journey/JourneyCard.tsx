@@ -54,6 +54,17 @@ const handlePersonaSelection = async (persona: any) => {
     }
     // ...
 };
+    const userId = userProgress?.userId || userProgress?.id || localStorage.getItem('userId') || 'default_user';
+    
+    // FIX: Add userId as first argument
+    
+    // Simuler le chargement si on est en mode Demo
+    if (demoMode) {
+        // ... (suite de la fonction)
+        return;
+    }
+    // ...
+};
     try {
       setIsLoading(true);
       setError(null);
