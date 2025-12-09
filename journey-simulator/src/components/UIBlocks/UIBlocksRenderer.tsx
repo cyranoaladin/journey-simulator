@@ -810,7 +810,7 @@ function ProjectSelection({ block }: { block: ProjectSelectionBlock }) {
 
 export default function UIBlocksRenderer({ response }: { response: JourneyStepResponse }) {
   // AUTO-ADAPTER: If no ui_blocks but results exist (Zyno format), convert them to blocks
-  let blocksToRender = response?.ui_blocks ? [...response.ui_blocks] : [];
+  const blocksToRender = response?.ui_blocks ? [...response.ui_blocks] : [];
 
   if (blocksToRender.length === 0 && (response as any).results) {
     const results = (response as any).results;
