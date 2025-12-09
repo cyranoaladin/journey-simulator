@@ -27,7 +27,7 @@ class BaseAgent {
     async retrieveRagContext(query, ctx) {
         if (!query) return { context: "", hits: [] };
         
-        // MOCK TEST: Avoid network calls in test mode
+        // MOCK TEST: Avoid network calls in test mode to satisfy strict CI/CD
         if (process.env.NODE_ENV === 'test') {
             return { context: "", hits: [] };
         }
@@ -48,8 +48,9 @@ class BaseAgent {
             return { context: contextParts.join("\n\n"), hits: hits };
 
         } catch (error) {
-            // FIX: Single string argument for console.warn (Critical for CI/CD tests)
-            console.warn(`[${this.name}] RAG Error (Recoverable): ${error.message}`);
+            // FIX: Single string argument for console.warn to satisfy Jest spies
+            const errorMsg = error && error.message ? error.message : String(error);
+            console.warn(`[${this.name}] RAG Error (Recoverable): ${errorMsg}`);
             return { context: "", hits: [] };
         }
     }
@@ -64,7 +65,8 @@ class BaseAgent {
             ragSources = ragResult.hits;
         } catch (err) {
             // FIX: Single string argument here too
-            console.warn(`[${this.name}] RAG failure (proceeding without context): ${err.message}`);
+            const errMsg = err && err.message ? err.message : String(err);
+            console.warn(`[${this.name}] RAG failure (proceeding without context): ${errMsg}`);
         }
 
         let systemPrompt = this.buildSystemPrompt(ctx);
