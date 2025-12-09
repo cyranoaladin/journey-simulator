@@ -24,7 +24,7 @@ const JourneyCard: React.FC<JourneyCardProps> = ({
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingDemo, setIsLoadingDemo] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [selectedPersona, setSelectedPersona] = useState<any>(null);
+    
 
     // Derive userId for API calls (Fixes TS2304: Cannot find name 'userProgress')
     const userId = userProgress?.userId || userProgress?.id || localStorage.getItem('userId') || 'default_user';
