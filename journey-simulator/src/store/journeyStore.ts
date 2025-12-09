@@ -429,7 +429,7 @@ export const useJourneyStore = create<JourneyState>()(
             normalizedName.includes('solana') ||
             normalizedName.includes('neuro-dividend')
           ) {
-            return '/images/nfts/capital-foundry/capital-discovery.svg'
+            return '/images/nfts/capital-foundry/capital-discovery.png'
           }
 
           if (
@@ -438,7 +438,7 @@ export const useJourneyStore = create<JourneyState>()(
             normalizedName.includes('tokenomics') ||
             normalizedName.includes('architect')
           ) {
-            return '/images/nfts/system-architect/architecture-scan.svg'
+            return '/images/nfts/system-architect/architecture-scan.png'
           }
 
           if (
@@ -446,7 +446,7 @@ export const useJourneyStore = create<JourneyState>()(
             normalizedName.includes('experience') ||
             normalizedName.includes('creator')
           ) {
-            return '/images/nfts/experience-studio/experience-discovery.svg'
+            return '/images/nfts/experience-studio/experience-discovery.png'
           }
 
           if (
@@ -454,7 +454,7 @@ export const useJourneyStore = create<JourneyState>()(
             normalizedName.includes('impact') ||
             normalizedName.includes('governance')
           ) {
-            return '/images/nfts/impact-engine/impact-charter.svg'
+            return '/images/nfts/impact-engine/impact-charter.png'
           }
 
           if (
@@ -462,15 +462,15 @@ export const useJourneyStore = create<JourneyState>()(
             normalizedName.includes('resilience') ||
             normalizedName.includes('guardian')
           ) {
-            return '/images/nfts/resilience-master/security-baseline.svg'
+            return '/images/nfts/resilience-master/security-baseline.png'
           }
 
           if (normalizedName.includes('proof-of-design')) {
-            return '/images/nfts/experience-studio/experience-discovery.svg'
+            return '/images/nfts/experience-studio/experience-discovery.png'
           }
 
           if (normalizedName.includes('proof-of-invest')) {
-            return '/images/nfts/capital-foundry/capital-discovery.svg'
+            return '/images/nfts/capital-foundry/capital-discovery.png'
           }
 
           return '/images/logo_mfai.png'
