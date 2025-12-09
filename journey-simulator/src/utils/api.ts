@@ -12,7 +12,7 @@ export async function request<T = any>(endpoint: string, options: RequestInit = 
   };
 
   const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
-  
+
   const response = await fetch(url, { ...options, headers });
 
   if (!response.ok) {
@@ -23,7 +23,7 @@ export async function request<T = any>(endpoint: string, options: RequestInit = 
       errorMessage = errorData?.message || errorData?.error || errorMessage;
     } catch (e) {
       // FIX: Add minimal logging to avoid 'no-empty' ESLint error
-      console.debug('Failed to parse error response JSON:', e); 
+      console.debug('Failed to parse error response JSON:', e);
     }
     throw new Error(errorMessage);
   }
@@ -40,8 +40,8 @@ export const api = {
   // Generic methods
   request: client.request,
   get: <T>(url: string) => client.request<T>(url, { method: 'GET' }),
-  post: <T>(url: string, body: any) => client.request<T>(url, { method: 'POST', body: JSON.stringify(body) }),
-  put: <T>(url: string, body: any) => client.request<T>(url, { method: 'PUT', body: JSON.stringify(body) }),
+  post: <T>(url: string, body: any = {}) => client.request<T>(url, { method: 'POST', body: JSON.stringify(body) }),
+  put: <T>(url: string, body: any = {}) => client.request<T>(url, { method: 'PUT', body: JSON.stringify(body) }),
   delete: <T>(url: string) => client.request<T>(url, { method: 'DELETE' }),
 
   // DAO
@@ -59,11 +59,12 @@ export const api = {
   register: <T = any>(payload: any) => api.post<T>('/auth/register', payload),
   loadDemoState: <T = any>() => api.get<T>('/demo/state'),
   getJourneyArtifacts: <T = any>(journeyId: string) => api.get<T>(`/journey/${journeyId}/artifacts`),
-  completePhase: <T = any>(journeyId: string, phaseId: string) => api.post<T>(`/journey/${journeyId}/phases/${phaseId}/complete`),
+  completePhase: <T = any>(journeyId: string, phaseId: string, body?: any) => api.post<T>(`/journey/${journeyId}/phases/${phaseId}/complete`, body),
   solanaMintSimulate: <T = any>(payload: any) => api.post<T>('/mint/solana/simulate', payload),
+  solanaMintExecute: <T = any>(payload: any) => api.post<T>('/mint/solana/execute', payload),
   addNFTCertificateEnhanced: <T = any>(payload: any) => api.post<T>('/nft/certificate', payload),
   listRagDocuments: <T = any>(q?: string) => api.get<T>(`/rag/documents${q ? `?q=${encodeURIComponent(q)}` : ''}`),
-  
+
   // Full list of helpers for compliance
   loginWithWallet: <T = any>(payload: any) => api.post<T>('/auth/wallet-login', payload),
   refreshToken: <T = any>(token: string) => api.post<T>('/auth/refresh', { token }),
@@ -77,11 +78,14 @@ export const api = {
   simulateCollaterizeLaunch: <T = any>(params: any) => api.post<T>('/simulate/collaterize', params),
   getAgentLogs: <T = any>(agentId: string) => api.get<T>(`/agents/${agentId}/logs`),
   getAgentScoreboard: <T = any>() => api.get<T>('/agents/scoreboard'),
-  exportMissionSummary: <T = any>(missionId: string) => api.get<T>(`/missions/${missionId}/summary`),
+  exportMissionSummary: <T = any>(payload: any) => api.post<T>(`/missions/export`, payload),
 
-  uploadDocument: <T = any>(file: File | Blob, opts?: RequestInit) => {
+  uploadDocument: <T = any>(file: File | Blob, metadata: Record<string, string> = {}, opts?: RequestInit) => {
     const form = new FormData();
     form.append('file', file);
+    Object.entries(metadata).forEach(([key, value]) => {
+      form.append(key, value);
+    });
     return api.request<T>('/rag/documents', { method: 'POST', body: form, ...opts });
   },
 

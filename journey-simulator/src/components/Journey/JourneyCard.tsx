@@ -7,9 +7,9 @@ interface JourneyCardProps {
     persona: any; // Type should be Persona, using 'any' for quick fix
     onSelected?: (persona: any) => void;
     demoMode?: boolean;
-    loadUserProgress: () => Promise<void>;
-    userProgress: any; // Type should be UserProgress, using 'any' for quick fix
-    setUserProgress: (progress: any) => void;
+    loadUserProgress?: () => Promise<void>;
+    userProgress?: any;
+    setUserProgress?: (progress: any) => void;
 }
 
 const JourneyCard: React.FC<JourneyCardProps> = ({
@@ -24,7 +24,7 @@ const JourneyCard: React.FC<JourneyCardProps> = ({
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingDemo, setIsLoadingDemo] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    
+
 
     // Derive userId for API calls (Fixes TS2304: Cannot find name 'userProgress')
     const userId = userProgress?.userId || userProgress?.id || localStorage.getItem('userId') || 'default_user';
@@ -37,11 +37,13 @@ const JourneyCard: React.FC<JourneyCardProps> = ({
 
         try {
             // Update user profile with selected persona in backend (Fixes TS2304: api)
-            await api.updateUserProfile(userId, { persona: persona.id }); 
-            
+            await api.updateUserProfile(userId, { persona: persona.id });
+
             // Reload progress
-            await loadUserProgress();
-            
+            if (loadUserProgress) {
+                await loadUserProgress();
+            }
+
             if (onSelected) {
                 onSelected(persona); // Use persona as argument if defined
             }
@@ -54,21 +56,21 @@ const JourneyCard: React.FC<JourneyCardProps> = ({
     }, [userId, persona, onSelected, loadUserProgress]); // Dependency array to prevent stale closure
 
     const handleLoadDemo = useCallback(async (e: React.MouseEvent) => {
-        e.stopPropagation(); 
+        e.stopPropagation();
         setIsLoadingDemo(true);
         setError(null);
 
         try {
-            // Call backend to fetch demo state (Fixes TS2304: api and persona)
-            const result = await api.loadDemoState(userId, persona.id); 
+            // Call backend to fetch demo state
+            const result = await api.loadDemoState();
 
             if (result?.success && result?.progress) {
                 const backendProgress = result.progress;
-                
+
                 // --- Progress Mapping (Fixes TS2304: userProgress, useJourneyStore) ---
                 const completedCount = typeof backendProgress.completed_phases === 'number' ? backendProgress.completed_phases : 0;
                 const completedPhases = Array.from({ length: completedCount }, (_, index) => index);
-                
+
                 const rawCertificates = Array.isArray(backendProgress.nft_certificates) ? backendProgress.nft_certificates : [];
                 const mappedNfts = rawCertificates.map((certificate: any) => certificate?.title || certificate?.nft_address || `Phase ${certificate?.phase} NFT`);
 
@@ -84,15 +86,19 @@ const JourneyCard: React.FC<JourneyCardProps> = ({
                     walletAddress: userProgress.walletAddress,
                 };
 
-                setUserProgress(mappedProgress); // Fixes TS2304: setUserProgress
+                if (setUserProgress) {
+                    setUserProgress(mappedProgress);
+                }
 
                 const { setCurrentPhase } = useJourneyStore.getState(); // Fixes TS2304: useJourneyStore
                 setCurrentPhase(completedCount);
-                
+
                 if (onSelected) onSelected(persona);
 
             } else {
-                await loadUserProgress(); // Fallback if demo data is incomplete
+                if (loadUserProgress) {
+                    await loadUserProgress();
+                }
             }
         } catch (err) {
             console.error('Failed to load demo:', err);
@@ -106,8 +112,8 @@ const JourneyCard: React.FC<JourneyCardProps> = ({
     const isBusy = isLoading || isLoadingDemo;
 
     return (
-        <div 
-            className={`transition-all duration-300 ease-in-out ${isBusy ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-xl cursor-pointer'}`} 
+        <div
+            className={`transition-all duration-300 ease-in-out ${isBusy ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-xl cursor-pointer'}`}
             onClick={isBusy ? undefined : handlePersonaSelection}
             aria-disabled={isBusy}
         >
@@ -127,7 +133,7 @@ const JourneyCard: React.FC<JourneyCardProps> = ({
                         {error}
                     </div>
                 )}
-                
+
                 <div className="mt-6 flex items-center justify-between">
                     <button
                         type="button"

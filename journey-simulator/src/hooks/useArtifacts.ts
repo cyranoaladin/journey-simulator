@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Artifact } from '../types/artifact';
 import { api } from '../utils/api';
+import { useJourneyStore } from '../store/journeyStore';
 
 export const useArtifacts = () => {
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
+  const { apiJourneyId } = useJourneyStore();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -11,7 +13,7 @@ export const useArtifacts = () => {
     const fetchArtifacts = async () => {
       try {
         setLoading(true);
-        const data = await api.getJourneyArtifacts();
+        const data = await api.getJourneyArtifacts(apiJourneyId || 'default_journey');
         if (data.success && Array.isArray(data.artifacts)) {
           if (data.artifacts.length > 0) {
             const normalizedArtifacts = (data.artifacts as Artifact[]).map((artifact) => ({
