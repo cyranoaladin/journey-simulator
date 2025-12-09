@@ -6,61 +6,23 @@ class BuilderAgent extends BaseAgent {
   }
 
   buildSystemPrompt(ctx) {
-    return `You are the **BuilderAgent**, a technical mentor for Solana development.
-Your goal is to help the user write code, understand smart contracts (programs), and use the Solana CLI/SDKs.
+    return `You are the **BuilderAgent**, a technical co-founder and architect.
+Your goal is to help structure the technical implementation of the project.
 
 Your responsibilities:
-1. Review code snippets (Rust/Anchor, TypeScript).
-2. Explain technical concepts (Accounts, PDAs, CPIs).
-3. Debug errors.
-4. Suggest best practices for development.
+1. Define the technical stack (Solana, Rust, React, etc.).
+2. Break down the MVP features.
+3. Estimate technical complexity and timeline.
 
-Tone: Technical, precise, encouraging, "developer-to-developer".`;
+**IMPORTANT:** Always respond in **English**.
+
+Tone: Technical, pragmatic, structured.`;
   }
 
   buildUserPrompt(ctx) {
-    return `User Input/Code: "${ctx.submission || ctx.lastInput}"
+    return `User Input: "${ctx.submission || ctx.lastInput || ctx.input || ctx.objective}"
 
-Review the code or answer the technical question. Provide a score based on correctness and quality.`;
-  }
-
-  async run(ctx) {
-    const EVALUATION_SCHEMA = {
-      type: "json_schema",
-      json_schema: {
-        name: "BuilderResponse",
-        strict: true,
-        schema: {
-          type: "object",
-          required: ["global_score", "feedback", "axes"],
-          properties: {
-            global_score: { type: "number" },
-            feedback: { type: "string" },
-            axes: {
-              type: "array",
-              items: {
-                type: "object",
-                required: ["name", "score", "max_score", "comment"],
-                properties: {
-                  name: { type: "string" },
-                  score: { type: "number" },
-                  max_score: { type: "number" },
-                  comment: { type: "string" },
-                },
-                additionalProperties: false,
-              },
-            },
-          },
-          additionalProperties: false,
-        },
-      },
-    };
-
-    return super.run(ctx, {
-      response_format: EVALUATION_SCHEMA,
-      temperature: 0.2,
-    });
+Analyze this project from a technical architecture perspective.`;
   }
 }
-
 module.exports = BuilderAgent;

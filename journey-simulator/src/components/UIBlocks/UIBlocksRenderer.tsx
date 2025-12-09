@@ -63,7 +63,8 @@ function Text({ block }: { block: TextBlock }) {
 }
 
 function Checklist({ block }: { block: ChecklistBlock }) {
-  const [items, setItems] = useState(block.items);
+  // FIX: Added || [] to prevent crash if items is undefined
+  const [items, setItems] = useState(block.items || []);
   return (
     <div className="bg-white/5 rounded-xl p-4">
       <h4 className="font-semibold mb-2">{block.title}</h4>
@@ -107,13 +108,16 @@ function Quiz({ block }: { block: QuizBlock }) {
   const lastStep = useJourneyStore((s) => s.lastStep);
   const updateProgress = useJourneyStore((s) => s.updateProgress);
 
-  const score = block.questions.reduce(
+  // FIX: Added || [] for questions
+  const questions = block.questions || [];
+
+  const score = questions.reduce(
     (acc, q) =>
       acc + ((answers[q.id] ?? -1) === q.correct_option_index ? 1 : 0),
     0,
   );
 
-  const allAnswered = block.questions.every((q) => answers[q.id] !== undefined);
+  const allAnswered = questions.every((q) => answers[q.id] !== undefined);
 
   const onSubmit = async () => {
     if (!allAnswered) return;
@@ -129,7 +133,7 @@ function Quiz({ block }: { block: QuizBlock }) {
         submission: JSON.stringify({
           answers,
           score,
-          max_score: block.questions.length,
+          max_score: questions.length,
           mode: "certifying"
         }),
         language: "en",
@@ -202,11 +206,11 @@ function Quiz({ block }: { block: QuizBlock }) {
       )}
 
       <div className="space-y-4">
-        {block.questions.map((q) => (
+        {questions.map((q) => (
           <div key={q.id} className="border border-white/10 rounded-lg p-3">
             <div className="font-medium mb-2">{q.question}</div>
             <div className="space-y-1">
-              {q.options.map((opt, idx) => {
+              {(q.options || []).map((opt, idx) => {
                 const selected = answers[q.id] === idx;
                 const isCorrect = showExplain && idx === q.correct_option_index;
                 const isWrong = showExplain && selected && !isCorrect;
@@ -273,7 +277,7 @@ function Quiz({ block }: { block: QuizBlock }) {
 
         {score !== null && showExplain && (
           <span className="text-sm font-medium">
-            Score: <span className={score === block.questions.length ? "text-green-400" : "text-white"}>{score}/{block.questions.length}</span>
+            Score: <span className={score === questions.length ? "text-green-400" : "text-white"}>{score}/{questions.length}</span>
           </span>
         )}
       </div>
@@ -401,7 +405,8 @@ function Resources({ block }: { block: ResourceBlock }) {
     <div className="bg-white/5 rounded-xl p-4">
       <h4 className="font-semibold mb-2">{block.title}</h4>
       <div className="grid gap-2">
-        {block.resources.map((r) => {
+        {/* FIX: Added || [] to prevent crash */}
+        {(block.resources || []).map((r) => {
           return (
             <div
               key={r.id}
@@ -545,6 +550,7 @@ function Evaluation({ block }: { block: EvaluationBlock }) {
       </div>
       <p className="text-sm opacity-90 mb-4 italic leading-relaxed">"{block.feedback}"</p>
       <div className="grid gap-3">
+        {/* FIX: Added || [] to prevent crash */}
         {(block.axes || []).map((ax, i) => {
           const maxScore = Math.max(ax.max_score ?? 0, 1);
           const scoreValue = Math.max(0, Math.min(ax.score ?? 0, maxScore));
@@ -636,7 +642,8 @@ function ActionSuggestions({ block }: { block: ActionSuggestionsBlock }) {
     <div className="bg-white/5 rounded-xl p-4 relative">
       <h4 className="font-semibold mb-3">{block.title}</h4>
       <div className="flex flex-wrap gap-2">
-        {block.suggestions.map((s, i) => (
+        {/* FIX: Added || [] to prevent crash */}
+        {(block.suggestions || []).map((s, i) => (
           <button
             key={i}
             onClick={() => onChoose(s.action_id)}
@@ -761,7 +768,8 @@ function ProjectSelection({ block }: { block: ProjectSelectionBlock }) {
     <div className="bg-white/5 rounded-xl p-4">
       <h4 className="font-semibold mb-4">{block.title}</h4>
       <div className="grid gap-4 md:grid-cols-2">
-        {block.projects.map((p) => (
+        {/* FIX: Added || [] to prevent crash */}
+        {(block.projects || []).map((p) => (
           <div
             key={p.id}
             onClick={() => setSelected(p.id)}
@@ -780,7 +788,7 @@ function ProjectSelection({ block }: { block: ProjectSelectionBlock }) {
               {p.description}
             </p>
             <div className="flex flex-wrap gap-1">
-              {p.tags.map((t) => (
+              {(p.tags || []).map((t) => (
                 <span key={t} className="text-[10px] px-1.5 py-0.5 rounded bg-white/5">
                   {t}
                 </span>
@@ -819,7 +827,6 @@ export default function UIBlocksRenderer({ response }: { response: JourneyStepRe
 
       // 2. Convert Feedback to EvaluationBlock
       if (res.feedback && (res.axes || typeof res.feedback === 'string')) {
-         // Handle simple string feedback vs complex object
          const feedbackText = typeof res.feedback === 'object' ? res.feedback.summary || "Assessment complete" : res.feedback;
          
          blocksToRender.push({

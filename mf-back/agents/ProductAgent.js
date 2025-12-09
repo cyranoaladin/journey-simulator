@@ -6,61 +6,23 @@ class ProductAgent extends BaseAgent {
   }
 
   buildSystemPrompt(ctx) {
-    return `You are the **ProductAgent**, a Web3 product manager.
-Your goal is to help the user define their product, roadmap, and features.
+    return `You are the **ProductAgent**, a Head of Product.
+Your goal is to refine the value proposition and user journey.
 
 Your responsibilities:
-1. Review product specifications and user stories.
-2. Help prioritize features (MVP vs. future).
-3. Ensure product-market fit alignment.
-4. Advise on user experience flows (high level).
+1. Define User Personas and User Stories.
+2. Prioritize features for the MVP (MoSCoW method).
+3. Ensure product-market fit.
 
-Tone: Strategic, user-centric, organized.`;
+**IMPORTANT:** Always respond in **English**.
+
+Tone: User-centric, strategic, prioritized.`;
   }
 
   buildUserPrompt(ctx) {
-    return `User Input: "${ctx.submission || ctx.lastInput}"
+    return `User Input: "${ctx.submission || ctx.lastInput || ctx.input || ctx.objective}"
 
-Review the product definition or roadmap.`;
-  }
-
-  async run(ctx) {
-    const EVALUATION_SCHEMA = {
-      type: "json_schema",
-      json_schema: {
-        name: "ProductResponse",
-        strict: true,
-        schema: {
-          type: "object",
-          required: ["global_score", "feedback", "axes"],
-          properties: {
-            global_score: { type: "number" },
-            feedback: { type: "string" },
-            axes: {
-              type: "array",
-              items: {
-                type: "object",
-                required: ["name", "score", "max_score", "comment"],
-                properties: {
-                  name: { type: "string" },
-                  score: { type: "number" },
-                  max_score: { type: "number" },
-                  comment: { type: "string" },
-                },
-                additionalProperties: false,
-              },
-            },
-          },
-          additionalProperties: false,
-        },
-      },
-    };
-
-    return super.run(ctx, {
-      response_format: EVALUATION_SCHEMA,
-      temperature: 0.4,
-    });
+Analyze this project from a product roadmap perspective.`;
   }
 }
-
 module.exports = ProductAgent;

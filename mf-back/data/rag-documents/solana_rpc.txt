@@ -1,0 +1,23 @@
+# RPC (Remote Procedure Call) on Solana
+
+## Definition
+RPC (Remote Procedure Call) is the communication protocol used to interact with the Solana blockchain. It acts as a gateway that allows dApps, wallets, and scripts to read data from the blockchain or send transactions.
+
+## How it works
+Solana uses JSON-RPC 2.0. Clients send HTTP POST requests to an RPC Node.
+- **Read:** Queries ledger data (e.g., `getBalance`, `getAccountInfo`).
+- **Write:** Forwards signed transactions to validators (`sendTransaction`).
+
+## RPC Providers
+1. **Public:** Free, low limits (e.g., Solana Foundation nodes). Not for production.
+2. **Private:** Paid, high throughput (e.g., Helius, QuickNode, Alchemy, Triton).
+
+## Common Methods
+- `getBalance(pubkey)`: Get SOL balance.
+- `getAccountInfo(pubkey)`: Get raw account data.
+- `getProgramAccounts(programId)`: Get all accounts for a program (heavy operation).
+- `simulateTransaction`: Test a transaction without sending it.
+
+## Troubleshooting
+- **429 Too Many Requests:** You are hitting rate limits. Use a private RPC or backoff strategy.
+- **Node Lag:** The RPC node is behind the network tip.

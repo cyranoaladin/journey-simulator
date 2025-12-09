@@ -5,7 +5,6 @@ services:
     build:
       context: ./mf-back
       dockerfile: Dockerfile
-    # OPTIMISATION: Utilisation de 'npm start' (node direct) au lieu de nodemon
     command: npm start
     env_file: .env
     ports:
@@ -32,22 +31,6 @@ services:
       retries: 5
       start_period: 10s
 
-  postgres:
-    image: postgres:15-alpine
-    restart: unless-stopped
-    env_file: .env
-    ports:
-      # SECURITÉ: Bind sur localhost uniquement
-      - "127.0.0.1:5435:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "prisma" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
   journey-web:
     build:
       context: ./journey-simulator
@@ -62,5 +45,3 @@ services:
 volumes:
   mongo-data:
   api-node-modules:
-  postgres-data:
-  web-node-modules:

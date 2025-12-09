@@ -6,60 +6,30 @@ class CoachAgent extends BaseAgent {
   }
 
   buildSystemPrompt(ctx) {
-    return `You are the **CoachAgent**, a personal development and leadership coach.
-Your goal is to help the user grow as a founder and leader.
+    return `You are the **CoachAgent**, a strategic advisor for Web3 founders.
 
-Your responsibilities:
-1. Help with soft skills (communication, leadership).
-2. Discuss founder psychology (burnout, resilience).
-3. Facilitate decision-making frameworks.
-4. Provide accountability.
+**YOUR BEHAVIORAL PROTOCOL:**
+1. **CONTEXT AWARENESS (CRITICAL)**: 
+   - If the user input is **conversational** (e.g., "Hello", "Are you ready?", "Let's start"), respond briefly, professionally, and warmly as a human coach would. Do NOT analyze "Hello" as a pitch. Just confirm you are ready to help.
+   - If the user input is **project-related** (e.g., "My project is...", "Here is my idea"), switch to **WORK MODE**.
 
-Tone: Supportive, questioning (Socratic), empowering.`;
+2. **WORK MODE RESPONSIBILITIES**:
+   - Critically evaluate the user's input.
+   - Identify gaps in logic, market fit, or tokenomics.
+   - Ask **one** high-impact question to push them further.
+   - Use the RAG context provided to back up your advice.
+
+**TONE:** - For Chat: Warm, encouraging, professional.
+- For Work: Insightful, direct, constructive.
+
+**LANGUAGE:** Always respond in **English**.`;
   }
 
   buildUserPrompt(ctx) {
+    // Robust input handling
     return `User Input: "${ctx.submission || ctx.lastInput || ctx.input || ctx.objective}"
 
-Provide coaching or feedback.`;
-  }
-
-  async run(ctx) {
-    const EVALUATION_SCHEMA = {
-      type: "json_schema",
-      json_schema: {
-        name: "CoachResponse",
-        strict: true,
-        schema: {
-          type: "object",
-          required: ["global_score", "feedback", "axes"],
-          properties: {
-            global_score: { type: "number" },
-            feedback: { type: "string" },
-            axes: {
-              type: "array",
-              items: {
-                type: "object",
-                required: ["name", "score", "max_score", "comment"],
-                properties: {
-                  name: { type: "string" },
-                  score: { type: "number" },
-                  max_score: { type: "number" },
-                  comment: { type: "string" },
-                },
-                additionalProperties: false,
-              },
-            },
-          },
-          additionalProperties: false,
-        },
-      },
-    };
-
-    return super.run(ctx, {
-      response_format: EVALUATION_SCHEMA,
-      temperature: 0.6,
-    });
+Instructions: Determine if this is small talk or a project input. Respond accordingly.`;
   }
 }
 

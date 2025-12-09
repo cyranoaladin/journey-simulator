@@ -25,3 +25,4 @@ test-results/
 prisma/dev.db
 prisma/*.db
 .env
+.env
