@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import JourneyCard from './Journey/JourneyCard';
-import { api } from '@/utils/api'; 
 import { Loader2 } from 'lucide-react';
 
 // Placeholders for types
 type PersonaType = { id: string; title: string; description: string; };
-type UserProgressType = { userId?: string; id?: string; [key: string]: any };
+type UserProgressType = { userId?: string; id?: string;[key: string]: any };
 
 const DUMMY_PERSONAS: PersonaType[] = [
     { id: 'builder', title: 'Builder', description: 'Focus on smart contract development.' },
@@ -13,7 +12,7 @@ const DUMMY_PERSONAS: PersonaType[] = [
 ];
 
 const JourneysPage: React.FC = () => {
-    const [personas, setPersonas] = useState<PersonaType[]>(DUMMY_PERSONAS);
+    const [personas] = useState<PersonaType[]>(DUMMY_PERSONAS);
     const [userProgress, setUserProgress] = useState<UserProgressType>({});
     const [loading, setLoading] = useState(true);
 

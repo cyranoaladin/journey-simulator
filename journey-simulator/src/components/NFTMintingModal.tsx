@@ -1,4 +1,4 @@
-import { useState, useEffect, type FC } from "react";
+import { useState, useEffect, type FC, type MouseEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -82,7 +82,7 @@ const NFTMintingModal: FC<NFTMintingModalProps> = ({
 
       // Step 2: execute
       setCurrentStep(3);
-      const exec = await api.post</T>('/mint/solana/execute', payload)(sim.sim);
+      const exec = await api.post<any>('/mint/solana/execute', { ...simulatePayload, ...sim.sim });
       if (!exec?.ok || !exec?.tx?.txSig) {
         throw new Error("Execution failed");
       }
@@ -202,7 +202,7 @@ const NFTMintingModal: FC<NFTMintingModalProps> = ({
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e: MouseEvent) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-label="Mint Proof-of-Skill™ NFT"
