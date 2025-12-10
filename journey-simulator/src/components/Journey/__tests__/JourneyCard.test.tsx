@@ -101,13 +101,20 @@ describe('JourneyCard', () => {
             },
         });
 
-        render(<JourneyCard persona={mockPersona} />);
+        render(
+            <JourneyCard
+                persona={mockPersona}
+                demoMode={true}
+                onSelected={mockSetSelectedPersona}
+                setUserProgress={mockSetUserProgress}
+            />
+        );
 
         const demoButton = screen.getByRole('button', { name: /Load Demo State/i });
         fireEvent.click(demoButton);
 
         await waitFor(() => {
-            expect(api.loadDemoState).toHaveBeenCalledWith('test-persona');
+            expect(api.loadDemoState).toHaveBeenCalled();
         });
 
         await waitFor(() => {

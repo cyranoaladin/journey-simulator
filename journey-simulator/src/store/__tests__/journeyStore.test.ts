@@ -29,6 +29,7 @@ describe('Journey Store - Phase Completion', () => {
 
     if (typeof window !== 'undefined' && window.localStorage) {
       window.localStorage.setItem('accessToken', 'test-token');
+      window.localStorage.setItem('userId', 'test-user');
     }
   });
 
@@ -41,11 +42,11 @@ describe('Journey Store - Phase Completion', () => {
   it('should correctly complete a phase and trigger a progress reload', async () => {
     const store = useJourneyStore;
     const persona = personas[0]; // Let's use the first persona for testing
-    
+
     // 1. Setup: Select a persona
     store.getState().setSelectedPersona(persona);
     expect(store.getState().userProgress.completedPhases).toEqual([]);
-    
+
     const phaseToComplete = 0;
     const phaseData = persona.phases[phaseToComplete];
 
@@ -58,23 +59,27 @@ describe('Journey Store - Phase Completion', () => {
 
     // 2. Action: Complete the first phase
     await store.getState().completePhase(phaseToComplete);
-    
+
     // 3. Assertions
     // Check if the API was called correctly
-    expect(mockApi.completePhase).toHaveBeenCalledWith(expect.objectContaining({
-      phase_number: phaseToComplete + 1,
-      score: 100,
-      xp_reward: phaseData.xpReward,
-      mfai_reward: phaseData.mfaiReward,
-      nft_address: expect.any(String)
-    }));
+    expect(mockApi.completePhase).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.stringContaining('phase-1'),
+      expect.objectContaining({
+        phase_number: phaseToComplete + 1,
+        score: 100,
+        xp_reward: phaseData.xpReward,
+        mfai_reward: phaseData.mfaiReward,
+        nft_address: expect.any(String)
+      })
+    );
 
     // Check if the local state was updated optimistically
     expect(store.getState().userProgress.completedPhases).toContain(phaseToComplete);
 
     // Check if progress reload was triggered
     expect(mockApi.getUserProgress).toHaveBeenCalled();
-    
+
     // Let's check the final state after reload
     // This requires the store to be fully updated after the async operations
     // We can wait for all promises to resolve
@@ -85,7 +90,7 @@ describe('Journey Store - Phase Completion', () => {
 
   it('should not allow completing a phase that is already completed', async () => {
     const store = useJourneyStore;
-    
+
     // Manually set a phase as completed
     store.setState({
       userProgress: {

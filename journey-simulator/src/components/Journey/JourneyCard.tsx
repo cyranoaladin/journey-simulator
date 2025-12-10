@@ -82,8 +82,8 @@ const JourneyCard: React.FC<JourneyCardProps> = ({
                     completedPhases,
                     currentPersona: persona.id,
                     votingPower: Math.floor((backendProgress.total_xp || 0) / 10),
-                    walletConnected: userProgress.walletConnected,
-                    walletAddress: userProgress.walletAddress,
+                    walletConnected: userProgress?.walletConnected ?? false,
+                    walletAddress: userProgress?.walletAddress,
                 };
 
                 if (setUserProgress) {
