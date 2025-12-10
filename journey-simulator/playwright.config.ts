@@ -34,6 +34,7 @@ export default defineConfig({
   webServer: {
     command: 'VITE_API_URL=/ npm run preview -- --port 5176',
     url: 'http://127.0.0.1:5176',
+    timeout: 120 * 1000,
     reuseExistingServer: !process.env.CI,
     stdout: 'ignore',
     stderr: 'ignore',
