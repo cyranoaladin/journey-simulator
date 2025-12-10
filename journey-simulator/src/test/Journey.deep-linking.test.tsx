@@ -35,6 +35,23 @@ vi.mock('../contexts/TutorialContext', () => ({
     })
 }));
 
+vi.mock('../contexts/WorkspaceLayoutContext', () => ({
+    useWorkspaceLayout: () => ({
+        focusMode: false,
+        leftPanelOpen: true,
+        rightPanelOpen: false,
+        density: 'comfortable',
+        cycleDensity: vi.fn(),
+        toggleFocusMode: vi.fn(),
+        toggleLeftPanel: vi.fn(),
+        toggleRightPanel: vi.fn()
+    })
+}));
+
+vi.mock('../components/Journey/JourneyWorkspace', () => ({
+    default: () => <div>JourneyWorkspace</div>
+}));
+
 describe('Journey Component - Deep Linking', () => {
     const mockSetSelectedPersona = vi.fn();
 

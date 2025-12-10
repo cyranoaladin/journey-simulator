@@ -24,7 +24,8 @@ const Journey = () => {
         setSelectedPersona(persona);
         // Reload progress to ensure we have the latest backend state for this journey
         // This replaces the call in JourneyCard to avoid race conditions
-        useJourneyStore.getState().loadUserProgress().catch(console.error);
+        const state = useJourneyStore.getState?.();
+        state?.loadUserProgress?.().catch(console.error);
       }
     } else if (selectedPersona) {
       // If no journeyId in URL but we have a selected persona, clear it

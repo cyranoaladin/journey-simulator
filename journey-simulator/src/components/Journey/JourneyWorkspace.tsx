@@ -68,7 +68,7 @@ const JourneyWorkspace = () => {
     // A more robust implementation would check the step completion status from the store.
     if (lastStep && lastStep.ui_blocks && lastStep.ui_blocks.length > 0) {
       const personaId = selectedPersona?.id || 'web3_builder';
-      const currentStepIndex = userProgress.completedPhases.length + 1;
+      const currentStepIndex = (userProgress?.completedPhases?.length ?? 0) + 1;
       const artifactId = DEMO_SCENARIOS[personaId]?.[currentStepIndex];
 
       if (artifactId && !unlockedArtifacts.includes(artifactId)) {
@@ -91,7 +91,7 @@ const JourneyWorkspace = () => {
         }, 3500);
       }
     }
-  }, [lastStep, selectedPersona, userProgress.completedPhases, unlockedArtifacts]);
+  }, [lastStep, selectedPersona, userProgress?.completedPhases, unlockedArtifacts]);
 
   useEffect(() => {
     console.log('[JourneyWorkspace] MOUNTED');
@@ -113,7 +113,7 @@ const JourneyWorkspace = () => {
 
   if (!selectedPersona) return null;
 
-  const activePhaseIndex = currentPhaseIndex ?? userProgress.completedPhases.length;
+  const activePhaseIndex = currentPhaseIndex ?? (userProgress?.completedPhases?.length ?? 0);
 
 
 
@@ -126,10 +126,10 @@ const JourneyWorkspace = () => {
   console.log('[JourneyWorkspace] Rendering phase:', activePhase?.title, 'ID:', activePhase?.id);
 
   const totalPhases = selectedPersona.phases.length;
-  const completedPhases = userProgress.completedPhases.length;
+  const completedPhases = userProgress?.completedPhases?.length ?? 0;
   const completionRate = totalPhases === 0 ? 0 : Math.round((completedPhases / totalPhases) * 100);
   const activePhaseNumber = activePhaseIndex + 1;
-  const isPhaseCompleted = userProgress.completedPhases.includes(activePhaseIndex);
+  const isPhaseCompleted = userProgress?.completedPhases?.includes(activePhaseIndex) ?? false;
   const densityLabel = density === 'compact' ? 'Compact' : 'Comfortable';
   const focusButtonCopy = focusMode ? 'Exit Focus' : 'Focus Mode';
   const navButtonCopy = leftPanelOpen ? 'Hide Navigation' : 'Navigation';
@@ -235,11 +235,11 @@ const JourneyWorkspace = () => {
               <span>Phase {activePhaseNumber} of {totalPhases}</span>
               <span className="flex items-center gap-2">
                 <Trophy size={16} className="text-accent-gold" />
-                {userProgress.totalXP.toLocaleString()} XP
+                {(userProgress?.totalXP ?? 0).toLocaleString()} XP
               </span>
               <span className="flex items-center gap-2">
                 <Coins size={16} className="text-accent-cyan" />
-                {userProgress.mfaiTokens.toLocaleString()} $MFAI
+                {(userProgress?.mfaiTokens ?? 0).toLocaleString()} $MFAI
               </span>
             </div>
           </div>
@@ -289,7 +289,7 @@ const JourneyWorkspace = () => {
           <div className="flex flex-wrap items-center gap-4 text-xs text-white/60">
             <span>{completionRate}% complete</span>
             <span>{completedPhases}/{totalPhases} phases validated</span>
-            <span>{userProgress.nfts.length} Proof-of-Skill™ badges</span>
+            <span>{(userProgress?.nfts?.length ?? 0)} Proof-of-Skill™ badges</span>
           </div>
         </div>
       </section>
