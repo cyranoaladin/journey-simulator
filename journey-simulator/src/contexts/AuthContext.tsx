@@ -237,6 +237,20 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         }
       } catch (verifyError) {
         console.error("Token verification failed:", verifyError);
+
+        // Check if token was already cleared by api.ts (401 error)
+        const tokenStillExists = localStorage.getItem("accessToken");
+
+        // If token was auto-cleared, don't try to refresh
+        if (!tokenStillExists) {
+          console.log("AuthContext: Token was auto-cleared, skipping refresh");
+          setUser(null);
+          await resetProgress();
+          console.log("AuthContext: setting isLoading false (after auto-clear)");
+          setIsLoading(false);
+          return;
+        }
+
         // Token is invalid, try to refresh only if refresh token exists
         if (refreshTokenValue) {
           try {
@@ -246,9 +260,9 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
               console.log("AuthContext: Token refresh successful");
               // Retry the verification after refresh
               try {
-                const token = localStorage.getItem("accessToken");
-                if (!token) throw new Error("No access token available after refresh");
-                const data = await api.verifyToken(token);
+                const newToken = localStorage.getItem("accessToken");
+                if (!newToken) throw new Error("No access token available after refresh");
+                const data = await api.verifyToken(newToken);
                 setUser(data.user);
 
                 // Load user progress

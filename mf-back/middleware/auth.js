@@ -106,4 +106,58 @@ const adminOnly = (req, res, next) => {
   }
 };
 
-module.exports = { protect, adminOnly };
+// Optional authentication - allows requests with or without token
+const optionalAuth = async (req, res, next) => {
+  try {
+    let token;
+
+    // Check for token in Authorization header
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+
+    // If no token, just proceed without user
+    if (!token) {
+      req.user = null;
+      return next();
+    }
+
+    // Special handling for demo mode
+    if (token === 'demo-token') {
+      req.user = {
+        id: '507f1f77bcf86cd799439011',
+        name: 'Demo User',
+        email: 'demo@moneyfactory.ai',
+        role: 'user',
+        wallet_address: 'DEMO_WALLET_ADDRESS',
+        persona: 'cognitive-activation-hub',
+        is_active: true,
+        _id: '507f1f77bcf86cd799439011'
+      };
+      return next();
+    }
+
+    try {
+      // Verify real JWT token
+      const decoded = jwt.verify(token, JWT_SECRET);
+      const user = await User.findById(decoded.id).select('-password');
+
+      if (user && user.is_active) {
+        req.user = user;
+      } else {
+        req.user = null;
+      }
+      next();
+    } catch (error) {
+      // Invalid token, but we allow the request to proceed
+      req.user = null;
+      next();
+    }
+  } catch (error) {
+    console.error('OptionalAuth middleware error:', error);
+    req.user = null;
+    next();
+  }
+};
+
+module.exports = { protect, adminOnly, optionalAuth };

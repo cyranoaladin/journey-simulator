@@ -67,7 +67,7 @@ router.post('/login', async (req, res) => {
 
         // Check password (if user has one - web3 users might not)
         if (!user.password) {
-             return res.status(400).json({ error: 'Please login with your Wallet' });
+            return res.status(400).json({ error: 'Please login with your Wallet' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
@@ -117,17 +117,17 @@ router.post('/connect-wallet', async (req, res) => {
         }
 
         const token = generateToken(user);
-        res.json({ 
-            success: true, 
-            token, 
-            user: { 
-                id: user._id, 
-                name: user.name, 
+        res.json({
+            success: true,
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
                 wallet: user.wallet_address,
                 persona: user.persona,
                 xp: user.total_xp,
                 level: user.current_level
-            } 
+            }
         });
 
     } catch (error) {
@@ -150,6 +150,111 @@ router.get('/me', async (req, res) => {
         res.json({ user });
     } catch (error) {
         res.status(401).json({ error: 'Invalid token' });
+    }
+});
+
+// POST /auth/verify - Verify token validity
+router.post('/verify', async (req, res) => {
+    try {
+        const { token } = req.body;
+        if (!token) {
+            return res.status(400).json({ success: false, message: 'Token is required' });
+        }
+
+        // Special handling for demo token
+        if (token === 'demo-token') {
+            return res.json({
+                success: true,
+                valid: true,
+                user: {
+                    id: '507f1f77bcf86cd799439011',
+                    name: 'Demo User',
+                    email: 'demo@moneyfactory.ai'
+                }
+            });
+        }
+
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret-key');
+            const user = await User.findById(decoded.id).select('-password');
+
+            if (!user || !user.is_active) {
+                return res.status(401).json({ success: false, message: 'Invalid token' });
+            }
+
+            res.json({
+                success: true,
+                valid: true,
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role
+                }
+            });
+        } catch (jwtError) {
+            // Handle JWT-specific errors (expired, malformed, etc.)
+            if (jwtError.name === 'TokenExpiredError') {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Token expired',
+                    expired: true
+                });
+            } else if (jwtError.name === 'JsonWebTokenError') {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Invalid token format'
+                });
+            }
+            throw jwtError; // Re-throw if it's not a JWT error
+        }
+    } catch (error) {
+        console.error('Token verification error:', error);
+        res.status(401).json({ success: false, message: 'Invalid or expired token' });
+    }
+});
+
+// POST /auth/refresh - Refresh access token
+router.post('/refresh', async (req, res) => {
+    try {
+        const { token, refreshToken } = req.body;
+
+        if (!token && !refreshToken) {
+            return res.status(400).json({ success: false, message: 'Token is required' });
+        }
+
+        const tokenToUse = refreshToken || token;
+
+        // Try to decode the token (even if expired)
+        let decoded;
+        try {
+            decoded = jwt.verify(tokenToUse, process.env.JWT_SECRET || 'dev-secret-key', { ignoreExpiration: true });
+        } catch (error) {
+            return res.status(401).json({ success: false, message: 'Invalid token' });
+        }
+
+        const user = await User.findById(decoded.id).select('-password');
+
+        if (!user || !user.is_active) {
+            return res.status(401).json({ success: false, message: 'User not found or inactive' });
+        }
+
+        // Generate new token
+        const newToken = generateToken(user);
+
+        res.json({
+            success: true,
+            accessToken: newToken,
+            token: newToken,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email
+            }
+        });
+    } catch (error) {
+        console.error('Token refresh error:', error);
+        res.status(401).json({ success: false, message: 'Token refresh failed' });
     }
 });
 

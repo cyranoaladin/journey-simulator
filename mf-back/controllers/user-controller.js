@@ -246,3 +246,150 @@ exports.addNFTCertificate = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server Error', error: error.message });
   }
 };
+
+/**
+ * GET /user/:userId/progress
+ * Get user progress
+ */
+exports.getUserProgress = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Verify user is requesting their own progress or is admin
+    if (req.user.id !== userId && req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized to access this user\'s progress'
+      });
+    }
+
+    const user = await User.findById(userId).select('-password');
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      progress: user.progress || {
+        completedPhases: [],
+        currentPhase: null,
+        artifacts: []
+      },
+      tokens: user.tokens || 0,
+      xp: user.xp || 0,
+      persona: user.persona
+    });
+  } catch (error) {
+    console.error('Error getting user progress:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get user progress',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * POST /user/:userId/progress
+ * Update user progress
+ */
+exports.updateUserProgress = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Verify user is updating their own progress or is admin
+    if (req.user.id !== userId && req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized to update this user\'s progress'
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    const { progress, tokens, xp } = req.body;
+
+    if (progress) user.progress = progress;
+    if (tokens !== undefined) user.tokens = tokens;
+    if (xp !== undefined) user.xp = xp;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Progress updated successfully',
+      progress: user.progress,
+      tokens: user.tokens,
+      xp: user.xp
+    });
+  } catch (error) {
+    console.error('Error updating user progress:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update user progress',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * POST /user/:userId/progress/reset
+ * Reset user progress
+ */
+exports.resetUserProgress = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Verify user is resetting their own progress or is admin
+    if (req.user.id !== userId && req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized to reset this user\'s progress'
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Reset progress to initial state
+    user.progress = {
+      completedPhases: [],
+      currentPhase: null,
+      artifacts: []
+    };
+    user.tokens = 0;
+    user.xp = 0;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Progress reset successfully',
+      progress: user.progress,
+      tokens: user.tokens,
+      xp: user.xp
+    });
+  } catch (error) {
+    console.error('Error resetting user progress:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to reset user progress',
+      error: error.message
+    });
+  }
+};
+

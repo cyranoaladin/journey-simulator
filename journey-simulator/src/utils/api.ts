@@ -1,10 +1,21 @@
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 /**
+ * Clear all authentication data from localStorage
+ */
+function clearAuthData() {
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+  localStorage.removeItem('token'); // Legacy key
+  localStorage.removeItem('userId');
+}
+
+/**
  * Generic request helper (sends token)
  */
 export async function request<T = any>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const token = localStorage.getItem('token');
+  // CRITICAL FIX: Use 'accessToken' key (not 'token')
+  const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     ...options.headers,
@@ -16,7 +27,11 @@ export async function request<T = any>(endpoint: string, options: RequestInit = 
   const response = await fetch(url, { ...options, headers });
 
   if (!response.ok) {
-    if (response.status === 401) console.warn('⚠️ Session expired or invalid token');
+    if (response.status === 401) {
+      console.warn('⚠️ Session expired or invalid token - clearing auth data');
+      // Automatically clear invalid tokens to prevent future errors
+      clearAuthData();
+    }
     let errorMessage = `Error ${response.status}`;
     try {
       const errorData = await response.json();

@@ -24,4 +24,9 @@ router.put('/subscription/:id', protect, adminOnly, userController.subscription)
 router.put('/tokens', protect, userController.updateTokenBalance);
 router.post('/nft-certificates', protect, userController.addNFTCertificate);
 
+/* User progress routes */
+router.get('/:userId/progress', protect, userController.getUserProgress);
+router.post('/:userId/progress', protect, userController.updateUserProgress);
+router.post('/:userId/progress/reset', protect, userController.resetUserProgress);
+
 module.exports = router;

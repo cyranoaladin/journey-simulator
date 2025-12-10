@@ -13,6 +13,8 @@ const journeyRouter = require('./routes/journey-routes');
 const orchestrationRouter = require('./routes/zyno-routes'); // Routes pour l'IA
 const daoRouter = require('./routes/dao-routes'); // Routes DAO
 const ragRouter = require('./routes/rag-routes');
+const demoRouter = require('./routes/demo-routes'); // Routes Demo
+const userRouter = require('./routes/user-routes'); // Routes User
 
 // Database Connection
 const mongoose = require('mongoose');
@@ -38,6 +40,8 @@ app.use('/journey', journeyRouter);
 app.use('/orchestration', orchestrationRouter);
 app.use('/dao', daoRouter);
 app.use('/', ragRouter);
+app.use('/demo', demoRouter);           // Routes Demo
+app.use('/user', userRouter);           // Routes User
 
 // Base API health check
 app.get('/health', (req, res) => {
