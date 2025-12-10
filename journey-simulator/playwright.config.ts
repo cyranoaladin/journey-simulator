@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
@@ -8,7 +9,10 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: [['list'], ['html', { outputFolder: 'tests/e2e-report' }]],
   use: {
-    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? 'http://127.0.0.1:5174',
+    launchOptions: {
+      args: ['--disable-web-security'],
+    },
+    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? 'http://127.0.0.1:5176',
     trace: 'on-first-retry',
     video: 'retain-on-failure',
     screenshot: 'only-on-failure',
@@ -16,16 +20,20 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+      },
     },
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: {
+        ...devices['Desktop Firefox'],
+      },
     },
   ],
   webServer: {
-    command: 'npm run dev -- --port 5174',
-    url: 'http://127.0.0.1:5174',
+    command: 'VITE_API_URL=/ npm run preview -- --port 5176',
+    url: 'http://127.0.0.1:5176',
     reuseExistingServer: !process.env.CI,
     stdout: 'ignore',
     stderr: 'ignore',

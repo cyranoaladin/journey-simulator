@@ -36,17 +36,15 @@ const JourneyCard: React.FC<JourneyCardProps> = ({
         setError(null);
 
         try {
-            // Update user profile with selected persona in backend (Fixes TS2304: api)
+            // Update user profile with selected persona in backend (await to ensure state consistency)
             await api.updateUserProfile(userId, { persona: persona.id });
 
-            // Reload progress
-            if (loadUserProgress) {
-                await loadUserProgress();
-            }
-
+            // Navigate after successful update
             if (onSelected) {
-                onSelected(persona); // Use persona as argument if defined
+                onSelected(persona);
             }
+            // Logic moved to Journey.tsx to prevent race condition during navigation
+
         } catch (err) {
             console.error('Failed to select persona:', err);
             setError('Failed to select journey. Please try again.');
@@ -137,7 +135,10 @@ const JourneyCard: React.FC<JourneyCardProps> = ({
                 <div className="mt-6 flex items-center justify-between">
                     <button
                         type="button"
-                        onClick={handlePersonaSelection}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handlePersonaSelection();
+                        }}
                         disabled={isBusy}
                         className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:bg-slate-400/60"
                     >

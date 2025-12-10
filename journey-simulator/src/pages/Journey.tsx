@@ -6,20 +6,25 @@ import JourneysPage from '../components/JourneysPage';
 import { useJourneyStore } from '../store/journeyStore';
 import { useTutorial } from '../contexts/TutorialContext';
 import { HelpCircle } from 'lucide-react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { personas } from '../data/personas';
+import JourneyWorkspace from '../components/Journey/JourneyWorkspace';
 
 const Journey = () => {
   const { selectedPersona, setSelectedPersona } = useJourneyStore();
   const { startTutorial } = useTutorial();
   const { journeyId } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (journeyId) {
       const persona = personas.find(p => p.id === journeyId);
       if (persona && persona.id !== selectedPersona?.id) {
         setSelectedPersona(persona);
+        // Reload progress to ensure we have the latest backend state for this journey
+        // This replaces the call in JourneyCard to avoid race conditions
+        useJourneyStore.getState().loadUserProgress().catch(console.error);
       }
     } else if (selectedPersona) {
       // If no journeyId in URL but we have a selected persona, clear it
@@ -55,13 +60,22 @@ const Journey = () => {
     ], { autoStart: true });
   };
 
+  const handlePersonaSelect = (persona: any) => {
+    // Rely on useEffect to sync state from URL, avoiding race condition
+    navigate(`/journeys/${persona.id}`);
+  };
+
   return (
     <div className="space-y-8">
       <WalletConnectionBanner />
       <SkillchainBanner />
       {!selectedPersona && <HeroSection />}
       <div className="relative">
-        <JourneysPage />
+        {selectedPersona ? (
+          <JourneyWorkspace />
+        ) : (
+          <JourneysPage onPersonaSelect={handlePersonaSelect} />
+        )}
         <button
           onClick={showJourneyTutorial}
           className="fixed bottom-6 right-6 z-50 p-3 rounded-full bg-gradient-to-r from-cyan-600 to-purple-600 shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 transition-all"
