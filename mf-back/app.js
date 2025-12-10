@@ -12,6 +12,7 @@ const authRouter = require('./routes/auth-routes'); // Correction du nom
 const journeyRouter = require('./routes/journey-routes');
 const orchestrationRouter = require('./routes/zyno-routes'); // Routes pour l'IA
 const daoRouter = require('./routes/dao-routes'); // Routes DAO
+const ragRouter = require('./routes/rag-routes');
 
 // Database Connection
 const mongoose = require('mongoose');
@@ -36,6 +37,7 @@ app.use('/auth', authRouter);           // C'est ici que ça manquait !
 app.use('/journey', journeyRouter);
 app.use('/orchestration', orchestrationRouter);
 app.use('/dao', daoRouter);
+app.use('/', ragRouter);
 
 // Base API health check
 app.get('/health', (req, res) => {

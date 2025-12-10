@@ -75,31 +75,135 @@ exports.loginUser = async (req, res) => {
 };
 
 exports.loginWithWallet = async (req, res) => {
-    // Basic implementation for tests/stub
-    try {
-        const { wallet_address } = req.body;
-        if (!wallet_address) return res.status(400).json({ success: false, message: 'Wallet required' });
-        
-        let user = await User.findOne({ wallet_address });
-        if (!user) return res.status(404).json({ success: false, message: 'User not found' });
-        
-        const accessToken = generateAccessToken(user);
-        res.status(200).json({ success: true, accessToken, user: { id: user._id } });
-    } catch (e) {
-        res.status(500).json({ success: false, error: e.message });
-    }
+  // Basic implementation for tests/stub
+  try {
+    const { wallet_address } = req.body;
+    if (!wallet_address) return res.status(400).json({ success: false, message: 'Wallet required' });
+
+    let user = await User.findOne({ wallet_address });
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    const accessToken = generateAccessToken(user);
+    res.status(200).json({ success: true, accessToken, user: { id: user._id } });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
 };
 
 // ... Other methods simplified for brevity but exist in full file ...
-exports.getUserProfile = async (req, res) => { res.json({ success: true, user: req.user }); };
-exports.updateUserProfile = async (req, res) => { res.json({ success: true, message: 'Updated' }); };
-exports.deleteUser = async (req, res) => { res.json({ success: true, message: 'Deleted' }); };
-exports.getAllUsers = async (req, res) => { res.json({ success: true, users: [] }); };
-exports.changeUserRole = async (req, res) => { res.json({ success: true }); };
-exports.subscription = async (req, res) => { res.json({ success: true }); };
-exports.logoutUser = async (req, res) => { res.json({ success: true }); };
-exports.refreshToken = async (req, res) => { res.json({ success: true, accessToken: 'token' }); };
-exports.updateTokenBalance = async (req, res) => { res.json({ success: true }); };
+exports.getUserProfile = async (req, res) => {
+  try {
+    if (!req.user) return res.status(401).json({ success: false });
+    res.status(200).json({ success: true, user: req.user });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+};
+
+exports.updateUserProfile = async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(req.user.id, req.body, { new: true }).select('-password');
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    res.status(200).json({ success: true, user });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Unauthorized' });
+    }
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    user.is_active = false;
+    await user.save();
+    res.status(200).json({ success: true, message: 'User deactivated' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}).select('-password');
+    res.status(200).json({ success: true, count: users.length, users });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+exports.changeUserRole = async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') return res.status(403).json({ success: false });
+
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ success: false });
+
+    user.role = req.body.role;
+    await user.save();
+    res.status(200).json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+exports.subscription = async (req, res) => {
+  try {
+    const { subscription } = req.body;
+    if (!['free', 'gold', 'platinum'].includes(subscription)) {
+      return res.status(400).json({ success: false, message: 'Invalid subscription' });
+    }
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ success: false });
+
+    user.subscription = subscription;
+    await user.save();
+    res.status(200).json({ success: true, user });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+exports.logoutUser = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+    const user = await User.findOne({ refreshToken });
+    if (user) {
+      user.refreshToken = undefined;
+      await user.save();
+    }
+    res.status(200).json({ success: true });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+};
+exports.refreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) return res.status(400).json({ success: false, message: 'Refresh Token required' });
+
+    const user = await User.findOne({ refreshToken });
+    if (!user) return res.status(403).json({ success: false, message: 'Invalid Refresh Token' });
+
+    const accessToken = generateAccessToken(user);
+    res.status(200).json({ success: true, accessToken });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+};
+
+exports.updateTokenBalance = async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(req.user.id, req.body, { new: true }).select('-password');
+    if (!user) return res.status(404).json({ success: false });
+    res.status(200).json({ success: true });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+};
 
 
 // --- CRITICAL FIX FOR NFT VERIFICATION ---

@@ -14,16 +14,14 @@ function isValidUrl(urlString) {
 function isTrustedDomain(urlString) {
     try {
         const url = new URL(urlString);
-        if (process.env.NODE_ENV === 'test') return true; 
+        if (process.env.NODE_ENV === 'test') return true;
         return ALLOWED_DOMAINS.some(domain => url.hostname.endsWith(domain));
     } catch (e) { return false; }
 }
 
 async function checkUrlReachability(url) {
-    if (process.env.NODE_ENV === 'test') {
-        if (url.includes('bad-site') || url.includes('unreachable')) return false;
-        return true;
-    }
+    // Test bypass removed to ensure mocks are used
+
     try {
         await axios.head(url, { timeout: 2000, validateStatus: (s) => s < 400 });
         return true;
@@ -56,11 +54,11 @@ async function sanitizeResourceBlock(block) {
 
         const isReachable = await checkUrlReachability(resource.url);
         if (!isReachable) {
-            return { 
-                ...resource, 
+            return {
+                ...resource,
                 url: generateFallbackUrl(resource),
-                original_url: resource.url, 
-                status: 'unreachable' 
+                original_url: resource.url,
+                status: 'unreachable'
             };
         }
         return resource;
@@ -73,7 +71,7 @@ async function validateAndSanitizeResponse(response) {
     if (!response || !response.ui_blocks || !Array.isArray(response.ui_blocks)) {
         return response;
     }
-    
+
     const sanitizedBlocks = await Promise.all(response.ui_blocks.map(async block => {
         if (block.kind === 'resource_block') {
             return await sanitizeResourceBlock(block);

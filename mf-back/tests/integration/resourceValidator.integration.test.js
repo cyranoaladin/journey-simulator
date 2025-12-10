@@ -1,9 +1,7 @@
 jest.mock('axios', () => ({
     head: jest.fn((url) => {
         if (
-            url.includes('solana.com') ||
-            url.includes('malicious.com') ||
-            url.includes('bad-site.com')
+            url.includes('solana.com')
         ) {
             return Promise.resolve({ status: 200 });
         }
@@ -49,7 +47,7 @@ describe('Resource Validator Integration', () => {
 
         expect(response.status).toBe(200);
         expect(response.body.ui_blocks[0].resources[0].url).toBe('https://solana.com');
-        expect(response.body.ui_blocks[0].resources[1].url).toBe('');
+        expect(response.body.ui_blocks[0].resources[1].url).toBe('https://www.google.com/search?q=Bad');
     });
 
     it('should preserve non-resource blocks unchanged', async () => {
@@ -79,7 +77,7 @@ describe('Resource Validator Integration', () => {
         expect(response.status).toBe(200);
         expect(response.body.ui_blocks[0].kind).toBe('text_block');
         expect(response.body.ui_blocks[0].title).toBe('Hello');
-        expect(response.body.ui_blocks[1].resources[0].url).toBe('');
+        expect(response.body.ui_blocks[1].resources[0].url).toBe('https://www.google.com/search?q=Test');
     });
 
     it('should handle empty resource arrays', async () => {

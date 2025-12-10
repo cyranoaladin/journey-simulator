@@ -26,11 +26,9 @@ class BaseAgent {
 
     async retrieveRagContext(query, ctx) {
         if (!query) return { context: "", hits: [] };
-        
-        // MOCK TEST: Avoid network calls in test mode to satisfy strict CI/CD
-        if (process.env.NODE_ENV === 'test') {
-            return { context: "", hits: [] };
-        }
+
+        // REMOVED: Mock test bypass to allow integration tests to verify RAG logic
+
 
         try {
             console.log(`[${this.name}] Querying RAG...`);
@@ -41,7 +39,7 @@ class BaseAgent {
 
             if (!hits || hits.length === 0) return { context: "", hits: [] };
 
-            const contextParts = hits.map((hit, index) => 
+            const contextParts = hits.map((hit, index) =>
                 `[Document ${index + 1} - ${hit.title}]\n${hit.content}`
             );
 
@@ -73,7 +71,7 @@ class BaseAgent {
         const userPrompt = this.buildUserPrompt(ctx);
 
         if (ragContext) {
-            systemPrompt += `\n\n--- RAG CONTEXT ---\n${ragContext}\n--- END CONTEXT ---\n\nUse this context primarily.`;
+            systemPrompt += `\n\n--- RAG CONTEXT ---\n${ragContext}\n--- END CONTEXT ---\n\nYou are an expert. Use EXCLUSIVELY the context above`;
         }
 
         const llmOptions = {
@@ -85,7 +83,8 @@ class BaseAgent {
             messages: [
                 { role: "system", content: systemPrompt },
                 { role: "user", content: userPrompt },
-            ]
+            ],
+            metadata: { agent: this.name }
         };
 
         const { message } = await callGpt5(llmOptions);
