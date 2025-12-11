@@ -1,50 +1,68 @@
+# journey-simulator
 
-# Money Factory AI Journey Simulator
+A TypeScript project to simulate journeys (placeholder description).
 
-## Présentation
-Plateforme d’apprentissage Web3 gamifiée, orchestrée par des agents IA (Zyno), intégrant la blockchain (NFT, staking, DAO) et la gestion de parcours personnalisés.
+## Table of contents
+- [About](#about)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Development](#development)
+- [Scripts](#scripts)
+- [Testing](#testing)
+- [Linting and formatting](#linting-and-formatting)
+- [Contributing](#contributing)
+- [Onboarding checklist](#onboarding-checklist)
+- [License](#license)
 
-## Architecture
-- **Frontend** : React/TypeScript (journey-simulator)
-- **Backend** : Node.js/Express, MongoDB (mf-back)
-- **Landing** : Next.js (web)
-- **Orchestration IA** : Zyno multi-agent, RAG
+## About
+Provide a brief project description here: purpose, high-level architecture, what the simulator models. Replace this placeholder with project-specific details.
 
-## Fonctionnalités principales
-- Authentification sécurisée (JWT)
-- Suivi de progression, XP, NFT, tokens
-- Mint NFT, staking, vote DAO, collaterize
-- Orchestration multi-agent, recherche documentaire RAG
-- UI moderne, responsive
+## Prerequisites
+- Node.js v18+ (LTS recommended)
+- npm (or yarn/pnpm) 
 
 ## Installation
+Clone the repo and install dependencies:
+
 ```bash
-./start_dev.sh # Docker (recommandé)
-# ou
-cd mf-back && npm run dev
-cd journey-simulator && npm run dev
+git clone https://github.com/cyranoaladin/journey-simulator.git
+cd journey-simulator
+npm ci
 ```
 
-## Tests
-- **Backend** : `make test` (Jest)
-- **Frontend** : Cypress e2e dans `journey-simulator/cypress/e2e/`
+## Development
+Run the type checker, linter and tests locally before opening PRs.
 
-## Documentation technique
-- **Endpoints API** : voir `mf-back/routes/`
-- **Schémas DB** : `mf-back/models/`
-- **Agents Zyno** : `mf-back/agents/`, orchestration dans `mf-back/orchestration/`
-- **Workflows blockchain** : `src/utils/blockchain.ts`, roadmap dans `docs/blockchain_integration_plan.md`
+## Scripts
+Add these scripts to package.json if not present:
 
-## Démo investisseur
-1. Création de compte
-2. Navigation parcours, phases
-3. Mint NFT, staking, vote DAO
-4. Orchestration IA (console Zyno)
+```json
+{
+  "scripts": {
+    "lint": "eslint 'src/**/*.{ts,tsx}' --max-warnings=0",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "build": "tsc -p tsconfig.build.json"
+  }
+}
+```
 
-## Pitch
-- Plateforme scalable, modulaire, extensible
-- IA multi-agent, RAG, blockchain intégrée
-- UX gamifiée, traçabilité, sécurité
+## Testing
+Use Vitest or Jest. Example (Vitest):
 
----
-Pour plus de détails, consultez les docs dans `docs/` et les README de chaque sous-projet.
+```bash
+npm run test
+```
+
+## Linting and formatting
+We recommend ESLint + Prettier. Use husky + lint-staged for pre-commit checks.
+
+## Contributing
+See CONTRIBUTING.md for the contribution workflow and guidelines.
+
+## Onboarding checklist
+See ONBOARDING.md for a step-by-step checklist for new contributors.
+
+## License
+This repository currently has no license declared. If you are the repository owner, add a LICENSE file (MIT/Apache-2.0 recommended).
