@@ -163,9 +163,7 @@ describe('JourneyCard', () => {
         render(
             <JourneyCard
                 persona={mockPersona}
-                demoMode={true}
                 onSelected={mockSetSelectedPersona}
-                setUserProgress={mockSetUserProgress}
             />
         );
 

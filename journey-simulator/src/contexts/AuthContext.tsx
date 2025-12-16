@@ -60,7 +60,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
   const login = useCallback(async (email: string, password: string): Promise<boolean> => {
     try {
-      const data = await api.login({ email, password });
+      const data = await api.login(email, password);
 
       // Store tokens
       localStorage.setItem("accessToken", data.accessToken);
@@ -169,7 +169,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     try {
       const token = localStorage.getItem("refreshToken");
       if (!token) throw new Error("No refresh token available");
-      const data = await api.refreshToken(token);
+      const data = await api.refreshToken();
       localStorage.setItem("accessToken", data.accessToken);
       if (data.refreshToken) {
         localStorage.setItem("refreshToken", data.refreshToken);
@@ -217,7 +217,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       try {
         console.log("AuthContext: Verifying token...");
         // Verify token with backend
-        const data = await api.verifyToken(token);
+        const data = await api.verifyToken();
         console.log("AuthContext: Token verified successfully", data);
         setUser(data.user);
         try {
@@ -272,7 +272,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
               try {
                 const newToken = localStorage.getItem("accessToken");
                 if (!newToken) throw new Error("No access token available after refresh");
-                const data = await api.verifyToken(newToken);
+                const data = await api.verifyToken();
                 setUser(data.user);
 
                 // Load user progress

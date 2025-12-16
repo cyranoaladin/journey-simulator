@@ -80,13 +80,10 @@ const ResourceUploader = () => {
       // 1. Read the file content
       const fileContent = await selectedFile.text();
 
-      // 2. Create the Blob for upload
-      const fileBlob = new Blob([fileContent], { type: selectedFile.type || 'text/plain' });
-
-      // 3. Call the API with the correct structure
-      await api.uploadDocument(fileBlob, {
+      await api.uploadDocument({
         title: selectedFile.name,
-        tags: 'rag,document'
+        content: fileContent,
+        tags: 'rag,document',
       });
 
       setUploadMessage(`✅ ${selectedFile.name} successfully ingested.`);

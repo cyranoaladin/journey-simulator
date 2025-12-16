@@ -6,7 +6,7 @@ import JourneysPage from '../components/JourneysPage';
 import { useJourneyStore } from '../store/journeyStore';
 import { useTutorial } from '../contexts/TutorialContext';
 import { HelpCircle } from 'lucide-react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { personas } from '../data/personas';
 import JourneyWorkspace from '../components/Journey/JourneyWorkspace';
@@ -15,7 +15,6 @@ const Journey = () => {
   const { selectedPersona, setSelectedPersona } = useJourneyStore();
   const { startTutorial } = useTutorial();
   const { journeyId } = useParams();
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (journeyId) {
@@ -61,11 +60,6 @@ const Journey = () => {
     ], { autoStart: true });
   };
 
-  const handlePersonaSelect = (persona: any) => {
-    // Rely on useEffect to sync state from URL, avoiding race condition
-    navigate(`/journeys/${persona.id}`);
-  };
-
   return (
     <div className="space-y-8">
       <WalletConnectionBanner />
@@ -75,7 +69,7 @@ const Journey = () => {
         {selectedPersona ? (
           <JourneyWorkspace />
         ) : (
-          <JourneysPage onPersonaSelect={handlePersonaSelect} />
+          <JourneysPage />
         )}
         <button
           onClick={showJourneyTutorial}

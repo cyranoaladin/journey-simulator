@@ -27,13 +27,8 @@ export async function GET(req: NextRequest) {
 
   const { name, wallet, score, journey, description, image } = parsed.data
 
-  // Ici tu peux aller chercher le vrai score / journey en DB si besoin
-  // const dbData = await prisma.journey.findUnique({ ... })
-
   const title = name || 'MFAI – Proof of Skill'
   const imageBase = process.env.MFAI_METADATA_IMAGE_BASE || 'https://mfai.app/images/proof-of-skill'
-
-  // Tu peux générer dynamiquement des URLs vers des images generatives
   const imageUrl = image || `${imageBase}?tier=A&wallet=${wallet ?? ''}`
 
   const json = {
@@ -53,6 +48,6 @@ export async function GET(req: NextRequest) {
   }
 
   const res = NextResponse.json(json)
-  res.headers.set('Cache-Control', 'public, max-age=300') // 5 min
+  res.headers.set('Cache-Control', 'public, max-age=300')
   return res
 }

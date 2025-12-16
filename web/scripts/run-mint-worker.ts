@@ -1,4 +1,13 @@
-import '../src/workers/mintWorker.ts'
+import { mintWorker } from '../src/workers/mintWorker.ts'
 
-// The worker is instantiated on import; keep this process alive.
-console.log('[worker:mint] Mint worker started')
+async function startWorker() {
+  console.log('[worker:mint] Mint worker started')
+  // The worker is initialized on import (mintWorker.ts)
+}
+
+startWorker().catch((err) => {
+  console.error('[worker:mint] Fatal error:', err)
+  process.exit(1)
+})
+
+

@@ -3,7 +3,6 @@ import { z } from 'zod'
 import { mintQueue } from '@/server/queue'
 import prisma from '@/lib/prisma'
 
-// This route depends on request URL params and queue state; it must be dynamic.
 export const dynamic = 'force-dynamic'
 
 const Query = z.object({
@@ -25,7 +24,6 @@ export async function GET(req: NextRequest) {
 
     const { jobId, mintAddress } = parsed.data
 
-    // Check by jobId
     if (jobId) {
       const job = await mintQueue.getJob(jobId)
       if (!job) {
@@ -33,19 +31,16 @@ export async function GET(req: NextRequest) {
       }
 
       const state = await job.getState()
-      const progress = job.progress
-      const result = job.returnvalue
 
       return NextResponse.json({
         jobId,
         status: state,
-        progress,
-        result,
+        progress: job.progress,
+        result: job.returnvalue,
         failedReason: job.failedReason,
       })
     }
 
-    // Check by mintAddress
     if (mintAddress) {
       const mintLog = await prisma.mintLog.findFirst({
         where: { mintAddress },

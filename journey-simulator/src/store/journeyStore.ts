@@ -344,19 +344,13 @@ export const useJourneyStore = create<JourneyState>()(
 
         // Sync with backend
         try {
-          const userId = localStorage.getItem('userId');
-          if (userId) {
-            await api.updateProgress(userId, {
-              total_xp: newTotalXP,
-              current_level: Math.floor(newTotalXP / 200),
-              completed_phases: updatedProgress.completedPhases.length
-            })
-          }
+          await api.updateProgress({
+            total_xp: newTotalXP,
+            current_level: Math.floor(newTotalXP / 200),
+            completed_phases: updatedProgress.completedPhases.length,
+          })
 
-          // Update token balance
-          if (userId) {
-            await api.updateTokenBalance(userId, { mfai_tokens: newMfaiTokens })
-          }
+          await api.updateTokenBalance({ mfai_tokens: newMfaiTokens })
         } catch (error) {
           console.error('Failed to sync progress with backend:', error)
         }
@@ -450,11 +444,7 @@ export const useJourneyStore = create<JourneyState>()(
         }
 
         try {
-          const journeyId = state.apiJourneyId || 'default-journey';
-          // Use a default phaseId if not provided (should be provided, but falling back for compatibility)
-          const phaseId = `phase-${phaseNumber}`;
-
-          const response = await api.completePhase(journeyId, phaseId, {
+          const response = await api.completePhase({
             phase_number: phaseNumber,
             score: options.score ?? 100,
             nft_address: options.nftAddress || '0x' + Math.random().toString(16).substr(2, 40),
@@ -681,8 +671,7 @@ export const useJourneyStore = create<JourneyState>()(
 
         if (hasAccessToken) {
           try {
-            const userId = window.localStorage.getItem('userId');
-            if (userId) await api.resetProgress(userId)
+            await api.resetProgress()
           } catch (error) {
             console.error('Failed to reset progress on server:', error)
           }
@@ -723,11 +712,7 @@ export const useJourneyStore = create<JourneyState>()(
         const currentState = get()
 
         try {
-          const userId = localStorage.getItem('userId');
-          if (!userId) {
-            return;
-          }
-          const response = await api.getUserProgress(userId)
+          const response = await api.getUserProgress()
 
           if (!response?.success) {
             return

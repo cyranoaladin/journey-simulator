@@ -9,6 +9,8 @@ data/
 coverage/
 dist/
 .next/
+.next_trash/
+**/.next_trash/
 playwright-report/
 test-results/
 .pid
@@ -31,5 +33,3 @@ web/minter.json
 # Prisma artifacts
 prisma/dev.db
 prisma/*.db
-.env
-.env
