@@ -353,71 +353,339 @@ Structure d’une phase (type) : `journey-simulator/src/types/journey.ts`
 
 #### 3.4.1 Persona “The Cognitive Activation Hub” (`cognitive-activation-hub`)
 
+##### Public cible (qui est-ce ?) — `cognitive-activation-hub`
+
+Entrants Web3 ambitieux, profils “cross-over” (product/finance/engineering) et builders curieux qui veulent acquérir les bons **modèles mentaux** + bases Solana pour opérer dans des marchés décentralisés.
+
+- **Target profile (source)** : “Ambitious newcomers, cross-over professionals, and curious builders entering decentralized technologies.” *(FR : nouveaux entrants ambitieux, profils en reconversion, builders curieux.)*
+- **Motivation (source)** : “Master Web3 paradigms, Solana fundamentals, and tokenized economies to operate confidently in decentralized markets.” *(FR : maîtriser paradigmes Web3, fondamentaux Solana et économies tokenisées.)*
+- **Pass** : *Genesis Cognition Pass*
+
+##### Persona — pour qui / cas d’usage — `cognitive-activation-hub`
+
+- **Solo builder** : tu veux un “socle” solide (mindset, sécurité, tokenomics) pour ensuite builder un projet sur Solana sans erreurs de base.
+- **Cohorte / bootcamp (AECO)** : idéal comme **parcours d’onboarding** commun (mêmes concepts, mêmes rituels) avant d’attaquer des tracks plus spécialisés.
+- **Organisation / DAO** : standardiser un langage commun (identity/security/governance) pour aligner équipes produit/tech/ops.
+
 | # | Phase ID | Titre | Gating | XP | $MFAI | NFT reward |
 |---:|---|---|---|---:|---:|---|
-| 1 | cognitive-orientation | Cognition Ignition | — | 60 | 6 | Proof-of-Skill™: Web3 Orientation |
-| 2 | solana-fluency | Solana Systems Lab | Staking 50 | 80 | 8 | Solana Fluency Patch |
-| 3 | token-design-lab | Token Design Studio | DAO vote | 90 | 9 | Tokenomics Architect Badge |
-| 4 | identity-proofing | Identity & Security Forge | — | 100 | 10 | Sovereign Identity Seal |
-| 5 | ecosystem-engagement | Ecosystem Activation | — | 120 | 12 | Proof-of-Skill™: Activation |
-| 6 | launch-collaterize | Launch via Collaterize | — | 200 | 20 | Collaterize Launch Badge |
+| 1 | cognitive-orientation | Cognition Ignition *(Allumage cognitif)* | — | 60 | 6 | Proof-of-Skill™: Web3 Orientation |
+| 2 | solana-fluency | Solana Systems Lab *(Labo des systèmes Solana)* | Staking 50 | 80 | 8 | Solana Fluency Patch |
+| 3 | token-design-lab | Token Design Studio *(Studio tokenomics)* | DAO vote | 90 | 9 | Tokenomics Architect Badge |
+| 4 | identity-proofing | Identity & Security Forge *(Forge identité & sécurité)* | — | 100 | 10 | Sovereign Identity Seal |
+| 5 | ecosystem-engagement | Ecosystem Activation *(Activation écosystème)* | — | 120 | 12 | Proof-of-Skill™: Activation |
+| 6 | launch-collaterize | Launch via Collaterize *(Lancement via Collaterize)* | — | 200 | 20 | Collaterize Launch Badge |
+
+##### Phases (détail, phase par phase) — `cognitive-activation-hub`
+
+- **(1) `cognitive-orientation` — Cognition Ignition**
+  - **Objectif** : installer le “mindset Web3” (décentralisation, composabilité, ownership) et clarifier ta mission.
+  - **Mission** : étude approfondie des paradigmes Web3, cartographie “legacy vs protocol”, rédaction d’un *mission statement*.
+  - **Durée** : 1 week — **Rewards** : 60 XP, 6 $MFAI, NFT “Proof-of-Skill™: Web3 Orientation”.
+  - **Tools / Outcomes** : Zyno Learning Blocks, protocol atlas, workshops → thèse d’apprentissage + premier credential.
+
+- **(2) `solana-fluency` — Solana Systems Lab**
+  - **Objectif** : comprendre le modèle d’exécution Solana (runtime, transactions, parallelism) pour prendre de bonnes décisions perf.
+  - **Mission** : parcours guidé d’un validator, analyse des flux de transactions, prototype d’une interaction Solana (playground).
+  - **Durée** : 10 days — **Gating** : Staking 50 — **Rewards** : 80 XP, 8 $MFAI, NFT “Solana Fluency Patch”.
+
+- **(3) `token-design-lab` — Token Design Studio**
+  - **Objectif** : concevoir des incentives + gouvernance + trésorerie cohérentes (tokenomics “soutenable”).
+  - **Mission** : cartographie des incentives, stress-test de la gouvernance, rédaction d’un “impact canvas” de protocole.
+  - **Durée** : 2 weeks — **Gating** : DAO vote — **Rewards** : 90 XP, 9 $MFAI, NFT “Tokenomics Architect Badge”.
+
+- **(4) `identity-proofing` — Identity & Security Forge**
+  - **Objectif** : sécurité wallet / custody / identité décentralisée → réflexes de souveraineté.
+  - **Mission** : hardening wallet stack, trade-offs custody, design flow onboarding DeID.
+  - **Durée** : 1 week — **Rewards** : 100 XP, 10 $MFAI, NFT “Sovereign Identity Seal”.
+
+- **(5) `ecosystem-engagement` — Ecosystem Activation**
+  - **Objectif** : passer à l’action : contribution, documentation, participation DAO, activation écosystème.
+  - **Mission** : contribution communautaire, brief d’activation, initiation participation DAO.
+  - **Durée** : 2 weeks — **Rewards** : 120 XP, 12 $MFAI, NFT “Proof-of-Skill™: Activation”.
+
+- **(6) `launch-collaterize` — Launch via Collaterize**
+  - **Objectif** : simuler le lancement (readiness “Core Track”) et obtenir un score d’éligibilité.
+  - **Mission** : exécuter la simulation Collaterize, analyser eligibility score, revoir le launch plan.
+  - **Durée** : 1 week — **Rewards** : 200 XP, 20 $MFAI, NFT “Collaterize Launch Badge”.
 
 #### 3.4.2 Persona “The Capital Foundry” (`capital-foundry`)
 
+##### Public cible (qui est-ce ?) — `capital-foundry`
+
+Fondateurs FinTech/DeFi, ingénieurs Solana/Anchor/Rust, équipes quantitatives et stratèges treasury qui veulent construire des primitives DeFi **performantes** et **auditables**.
+
+- **Target profile (source)** : “FinTech founders, DeFi engineers, quantitative teams, and treasury strategists pursuing decentralized finance.” *(FR : fondateurs FinTech/DeFi, équipes quant, engineers Solana, stratèges trésorerie.)*
+- **Motivation (source)** : “Design, prototype, and deploy performant Solana DeFi primitives that withstand market and security scrutiny.” *(FR : concevoir, prototyper et déployer des primitives DeFi Solana robustes.)*
+- **Pass** : *Sovereign Capital Pass*
+
+##### Persona — pour qui / cas d’usage — `capital-foundry`
+
+- **Solo builder** : tu construis une primitive DeFi (AMM, lending, vault, oracle adapter) et tu veux passer de l’idée → proto → runbook.
+- **Cohorte / bootcamp (AECO)** : équipe DeFi (dev+quant+product) qui avance en sprints, avec revues croisées (tests/fuzzing/risk).
+- **Organisation / DAO** : structurer un “risk & governance” package (circuit breakers, reporting, votes) pour un go-live piloté.
+
 | # | Phase ID | Titre | Gating | XP | $MFAI | NFT reward |
 |---:|---|---|---|---:|---:|---|
-| 1 | capital-discovery | Protocol Discovery Sprint | — | 80 | 8 | DeFi Recon Marker |
-| 2 | program-forge | Program Forge Lab | — | 110 | 11 | Anchor Mastery Crest |
-| 3 | oracle-integration | Oracle & Liquidity Mesh | — | 120 | 12 | Liquidity Architect Token |
-| 4 | risk-command | Risk Command Center | Staking 75 | 130 | 13 | Proof-of-Yield™ Sentinel |
-| 5 | capital-launchpad | Launch & Scale Deck | DAO vote | 150 | 15 | Neuro-Dividend Initiator |
-| 6 | launch-collaterize | Launch via Collaterize | — | 200 | 20 | Collaterize Launch Badge |
+| 1 | capital-discovery | Protocol Discovery Sprint *(Sprint découverte protocolaire)* | — | 80 | 8 | DeFi Recon Marker |
+| 2 | program-forge | Program Forge Lab *(Labo de forge de programmes)* | — | 110 | 11 | Anchor Mastery Crest |
+| 3 | oracle-integration | Oracle & Liquidity Mesh *(Maillage oracles & liquidité)* | — | 120 | 12 | Liquidity Architect Token |
+| 4 | risk-command | Risk Command Center *(Centre de commandement du risque)* | Staking 75 | 130 | 13 | Proof-of-Yield™ Sentinel |
+| 5 | capital-launchpad | Launch & Scale Deck *(Dossier lancement & scale)* | DAO vote | 150 | 15 | Neuro-Dividend Initiator |
+| 6 | launch-collaterize | Launch via Collaterize *(Lancement via Collaterize)* | — | 200 | 20 | Collaterize Launch Badge |
+
+##### Phases (détail, phase par phase) — `capital-foundry`
+
+- **(1) `capital-discovery` — Protocol Discovery Sprint**
+  - **Objectif** : audit du paysage DeFi Solana + opportunités marché.
+  - **Mission** : benchmark protocoles, patterns de composabilité, opportunity matrix.
+  - **Durée** : 8 days — **Rewards** : 80 XP, 8 $MFAI, NFT “DeFi Recon Marker”.
+
+- **(2) `program-forge` — Program Forge Lab**
+  - **Objectif** : builder Anchor/Rust (tests, fuzzing) avec focus performance + sécurité.
+  - **Mission** : livrer un module cœur (lending/AMM), écrire des tests déterministes, mettre en place un harness de fuzzing.
+  - **Durée** : 2 weeks — **Rewards** : 110 XP, 11 $MFAI, NFT “Anchor Mastery Crest”.
+
+- **(3) `oracle-integration` — Oracle & Liquidity Mesh**
+  - **Objectif** : oracles + liquidité + résilience aux chocs / contingences cross-chain.
+  - **Mission** : intégration feeds, simulation chocs liquidité, design flows contingence.
+  - **Durée** : 10 days — **Rewards** : 120 XP, 12 $MFAI, NFT “Liquidity Architect Token”.
+
+- **(4) `risk-command` — Risk Command Center**
+  - **Objectif** : risk analytics, circuit breakers, contrôles treasury, reporting DAO-ready.
+  - **Mission** : définir guardrails, fee policies, dashboards.
+  - **Durée** : 2 weeks — **Gating** : Staking 75 — **Rewards** : 130 XP, 13 $MFAI, NFT “Proof-of-Yield™ Sentinel”.
+
+- **(5) `capital-launchpad` — Launch & Scale Deck**
+  - **Objectif** : préparer prod (audit éco, alignement investisseurs, rollout DAO).
+  - **Mission** : economic audit, pitch réseau builders, vote DAO de déploiement.
+  - **Durée** : 3 weeks — **Gating** : DAO vote — **Rewards** : 150 XP, 15 $MFAI, NFT “Neuro-Dividend Initiator”.
+
+- **(6) `launch-collaterize` — Launch via Collaterize**
+  - **Objectif/Mission** : idem ci-dessus (simulation launch readiness).
+  - **Durée** : 1 week — **Rewards** : 200 XP, 20 $MFAI, NFT “Collaterize Launch Badge”.
 
 #### 3.4.3 Persona “The System Architect” (`system-architect`)
 
+##### Public cible (qui est-ce ?) — `system-architect`
+
+Ingénieurs systèmes, chercheurs AI, innovateurs hardware, experts infra distribuée (DePIN, compute, storage) qui veulent fusionner utilité réelle + performance Solana.
+
+- **Target profile (source)** : “Systems engineers, AI researchers, hardware innovators, and distributed computing experts.” *(FR : systèmes/infra, AI, hardware, experts distribués.)*
+- **Motivation (source)** : “Architect high-throughput decentralized infrastructure that fuses Solana performance with real-world utility.” *(FR : concevoir une infra décentralisée haut débit avec utilité réelle.)*
+- **Pass** : *Architect Protocol Pass*
+
+##### Persona — pour qui / cas d’usage — `system-architect`
+
+- **Solo builder** : tu veux concevoir une infra “DePIN/AI” (même en mode prototype) avec exigences SLO/observabilité.
+- **Cohorte / bootcamp (AECO)** : équipe infra (ops+dev+data) qui formalise une architecture et des runbooks, puis se “challenge” par scénarios.
+- **Organisation / DAO** : standardiser gouvernance + déploiement (synaptic rollout) pour un protocole infra consommé par d’autres builders.
+
 | # | Phase ID | Titre | Gating | XP | $MFAI | NFT reward |
 |---:|---|---|---|---:|---:|---|
-| 1 | architecture-scan | Topology Reconnaissance | — | 90 | 9 | Systems Scout Sigil |
-| 2 | depin-studio | DePIN Studio | Staking 90 | 120 | 12 | DePIN Architect Token |
-| 3 | onchain-ai | On-Chain Intelligence Lab | — | 130 | 13 | AI Provenance Seal |
-| 4 | systems-hardening | Systems Hardening Forge | — | 140 | 14 | Reliability Vanguard Patch |
-| 5 | synaptic-rollout | Synaptic Rollout | DAO vote | 160 | 16 | Protocol Architect Laureate |
-| 6 | launch-collaterize | Launch via Collaterize | — | 200 | 20 | Collaterize Launch Badge |
+| 1 | architecture-scan | Topology Reconnaissance *(Reconnaissance de topologie)* | — | 90 | 9 | Systems Scout Sigil |
+| 2 | depin-studio | DePIN Studio *(Studio DePIN)* | Staking 90 | 120 | 12 | DePIN Architect Token |
+| 3 | onchain-ai | On-Chain Intelligence Lab *(Labo d’intelligence on-chain)* | — | 130 | 13 | AI Provenance Seal |
+| 4 | systems-hardening | Systems Hardening Forge *(Forge de durcissement système)* | — | 140 | 14 | Reliability Vanguard Patch |
+| 5 | synaptic-rollout | Synaptic Rollout *(Déploiement synaptique)* | DAO vote | 160 | 16 | Protocol Architect Laureate |
+| 6 | launch-collaterize | Launch via Collaterize *(Lancement via Collaterize)* | — | 200 | 20 | Collaterize Launch Badge |
+
+##### Phases (détail, phase par phase) — `system-architect`
+
+- **(1) `architecture-scan` — Topology Reconnaissance**
+  - **Objectif** : cartographier le stack (compute/storage/network/intelligence) et les besoins throughput.
+  - **Mission** : audit infra, benchmark DePIN, intent canvas.
+  - **Durée** : 9 days — **Rewards** : 90 XP, 9 $MFAI, NFT “Systems Scout Sigil”.
+
+- **(2) `depin-studio` — DePIN Studio**
+  - **Objectif** : prototyper un système DePIN (incentives, coordination devices, telemetry).
+  - **Mission** : onboarding devices, simulation incentives, plan pipelines de validation data.
+  - **Durée** : 2 weeks — **Gating** : Staking 90 — **Rewards** : 120 XP, 12 $MFAI, NFT “DePIN Architect Token”.
+
+- **(3) `onchain-ai` — On-Chain Intelligence Lab**
+  - **Objectif** : IA “verifiable” (provenance, garde-fous) + privacy/analytics.
+  - **Mission** : déployer un pipeline d’inférence vérifiable, concevoir un ledger de provenance des données, implémenter des analytics “privacy-preserving”.
+  - **Durée** : 2 weeks — **Rewards** : 130 XP, 13 $MFAI, NFT “AI Provenance Seal”.
+
+- **(4) `systems-hardening` — Systems Hardening Forge**
+  - **Objectif** : HA/failover/observabilité, tests extrêmes, SLOs.
+  - **Mission** : plan rollout multi-region, stress tests, dashboards.
+  - **Durée** : 12 days — **Rewards** : 140 XP, 14 $MFAI, NFT “Reliability Vanguard Patch”.
+
+- **(5) `synaptic-rollout` — Synaptic Rollout**
+  - **Objectif** : déploiement + gouvernance + enablement écosystème (adoption).
+  - **Mission** : alignement Synaptic Governance, guardian dry-runs, kit readiness public.
+  - **Durée** : 3 weeks — **Gating** : DAO vote — **Rewards** : 160 XP, 16 $MFAI, NFT “Protocol Architect Laureate”.
+
+- **(6) `launch-collaterize` — Launch via Collaterize**
+  - **Durée** : 1 week — **Rewards** : 200 XP, 20 $MFAI, NFT “Collaterize Launch Badge”.
 
 #### 3.4.4 Persona “The Experience Studio” (`experience-studio`)
 
+##### Public cible (qui est-ce ?) — `experience-studio`
+
+Créatifs-tech, designers UX, game builders, storytellers : construire des dApps/NFT/on-chain experiences où **le plaisir utilisateur** rencontre la perf Solana.
+
+- **Target profile (source)** : “Creative technologists, UX designers, game builders, and storytellers shipping Solana experiences.” *(FR : créatifs-tech, UX, game builders, storytellers.)*
+- **Motivation (source)** : “Design immersive Web3 applications where user delight and protocol performance combine seamlessly.” *(FR : concevoir des expériences Web3 immersives, fluides et performantes.)*
+- **Pass** : *Experience Creator Pass*
+
+##### Persona — pour qui / cas d’usage — `experience-studio`
+
+- **Solo builder** : tu prototypes un “experience layer” (NFT, game loop, onboarding) et tu veux une checklist complète (UX + token mechanics).
+- **Cohorte / bootcamp (AECO)** : équipe créa+dev+community qui itère sur story/world-building + instrumentation/retention.
+- **Organisation / DAO** : lancer une expérience communautaire (mint/event) avec plan d’activation et garde-fous anti-abuse.
+
 | # | Phase ID | Titre | Gating | XP | $MFAI | NFT reward |
 |---:|---|---|---|---:|---:|---|
-| 1 | experience-discovery | Experience Discovery | — | 70 | 7 | Experience Strategist Pin |
-| 2 | nft-systems-lab | NFT Systems Lab | — | 100 | 10 | Metaplex Creator Crest |
-| 3 | gameplay-lab | Gameplay & Mechanics Forge | — | 120 | 12 | Gameplay Architect Badge |
-| 4 | ux-elevation | UX Elevation Studio | — | 130 | 13 | UX Maestro Token |
-| 5 | experience-launch | Launch & Community Resonance | — | 150 | 15 | Cultural Impact Seal |
-| 6 | launch-collaterize | Launch via Collaterize | — | 200 | 20 | Collaterize Launch Badge |
+| 1 | experience-discovery | Experience Discovery *(Découverte d’expérience)* | — | 70 | 7 | Experience Strategist Pin |
+| 2 | nft-systems-lab | NFT Systems Lab *(Labo systèmes NFT)* | — | 100 | 10 | Metaplex Creator Crest |
+| 3 | gameplay-lab | Gameplay & Mechanics Forge *(Forge gameplay & mécaniques)* | — | 120 | 12 | Gameplay Architect Badge |
+| 4 | ux-elevation | UX Elevation Studio *(Studio d’élévation UX)* | — | 130 | 13 | UX Maestro Token |
+| 5 | experience-launch | Launch & Community Resonance *(Lancement & résonance communauté)* | — | 150 | 15 | Cultural Impact Seal |
+| 6 | launch-collaterize | Launch via Collaterize *(Lancement via Collaterize)* | — | 200 | 20 | Collaterize Launch Badge |
+
+##### Phases (détail, phase par phase) — `experience-studio`
+
+- **(1) `experience-discovery` — Experience Discovery**
+  - **Objectif** : research signaux culturels + motivations audience.
+  - **Mission** : interviews narratifs, mapping motivations, “experience compass”.
+  - **Durée** : 1 week — **Rewards** : 70 XP, 7 $MFAI, NFT “Experience Strategist Pin”.
+
+- **(2) `nft-systems-lab` — NFT Systems Lab**
+  - **Objectif** : économies NFT, metadata dynamique, royalties.
+  - **Mission** : prototype logique collection, routing royalties, automation metadata.
+  - **Durée** : 10 days — **Rewards** : 100 XP, 10 $MFAI, NFT “Metaplex Creator Crest”.
+
+- **(3) `gameplay-lab` — Gameplay & Mechanics Forge**
+  - **Objectif** : mécaniques tokenisées, progression, économie in-app + anti-abuse.
+  - **Mission** : UX wallet-aware, simulation rewards, safeguards anti-bot.
+  - **Durée** : 2 weeks — **Rewards** : 120 XP, 12 $MFAI, NFT “Gameplay Architect Badge”.
+
+- **(4) `ux-elevation` — UX Elevation Studio**
+  - **Objectif** : onboarding + accessibilité + réduction friction.
+  - **Mission** : usability labs, prototypes onboarding, scorecards accessibilité.
+  - **Durée** : 12 days — **Rewards** : 130 XP, 13 $MFAI, NFT “UX Maestro Token”.
+
+- **(5) `experience-launch` — Launch & Community Resonance**
+  - **Objectif** : lancement (release/mint) + activation communauté + pipeline partenaires.
+  - **Mission** : organiser un événement de lancement, activer le réseau (builders/partenaires), publier un plan de “community care” (modération, support, cadence).
+  - **Durée** : 3 weeks — **Rewards** : 150 XP, 15 $MFAI, NFT “Cultural Impact Seal”.
+
+- **(6) `launch-collaterize` — Launch via Collaterize**
+  - **Durée** : 1 week — **Rewards** : 200 XP, 20 $MFAI, NFT “Collaterize Launch Badge”.
 
 #### 3.4.5 Persona “The Impact Engine” (`impact-engine`)
 
+##### Public cible (qui est-ce ?) — `impact-engine`
+
+Stratèges communauté, innovateurs policy, ONG/associations, social entrepreneurs : construire des systèmes DAO/coordination + funding transparents et mesurables.
+
+- **Target profile (source)** : “Community strategists, policy innovators, NGO leaders, and social entrepreneurs.” *(FR : stratèges communauté, innovateurs policy, leaders ONG, entrepreneurs sociaux.)*
+- **Motivation (source)** : “Design participatory governance, decentralized funding rails, and regenerative economic mechanisms.” *(FR : gouvernance participative + rails de financement + mécanismes régénératifs.)*
+- **Pass** : *Impact Operator Pass*
+
+##### Persona — pour qui / cas d’usage — `impact-engine`
+
+- **Solo builder** : tu veux structurer une initiative d’impact (mission + métriques + gouvernance) et la rendre “audit-able”.
+- **Cohorte / bootcamp (AECO)** : cohorte d’opérateurs (community + ops + legal/policy) qui écrit constitution, workflows grants, dashboards.
+- **Organisation / DAO** : mettre en place des rails de financement transparents, un scoring de contribution, et un protocole de reporting.
+
 | # | Phase ID | Titre | Gating | XP | $MFAI | NFT reward |
 |---:|---|---|---|---:|---:|---|
-| 1 | impact-charter | Mission Charter Lab | — | 75 | 7 | Purpose Architect Token |
-| 2 | dao-design | DAO Design Workshop | — | 110 | 11 | Synaptic Governance Badge |
-| 3 | philanthropy-protocols | Transparent Funding Protocols | — | 125 | 12 | Public Goods Laureate |
-| 4 | identity-reputation | Identity & Reputation Mesh | — | 135 | 13 | Social Proof Seal |
-| 5 | synaptic-impact | Synaptic Impact Launch | — | 150 | 15 | Impact Engine Proof |
-| 6 | launch-collaterize | Launch via Collaterize | — | 200 | 20 | Collaterize Launch Badge |
+| 1 | impact-charter | Mission Charter Lab *(Charte de mission)* | — | 75 | 7 | Purpose Architect Token |
+| 2 | dao-design | DAO Design Workshop *(Atelier design DAO)* | — | 110 | 11 | Synaptic Governance Badge |
+| 3 | philanthropy-protocols | Transparent Funding Protocols *(Financement transparent)* | — | 125 | 12 | Public Goods Laureate |
+| 4 | identity-reputation | Identity & Reputation Mesh *(Identité & réputation)* | — | 135 | 13 | Social Proof Seal |
+| 5 | synaptic-impact | Synaptic Impact Launch *(Lancement synaptique d’impact)* | — | 150 | 15 | Impact Engine Proof |
+| 6 | launch-collaterize | Launch via Collaterize *(Lancement via Collaterize)* | — | 200 | 20 | Collaterize Launch Badge |
+
+##### Phases (détail, phase par phase) — `impact-engine`
+
+- **(1) `impact-charter` — Mission Charter Lab**
+  - **Objectif** : cadrer purpose + stakeholders + principes éthiques.
+  - **Mission** : rédiger une thèse d’impact, cartographier les incentives des parties prenantes, formaliser des principes directeurs.
+  - **Durée** : 1 week — **Rewards** : 75 XP, 7 $MFAI, NFT “Purpose Architect Token”.
+
+- **(2) `dao-design` — DAO Design Workshop**
+  - **Objectif** : gouvernance équitable (vote, délégation, rewards contribution).
+  - **Mission** : prototyper une constitution DAO, exécuter des simulations de vote, modéliser des rewards basées sur contribution.
+  - **Durée** : 12 days — **Rewards** : 110 XP, 11 $MFAI, NFT “Synaptic Governance Badge”.
+
+- **(3) `philanthropy-protocols` — Transparent Funding Protocols**
+  - **Objectif** : rails funding transparents + mesure d’impact.
+  - **Mission** : mettre en place des dashboards de trésorerie, lancer des workflows de grants, publier des métriques d’impact.
+  - **Durée** : 2 weeks — **Rewards** : 125 XP, 12 $MFAI, NFT “Public Goods Laureate”.
+
+- **(4) `identity-reputation` — Identity & Reputation Mesh**
+  - **Objectif** : reputation/credential, modération, reconnaissance cross-community.
+  - **Mission** : concevoir des credentials soulbound, intégrer des oracles de réputation, définir des parcours de modération/arbitrage.
+  - **Durée** : 10 days — **Rewards** : 135 XP, 13 $MFAI, NFT “Social Proof Seal”.
+
+- **(5) `synaptic-impact` — Synaptic Impact Launch**
+  - **Objectif** : activer DAO + rounds funding + rewards MFAI (Neuro-Dividends).
+  - **Mission** : présenter à Synaptic Governance, activer les Neuro-Dividends, lancer un sprint d’impact communautaire.
+  - **Durée** : 3 weeks — **Rewards** : 150 XP, 15 $MFAI, NFT “Impact Engine Proof”.
+
+- **(6) `launch-collaterize` — Launch via Collaterize**
+  - **Durée** : 1 week — **Rewards** : 200 XP, 20 $MFAI, NFT “Collaterize Launch Badge”.
 
 #### 3.4.6 Persona “The Resilience Master” (`resilience-master`)
 
+##### Public cible (qui est-ce ?) — `resilience-master`
+
+Ingénieurs sécurité, auditeurs, threat hunters, guardians fiabilité : protéger protocoles, marchés, et confiance (prévention, détection, réponse incident).
+
+- **Target profile (source)** : “Security engineers, auditors, threat hunters, and reliability guardians.” *(FR : security engineers, auditeurs, chasseurs de menaces, guardians.)*
+- **Motivation (source)** : “Detect, mitigate, and prevent attack vectors across Solana programs and decentralized infrastructure.” *(FR : détecter, mitiger et prévenir les vecteurs d’attaque sur Solana.)*
+- **Pass** : *Resilience Sentinel Pass*
+
+##### Persona — pour qui / cas d’usage — `resilience-master`
+
+- **Solo builder** : tu veux un parcours “security-first” (threat model → fuzzing → runbooks incident) pour sécuriser ton protocole.
+- **Cohorte / bootcamp (AECO)** : équipe sécurité/infra qui se met d’accord sur une méthode commune (drills, disclosure, dashboards).
+- **Organisation / DAO** : formaliser défense en profondeur + incident command + rituels Red/Blue (cadence threat intel).
+
 | # | Phase ID | Titre | Gating | XP | $MFAI | NFT reward |
 |---:|---|---|---|---:|---:|---|
-| 1 | security-baseline | Security Baseline Forge | — | 90 | 9 | Guardian Initiate Emblem |
-| 2 | exploit-hunt | Exploit Hunter Arena | — | 120 | 12 | Offense-Informed Shield |
-| 3 | defense-systems | Defense Systems Orchestrator | — | 130 | 13 | Protocol Shield Token |
-| 4 | incident-response | On-Chain Incident Command | — | 140 | 14 | Forensic Vanguard Badge |
-| 5 | redblue-evolution | Red/Blue Evolution | — | 170 | 17 | Resilience Master Seal |
-| 6 | launch-collaterize | Launch via Collaterize | — | 200 | 20 | Collaterize Launch Badge |
+| 1 | security-baseline | Security Baseline Forge *(Fondamentaux sécurité)* | — | 90 | 9 | Guardian Initiate Emblem |
+| 2 | exploit-hunt | Exploit Hunter Arena *(Chasse aux exploits)* | — | 120 | 12 | Offense-Informed Shield |
+| 3 | defense-systems | Defense Systems Orchestrator *(Systèmes de défense)* | — | 130 | 13 | Protocol Shield Token |
+| 4 | incident-response | On-Chain Incident Command *(Commandement incident)* | — | 140 | 14 | Forensic Vanguard Badge |
+| 5 | redblue-evolution | Red/Blue Evolution *(Évolution Red/Blue)* | — | 170 | 17 | Resilience Master Seal |
+| 6 | launch-collaterize | Launch via Collaterize *(Lancement via Collaterize)* | — | 200 | 20 | Collaterize Launch Badge |
 
-> Pour le **détail exhaustif** par phase (mission, tools, outcomes, zynoTip), consulter directement `journey-simulator/src/data/personas.ts`.
+##### Phases (détail, phase par phase) — `resilience-master`
+
+- **(1) `security-baseline` — Security Baseline Forge**
+  - **Objectif** : bases audit Solana (accounts model, runtime, patterns mémoire).
+  - **Mission** : produire un threat model Solana, analyser des exploits historiques, constituer une checklist de secure coding.
+  - **Durée** : 9 days — **Rewards** : 90 XP, 9 $MFAI, NFT “Guardian Initiate Emblem”.
+
+- **(2) `exploit-hunt` — Exploit Hunter Arena**
+  - **Objectif** : offensive security pour anticiper vulnérabilités.
+  - **Mission** : exécuter des batteries de fuzzing, produire des PoC d’exploit, formaliser une démarche de disclosure responsable.
+  - **Durée** : 2 weeks — **Rewards** : 120 XP, 12 $MFAI, NFT “Offense-Informed Shield”.
+
+- **(3) `defense-systems` — Defense Systems Orchestrator**
+  - **Objectif** : protections runtime (guardians, timelocks, kill-switch, monitoring).
+  - **Mission** : mettre en place des guardian agents, configurer des circuit breakers, déployer de la détection d’anomalies.
+  - **Durée** : 12 days — **Rewards** : 130 XP, 13 $MFAI, NFT “Protocol Shield Token”.
+
+- **(4) `incident-response` — On-Chain Incident Command**
+  - **Objectif** : forensic triage + communication + coordination.
+  - **Mission** : mener des exercices de forensic, préparer des templates de communication de crise, coordonner avec le guardian network.
+  - **Durée** : 2 weeks — **Rewards** : 140 XP, 14 $MFAI, NFT “Forensic Vanguard Badge”.
+
+- **(5) `redblue-evolution` — Red/Blue Evolution**
+  - **Objectif** : culture sécurité continue (drills, threat intel, incentives Neuro-Dividends).
+  - **Mission** : organiser des simulations d’incidents “live”, publier un cycle de threat intel mensuel, activer des incentives (Neuro-Dividends).
+  - **Durée** : Ongoing — **Rewards** : 170 XP, 17 $MFAI, NFT “Resilience Master Seal”.
+
+- **(6) `launch-collaterize` — Launch via Collaterize**
+  - **Durée** : 1 week — **Rewards** : 200 XP, 20 $MFAI, NFT “Collaterize Launch Badge”.
+
+> Source de vérité : `journey-simulator/src/data/personas.ts` (missions, tools, outcomes, zynoTip, gating, rewards).
 
 ---
 
@@ -528,7 +796,7 @@ La valeur attendue correspond à la variable serveur **`ADMIN_API_KEY`** (secret
   - header `x-api-key` absent, ou
   - `x-api-key !== process.env.ADMIN_API_KEY`
 
-2) **Côté Express `mf-back`**
+1) **Côté Express `mf-back`**
 
 - Exemple explicite : `mf-back/routes/zyno-routes.js` protège :
   - `GET /admin/agent-scoreboard` via `x-api-key`
@@ -962,12 +1230,12 @@ On distingue 3 catégories :
 - Produits en `document_block` (markdown) et/ou `text_block`.
 - Exemples : blueprint, pitch deck narrative, checklist sécurité, tokenomics, DAO constitution, runbooks.
 
-2) **Artifacts (viewer)**
+1) **Artifacts (viewer)**
 
 - Définis dans `journey-simulator/src/data/artifacts.json` (titres, agents, contenu).
 - En demo, certains artifacts se déverrouillent automatiquement sur des étapes spécifiques.
 
-3) **Resources (bibliothèque statique)**
+1) **Resources (bibliothèque statique)**
 
 - Page : `https://journey.mfai.app/resources`
 - Contenu : playbooks/templates/PDF/guide “HTML” servis depuis `/documents` (base : `VITE_RESOURCE_LIBRARY_BASE_URL`, défaut `/documents`).

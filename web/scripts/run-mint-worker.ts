@@ -9,5 +9,3 @@ startWorker().catch((err) => {
   console.error('[worker:mint] Fatal error:', err)
   process.exit(1)
 })
-
-
