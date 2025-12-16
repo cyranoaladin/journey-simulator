@@ -14,6 +14,7 @@ import {
     Rocket,
     Brain
 } from 'lucide-react';
+import { AEPO, AECO, AEPO_VS_AECO } from '@/content/aepoAeco';
 
 const GuidePage = () => {
     const [activeSection, setActiveSection] = useState('getting-started');
@@ -23,6 +24,7 @@ const GuidePage = () => {
         { id: 'getting-started', label: 'Getting Started', icon: Compass },
         { id: 'the-journey', label: 'The Journey', icon: Rocket },
         { id: 'ai-agents', label: 'AI Agents', icon: Brain },
+        { id: 'aepo-aeco', label: 'AEPO & AECO', icon: Layers },
         { id: 'progression', label: 'Progression & XP', icon: Trophy },
         { id: 'economy', label: 'Economy & DAO', icon: Coins },
         { id: 'launch', label: 'Launch & Collaterize', icon: Rocket },
@@ -296,6 +298,88 @@ const GuidePage = () => {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* AEPO / AECO */}
+                    <section id="aepo-aeco" className="mb-20 scroll-mt-24">
+                        <div className="mb-6 flex items-center gap-3 border-b border-white/10 pb-4">
+                            <Layers className="text-indigo-400" size={32} />
+                            <h2 className="text-3xl font-bold">AEPO &amp; AECO Orchestration</h2>
+                        </div>
+
+                        <div className="space-y-6 text-white/80">
+                            <p className="leading-relaxed">
+                                AEPO and AECO are two complementary orchestration layers driven by <strong>Zyno</strong>.
+                                They unify how missions are routed, how progress is tracked, and how value (XP, Proof-of-Skill™, $MFAI) is delivered to builders.
+                            </p>
+
+                            <div className="grid gap-6 lg:grid-cols-2">
+                                <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+                                    <h3 className="text-xl font-bold text-white">
+                                        🧠 {AEPO.acronym} — {AEPO.name}
+                                    </h3>
+                                    <p className="mt-2 text-sm text-white/60">{AEPO.tagline}</p>
+                                    <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-white/75">
+                                        {AEPO.description}
+                                    </p>
+                                </div>
+
+                                <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+                                    <h3 className="text-xl font-bold text-white">
+                                        👥 {AECO.acronym} — {AECO.name}
+                                    </h3>
+                                    <p className="mt-2 text-sm text-white/60">{AECO.tagline}</p>
+                                    <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-white/75">
+                                        {AECO.description}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="rounded-2xl border border-white/10 bg-[#1a1a2e] p-6">
+                                <h3 className="text-xl font-bold text-white mb-4">AEPO vs AECO (Developer Summary)</h3>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left text-sm">
+                                        <thead className="text-xs uppercase tracking-wider text-white/50">
+                                            <tr>
+                                                <th className="py-2 pr-4">Feature</th>
+                                                <th className="py-2 pr-4">AEPO</th>
+                                                <th className="py-2">AECO</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="text-white/70">
+                                            {AEPO_VS_AECO.map((row) => (
+                                                <tr key={row.feature} className="border-t border-white/10">
+                                                    <td className="py-3 pr-4 font-semibold text-white/80">{row.feature}</td>
+                                                    <td className="py-3 pr-4">{row.aepo}</td>
+                                                    <td className="py-3">{row.aeco}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+                                <h3 className="text-xl font-bold text-white mb-4">Diagram</h3>
+                                <p className="text-sm text-white/60 mb-4">
+                                    Visual overview of the AEPO (individual pathway) and AECO (cohort orchestration) split.
+                                </p>
+                                <img
+                                    src="/images/AECO_AEPO.png"
+                                    alt="AEPO & AECO diagram"
+                                    className="w-full rounded-xl border border-white/10 bg-black/20"
+                                    loading="lazy"
+                                />
+                            </div>
+
+                            <div className="rounded-2xl border border-indigo-500/30 bg-indigo-500/10 p-6">
+                                <h3 className="text-xl font-bold text-white mb-3">UI Tooltips</h3>
+                                <p className="text-sm text-white/70">
+                                    <strong>🧠 AEPO Active:</strong> Your personal Zyno-guided roadmap is being updated.<br />
+                                    <strong>👥 AECO Program:</strong> You are part of a cohort. Progress is synchronized with your team.
+                                </p>
                             </div>
                         </div>
                     </section>

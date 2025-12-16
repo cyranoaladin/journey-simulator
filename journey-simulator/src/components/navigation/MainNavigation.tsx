@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
@@ -35,13 +35,14 @@ type NavItem = {
   external?: string
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { label: 'Home', href: '/dashboard', icon: Sparkles },
-  { label: 'Journeys', href: '/journeys', icon: Waypoints },
-  { label: 'Zyno Console', href: '/zyno', icon: BrainCircuit, badge: 'Live' },
-  { label: 'Playground', href: '/playground', icon: Atom },
+// Keep the header nav intentionally simple. Full navigation stays available in the left sidebar.
+const NAV_ITEMS: NavItem[] = [{ label: 'Journeys', href: '/journeys', icon: Waypoints }]
+
+const MORE_ITEMS: NavItem[] = [
   { label: 'DAO', href: '/dao', icon: Vote, badge: 'Beta' },
   { label: 'Resources', href: '/resources', icon: LibraryBig, badge: 'New' },
+  { label: 'Zyno Console', href: '/zyno', icon: BrainCircuit, badge: 'Live' },
+  { label: 'Playground', href: '/playground', icon: Atom },
   { label: 'Help', href: '/support', icon: LifeBuoy, badge: 'Guide' },
 ]
 
@@ -52,7 +53,9 @@ const MainNavigation = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isMoreOpen, setIsMoreOpen] = useState(false)
   const headerRef = useRef<HTMLElement | null>(null)
+  const moreRef = useRef<HTMLDivElement | null>(null)
 
   const totalPhases = selectedPersona?.phases?.length ?? 0
   const completedPhases = userProgress.completedPhases.length
@@ -248,7 +251,28 @@ const MainNavigation = () => {
     }
 
     setIsMobileMenuOpen(false)
+    setIsMoreOpen(false)
   }
+
+  useEffect(() => {
+    if (!isMoreOpen) return
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsMoreOpen(false)
+    }
+    const onPointerDown = (e: MouseEvent | PointerEvent) => {
+      const target = e.target as Node | null
+      if (!target) return
+      if (!moreRef.current) return
+      if (moreRef.current.contains(target)) return
+      setIsMoreOpen(false)
+    }
+    window.addEventListener('keydown', onKeyDown)
+    window.addEventListener('pointerdown', onPointerDown)
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('pointerdown', onPointerDown)
+    }
+  }, [isMoreOpen])
 
   return (
     <motion.header
@@ -262,7 +286,7 @@ const MainNavigation = () => {
       <div className="flex w-full flex-col gap-3 px-2 py-3 sm:px-3 lg:px-4">
         <div className="flex items-center justify-between gap-3">
           <button
-            onClick={() => handleNavigate(NAV_ITEMS[0])}
+            onClick={() => navigate('/dashboard')}
             className="flex items-center gap-3 text-left focus:outline-none focus:ring-2 focus:ring-accent-cyan rounded-lg p-2"
             aria-label="Return to home page"
           >
@@ -278,7 +302,7 @@ const MainNavigation = () => {
           </button>
 
           <nav aria-label="Navigation principale" className="hidden flex-1 items-center justify-center gap-6 lg:flex">
-            <ul className="flex gap-1">
+            <ul className="flex items-center gap-2">
               {NAV_ITEMS.map((item) => {
                 const Icon = item.icon
                 const isActive = !item.disabled && location.pathname === item.href
@@ -318,6 +342,67 @@ const MainNavigation = () => {
                 )
               })}
             </ul>
+
+            <div ref={moreRef} className="relative">
+              <motion.button
+                whileHover={{ y: -2 }}
+                type="button"
+                onClick={() => setIsMoreOpen((v) => !v)}
+                className={`relative flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold transition-colors ${navDefaultTone}`}
+                aria-haspopup="menu"
+                aria-expanded={isMoreOpen}
+              >
+                <Menu size={16} className="opacity-80" aria-hidden="true" />
+                <span>Menu</span>
+              </motion.button>
+
+              <AnimatePresence>
+                {isMoreOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.15 }}
+                    role="menu"
+                    className={`absolute left-0 mt-2 w-56 overflow-hidden rounded-2xl border shadow-glass backdrop-blur-2xl ${mobileMenuTone}`}
+                  >
+                    <div className="p-2">
+                      {MORE_ITEMS.map((item) => {
+                        const Icon = item.icon
+                        const isActive = !item.disabled && location.pathname === item.href
+                        return (
+                          <button
+                            key={item.label}
+                            type="button"
+                            role="menuitem"
+                            onClick={() => handleNavigate(item)}
+                            className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${isActive
+                              ? mobileItemActive
+                              : item.disabled
+                                ? mobileItemDisabled
+                                : mobileItemDefault
+                              }`}
+                            disabled={item.disabled}
+                          >
+                            <span className="flex items-center gap-2">
+                              <Icon size={16} aria-hidden="true" />
+                              {item.label}
+                            </span>
+                            {item.badge && (
+                              <span
+                                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${getBadgeClasses(item.badge)}`}
+                              >
+                                {item.badge}
+                              </span>
+                            )}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -326,6 +411,50 @@ const MainNavigation = () => {
             </div>
 
             <WalletButton />
+
+            <div className="hidden lg:flex items-center gap-3">
+              <div className="w-px h-6 bg-white/20"></div>
+
+              {!user ? (
+                <>
+                  <motion.button
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => navigate('/login?demo=1')}
+                    className="btn-primary flex items-center justify-center"
+                  >
+                    <span>Demo Mode</span>
+                  </motion.button>
+
+                  <motion.button
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => navigate('/login')}
+                    className="btn-secondary flex items-center justify-center"
+                  >
+                    <span>Sign In</span>
+                  </motion.button>
+
+                  <motion.button
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => navigate('/register')}
+                    className="rounded-2xl border-2 border-accent-cyan/50 bg-transparent px-6 py-3 text-base font-semibold text-accent-cyan transition-all duration-300 hover:bg-accent-cyan hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
+                  >
+                    <span>Sign Up</span>
+                  </motion.button>
+                </>
+              ) : (
+                <motion.button
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
+                  onClick={logout}
+                  className="btn-secondary flex items-center justify-center"
+                >
+                  <span>Logout</span>
+                </motion.button>
+              )}
+            </div>
 
             {/* Logout button removed - handled by WalletButton */}
 
@@ -418,7 +547,7 @@ const MainNavigation = () => {
             className={`px-4 pb-6 pt-4 lg:hidden ${mobileMenuTone}`}
           >
             <div className="flex flex-col gap-3">
-              {NAV_ITEMS.map((item) => {
+              {[...NAV_ITEMS, ...MORE_ITEMS].map((item) => {
                 const Icon = item.icon
                 const isActive = !item.disabled && location.pathname === item.href
                 return (
@@ -446,6 +575,34 @@ const MainNavigation = () => {
                   </button>
                 )
               })}
+            </div>
+
+            <div className="mt-6 grid grid-cols-1 gap-3">
+              {!user ? (
+                <>
+                  <button
+                    type="button"
+                    className="btn-primary w-full"
+                    onClick={() => navigate('/login?demo=1')}
+                  >
+                    Demo Mode
+                  </button>
+                  <button type="button" className="btn-secondary w-full" onClick={() => navigate('/login')}>
+                    Sign In
+                  </button>
+                  <button
+                    type="button"
+                    className="w-full rounded-2xl border-2 border-accent-cyan/50 bg-transparent px-6 py-3 text-base font-semibold text-accent-cyan transition-all duration-300 hover:bg-accent-cyan hover:text-black"
+                    onClick={() => navigate('/register')}
+                  >
+                    Sign Up
+                  </button>
+                </>
+              ) : (
+                <button type="button" className="btn-secondary w-full" onClick={logout}>
+                  Logout
+                </button>
+              )}
             </div>
 
             <div className="mt-6 grid grid-cols-2 gap-3">

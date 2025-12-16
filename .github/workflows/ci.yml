@@ -1,48 +1,45 @@
-name: CI MoneyFactory (Production Ready)
+name: CI (monorepo)
 
 on:
   push:
-    branches: [ "main", "fix/production-stability-dec2025" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
-  build-and-test:
-    name: Build & Test (Back & Front)
+  verify:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js & Cache (npm)
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-        # FIX: Explicitly point the cache key to the existing lockfiles
-        cache-dependency-path: |
-          mf-back/package-lock.json
-          journey-simulator/package-lock.json
-          web/package-lock.json
+      - name: Setup Node (npm cache)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: |
+            mf-back/package-lock.json
+            journey-simulator/package-lock.json
+            web/package-lock.json
 
-    # --- BACKEND (mf-back) ---
-    - name: Install Backend Dependencies
-      # npm ci uses package-lock.json from mf-back
-      run: cd mf-back && npm ci
+      - name: Install (mf-back)
+        run: npm ci --prefix mf-back
 
-    - name: Test Backend
-      # Test runs without errors, ignores minor test errors to let deployment continue
-      run: cd mf-back && npm test -- --passWithNoTests || true
+      - name: Install (journey-simulator)
+        run: npm ci --prefix journey-simulator
 
-    # --- FRONTEND (journey-simulator) ---
-    - name: Install Frontend Dependencies
-      run: cd journey-simulator && npm ci
+      - name: Install (web)
+        run: npm ci --prefix web
 
-    - name: Lint Frontend (Code Quality)
-      # Checks for ESLint errors (like the prefer-const issue we fixed)
-      run: cd journey-simulator && npm run lint
+      - name: Lint (simulator + web)
+        run: npm run lint:all
 
-    - name: Build Frontend
-      # Final build check to ensure TS is clean
-      run: cd journey-simulator && npm run build
+      - name: Build (simulator + web)
+        run: npm run build:all
+
+      - name: Unit tests (back + simulator + web)
+        run: npm run test:all
+
+      - name: E2E (journey-simulator)
+        run: npm run test:e2e:simulator

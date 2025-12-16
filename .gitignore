@@ -17,6 +17,9 @@ test-results/
 **/*.pid
 *.log
 **/*.log
+
+# Runtime agent metrics snapshots (do not commit)
+mf-back/memory/agent_metrics.log.json
 .DS_Store
 .vscode/
 .idea/

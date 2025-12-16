@@ -5,7 +5,8 @@ import { disablePageAnimations } from './utils/pageStability';
 test.describe('Capital Foundry Journey', () => {
   test.beforeEach(async ({ page }) => {
     await setupJourneyMocks(page, { personaId: 'capital-foundry', mockMint: true });
-    await seedDemoUser(page, null);
+    // Use a non-demo token to keep "Run Simulation" in single-step mode for this test.
+    await seedDemoUser(page, null, 'e2e-token');
     await disablePageAnimations(page);
   });
 
@@ -24,7 +25,7 @@ test.describe('Capital Foundry Journey', () => {
     await page.getByRole('button', { name: /Run Simulation|Start Journey/i }).click();
     await expect(page.getByRole('button', { name: 'Mint NFT' })).toBeVisible();
     await page.getByRole('button', { name: 'Mint NFT' }).click();
-    await expect(page.getByRole('heading', { name: 'DeFi Recon Marker' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Proof-of-Yield™ NFT', exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Close' }).first().click();
 
     await expect(page.getByRole('heading', { name: 'Program Forge Lab', level: 2 })).toBeVisible();

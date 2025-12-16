@@ -33,7 +33,7 @@ Chaque `phase` définie dans les fichiers de templates (journey-tasks.json, temp
 - ✅ Afficher le nom de l’agent déclenché
 - ✅ Présenter le raisonnement ou la stratégie de l’agent (si disponible)
 - ✅ Fournir une sortie exploitable : lien, graphique, ressource, résumé
-- ✅ Demander un retour utilisateur (AEPO / AECO)
+- ✅ Demander un retour utilisateur (AEPO = orchestration du parcours individuel / AECO = orchestration de cohorte)
 
 ---
 
@@ -48,7 +48,7 @@ Chaque `phase` définie dans les fichiers de templates (journey-tasks.json, temp
 
 ### 2. **JourneyCard / PhaseView**
 
-- Ajouter : 
+- Ajouter :
   - 🎯 But de la phase + rôle de l’agent
   - 🤖 Résumé généré par Zyno (reasoning)
   - 📍 Indicateur d’état : en cours / terminé / en attente feedback

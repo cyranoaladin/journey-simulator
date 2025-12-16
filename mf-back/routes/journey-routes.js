@@ -20,9 +20,9 @@ router.post('/reset-progress', protect, journeyController.resetUserProgress);
 router.get('/user-journeys', protect, journeyController.getUserJourneys);
 
 // AI / Zyno routes
-// Note: We might want to protect these, but for dev/demo ease we can leave them open or use 'protect'
+// Step is left unprotected for backwards compatibility, submissions require auth (supports demo token)
 router.post('/:journeyId/step', journeyController.step);
-router.post('/:journeyId/submit', journeyController.submit);
+router.post('/:journeyId/submit', protect, journeyController.submit);
 
 // Demo mode route
 router.post('/load-demo', protect, journeyController.loadDemoState);

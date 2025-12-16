@@ -12,7 +12,7 @@ test.describe('Journey Workspace UX Enhancement', () => {
         await page.goto('/journeys/capital-foundry');
 
         // Wait for workspace to load
-        await expect(page.getByText('Journey Workspace')).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Current Phase' })).toBeVisible();
         // Debug
         // console.log(await page.content());
     });
@@ -21,26 +21,24 @@ test.describe('Journey Workspace UX Enhancement', () => {
         // Check for Progress Bar presence (should be full width now)
         await expect(page.getByTestId('journey-progress-bar')).toBeVisible();
 
-        // Check Left Column Elements
-        // "Journey Overview" card
-        await expect(page.getByText('Journey Overview', { exact: true })).toBeVisible();
-        // "Current Phase" card
+        // Left column: Current phase + artifacts
         await expect(page.getByRole('heading', { name: 'Current Phase' })).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Project Artifacts' })).toBeVisible();
 
         // Check Right Column Elements
         // "Next Actions" panel
         await expect(page.getByTestId('journey-next-actions')).toBeVisible();
 
-        // Check if Persona Context is visible (New card)
-        await expect(page.getByText('Role & Goals')).toBeVisible();
+        // Agent intel is inside Next Actions panel
+        await expect(page.getByText('Agent Intel')).toBeVisible();
     });
 
     test('Should display Key Artifacts and Agent Intel', async ({ page }) => {
-        // Key Artifacts (Left Col)
-        await expect(page.getByRole('heading', { name: 'Key Artifacts' })).toBeVisible();
+        // Project Artifacts (Left Col)
+        await expect(page.getByRole('heading', { name: 'Project Artifacts' })).toBeVisible();
 
         // Agent Intel (Right Col or inside Actions)
-        await expect(page.getByRole('heading', { name: 'Agent Intel' })).toBeVisible();
+        await expect(page.getByText('Agent Intel')).toBeVisible();
     });
 
 });

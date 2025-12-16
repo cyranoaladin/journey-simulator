@@ -31,6 +31,27 @@ export function middleware(req: Request) {
     url.pathname.startsWith('/dao/') ||
     url.pathname.startsWith('/admin/')
 
+  // API-only mode:
+  // - Keep API/endpoint routes working
+  // - Redirect "/" to the real UI (journey-simulator on :3003)
+  // - For any other path, return a plain 404 (avoid rendering Next pages/HTML)
+  const isAllowedNonApiPath =
+    url.pathname === '/' ||
+    url.pathname.startsWith('/api/') ||
+    url.pathname.startsWith('/user/') ||
+    url.pathname.startsWith('/journey/') ||
+    url.pathname.startsWith('/dao/') ||
+    url.pathname.startsWith('/admin/')
+
+  if (!isAllowedNonApiPath) {
+    return new NextResponse('Not Found', { status: 404 })
+  }
+
+  if (url.pathname === '/') {
+    const target = process.env.SIMULATOR_BASE_URL || 'http://127.0.0.1:3003/'
+    return NextResponse.redirect(target, 307)
+  }
+
   // Handle CORS (including preflight) for relevant paths
   if (isCorsPath) {
     const res = isPreflight ? new NextResponse(null, { status: 204 }) : NextResponse.next()
@@ -81,5 +102,5 @@ export function middleware(req: Request) {
 }
 
 export const config = {
-  matcher: ['/api/:path*', '/admin/:path*', '/user/:path*', '/journey/:path*', '/dao/:path*'],
+  matcher: ['/:path*'],
 }

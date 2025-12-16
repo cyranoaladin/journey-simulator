@@ -1,7 +1,7 @@
 import type { Page, Route } from '@playwright/test';
 
 export type JourneyMockOptions = {
-  personaId?: string | null;
+  personaId?: string;
   completedPhases?: number[];
   totalXP?: number;
   tokens?: number;
@@ -20,12 +20,7 @@ const fulfillJson = async (route: Route, data: unknown, status = 200) => {
 };
 
 export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions = {}) => {
-  // If undefined, default to 'cognitive-activation-hub'. If null, keep null.
-  const personaId = options.personaId === undefined ? 'cognitive-activation-hub' : options.personaId;
-
-  const stateId = Math.floor(Math.random() * 10000);
-  console.log(`[Mock:${stateId}] Setup with personaId: ${personaId}`);
-
+  const personaId = options.personaId ?? 'cognitive-activation-hub';
   const progressState = {
     personaId,
     completedPhases: new Set(options.completedPhases ?? []),
@@ -46,12 +41,7 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
     }
   });
 
-  // No changes to setupJourneyMocks signature...
-
-  // Removed **/user/profile as it's not a primary auth check on load usually, mostly verifyToken.
-  // Unless explicit profile fetch. `api.getUserProfile` isn't used in AuthContext checkAuthStatus, only verifyToken.
-
-  await page.route('**/auth/verify', async (route) => {
+  await page.route('**/user/profile', async (route) => {
     await fulfillJson(route, {
       success: true,
       user: {
@@ -59,113 +49,42 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
         name: 'Playwright User',
         email: 'playwright@moneyfactory.ai',
         role: 'user',
-        persona: progressState.personaId
+        persona: personaId
       }
     });
   });
-  await page.route('**/auth/login', async (route) => {
+
+  await page.route('**/user/verify', async (route) => {
     await fulfillJson(route, {
       success: true,
-      token: 'mock-token-123',
-      refreshToken: 'mock-refresh-123',
       user: {
         id: 'e2e-user-id',
         name: 'Playwright User',
         email: 'playwright@moneyfactory.ai',
         role: 'user',
-        persona: progressState.personaId
+        persona: personaId
       }
     });
   });
-  await page.route('**/user/*', async (route) => {
-    const request = route.request();
-    console.log(`[Mock] User Request: ${request.method()} ${request.url()}`);
-    if (request.method() === 'OPTIONS') {
-      await route.fulfill({
-        status: 200,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'PUT, POST, GET, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type'
-        }
-      });
-      return;
-    }
 
-    if (request.method() === 'PUT') {
-      // Handles api.updateUserProfile (PUT /user/:id)
-      try {
-        const body = JSON.parse(request.postData() || '{}');
-        if (body?.persona) {
-          progressState.personaId = body.persona;
-          progressState.completedPhases.clear();
-        }
-      } catch (e) {
-        console.error(`[Mock:${stateId}] PUT Parse Error:`, e);
+  await page.route('**/user/update-profile', async (route) => {
+    try {
+      const body = JSON.parse(route.request().postData() || '{}');
+      if (body?.persona) {
+        progressState.personaId = body.persona;
       }
-      await fulfillJson(route, { success: true });
-      return;
+    } catch {
+      // ignore
     }
-    // If it's not a PUT, continue to matching other routes
-    // But verify we don't block other specific routes if any exist (none so far inside user/* other than progress which has its own handler)
-    await route.continue();
+    await fulfillJson(route, { success: true });
   });
 
-  // Mock for Collaterize simulation (Moved out of user handler)
-  await page.route('**/simulate/collaterize', async (route) => {
-    const method = route.request().method();
-    const headers = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type'
-    };
-
-    if (method === 'OPTIONS') {
-      await route.fulfill({
-        status: 200,
-        headers
-      });
-      return;
-    }
-
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      headers,
-      body: JSON.stringify({
-        ok: true,
-        simulation: {
-          eligibilityScore: 85,
-          communityScore: 75,
-          riskScore: 0.12,
-          notes: ['Strong team', 'Audited code'],
-          tier: 'gold',
-          accepted: true,
-          targetRaiseUSD: 1000000,
-          softCapUSD: 500000,
-          hardCapUSD: 2000000,
-          liquidityUSD: 250000,
-          initialPriceUSD: 0.10,
-          simulatedLaunchUrl: 'https://collaterize.example/simulation'
-        }
-      })
-    });
-  });
-
-  // Combined handler for GET user progress and POST update progress
-  await page.route('**/user/*/progress', async (route) => {
+  await page.route('**/journey/user-progress', async (route) => {
     if (route.request().method() === 'GET') {
-      const payload = buildProgressPayload();
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
-        body: JSON.stringify(payload)
-      });
+      await fulfillJson(route, buildProgressPayload());
       return;
     }
 
-    // POST update
     try {
       const body = JSON.parse(route.request().postData() || '{}');
       if (typeof body?.total_xp === 'number') {
@@ -182,7 +101,7 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
     await fulfillJson(route, { success: true });
   });
 
-  await page.route('**/user/*/progress/reset', async (route) => {
+  await page.route('**/journey/reset-progress', async (route) => {
     progressState.completedPhases.clear();
     progressState.totalXP = 0;
     progressState.tokens = 0;
@@ -190,7 +109,7 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
     await fulfillJson(route, { success: true });
   });
 
-  await page.route('**/demo/state', async (route) => {
+  await page.route('**/journey/load-demo', async (route) => {
     await fulfillJson(route, {
       success: true,
       journey: { id: progressState.personaId },
@@ -203,7 +122,7 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
     });
   });
 
-  await page.route('**/journey/*/phases/*/complete', async (route) => {
+  await page.route('**/journey/complete-phase', async (route) => {
     let body: any = {};
     try {
       body = JSON.parse(route.request().postData() || '{}');
@@ -242,12 +161,12 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
     });
   });
 
-  await page.route('**/journey/*/artifacts', async (route) => {
+  await page.route('**/journey/artifacts', async (route) => {
     await fulfillJson(route, {
       success: true,
       artifacts: (options.artifacts ?? [
-        { id: 'artifact-1', title: 'Protocol Blueprint', agent: { name: 'Architect', role: 'System', color: 'text-blue-400' }, type: 'TECHNICAL', thumbnailIcon: 'file-text' },
-        { id: 'artifact-2', title: 'Market Readiness Checklist', agent: { name: 'Growth', role: 'Strategy', color: 'text-green-400' }, type: 'STRATEGY', thumbnailIcon: 'file-text' }
+        { id: 'artifact-1', title: 'Protocol Blueprint' },
+        { id: 'artifact-2', title: 'Market Readiness Checklist' }
       ]).map((artifact) => ({
         ...artifact,
         unlockPhase: 0,
@@ -257,13 +176,72 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
     });
   });
 
-  // ... (agent-logs, journey/*/step seem OK or need check)
-  // journey/*/step is correct in journeyStore (fetch).
+  await page.route('**/admin/agent-logs*', async (route) => {
+    await fulfillJson(route, [
+      {
+        userId: 'e2e-user-id',
+        agentName: 'Zyno Orchestrator',
+        ae_summary: 'Mocked agent log entry.',
+        ae_outcome: 'success',
+        timestamp: new Date().toISOString()
+      }
+    ]);
+  });
 
-  // ...
+  await page.route('**/journey/*/step', async (route) => {
+    await fulfillJson(route, {
+      metadata: {
+        persona_id: progressState.personaId,
+        journey_track: 'demo',
+        phase_id: `phase-${progressState.completedPhases.size}`,
+        language: 'en'
+      },
+      ui_blocks: [
+        {
+          kind: 'text_block',
+          id: 'mock-step-guidance',
+          title: 'Mocked Mission Guidance',
+          body_markdown: 'This response is generated by the Playwright mock layer to unblock UI rendering.'
+        }
+      ],
+      agent_actions: [],
+      next_state: {
+        phase_id: `phase-${progressState.completedPhases.size}`,
+        completed_missions: [],
+        xp_delta: 0
+      }
+    });
+  });
+
+  await page.route('**/journey/**/submit', async (route) => {
+    await fulfillJson(route, {
+      success: true,
+      evaluation: { global_score: 10, max_score: 10 },
+      metadata: {
+        persona_id: progressState.personaId,
+        journey_track: 'demo',
+        phase_id: `phase-${progressState.completedPhases.size}`,
+        language: 'en'
+      },
+      ui_blocks: [
+        {
+          kind: 'text_block',
+          id: 'mock-submit',
+          title: 'Submission Received',
+          body_markdown: 'Submission accepted via mock route.'
+        }
+      ],
+      agent_actions: [],
+      next_state: {
+        phase_id: `phase-${progressState.completedPhases.size}`,
+        completed_missions: [],
+        xp_delta: 0
+      }
+    });
+  });
 
   // Token balance updates
-  await page.route('**/user/*/tokens', async (route) => {
+  await page.route('**/user/tokens', async (route) => {
     try {
       const body = JSON.parse(route.request().postData() || '{}');
       if (typeof body?.mfai_tokens === 'number') {
@@ -275,7 +253,7 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
     await fulfillJson(route, { success: true });
   });
 
-  await page.route('**/nft/certificate', async (route) => {
+  await page.route('**/user/nft-certificates', async (route) => {
     try {
       const body = JSON.parse(route.request().postData() || '{}');
       if (body?.title) {
@@ -318,9 +296,13 @@ export const setupMintMocks = async (page: Page, txSignature = 'PLAYWRIGHT_SIG')
   });
 };
 
-export const seedDemoUser = async (page: Page, personaId: string | null = 'cognitive-activation-hub', progressOverride: any = {}) => {
-  await page.addInitScript(({ persona, progress }) => {
-    localStorage.setItem('accessToken', 'demo-token');
+export const seedDemoUser = async (
+  page: Page,
+  personaId: string | null = 'cognitive-activation-hub',
+  accessToken: string = 'demo-token'
+) => {
+  await page.addInitScript(({ persona, token }) => {
+    localStorage.setItem('accessToken', token);
     localStorage.setItem('refreshToken', 'demo-refresh-token');
     localStorage.setItem('userId', 'demo-user-id');
     if (persona) {
@@ -331,7 +313,9 @@ export const seedDemoUser = async (page: Page, personaId: string | null = 'cogni
 
     const persisted = {
       state: {
-        selectedPersona: null, // Force hydration from userProgress to ensure full persona object (phases, etc.)
+        // Keep null here so the /journeys/:journeyId route can hydrate the full persona object
+        // from the in-app personas catalogue (avoids tests breaking with partial persona data).
+        selectedPersona: null,
         userProgress: {
           totalXP: 0,
           nfts: [],
@@ -347,12 +331,11 @@ export const seedDemoUser = async (page: Page, personaId: string | null = 'cogni
           socialShareCount: 0,
           shareHistory: [],
           currentPersona: persona ?? undefined,
-          ...progress // Apply overrides
         }
       },
       version: 0
     };
 
     localStorage.setItem('mfai-journey-storage', JSON.stringify(persisted));
-  }, { persona: personaId, progress: progressOverride });
+  }, { persona: personaId, token: accessToken });
 };

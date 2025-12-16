@@ -39,9 +39,17 @@ if (!parsed.success) {
 
 const env = parsed.data;
 
-const allowedOrigins = env.CORS_ALLOWED_ORIGINS
-  ? env.CORS_ALLOWED_ORIGINS.split(',').map((origin) => origin.trim()).filter(Boolean)
-  : DEFAULT_ORIGINS;
+// Always include safe local defaults, and extend with env-provided origins.
+// This avoids breaking local preview/prod-like runs when CORS_ALLOWED_ORIGINS is set but incomplete.
+const allowedOriginsSet = new Set(DEFAULT_ORIGINS);
+if (env.CORS_ALLOWED_ORIGINS) {
+  env.CORS_ALLOWED_ORIGINS
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+    .forEach((origin) => allowedOriginsSet.add(origin));
+}
+const allowedOrigins = Array.from(allowedOriginsSet);
 
 const rateLimitConfig = {
   windowMs: env.RATE_LIMIT_WINDOW_MS,

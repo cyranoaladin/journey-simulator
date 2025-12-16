@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
@@ -14,6 +14,7 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const autoDemoTriggeredRef = useRef(false);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -22,6 +23,30 @@ const LoginPage: React.FC = () => {
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, navigate, location]);
+
+  // If header "Demo Mode" is clicked, we land on /login?demo=1 and auto-enter demo.
+  useEffect(() => {
+    if (isLoading || isAuthenticated) return;
+    if (autoDemoTriggeredRef.current) return;
+    const params = new URLSearchParams(location.search);
+    const demo = params.get('demo');
+    if (demo !== '1') return;
+
+    autoDemoTriggeredRef.current = true;
+    // fire-and-forget: reuses existing handler (shows loader, sets tokens, redirects)
+    void (async () => {
+      setIsSubmitting(true);
+      setError('');
+      try {
+        const ok = await loginAsDemo();
+        if (!ok) setError('Demo login failed. Please try again.');
+      } catch {
+        setError('Demo login failed. Please try again.');
+      } finally {
+        setIsSubmitting(false);
+      }
+    })();
+  }, [isLoading, isAuthenticated, location.search, loginAsDemo]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -82,6 +82,7 @@ function App() {
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="journeys" element={<Journey />} />
                   <Route path="journeys/:journeyId" element={<Journey />} />
+                  <Route path="journeys/demo" element={<Journey />} />
                   <Route path="journeys/completed" element={<JourneyCompleted />} />
                   <Route path="playground" element={<Playground />} />
                   <Route path="dao" element={<Dao />} />

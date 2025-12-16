@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware'
 import { Persona, UserProgress, TestnetFeatures } from '../types/journey'
 import { personas } from '../data/personas'
 import { getPersonaProofData, getProofType } from '../data/proofsData'
-import { api } from '../utils/api'
+import { api, API_BASE_URL } from '../utils/api'
 import { mintProofOfSkill } from '../utils/blockchain'
 import { normalizeCompletedPhases } from '../utils/progress'
 
@@ -293,10 +293,13 @@ export const useJourneyStore = create<JourneyState>()(
           tone: uiTone,
           journeyState: { xp: get().userProgress.totalXP, completed: get().userProgress.completedPhases }
         }
-        const base = import.meta.env.VITE_API_BASE_URL || 'https://journey.mfai.app/api'
         try {
           set({ isStepLoading: true })
-          const resp = await window.fetch(`${base}/journey/${id}/step`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+          const resp = await window.fetch(`${API_BASE_URL}/journey/${id}/step`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          })
           if (!resp.ok) throw new Error(`step failed: ${resp.status}`)
           const json = await resp.json()
           set({ lastStep: json })

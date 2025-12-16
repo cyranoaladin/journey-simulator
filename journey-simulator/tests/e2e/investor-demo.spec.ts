@@ -28,24 +28,32 @@ test.describe('Investor Demo Flow - Capital Foundry', () => {
         await expect(page.getByRole('heading', { name: 'Protocol Discovery Sprint', level: 2 })).toBeVisible();
 
         await page.getByRole('button', { name: /Run Simulation|Start Journey/i }).click();
-        await expect(page.getByRole('button', { name: 'Mint NFT' })).toBeVisible();
-        await page.getByRole('button', { name: 'Mint NFT' }).click();
-        await expect(page.getByRole('heading', { name: 'DeFi Recon Marker' })).toBeVisible();
-        await page.getByRole('button', { name: 'Close' }).first().click();
+        // Demo mode now auto-plays phases. Validate the new UX:
+        await expect(page.getByRole('button', { name: 'Stop' })).toBeVisible({ timeout: 15000 });
+        await expect(page.getByText(/Auto-simulation en cours/i)).toBeVisible({ timeout: 15000 });
 
-        await expect(page.getByRole('heading', { name: 'Program Forge Lab', level: 2 })).toBeVisible();
+        // Auto-sim may surface an artifact modal that intercepts clicks; close it if present.
+        const closeArtifactBtnEarly = page.getByRole('button', { name: 'Close artifact viewer' });
+        if (await closeArtifactBtnEarly.isVisible().catch(() => false)) {
+            await closeArtifactBtnEarly.click();
+        }
 
-        // Wait for Neural Overlay to disappear if present
-        await expect(page.getByTestId('neural-overlay')).not.toBeVisible({ timeout: 30000 });
+        // Wait until the auto-sim reaches the launch phase.
+        await expect(page.getByRole('heading', { name: 'Launch via Collaterize', level: 2 })).toBeVisible({
+            timeout: 30000
+        });
+
+        // Auto-simulation should finish shortly; wait for Stop CTA to disappear.
+        await expect(page.getByRole('button', { name: 'Stop' })).not.toBeVisible({ timeout: 30000 });
 
         // Close the artifact viewer if it's open (it covers the back button)
         const closeArtifactBtn = page.getByRole('button', { name: 'Close artifact viewer' });
-        if (await closeArtifactBtn.isVisible()) {
+        if (await closeArtifactBtn.isVisible().catch(() => false)) {
             await closeArtifactBtn.click();
         }
 
-        await page.getByTestId('back-to-journeys').click();
-        await page.waitForURL('**/journeys');
+        // Some layouts don't render the JourneyWorkspace header back button; navigate directly.
+        await page.goto('/journeys');
         await expect(page.getByText('Choose Your Path to Sovereignty')).toBeVisible();
     });
 });

@@ -21,6 +21,9 @@ router.post('/', async (req, res) => {
       userId,
       missionId,
       aepoScore: null,
+      // AECO (Cohort Orchestration) signal (MVP):
+      // We store user satisfaction feedback here. In future iterations this can expand to cohort-level analytics
+      // (peer review scores, team readiness, shared milestone completion, etc.).
       aecoFeedback: {
         satisfaction: feedbackData.score,
         comment: feedbackData.comment

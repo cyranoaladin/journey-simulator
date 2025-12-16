@@ -9,6 +9,8 @@
     "build:optimized": "tsc && vite build --mode production",
     "analyze": "npm run build -- --mode analyze",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit",
     "check": "npm run lint && npm run test",
     "preview": "vite preview",
     "perf:check": "lighthouse http://localhost:3000 --output html --output-path=./reports/performance-report.html",

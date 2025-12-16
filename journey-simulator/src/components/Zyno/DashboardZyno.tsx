@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useJourneyStore } from '../../store/journeyStore';
 import type { MissionSummary } from './MissionFeedbackSummary';
+import { AEPO, AECO } from '../../content/aepoAeco';
 
 interface DashboardZynoProps {
   missionSummary?: MissionSummary | null;
@@ -38,7 +39,7 @@ const quickActions = [
   },
   {
     title: 'Export to Notion',
-    description: 'Centralize your AEPO/AECO summaries in your knowledge base.',
+    description: 'Centralize your AEPO (pathway) and AECO (cohort) signals in your knowledge base.',
     icon: TrendingUp,
     href: '#zyno-console',
   },
@@ -118,7 +119,7 @@ const DashboardZyno = ({ missionSummary }: DashboardZynoProps) => {
               <div className="mfai-divider mt-4" />
               <p className="mt-3 text-xs text-slate-600 dark:text-mfai-text/70">
                 {stat.label === 'AEPO Score'
-                  ? 'The AEPO score reflects the relevance of generated recommendations.'
+                  ? 'AEPO measures how well your personalized roadmap is orchestrated (signals from missions, progress, and agent outputs).'
                   : stat.label === 'Active Agents'
                     ? 'Number of agents solicited during the last mission.'
                     : stat.label === 'Total XP'
@@ -138,7 +139,19 @@ const DashboardZyno = ({ missionSummary }: DashboardZynoProps) => {
               {selectedPersona?.title ?? 'Select a persona to start your simulation'}
             </h3>
             <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-mfai-text/75">
-              Follow key phases orchestrated by Zyno. Each step unlocks resources, guided missions, and AECO/AEPO feedback.
+              Follow key phases orchestrated by Zyno. Each step unlocks resources, guided missions, and
+              {' '}
+              <span title={AEPO.tooltip} className="cursor-help border-b border-dashed border-slate-300/60 dark:border-mfai-border/60">
+                AEPO
+              </span>
+              {' '}
+              /
+              {' '}
+              <span title={AECO.tooltip} className="cursor-help border-b border-dashed border-slate-300/60 dark:border-mfai-border/60">
+                AECO
+              </span>
+              {' '}
+              signals.
             </p>
           </div>
           <div className="w-full max-w-xs rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-inner-glow dark:border-mfai-border/60 dark:bg-mfai-surfaceAlt/40">

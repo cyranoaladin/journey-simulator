@@ -1,16 +1,18 @@
 import { test, expect } from '@playwright/test';
-import { setupJourneyMocks, seedDemoUser } from './utils/journeyMocks';
-
-// ... (existing imports)
-
-// ... (existing imports)
+import { setupJourneyMocks } from './utils/journeyMocks';
 import { disablePageAnimations } from './utils/pageStability';
 
 test.describe('Full Journey & Collaterize Launch', () => {
   test.beforeEach(async ({ page }) => {
-    // Moved setupJourneyMocks to individual tests to allow custom configuration overrides without LIFO conflicts
-    // await setupJourneyMocks(page, { personaId: 'cognitive-activation-hub' });
     await disablePageAnimations(page);
+
+    await setupJourneyMocks(page, {
+      personaId: 'cognitive-activation-hub',
+      completedPhases: [0, 1, 2, 3, 4],
+      totalXP: 5200,
+      tokens: 480,
+      mockMint: true,
+    });
 
     await page.route('**/journeys/*/phases/launch-collaterize/simulate', async (route) => {
       await route.fulfill({
@@ -38,45 +40,47 @@ test.describe('Full Journey & Collaterize Launch', () => {
   });
 
   test('simulates collaterize launch results in demo mode', async ({ page }) => {
-    await setupJourneyMocks(page, {
-      personaId: 'cognitive-activation-hub',
-      completedPhases: [0, 1, 2, 3, 4],
-      totalXP: 5200,
-      tokens: 480,
-      mockMint: true,
-    });
+    await page.goto('/login');
 
     const demoSeed = {
-      totalXP: 5200,
-      mfaiTokens: 480,
+      xp: 5200,
+      tokens: 480,
       completedPhases: [0, 1, 2, 3, 4],
-      nfts: ['Proof-of-Skill™: Activation', 'Solana Fluency Patch'],
-      currentPersona: 'cognitive-activation-hub'
+      nfts: ['Proof-of-Skill™: Activation', 'Solana Fluency Patch']
     };
 
-    // Use enhanced seedDemoUser to prepopulate storage
-    await seedDemoUser(page, 'cognitive-activation-hub', demoSeed);
+    await page.getByRole('button', { name: 'Try Demo Mode' }).click();
+    await page.waitForURL('**/journeys');
 
-    await page.goto('/journeys/cognitive-activation-hub');
-    // Removed "Try Demo Mode" click as we are already authenticated via seedDemoUser
+    const personaCard = page.locator('article').filter({ has: page.getByRole('heading', { name: 'The Cognitive Activation Hub' }) }).first();
+    await personaCard.getByRole('button', { name: 'Launch with Zyno' }).click();
 
-    // Wait for workspace to load (auto-redirect logic in App)
-    // We skip explicit waitForURL as it can be flaky, and rely on element visibility
-    // Wait for the stored persona to be loaded and rendered
-    // We rely on the UI being visible as the store variable is not exposed in preview
-    try {
-      // Relaxed selector to catch text even if strict heading role match fails
-      await expect(page.getByRole('heading', { name: 'Launch via Collaterize', level: 3 })).toBeVisible({ timeout: 20000 });
-    } catch (e) {
-      console.log('Heading not found, dumping page content...');
-      const content = await page.content();
-      console.log(content);
-      throw e;
-    }
+    await page.waitForURL('**/journeys/cognitive-activation-hub');
 
-    // Manual hydration removed as seedDemoUser handles it
+    await page.waitForFunction(() => {
+      const store = (window as any).useJourneyStore?.getState?.();
+      return store?.selectedPersona?.id === 'cognitive-activation-hub';
+    });
 
-    await expect(page.getByRole('heading', { level: 3, name: 'Launch via Collaterize' })).toBeVisible();
+    await page.evaluate((seed) => {
+      const storeApi = (window as any).useJourneyStore;
+      if (!storeApi?.setState) return;
+
+      const current = storeApi.getState();
+      storeApi.setState({
+        userProgress: {
+          ...current.userProgress,
+          totalXP: seed.xp,
+          mfaiTokens: seed.tokens,
+          completedPhases: seed.completedPhases,
+          nfts: seed.nfts,
+          currentPersona: 'cognitive-activation-hub'
+        },
+        currentPhase: seed.completedPhases.length
+      });
+    }, demoSeed);
+
+    await expect(page.getByRole('heading', { level: 2, name: 'Launch via Collaterize' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Ready to Launch?' })).toBeVisible();
 
     await page.evaluate(() => {
@@ -88,7 +92,13 @@ test.describe('Full Journey & Collaterize Launch', () => {
     await expect(page.getByText('Launch Simulation Results')).toBeVisible();
     await expect(page.getByText('ELIGIBLE')).toBeVisible();
 
-    // Verify UI outcome instead of internal store state which is not exposed
+    const simulationState = await page.evaluate(() => {
+      const storeApi = (window as any).useJourneyStore;
+      return storeApi?.getState?.().userProgress?.collaterizeSimulation ?? null;
+    });
+
+    expect(simulationState).toBeTruthy();
+    expect(simulationState?.targetRaiseUSD).toBe(750000);
     await expect(page.getByRole('link', { name: /Open Collaterize/i })).toHaveAttribute('href', 'https://collaterize.example/simulation');
   });
 });

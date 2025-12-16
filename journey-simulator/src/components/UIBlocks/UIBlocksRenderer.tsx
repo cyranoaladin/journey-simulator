@@ -628,6 +628,7 @@ function Document({ block }: { block: DocumentBlock }) {
 }
 
 function Evaluation({ block }: { block: EvaluationBlock }) {
+  console.log('Evaluation block:', block);
   return (
     <div className="bg-white/5 rounded-xl p-4">
       <div className="flex items-center justify-between mb-2">
@@ -665,6 +666,7 @@ function Evaluation({ block }: { block: EvaluationBlock }) {
 }
 
 function ActionSuggestions({ block }: { block: ActionSuggestionsBlock }) {
+  console.log('ActionSuggestions block:', block);
   const ensureApiJourneyId = useJourneyStore((s) => s.ensureApiJourneyId);
   const selectedPersona = useJourneyStore((s) => s.selectedPersona);
   const lastStep = useJourneyStore((s) => s.lastStep);
@@ -729,7 +731,7 @@ function ActionSuggestions({ block }: { block: ActionSuggestionsBlock }) {
     <div className="bg-white/5 rounded-xl p-4 relative">
       <h4 className="font-semibold mb-3">{block.title}</h4>
       <div className="flex flex-wrap gap-2">
-        {block.suggestions.map((s, i) => (
+        {(block.suggestions || []).map((s, i) => (
           <button
             key={i}
             onClick={() => onChoose(s.action_id)}
@@ -916,6 +918,7 @@ export default function UIBlocksRenderer({ response }: { response: JourneyStepRe
   if (!response || !response.ui_blocks) return null;
 
   const render = (b: UIBlock) => {
+    try {
     switch (b.kind) {
       case "text_block":
         return <Text key={b.id} block={b} />;
@@ -959,6 +962,10 @@ export default function UIBlocksRenderer({ response }: { response: JourneyStepRe
       default:
         return null;
     }
+    } catch (error) {
+        console.error('Error rendering block:', b.kind, error);
+        return null;
+    }
   };
 
   const container = {
@@ -985,6 +992,7 @@ export default function UIBlocksRenderer({ response }: { response: JourneyStepRe
     >
       <AnimatePresence>
         {response.ui_blocks.map((b, index) => {
+          console.log('Rendering block:', b);
           const blockKey = b.id ? `${b.id}` : `${b.kind}-${index}`;
 
           return (

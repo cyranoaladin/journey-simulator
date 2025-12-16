@@ -5,6 +5,7 @@ const { loadTemplateForIntent } = require('../data/parcoursTemplates');
 const computeAEPO = require('../metrics/computeAEPO');
 const { saveMetric } = require('../memory/agent_metrics');
 const agentMemory = require('../memory/agent_memory');
+const { AEPO, AECO } = require('../utils/aepoAeco');
 
 function normalizeReferences(agentResult = {}) {
   if (Array.isArray(agentResult.sources)) {
@@ -183,6 +184,9 @@ async function triggerAgents(agentNames, mode, context, intent) {
         errorCount
       };
 
+      // AEPO (Pathway Orchestration) signal:
+      // In this MVP implementation, we compute a per-agent execution quality score (latency/success/retries)
+      // that feeds AEPO-driven pathway decisions. This is NOT the A/E/P/O scorecard.
       saveMetric(agentName, userId, 'AEPO', metricPayload, missionId);
       agentMemory.saveInteraction(agentName, userId, {
         type: 'AEPO',
@@ -230,6 +234,11 @@ async function triggerAgents(agentNames, mode, context, intent) {
         summary: summarizeOutput(normalized.output ?? normalized.response),
         sources: normalized.sources,
         feedback: normalized.feedback,
+        // Human-readable context for observers (dev/investors). Safe to ignore by clients.
+        orchestration: {
+          aepo: AEPO,
+          aeco: AECO,
+        },
       });
 
       return normalized;
@@ -350,4 +359,3 @@ async function orchestrateZyno(userInput, context = {}) {
 }
 
 module.exports = { orchestrateZyno };
-

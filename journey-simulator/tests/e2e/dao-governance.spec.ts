@@ -1,19 +1,15 @@
 import { test, expect } from '@playwright/test';
+import { disablePageAnimations } from './utils/pageStability';
 
 test.describe('DAO Governance', () => {
     test.beforeEach(async ({ page }) => {
-        // Mock login
-        await page.route('**/user/login', async (route) => {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    success: true,
-                    accessToken: 'mock-token',
-                    refreshToken: 'mock-refresh',
-                    user: { id: 'user-123', name: 'Test User', email: 'test@example.com', role: 'user' }
-                })
-            });
+        await disablePageAnimations(page);
+
+        // Inject auth token into localStorage before any navigation
+        await page.addInitScript(() => {
+            localStorage.setItem('accessToken', 'e2e-token');
+            localStorage.setItem('refreshToken', 'e2e-refresh-token');
+            localStorage.setItem('userId', 'user-123');
         });
 
         // Mock profile
@@ -22,6 +18,7 @@ test.describe('DAO Governance', () => {
                 status: 200,
                 contentType: 'application/json',
                 body: JSON.stringify({
+                    success: true,
                     user: { id: 'user-123', name: 'Test User', email: 'test@example.com', role: 'user' }
                 })
             });
@@ -29,16 +26,28 @@ test.describe('DAO Governance', () => {
 
         // Mock journey progress
         await page.route('**/journey/user-progress', async (route) => {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    total_xp: 0,
-                    current_level: 1,
-                    completed_phases: [],
-                    currentPersona: null
-                })
-            });
+            if (route.request().method() === 'GET') {
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({
+                        success: true,
+                        progress: {
+                            total_xp: 0,
+                            completed_phases: 0,
+                            persona: 'capital-foundry',
+                            token_transactions: { mfai_tokens: 0 },
+                            nft_certificates: []
+                        }
+                    })
+                });
+            } else {
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({ success: true })
+                });
+            }
         });
 
         // Mock DAO Config
@@ -76,54 +85,41 @@ test.describe('DAO Governance', () => {
                         ]
                     })
                 });
-            } else if (route.request().method() === 'POST') {
-                // Mock Create Proposal
-                const postData = route.request().postDataJSON();
-                await route.fulfill({
-                    status: 201,
-                    contentType: 'application/json',
-                    body: JSON.stringify({
-                        message: 'Proposal created successfully',
-                        proposal: {
-                            id: 'prop-new',
-                            title: postData.title,
-                            description: postData.description,
-                            createdBy: 'user-123',
-                            createdAt: new Date().toISOString(),
-                            status: 'active',
-                            votes: { yes: 0, no: 0 },
-                            quorumMet: false,
-                            voterDetails: {}
-                        }
-                    })
-                });
             }
         });
 
-        // Mock Vote
-        await page.route('**/dao/proposals/*/vote', async (route) => {
+        // Mock Create Proposal (actual endpoint)
+        await page.route('**/dao/proposal', async (route) => {
+            if (route.request().method() !== 'POST') {
+                await route.fulfill({ status: 405, contentType: 'application/json', body: JSON.stringify({ error: 'method_not_allowed' }) })
+                return
+            }
+            const postData = route.request().postDataJSON() as any
             await route.fulfill({
-                status: 200,
+                status: 201,
                 contentType: 'application/json',
                 body: JSON.stringify({
-                    message: 'Vote cast successfully',
+                    success: true,
                     proposal: {
-                        id: 'prop-1',
-                        votes: { yes: 1100, no: 50 },
-                        voterDetails: { 'user-123': { support: 'yes', weight: 1000 } }
+                        id: 'prop-new',
+                        title: postData.title,
+                        description: postData.description,
+                        createdAt: new Date().toISOString(),
+                        status: 'active',
+                        votes: { yes: 0, no: 0 },
                     }
                 })
             });
-        });
+        })
 
-        // Login and navigate to DAO
-        await page.goto('/login');
-        await page.locator('input[name="email"]').fill('test@example.com');
-        await page.locator('input[name="password"]').fill('password');
-        await page.getByRole('button', { name: 'Sign In' }).click();
-
-        // Wait for redirection to /journeys
-        await page.waitForURL('**/journeys', { timeout: 30000 });
+        // Mock Vote (actual endpoint)
+        await page.route('**/dao/vote', async (route) => {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({ success: true })
+            });
+        })
     });
 
     test('should display proposals list', async ({ page }) => {
@@ -143,10 +139,10 @@ test.describe('DAO Governance', () => {
         await expect(page.locator('.animate-spin')).not.toBeVisible({ timeout: 10000 });
 
         // Open Admin Panel
-        const adminBtn = page.getByRole('button', { name: /Open admin console/i });
+        const adminBtn = page.getByRole('button', { name: /Open Admin Console/i });
         await expect(adminBtn).toBeVisible();
         await page.waitForTimeout(500); // Wait for any layout shift
-        await adminBtn.dispatchEvent('click');
+        await adminBtn.click();
 
         // Wait for panel to appear
         const apiKeyInput = page.locator('input[type="password"]');
@@ -160,7 +156,7 @@ test.describe('DAO Governance', () => {
         await page.getByPlaceholder('Description / context').fill('Description of the proposal');
 
         // Submit
-        const submitBtn = page.getByRole('button', { name: 'Create proposal' });
+        const submitBtn = page.getByRole('button', { name: /Create Proposal/i });
         await expect(submitBtn).toBeVisible();
         await submitBtn.click({ force: true });
 
@@ -185,10 +181,10 @@ test.describe('DAO Governance', () => {
         await expect(page.locator('.animate-spin')).not.toBeVisible({ timeout: 10000 });
 
         // Open Admin Panel to access voter selection
-        const adminBtn = page.getByRole('button', { name: /Open admin console/i });
+        const adminBtn = page.getByRole('button', { name: /Open Admin Console/i });
         await expect(adminBtn).toBeVisible();
         await page.waitForTimeout(500);
-        await adminBtn.dispatchEvent('click');
+        await adminBtn.click();
 
         // Select a voter
         const voterSelect = page.locator('select[name="dao-voter"]');

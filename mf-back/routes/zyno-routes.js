@@ -3,6 +3,7 @@ const AgentLog = require('../models/agentFeedbackLog');
 const { orchestrateZyno } = require('../orchestration/zynoOrchestrator');
 const { listTemplates } = require('../data/parcoursTemplates');
 const agentMemory = require('../memory/agent_memory');
+const { getOrchestrationGlossary } = require('../utils/aepoAeco');
 
 const router = express.Router();
 
@@ -60,6 +61,10 @@ router.post('/orchestration', async (req, res) => {
       ...orchestrationResult,
       availableTemplates,
       timestamp: new Date().toISOString(),
+      // Non-breaking metadata for developers/investors: unified AEPO/AECO definitions.
+      meta: {
+        orchestration: getOrchestrationGlossary(),
+      },
     });
   } catch (error) {
     console.error('Orchestration error:', error);

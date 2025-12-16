@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import JourneyTimeline from './JourneyTimeline';
 import { JourneyProgressBar } from './JourneyProgressBar';
 import { JourneyNextActionsPanel } from './JourneyNextActionsPanel';
@@ -28,6 +28,7 @@ import NFTProofModal from '../NFTProofModal';
 import { getProofType, getPersonaProofData } from '../../data/proofsData';
 import { resources, getResourceIcon } from '../../data/resources';
 import PhaseDetails from './PhaseDetails';
+import { api } from '../../utils/api';
 
 import StakingModal from '../StakingModal';
 import DAOVoteModal from '../DAOVoteModal';
@@ -55,13 +56,19 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
     runInteractiveStep,
     runInteractiveStepDebug,
     setCurrentPhase,
-    completePhase
+    completePhase,
+    ensureApiJourneyId,
+    uiMode,
+    uiTone
   } = useJourneyStore();
 
   const [isThinking, setIsThinking] = useState(false);
   const [currentTask, setCurrentTask] = useState({ agent: '', task: '' });
   const [viewingArtifact, setViewingArtifact] = useState<any>(null);
   const [unlockedArtifacts, setUnlockedArtifacts] = useState<string[]>([]);
+  const [isAutoSimulating, setIsAutoSimulating] = useState(false);
+  const autoSimAbortRef = useRef(false);
+  const [autoSimProgress, setAutoSimProgress] = useState<{ current: number; total: number } | null>(null);
 
   const DEMO_SCENARIOS: Record<string, Record<number, string>> = {
     'cognitive-activation-hub': {
@@ -121,6 +128,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
   const [proofModalData, setProofModalData] = useState<any>(null);
   const [showStakingModal, setShowStakingModal] = useState(false);
   const [showVoteModal, setShowVoteModal] = useState(false);
+  const [isSubmittingPhase, setIsSubmittingPhase] = useState(false);
   const {
     focusMode,
     leftPanelOpen,
@@ -178,8 +186,21 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
     }
   };
 
-  const handleCompletePhase = () => {
-    // Capture current phase data BEFORE updating state
+  const handleCompletePhase = async () => {
+    if (isSubmittingPhase || isPhaseCompleted) {
+      return;
+    }
+
+    if (!selectedPersona || !activePhase) {
+      return;
+    }
+
+    const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    if (!accessToken) {
+      toast.error('Please sign in before completing this phase.');
+      return;
+    }
+
     const proofType = getProofType(selectedPersona.id, activePhase.id);
     const proofData = getPersonaProofData(
       selectedPersona.id,
@@ -202,37 +223,152 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
       phaseNumber: activePhaseIndex + 1
     };
 
-    // Call the actual store action
-    completePhase(activePhaseIndex, {
-      score: 100,
-      phaseNumber: activePhaseIndex + 1,
-      xpReward: activePhase.xpReward,
-      mfaiReward: activePhase.mfaiReward,
-      nftReward: activePhase.nftReward
-    });
+    const journeyId = ensureApiJourneyId();
+    const missionId = `${activePhase.id}-mission`;
 
-    // Show modal after a short delay with CAPTURED data
-    setTimeout(() => {
-      setProofModalData(completedPhaseData);
-    }, 1000);
+    const missionPayload = {
+      missionId,
+      inputType: 'confirmation',
+      submission: completedPhaseData.description,
+      language: 'en',
+      mode: uiMode,
+      tone: uiTone,
+      trackId: selectedPersona.id,
+      phaseId: activePhase.id,
+      phaseNumber: activePhaseIndex + 1,
+      journeyState: {
+        xp: userProgress.totalXP,
+        totalXP: userProgress.totalXP,
+        completed: userProgress.completedPhases,
+        completedCount: userProgress.completedPhases.length,
+        nfts: userProgress.nfts,
+        mfaiTokens: userProgress.mfaiTokens,
+        currentPhase: activePhaseIndex + 1
+      }
+    };
+
+    try {
+      setIsSubmittingPhase(true);
+      const submissionResult = await api.submitMission(journeyId, missionPayload);
+
+      if (!submissionResult?.success) {
+        throw new Error(submissionResult?.message || 'Submission rejected');
+      }
+
+      const rawScore = submissionResult?.evaluation?.global_score;
+      const normalizedScore = typeof rawScore === 'number'
+        ? Math.round(Math.max(0, Math.min(rawScore, 10)) * 10)
+        : 100;
+
+      await completePhase(activePhaseIndex, {
+        score: normalizedScore,
+        phaseNumber: activePhaseIndex + 1,
+        xpReward: activePhase.xpReward,
+        mfaiReward: activePhase.mfaiReward,
+        nftReward: activePhase.nftReward
+      });
+
+      setTimeout(() => {
+        setProofModalData(completedPhaseData);
+      }, 1000);
+
+      toast.success('Phase validated by Zyno AI.');
+    } catch (error) {
+      console.error('Failed to submit mission:', error);
+      toast.error('Zyno could not evaluate this phase. Please try again.');
+    } finally {
+      setIsSubmittingPhase(false);
+    }
   };
 
   const handleRunInteractiveStep = async () => {
-    if (isStepLoading) return;
+    if (isStepLoading || isAutoSimulating) return;
     if (!activePhase) return;
 
     try {
       const isE2EDebug = typeof window !== 'undefined' && Boolean((window as any).__e2eJourneyStepConfig);
       const runner = isE2EDebug ? runInteractiveStepDebug : runInteractiveStep;
+      const isDemo =
+        Boolean(userProgress.demoModeEnabled) ||
+        (typeof window !== 'undefined' &&
+          (() => {
+            try {
+              return window.localStorage.getItem('accessToken') === 'demo-token'
+            } catch {
+              return false
+            }
+          })())
+
+      // In demo mode, "Run Simulation" should autoplay phases sequentially.
+      if (isDemo) {
+        autoSimAbortRef.current = false
+        setIsAutoSimulating(true)
+        setAutoSimProgress({ current: Math.max(1, activePhaseIndex + 1), total: selectedPersona.phases.length })
+
+        try {
+          const phases = selectedPersona.phases
+          for (let i = activePhaseIndex; i < phases.length; i++) {
+            if (autoSimAbortRef.current) break
+
+            const phase = phases[i]
+            setAutoSimProgress({ current: i + 1, total: phases.length })
+            setCurrentPhase(i)
+
+            // Let React render the phase switch before requesting.
+            await new Promise((r) => setTimeout(r, 150))
+
+            await runner({
+              phaseId: phase.id,
+              trackId: selectedPersona.id,
+              userInput: '',
+            })
+
+            // Small delay so the user can see the generated blocks.
+            await new Promise((r) => setTimeout(r, 650))
+
+            // Mark phase as completed in demo so progress/artifacts can advance.
+            await completePhase(i, {
+              score: 100,
+              phaseNumber: i + 1,
+              xpReward: phase.xpReward,
+              mfaiReward: phase.mfaiReward,
+              nftReward: phase.nftReward,
+            })
+
+            // Another small pause before moving to next phase.
+            await new Promise((r) => setTimeout(r, 450))
+          }
+
+          if (!autoSimAbortRef.current) {
+            toast.success('Simulation démo terminée : phases déroulées automatiquement.')
+          } else {
+            toast.message('Auto-simulation arrêtée.')
+          }
+        } finally {
+          setIsAutoSimulating(false)
+          setAutoSimProgress(null)
+        }
+
+        return
+      }
+
+      // Non-demo: run only current phase step.
       await runner({
         phaseId: activePhase.id,
         trackId: selectedPersona.id,
-        userInput: ''
-      });
+        userInput: '',
+      })
     } catch (error) {
       console.error('Error running interactive step:', error);
     }
   };
+
+  const handleStopAutoSimulation = () => {
+    if (!isAutoSimulating) return
+    autoSimAbortRef.current = true
+    setIsAutoSimulating(false)
+    setAutoSimProgress(null)
+  }
 
   /* ... inside JourneyWorkspace component ... */
 
@@ -442,25 +578,79 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
                   onClick={handleRunInteractiveStep}
                   className="inline-flex items-center gap-2 rounded-full bg-accent-cyan px-8 py-4 text-base font-bold text-black shadow-lg shadow-accent-cyan/20 transition hover:bg-accent-cyan/90 hover:scale-105 active:scale-95"
                 >
-                  {isStepLoading ? <Loader2 size={20} className="animate-spin" /> : 'Run Simulation'}
+                  {isStepLoading || isAutoSimulating ? (
+                    <Loader2 size={20} className="animate-spin" />
+                  ) : (
+                    'Run Simulation'
+                  )}
                   <ArrowRight size={20} />
                 </button>
 
-                {!isPhaseCompleted && (
+                {isAutoSimulating && autoSimProgress && (
                   <button
-                    onClick={() => {
-                      if (activePhase.stakingRequired) setShowStakingModal(true);
-                      else if (activePhase.daoVoteRequired) setShowVoteModal(true);
-                      else if (activePhase.nftReward) handleCompletePhase();
-                      else completePhase(activePhaseIndex, { score: 100, phaseNumber: activePhaseNumber, xpReward: activePhase.xpReward, mfaiReward: activePhase.mfaiReward });
-                    }}
-                    className="inline-flex items-center gap-2 rounded-full bg-white/10 px-8 py-4 text-base font-bold text-white border border-white/10 hover:bg-white/20 transition"
+                    onClick={handleStopAutoSimulation}
+                    className="inline-flex items-center gap-2 rounded-full bg-red-500/90 px-8 py-4 text-base font-bold text-white shadow-lg shadow-red-500/20 transition hover:bg-red-500 active:scale-95"
                   >
-                    {activePhase.nftReward ? <Award size={20} className="text-accent-cyan" /> : <CheckCircle2 size={20} />}
-                    <span>{activePhase.nftReward ? 'Mint NFT' : 'Complete'}</span>
+                    Stop
                   </button>
                 )}
+
+                  {!isPhaseCompleted && (
+                    <button
+                      onClick={() => {
+                        if (isSubmittingPhase) return;
+                        if (activePhase.stakingRequired) {
+                          setShowStakingModal(true);
+                          return;
+                        }
+                        if (activePhase.daoVoteRequired) {
+                          setShowVoteModal(true);
+                          return;
+                        }
+
+                        void handleCompletePhase();
+                      }}
+                      disabled={isSubmittingPhase}
+                      className={`inline-flex items-center gap-2 rounded-full bg-white/10 px-8 py-4 text-base font-bold text-white border border-white/10 transition ${isSubmittingPhase ? 'cursor-wait opacity-70' : 'hover:bg-white/20'}`}
+                    >
+                      {isSubmittingPhase ? (
+                        <>
+                          <Loader2 size={20} className="animate-spin" />
+                          <span>Submitting…</span>
+                        </>
+                      ) : (
+                        <>
+                          {activePhase.nftReward ? <Award size={20} className="text-accent-cyan" /> : <CheckCircle2 size={20} />}
+                          <span>{activePhase.nftReward ? 'Mint NFT' : 'Complete'}</span>
+                        </>
+                      )}
+                    </button>
+                  )}
               </div>
+
+              {isAutoSimulating && autoSimProgress && (
+                <div className="mt-4 rounded-xl border border-white/10 bg-white/5 p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="text-sm text-white/80 font-semibold">
+                      Auto-simulation en cours : phase {autoSimProgress.current}/{autoSimProgress.total}
+                    </div>
+                    <div className="text-xs text-white/50">
+                      {Math.round((autoSimProgress.current / autoSimProgress.total) * 100)}%
+                    </div>
+                  </div>
+                  <div className="mt-3 h-2 w-full rounded-full bg-white/10 overflow-hidden">
+                    <div
+                      className="h-full bg-accent-cyan"
+                      style={{
+                        width: `${Math.min(
+                          100,
+                          Math.max(0, (autoSimProgress.current / autoSimProgress.total) * 100)
+                        )}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Phase Interaction Render */}
@@ -615,18 +805,11 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
             availableAmount={1000}
             currentStaked={0}
             onClose={() => setShowStakingModal(false)}
-            onStake={(_amount) => {
+              onStake={(_amount) => {
               setShowStakingModal(false);
-              if (activePhase.nftReward) {
-                handleCompletePhase();
-              } else {
-                completePhase(activePhaseIndex, {
-                  score: 100,
-                  phaseNumber: activePhaseNumber,
-                  xpReward: activePhase.xpReward,
-                  mfaiReward: activePhase.mfaiReward
-                });
-              }
+                if (!isSubmittingPhase) {
+                  void handleCompletePhase();
+                }
             }}
           />
         )
@@ -638,18 +821,11 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
             phase={activePhase}
             votingPower={50}
             onClose={() => setShowVoteModal(false)}
-            onVote={(_vote) => {
+              onVote={(_vote) => {
               setShowVoteModal(false);
-              if (activePhase.nftReward) {
-                handleCompletePhase();
-              } else {
-                completePhase(activePhaseIndex, {
-                  score: 100,
-                  phaseNumber: activePhaseNumber,
-                  xpReward: activePhase.xpReward,
-                  mfaiReward: activePhase.mfaiReward
-                });
-              }
+                if (!isSubmittingPhase) {
+                  void handleCompletePhase();
+                }
             }}
           />
         )

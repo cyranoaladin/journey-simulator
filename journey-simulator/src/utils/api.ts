@@ -1,5 +1,38 @@
-// API base URL - configurable via environment variable for different deployments
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://journey.mfai.app/api';
+// API base URL - configurable via environment variable for different deployments.
+// IMPORTANT: this is the ORIGIN/root (no trailing "/api"), because this frontend calls both:
+// - /journey/*  (mf-back)
+// - /user/*, /dao/*, /api/* (mf-back aliases)
+function normalizeApiBaseUrl(input: string): string {
+  // Strip trailing slashes
+  let url = input.replace(/\/+$/, '')
+  // If someone set ".../api" by habit, strip it to avoid "/api/journey" mismatches.
+  url = url.replace(/\/api$/i, '')
+  return url
+}
+
+function isLocalUiHost(): boolean {
+  if (typeof window === 'undefined') return false
+  const h = window.location.hostname
+  return h === 'localhost' || h === '127.0.0.1'
+}
+
+function resolveApiBaseUrl(): string {
+  const configured = import.meta.env.VITE_API_BASE_URL
+  const normalizedConfigured = configured ? normalizeApiBaseUrl(configured) : null
+
+  // If UI runs locally, always prefer local mf-back unless the user explicitly configured a local URL.
+  if (isLocalUiHost()) {
+    if (normalizedConfigured && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(normalizedConfigured)) {
+      return normalizedConfigured
+    }
+    return 'http://127.0.0.1:3002'
+  }
+
+  // Non-local UI: use configured URL or hosted default.
+  return normalizedConfigured || 'https://journey.mfai.app'
+}
+
+export const API_BASE_URL = resolveApiBaseUrl()
 
 export const SOLANA_API_BASE_URL =
   import.meta.env.VITE_SOLANA_API_BASE_URL || 'http://127.0.0.1:3001';
@@ -1098,18 +1131,22 @@ export const api = {
   },
 
   // Submit mission for evaluation
-  submitMission: async (missionData: {
-    missionId: string;
-    inputType: string;
-    submission: string;
-    language: string;
-    mode: string;
-    tone: string;
-    trackId: string;
-    phaseId: string;
-    journeyState: any;
-  }): Promise<any> => {
-    return request<any>('/journey/submit', {
+  submitMission: async (
+    journeyId: string,
+    missionData: {
+      missionId: string;
+      inputType: string;
+      submission: string;
+      language: string;
+      mode: string;
+      tone: string;
+      trackId: string;
+      phaseId: string;
+      phaseNumber: number;
+      journeyState: any;
+    }
+  ): Promise<any> => {
+    return request<any>(`/journey/${journeyId}/submit`, {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(missionData),

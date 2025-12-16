@@ -4,6 +4,21 @@ import JourneyWorkspace from '../JourneyWorkspace';
 import { useJourneyStore } from '../../../store/journeyStore';
 import { getPersonaProofData } from '../../../data/proofsData';
 
+// Partially mock API layer used by JourneyWorkspace when validating/completing phases
+vi.mock('../../../utils/api', async (importOriginal) => {
+    const actual: any = await importOriginal()
+    return {
+        ...actual,
+        api: {
+            ...(actual.api || {}),
+            submitMission: vi.fn().mockResolvedValue({
+                success: true,
+                evaluation: { global_score: 10, max_score: 10 }
+            }),
+        },
+    }
+})
+
 // Mock the store
 vi.mock('../../../store/journeyStore');
 
@@ -66,6 +81,13 @@ describe('NFT Integration in JourneyWorkspace', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        // Complete phase requires an auth token in localStorage
+        try {
+            window.localStorage.setItem('accessToken', 'demo-token')
+            window.localStorage.setItem('refreshToken', 'demo-refresh-token')
+        } catch (e) {
+            void e
+        }
         layoutMock.toggleFocusMode.mockClear();
         layoutMock.setLeftPanelOpen.mockClear();
         layoutMock.setRightPanelOpen.mockClear();
@@ -125,8 +147,10 @@ describe('NFT Integration in JourneyWorkspace', () => {
         const completeButton = screen.getAllByText('Mint NFT')[0];
         fireEvent.click(completeButton);
 
-        // Expect completePhase to be called
-        expect(mockCompletePhase).toHaveBeenCalled();
+        // completePhase is called after an async submitMission, so wait for it
+        await waitFor(() => {
+            expect(mockCompletePhase).toHaveBeenCalled();
+        });
 
         // Wait for the modal to appear (it has a timeout in the component)
         await waitFor(() => {

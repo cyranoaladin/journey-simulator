@@ -1,21 +1,17 @@
 import { test, expect } from '@playwright/test';
+import { disablePageAnimations } from './utils/pageStability';
 
 test.describe('Growth Agent Integration', () => {
     test.setTimeout(60000);
 
     test.beforeEach(async ({ page }) => {
-        // Mock login
-        await page.route('**/user/login', async (route) => {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    success: true,
-                    accessToken: 'mock-token',
-                    refreshToken: 'mock-refresh',
-                    user: { id: 'user-123', name: 'Test User', email: 'test@example.com', role: 'user' }
-                })
-            });
+        await disablePageAnimations(page);
+
+        // Inject auth token into localStorage before any navigation
+        await page.addInitScript(() => {
+            localStorage.setItem('accessToken', 'e2e-token');
+            localStorage.setItem('refreshToken', 'e2e-refresh-token');
+            localStorage.setItem('userId', 'user-123');
         });
 
         // Mock profile
@@ -24,6 +20,7 @@ test.describe('Growth Agent Integration', () => {
                 status: 200,
                 contentType: 'application/json',
                 body: JSON.stringify({
+                    success: true,
                     user: { id: 'user-123', name: 'Test User', email: 'test@example.com', role: 'user' }
                 })
             });
@@ -31,35 +28,24 @@ test.describe('Growth Agent Integration', () => {
 
         // Mock user progress (Start at Phase 0)
         await page.route('**/journey/user-progress', async (route) => {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    total_xp: 0,
-                    current_level: 1,
-                    completed_phases: [], // Start at Phase 0
-                    currentPersona: 'cognitive-activation-hub'
-                })
-            });
-        });
-
-        // Mock User Profile and Update Profile
-        await page.route('**/user/profile', async (route) => {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    success: true,
-                    user: {
-                        id: 'test-user-id',
-                        name: 'Test User',
-                        email: 'test@example.com',
-                        role: 'user',
-                        wallet_address: '0x123',
-                        persona: 'cognitive-activation-hub'
-                    }
-                })
-            });
+            if (route.request().method() === 'GET') {
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({
+                        success: true,
+                        progress: {
+                            total_xp: 0,
+                            completed_phases: 0,
+                            persona: 'cognitive-activation-hub',
+                            token_transactions: { mfai_tokens: 0 },
+                            nft_certificates: []
+                        }
+                    })
+                });
+            } else {
+                await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true }) });
+            }
         });
 
         await page.route('**/user/update-profile', async (route) => {
@@ -79,6 +65,18 @@ test.describe('Growth Agent Integration', () => {
                 })
             });
         });
+
+        // Mock submit mission (required before completePhase is called in JourneyWorkspace)
+        await page.route('**/journey/**/submit', async (route) => {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    success: true,
+                    evaluation: { global_score: 9, max_score: 10 }
+                })
+            })
+        })
 
         // Mock Complete Phase (Zyno Response with Growth Agent Evaluation)
         await page.route('**/journey/complete-phase', async (route) => {
@@ -122,19 +120,9 @@ test.describe('Growth Agent Integration', () => {
             });
         });
 
-        // Login and navigate to workspace
-        await page.goto('/login');
-        await page.locator('input[name="email"]').fill('test@example.com');
-        await page.locator('input[name="password"]').fill('password');
-        await page.getByRole('button', { name: 'Sign In' }).click();
-        await page.waitForURL('**/journeys', { timeout: 10000 });
-
-        // Select persona to enter workspace
-        // Click any button that enters the journey (Launch, Continue, Resume)
-        const enterBtn = page.getByRole('button', { name: /Launch with Zyno|Continue journey|Resume onboarding/i }).first();
-        await expect(enterBtn).toBeVisible({ timeout: 10000 });
-        await enterBtn.click();
-        await page.waitForLoadState('networkidle');
+        // Navigate directly to workspace
+        await page.goto('/journeys/cognitive-activation-hub');
+        await expect(page.getByRole('heading', { name: 'Current Phase' })).toBeVisible({ timeout: 20000 });
     });
 
     test('should display Growth Agent evaluation', async ({ page }) => {
@@ -149,8 +137,8 @@ test.describe('Growth Agent Integration', () => {
         // We wait for the "Back to all journeys" button to confirm we are in the workspace.
         await expect(page.getByTestId('back-to-journeys')).toBeVisible({ timeout: 10000 });
 
-        // Trigger the step (Validate & Mint NFT button for Phase 0)
-        const validateBtn = page.getByRole('button', { name: /Validate & Mint NFT/i }).first();
+        // Complete phase (Mint NFT)
+        const validateBtn = page.getByRole('button', { name: /Mint NFT/i }).first();
         await expect(validateBtn).toBeVisible({ timeout: 10000 });
 
         // Use dispatchEvent for more reliable click handling in this complex UI

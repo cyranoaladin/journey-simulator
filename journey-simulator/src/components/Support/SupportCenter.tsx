@@ -22,6 +22,24 @@ interface FaqItem {
 
 const faqs: FaqItem[] = [
   {
+    id: 'aepo-what-is',
+    question: 'What is AEPO and how does it help me build my project?',
+    answer: 'AEPO (AI-Enhanced Pathway Orchestration) is the Zyno-driven engine that creates and updates your personalized roadmap. It routes the right agents based on your context (persona, phase, intent), proposes next actions, and adapts content, rewards, and Proof-of-Skill™ outputs as you progress.',
+    category: 'Resources'
+  },
+  {
+    id: 'aeco-what-is',
+    question: 'How does Zyno manage group learning (AECO)?',
+    answer: 'AECO (AI-Enhanced Cohort Orchestration) coordinates cohort programs: shared milestones, synchronized progress, peer reviews with agent support, AI-led sessions, and group dashboards. It is designed for bootcamps, accelerators, DAO formations, and team incubation tracks.',
+    category: 'Resources'
+  },
+  {
+    id: 'aepo-vs-aeco',
+    question: 'What’s the difference between AEPO and AECO?',
+    answer: 'AEPO orchestrates an individual pathway (your personal roadmap). AECO orchestrates a cohort (group programs, shared deliverables, synchronized milestones). Both are powered by Zyno and share the same agent ecosystem.',
+    category: 'Resources'
+  },
+  {
     id: 'dao-quorum',
     question: 'How to quickly reach DAO quorum?',
     answer: 'Activate your MFAI staking, assign voting power to key operational accounts, and schedule a Zyno reminder to nudge voters who haven\'t signed. Use the DAO console to track achievement percentage live.',

@@ -8,6 +8,7 @@ test.describe('Resource Validation in Journey Steps', () => {
                 status: 200,
                 contentType: 'application/json',
                 body: JSON.stringify({
+                    success: true,
                     user: {
                         id: 'user-123',
                         name: 'Test User',
@@ -20,15 +21,29 @@ test.describe('Resource Validation in Journey Steps', () => {
 
         // Mock user progress
         await page.route('**/journey/user-progress', async (route) => {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    total_xp: 0,
-                    completed_phases: [],
-                    currentPersona: null
-                })
-            });
+            if (route.request().method() === 'GET') {
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({
+                        success: true,
+                        progress: {
+                            total_xp: 0,
+                            current_level: 1,
+                            completed_phases: 0,
+                            persona: 'capital-foundry',
+                            token_transactions: { mfai_tokens: 0 },
+                            nft_certificates: [],
+                        }
+                    })
+                });
+            } else {
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({ success: true })
+                });
+            }
         });
 
         // Inject auth token
@@ -84,7 +99,7 @@ test.describe('Resource Validation in Journey Steps', () => {
 
         // Navigate to journey and trigger a step
         await page.goto('/journeys/capital-foundry');
-        await page.locator('button:has-text("Start / Continue")').click();
+        await page.getByRole('button', { name: /Run Simulation/i }).click();
 
         // Wait for resources to load (supports localized titles)
         const resourcesSection = page.getByTestId('resources-section').first();
@@ -142,7 +157,7 @@ test.describe('Resource Validation in Journey Steps', () => {
         });
 
         await page.goto('/journeys/capital-foundry');
-        await page.locator('button:has-text("Start / Continue")').click();
+        await page.getByRole('button', { name: /Run Simulation/i }).click();
 
         // Wait for resources to load regardless of locale
         const resourcesSection = page.getByTestId('resources-section').first();
@@ -195,7 +210,7 @@ test.describe('Resource Validation in Journey Steps', () => {
         });
 
         await page.goto('/journeys/capital-foundry');
-        await page.locator('button:has-text("Start / Continue")').click();
+        await page.getByRole('button', { name: /Run Simulation/i }).click();
 
         // Wait for resources section to resolve in any language
         const resourcesSection = page.getByTestId('resources-section').first();

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { disablePageAnimations } from './utils/pageStability'
 
 /**
  * E2E: verify ActionSuggestions block triggers step on click
@@ -35,6 +36,8 @@ test.describe('ActionSuggestions flow', () => {
   }
 
   test.beforeEach(async ({ page }) => {
+    await disablePageAnimations(page)
+
     await page.addInitScript((persona) => {
       window.localStorage.setItem('accessToken', 'e2e-access-token')
       window.localStorage.setItem('refreshToken', 'e2e-refresh-token')
@@ -203,7 +206,7 @@ test.describe('ActionSuggestions flow', () => {
     await page.goto('/journeys/e2e-persona')
     await expect(page.getByRole('heading', { name: /Current Phase/i })).toBeVisible()
     await page.waitForTimeout(1000); // Wait for hydration/stability
-    const startButton = page.getByRole('button', { name: 'Start / Continue' });
+    const startButton = page.getByRole('button', { name: /Run Simulation/i });
     await startButton.waitFor({ state: 'visible' });
     await startButton.dispatchEvent('click');
 
@@ -253,7 +256,7 @@ test.describe('ActionSuggestions flow', () => {
     await page.goto('/journeys/e2e-persona')
     await expect(page.getByRole('heading', { name: /Current Phase/i })).toBeVisible()
     await page.waitForTimeout(1000);
-    const startButton = page.getByRole('button', { name: 'Start / Continue' });
+    const startButton = page.getByRole('button', { name: /Run Simulation/i });
     await startButton.waitFor({ state: 'visible' });
     await startButton.dispatchEvent('click');
 

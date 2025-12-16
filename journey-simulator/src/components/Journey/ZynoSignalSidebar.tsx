@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Bot, MessageCircle, Sparkles, Send, Activity, ShieldCheck, Flame } from 'lucide-react'
 import { useJourneyStore } from '../../store/journeyStore'
 import { deriveJourneySignals } from '../../utils/journeySignals'
+import { AECO, AEPO } from '../../content/aepoAeco'
 
 interface ChatMessage {
   id: string
@@ -89,7 +90,12 @@ const ZynoSignalSidebar: React.FC<Props> = ({ className = '' }) => {
         {signalWidgets.map((signal) => (
           <div key={signal.label} className={`rounded-2xl border border-white/10 bg-gradient-to-r ${signal.accent} p-3`}>
             <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-white/60">
-              <span>{signal.label}</span>
+              <span
+                title={signal.label === 'AEPO' ? AEPO.tooltip : signal.label === 'AECO' ? AECO.tooltip : 'Governance + execution alignment across signals.'}
+                className={signal.label === 'AEPO' || signal.label === 'AECO' ? 'cursor-help border-b border-dashed border-white/20' : undefined}
+              >
+                {signal.label}
+              </span>
               <span className="text-white">{signal.value}/100</span>
             </div>
             <div className="mt-2 h-2 rounded-full bg-white/10">
@@ -161,7 +167,11 @@ const ZynoSignalSidebar: React.FC<Props> = ({ className = '' }) => {
           <span className="text-xs uppercase tracking-[0.3em]">Next suggestion</span>
         </div>
         <p className="mt-2">
-          Publish an artifact recap for the current phase and log an AEPO checkpoint to boost visibility inside the Sovereign Builders Network.
+          Publish an artifact recap for the current phase and log an{' '}
+          <span title={AEPO.tooltip} className="cursor-help border-b border-dashed border-white/20 text-white/80">
+            AEPO
+          </span>{' '}
+          checkpoint to boost visibility inside the Sovereign Builders Network.
         </p>
       </div>
     </div>

@@ -11,6 +11,7 @@ import {
   Search,
   Sparkles
 } from 'lucide-react'
+import { AEPO, AECO } from '@/content/aepoAeco'
 
 const KNOWLEDGE_BASE_URL =
   import.meta.env.VITE_RESOURCE_LIBRARY_BASE_URL ??
@@ -24,6 +25,7 @@ interface Resource {
   format: 'PDF' | 'Guide' | 'Template' | 'Playbook'
   slug: string
   minutes: number
+  coverImage?: string
 }
 
 const resourceLibrary: Resource[] = [
@@ -97,7 +99,8 @@ const resourceLibrary: Resource[] = [
     tags: ['Analytics', 'Agents', 'Playbook'],
     format: 'Guide',
     slug: 'mission-feedback-loops.html',
-    minutes: 7
+    minutes: 7,
+    coverImage: '/images/AECO_AEPO.png'
   }
 ]
 
@@ -172,7 +175,17 @@ const ResourceHub = () => {
             <div className="space-y-3 text-sm text-white/75">
               <div className="flex items-center gap-3">
                 <BrainCircuit size={18} />
-                <span>Ready-to-use AEPO/AECO Templates</span>
+                <span>
+                  Ready-to-use{' '}
+                  <span title={AEPO.tooltip} className="cursor-help border-b border-dashed border-white/20">
+                    AEPO
+                  </span>
+                  /
+                  <span title={AECO.tooltip} className="cursor-help border-b border-dashed border-white/20">
+                    AECO
+                  </span>{' '}
+                  playbooks
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <Layers size={18} />
@@ -262,6 +275,16 @@ const ResourceHub = () => {
                 transition={{ delay: index * 0.05, duration: 0.3 }}
                 className="group flex h-full flex-col justify-between gap-5 rounded-3xl border border-white/10 bg-white/5 p-6 text-white shadow-glass backdrop-blur"
               >
+                {resource.coverImage ? (
+                  <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+                    <img
+                      src={resource.coverImage}
+                      alt={`${resource.title} cover`}
+                      className="h-40 w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                      loading="lazy"
+                    />
+                  </div>
+                ) : null}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-white/60">
                     <span>{resource.format}</span>

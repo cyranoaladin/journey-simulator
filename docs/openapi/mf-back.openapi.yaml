@@ -2,11 +2,112 @@ openapi: 3.1.0
 info:
   title: Money Factory AI Backend API
   version: 1.0.0
-  description: Core backend services for Agents, Journeys, and Auth.
+  description: Core backend services for Agents, Journeys, Auth, and Zyno Orchestration (AEPO/AECO).
 servers:
   - url: http://localhost:3000/api
     description: Local Development
 paths:
+  /orchestration:
+    post:
+      summary: Run Zyno orchestration (AEPO/AECO)
+      description: |
+        Runs the Zyno orchestrator on a user input and returns agent timeline + outputs.
+
+        **AEPO (AI-Enhanced Pathway Orchestration)**: individual pathway orchestration (personal roadmap).
+        **AECO (AI-Enhanced Cohort Orchestration)**: cohort/group orchestration signals (feedback & future cohort analytics).
+
+        The response includes a non-breaking `meta.orchestration` glossary to make payloads self-explanatory.
+      tags: [Zyno]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrchestrationRequest'
+      responses:
+        '200':
+          description: Orchestration completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrchestrationResponse'
+        '500':
+          description: Orchestration failed
+
+  /orchestration/logs:
+    get:
+      summary: List orchestration logs
+      tags: [Zyno]
+      parameters:
+        - name: userId
+          in: query
+          schema: { type: string }
+        - name: intent
+          in: query
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 200, default: 50 }
+      responses:
+        '200':
+          description: Logs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count: { type: integer }
+                  items:
+                    type: array
+                    items: { type: object }
+
+  /orchestration/current-step:
+    get:
+      summary: Get the latest orchestration step for a user
+      tags: [Zyno]
+      parameters:
+        - name: userId
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: Current step
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  currentStep:
+                    anyOf:
+                      - type: 'null'
+                      - $ref: '#/components/schemas/AgentTimelineEntry'
+
+  /feedback:
+    post:
+      summary: Submit user feedback (AECO signal)
+      description: |
+        Stores user feedback as an **AECO signal** (rating/comment). In MVP this is stored per agent & mission,
+        and can evolve into cohort analytics later.
+      tags: [Zyno]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackRequest'
+      responses:
+        '200':
+          description: Feedback saved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+        '400':
+          description: Invalid request
+        '500':
+          description: Server error
   /user/wallet-challenge:
     post:
       summary: Get a nonce for wallet authentication
@@ -176,6 +277,124 @@ components:
       bearerFormat: JWT
 
   schemas:
+    OrchestrationRequest:
+      type: object
+      required: [input, userId]
+      properties:
+        input:
+          type: string
+          description: User prompt / mission input.
+        userId:
+          type: string
+          description: User identifier (default often demo_user).
+        journey:
+          type: object
+          description: Optional journey context.
+        phase:
+          type: string
+          description: Optional phase label (Learn/Build/Prove/Activate/Scale).
+        objective:
+          type: string
+          description: Optional objective override (defaults to input).
+
+    OrchestrationResponse:
+      type: object
+      description: |
+        Orchestration output. Includes agent results and a timeline.
+        - `feedback.aepo`: AEPO execution signal (per-agent score) feeding the pathway engine.
+        - `meta.orchestration`: glossary for AEPO/AECO definitions (non-breaking).
+      properties:
+        executedAgents:
+          type: array
+          items: { type: string }
+        intent:
+          type: string
+        mode:
+          type: string
+        results:
+          type: object
+          additionalProperties: true
+        timeline:
+          type: array
+          items: { $ref: '#/components/schemas/AgentTimelineEntry' }
+        availableTemplates:
+          type: array
+          items:
+            type: object
+            properties:
+              templateId: { type: string }
+              fileName: { type: string }
+        timestamp:
+          type: string
+          format: date-time
+        meta:
+          type: object
+          properties:
+            orchestration:
+              $ref: '#/components/schemas/OrchestrationGlossary'
+
+    AgentTimelineEntry:
+      type: object
+      properties:
+        agent: { type: string }
+        phase: { type: string, nullable: true }
+        intent: { type: string, nullable: true }
+        status: { type: string, enum: [completed, failed] }
+        startedAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time }
+        durationMs: { type: integer, nullable: true }
+        prompt: { type: string, nullable: true }
+        reasoning: { type: string, nullable: true }
+        action: { type: string, nullable: true }
+        summary: { type: string, nullable: true }
+        sources:
+          type: array
+          items: { type: object }
+        feedback:
+          type: object
+          description: |
+            `aepo` and `aeco` are numeric signals (0-100) where available.
+            AEPO is a pathway signal; AECO is a cohort/feedback signal.
+          properties:
+            ae_summary: { type: string, nullable: true }
+            ae_outcome: { type: string, nullable: true }
+            aepo: { type: integer, nullable: true }
+            aeco: { type: integer, nullable: true }
+
+    OrchestrationGlossary:
+      type: object
+      properties:
+        AEPO:
+          type: object
+          properties:
+            acronym: { type: string, example: AEPO }
+            name: { type: string }
+            tooltip: { type: string }
+        AECO:
+          type: object
+          properties:
+            acronym: { type: string, example: AECO }
+            name: { type: string }
+            tooltip: { type: string }
+        table:
+          type: array
+          items:
+            type: object
+            properties:
+              feature: { type: string }
+              aepo: { type: string }
+              aeco: { type: string }
+
+    FeedbackRequest:
+      type: object
+      required: [agentName, userId, rating]
+      properties:
+        agentName: { type: string }
+        userId: { type: string }
+        missionId: { type: string }
+        rating: { type: number, description: "User satisfaction score (AECO signal)." }
+        comment: { type: string }
+
     User:
       type: object
       properties:
@@ -184,7 +403,7 @@ components:
         wallet_address: { type: string }
         role: { type: string, enum: [user, admin] }
         persona: { type: string }
-    
+
     LoginResponse:
       type: object
       properties:

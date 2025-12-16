@@ -3,6 +3,7 @@ import { Download, PenSquare } from 'lucide-react';
 import { api } from '../../utils/api';
 import { useAgentScoreboardContext } from './AgentScoreboardContext';
 import { sendToNotion } from '../../utils/sendToNotion';
+import { AEPO, AECO } from '../../content/aepoAeco';
 
 export type MissionSummary = {
   userId: string;
@@ -150,10 +151,16 @@ export default function MissionFeedbackSummary({ summary }: Props) {
           <strong>Date:</strong> {formattedTimestamp}
         </p>
         <p>
-          <strong>AEPO Score:</strong> {summary.aepoScore} / 100
+          <strong title={AEPO.tooltip} className="cursor-help border-b border-dashed border-slate-300/70 dark:border-slate-700">
+            AEPO Score:
+          </strong>{' '}
+          {summary.aepoScore} / 100
         </p>
         <p>
-          <strong>AECO Progress:</strong> {summary.aecoPhase}
+          <strong title={AECO.tooltip} className="cursor-help border-b border-dashed border-slate-300/70 dark:border-slate-700">
+            AECO Signal:
+          </strong>{' '}
+          {summary.aecoPhase}
         </p>
         <p>
           <strong>Activated Agents:</strong> {summary.agents.join(', ')}

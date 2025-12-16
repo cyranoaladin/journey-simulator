@@ -1,7 +1,22 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from 'vitest'
 import JourneyWorkspace from '../JourneyWorkspace'
 import { useJourneyStore } from '../../../store/journeyStore'
+
+// Partially mock API layer used by JourneyWorkspace when validating/completing phases
+vi.mock('../../../utils/api', async (importOriginal) => {
+    const actual: any = await importOriginal()
+    return {
+        ...actual,
+        api: {
+            ...(actual.api || {}),
+            submitMission: vi.fn().mockResolvedValue({
+                success: true,
+                evaluation: { global_score: 10, max_score: 10 }
+            }),
+        },
+    }
+})
 
 // Mock child components to simplify testing
 vi.mock('../JourneyTimeline', () => ({
@@ -87,6 +102,15 @@ describe('JourneyWorkspace', () => {
     beforeEach(() => {
         vi.clearAllMocks()
 
+        // Complete phase requires an auth token in localStorage
+        try {
+            window.localStorage.setItem('accessToken', 'demo-token')
+            window.localStorage.setItem('refreshToken', 'demo-refresh-token')
+        } catch (e) {
+            // ignore jsdom storage failures
+            void e
+        }
+
         layoutMock.toggleFocusMode.mockClear()
         layoutMock.setLeftPanelOpen.mockClear()
         layoutMock.setRightPanelOpen.mockClear()
@@ -116,6 +140,7 @@ describe('JourneyWorkspace', () => {
             uiTone: 'pedagogical',
             runInteractiveStep: mockRunInteractiveStep,
             completePhase: mockCompletePhase,
+            ensureApiJourneyId: vi.fn().mockReturnValue('mock-journey-id'),
             setCurrentPhase: mockSetCurrentPhase,
             setUiMode: mockSetUiMode,
             setUiTone: mockSetUiTone,
@@ -131,6 +156,13 @@ describe('JourneyWorkspace', () => {
     })
 
     it('calls runInteractiveStep when Start button is clicked', () => {
+        // This test asserts single-step behavior; disable demo autoplay for it.
+        try {
+            window.localStorage.setItem('accessToken', 'real-token')
+        } catch (e) {
+            void e
+        }
+
         render(<JourneyWorkspace />)
 
         const startButton = screen.getByText('Run Simulation')
@@ -180,7 +212,7 @@ describe('JourneyWorkspace', () => {
         expect(screen.getAllByText('Complete')[0]).toBeInTheDocument()
     })
 
-    it('calls completePhase when Complete Phase button is clicked', () => {
+    it('calls completePhase when Complete Phase button is clicked', async () => {
         useJourneyStore.setState({
             lastStep: {
                 type: 'evaluation',
@@ -197,6 +229,9 @@ describe('JourneyWorkspace', () => {
         const completeButton = screen.getAllByText('Complete')[0]
         fireEvent.click(completeButton)
 
-        expect(mockCompletePhase).toHaveBeenCalledWith(0, expect.objectContaining({ score: 100, phaseNumber: 1 }))
+        // handleCompletePhase is async (submitMission -> completePhase), so wait for it.
+        await waitFor(() => {
+            expect(mockCompletePhase).toHaveBeenCalledWith(0, expect.objectContaining({ score: 100, phaseNumber: 1 }))
+        })
     })
 })

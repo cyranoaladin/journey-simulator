@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, GaugeCircle, Trophy } from 'lucide-react'
 import missionFlowIcon from '@/assets/svg/mission-flow.svg'
@@ -8,6 +8,8 @@ import feedbackStarsIcon from '@/assets/svg/feedback-stars.svg'
 import daoLaunchpadIcon from '@/assets/svg/dao-launchpad.svg'
 import zynoReactions, { type ZynoPhaseKey } from '@/data/zynoReactions'
 import Button from '@/components/shared/Button'
+import MainNavigation from '@/components/navigation/MainNavigation'
+import { AECO, AEPO } from '@/content/aepoAeco'
 
 const featureCards = [
   {
@@ -45,12 +47,12 @@ const heroHighlights = [
   {
     icon: GaugeCircle,
     title: 'AEPO Strategizes',
-    description: 'Autonomous Execution & Planning Operator keeps every sprint aligned with mission intent.'
+    description: 'AI-Enhanced Pathway Orchestration generates and updates your personalized roadmap.'
   },
   {
     icon: Trophy,
     title: 'AECO Rewards',
-    description: 'Autonomous Execution & Completion Optimizer scores contributors and unlocks staking incentives.'
+    description: 'AI-Enhanced Cohort Orchestration coordinates group programs and shared milestones.'
   }
 ] as const
 
@@ -67,15 +69,6 @@ const phaseDescriptions: Record<ZynoPhaseKey, string> = {
   launch: 'Communities align. Treasury ignition sequences are armed.',
   growth: 'Staking loops compounding. Liquidity engines stay online.'
 }
-
-const navLinks = [
-  { label: 'Protocol', to: '#hero' },
-  { label: 'Missions', to: '#journeys' },
-  { label: 'Command Console', to: '#console' },
-  { label: 'Playground', to: '#playground' },
-  { label: 'Platform Guide', to: '/guide' },
-  { label: 'Authenticate', to: '/login' }
-] as const
 
 const heroTitleVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -131,40 +124,9 @@ const HomePage = () => {
     <div className="relative min-h-screen overflow-hidden bg-[#0d0d1a] text-white">
       <AnimatedBackground />
 
-      <header className="sticky top-0 z-20 bg-white/0 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-6 sm:px-6 lg:px-12">
-          <Link to="/" className="flex items-center gap-3 text-left font-semibold">
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-500 text-lg font-black">Z</span>
-            <span className="flex flex-col">
-              <span className="text-lg tracking-wide text-white/90">Zyno Launch Stack</span>
-              <span className="text-[10px] font-medium uppercase tracking-[0.35em] text-white/40">Internet Capital Markets • Solana Native</span>
-            </span>
-          </Link>
-          <nav className="hidden items-center gap-6 text-sm font-medium text-white/70 md:flex">
-            {navLinks.map((link) => (
-              link.to.startsWith('#') ? (
-                <a key={link.label} href={link.to} className="transition-colors hover:text-white">
-                  {link.label}
-                </a>
-              ) : (
-                <Link key={link.label} to={link.to} className="transition-colors hover:text-white">
-                  {link.label}
-                </Link>
-              )
-            ))}
-          </nav>
-          <div className="flex items-center gap-3">
-            <Link to="/register" className="hidden text-sm font-semibold text-white/70 transition-colors hover:text-white md:inline-flex">
-              Create Hangar Access
-            </Link>
-            <Button size="sm" onClick={() => navigate('/login')} className="hidden md:inline-flex">
-              Enter Command Deck
-            </Button>
-          </div>
-        </div>
-      </header>
+      <MainNavigation />
 
-      <main className="relative z-10 flex flex-col gap-24 pb-24">
+      <main className="relative z-10 flex flex-col gap-24 pb-24 pt-[calc(var(--header-height,4rem)+1.5rem)]">
         <section id="hero" className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 pt-24 sm:px-6 lg:px-12 lg:flex-row lg:items-center">
           <div className="relative z-10 max-w-3xl space-y-8">
             <motion.div
@@ -198,7 +160,15 @@ const HomePage = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="max-w-xl text-lg text-white/80"
             >
-              Build, simulate, and deploy Web3 businesses on Solana while <abbr title="Autonomous Execution & Planning Operator" className="cursor-help border-b border-dashed border-white/30 text-white">AEPO</abbr> orchestrates strategy and <abbr title="Autonomous Execution & Completion Optimizer" className="cursor-help border-b border-dashed border-white/30 text-white">AECO</abbr> rewards flawless execution.
+              Build, simulate, and deploy Web3 businesses on Solana while{' '}
+              <abbr title={AEPO.tooltip} className="cursor-help border-b border-dashed border-white/30 text-white">
+                AEPO
+              </abbr>{' '}
+              orchestrates your pathway and{' '}
+              <abbr title={AECO.tooltip} className="cursor-help border-b border-dashed border-white/30 text-white">
+                AECO
+              </abbr>{' '}
+              coordinates cohort execution.
             </motion.p>
 
             <motion.div
@@ -256,7 +226,16 @@ const HomePage = () => {
               transition={{ duration: 0.6, delay: 0.5 }}
               className="flex flex-col gap-2 text-xs text-white/60 sm:flex-row sm:items-center sm:gap-6"
             >
-              <span className="font-medium uppercase tracking-[0.3em] text-white/50">AEPO directs. AECO rewards. You build.</span>
+              <span className="font-medium uppercase tracking-[0.3em] text-white/50">
+                <abbr title={AEPO.tooltip} className="cursor-help border-b border-dashed border-white/30 text-white/70 hover:text-white">
+                  AEPO
+                </abbr>{' '}
+                directs.{' '}
+                <abbr title={AECO.tooltip} className="cursor-help border-b border-dashed border-white/30 text-white/70 hover:text-white">
+                  AECO
+                </abbr>{' '}
+                coordinates. You build.
+              </span>
               <span>
                 Wallet-ready staking loops, contributor reputation, and DAO readiness tracked in real time.
               </span>
@@ -276,7 +255,12 @@ const HomePage = () => {
                 <span>DAO readiness 76%</span>
               </div>
               <div className="rounded-2xl border border-white/10 bg-[#0f0f21]/80 p-5">
-                <span className="text-xs font-semibold uppercase tracking-[0.4em] text-white/40">AECO Execution Score</span>
+                <span className="text-xs font-semibold uppercase tracking-[0.4em] text-white/40">
+                  <abbr title={AECO.tooltip} className="cursor-help border-b border-dashed border-white/30">
+                    AECO
+                  </abbr>{' '}
+                  Execution Signal
+                </span>
                 <p className="mt-3 text-3xl font-bold text-white">92.8</p>
                 <p className="mt-3 text-sm text-white/70">Reward window open; contributor staking yields boosted for flawless completion signals.</p>
                 <p className="mt-2 text-xs uppercase tracking-[0.3em] text-white/40">AECO feeds treasury and reputation oracles.</p>
@@ -286,13 +270,23 @@ const HomePage = () => {
                   <p className="text-xs text-white/50">Builder Agent</p>
                   <p className="mt-2 text-xl font-semibold text-white">Calibrating sprint map</p>
                   <p className="text-xs text-white/40">Next sync: backlog finalization</p>
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-white/30">AEPO directive</p>
+                  <p className="text-[10px] uppercase tracking-[0.25em] text-white/30">
+                    <abbr title={AEPO.tooltip} className="cursor-help border-b border-dashed border-white/30">
+                      AEPO
+                    </abbr>{' '}
+                    directive
+                  </p>
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-[#0f0f21]/80 p-4">
                   <p className="text-xs text-white/50">Growth Agent</p>
                   <p className="mt-2 text-xl font-semibold text-white">Deploying market loops</p>
                   <p className="text-xs text-white/40">Channels: Solana DeFi, creator hubs</p>
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-white/30">AEPO directive</p>
+                  <p className="text-[10px] uppercase tracking-[0.25em] text-white/30">
+                    <abbr title={AEPO.tooltip} className="cursor-help border-b border-dashed border-white/30">
+                      AEPO
+                    </abbr>{' '}
+                    directive
+                  </p>
                 </div>
               </div>
               <div className="space-y-2 rounded-2xl border border-white/10 bg-[#0f0f21]/80 p-4">
@@ -304,7 +298,12 @@ const HomePage = () => {
                   <div className="h-full w-3/4 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500" />
                 </div>
                 <p className="text-xs text-white/50">DAO launch kit, liquidity simulations, and community staking are in flight.</p>
-                <p className="text-[10px] uppercase tracking-[0.3em] text-white/30">AECO telemetry stable</p>
+                <p className="text-[10px] uppercase tracking-[0.3em] text-white/30">
+                  <abbr title={AECO.tooltip} className="cursor-help border-b border-dashed border-white/30">
+                    AECO
+                  </abbr>{' '}
+                  telemetry stable
+                </p>
               </div>
               <Button variant="secondary" className="w-full" onClick={() => navigate('/zyno')}>
                 Open Command Console

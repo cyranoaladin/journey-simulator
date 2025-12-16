@@ -38,7 +38,10 @@ function saveMetric(agentName, userId, metricType, value, missionId) {
     agentName,
     userId,
     missionId: missionId ?? null,
-    type: metricType, // "AEPO" or "AECO"
+    // "AEPO" or "AECO" (see utils/aepoAeco.js for unified definitions)
+    // - AEPO: per-agent execution signal feeding the individual pathway engine (AEPO orchestration).
+    // - AECO: feedback/cohort signal (ratings/comments), extensible to cohort analytics.
+    type: metricType,
     value
   };
 
