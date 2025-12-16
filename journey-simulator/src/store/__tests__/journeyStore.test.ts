@@ -22,9 +22,9 @@ vi.mock('../../utils/api', () => ({
 const mockApi = api as Mocked<typeof api>;
 
 describe('Journey Store - Phase Completion', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     // Reset the store and mocks before each test
-    useJourneyStore.getState().resetProgress();
+    await useJourneyStore.getState().resetProgress()
     vi.clearAllMocks();
 
     if (typeof window !== 'undefined' && window.localStorage) {
@@ -63,16 +63,14 @@ describe('Journey Store - Phase Completion', () => {
     // 3. Assertions
     // Check if the API was called correctly
     expect(mockApi.completePhase).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.stringContaining('phase-1'),
       expect.objectContaining({
         phase_number: phaseToComplete + 1,
         score: 100,
         xp_reward: phaseData.xpReward,
         mfai_reward: phaseData.mfaiReward,
-        nft_address: expect.any(String)
+        nft_address: expect.any(String),
       })
-    );
+    )
 
     // Check if the local state was updated optimistically
     expect(store.getState().userProgress.completedPhases).toContain(phaseToComplete);
