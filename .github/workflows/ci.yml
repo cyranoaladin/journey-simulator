@@ -16,21 +16,27 @@ jobs:
       - name: Setup Node (npm cache)
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "npm"
           cache-dependency-path: |
             mf-back/package-lock.json
             journey-simulator/package-lock.json
             web/package-lock.json
 
+      - name: Upgrade npm
+        run: npm install -g npm@11
+
       - name: Install (mf-back)
-        run: npm ci --prefix mf-back
+        working-directory: mf-back
+        run: npm ci
 
       - name: Install (journey-simulator)
-        run: npm ci --prefix journey-simulator
+        working-directory: journey-simulator
+        run: npm ci
 
       - name: Install (web)
-        run: npm ci --prefix web
+        working-directory: web
+        run: npm ci
 
       - name: Lint (simulator + web)
         run: npm run lint:all
