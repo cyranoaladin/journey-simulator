@@ -33,6 +33,11 @@ Allowlist limitée à :
 
 ✅ Résultat : **pas d’accès à la racine du repo**, donc un `.env` racine (ou d’autres secrets) n’est pas lisible via MCP.
 
+Notes sécurité :
+
+- Ce repo utilise un serveur MCP **interne** `tools/mcp/filesystem-ro.mjs` (Node) en **read-only**.
+- Il applique une **allowlist stricte** (répertoires) + un **blocage explicite** des fichiers `.env*` (même si un jour ils réapparaissaient).
+
 ### `git`
 
 Permet à Cursor d’interroger l’historique/diffs/blame sur :
@@ -43,13 +48,18 @@ Permet à Cursor d’interroger l’historique/diffs/blame sur :
 
 Inspection Postgres en lecture via :
 
-- `DATABASE_URL=postgresql://prisma:prisma@127.0.0.1:5435/prisma`
+- `postgresql://mcp_ro:prisma@127.0.0.1:5435/prisma`
 
 > **Pourquoi 5435 ?** Parce que `docker-compose.yml` expose Postgres en `5435:5432` et `scripts/prod-local-up.sh` utilise 5435 par défaut.
 
 ### `fetch`
 
 Permet à Cursor d’aspirer de la doc web (Solana / Metaplex / SIWS / etc.) pour l’exploiter dans l’agent.
+
+Notes sécurité :
+
+- Ce repo utilise un serveur MCP **interne** `tools/mcp/fetch-server.mjs` (Node).
+- **HTTPS uniquement**, et blocage de cibles locales (localhost / ranges privés basiques).
 
 ---
 
@@ -171,7 +181,7 @@ psql "postgresql://prisma:prisma@127.0.0.1:5435/prisma" -f /path/to/commands.sql
 Après création du user, modifiez la DSN du serveur `postgres_ro` :
 
 - Avant : `postgresql://prisma:prisma@127.0.0.1:5435/prisma`
-- Après : `postgresql://mcp_ro:CHANGE_ME_STRONG_PASSWORD@127.0.0.1:5435/prisma`
+- Après : `postgresql://mcp_ro:prisma@127.0.0.1:5435/prisma`
 
 Puis ré-importer `mcp.json` dans Cursor.
 
