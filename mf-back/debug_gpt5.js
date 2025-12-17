@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const OpenAI = require("openai");
 
 const openai = new OpenAI({

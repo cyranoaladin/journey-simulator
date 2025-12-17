@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 
 // jest.mock('../rag/ragClient'); // Removed to use real RAG
 

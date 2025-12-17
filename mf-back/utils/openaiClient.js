@@ -1,5 +1,5 @@
 const OpenAI = require("openai");
-require("dotenv").config();
+require("dotenv").config({ quiet: true });
 
 if (!process.env.OPENAI_API_KEY) {
   console.warn("WARNING: OPENAI_API_KEY is missing in .env");

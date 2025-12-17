@@ -33,7 +33,7 @@ const journeySchema = new mongoose.Schema({
         type: String,
         enum: ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED', 'FAILED'],
         default: 'IN_PROGRESS',
-        index: true
+        // index défini via journeySchema.index({ state: 1 })
     },
     currentStepId: {
         type: String,
