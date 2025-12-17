@@ -19,7 +19,9 @@
       "name": "git",
       "transport": "stdio",
       "command": "node",
-      "args": ["/home/alaeddine/Documents/journey_mfai_back_front/tools/mcp/git-server.mjs"]
+      "args": [
+        "/home/alaeddine/Documents/journey_mfai_back_front/tools/mcp/git-server.mjs"
+      ]
     },
     {
       "name": "postgres_ro",
@@ -35,7 +37,9 @@
       "name": "fetch",
       "transport": "stdio",
       "command": "node",
-      "args": ["/home/alaeddine/Documents/journey_mfai_back_front/tools/mcp/fetch-server.mjs"]
+      "args": [
+        "/home/alaeddine/Documents/journey_mfai_back_front/tools/mcp/fetch-server.mjs"
+      ]
     }
   ]
 }
