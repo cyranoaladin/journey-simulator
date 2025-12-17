@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { MessageCircle, Send, Sparkles, ThumbsDown, ThumbsUp, X } from 'lucide-react';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useJourneyStore } from '../../store/journeyStore';
 
 const EMPTY_TIPS: string[] = [];
@@ -12,7 +12,7 @@ interface ZynoBoxProps {
 }
 
 const ZynoBox: React.FC<ZynoBoxProps> = ({
-  context = '',
+  context: _context = '',
   tips = EMPTY_TIPS,
   onPrompt
 }) => {
@@ -107,35 +107,13 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
     defaultTips
   ]);
 
-  // Keep the latest tips in a ref to avoid effect loops caused by unstable array identities.
-  const activeTipsRef = useRef<string[]>(EMPTY_TIPS);
-  useEffect(() => {
-    activeTipsRef.current = activeTips;
-  }, [activeTips]);
-
-  // Stable key to detect effective tip-set changes even if array identity changes.
-  const activeTipsKey = useMemo(() => activeTips.join('||'), [activeTips]);
-
-  // Set a random tip when component mounts or context changes
-  useEffect(() => {
-    const currentTips = activeTipsRef.current;
-    if (!currentTips || currentTips.length === 0) {
-      // Avoid redundant state updates if already cleared.
-      setCurrentTip((prev) => (prev === null ? prev : null));
-      setFeedbackGiven((prev) => (prev ? false : prev));
-      return;
-    }
-
-    // Reset feedback only if needed.
-    setFeedbackGiven((prev) => (prev ? false : prev));
-
-    // If the current tip is still valid for this context, keep it to avoid update loops.
-    setCurrentTip((prev) => {
-      if (prev && currentTips.includes(prev)) return prev;
-      const randomIndex = Math.floor(Math.random() * currentTips.length);
-      return currentTips[randomIndex] ?? null;
-    });
-  }, [context, selectedPersona?.id, activeTipsKey]);
+  // Safety: avoid any automatic setState loops in production.
+  // We only pick a tip when the user opens the box, or clicks "New tip".
+  function pickRandomTip(list: string[]) {
+    if (!list || list.length === 0) return null;
+    const randomIndex = Math.floor(Math.random() * list.length);
+    return list[randomIndex] ?? null;
+  }
 
   // Get a contextual greeting based on user progress
   const getGreeting = () => {
@@ -182,7 +160,11 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
         transition={{ delay: 1, type: "spring", stiffness: 300 }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          setIsOpen(true);
+          setFeedbackGiven(false);
+          setCurrentTip((prev) => (prev ? prev : pickRandomTip(activeTips)));
+        }}
         className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-gradient-primary rounded-full flex items-center justify-center shadow-lg"
       >
         <MessageCircle size={24} className="text-white" />
