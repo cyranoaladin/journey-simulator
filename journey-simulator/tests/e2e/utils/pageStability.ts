@@ -23,6 +23,16 @@ export async function disablePageAnimations(page: Page) {
       }
     `;
 
-    document.head.appendChild(style);
+    // In some browsers/edge-timings, document/head/documentElement can be null at document-start.
+    // Retry until a mount point exists to avoid init-script exceptions that would break the app.
+    const attach = () => {
+      const target = document.head || document.documentElement;
+      if (target) {
+        target.appendChild(style);
+        return;
+      }
+      setTimeout(attach, 0);
+    };
+    attach();
   });
 }

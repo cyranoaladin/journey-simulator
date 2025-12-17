@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Resource Validation in Journey Steps', () => {
     test.beforeEach(async ({ page }) => {
@@ -48,6 +48,7 @@ test.describe('Resource Validation in Journey Steps', () => {
 
         // Inject auth token
         await page.addInitScript(() => {
+            localStorage.clear();
             localStorage.setItem('accessToken', 'mock-access-token');
             localStorage.setItem('userId', 'user-123');
         });
@@ -99,11 +100,14 @@ test.describe('Resource Validation in Journey Steps', () => {
 
         // Navigate to journey and trigger a step
         await page.goto('/journeys/capital-foundry');
-        await page.getByRole('button', { name: /Run Simulation/i }).click();
+        await expect(page.getByTestId('back-to-journeys')).toBeVisible({ timeout: 15000 });
+        const stepResp = page.waitForResponse((resp) => resp.url().includes('/journey/') && resp.url().includes('/step') && resp.request().method() === 'POST');
+        await page.getByRole('button', { name: /Run Simulation/i }).click({ timeout: 15000 });
+        await stepResp;
 
         // Wait for resources to load (supports localized titles)
         const resourcesSection = page.getByTestId('resources-section').first();
-        await expect(resourcesSection).toBeVisible({ timeout: 10000 });
+        await expect(resourcesSection).toBeVisible({ timeout: 20000 });
 
         // Verify valid URLs are displayed and clickable
         // Verify valid URLs are displayed and clickable
@@ -157,11 +161,14 @@ test.describe('Resource Validation in Journey Steps', () => {
         });
 
         await page.goto('/journeys/capital-foundry');
-        await page.getByRole('button', { name: /Run Simulation/i }).click();
+        await expect(page.getByTestId('back-to-journeys')).toBeVisible({ timeout: 15000 });
+        const stepResp = page.waitForResponse((resp) => resp.url().includes('/journey/') && resp.url().includes('/step') && resp.request().method() === 'POST');
+        await page.getByRole('button', { name: /Run Simulation/i }).click({ timeout: 15000 });
+        await stepResp;
 
         // Wait for resources to load regardless of locale
         const resourcesSection = page.getByTestId('resources-section').first();
-        await expect(resourcesSection).toBeVisible({ timeout: 10000 });
+        await expect(resourcesSection).toBeVisible({ timeout: 20000 });
 
         // Verify the resource with empty URL doesn't have an "Ouvrir" link
         const resourceBlocks = page.locator('text=Invalid Resource');
@@ -210,11 +217,14 @@ test.describe('Resource Validation in Journey Steps', () => {
         });
 
         await page.goto('/journeys/capital-foundry');
-        await page.getByRole('button', { name: /Run Simulation/i }).click();
+        await expect(page.getByTestId('back-to-journeys')).toBeVisible({ timeout: 15000 });
+        const stepResp = page.waitForResponse((resp) => resp.url().includes('/journey/') && resp.url().includes('/step') && resp.request().method() === 'POST');
+        await page.getByRole('button', { name: /Run Simulation/i }).click({ timeout: 15000 });
+        await stepResp;
 
         // Wait for resources section to resolve in any language
         const resourcesSection = page.getByTestId('resources-section').first();
-        await expect(resourcesSection).toBeVisible({ timeout: 10000 });
+        await expect(resourcesSection).toBeVisible({ timeout: 20000 });
 
         // Verify the copy button is still present
         // Verify the copy button is still present

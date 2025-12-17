@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, Sparkles, ThumbsUp, ThumbsDown, X, Send } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { MessageCircle, Send, Sparkles, ThumbsDown, ThumbsUp, X } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useJourneyStore } from '../../store/journeyStore';
+
+const EMPTY_TIPS: string[] = [];
 
 interface ZynoBoxProps {
   context?: string;
@@ -9,10 +11,10 @@ interface ZynoBoxProps {
   onPrompt?: (msg: string) => void;
 }
 
-const ZynoBox: React.FC<ZynoBoxProps> = ({ 
+const ZynoBox: React.FC<ZynoBoxProps> = ({
   context = '',
-  tips = [],
-  onPrompt 
+  tips = EMPTY_TIPS,
+  onPrompt
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentTip, setCurrentTip] = useState<string | null>(null);
@@ -20,71 +22,71 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
   const { selectedPersona, userProgress } = useJourneyStore();
 
   // Enhanced tips based on different personas
-  const cognitiveHubTips = [
+  const cognitiveHubTips = useMemo(() => [
     'Concepts are capital. Every mental model you sharpen turns future builds into compounding assets.',
     'Solana throughput is a design choice. Prototype until latency feels optional.',
     'Token design is economic storytelling—make incentives the plot that everyone wants to follow.',
     'Security is a ritual. Harden your wallet stack before the stakes climb.',
     'DAO participation is practice for ownership. The earlier you vote, the faster you influence.',
     'Publish your activation brief—clarity attracts collaborators and opportunities alike.'
-  ];
+  ], []);
 
-  const capitalFoundryTips = [
+  const capitalFoundryTips = useMemo(() => [
     'Performance plus risk discipline is the edge. Optimize Anchor code as hard as you iterate token design.',
     'Liquidity health tells the truth about your protocol. Stress-test it before users do.',
     'Oracle integrity is non-negotiable—guard it like the protocol’s nervous system.',
     'Circuit breakers and treasury dashboards win community trust when markets get loud.',
     'Sovereign Builders Network meetings are momentum multipliers—arrive with data and a precise ask.',
     'Neuro-Dividends reward shipping resilient primitives. Make that timeline concrete.'
-  ];
+  ], []);
 
-  const systemArchitectTips = [
+  const systemArchitectTips = useMemo(() => [
     'Think in primitives—every reusable component compounds ecosystem velocity.',
     'Device incentives must feel fair on day one; otherwise your DePIN network never boots.',
     'Bind AI outputs to provenance so enterprises can trust what you deploy.',
     'Failure drills are your certification. Practice incidents before mainnet pressure arrives.',
     'Guardian agents are teammates—activate them early in your rollout plan.',
     'Documentation is infrastructure. Publish builder kits as soon as your topology stabilizes.'
-  ];
+  ], []);
 
-  const experienceStudioTips = [
+  const experienceStudioTips = useMemo(() => [
     'Narrative clarity wins launches. Know exactly which emotion your experience should unlock.',
     'Design NFT lifecycles so value grows post-mint; static metadata is wasted potential.',
     'Token rewards need anti-bot habits baked in from sprint one.',
     'Usability labs are cheaper than churn. Watch real users move through your flows.',
     'Launch day is chapter one—keep rituals alive so community energy compounds.',
     'Sovereign Builders intros connect creatives with execution muscle. Ask Zyno for the match.'
-  ];
+  ], []);
 
-  const impactEngineTips = [
+  const impactEngineTips = useMemo(() => [
     'Purpose statements anchor governance. Revisit them every time the DAO scales.',
     'Contribution-based rewards keep momentum ethical and transparent.',
     'Impact metrics are narrative fuel—share them in dashboards people actually read.',
     'Soulbound credentials convert invisible labor into visible influence.',
     'Synaptic Governance favors clarity. Enter votes with concise trade-off analysis.',
     'Neuro-Dividends fund communities that stay accountable. Document your sprint outcomes.'
-  ];
+  ], []);
 
-  const resilienceMasterTips = [
+  const resilienceMasterTips = useMemo(() => [
     'Every exploit report you study buys you future response time.',
     'Fuzzing is non-negotiable—treat it like integration tests.',
     'Guardian agents love playbooks. Hand them crisp emergency procedures.',
     'On-chain forensics demand meticulous logs. Instrument before you need them.',
     'Communication discipline during incidents preserves credibility.',
     'Reward the fixes, not just the finds. Neuro-Dividends close the security loop.'
-  ];
+  ], []);
 
   // Default tips if none provided
-  const defaultTips = [
+  const defaultTips = useMemo(() => [
     'Every pathway converts capability into Proof-of-Skill™. Pick the mission that mirrors your ambition.',
     'Zyno, your AI Co-Founder, adapts phases dynamically—ask for a custom sprint if you need one.',
     'Proof assets are working credentials. Share them with collaborators to unlock opportunities faster.',
     'Skillchain Mining rewards consistent progress. Small completions compound quickly.',
     'The protocol agent mesh is active—ping us for Skillchain validation, guardian drills, or launch introductions.'
-  ];
+  ], []);
 
-  // Use persona-specific tips if available
-  const getActiveTips = () => {
+  // Use persona-specific tips if available (memoized to avoid effect loops)
+  const activeTips = useMemo(() => {
     if (selectedPersona?.id === 'cognitive-activation-hub') return cognitiveHubTips;
     if (selectedPersona?.id === 'capital-foundry') return capitalFoundryTips;
     if (selectedPersona?.id === 'system-architect') return systemArchitectTips;
@@ -93,32 +95,43 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
     if (selectedPersona?.id === 'resilience-master') return resilienceMasterTips;
     if (tips.length > 0) return tips;
     return defaultTips;
-  };
+  }, [
+    selectedPersona?.id,
+    tips,
+    cognitiveHubTips,
+    capitalFoundryTips,
+    systemArchitectTips,
+    experienceStudioTips,
+    impactEngineTips,
+    resilienceMasterTips,
+    defaultTips
+  ]);
 
-  const activeTips = getActiveTips();
+  // Stable key to detect effective tip-set changes even if `tips` array identity changes.
+  const tipsKey = useMemo(() => tips.join('||'), [tips]);
 
   // Set a random tip when component mounts or context changes
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * activeTips.length);
     setCurrentTip(activeTips[randomIndex]);
     setFeedbackGiven(false);
-  }, [context, activeTips]);
+  }, [context, selectedPersona?.id, tipsKey]);
 
   // Get a contextual greeting based on user progress
   const getGreeting = () => {
     if (!selectedPersona) return "Hi! I'm Zyno, your AI Co-Founder™. Ready to start your cognitive activation journey?";
-    
+
     if (userProgress.completedPhases.length === 0) {
       return `Welcome to the ${selectedPersona.title} journey! I'm Zyno, your AI Co-Founder™. Let's transform your skills into capital.`;
     }
-    
+
     if (userProgress.completedPhases.length === selectedPersona.phases.length) {
       return "Congratulations on completing your journey! You've achieved digital sovereignty. What's your next adventure?";
     }
-    
+
     const currentPhaseIndex = userProgress.completedPhases.length;
     const currentPhase = selectedPersona.phases[currentPhaseIndex];
-    
+
     return `You're currently in the ${currentPhase.title} phase. I'm here to guide you through each step. How can I help you progress?`;
   };
 
@@ -217,7 +230,7 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
                   </div>
                   <div className="bg-white/5 p-3 rounded-lg rounded-tl-none">
                     <p className="text-sm">{currentTip}</p>
-                    
+
                     {/* Feedback buttons */}
                     {!feedbackGiven ? (
                       <div className="flex justify-between mt-3">
@@ -282,7 +295,7 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
                   </div>
                   <div className="bg-white/5 p-3 rounded-lg rounded-tl-none">
                     <p className="text-sm">
-                      You've completed {userProgress.completedPhases.length} out of {selectedPersona.phases.length} phases. 
+                      You've completed {userProgress.completedPhases.length} out of {selectedPersona.phases.length} phases.
                       {userProgress.completedPhases.length === 0 && " Ready to start your first phase?"}
                       {userProgress.completedPhases.length > 0 && userProgress.completedPhases.length < selectedPersona.phases.length && " Keep up the great progress!"}
                       {userProgress.completedPhases.length === selectedPersona.phases.length && " Amazing! You've achieved digital sovereignty!"}
