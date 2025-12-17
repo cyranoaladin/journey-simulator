@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
 import JourneyWorkspace from '../JourneyWorkspace'
 import { useJourneyStore } from '../../../store/journeyStore'
 
@@ -148,7 +149,11 @@ describe('JourneyWorkspace', () => {
     })
 
     it('renders correctly with selected persona', () => {
-        render(<JourneyWorkspace />)
+        render(
+            <MemoryRouter>
+                <JourneyWorkspace />
+            </MemoryRouter>
+        )
 
         expect(screen.getAllByText('Test Persona')[0]).toBeInTheDocument()
         expect(screen.getAllByText('Phase 1')[0]).toBeInTheDocument()
@@ -163,7 +168,11 @@ describe('JourneyWorkspace', () => {
             void e
         }
 
-        render(<JourneyWorkspace />)
+        render(
+            <MemoryRouter>
+                <JourneyWorkspace />
+            </MemoryRouter>
+        )
 
         const startButton = screen.getByText('Run Simulation')
         fireEvent.click(startButton)
@@ -177,7 +186,11 @@ describe('JourneyWorkspace', () => {
 
     it('shows loading state when isStepLoading is true', () => {
         useJourneyStore.setState({ isStepLoading: true } as any)
-        render(<JourneyWorkspace />)
+        render(
+            <MemoryRouter>
+                <JourneyWorkspace />
+            </MemoryRouter>
+        )
 
         // The button text changes to a loader, so "Start / Continue" should not be there
         expect(screen.queryByText('Run Simulation')).not.toBeInTheDocument()
@@ -191,7 +204,11 @@ describe('JourneyWorkspace', () => {
             } as any
         } as any)
 
-        render(<JourneyWorkspace />)
+        render(
+            <MemoryRouter>
+                <JourneyWorkspace />
+            </MemoryRouter>
+        )
 
         expect(screen.getByTestId('ui-blocks-renderer')).toBeInTheDocument()
     })
@@ -208,7 +225,11 @@ describe('JourneyWorkspace', () => {
             } as any
         } as any)
 
-        render(<JourneyWorkspace />)
+        render(
+            <MemoryRouter>
+                <JourneyWorkspace />
+            </MemoryRouter>
+        )
         expect(screen.getAllByText('Complete')[0]).toBeInTheDocument()
     })
 
@@ -224,7 +245,11 @@ describe('JourneyWorkspace', () => {
             } as any
         } as any)
 
-        render(<JourneyWorkspace />)
+        render(
+            <MemoryRouter>
+                <JourneyWorkspace />
+            </MemoryRouter>
+        )
 
         const completeButton = screen.getAllByText('Complete')[0]
         fireEvent.click(completeButton)

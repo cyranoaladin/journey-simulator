@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import JourneyWorkspace from '../JourneyWorkspace';
 import { useJourneyStore } from '../../../store/journeyStore';
 import { getPersonaProofData } from '../../../data/proofsData';
@@ -141,7 +142,11 @@ describe('NFT Integration in JourneyWorkspace', () => {
     });
 
     it('opens NFTProofModal with correct image URL after phase completion', async () => {
-        render(<JourneyWorkspace />);
+        render(
+            <MemoryRouter>
+                <JourneyWorkspace />
+            </MemoryRouter>
+        );
 
         // Find and click the Complete Phase button
         const completeButton = screen.getAllByText('Mint NFT')[0];
