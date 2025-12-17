@@ -107,15 +107,24 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
     defaultTips
   ]);
 
-  // Stable key to detect effective tip-set changes even if `tips` array identity changes.
-  const tipsKey = useMemo(() => tips.join('||'), [tips]);
+  // Stable key to detect effective tip-set changes even if array identity changes.
+  const activeTipsKey = useMemo(() => activeTips.join('||'), [activeTips]);
 
   // Set a random tip when component mounts or context changes
   useEffect(() => {
+    if (activeTips.length === 0) {
+      setCurrentTip(null);
+      setFeedbackGiven(false);
+      return;
+    }
+
     const randomIndex = Math.floor(Math.random() * activeTips.length);
-    setCurrentTip(activeTips[randomIndex]);
+    const nextTip = activeTips[randomIndex] ?? null;
+
+    // Avoid redundant updates to reduce the chance of update loops.
+    setCurrentTip((prev) => (prev === nextTip ? prev : nextTip));
     setFeedbackGiven(false);
-  }, [context, selectedPersona?.id, tipsKey]);
+  }, [context, selectedPersona?.id, activeTipsKey, activeTips]);
 
   // Get a contextual greeting based on user progress
   const getGreeting = () => {
