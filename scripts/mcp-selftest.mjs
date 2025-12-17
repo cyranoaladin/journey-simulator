@@ -12,9 +12,10 @@
 
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
+import path from 'node:path';
 
-const ROOT = '/home/alaeddine/Documents/journey_mfai_back_front';
-const MCP_JSON = `${ROOT}/mcp.json`;
+const ROOT = process.env.MCP_ROOT ? path.resolve(process.env.MCP_ROOT) : process.cwd();
+const MCP_JSON = process.env.MCP_JSON ? path.resolve(process.env.MCP_JSON) : path.join(ROOT, 'mcp.json');
 
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
@@ -32,6 +33,7 @@ function createStdioClient({ name, command, args, env }) {
   const child = spawn(command, args, {
     stdio: ['pipe', 'pipe', 'pipe'],
     env: { ...process.env, ...(env || {}) },
+    cwd: ROOT,
   });
 
   let nextId = 1;
@@ -213,7 +215,7 @@ async function main() {
         const fetchTool = toolNames.find((n) => n === 'fetch') || toolNames.find((n) => n.includes('fetch'));
         if (fetchTool) {
           const f1 = await withTimeout(
-            client.request('tools/call', { name: fetchTool, arguments: { url: 'https://docs.login.xyz/' } }),
+            client.request('tools/call', { name: fetchTool, arguments: { url: 'https://example.com' } }),
             15000,
             `${s.name}:fetch`
           );
@@ -245,5 +247,3 @@ main().catch((e) => {
   console.error(e);
   process.exit(1);
 });
-
-

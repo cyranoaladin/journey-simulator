@@ -6,13 +6,13 @@
       "transport": "stdio",
       "command": "node",
       "args": [
-        "/home/alaeddine/Documents/journey_mfai_back_front/tools/mcp/filesystem-ro.mjs",
-        "/home/alaeddine/Documents/journey_mfai_back_front/docs",
-        "/home/alaeddine/Documents/journey_mfai_back_front/mf-back",
-        "/home/alaeddine/Documents/journey_mfai_back_front/web",
-        "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator",
-        "/home/alaeddine/Documents/journey_mfai_back_front/scripts",
-        "/home/alaeddine/Documents/journey_mfai_back_front/tmp"
+        "./tools/mcp/filesystem-ro.mjs",
+        "./docs",
+        "./mf-back",
+        "./web",
+        "./journey-simulator",
+        "./scripts",
+        "./tmp"
       ]
     },
     {
@@ -20,7 +20,8 @@
       "transport": "stdio",
       "command": "node",
       "args": [
-        "/home/alaeddine/Documents/journey_mfai_back_front/tools/mcp/git-server.mjs"
+        "./tools/mcp/git-server.mjs",
+        "."
       ]
     },
     {
@@ -38,7 +39,7 @@
       "transport": "stdio",
       "command": "node",
       "args": [
-        "/home/alaeddine/Documents/journey_mfai_back_front/tools/mcp/fetch-server.mjs"
+        "./tools/mcp/fetch-server.mjs"
       ]
     }
   ]

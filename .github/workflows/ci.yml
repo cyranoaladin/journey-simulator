@@ -14,6 +14,19 @@ jobs:
         image: redis:7-alpine
         ports:
           - 6379:6379
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: prisma
+          POSTGRES_USER: prisma
+          POSTGRES_PASSWORD: prisma
+        ports:
+          - 5435:5432
+        options: >-
+          --health-cmd="pg_isready -U prisma"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,6 +44,27 @@ jobs:
       - name: Upgrade npm
         run: npm install -g npm@11
 
+      - name: Init Postgres read-only user (mcp_ro)
+        run: |
+          set -euo pipefail
+          sudo apt-get update -y
+          sudo apt-get install -y postgresql-client
+          export PGPASSWORD=prisma
+          psql -h 127.0.0.1 -p 5435 -U prisma -d prisma -v ON_ERROR_STOP=1 <<'SQL'
+          DO $$
+          BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'mcp_ro') THEN
+              CREATE ROLE mcp_ro LOGIN PASSWORD 'prisma';
+            END IF;
+          END $$;
+          GRANT CONNECT ON DATABASE prisma TO mcp_ro;
+          GRANT USAGE ON SCHEMA public TO mcp_ro;
+          GRANT SELECT ON ALL TABLES IN SCHEMA public TO mcp_ro;
+          GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO mcp_ro;
+          ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO mcp_ro;
+          ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON SEQUENCES TO mcp_ro;
+          SQL
+
       - name: Install (mf-back)
         working-directory: mf-back
         run: npm ci
@@ -42,6 +76,9 @@ jobs:
       - name: Install (web)
         working-directory: web
         run: npm ci
+
+      - name: MCP selftest (filesystem/git/postgres/fetch)
+        run: node scripts/mcp-selftest.mjs
 
       - name: Lint (simulator + web)
         run: npm run lint:all

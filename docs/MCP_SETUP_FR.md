@@ -14,6 +14,8 @@ L’objectif MCP ici : donner à Cursor des “super‑pouvoirs” **utiles au m
 
 Le repo fournit une config prête à importer : `mcp.json`.
 
+> `mcp.json` est **portable** (chemins relatifs) : pas besoin d’éditer des chemins absolus quand le repo change d’emplacement.
+
 ### Serveurs inclus
 
 - **`filesystem_ro`** : serveur MCP **interne** (Node) **read-only**, allowlist stricte, et **blocage explicite des `.env*`**.

@@ -2,11 +2,41 @@
 /**
  * Lightweight MCP server (stdio) for local git operations (read-only).
  * No external deps; uses `git` CLI.
+ *
+ * Portability:
+ * - Prefer an explicit repo path passed as argv[2]
+ * - Fallback to MCP_REPO env var
+ * - Fallback to process.cwd()
  */
 
 import { execFile } from 'node:child_process';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const REPO = '/home/alaeddine/Documents/journey_mfai_back_front';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const DEFAULT_ROOT = path.resolve(__dirname, '../..');
+
+function resolveRepoPath(p) {
+  if (!p) return process.cwd();
+  return path.isAbsolute(p) ? p : path.resolve(DEFAULT_ROOT, p);
+}
+
+const REPO = resolveRepoPath(process.argv[2] || process.env.MCP_REPO || process.cwd());
+
+async function assertRepo(p) {
+  const abs = path.resolve(p);
+  const st = await fs.stat(abs);
+  if (!st.isDirectory()) throw new Error(`Repo path is not a directory: ${abs}`);
+  // best-effort: ensure it's a git repo (or a worktree)
+  try {
+    await fs.stat(path.join(abs, '.git'));
+  } catch {
+    // allow worktrees/submodules where .git is a file; git itself will validate
+  }
+  return abs;
+}
 
 function reply(id, result) {
   process.stdout.write(JSON.stringify({ jsonrpc: '2.0', id, result }) + '\n');
@@ -20,9 +50,10 @@ function textResult(text) {
   return { content: [{ type: 'text', text }] };
 }
 
-function runGit(args) {
+async function runGit(args) {
+  const repo = await assertRepo(REPO);
   return new Promise((resolve, reject) => {
-    execFile('git', ['-C', REPO, ...args], { maxBuffer: 10 * 1024 * 1024 }, (err, stdout, stderr) => {
+    execFile('git', ['-C', repo, ...args], { maxBuffer: 10 * 1024 * 1024 }, (err, stdout, stderr) => {
       if (err) reject(new Error(stderr || err.message));
       else resolve(stdout);
     });
@@ -93,5 +124,3 @@ process.stdin.on('data', async (chunk) => {
     void handle(req);
   }
 });
-
-

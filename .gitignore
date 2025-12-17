@@ -27,6 +27,7 @@ mf-back/memory/agent_metrics.log.json
 .vscode/
 .idea/
 .serena/
+.cursor/
 
 # Solana minter secrets
 web/minter.json

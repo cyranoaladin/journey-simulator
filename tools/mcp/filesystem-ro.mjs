@@ -10,8 +10,18 @@
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const allowedDirs = process.argv.slice(2).filter(Boolean);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// tools/mcp/* -> repo root
+const DEFAULT_ROOT = path.resolve(__dirname, '../..');
+
+function resolveFromRoot(p) {
+  return path.isAbsolute(p) ? p : path.resolve(DEFAULT_ROOT, p);
+}
+
+const allowedDirs = process.argv.slice(2).filter(Boolean).map(resolveFromRoot);
 const allowedRealpaths = await Promise.all(
   allowedDirs.map(async (p) => {
     const rp = await fs.realpath(p);

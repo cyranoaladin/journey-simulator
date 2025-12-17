@@ -42,7 +42,7 @@ Notes sécurité :
 
 Permet à Cursor d’interroger l’historique/diffs/blame sur :
 
-- Repo : `/home/alaeddine/Documents/journey_mfai_back_front`
+- Repo : **le repo courant** (config portable; pas de chemin hardcodé)
 
 ### `postgres_ro`
 
@@ -110,15 +110,8 @@ Si `npx` est absent : réinstaller Node (ex. via nvm) et relancer Cursor.
 
 ### Mauvais chemins (repo déplacé)
 
-Si le repo n’est pas à `/home/alaeddine/Documents/journey_mfai_back_front`, mettez à jour dans `mcp.json` :
-
-- les chemins passés aux serveurs internes :
-  - `filesystem_ro.args` (liste des répertoires allowlistés)
-  - `git.args[0]` (le serveur est interne mais pointe sur le repo)
-  - `fetch.args[0]` (serveur interne)
-- la DSN Postgres dans `postgres_ro.args` (dernier argument)
-
-Puis ré-importer `mcp.json` dans Cursor.
+Normalement **rien à faire** : `mcp.json` utilise des chemins **relatifs** et les serveurs MCP internes résolvent ces chemins par rapport au repo.
+Si vous avez modifié la structure du repo, vérifiez seulement que la liste allowlist de `filesystem_ro` (dans `mcp.json`) correspond toujours aux bons dossiers.
 
 ### Postgres down / mauvais port (5435 vs 5433)
 
@@ -150,8 +143,14 @@ Adapter ensuite `DATABASE_URL` dans `mcp.json` :
 Si vous voulez une preuve 100% reproductible (sans dépendre de l’UI Cursor), exécutez :
 
 ```bash
-cd /home/alaeddine/Documents/journey_mfai_back_front
+cd /chemin/vers/le/repo
 node scripts/mcp-selftest.mjs
+```
+
+One-liner CI/local (lint + build + unit + e2e + MCP) :
+
+```bash
+cd /chemin/vers/le/repo && npm run ci:verify
 ```
 
 Ce script démarre chaque serveur MCP (stdio), fait `initialize`, `tools/list`, et des appels simples (FS + sécurité `.env*`, git diff, Postgres SELECT, fetch HTTPS).
