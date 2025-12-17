@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { MessageCircle, Send, Sparkles, ThumbsDown, ThumbsUp, X } from 'lucide-react';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useJourneyStore } from '../../store/journeyStore';
 
 const EMPTY_TIPS: string[] = [];
@@ -107,24 +107,31 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
     defaultTips
   ]);
 
+  // Keep the latest tips in a ref to avoid effect loops caused by unstable array identities.
+  const activeTipsRef = useRef<string[]>(EMPTY_TIPS);
+  useEffect(() => {
+    activeTipsRef.current = activeTips;
+  }, [activeTips]);
+
   // Stable key to detect effective tip-set changes even if array identity changes.
   const activeTipsKey = useMemo(() => activeTips.join('||'), [activeTips]);
 
   // Set a random tip when component mounts or context changes
   useEffect(() => {
-    if (activeTips.length === 0) {
+    const currentTips = activeTipsRef.current;
+    if (!currentTips || currentTips.length === 0) {
       setCurrentTip(null);
       setFeedbackGiven(false);
       return;
     }
 
-    const randomIndex = Math.floor(Math.random() * activeTips.length);
-    const nextTip = activeTips[randomIndex] ?? null;
+    const randomIndex = Math.floor(Math.random() * currentTips.length);
+    const nextTip = currentTips[randomIndex] ?? null;
 
     // Avoid redundant updates to reduce the chance of update loops.
     setCurrentTip((prev) => (prev === nextTip ? prev : nextTip));
     setFeedbackGiven(false);
-  }, [context, selectedPersona?.id, activeTipsKey, activeTips]);
+  }, [context, selectedPersona?.id, activeTipsKey]);
 
   // Get a contextual greeting based on user progress
   const getGreeting = () => {
