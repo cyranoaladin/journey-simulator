@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { RewardSpec, SimResult } from 'agents/tools/solana'
 import { mintQueue } from '@/server/queue'
+import { log, error as logError } from '@/server/logger'
 
 const RewardSpecSchema = z.object({
   recipient: z.string(),
@@ -58,12 +59,12 @@ export async function POST(req: Request) {
       userId,
     })
 
-    console.log(`[API] Added mint job ${job.id} to queue`)
+    log(`[API] Added mint job ${job.id} to queue`)
 
     // Return job ID so client can poll if needed
     return NextResponse.json({ ok: true, jobId: job.id, status: 'queued' })
   } catch (error) {
-    console.error('/api/mint/execute error', error)
+    logError('/api/mint/execute error', error)
     return NextResponse.json({ error: 'queue_failed' }, { status: 500 })
   }
 }

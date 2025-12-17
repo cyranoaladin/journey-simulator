@@ -5,6 +5,7 @@ import {
   type RewardSpec,
   type SimResult,
 } from '../../packages/agents/tools/solana.ts'
+import { log, error as logError } from '../server/logger'
 
 // We need to import the Prisma client dynamically or ensure it's available in the worker context
 // For simplicity, we'll assume we can import the db helper if it exists, or use PrismaClient directly.
@@ -23,7 +24,7 @@ export const mintWorker = new Worker<MintJobData>(
   'minting',
   async (job: Job<MintJobData>) => {
     const { spec, sim, userId } = job.data
-    console.log(`[Worker] Processing mint job ${job.id} for ${spec.recipient}`)
+    log(`[Worker] Processing mint job ${job.id} for ${spec.recipient}`)
 
     try {
       // Execute the mint
@@ -41,10 +42,10 @@ export const mintWorker = new Worker<MintJobData>(
         },
       })
 
-      console.log(`[Worker] Mint success: ${result.mintAddress}`)
+      log(`[Worker] Mint success: ${result.mintAddress}`)
       return result
     } catch (error: any) {
-      console.error(`[Worker] Mint failed for job ${job.id}:`, error)
+      logError(`[Worker] Mint failed for job ${job.id}:`, error)
 
       // Log failure to DB
       await prisma.mintLog.create({
@@ -67,9 +68,9 @@ export const mintWorker = new Worker<MintJobData>(
 )
 
 mintWorker.on('completed', (job) => {
-  console.log(`[Worker] Job ${job.id} completed!`)
+  log(`[Worker] Job ${job.id} completed!`)
 })
 
 mintWorker.on('failed', (job, err) => {
-  console.error(`[Worker] Job ${job?.id} failed with ${err.message}`)
+  logError(`[Worker] Job ${job?.id} failed with ${err.message}`)
 })
