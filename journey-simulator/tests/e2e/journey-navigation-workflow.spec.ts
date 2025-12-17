@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { setupJourneyMocks, seedDemoUser } from './utils/journeyMocks';
+import { expect, test } from '@playwright/test';
+import { seedDemoUser, setupJourneyMocks } from './utils/journeyMocks';
 import { disablePageAnimations } from './utils/pageStability';
 
 test.describe('Journey Navigation Workflow', () => {

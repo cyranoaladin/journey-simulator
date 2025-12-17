@@ -1,14 +1,14 @@
-import { useState, useEffect, type FC } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useEffect, useState, type FC } from "react";
+import { useNavigate } from "react-router-dom";
 import MessageDisplay from "../components/shared/MessageDisplay";
 import { useJourneyStore } from "../store/journeyStore";
 import JourneyCard from "./Journey/JourneyCard";
 import ZynoBox from "./Journey/ZynoBox";
 
 import { personas } from "../data/personas";
-import ResetProgressButton from "./ResetProgressButton";
 import JourneyWorkspace from "./Journey/JourneyWorkspace";
+import ResetProgressButton from "./ResetProgressButton";
 
 const JourneysPage: FC = () => {
   const selectedPersona = useJourneyStore((state) => state.selectedPersona);
