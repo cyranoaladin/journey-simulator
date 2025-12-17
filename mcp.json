@@ -9,8 +9,6 @@
         "-y",
         "@modelcontextprotocol/server-filesystem",
         "--allowed-dir",
-        "/home/alaeddine/Documents/journey_mfai_back_front",
-        "--allowed-dir",
         "/home/alaeddine/Documents/journey_mfai_back_front/docs",
         "--allowed-dir",
         "/home/alaeddine/Documents/journey_mfai_back_front/mf-back",
