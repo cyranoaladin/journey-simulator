@@ -1,8 +1,8 @@
 // src/store/__tests__/journeyStore.test.ts
-import { vi, describe, it, expect, beforeEach, afterEach, Mocked } from 'vitest';
-import { useJourneyStore } from '../journeyStore';
-import { api } from '../../utils/api';
+import { afterEach, beforeEach, describe, expect, it, Mocked, vi } from 'vitest';
 import { personas } from '../../data/personas';
+import { api } from '../../utils/api';
+import { useJourneyStore } from '../journeyStore';
 
 // Mock the entire api module
 vi.mock('../../utils/api', () => ({
@@ -24,7 +24,7 @@ const mockApi = api as Mocked<typeof api>;
 describe('Journey Store - Phase Completion', () => {
   beforeEach(async () => {
     // Reset the store and mocks before each test
-    await useJourneyStore.getState().resetProgress()
+    await useJourneyStore.getState().resetProgress();
     vi.clearAllMocks();
 
     if (typeof window !== 'undefined' && window.localStorage) {
@@ -69,8 +69,10 @@ describe('Journey Store - Phase Completion', () => {
         xp_reward: phaseData.xpReward,
         mfai_reward: phaseData.mfaiReward,
         nft_address: expect.any(String),
+        // The store enriches the payload with NFT metadata (best-effort). We only require a reward label.
+        nft_reward: expect.any(String),
       })
-    )
+    );
 
     // Check if the local state was updated optimistically
     expect(store.getState().userProgress.completedPhases).toContain(phaseToComplete);
