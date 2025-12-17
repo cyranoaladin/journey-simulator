@@ -120,17 +120,21 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
   useEffect(() => {
     const currentTips = activeTipsRef.current;
     if (!currentTips || currentTips.length === 0) {
-      setCurrentTip(null);
-      setFeedbackGiven(false);
+      // Avoid redundant state updates if already cleared.
+      setCurrentTip((prev) => (prev === null ? prev : null));
+      setFeedbackGiven((prev) => (prev ? false : prev));
       return;
     }
 
-    const randomIndex = Math.floor(Math.random() * currentTips.length);
-    const nextTip = currentTips[randomIndex] ?? null;
+    // Reset feedback only if needed.
+    setFeedbackGiven((prev) => (prev ? false : prev));
 
-    // Avoid redundant updates to reduce the chance of update loops.
-    setCurrentTip((prev) => (prev === nextTip ? prev : nextTip));
-    setFeedbackGiven(false);
+    // If the current tip is still valid for this context, keep it to avoid update loops.
+    setCurrentTip((prev) => {
+      if (prev && currentTips.includes(prev)) return prev;
+      const randomIndex = Math.floor(Math.random() * currentTips.length);
+      return currentTips[randomIndex] ?? null;
+    });
   }, [context, selectedPersona?.id, activeTipsKey]);
 
   // Get a contextual greeting based on user progress
@@ -159,8 +163,13 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
 
   const getNewTip = () => {
     const availableTips = activeTips.filter(tip => tip !== currentTip);
+    if (availableTips.length === 0) {
+      // Nothing else to show; keep current tip but reset feedback.
+      setFeedbackGiven(false);
+      return;
+    }
     const randomIndex = Math.floor(Math.random() * availableTips.length);
-    setCurrentTip(availableTips[randomIndex]);
+    setCurrentTip(availableTips[randomIndex] ?? null);
     setFeedbackGiven(false);
   };
 
