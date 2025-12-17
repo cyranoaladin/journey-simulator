@@ -52,5 +52,9 @@ jobs:
       - name: Unit tests (back + simulator + web)
         run: npm run test:all
 
+      - name: Install Playwright browsers (journey-simulator)
+        working-directory: journey-simulator
+        run: npx playwright install --with-deps
+
       - name: E2E (journey-simulator)
         run: npm run test:e2e:simulator
