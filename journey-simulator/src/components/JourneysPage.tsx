@@ -10,11 +10,12 @@ import { personas } from "../data/personas";
 import JourneyWorkspace from "./Journey/JourneyWorkspace";
 import ResetProgressButton from "./ResetProgressButton";
 
+const EMPTY_TIPS: string[] = [];
+
 const JourneysPage: FC = () => {
   const selectedPersona = useJourneyStore((state) => state.selectedPersona);
   const setSelectedPersona = useJourneyStore((state) => state.setSelectedPersona);
   const userProgress = useJourneyStore((state) => state.userProgress);
-  const loadUserProgress = useJourneyStore((state) => state.loadUserProgress);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,7 +51,9 @@ const JourneysPage: FC = () => {
       try {
         setIsLoading(true);
         setError(null);
-        await loadUserProgress();
+        // NOTE: Some store implementations return unstable function references.
+        // Using getState() avoids effect loops in production builds.
+        await useJourneyStore.getState().loadUserProgress();
         console.log("JourneysPage: progress loaded successfully");
       } catch (err) {
         console.error("Failed to load user progress:", err);
@@ -61,13 +64,13 @@ const JourneysPage: FC = () => {
     };
 
     loadProgress();
-  }, [loadUserProgress]);
+  }, []);
 
   const handleRefreshProgress = async () => {
     try {
       setIsLoading(true);
       setError(null);
-      await loadUserProgress();
+      await useJourneyStore.getState().loadUserProgress();
     } catch (err) {
       console.error("Failed to refresh progress:", err);
       setError("Failed to refresh progress. Please try again.");
@@ -79,7 +82,8 @@ const JourneysPage: FC = () => {
   const navigate = useNavigate();
 
   const personaId = selectedPersona?.id ?? "none";
-  const personaTips = selectedPersona?.phases?.[userProgress.completedPhases.length]?.zynoTips ?? [];
+  const personaTips =
+    selectedPersona?.phases?.[userProgress.completedPhases.length]?.zynoTips ?? EMPTY_TIPS;
 
   const handleBackToPersonas = () => {
     setSelectedPersona(null);
