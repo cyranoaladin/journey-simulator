@@ -53,7 +53,7 @@ test.describe('Journey Navigation Workflow', () => {
         // Navigate back to journeys
         // Clear persisted journey store to avoid flaky re-hydration keeping a selected persona.
         await page.evaluate(() => {
-            try { window.localStorage.removeItem('mfai-journey-storage'); } catch {}
+            try { window.localStorage.removeItem('mfai-journey-storage'); } catch { /* ignore */ }
         });
         await page.goto('/journeys');
         await page.waitForURL(url => url.pathname === '/journeys', { timeout: 20000 });
@@ -95,7 +95,7 @@ test.describe('Journey Navigation Workflow', () => {
     test('should handle browser back/forward navigation', async ({ page }) => {
         // Ensure a clean persisted store so /journeys renders predictably.
         await page.addInitScript(() => {
-            try { window.localStorage.removeItem('mfai-journey-storage'); } catch {}
+            try { window.localStorage.removeItem('mfai-journey-storage'); } catch { /* ignore */ }
         });
 
         // Create history entries: /journeys -> /journeys/capital-foundry

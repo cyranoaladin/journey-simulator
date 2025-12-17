@@ -77,6 +77,9 @@ jobs:
         working-directory: web
         run: npm ci
 
+      - name: Ensure tmp directory exists (MCP filesystem_ro)
+        run: mkdir -p tmp
+
       - name: MCP selftest (filesystem/git/postgres/fetch)
         run: node scripts/mcp-selftest.mjs
 
