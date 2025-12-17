@@ -138,7 +138,7 @@ const JourneysPage: FC = () => {
         </div>
       </div>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8" data-testid="journeys-page">
         {!selectedPersona && (
           <>
             <motion.div
@@ -147,7 +147,7 @@ const JourneysPage: FC = () => {
               className="text-center mb-12"
             >
               <h1 className="text-4xl md:text-6xl font-space font-bold mb-6">
-                <span className="gradient-text">
+                <span className="gradient-text" data-testid="journeys-page-title">
                   Choose Your Path to Sovereignty
                 </span>
               </h1>
