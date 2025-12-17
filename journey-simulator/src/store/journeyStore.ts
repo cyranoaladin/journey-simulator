@@ -732,13 +732,16 @@ export const useJourneyStore = create<JourneyState>()(
             ? personas.find((persona) => persona.id === backendPersonaId)
             : null
 
-          const effectivePersona = currentState.selectedPersona ?? matchedPersona ?? null
+          // Persona used to normalize phase counts/progress math.
+          // We intentionally do NOT auto-select a persona here, otherwise the UI can
+          // oscillate between /journeys list and an auto-selected workspace.
+          const progressPersona = currentState.selectedPersona ?? matchedPersona ?? null
           const mergedPhaseIndexes = Array.from(new Set([
             ...backendCompletedPhases,
             ...currentState.userProgress.completedPhases
           ])).sort((a, b) => a - b)
 
-          const personaPhaseCount = effectivePersona?.phases?.length
+          const personaPhaseCount = progressPersona?.phases?.length
             ?? Math.max(mergedPhaseIndexes.length, normalizedBackend.completedCount)
 
           const completedPhases = mergedPhaseIndexes.filter((index) => index < personaPhaseCount)
@@ -801,7 +804,8 @@ export const useJourneyStore = create<JourneyState>()(
           }
 
           set({
-            selectedPersona: effectivePersona,
+            // Keep current selection; do not auto-select from backend progress.
+            selectedPersona: currentState.selectedPersona,
             currentPhase: safeCompletedCount,
             userProgress: mappedProgress,
           })
