@@ -130,7 +130,8 @@ start_bg "worker-mint" "cd '$ROOT_DIR' && NODE_ENV=production DATABASE_URL='${DA
 start_bg "simulator" "cd '$ROOT_DIR' && NODE_ENV=production npm run preview --prefix journey-simulator -- --host 0.0.0.0 --port '${PORT_SIM}'"
 
 echo "[prod-local] smoke-check"
-curl -s -o /dev/null -w " - mf-back: %{http_code}\n" "http://127.0.0.1:${PORT_BACKEND}/" || true
+curl -s -o /dev/null -w " - mf-back /healthz: %{http_code}\n" "http://127.0.0.1:${PORT_BACKEND}/healthz" || true
+curl -s -o /dev/null -w " - mf-back /readyz: %{http_code}\n" "http://127.0.0.1:${PORT_BACKEND}/readyz" || true
 curl -s -o /dev/null -w " - web /api/health: %{http_code}\n" "http://127.0.0.1:${PORT_WEB}/api/health" || true
 curl -s -o /dev/null -w " - simulator: %{http_code}\n" "http://127.0.0.1:${PORT_SIM}/" || true
 

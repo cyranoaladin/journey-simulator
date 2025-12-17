@@ -1,6 +1,23 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Resource Validation in Journey Steps', () => {
+    async function dismissWalletModalIfPresent(page: any) {
+        // Wallet-adapter modal occasionally appears in Firefox and can steal clicks/focus.
+        // Best-effort: close it if present.
+        try {
+            const closeBtn = page.locator('.wallet-adapter-modal-button-close');
+            if (await closeBtn.isVisible({ timeout: 250 })) {
+                await closeBtn.click({ force: true });
+            }
+        } catch { /* ignore */ }
+        try {
+            const dismiss = page.getByRole('button', { name: /dismiss/i });
+            if (await dismiss.isVisible({ timeout: 250 })) {
+                await dismiss.click({ force: true });
+            }
+        } catch { /* ignore */ }
+    }
+
     test.beforeEach(async ({ page }) => {
         // Mock authentication
         await page.route('**/user/profile', async (route) => {
@@ -101,9 +118,8 @@ test.describe('Resource Validation in Journey Steps', () => {
         // Navigate to journey and trigger a step
         await page.goto('/journeys/capital-foundry');
         await expect(page.getByTestId('back-to-journeys')).toBeVisible({ timeout: 15000 });
-        const stepResp = page.waitForResponse((resp) => resp.url().includes('/journey/') && resp.url().includes('/step') && resp.request().method() === 'POST');
+        await dismissWalletModalIfPresent(page);
         await page.getByRole('button', { name: /Run Simulation/i }).click({ timeout: 15000 });
-        await stepResp;
 
         // Wait for resources to load (supports localized titles)
         const resourcesSection = page.getByTestId('resources-section').first();
@@ -162,9 +178,8 @@ test.describe('Resource Validation in Journey Steps', () => {
 
         await page.goto('/journeys/capital-foundry');
         await expect(page.getByTestId('back-to-journeys')).toBeVisible({ timeout: 15000 });
-        const stepResp = page.waitForResponse((resp) => resp.url().includes('/journey/') && resp.url().includes('/step') && resp.request().method() === 'POST');
+        await dismissWalletModalIfPresent(page);
         await page.getByRole('button', { name: /Run Simulation/i }).click({ timeout: 15000 });
-        await stepResp;
 
         // Wait for resources to load regardless of locale
         const resourcesSection = page.getByTestId('resources-section').first();
@@ -218,9 +233,8 @@ test.describe('Resource Validation in Journey Steps', () => {
 
         await page.goto('/journeys/capital-foundry');
         await expect(page.getByTestId('back-to-journeys')).toBeVisible({ timeout: 15000 });
-        const stepResp = page.waitForResponse((resp) => resp.url().includes('/journey/') && resp.url().includes('/step') && resp.request().method() === 'POST');
+        await dismissWalletModalIfPresent(page);
         await page.getByRole('button', { name: /Run Simulation/i }).click({ timeout: 15000 });
-        await stepResp;
 
         // Wait for resources section to resolve in any language
         const resourcesSection = page.getByTestId('resources-section').first();

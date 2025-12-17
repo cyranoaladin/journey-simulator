@@ -66,7 +66,9 @@ test.describe('Journey Navigation Workflow', () => {
 
         // 5. Re-select the persona
         // Clicking the card is flaky in Firefox, so we simulate the navigation directly
-        await page.goto('/journeys/capital-foundry');
+        // Firefox can hang on "load" for SPA navigations (service worker, long-lived connections).
+        // We only need the app shell and route content, so domcontentloaded is sufficient and more stable.
+        await page.goto('/journeys/capital-foundry', { waitUntil: 'domcontentloaded' });
         await page.waitForURL('**/journeys/capital-foundry');
         await expect(page.getByRole('heading', { name: 'The Capital Foundry', level: 2 })).toBeVisible({ timeout: 15000 });
         await expect(page.getByTestId('back-to-journeys')).toBeVisible({ timeout: 15000 });

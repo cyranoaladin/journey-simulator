@@ -48,6 +48,16 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', env: process.env.NODE_ENV });
 });
 
+// K8s-style probes (kept simple for now)
+app.get('/healthz', (req, res) => {
+  res.status(200).json({ ok: true });
+});
+
+app.get('/readyz', (req, res) => {
+  // If you later want stricter checks: verify DB connections, queue backends, etc.
+  res.status(200).json({ ok: true });
+});
+
 // Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
