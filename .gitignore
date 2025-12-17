@@ -32,6 +32,13 @@ mf-back/memory/agent_metrics.log.json
 # Solana minter secrets
 web/minter.json
 
+# Temporary simulator image drops (do not commit)
+journey-simulator/public/images/Developer_use_cases.png
+journey-simulator/public/images/Developer_use_cases_products.png
+journey-simulator/public/images/Investor_testimonials.png
+journey-simulator/public/images/Smart_contract_audit_badge.png
+journey-simulator/public/images/coming_soon.png
+
 # Prisma artifacts
 prisma/dev.db
 prisma/*.db
