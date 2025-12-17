@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import JourneyTimeline from './JourneyTimeline';
 import { JourneyProgressBar } from './JourneyProgressBar';
 import { JourneyNextActionsPanel } from './JourneyNextActionsPanel';
@@ -47,6 +48,7 @@ interface JourneyWorkspaceProps {
 }
 
 const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
+  const navigate = useNavigate();
   const {
     selectedPersona,
     userProgress,
@@ -445,7 +447,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
         <div className="flex items-center gap-3">
           <button
             data-testid="back-to-journeys"
-            onClick={() => onBack ? onBack() : window.history.back()}
+            onClick={() => onBack ? onBack() : navigate('/journeys')}
             className="group flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 transition hover:bg-white/10 hover:border-white/20"
           >
             <ArrowLeft size={14} className="text-white/60 group-hover:text-white" />

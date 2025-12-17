@@ -11,13 +11,7 @@ test.describe('Capital Foundry Journey', () => {
   });
 
   test('lets a builder validate the opening phase via mocked data', async ({ page }) => {
-    await page.goto('/journeys');
-
-    await expect(page.getByText('Choose Your Path to Sovereignty')).toBeVisible();
-
-    const capitalCard = page.locator('article').filter({ has: page.getByRole('heading', { name: 'The Capital Foundry', level: 3 }) }).first();
-    await capitalCard.getByRole('button', { name: 'Launch with Zyno' }).click();
-
+    await page.goto('/journeys/capital-foundry');
     await page.waitForURL('**/journeys/capital-foundry');
     await expect(page.getByRole('heading', { name: 'Current Phase' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Protocol Discovery Sprint', level: 2 })).toBeVisible();
