@@ -78,7 +78,13 @@ jobs:
         run: npm ci
 
       - name: Ensure tmp directory exists (MCP filesystem_ro)
-        run: mkdir -p tmp
+        run: mkdir -p tmp journey-simulator/tmp
+
+      - name: Prisma migrate deploy (web)
+        working-directory: web
+        env:
+          DATABASE_URL: postgresql://prisma:prisma@127.0.0.1:5435/prisma?schema=public
+        run: npx prisma migrate deploy
 
       - name: MCP selftest (filesystem/git/postgres/fetch)
         run: node scripts/mcp-selftest.mjs
