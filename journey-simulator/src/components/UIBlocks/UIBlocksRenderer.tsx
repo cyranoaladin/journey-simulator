@@ -127,19 +127,20 @@ function Quiz({ block }: { block: QuizBlock }) {
   const [mode, setMode] = useState<"training" | "certifying">("training");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const questions = Array.isArray(block.questions) ? block.questions : [];
 
   const ensureApiJourneyId = useJourneyStore((s) => s.ensureApiJourneyId);
   const selectedPersona = useJourneyStore((s) => s.selectedPersona);
   const lastStep = useJourneyStore((s) => s.lastStep);
   const updateProgress = useJourneyStore((s) => s.updateProgress);
 
-  const score = block.questions.reduce(
+  const score = questions.reduce(
     (acc, q) =>
       acc + ((answers[q.id] ?? -1) === q.correct_option_index ? 1 : 0),
     0,
   );
 
-  const allAnswered = block.questions.every((q) => answers[q.id] !== undefined);
+  const allAnswered = questions.every((q) => answers[q.id] !== undefined);
 
   const onSubmit = async () => {
     if (!allAnswered) return;
@@ -155,7 +156,7 @@ function Quiz({ block }: { block: QuizBlock }) {
         submission: JSON.stringify({
           answers,
           score,
-          max_score: block.questions.length,
+          max_score: questions.length,
           mode: "certifying"
         }),
         language: "en",
@@ -239,11 +240,11 @@ function Quiz({ block }: { block: QuizBlock }) {
       )}
 
       <div className="space-y-4">
-        {block.questions.map((q) => (
+        {questions.map((q) => (
           <div key={q.id} className="border border-white/10 rounded-lg p-3">
             <div className="font-medium mb-2">{q.question}</div>
             <div className="space-y-1">
-              {q.options.map((opt, idx) => {
+              {(Array.isArray(q.options) ? q.options : []).map((opt, idx) => {
                 const selected = answers[q.id] === idx;
                 const isCorrect = showExplain && idx === q.correct_option_index;
                 const isWrong = showExplain && selected && !isCorrect;
@@ -446,6 +447,7 @@ function Resources({ block }: { block: ResourceBlock }) {
     const content = `# ${r.label}\n\n${r.description ?? ""}\n${r.url ?? ""}`;
     navigator.clipboard.writeText(content);
   };
+  const resources = Array.isArray(block.resources) ? block.resources : [];
 
   // TEMPORARILY DISABLED - Favorites functionality
   // const { addFavorite, removeFavoriteByResourceId, isFavorite } = useFavoritesStore();
@@ -476,7 +478,7 @@ function Resources({ block }: { block: ResourceBlock }) {
     <div className="bg-white/5 rounded-xl p-4" data-testid="resources-section">
       <h4 className="font-semibold mb-2" data-testid="resources-section-title">{block.title}</h4>
       <div className="grid gap-2" data-testid="resources-list">
-        {block.resources.map((r) => {
+        {resources.map((r) => {
           // const favorited = isFavorite(r.id);
           return (
             <div
@@ -552,6 +554,9 @@ function Resources({ block }: { block: ResourceBlock }) {
             </div>
           );
         })}
+        {resources.length === 0 && (
+          <div className="text-xs opacity-70">No resources available.</div>
+        )}
       </div>
     </div>
   );
@@ -871,11 +876,12 @@ function Diagram({ block }: { block: DiagramBlock }) {
 
 function ProjectSelection({ block }: { block: ProjectSelectionBlock }) {
   const [selected, setSelected] = useState<string | null>(null);
+  const projects = Array.isArray(block.projects) ? block.projects : [];
   return (
     <div className="bg-white/5 rounded-xl p-4">
       <h4 className="font-semibold mb-4">{block.title}</h4>
       <div className="grid gap-4 md:grid-cols-2">
-        {block.projects.map((p) => (
+        {projects.map((p) => (
           <div
             key={p.id}
             onClick={() => setSelected(p.id)}
@@ -887,14 +893,14 @@ function ProjectSelection({ block }: { block: ProjectSelectionBlock }) {
             <div className="flex justify-between items-start mb-2">
               <h5 className="font-medium">{p.name}</h5>
               <span className="text-xs bg-white/10 px-2 py-1 rounded">
-                {Math.round((p.currentFunding / p.fundingGoal) * 100)}% funded
+                {p.fundingGoal ? Math.round((p.currentFunding / p.fundingGoal) * 100) : 0}% funded
               </span>
             </div>
             <p className="text-sm opacity-80 mb-3 line-clamp-2">
               {p.description}
             </p>
             <div className="flex flex-wrap gap-1">
-              {p.tags.map((t) => (
+              {(Array.isArray(p.tags) ? p.tags : []).map((t) => (
                 <span key={t} className="text-[10px] px-1.5 py-0.5 rounded bg-white/5">
                   {t}
                 </span>
@@ -902,6 +908,9 @@ function ProjectSelection({ block }: { block: ProjectSelectionBlock }) {
             </div>
           </div>
         ))}
+        {projects.length === 0 && (
+          <div className="text-xs opacity-70">No projects available.</div>
+        )}
       </div>
       {selected && (
         <div className="mt-4 flex justify-end">
