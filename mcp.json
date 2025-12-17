@@ -26,13 +26,21 @@
       "name": "git",
       "transport": "stdio",
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-git", "--repo", "/home/alaeddine/Documents/journey_mfai_back_front"]
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-git",
+        "--repo",
+        "/home/alaeddine/Documents/journey_mfai_back_front"
+      ]
     },
     {
       "name": "postgres_ro",
       "transport": "stdio",
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres"
+      ],
       "env": {
         "DATABASE_URL": "postgresql://prisma:prisma@127.0.0.1:5435/prisma"
       }
@@ -41,9 +49,10 @@
       "name": "fetch",
       "transport": "stdio",
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-fetch"]
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-fetch"
+      ]
     }
   ]
 }
-
-
