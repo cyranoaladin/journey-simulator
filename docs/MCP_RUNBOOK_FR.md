@@ -112,8 +112,11 @@ Si `npx` est absent : réinstaller Node (ex. via nvm) et relancer Cursor.
 
 Si le repo n’est pas à `/home/alaeddine/Documents/journey_mfai_back_front`, mettez à jour dans `mcp.json` :
 
-- `git.args --repo`
-- tous les `--allowed-dir`
+- les chemins passés aux serveurs internes :
+  - `filesystem_ro.args` (liste des répertoires allowlistés)
+  - `git.args[0]` (le serveur est interne mais pointe sur le repo)
+  - `fetch.args[0]` (serveur interne)
+- la DSN Postgres dans `postgres_ro.args` (dernier argument)
 
 Puis ré-importer `mcp.json` dans Cursor.
 
@@ -137,8 +140,21 @@ docker compose -f docker-compose.prod.yml ps mfai-postgres
 
 Adapter ensuite `DATABASE_URL` dans `mcp.json` :
 
-- dev : `postgresql://…@127.0.0.1:5435/prisma`
-- prod-like : `postgresql://…@127.0.0.1:5433/prisma`
+- dev : `postgresql://mcp_ro:prisma@127.0.0.1:5435/prisma`
+- prod-like : `postgresql://mcp_ro:prisma@127.0.0.1:5433/prisma`
+
+---
+
+## 4bis) Preuve “sans UI Cursor” (CLI)
+
+Si vous voulez une preuve 100% reproductible (sans dépendre de l’UI Cursor), exécutez :
+
+```bash
+cd /home/alaeddine/Documents/journey_mfai_back_front
+node scripts/mcp-selftest.mjs
+```
+
+Ce script démarre chaque serveur MCP (stdio), fait `initialize`, `tools/list`, et des appels simples (FS + sécurité `.env*`, git diff, Postgres SELECT, fetch HTTPS).
 
 ---
 
