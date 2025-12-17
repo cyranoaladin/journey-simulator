@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Journey Flow', () => {
     test.beforeEach(async ({ page }) => {
@@ -66,7 +66,10 @@ test.describe('Journey Flow', () => {
         await page.locator('input[name="email"]').fill('test@example.com');
         await page.locator('input[name="password"]').fill('password');
         await page.getByRole('button', { name: 'Sign In' }).click();
-        await page.waitForURL('**/journeys');
+        // Firefox can hang on "load" for SPA navigations; domcontentloaded is more stable.
+        await page.waitForURL('**/journeys', { timeout: 30000 });
+        await page.waitForLoadState('domcontentloaded');
+        await expect(page.getByRole('button', { name: 'Menu' })).toBeVisible({ timeout: 30000 });
     });
 
     test('User can select a journey', async ({ page }) => {
