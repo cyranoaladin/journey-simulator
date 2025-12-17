@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "servers": [
+    {
+      "name": "filesystem_ro",
+      "transport": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "--allowed-dir",
+        "/home/alaeddine/Documents/journey_mfai_back_front",
+        "--allowed-dir",
+        "/home/alaeddine/Documents/journey_mfai_back_front/docs",
+        "--allowed-dir",
+        "/home/alaeddine/Documents/journey_mfai_back_front/mf-back",
+        "--allowed-dir",
+        "/home/alaeddine/Documents/journey_mfai_back_front/web",
+        "--allowed-dir",
+        "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator",
+        "--allowed-dir",
+        "/home/alaeddine/Documents/journey_mfai_back_front/scripts",
+        "--allowed-dir",
+        "/home/alaeddine/Documents/journey_mfai_back_front/tmp"
+      ]
+    },
+    {
+      "name": "git",
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-git", "--repo", "/home/alaeddine/Documents/journey_mfai_back_front"]
+    },
+    {
+      "name": "postgres_ro",
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "env": {
+        "DATABASE_URL": "postgresql://prisma:prisma@127.0.0.1:5435/prisma"
+      }
+    },
+    {
+      "name": "fetch",
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"]
+    }
+  ]
+}
+
+
