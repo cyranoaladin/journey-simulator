@@ -234,7 +234,12 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
     const entryId = generatePromptId();
     setHistory((prev) =>
       [
-        { id: entryId, text: trimmed, createdAt: new Date().toISOString(), status: 'pending' },
+        {
+          id: entryId,
+          text: trimmed,
+          createdAt: new Date().toISOString(),
+          status: 'pending' as PromptStatus,
+        },
         ...prev,
       ].slice(0, MAX_PROMPT_HISTORY),
     );
