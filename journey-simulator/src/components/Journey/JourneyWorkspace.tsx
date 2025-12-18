@@ -130,10 +130,6 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
     }
   }, [])
 
-  useEffect(() => {
-    console.log('[JourneyWorkspace] MOUNTED');
-  }, []);
-
   const [proofModalData, setProofModalData] = useState<any>(null);
   const [showStakingModal, setShowStakingModal] = useState(false);
   const [showVoteModal, setShowVoteModal] = useState(false);
@@ -161,7 +157,6 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
   }
 
   const activePhase = selectedPersona.phases[activePhaseIndex] || selectedPersona.phases[0];
-  console.log('[JourneyWorkspace] Rendering phase:', activePhase?.title, 'ID:', activePhase?.id);
 
   const { completedPhases } = userProgress;
   const activePhaseNumber = activePhaseIndex + 1;

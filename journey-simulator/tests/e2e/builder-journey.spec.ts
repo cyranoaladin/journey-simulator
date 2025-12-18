@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { setupJourneyMocks, seedDemoUser } from './utils/journeyMocks';
 import { disablePageAnimations } from './utils/pageStability';
+import { clickMintNft, clickRunSimulation } from './utils/uiActions';
 
 test.describe('Capital Foundry Journey', () => {
   test.beforeEach(async ({ page }) => {
@@ -9,46 +10,6 @@ test.describe('Capital Foundry Journey', () => {
     await seedDemoUser(page, null, 'e2e-token');
     await disablePageAnimations(page);
   });
-
-  async function clickRunSimulation(page: any) {
-    const runBtn = page.getByTestId('run-simulation').first();
-    await expect(runBtn).toBeVisible({ timeout: 15000 });
-    await expect(runBtn).toBeEnabled({ timeout: 15000 });
-    try {
-      await runBtn.click({ timeout: 15000, force: true });
-      return;
-    } catch {
-      // ignore and fallback
-    }
-
-    await page.waitForFunction(() => {
-      const btn = document.querySelector('[data-testid="run-simulation"]');
-      if (!btn) return false;
-      const r = btn.getBoundingClientRect();
-      return r.width > 0 && r.height > 0;
-    }, { timeout: 15000 });
-
-    await page.evaluate(() => {
-      const btn = document.querySelector('[data-testid="run-simulation"]') as HTMLButtonElement | null;
-      btn?.click();
-    });
-  }
-
-  async function clickMintNft(page: any) {
-    const mintBtn = page.getByTestId('mint-nft').first();
-    await expect(mintBtn).toBeVisible({ timeout: 15000 });
-    try {
-      await mintBtn.click({ timeout: 15000, force: true });
-      return;
-    } catch {
-      // ignore and fallback
-    }
-
-    await page.evaluate(() => {
-      const btn = document.querySelector('[data-testid="mint-nft"]') as HTMLButtonElement | null;
-      btn?.click();
-    });
-  }
 
   test('lets a builder validate the opening phase via mocked data', async ({ page }) => {
     await page.goto('/journeys/capital-foundry');

@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { setupJourneyMocks } from './utils/journeyMocks';
 import { disablePageAnimations } from './utils/pageStability';
+import { dismissWalletModalIfPresent } from './utils/uiActions';
 
 /**
  * Ensures demo-mode artifact generation shows the neural overlay and modal output.
@@ -49,23 +50,6 @@ test.describe('Demo Day artifacts', () => {
     });
     await disablePageAnimations(page);
   });
-
-  async function dismissWalletModalIfPresent(page: any) {
-    // Wallet-adapter modal occasionally appears in Firefox and can steal clicks/focus.
-    // Best-effort: close it if present.
-    try {
-      const closeBtn = page.locator('.wallet-adapter-modal-button-close');
-      if (await closeBtn.isVisible({ timeout: 250 })) {
-        await closeBtn.click({ force: true });
-      }
-    } catch { /* ignore */ }
-    try {
-      const dismiss = page.getByRole('button', { name: /dismiss/i });
-      if (await dismiss.isVisible({ timeout: 250 })) {
-        await dismiss.click({ force: true });
-      }
-    } catch { /* ignore */ }
-  }
 
   test('shows neural overlay followed by artifact modal', async ({ page }) => {
     await page.goto('/journeys/cognitive-activation-hub', { waitUntil: 'domcontentloaded' });

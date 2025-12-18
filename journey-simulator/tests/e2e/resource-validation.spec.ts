@@ -1,49 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { disablePageAnimations } from './utils/pageStability';
+import { clickRunSimulation, dismissWalletModalIfPresent } from './utils/uiActions';
 
 test.describe('Resource Validation in Journey Steps', () => {
-    async function dismissWalletModalIfPresent(page: any) {
-        // Wallet-adapter modal occasionally appears in Firefox and can steal clicks/focus.
-        // Best-effort: close it if present.
-        try {
-            const closeBtn = page.locator('.wallet-adapter-modal-button-close');
-            if (await closeBtn.isVisible({ timeout: 250 })) {
-                await closeBtn.click({ force: true });
-            }
-        } catch { /* ignore */ }
-        try {
-            const dismiss = page.getByRole('button', { name: /dismiss/i });
-            if (await dismiss.isVisible({ timeout: 250 })) {
-                await dismiss.click({ force: true });
-            }
-        } catch { /* ignore */ }
-    }
-
-    async function clickRunSimulation(page: any) {
-        const runBtn = page.getByTestId('run-simulation').first();
-        await expect(runBtn).toBeVisible({ timeout: 15000 });
-        await expect(runBtn).toBeEnabled({ timeout: 15000 });
-        // Firefox can be extra sensitive to fast rerenders; avoid scrollIntoView (it waits for stability).
-        try {
-            await runBtn.click({ timeout: 15000, force: true });
-            return;
-        } catch {
-            // Fallback: click from within the page context (bypasses Playwright's stability heuristics).
-        }
-
-        await page.waitForFunction(() => {
-            const btn = document.querySelector('[data-testid="run-simulation"]');
-            if (!btn) return false;
-            const r = btn.getBoundingClientRect();
-            return r.width > 0 && r.height > 0;
-        }, { timeout: 15000 });
-
-        await page.evaluate(() => {
-            const btn = document.querySelector('[data-testid="run-simulation"]') as HTMLButtonElement | null;
-            btn?.click();
-        });
-    }
-
     test.beforeEach(async ({ page }) => {
         // Mock authentication
         await page.route('**/user/profile', async (route) => {
