@@ -1,10 +1,11 @@
 import { motion } from "framer-motion";
-import { useEffect, useState, type FC } from "react";
+import { useEffect, useMemo, useState, type FC } from "react";
 import { useNavigate } from "react-router-dom";
 import MessageDisplay from "../components/shared/MessageDisplay";
 import { useJourneyStore } from "../store/journeyStore";
 import JourneyCard from "./Journey/JourneyCard";
 import ZynoBox from "./Journey/ZynoBox";
+import { shallow } from "zustand/shallow";
 
 import { personas } from "../data/personas";
 import JourneyWorkspace from "./Journey/JourneyWorkspace";
@@ -14,36 +15,44 @@ import { logger } from "../utils/logger";
 const EMPTY_TIPS: string[] = [];
 
 const JourneysPage: FC = () => {
-  const selectedPersona = useJourneyStore((state) => state.selectedPersona);
-  const setSelectedPersona = useJourneyStore((state) => state.setSelectedPersona);
-  const userProgress = useJourneyStore((state) => state.userProgress);
+  const { selectedPersona, setSelectedPersona, userProgress } = useJourneyStore(
+    (state) => ({
+      selectedPersona: state.selectedPersona,
+      setSelectedPersona: state.setSelectedPersona,
+      userProgress: state.userProgress,
+    }),
+    shallow
+  );
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const supportHighlights = [
-    {
-      title: "Zyno, AI Co-Founder",
-      description:
-        "Zyno orchestrates personalized curricula, turns protocol complexity into guided actions, and pair-programs on Solana builds so each pathway compounds faster.",
-      bullets: [
-        "Design studio for strategy, token economics, and governance stress tests",
-        "Real-time AI pair for code reviews, prompt engineering, and architectural simulations",
-        "Cognitive activator that adapts missions based on Proof-of-Skill™ signals",
-      ],
-    },
-    {
-      title: "Protocol Agent Mesh",
-      description:
-        "Specialized MFAI agents coordinate alongside Zyno to keep momentum high from ideation to launch.",
-      bullets: [
-        "Skillchain Miners validate mastery on-chain and unlock higher stakes missions",
-        "Guardian Agents monitor security, treasury health, and incident response drills",
-        "Sovereign Builders Network links founders with talent, capital, and Synaptic Governance",
-      ],
-    },
-  ];
+  const supportHighlights = useMemo(
+    () => [
+      {
+        title: "Zyno, AI Co-Founder",
+        description:
+          "Zyno orchestrates personalized curricula, turns protocol complexity into guided actions, and pair-programs on Solana builds so each pathway compounds faster.",
+        bullets: [
+          "Design studio for strategy, token economics, and governance stress tests",
+          "Real-time AI pair for code reviews, prompt engineering, and architectural simulations",
+          "Cognitive activator that adapts missions based on Proof-of-Skill™ signals",
+        ],
+      },
+      {
+        title: "Protocol Agent Mesh",
+        description:
+          "Specialized MFAI agents coordinate alongside Zyno to keep momentum high from ideation to launch.",
+        bullets: [
+          "Skillchain Miners validate mastery on-chain and unlock higher stakes missions",
+          "Guardian Agents monitor security, treasury health, and incident response drills",
+          "Sovereign Builders Network links founders with talent, capital, and Synaptic Governance",
+        ],
+      },
+    ],
+    []
+  );
 
   useEffect(() => {
     logger.debug("JourneysPage: useEffect triggered");

@@ -5,6 +5,7 @@ import { useJourneyStore } from '../../store/journeyStore';
 import { useAuth } from '../../contexts/AuthContext';
 import clsx from 'clsx';
 import { logger } from '../../utils/logger';
+import { shallow } from 'zustand/shallow';
 
 type SidebarProps = {
   variant?: 'docked' | 'overlay';
@@ -24,8 +25,13 @@ const navItems = [
 
 const Sidebar = ({ variant = 'docked', onClose }: SidebarProps) => {
   const { logout } = useAuth();
-  const selectedPersona = useJourneyStore((state) => state.selectedPersona);
-  const userProgress = useJourneyStore((state) => state.userProgress);
+  const { selectedPersona, userProgress } = useJourneyStore(
+    (state) => ({
+      selectedPersona: state.selectedPersona,
+      userProgress: state.userProgress,
+    }),
+    shallow
+  );
   logger.debug('Sidebar: render', { selectedPersonaId: selectedPersona?.id, completedPhases: userProgress.completedPhases.length, variant });
   const isOverlay = variant === 'overlay';
   const [expanded, setExpanded] = useState(true);

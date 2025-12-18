@@ -18,6 +18,7 @@ import {
 import { useJourneyStore } from '../store/journeyStore'
 import { useAuth } from '../contexts/AuthContext'
 import { logger } from '../utils/logger'
+import { shallow } from 'zustand/shallow'
 
 const WalletButton = () => {
   const { publicKey, wallet, disconnect, connected, connecting, signMessage } = useWallet()
@@ -26,7 +27,13 @@ const WalletButton = () => {
   const [copied, setCopied] = useState(false)
   const [isConnecting, setIsConnecting] = useState(false)
   const [connectError, setConnectError] = useState<string | null>(null)
-  const { userProgress, updateWalletConnection } = useJourneyStore()
+  const { userProgress, updateWalletConnection } = useJourneyStore(
+    (state) => ({
+      userProgress: state.userProgress,
+      updateWalletConnection: state.updateWalletConnection,
+    }),
+    shallow
+  )
   const { loginWithWallet, isAuthenticated } = useAuth()
 
   // Update store when connection changes
