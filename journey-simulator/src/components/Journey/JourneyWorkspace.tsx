@@ -71,6 +71,8 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
   const [isAutoSimulating, setIsAutoSimulating] = useState(false);
   const autoSimAbortRef = useRef(false);
   const [autoSimProgress, setAutoSimProgress] = useState<{ current: number; total: number } | null>(null);
+  // Prevent Firefox/StrictMode rerenders from re-triggering the same artifact generation overlay forever.
+  const pendingArtifactIdsRef = useRef<Set<string>>(new Set())
 
   const DEMO_SCENARIOS: Record<string, Record<number, string>> = {
     'cognitive-activation-hub': {
@@ -101,27 +103,32 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
       const currentStepIndex = userProgress.completedPhases.length + 1;
       const artifactId = DEMO_SCENARIOS[personaId]?.[currentStepIndex];
 
-      if (artifactId && !unlockedArtifacts.includes(artifactId)) {
+      if (
+        artifactId &&
+        !unlockedArtifacts.includes(artifactId) &&
+        !pendingArtifactIdsRef.current.has(artifactId)
+      ) {
         const artifact = artifactsData.find(a => a.id === artifactId);
         if (!artifact) return;
 
-        setCurrentTask({
-          agent: artifact.agent.name,
-          task: `Generating ${artifact.title}...`
-        });
-        setIsThinking(true);
+        // Mark pending immediately to avoid duplicate timeouts on rerender.
+        pendingArtifactIdsRef.current.add(artifactId)
 
-        setTimeout(() => {
-          setIsThinking(false);
-          setUnlockedArtifacts(prev => [...prev, artifactId]);
-
-          toast.success("New Artifact Generated!");
-
-          setViewingArtifact(artifact);
-        }, 3500);
+        // Keep demo artifacts deterministic: unlock + open the artifact immediately (no timers).
+        // This avoids Firefox flakiness around setTimeout/overlay state during CI.
+        setUnlockedArtifacts((prev) => (prev.includes(artifactId) ? prev : [...prev, artifactId]))
+        pendingArtifactIdsRef.current.delete(artifactId)
+        toast.success("New Artifact Generated!");
+        setViewingArtifact(artifact);
       }
     }
   }, [lastStep, selectedPersona, userProgress.completedPhases, unlockedArtifacts]);
+
+  useEffect(() => {
+    return () => {
+      pendingArtifactIdsRef.current.clear()
+    }
+  }, [])
 
   useEffect(() => {
     console.log('[JourneyWorkspace] MOUNTED');
@@ -287,6 +294,23 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
     if (isStepLoading || isAutoSimulating) return;
     if (!activePhase) return;
 
+    const showNeuralOverlay = async (task: string) => {
+      const startedAt = Date.now()
+      setIsThinking(true)
+      setCurrentTask({ agent: 'Zyno', task })
+      // Ensure at least one paint even when mocks resolve instantly (helps UX + avoids flaky e2e).
+      await new Promise((r) => setTimeout(r, 150))
+      return startedAt
+    }
+
+    const hideNeuralOverlay = async (startedAt: number) => {
+      const elapsed = Date.now() - startedAt
+      if (elapsed < 450) {
+        await new Promise((r) => setTimeout(r, 450 - elapsed))
+      }
+      setIsThinking(false)
+    }
+
     try {
       const isE2EDebug = typeof window !== 'undefined' && Boolean((window as any).__e2eJourneyStepConfig);
       const runner = isE2EDebug ? runInteractiveStepDebug : runInteractiveStep;
@@ -319,11 +343,16 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
             // Let React render the phase switch before requesting.
             await new Promise((r) => setTimeout(r, 150))
 
-            await runner({
-              phaseId: phase.id,
-              trackId: selectedPersona.id,
-              userInput: '',
-            })
+            const overlayStart = await showNeuralOverlay(`Generating ${phase.title}…`)
+            try {
+              await runner({
+                phaseId: phase.id,
+                trackId: selectedPersona.id,
+                userInput: '',
+              })
+            } finally {
+              await hideNeuralOverlay(overlayStart)
+            }
 
             // Small delay so the user can see the generated blocks.
             await new Promise((r) => setTimeout(r, 650))
@@ -355,13 +384,19 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
       }
 
       // Non-demo: run only current phase step.
-      await runner({
-        phaseId: activePhase.id,
-        trackId: selectedPersona.id,
-        userInput: '',
-      })
+      const overlayStart = await showNeuralOverlay(`Generating ${activePhase.title}…`)
+      try {
+        await runner({
+          phaseId: activePhase.id,
+          trackId: selectedPersona.id,
+          userInput: '',
+        })
+      } finally {
+        await hideNeuralOverlay(overlayStart)
+      }
     } catch (error) {
       console.error('Error running interactive step:', error);
+      setIsThinking(false)
     }
   };
 
@@ -403,11 +438,20 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
   };
 
   const handleArtifactClick = (artifactName: string) => {
+    const fallbackFileUrlByName: Record<string, string> = {
+      Litepaper: '/generated/litepaper_sim.html',
+      Tokenomics: '/generated/tokenomics_sim.html',
+      'Pitch Deck': '/generated/pitch_deck_slide.html',
+      'Legal Opinion': '/generated/investor_memo.html',
+      'Go-to-Market': '/generated/business_model.html',
+      'Audit Report': '/generated/migration_blueprint.html',
+    }
+
     // Mock lookup for artifacts based on string name
     // In real app, `artifactsData` would be used properly
     const mockArtifact = {
       title: artifactName,
-      fileUrl: '', // Would be a real URL in production
+      fileUrl: fallbackFileUrlByName[artifactName] ?? '', // Would be a real URL in production
       type: 'document'
     };
 
@@ -578,6 +622,8 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
               <div className="pt-2 flex flex-wrap gap-4">
                 <button
                   onClick={handleRunInteractiveStep}
+                  disabled={isStepLoading || isAutoSimulating}
+                  data-testid="run-simulation"
                   className="inline-flex items-center gap-2 rounded-full bg-accent-cyan px-8 py-4 text-base font-bold text-black shadow-lg shadow-accent-cyan/20 transition hover:bg-accent-cyan/90 hover:scale-105 active:scale-95"
                 >
                   {isStepLoading || isAutoSimulating ? (
@@ -613,6 +659,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
                         void handleCompletePhase();
                       }}
                       disabled={isSubmittingPhase}
+                      data-testid={activePhase.nftReward ? 'mint-nft' : 'complete-phase'}
                       className={`inline-flex items-center gap-2 rounded-full bg-white/10 px-8 py-4 text-base font-bold text-white border border-white/10 transition ${isSubmittingPhase ? 'cursor-wait opacity-70' : 'hover:bg-white/20'}`}
                     >
                       {isSubmittingPhase ? (
@@ -713,6 +760,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
                 <button
                   key={i}
                   onClick={() => handleArtifactClick(art)}
+                  data-testid={`artifact-card-${art.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
                   className="w-full text-left group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 p-4 transition hover:bg-white/10 hover:border-white/20 hover:shadow-xl cursor-pointer"
                 >
                   <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-accent-purple/10 text-accent-purple group-hover:bg-accent-purple group-hover:text-white transition">

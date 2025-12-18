@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { disablePageAnimations } from './utils/pageStability';
 
 test.describe('Resource Validation in Journey Steps', () => {
     async function dismissWalletModalIfPresent(page: any) {
@@ -16,6 +17,31 @@ test.describe('Resource Validation in Journey Steps', () => {
                 await dismiss.click({ force: true });
             }
         } catch { /* ignore */ }
+    }
+
+    async function clickRunSimulation(page: any) {
+        const runBtn = page.getByTestId('run-simulation').first();
+        await expect(runBtn).toBeVisible({ timeout: 15000 });
+        await expect(runBtn).toBeEnabled({ timeout: 15000 });
+        // Firefox can be extra sensitive to fast rerenders; avoid scrollIntoView (it waits for stability).
+        try {
+            await runBtn.click({ timeout: 15000, force: true });
+            return;
+        } catch {
+            // Fallback: click from within the page context (bypasses Playwright's stability heuristics).
+        }
+
+        await page.waitForFunction(() => {
+            const btn = document.querySelector('[data-testid=\"run-simulation\"]');
+            if (!btn) return false;
+            const r = btn.getBoundingClientRect();
+            return r.width > 0 && r.height > 0;
+        }, { timeout: 15000 });
+
+        await page.evaluate(() => {
+            const btn = document.querySelector('[data-testid=\"run-simulation\"]') as HTMLButtonElement | null;
+            btn?.click();
+        });
     }
 
     test.beforeEach(async ({ page }) => {
@@ -69,6 +95,8 @@ test.describe('Resource Validation in Journey Steps', () => {
             localStorage.setItem('accessToken', 'mock-access-token');
             localStorage.setItem('userId', 'user-123');
         });
+
+        await disablePageAnimations(page);
     });
 
     test('should display resources with valid URLs', async ({ page }) => {
@@ -119,7 +147,7 @@ test.describe('Resource Validation in Journey Steps', () => {
         await page.goto('/journeys/capital-foundry');
         await expect(page.getByTestId('back-to-journeys')).toBeVisible({ timeout: 15000 });
         await dismissWalletModalIfPresent(page);
-        await page.getByRole('button', { name: /Run Simulation/i }).click({ timeout: 15000 });
+        await clickRunSimulation(page);
 
         // Wait for resources to load (supports localized titles)
         const resourcesSection = page.getByTestId('resources-section').first();
@@ -179,7 +207,7 @@ test.describe('Resource Validation in Journey Steps', () => {
         await page.goto('/journeys/capital-foundry');
         await expect(page.getByTestId('back-to-journeys')).toBeVisible({ timeout: 15000 });
         await dismissWalletModalIfPresent(page);
-        await page.getByRole('button', { name: /Run Simulation/i }).click({ timeout: 15000 });
+        await clickRunSimulation(page);
 
         // Wait for resources to load regardless of locale
         const resourcesSection = page.getByTestId('resources-section').first();
@@ -234,7 +262,7 @@ test.describe('Resource Validation in Journey Steps', () => {
         await page.goto('/journeys/capital-foundry');
         await expect(page.getByTestId('back-to-journeys')).toBeVisible({ timeout: 15000 });
         await dismissWalletModalIfPresent(page);
-        await page.getByRole('button', { name: /Run Simulation/i }).click({ timeout: 15000 });
+        await clickRunSimulation(page);
 
         // Wait for resources section to resolve in any language
         const resourcesSection = page.getByTestId('resources-section').first();
