@@ -1,5 +1,6 @@
-import { create } from 'zustand';
+import { createWithEqualityFn } from 'zustand/traditional';
 import { persist } from 'zustand/middleware';
+import { shallow } from 'zustand/shallow';
 import { personas } from '../data/personas';
 import { getPersonaProofData, getProofType } from '../data/proofsData';
 import { Persona, TestnetFeatures, UserProgress } from '../types/journey';
@@ -78,6 +79,10 @@ interface JourneyState {
   setDemoMode: (enabled: boolean) => void;
   setCollaterizeSimulation: (sim: CollaterizeSimulation | undefined) => void;
 }
+
+// Helper: prefer this over `useJourneyStore()` (no selector), to reduce rerenders.
+export const useJourneyStoreShallow = <T,>(selector: (state: JourneyState) => T) =>
+  useJourneyStore(selector, shallow);
 
 const initialUserProgress: UserProgress = {
   totalXP: 0,
@@ -228,7 +233,7 @@ const derivePassLevel = (
   return 'Free';
 };
 
-export const useJourneyStore = create<JourneyState>()(
+export const useJourneyStore = createWithEqualityFn<JourneyState>()(
   persist(
     (set, get) => ({
       selectedPersona: null,

@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 interface LazyLoadProps<T> {
   items: T[];
   renderItem: (item: T, index: number) => React.ReactNode;
+  getKey?: (item: T, index: number) => string | number;
   itemsPerBatch?: number;
   threshold?: number;
   containerHeight?: string;
@@ -12,6 +13,7 @@ interface LazyLoadProps<T> {
 const LazyLoadList = <T,>({
   items,
   renderItem,
+  getKey,
   itemsPerBatch = 10,
   threshold = 100,
   containerHeight = 'auto',
@@ -42,7 +44,7 @@ const LazyLoadList = <T,>({
     if (!containerRef.current) return;
 
     const options = {
-      root: null,
+      root: containerRef.current,
       rootMargin: `${threshold}px`,
       threshold: 0.1
     };
@@ -58,7 +60,7 @@ const LazyLoadList = <T,>({
     // Observer le dernier élément visible
     if (visibleItems.length > 0 && visibleItems.length < items.length) {
       const lastItemIndex = visibleItems.length - 1;
-      const lastItem = document.querySelector(`[data-lazy-item="${lastItemIndex}"]`);
+      const lastItem = containerRef.current.querySelector(`[data-lazy-item="${lastItemIndex}"]`);
       if (lastItem) {
         observerRef.current.observe(lastItem);
       }
@@ -89,7 +91,7 @@ const LazyLoadList = <T,>({
       style={{ height: containerHeight, overflowY: 'auto' }}
     >
       {visibleItems.map((item, index) => (
-        <div key={index} data-lazy-item={index}>
+        <div key={getKey ? getKey(item, index) : index} data-lazy-item={index}>
           {renderItem(item, index)}
         </div>
       ))}

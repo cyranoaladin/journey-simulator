@@ -9,12 +9,16 @@ import {
   RefreshCw,
   ExternalLink,
 } from "lucide-react";
-import { useJourneyStore } from "../../store/journeyStore";
+import { useJourneyStoreShallow } from "../../store/journeyStore";
 
 import { API_BASE_URL } from "../../utils/api";
 
 const JourneyDashboard: FC = () => {
-  const { userProgress, selectedPersona, loadUserProgress } = useJourneyStore();
+  const { userProgress, selectedPersona, loadUserProgress } = useJourneyStoreShallow((state) => ({
+    userProgress: state.userProgress,
+    selectedPersona: state.selectedPersona,
+    loadUserProgress: state.loadUserProgress,
+  }));
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [lastMint, setLastMint] = useState<{

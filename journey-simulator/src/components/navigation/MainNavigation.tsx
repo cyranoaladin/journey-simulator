@@ -23,7 +23,7 @@ import type { LucideIcon } from 'lucide-react'
 import WalletButton from '../WalletButton'
 import { useThemeStore } from '../../store/themeStore'
 import { useAuth } from '../../contexts/AuthContext'
-import { useJourneyStore } from '../../store/journeyStore'
+import { useJourneyStoreShallow } from '../../store/journeyStore'
 import UserMetricsPanel from './UserMetricsPanel'
 
 type NavItem = {
@@ -49,7 +49,10 @@ const MORE_ITEMS: NavItem[] = [
 const MainNavigation = () => {
   const { isDark, toggleTheme } = useThemeStore()
   const { logout, user } = useAuth()
-  const { selectedPersona, userProgress } = useJourneyStore()
+  const { selectedPersona, userProgress } = useJourneyStoreShallow((state) => ({
+    selectedPersona: state.selectedPersona,
+    userProgress: state.userProgress,
+  }))
   const location = useLocation()
   const navigate = useNavigate()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)

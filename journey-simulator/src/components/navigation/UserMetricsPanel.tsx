@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Crown, GaugeCircle, Gem, Gavel } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useThemeStore } from '../../store/themeStore';
-import { useJourneyStore } from '../../store/journeyStore';
+import { useJourneyStoreShallow } from '../../store/journeyStore';
 
 interface Metric {
   id: string;
@@ -14,7 +14,10 @@ interface Metric {
 
 const UserMetricsPanel = () => {
   const { isDark } = useThemeStore();
-  const { selectedPersona, userProgress } = useJourneyStore();
+  const { selectedPersona, userProgress } = useJourneyStoreShallow((state) => ({
+    selectedPersona: state.selectedPersona,
+    userProgress: state.userProgress,
+  }));
 
   const level = Math.max(1, Math.floor(userProgress.totalXP / 200) + 1);
 

@@ -6,6 +6,7 @@ import { JourneyNextActionsPanel } from './JourneyNextActionsPanel';
 import ZynoSignalSidebar from './ZynoSignalSidebar';
 import UIBlocksRenderer from '../UIBlocks/UIBlocksRenderer';
 import { useJourneyStore } from '../../store/journeyStore';
+import { shallow } from 'zustand/shallow';
 import {
   Loader2,
   Trophy,
@@ -53,7 +54,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
   const {
     selectedPersona,
     userProgress,
-    currentPhase: currentPhaseIndex,
+    currentPhaseIndex,
     lastStep,
     isStepLoading,
     runInteractiveStep,
@@ -62,8 +63,24 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
     completePhase,
     ensureApiJourneyId,
     uiMode,
-    uiTone
-  } = useJourneyStore();
+    uiTone,
+  } = useJourneyStore(
+    (state) => ({
+    selectedPersona: state.selectedPersona,
+    userProgress: state.userProgress,
+    currentPhaseIndex: state.currentPhase,
+    lastStep: state.lastStep,
+    isStepLoading: state.isStepLoading,
+    runInteractiveStep: state.runInteractiveStep,
+    runInteractiveStepDebug: state.runInteractiveStepDebug,
+    setCurrentPhase: state.setCurrentPhase,
+    completePhase: state.completePhase,
+    ensureApiJourneyId: state.ensureApiJourneyId,
+    uiMode: state.uiMode,
+    uiTone: state.uiTone,
+    }),
+    shallow
+  );
 
   const [isThinking, setIsThinking] = useState(false);
   const [currentTask, setCurrentTask] = useState({ agent: '', task: '' });
