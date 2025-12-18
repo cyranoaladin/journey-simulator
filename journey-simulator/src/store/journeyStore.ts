@@ -6,6 +6,7 @@ import { Persona, TestnetFeatures, UserProgress } from '../types/journey';
 import { api, API_BASE_URL } from '../utils/api';
 import { mintProofOfSkill } from '../utils/blockchain';
 import { normalizeCompletedPhases } from '../utils/progress';
+import { logger } from '../utils/logger';
 
 import type { JourneyStepResponse, Mode, Tone } from '../types/uiBlocks';
 
@@ -310,10 +311,10 @@ export const useJourneyStore = create<JourneyState>()(
       },
 
       runInteractiveStepDebug: async ({ phaseId, trackId, userInput }) => {
-        console.debug('[Store] runInteractiveStepDebug START', { phaseId, trackId });
+        logger.debug('[Store] runInteractiveStepDebug START', { phaseId, trackId });
         try {
           const response = await get().runInteractiveStep({ phaseId, trackId, userInput });
-          console.debug('[Store] runInteractiveStepDebug COMPLETE');
+          logger.debug('[Store] runInteractiveStepDebug COMPLETE');
           return response;
         } catch (error) {
           console.error('[Store] runInteractiveStepDebug FAILED', error);
@@ -681,7 +682,7 @@ export const useJourneyStore = create<JourneyState>()(
       downloadNFT: async (nftName: string) => {
         // Simulate download process and log the requested NFT name for analytics
         await new Promise(resolve => setTimeout(resolve, 1000));
-        console.info(`Simulated download for NFT: ${nftName}`);
+        logger.debug(`Simulated download for NFT: ${nftName}`);
         return true;
       },
 

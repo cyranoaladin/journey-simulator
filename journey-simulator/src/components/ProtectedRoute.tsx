@@ -2,6 +2,7 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
+import { logger } from '../utils/logger';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -10,7 +11,7 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
-  console.log("ProtectedRoute: render", { isAuthenticated, isLoading, path: location.pathname });
+  logger.debug("ProtectedRoute: render", { isAuthenticated, isLoading, path: location.pathname });
 
   // Show loading spinner while checking authentication
   if (isLoading) {
@@ -30,12 +31,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
-    console.log("ProtectedRoute: redirecting to login");
+    logger.debug("ProtectedRoute: redirecting to login");
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   // Render children if authenticated
-  console.log("ProtectedRoute: rendering children");
+  logger.debug("ProtectedRoute: rendering children");
   return <>{children}</>;
 };
 

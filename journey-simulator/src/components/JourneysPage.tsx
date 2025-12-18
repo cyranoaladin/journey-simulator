@@ -9,6 +9,7 @@ import ZynoBox from "./Journey/ZynoBox";
 import { personas } from "../data/personas";
 import JourneyWorkspace from "./Journey/JourneyWorkspace";
 import ResetProgressButton from "./ResetProgressButton";
+import { logger } from "../utils/logger";
 
 const EMPTY_TIPS: string[] = [];
 
@@ -45,16 +46,16 @@ const JourneysPage: FC = () => {
   ];
 
   useEffect(() => {
-    console.log("JourneysPage: useEffect triggered");
+    logger.debug("JourneysPage: useEffect triggered");
     const loadProgress = async () => {
-      console.log("JourneysPage: loading progress...");
+      logger.debug("JourneysPage: loading progress...");
       try {
         setIsLoading(true);
         setError(null);
         // NOTE: Some store implementations return unstable function references.
         // Using getState() avoids effect loops in production builds.
         await useJourneyStore.getState().loadUserProgress();
-        console.log("JourneysPage: progress loaded successfully");
+        logger.debug("JourneysPage: progress loaded successfully");
       } catch (err) {
         console.error("Failed to load user progress:", err);
         setError("Failed to load your progress. Please refresh the page.");
@@ -322,7 +323,7 @@ const JourneysPage: FC = () => {
         <ZynoBox
           context={`persona:${personaId};phase:${userProgress.completedPhases.length}`}
           tips={personaTips}
-          onPrompt={(msg) => console.log("User asked Zyno:", msg)}
+          onPrompt={(msg) => logger.debug("User asked Zyno:", msg)}
         />
       )}
     </div>

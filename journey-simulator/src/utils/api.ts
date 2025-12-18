@@ -2,6 +2,8 @@
 // IMPORTANT: this is the ORIGIN/root (no trailing "/api"), because this frontend calls both:
 // - /journey/*  (mf-back)
 // - /user/*, /dao/*, /api/* (mf-back aliases)
+import { logger } from './logger';
+
 function normalizeApiBaseUrl(input: string): string {
   // Strip trailing slashes
   let url = input.replace(/\/+$/, '')
@@ -307,13 +309,13 @@ const request = async <T>(
 ): Promise<T> => {
   // Mock response for demo mode
   const token = localStorage.getItem('accessToken');
-  console.log(`[API] Requesting: ${path} (Base: ${API_BASE_URL})`);
+  logger.debug(`[API] Requesting: ${path} (Base: ${API_BASE_URL})`);
 
   // CRITICAL: Allow real backend calls for AI agents even in demo mode
   const isAIAgentCall = path.includes('/step') || path.includes('/submit');
 
   if (token === 'demo-token' && !isAIAgentCall) {
-    console.log(`[Demo Mode] Mocking request to ${path}`);
+    logger.debug(`[Demo Mode] Mocking request to ${path}`);
 
     type DemoPersonaState = {
       xp: number;
@@ -773,7 +775,7 @@ const request = async <T>(
     throw networkError;
   }
 
-  console.log(`[API] Response for ${path}: ${response.status}`);
+  logger.debug(`[API] Response for ${path}: ${response.status}`);
 
   if (response.status === 401 && retryOnUnauthorized) {
     // Attempt token refresh once

@@ -62,5 +62,3 @@ export async function clickMintNft(page: Page) {
     btn?.click();
   });
 }
-
-

@@ -8,6 +8,7 @@ import JourneyModal from '../shared/JourneyModal';
 import ZynoAssistant from '../shared/ZynoAssistant';
 import BackToTopButton from '../shared/BackToTopButton';
 import { WorkspaceLayoutProvider, useWorkspaceLayout } from '../../contexts/WorkspaceLayoutContext';
+import { logger } from '../../utils/logger';
 
 type LayoutProps = {
   children: ReactNode;
@@ -22,7 +23,7 @@ const LayoutShell = ({ children }: LayoutProps) => {
     setRightPanelOpen,
   } = useWorkspaceLayout();
 
-  console.log('LayoutShell: render', { focusMode, leftPanelOpen, rightPanelOpen });
+  logger.debug('LayoutShell: render', { focusMode, leftPanelOpen, rightPanelOpen });
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-[#09081a] via-[#0D0B1F] to-[#0D0B1F] text-slate-100" data-focus-mode={focusMode}>
@@ -67,7 +68,7 @@ const LayoutShell = ({ children }: LayoutProps) => {
 };
 
 const Layout = ({ children }: LayoutProps) => {
-  console.log('Layout: render');
+  logger.debug('Layout: render');
   return (
     <WorkspaceLayoutProvider>
       <LayoutShell>{children}</LayoutShell>

@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useJourneyStore } from "../../store/journeyStore";
 import { API_BASE_URL } from '../../utils/api';
+import { logger } from '../../utils/logger';
 // TEMPORARILY DISABLED - import { useFavoritesStore } from "../../store/favoritesStore";
 import type {
   ActionSuggestionsBlock,
@@ -633,7 +634,7 @@ function Document({ block }: { block: DocumentBlock; }) {
 }
 
 function Evaluation({ block }: { block: EvaluationBlock; }) {
-  console.log('Evaluation block:', block);
+  logger.debug('Evaluation block:', block);
   return (
     <div className="bg-white/5 rounded-xl p-4">
       <div className="flex items-center justify-between mb-2">
@@ -671,7 +672,7 @@ function Evaluation({ block }: { block: EvaluationBlock; }) {
 }
 
 function ActionSuggestions({ block }: { block: ActionSuggestionsBlock; }) {
-  console.log('ActionSuggestions block:', block);
+  logger.debug('ActionSuggestions block:', block);
   const ensureApiJourneyId = useJourneyStore((s) => s.ensureApiJourneyId);
   const selectedPersona = useJourneyStore((s) => s.selectedPersona);
   const lastStep = useJourneyStore((s) => s.lastStep);
@@ -956,7 +957,7 @@ export default function UIBlocksRenderer({ response }: { response: JourneyStepRe
               <GovernanceDashboard
                 votingPower={b.votingPower}
                 proposals={b.proposals}
-                onVote={(pid, vote) => console.log("Vote:", pid, vote)}
+                onVote={(pid, vote) => logger.debug("Vote:", pid, vote)}
               />
             </div>
           );
@@ -1001,7 +1002,7 @@ export default function UIBlocksRenderer({ response }: { response: JourneyStepRe
     >
       <AnimatePresence>
         {response.ui_blocks.map((b, index) => {
-          console.log('Rendering block:', b);
+          logger.debug('Rendering block:', b);
           const blockKey = b.id ? `${b.id}` : `${b.kind}-${index}`;
 
           return (

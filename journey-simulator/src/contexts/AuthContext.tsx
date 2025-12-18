@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { api, LoginResponse } from "../utils/api";
 import { useJourneyStore } from "../store/journeyStore";
 import { loginWithWalletFlow } from "../lib/walletAuth";
+import { logger } from "../utils/logger";
 
 // User interface matching your backend schema
 type User = LoginResponse["user"];
@@ -51,7 +52,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
-  console.log("AuthProvider: render");
+  logger.debug("AuthProvider: render");
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -71,7 +72,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       try {
         localStorage.setItem("userId", data.user.id);
       } catch (storageError) {
-        console.warn("Unable to persist userId after login", storageError);
+        logger.warn("Unable to persist userId after login", storageError);
       }
       // Clear any lingering progress from a previous session
       await resetProgress();
@@ -87,13 +88,13 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         // Race the API call with a timeout to prevent hanging
         await Promise.race([progressPromise, timeoutPromise]);
       } catch (progressError) {
-        console.error("Failed to load user progress:", progressError);
+        logger.error("Failed to load user progress:", progressError);
         // Continue with default progress instead of blocking the UI
       }
 
       return true;
     } catch (error) {
-      console.error("Login error:", error);
+      logger.error("Login error:", error);
       return false;
     }
   }, [loadUserProgress, resetProgress]);
@@ -107,7 +108,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         data = await loginWithWalletFlow({ walletPublicKey: wallet_address, signMessage });
       } else {
         // Legacy flow (insecure)
-        console.warn('[AuthContext] Using insecure wallet login (no signature provided)');
+        logger.warn('[AuthContext] Using insecure wallet login (no signature provided)');
         data = await api.loginWithWallet(wallet_address);
       }
 
@@ -120,13 +121,13 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       try {
         localStorage.setItem("userId", data.user.id);
       } catch (storageError) {
-        console.warn("Unable to persist userId after login", storageError);
+        logger.warn("Unable to persist userId after login", storageError);
       }
       await resetProgress();
       await loadUserProgress();
       return true;
     } catch (error) {
-      console.error("Wallet login error:", error);
+      logger.error("Wallet login error:", error);
       return false;
     }
   }, [loadUserProgress, resetProgress]);
@@ -150,7 +151,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       try {
         localStorage.setItem("userId", data.user.id);
       } catch (storageError) {
-        console.warn(
+        logger.warn(
           "Unable to persist userId after registration",
           storageError,
         );
@@ -160,7 +161,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       await loadUserProgress();
       return true;
     } catch (error) {
-      console.error("Registration error:", error);
+      logger.error("Registration error:", error);
       return false;
     }
   }, [loadUserProgress, resetProgress]);
@@ -176,7 +177,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       }
       return true;
     } catch (error) {
-      console.error("Token refresh failed:", error);
+      logger.error("Token refresh failed:", error);
       return false;
     }
   }, []);
@@ -186,7 +187,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       // Call logout endpoint to invalidate refresh token
       await api.logout();
     } catch (error) {
-      console.error("Logout error:", error);
+      logger.error("Logout error:", error);
     } finally {
       // Clear local storage
       localStorage.removeItem("accessToken");
@@ -195,7 +196,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       try {
         localStorage.removeItem("userId");
       } catch (storageError) {
-        console.warn("Unable to clear userId on logout", storageError);
+        logger.warn("Unable to clear userId on logout", storageError);
       }
       await resetProgress();
       navigate("/login");
@@ -208,22 +209,22 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   }, [user]);
 
   const checkAuthStatus = async () => {
-    console.log("AuthContext: checkAuthStatus started");
+    logger.debug("AuthContext: checkAuthStatus started");
     const token = localStorage.getItem("accessToken");
     const refreshTokenValue = localStorage.getItem("refreshToken");
-    console.log("AuthContext: token present?", !!token, "refresh token present?", !!refreshTokenValue);
+    logger.debug("AuthContext: token present?", !!token, "refresh token present?", !!refreshTokenValue);
 
     if (token) {
       try {
-        console.log("AuthContext: Verifying token...");
+        logger.debug("AuthContext: Verifying token...");
         // Verify token with backend
         const data = await api.verifyToken();
-        console.log("AuthContext: Token verified successfully", data);
+        logger.debug("AuthContext: Token verified successfully");
         setUser(data.user);
         try {
           localStorage.setItem("userId", data.user.id);
         } catch (storageError) {
-          console.warn(
+          logger.warn(
             "Unable to persist userId after auth check",
             storageError,
           );
@@ -231,7 +232,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
         // Load user progress from backend with timeout protection
         try {
-          console.log("AuthContext: Loading user progress...");
+          logger.debug("AuthContext: Loading user progress...");
           const timeoutPromise = new Promise((_, reject) => {
             setTimeout(() => reject(new Error('User progress load timeout')), 10000); // 10 second timeout
           });
@@ -240,23 +241,23 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
           // Race the API call with a timeout to prevent hanging
           await Promise.race([progressPromise, timeoutPromise]);
-          console.log("AuthContext: User progress loaded");
+          logger.debug("AuthContext: User progress loaded");
         } catch (progressError) {
-          console.error("Failed to load user progress:", progressError);
+          logger.error("Failed to load user progress:", progressError);
           // Continue with default progress instead of blocking the UI
         }
       } catch (verifyError) {
-        console.error("Token verification failed:", verifyError);
+        logger.error("Token verification failed:", verifyError);
 
         // Check if token was already cleared by api.ts (401 error)
         const tokenStillExists = localStorage.getItem("accessToken");
 
         // If token was auto-cleared, don't try to refresh
         if (!tokenStillExists) {
-          console.log("AuthContext: Token was auto-cleared, skipping refresh");
+          logger.debug("AuthContext: Token was auto-cleared, skipping refresh");
           setUser(null);
           await resetProgress();
-          console.log("AuthContext: setting isLoading false (after auto-clear)");
+          logger.debug("AuthContext: setting isLoading false (after auto-clear)");
           setIsLoading(false);
           return;
         }
@@ -264,10 +265,10 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         // Token is invalid, try to refresh only if refresh token exists
         if (refreshTokenValue) {
           try {
-            console.log("AuthContext: Attempting token refresh...");
+            logger.debug("AuthContext: Attempting token refresh...");
             const refreshResult = await refreshToken();
             if (refreshResult) {
-              console.log("AuthContext: Token refresh successful");
+              logger.debug("AuthContext: Token refresh successful");
               // Retry the verification after refresh
               try {
                 const newToken = localStorage.getItem("accessToken");
@@ -284,24 +285,24 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
                   const progressPromise = loadUserProgress();
                   await Promise.race([progressPromise, timeoutPromise]);
                 } catch (progressError) {
-                  console.error("Failed to load user progress after refresh:", progressError);
+                  logger.error("Failed to load user progress after refresh:", progressError);
                 }
-                console.log("AuthContext: setting isLoading false (after refresh success)");
+                logger.debug("AuthContext: setting isLoading false (after refresh success)");
                 setIsLoading(false);
                 return; // Successfully refreshed and verified
               } catch (retryError) {
-                console.error("Token still invalid after refresh:", retryError);
+                logger.error("Token still invalid after refresh:", retryError);
               }
             } else {
-              console.log("AuthContext: Token refresh returned false");
+              logger.debug("AuthContext: Token refresh returned false");
             }
           } catch (refreshError) {
-            console.error("Token refresh failed:", refreshError);
+            logger.error("Token refresh failed:", refreshError);
           }
         }
 
         // If refresh failed or no refresh token, clear everything
-        console.log("AuthContext: Clearing auth state");
+        logger.debug("AuthContext: Clearing auth state");
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("userId");
@@ -309,10 +310,10 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         await resetProgress();
       }
     } else {
-      console.log("AuthContext: No token found, resetting progress");
+      logger.debug("AuthContext: No token found, resetting progress");
       await resetProgress();
     }
-    console.log("AuthContext: setting isLoading false (final)");
+    logger.debug("AuthContext: setting isLoading false (final)");
     setIsLoading(false);
   };
 

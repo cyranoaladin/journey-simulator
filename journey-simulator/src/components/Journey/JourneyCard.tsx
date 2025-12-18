@@ -5,6 +5,7 @@ import { useJourneyStore } from '../../store/journeyStore';
 import { Persona } from '../../types/journey';
 import { api } from '../../utils/api';
 import { normalizeCompletedPhases } from '../../utils/progress';
+import { logger } from '../../utils/logger';
 
 interface JourneyCardProps {
   persona: Persona;
@@ -126,7 +127,7 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
         }
 
         // Show success message
-        console.log('Demo state loaded:', result.demo_state);
+        logger.debug('Demo state loaded:', result.demo_state);
 
         onSelected?.();
       } else {

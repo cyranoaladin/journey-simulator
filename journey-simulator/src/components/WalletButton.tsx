@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { useJourneyStore } from '../store/journeyStore'
 import { useAuth } from '../contexts/AuthContext'
+import { logger } from '../utils/logger'
 
 const WalletButton = () => {
   const { publicKey, wallet, disconnect, connected, connecting, signMessage } = useWallet()
@@ -40,7 +41,7 @@ const WalletButton = () => {
           if (!success) {
             // If login fails (e.g. user not found), we might want to redirect to register
             // or show a notification. For now, we just log it.
-            console.log("Wallet login failed - user might need to register");
+            logger.warn("Wallet login failed - user might need to register");
           }
         }
       } else if (!connected) {

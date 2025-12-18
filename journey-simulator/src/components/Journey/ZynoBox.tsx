@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { MessageCircle, Send, Sparkles, ThumbsDown, ThumbsUp, X } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { useJourneyStore } from '../../store/journeyStore';
+import { logger } from '../../utils/logger';
 
 const EMPTY_TIPS: string[] = [];
 
@@ -135,7 +136,7 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
 
   const handleFeedback = (positive: boolean) => {
     // In a real implementation, this would send feedback to a backend
-    console.log(`User gave ${positive ? 'positive' : 'negative'} feedback for tip: ${currentTip}`);
+    logger.debug(`User gave ${positive ? 'positive' : 'negative'} feedback for tip: ${currentTip}`);
     setFeedbackGiven(true);
   };
 

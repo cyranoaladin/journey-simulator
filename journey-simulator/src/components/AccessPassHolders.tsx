@@ -4,6 +4,7 @@ import { holders } from '../data/holders';
 import { useJourneyStore } from '../store/journeyStore';
 import { Trophy, TrendingUp, Zap, ExternalLink, RefreshCw, AlertCircle } from 'lucide-react';
 // import { api } from '../utils/api'; // Will be used when backend is ready
+import { logger } from '../utils/logger';
 
 const AccessPassHolders: React.FC = () => {
   const { openModal } = useJourneyStore();
@@ -20,7 +21,7 @@ const AccessPassHolders: React.FC = () => {
       setError(null);
 
       // Try to fetch holders from backend (simulated for now)
-      console.log('Fetching access pass holders from backend...');
+      logger.debug('Fetching access pass holders from backend...');
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       // For now, use local data
@@ -48,7 +49,7 @@ const AccessPassHolders: React.FC = () => {
   const trackHolderInteraction = async (holderId: string, interactionType: string) => {
     try {
       // Simulate tracking (for now)
-      console.log('Tracking holder interaction:', {
+      logger.debug('Tracking holder interaction:', {
         holder_id: holderId,
         interaction_type: interactionType,
         timestamp: new Date().toISOString()

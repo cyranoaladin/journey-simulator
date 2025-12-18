@@ -4,6 +4,7 @@ import { Compass, Cpu, Gauge, Home, Layers, LifeBuoy, Network, Rocket, Book, Log
 import { useJourneyStore } from '../../store/journeyStore';
 import { useAuth } from '../../contexts/AuthContext';
 import clsx from 'clsx';
+import { logger } from '../../utils/logger';
 
 type SidebarProps = {
   variant?: 'docked' | 'overlay';
@@ -25,7 +26,7 @@ const Sidebar = ({ variant = 'docked', onClose }: SidebarProps) => {
   const { logout } = useAuth();
   const selectedPersona = useJourneyStore((state) => state.selectedPersona);
   const userProgress = useJourneyStore((state) => state.userProgress);
-  console.log('Sidebar: render', { selectedPersonaId: selectedPersona?.id, completedPhases: userProgress.completedPhases.length, variant });
+  logger.debug('Sidebar: render', { selectedPersonaId: selectedPersona?.id, completedPhases: userProgress.completedPhases.length, variant });
   const isOverlay = variant === 'overlay';
   const [expanded, setExpanded] = useState(true);
 

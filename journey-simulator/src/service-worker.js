@@ -1,6 +1,7 @@
 // src/service-worker.js - Service Worker for offline caching
 
 const CACHE_NAME = 'mfai-journey-simulator-v1';
+const DEBUG = false;
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
@@ -13,7 +14,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('Cache ouvert');
+        if (DEBUG) console.log('Cache ouvert');
         return cache.addAll(urlsToCache);
       })
   );
@@ -72,7 +73,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
-            console.log('Deleting cache', cacheName);
+            if (DEBUG) console.log('Deleting cache', cacheName);
             return caches.delete(cacheName);
           }
         })

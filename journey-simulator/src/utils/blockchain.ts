@@ -3,6 +3,7 @@ import {
   PublicKey,
   LAMPORTS_PER_SOL,
 } from '@solana/web3.js';
+import { logger } from './logger';
 
 // Constants
 const SOLANA_CLUSTER = 'devnet';
@@ -256,7 +257,7 @@ export const stakeMFAI = async (
     }
 
     // For simulation purposes, we'll log the intended stake amount and return a success response
-    console.debug(`Simulated staking of ${amount} $MFAI for wallet ${publicKey.toBase58()}`);
+    logger.debug(`Simulated staking of ${amount} $MFAI for wallet ${publicKey.toBase58()}`);
     return {
       success: true,
       signature: 'simulated_stake_' + Date.now()
@@ -302,7 +303,7 @@ export const submitDAOVote = async (
 // Get NFTs owned by wallet
 export const getWalletNFTs = async (publicKey: PublicKey): Promise<any[]> => {
   try {
-    console.debug('Simulating NFT fetch for wallet', publicKey.toBase58());
+    logger.debug('Simulating NFT fetch for wallet', publicKey.toBase58());
     // In a real implementation, we would:
     // 1. Query the Solana blockchain for token accounts owned by the wallet
     // 2. Filter for NFTs (tokens with supply of 1)

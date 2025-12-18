@@ -6,6 +6,7 @@ import SkillchainCard from './SkillchainCard';
 import WalletConnectionGuide from './WalletConnectionGuide';
 import { useWallet } from '@solana/wallet-adapter-react';
 // import { api } from '../utils/api' // Will be used when backend is ready
+import { logger } from '../utils/logger';
 
 const HeroSection = () => {
   const { connected } = useWallet();
@@ -19,7 +20,7 @@ const HeroSection = () => {
 
   const loadPlatformStats = async () => {
     try {
-      console.log('Fetching platform stats from backend...');
+      logger.debug('Fetching platform stats from backend...');
       await new Promise(resolve => setTimeout(resolve, 1000));
       setPlatformStats({
         totalUsers: 1250,

@@ -8,6 +8,7 @@ import { useJourneyStore } from '../store/journeyStore'
 import NFTProofModal from './NFTProofModal'
 import { getProofType } from '../data/proofsData'
 // import { api } from '../utils/api' // Will be used when backend is ready
+import { logger } from '../utils/logger'
 
 interface CertificationModalProps {
   certification: Certification
@@ -57,7 +58,7 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
       setError(null)
       
       // Track download in backend (simulated for now)
-      console.log('Tracking certification download:', {
+      logger.debug('Tracking certification download:', {
         certification_id: certification.id,
         phase: phaseNumber,
         user_persona: selectedPersona?.id,
@@ -87,7 +88,7 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
       setError(null)
       
       // Track share in backend (simulated for now)
-      console.log('Tracking certification share:', {
+      logger.debug('Tracking certification share:', {
         certification_id: certification.id,
         platform: platform,
         phase: phaseNumber,
