@@ -294,12 +294,10 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
     if (isStepLoading || isAutoSimulating) return;
     if (!activePhase) return;
 
-    const showNeuralOverlay = async (task: string) => {
+    const showNeuralOverlay = (task: string) => {
       const startedAt = Date.now()
       setIsThinking(true)
       setCurrentTask({ agent: 'Zyno', task })
-      // Ensure at least one paint even when mocks resolve instantly (helps UX + avoids flaky e2e).
-      await new Promise((r) => setTimeout(r, 150))
       return startedAt
     }
 
@@ -343,7 +341,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
             // Let React render the phase switch before requesting.
             await new Promise((r) => setTimeout(r, 150))
 
-            const overlayStart = await showNeuralOverlay(`Generating ${phase.title}…`)
+            const overlayStart = showNeuralOverlay(`Generating ${phase.title}…`)
             try {
               await runner({
                 phaseId: phase.id,
@@ -384,7 +382,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
       }
 
       // Non-demo: run only current phase step.
-      const overlayStart = await showNeuralOverlay(`Generating ${activePhase.title}…`)
+      const overlayStart = showNeuralOverlay(`Generating ${activePhase.title}…`)
       try {
         await runner({
           phaseId: activePhase.id,
