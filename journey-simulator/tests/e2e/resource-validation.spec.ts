@@ -32,14 +32,14 @@ test.describe('Resource Validation in Journey Steps', () => {
         }
 
         await page.waitForFunction(() => {
-            const btn = document.querySelector('[data-testid=\"run-simulation\"]');
+            const btn = document.querySelector('[data-testid="run-simulation"]');
             if (!btn) return false;
             const r = btn.getBoundingClientRect();
             return r.width > 0 && r.height > 0;
         }, { timeout: 15000 });
 
         await page.evaluate(() => {
-            const btn = document.querySelector('[data-testid=\"run-simulation\"]') as HTMLButtonElement | null;
+            const btn = document.querySelector('[data-testid="run-simulation"]') as HTMLButtonElement | null;
             btn?.click();
         });
     }
