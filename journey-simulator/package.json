@@ -21,6 +21,10 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "generate:api": "openapi-typescript ../docs/openapi/mf-back.openapi.yaml -o src/api/mf-back-client.ts",
+    "generate:phases-table": "node scripts/generate-phases-table.mjs",
+    "generate:file-index": "node scripts/generate-file-index.mjs",
+    "generate:api-surface": "node scripts/generate-api-surface.mjs",
+    "generate:readme": "node scripts/update-readme-autogen.mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },

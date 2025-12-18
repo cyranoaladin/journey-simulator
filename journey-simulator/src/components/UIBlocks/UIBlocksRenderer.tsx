@@ -1,35 +1,35 @@
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { useJourneyStore } from "../../store/journeyStore";
 import { API_BASE_URL } from '../../utils/api';
 // TEMPORARILY DISABLED - import { useFavoritesStore } from "../../store/favoritesStore";
 import type {
-  JourneyStepResponse,
-  UIBlock,
-  TextBlock,
+  ActionSuggestionsBlock,
   ChecklistBlock,
-  QuizBlock,
-  MissionBlock,
-  ResourceBlock,
-  ResourceItem,
+  DiagramBlock,
   DocumentBlock,
   EvaluationBlock,
-  ActionSuggestionsBlock,
-  XpBlock,
-  DiagramBlock,
-  ProjectSelectionBlock,
+  JourneyStepResponse,
+  MissionBlock,
   NarrativeChoiceBlock,
+  ProjectSelectionBlock,
+  QuizBlock,
+  ResourceBlock,
+  ResourceItem,
+  TextBlock,
+  UIBlock,
+  XpBlock,
 } from "../../types/uiBlocks";
 import GovernanceDashboard from "../Governance/GovernanceDashboard";
-import NarrativeChoice from "./NarrativeChoiceBlock";
 import IndicatorBlockComponent, { IndicatorBlock as IndicatorBlockType } from "./IndicatorBlock";
 import InteractiveTemplateComponent, { InteractiveTemplateBlock as InteractiveTemplateBlockType } from "./InteractiveTemplateBlock";
+import NarrativeChoice from "./NarrativeChoiceBlock";
 // TEMPORARILY DISABLED - import { Star } from "lucide-react";
 
 type MermaidModule = typeof import('mermaid');
 type MermaidAPI = MermaidModule & {
   initialize: (config: Record<string, unknown>) => void;
-  render: (id: string, definition: string) => Promise<{ svg: string }>;
+  render: (id: string, definition: string) => Promise<{ svg: string; }>;
 };
 
 let mermaidModule: MermaidAPI | null = null;
@@ -52,7 +52,7 @@ const loadMermaid = async (): Promise<MermaidAPI> => {
   return mermaidLoader;
 };
 
-function StreamingText({ text, speed = 10 }: { text: string; speed?: number }) {
+function StreamingText({ text, speed = 10 }: { text: string; speed?: number; }) {
   const [displayed, setDisplayed] = useState("");
 
   useEffect(() => {
@@ -79,7 +79,7 @@ function StreamingText({ text, speed = 10 }: { text: string; speed?: number }) {
   );
 }
 
-function Text({ block }: { block: TextBlock }) {
+function Text({ block }: { block: TextBlock; }) {
   return (
     <div className="bg-white/5 rounded-xl p-4">
       <h4 className="font-semibold mb-2">{block.title}</h4>
@@ -88,7 +88,7 @@ function Text({ block }: { block: TextBlock }) {
   );
 }
 
-function Checklist({ block }: { block: ChecklistBlock }) {
+function Checklist({ block }: { block: ChecklistBlock; }) {
   const [items, setItems] = useState(block.items);
   return (
     <div className="bg-white/5 rounded-xl p-4">
@@ -121,7 +121,7 @@ function Checklist({ block }: { block: ChecklistBlock }) {
   );
 }
 
-function Quiz({ block }: { block: QuizBlock }) {
+function Quiz({ block }: { block: QuizBlock; }) {
   const [answers, setAnswers] = useState<Record<string, number | null>>({});
   const [showExplain, setShowExplain] = useState(false);
   const [mode, setMode] = useState<"training" | "certifying">("training");
@@ -322,7 +322,7 @@ function Quiz({ block }: { block: QuizBlock }) {
   );
 }
 
-function Mission({ block }: { block: MissionBlock }) {
+function Mission({ block }: { block: MissionBlock; }) {
   const [showHelp, setShowHelp] = useState(false);
   const [value, setValue] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -441,7 +441,7 @@ function Mission({ block }: { block: MissionBlock }) {
   );
 }
 
-function Resources({ block }: { block: ResourceBlock }) {
+function Resources({ block }: { block: ResourceBlock; }) {
   const isFlashcards = (r: ResourceItem) => r.resource_type === 'flashcard';
   const copyDeck = (r: ResourceItem) => {
     const content = `# ${r.label}\n\n${r.description ?? ""}\n${r.url ?? ""}`;
@@ -455,7 +455,7 @@ function Resources({ block }: { block: ResourceBlock }) {
 
   // const toggleFavorite = async (r: ResourceItem) => {
   //   const journeyId = ensureApiJourneyId();
-  //   
+  //
   //   if (isFavorite(r.id)) {
   //     await removeFavoriteByResourceId(r.id);
   //   } else {
@@ -615,7 +615,7 @@ function renderBasicMarkdown(md: string) {
   return out.join("\n");
 }
 
-function Document({ block }: { block: DocumentBlock }) {
+function Document({ block }: { block: DocumentBlock; }) {
   return (
     <div className="bg-white/5 rounded-xl p-4">
       <h4 className="font-semibold mb-2">
@@ -632,7 +632,7 @@ function Document({ block }: { block: DocumentBlock }) {
   );
 }
 
-function Evaluation({ block }: { block: EvaluationBlock }) {
+function Evaluation({ block }: { block: EvaluationBlock; }) {
   console.log('Evaluation block:', block);
   return (
     <div className="bg-white/5 rounded-xl p-4">
@@ -670,7 +670,7 @@ function Evaluation({ block }: { block: EvaluationBlock }) {
   );
 }
 
-function ActionSuggestions({ block }: { block: ActionSuggestionsBlock }) {
+function ActionSuggestions({ block }: { block: ActionSuggestionsBlock; }) {
   console.log('ActionSuggestions block:', block);
   const ensureApiJourneyId = useJourneyStore((s) => s.ensureApiJourneyId);
   const selectedPersona = useJourneyStore((s) => s.selectedPersona);
@@ -786,7 +786,7 @@ function ActionSuggestions({ block }: { block: ActionSuggestionsBlock }) {
   );
 }
 
-function Xp({ block }: { block: XpBlock }) {
+function Xp({ block }: { block: XpBlock; }) {
   const safeMax = Math.max(block.next_level_xp ?? 0, block.current_xp ?? 0, 1);
   const current = Math.max(0, Math.min(safeMax, block.current_xp ?? 0));
 
@@ -824,7 +824,7 @@ function Xp({ block }: { block: XpBlock }) {
   );
 }
 
-function Diagram({ block }: { block: DiagramBlock }) {
+function Diagram({ block }: { block: DiagramBlock; }) {
   const [svg, setSvg] = useState<string>(
     '<div class="text-xs opacity-70">Loading diagram...</div>'
   );
@@ -874,7 +874,7 @@ function Diagram({ block }: { block: DiagramBlock }) {
   );
 }
 
-function ProjectSelection({ block }: { block: ProjectSelectionBlock }) {
+function ProjectSelection({ block }: { block: ProjectSelectionBlock; }) {
   const [selected, setSelected] = useState<string | null>(null);
   const projects = Array.isArray(block.projects) ? block.projects : [];
   return (
@@ -923,57 +923,57 @@ function ProjectSelection({ block }: { block: ProjectSelectionBlock }) {
   );
 }
 
-export default function UIBlocksRenderer({ response }: { response: JourneyStepResponse }) {
+export default function UIBlocksRenderer({ response }: { response: JourneyStepResponse; }) {
   if (!response || !response.ui_blocks) return null;
 
   const render = (b: UIBlock) => {
     try {
-    switch (b.kind) {
-      case "text_block":
-        return <Text key={b.id} block={b} />;
-      case "checklist_block":
-        return <Checklist key={b.id} block={b} />;
-      case "quiz_block":
-        return <Quiz key={b.id} block={b} />;
-      case "mission_block":
-        return <Mission key={b.id} block={b} />;
-      case "resource_block":
-        return <Resources key={b.id} block={b} />;
-      case "document_block":
-        return <Document key={b.id} block={b} />;
-      case "evaluation_block":
-        return <Evaluation key={b.id} block={b} />;
-      case "action_suggestions_block":
-        return <ActionSuggestions key={b.id} block={b} />;
-      case "xp_block":
-        return <Xp key={b.id} block={b} />;
-      case "diagram_block":
-        return <Diagram key={b.id} block={b} />;
-      case "dao_dashboard_block":
-        return (
-          <div className="bg-white/5 rounded-xl p-4" key={b.id}>
-            <h4 className="font-semibold mb-4">{b.title}</h4>
-            <GovernanceDashboard
-              votingPower={b.votingPower}
-              proposals={b.proposals}
-              onVote={(pid, vote) => console.log("Vote:", pid, vote)}
-            />
-          </div>
-        );
-      case "project_selection_block":
-        return <ProjectSelection key={b.id} block={b} />;
-      case "narrative_choice_block":
-        return <NarrativeChoice key={b.id} block={b as NarrativeChoiceBlock} />;
-      case "indicator_block":
-        return <IndicatorBlockComponent key={b.id} block={b as IndicatorBlockType} />;
-      case "interactive_template_block":
-        return <InteractiveTemplateComponent key={b.id} block={b as InteractiveTemplateBlockType} />;
-      default:
-        return null;
-    }
+      switch (b.kind) {
+        case "text_block":
+          return <Text key={b.id} block={b} />;
+        case "checklist_block":
+          return <Checklist key={b.id} block={b} />;
+        case "quiz_block":
+          return <Quiz key={b.id} block={b} />;
+        case "mission_block":
+          return <Mission key={b.id} block={b} />;
+        case "resource_block":
+          return <Resources key={b.id} block={b} />;
+        case "document_block":
+          return <Document key={b.id} block={b} />;
+        case "evaluation_block":
+          return <Evaluation key={b.id} block={b} />;
+        case "action_suggestions_block":
+          return <ActionSuggestions key={b.id} block={b} />;
+        case "xp_block":
+          return <Xp key={b.id} block={b} />;
+        case "diagram_block":
+          return <Diagram key={b.id} block={b} />;
+        case "dao_dashboard_block":
+          return (
+            <div className="bg-white/5 rounded-xl p-4" key={b.id}>
+              <h4 className="font-semibold mb-4">{b.title}</h4>
+              <GovernanceDashboard
+                votingPower={b.votingPower}
+                proposals={b.proposals}
+                onVote={(pid, vote) => console.log("Vote:", pid, vote)}
+              />
+            </div>
+          );
+        case "project_selection_block":
+          return <ProjectSelection key={b.id} block={b} />;
+        case "narrative_choice_block":
+          return <NarrativeChoice key={b.id} block={b as NarrativeChoiceBlock} />;
+        case "indicator_block":
+          return <IndicatorBlockComponent key={b.id} block={b as IndicatorBlockType} />;
+        case "interactive_template_block":
+          return <InteractiveTemplateComponent key={b.id} block={b as InteractiveTemplateBlockType} />;
+        default:
+          return null;
+      }
     } catch (error) {
-        console.error('Error rendering block:', b.kind, error);
-        return null;
+      console.error('Error rendering block:', b.kind, error);
+      return null;
     }
   };
 
@@ -1005,17 +1005,17 @@ export default function UIBlocksRenderer({ response }: { response: JourneyStepRe
           const blockKey = b.id ? `${b.id}` : `${b.kind}-${index}`;
 
           return (
-          <motion.div
-            key={blockKey}
-            variants={item}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="origin-top"
-          >
-            {render(b)}
-          </motion.div>
+            <motion.div
+              key={blockKey}
+              variants={item}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="origin-top"
+            >
+              {render(b)}
+            </motion.div>
           );
         })}
       </AnimatePresence>

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { FileText, Github, MessageCircle, Twitter, Users } from 'lucide-react';
+import { FileText, Github, MessageCircle, Send, Twitter, Users } from 'lucide-react';
 
 const Footer = () => {
   const footerLinks = {
@@ -9,16 +9,17 @@ const Footer = () => {
       { label: 'Skillchain Mining™', href: '#skillchain' },
     ],
     community: [
-      { label: 'Discord', href: '#', icon: MessageCircle },
-      { label: 'Twitter', href: '#', icon: Twitter },
-      { label: 'GitHub', href: '#', icon: Github },
-      { label: 'Forum', href: '#', icon: Users },
+      // Note: Discord URL is intentionally omitted here until a canonical invite is published.
+      { label: 'X (Twitter)', href: 'https://x.com/Moneyfactoryai', icon: Twitter },
+      { label: 'Telegram', href: 'https://t.me/MoneyFacoryAI_Portal', icon: Send },
+      { label: 'GitHub', href: 'https://github.com/cyranoaladin/Money_Factory', icon: Github },
+      { label: 'Support', href: '/support', icon: Users },
     ],
     resources: [
-      { label: 'Whitepaper', href: '#', icon: FileText },
-      { label: 'Litepaper', href: '#', icon: FileText },
-      { label: 'Protocol Paper', href: '#', icon: FileText },
-      { label: 'FAQ', href: '#', icon: FileText },
+      { label: 'Platform Guide', href: '/guide', icon: FileText },
+      { label: 'Resources', href: '/resources', icon: FileText },
+      { label: 'Docs (mfai.app)', href: 'https://mfai.app/docs.html', icon: FileText },
+      { label: 'Litepaper (mfai.app)', href: 'https://mfai.app/litepaper.html', icon: FileText },
     ],
   };
 
@@ -83,6 +84,8 @@ const Footer = () => {
                   <li key={link.label}>
                     <a
                       href={link.href}
+                      target={link.href.startsWith('http') ? '_blank' : undefined}
+                      rel={link.href.startsWith('http') ? 'noreferrer' : undefined}
                       className="flex items-center space-x-2 text-sm opacity-80 transition-colors hover:text-primary-400 hover:opacity-100"
                     >
                       <Icon size={16} />
@@ -104,12 +107,18 @@ const Footer = () => {
         >
           <p>© 2024 Money Factory AI. All rights reserved.</p>
           <div className="mt-4 flex items-center space-x-4 md:mt-0">
-            {[Twitter, MessageCircle, Github].map((Icon, index) => (
+            {[
+              { Icon: Twitter, href: 'https://x.com/Moneyfactoryai' },
+              { Icon: Send, href: 'https://t.me/MoneyFacoryAI_Portal' },
+              { Icon: Github, href: 'https://github.com/cyranoaladin/Money_Factory' },
+            ].map(({ Icon, href }, index) => (
               <motion.a
                 key={Icon.displayName ?? index}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                href="#"
+                href={href}
+                target="_blank"
+                rel="noreferrer"
                 className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
               >
                 <Icon size={16} />

@@ -89,6 +89,19 @@ router.post('/login', async (req, res) => {
 // POST /auth/connect-wallet
 router.post('/connect-wallet', async (req, res) => {
     try {
+        // This endpoint is legacy/insecure when used without signature.
+        // Prefer SIWS-like flow:
+        // 1) POST /user/wallet-challenge
+        // 2) Wallet signs message
+        // 3) POST /user/login-wallet
+        //
+        // In production, disallow insecure connect-wallet unless explicitly enabled.
+        if (process.env.NODE_ENV === 'production' && process.env.ALLOW_INSECURE_CONNECT_WALLET !== 'true') {
+            return res.status(410).json({
+                error: 'Deprecated: use /user/wallet-challenge + /user/login-wallet (signature-based login).'
+            });
+        }
+
         const { walletAddress, chain = 'solana', persona = 'investor' } = req.body;
 
         if (!walletAddress) {

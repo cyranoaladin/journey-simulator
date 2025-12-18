@@ -1,80 +1,80 @@
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
-import { Persona, UserProgress, TestnetFeatures } from '../types/journey'
-import { personas } from '../data/personas'
-import { getPersonaProofData, getProofType } from '../data/proofsData'
-import { api, API_BASE_URL } from '../utils/api'
-import { mintProofOfSkill } from '../utils/blockchain'
-import { normalizeCompletedPhases } from '../utils/progress'
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { personas } from '../data/personas';
+import { getPersonaProofData, getProofType } from '../data/proofsData';
+import { Persona, TestnetFeatures, UserProgress } from '../types/journey';
+import { api, API_BASE_URL } from '../utils/api';
+import { mintProofOfSkill } from '../utils/blockchain';
+import { normalizeCompletedPhases } from '../utils/progress';
 
-import type { JourneyStepResponse, Mode, Tone } from '../types/uiBlocks'
+import type { JourneyStepResponse, Mode, Tone } from '../types/uiBlocks';
 
 
 export type CollaterizeSimulation = {
-  accepted: boolean
-  eligibilityScore: number
-  tier: 'CORE' | 'EXPERIMENTAL' | 'REJECTED'
-  targetRaiseUSD: number
-  softCapUSD: number
-  hardCapUSD: number
-  liquidityUSD: number
-  initialPriceUSD: number
-  notes: string[]
-  simulatedLaunchUrl: string
-}
+  accepted: boolean;
+  eligibilityScore: number;
+  tier: 'CORE' | 'EXPERIMENTAL' | 'REJECTED';
+  targetRaiseUSD: number;
+  softCapUSD: number;
+  hardCapUSD: number;
+  liquidityUSD: number;
+  initialPriceUSD: number;
+  notes: string[];
+  simulatedLaunchUrl: string;
+};
 
 interface JourneyState {
-  selectedPersona: Persona | null
-  currentPhase: number
-  userProgress: UserProgress
-  testnetFeatures: TestnetFeatures
-  isModalOpen: boolean
-  modalContent: any
-  apiJourneyId: string | null
-  lastStep: JourneyStepResponse | null
-  uiMode: Mode
-  uiTone: Tone
-  isStepLoading: boolean
-  setIsStepLoading: (loading: boolean) => void
-  setSelectedPersona: (persona: Persona | null) => void
-  setCurrentPhase: (phase: number) => void
-  setUiMode: (mode: Mode) => void
-  setUiTone: (tone: Tone) => void
-  ensureApiJourneyId: () => string
-  runInteractiveStep: (args: { phaseId: string; trackId: string; userInput?: string }) => Promise<JourneyStepResponse>
-  runInteractiveStepDebug: (args: { phaseId: string; trackId: string; userInput?: string }) => Promise<JourneyStepResponse>
-  updateProgress: (xp: number, nfts?: string[], mfai?: number) => Promise<void>
-  openModal: (content: any) => void
-  closeModal: () => void
+  selectedPersona: Persona | null;
+  currentPhase: number;
+  userProgress: UserProgress;
+  testnetFeatures: TestnetFeatures;
+  isModalOpen: boolean;
+  modalContent: any;
+  apiJourneyId: string | null;
+  lastStep: JourneyStepResponse | null;
+  uiMode: Mode;
+  uiTone: Tone;
+  isStepLoading: boolean;
+  setIsStepLoading: (loading: boolean) => void;
+  setSelectedPersona: (persona: Persona | null) => void;
+  setCurrentPhase: (phase: number) => void;
+  setUiMode: (mode: Mode) => void;
+  setUiTone: (tone: Tone) => void;
+  ensureApiJourneyId: () => string;
+  runInteractiveStep: (args: { phaseId: string; trackId: string; userInput?: string; }) => Promise<JourneyStepResponse>;
+  runInteractiveStepDebug: (args: { phaseId: string; trackId: string; userInput?: string; }) => Promise<JourneyStepResponse>;
+  updateProgress: (xp: number, nfts?: string[], mfai?: number) => Promise<void>;
+  openModal: (content: any) => void;
+  closeModal: () => void;
   completePhase: (phaseIndex: number, options?: {
-    score?: number
-    nftAddress?: string
-    phaseNumber?: number
-    xpReward?: number
-    mfaiReward?: number
-    nftReward?: string
-  }) => Promise<void>
-  updateStaking: (amount: number) => void
-  updateVotingPower: (newPower: number) => void
-  updateWalletConnection: (connected: boolean, address?: string) => void
-  claimTestnetAirdrop: () => void
+    score?: number;
+    nftAddress?: string;
+    phaseNumber?: number;
+    xpReward?: number;
+    mfaiReward?: number;
+    nftReward?: string;
+  }) => Promise<void>;
+  updateStaking: (amount: number) => void;
+  updateVotingPower: (newPower: number) => void;
+  updateWalletConnection: (connected: boolean, address?: string) => void;
+  claimTestnetAirdrop: () => void;
   mintNFT: (nftName: string, wallet: any, options?: {
-    personaId?: string
-    phaseId?: string
-    phaseNumber?: number
-    xpEarned?: number
-    imageUrl?: string
-    proofType?: string
-  }) => Promise<{ mintAddress: string; signature: string }>
-  shareJourney: (platform: string) => void
-  resetProgress: () => Promise<void>
-  downloadNFT: (nftName: string) => Promise<boolean>
-  viewNFTOnExplorer: (tokenId: string) => string
-  completeMission: () => void
-  loadUserProgress: () => Promise<void>
-  setUserProgress: (progress: UserProgress) => void
-  setDemoMode: (enabled: boolean) => void
-  setCollaterizeSimulation: (sim: CollaterizeSimulation | undefined) => void
+    personaId?: string;
+    phaseId?: string;
+    phaseNumber?: number;
+    xpEarned?: number;
+    imageUrl?: string;
+    proofType?: string;
+  }) => Promise<{ mintAddress: string; signature: string; }>;
+  shareJourney: (platform: string) => void;
+  resetProgress: () => Promise<void>;
+  downloadNFT: (nftName: string) => Promise<boolean>;
+  viewNFTOnExplorer: (tokenId: string) => string;
+  completeMission: () => void;
+  loadUserProgress: () => Promise<void>;
+  setUserProgress: (progress: UserProgress) => void;
+  setDemoMode: (enabled: boolean) => void;
+  setCollaterizeSimulation: (sim: CollaterizeSimulation | undefined) => void;
 }
 
 const initialUserProgress: UserProgress = {
@@ -94,7 +94,7 @@ const initialUserProgress: UserProgress = {
   socialShareCount: 0,
   lastSharedPlatform: undefined,
   shareHistory: [],
-}
+};
 
 const initialTestnetFeatures: TestnetFeatures = {
   walletAirdrop: true,
@@ -102,103 +102,103 @@ const initialTestnetFeatures: TestnetFeatures = {
   stakingSimulation: true,
   daoVoting: true,
   socialSharing: true,
-}
+};
 
 type DemoPersonaSnapshot = {
-  xp: number
-  tokens: number
-  completedPhases: number[]
-  nfts: string[]
-}
+  xp: number;
+  tokens: number;
+  completedPhases: number[];
+  nfts: string[];
+};
 
 type DemoDatabase = {
-  version: number
-  personas: Record<string, DemoPersonaSnapshot>
-}
+  version: number;
+  personas: Record<string, DemoPersonaSnapshot>;
+};
 
-const DEMO_DB_KEY = 'demo_mock_db'
-const DEMO_DB_VERSION = 2
-const DEMO_ACTIVE_PERSONA_KEY = 'demo_active_persona'
+const DEMO_DB_KEY = 'demo_mock_db';
+const DEMO_DB_VERSION = 2;
+const DEMO_ACTIVE_PERSONA_KEY = 'demo_active_persona';
 
 const createEmptyDemoPersona = (): DemoPersonaSnapshot => ({
   xp: 0,
   tokens: 0,
   completedPhases: [],
   nfts: [],
-})
+});
 
 const readDemoDatabase = (): DemoDatabase => {
   if (typeof window === 'undefined') {
-    return { version: DEMO_DB_VERSION, personas: {} }
+    return { version: DEMO_DB_VERSION, personas: {} };
   }
 
   try {
-    const raw = window.localStorage.getItem(DEMO_DB_KEY)
+    const raw = window.localStorage.getItem(DEMO_DB_KEY);
     if (!raw) {
-      return { version: DEMO_DB_VERSION, personas: {} }
+      return { version: DEMO_DB_VERSION, personas: {} };
     }
 
-    const parsed = JSON.parse(raw)
+    const parsed = JSON.parse(raw);
     if (parsed && typeof parsed === 'object' && parsed.version === DEMO_DB_VERSION && parsed.personas) {
-      return parsed as DemoDatabase
+      return parsed as DemoDatabase;
     }
   } catch (error) {
-    console.warn('[Demo Mode] Failed to read demo datastore:', error)
+    console.warn('[Demo Mode] Failed to read demo datastore:', error);
   }
 
-  return { version: DEMO_DB_VERSION, personas: {} }
-}
+  return { version: DEMO_DB_VERSION, personas: {} };
+};
 
 const writeDemoDatabase = (db: DemoDatabase) => {
   if (typeof window === 'undefined') {
-    return
+    return;
   }
 
   try {
-    window.localStorage.setItem(DEMO_DB_KEY, JSON.stringify(db))
+    window.localStorage.setItem(DEMO_DB_KEY, JSON.stringify(db));
   } catch (error) {
-    console.warn('[Demo Mode] Failed to persist demo datastore:', error)
+    console.warn('[Demo Mode] Failed to persist demo datastore:', error);
   }
-}
+};
 
 const isDemoSession = (): boolean => {
-  if (typeof window === 'undefined') return false
+  if (typeof window === 'undefined') return false;
   try {
-    return window.localStorage.getItem('accessToken') === 'demo-token'
+    return window.localStorage.getItem('accessToken') === 'demo-token';
   } catch {
-    return false
+    return false;
   }
-}
+};
 
 const resetDemoPersonaProgress = (personaId: string | undefined | null) => {
   if (!personaId || typeof window === 'undefined') {
-    return
+    return;
   }
 
-  const datastore = readDemoDatabase()
-  datastore.personas[personaId] = createEmptyDemoPersona()
-  writeDemoDatabase(datastore)
-}
+  const datastore = readDemoDatabase();
+  datastore.personas[personaId] = createEmptyDemoPersona();
+  writeDemoDatabase(datastore);
+};
 
 const resetEntireDemoDatabase = () => {
   if (typeof window === 'undefined') {
-    return
+    return;
   }
 
-  writeDemoDatabase({ version: DEMO_DB_VERSION, personas: {} })
-}
+  writeDemoDatabase({ version: DEMO_DB_VERSION, personas: {} });
+};
 
 const setActiveDemoPersona = (personaId: string | undefined | null) => {
   if (!personaId || typeof window === 'undefined') {
-    return
+    return;
   }
 
   try {
-    window.localStorage.setItem(DEMO_ACTIVE_PERSONA_KEY, personaId)
+    window.localStorage.setItem(DEMO_ACTIVE_PERSONA_KEY, personaId);
   } catch (error) {
-    console.warn('[Demo Mode] Failed to set active persona:', error)
+    console.warn('[Demo Mode] Failed to set active persona:', error);
   }
-}
+};
 
 const derivePassLevel = (
   subscription: string | undefined,
@@ -207,29 +207,29 @@ const derivePassLevel = (
 ): UserProgress['passLevel'] => {
   switch (subscription) {
     case 'diamond':
-      return 'Diamond'
+      return 'Diamond';
     case 'platinum':
-      return 'Platinum'
+      return 'Platinum';
     case 'gold':
-      return 'Gold'
+      return 'Gold';
     default:
-      break
+      break;
   }
 
   if (totalXP >= 2000 && totalNFTs >= 10) {
-    return 'Diamond'
+    return 'Diamond';
   }
 
   if (totalXP >= 1000 && totalNFTs >= 5) {
-    return 'Platinum'
+    return 'Platinum';
   }
 
   if (totalXP >= 500 && totalNFTs >= 2) {
-    return 'Gold'
+    return 'Gold';
   }
 
-  return 'Free'
-}
+  return 'Free';
+};
 
 export const useJourneyStore = create<JourneyState>()(
   persist(
@@ -247,12 +247,12 @@ export const useJourneyStore = create<JourneyState>()(
       isStepLoading: false,
 
       setSelectedPersona: (persona) => {
-        const state = get()
-        const journeyId = state.apiJourneyId ?? state.ensureApiJourneyId()
+        const state = get();
+        const journeyId = state.apiJourneyId ?? state.ensureApiJourneyId();
 
         if (isDemoSession() && persona?.id) {
-          setActiveDemoPersona(persona.id)
-          resetDemoPersonaProgress(persona.id)
+          setActiveDemoPersona(persona.id);
+          resetDemoPersonaProgress(persona.id);
         }
 
         set({
@@ -264,7 +264,7 @@ export const useJourneyStore = create<JourneyState>()(
             currentPersona: persona?.id || undefined,
             completedPhases: [] // Reset completed phases when changing persona
           }
-        })
+        });
       },
 
       setCurrentPhase: (phase) => set({ currentPhase: phase }),
@@ -274,16 +274,16 @@ export const useJourneyStore = create<JourneyState>()(
       setIsStepLoading: (loading) => set({ isStepLoading: loading }),
 
       ensureApiJourneyId: () => {
-        const state = get()
-        if (state.apiJourneyId) return state.apiJourneyId
-        const id = (typeof crypto !== 'undefined' && 'randomUUID' in crypto) ? (crypto as any).randomUUID() : Math.random().toString(36).slice(2)
-        set({ apiJourneyId: id })
-        return id
+        const state = get();
+        if (state.apiJourneyId) return state.apiJourneyId;
+        const id = (typeof crypto !== 'undefined' && 'randomUUID' in crypto) ? (crypto as any).randomUUID() : Math.random().toString(36).slice(2);
+        set({ apiJourneyId: id });
+        return id;
       },
 
       runInteractiveStep: async ({ phaseId, trackId, userInput }) => {
-        const id = get().ensureApiJourneyId()
-        const { uiTone } = get()
+        const id = get().ensureApiJourneyId();
+        const { uiTone } = get();
         const body = {
           phaseId,
           trackId,
@@ -292,43 +292,43 @@ export const useJourneyStore = create<JourneyState>()(
           mode: get().uiMode,
           tone: uiTone,
           journeyState: { xp: get().userProgress.totalXP, completed: get().userProgress.completedPhases }
-        }
+        };
         try {
-          set({ isStepLoading: true })
+          set({ isStepLoading: true });
           const resp = await window.fetch(`${API_BASE_URL}/journey/${id}/step`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
-          })
-          if (!resp.ok) throw new Error(`step failed: ${resp.status}`)
-          const json = await resp.json()
-          set({ lastStep: json })
-          return json
+          });
+          if (!resp.ok) throw new Error(`step failed: ${resp.status}`);
+          const json = await resp.json();
+          set({ lastStep: json });
+          return json;
         } finally {
-          set({ isStepLoading: false })
+          set({ isStepLoading: false });
         }
       },
 
       runInteractiveStepDebug: async ({ phaseId, trackId, userInput }) => {
-        console.debug('[Store] runInteractiveStepDebug START', { phaseId, trackId })
+        console.debug('[Store] runInteractiveStepDebug START', { phaseId, trackId });
         try {
-          const response = await get().runInteractiveStep({ phaseId, trackId, userInput })
-          console.debug('[Store] runInteractiveStepDebug COMPLETE')
-          return response
+          const response = await get().runInteractiveStep({ phaseId, trackId, userInput });
+          console.debug('[Store] runInteractiveStepDebug COMPLETE');
+          return response;
         } catch (error) {
-          console.error('[Store] runInteractiveStepDebug FAILED', error)
-          throw error
+          console.error('[Store] runInteractiveStepDebug FAILED', error);
+          throw error;
         }
       },
 
       updateProgress: async (xp, nfts = [], mfai = 0) => {
-        const state = get()
-        const newTotalXP = state.userProgress.totalXP + xp
-        const newMfaiTokens = state.userProgress.mfaiTokens + mfai
+        const state = get();
+        const newTotalXP = state.userProgress.totalXP + xp;
+        const newMfaiTokens = state.userProgress.mfaiTokens + mfai;
 
         // Determine new pass level based on XP and achievements
-        const totalNFTs = state.userProgress.nfts.length + nfts.length
-        const newPassLevel = derivePassLevel(undefined, newTotalXP, totalNFTs)
+        const totalNFTs = state.userProgress.nfts.length + nfts.length;
+        const newPassLevel = derivePassLevel(undefined, newTotalXP, totalNFTs);
 
         const updatedProgress = {
           ...state.userProgress,
@@ -337,10 +337,10 @@ export const useJourneyStore = create<JourneyState>()(
           mfaiTokens: newMfaiTokens,
           passLevel: newPassLevel,
           votingPower: state.userProgress.votingPower + Math.floor(xp / 10), // 1 voting power per 10 XP
-        }
+        };
 
         // Update local state
-        set({ userProgress: updatedProgress })
+        set({ userProgress: updatedProgress });
 
         // Sync with backend
         try {
@@ -348,11 +348,11 @@ export const useJourneyStore = create<JourneyState>()(
             total_xp: newTotalXP,
             current_level: Math.floor(newTotalXP / 200),
             completed_phases: updatedProgress.completedPhases.length,
-          })
+          });
 
-          await api.updateTokenBalance({ mfai_tokens: newMfaiTokens })
+          await api.updateTokenBalance({ mfai_tokens: newMfaiTokens });
         } catch (error) {
-          console.error('Failed to sync progress with backend:', error)
+          console.error('Failed to sync progress with backend:', error);
         }
       },
 
@@ -361,36 +361,36 @@ export const useJourneyStore = create<JourneyState>()(
       closeModal: () => set({ isModalOpen: false, modalContent: null }),
 
       completePhase: async (phaseIndex, options = {}) => {
-        const state = get()
+        const state = get();
 
         if (state.userProgress.completedPhases.includes(phaseIndex)) {
-          return
+          return;
         }
 
-        const phaseNumber = options.phaseNumber ?? phaseIndex + 1
-        const currentPersona = state.selectedPersona
-        const personaData = currentPersona ? personas.find(p => p.id === currentPersona.id) : null
-        const phases = personaData ? personaData.phases : []
+        const phaseNumber = options.phaseNumber ?? phaseIndex + 1;
+        const currentPersona = state.selectedPersona;
+        const personaData = currentPersona ? personas.find(p => p.id === currentPersona.id) : null;
+        const phases = personaData ? personaData.phases : [];
 
         if (phaseIndex >= phases.length) {
-          return
+          return;
         }
 
-        const currentPhaseData = phases[phaseNumber - 1]
-        const xpReward = options.xpReward ?? currentPhaseData?.xpReward ?? 0
-        const mfaiReward = options.mfaiReward ?? currentPhaseData?.mfaiReward ?? 0
-        const nftReward = options.nftReward ?? currentPhaseData?.nftReward
+        const currentPhaseData = phases[phaseNumber - 1];
+        const xpReward = options.xpReward ?? currentPhaseData?.xpReward ?? 0;
+        const mfaiReward = options.mfaiReward ?? currentPhaseData?.mfaiReward ?? 0;
+        const nftReward = options.nftReward ?? currentPhaseData?.nftReward;
 
-        const resolvedPersonaId = currentPersona?.id ?? state.userProgress.currentPersona
-        const resolvedPhaseId = currentPhaseData?.id
-        const resolvedPhaseTitle = currentPhaseData?.title ?? `Phase ${phaseNumber}`
-        let resolvedNftName = nftReward
+        const resolvedPersonaId = currentPersona?.id ?? state.userProgress.currentPersona;
+        const resolvedPhaseId = currentPhaseData?.id;
+        const resolvedPhaseTitle = currentPhaseData?.title ?? `Phase ${phaseNumber}`;
+        let resolvedNftName = nftReward;
 
-        let proofData: any = null
+        let proofData: any = null;
 
         if (resolvedPersonaId && resolvedPhaseId) {
           try {
-            const proofType = getProofType(resolvedPersonaId, resolvedPhaseId)
+            const proofType = getProofType(resolvedPersonaId, resolvedPhaseId);
             proofData = getPersonaProofData(
               resolvedPersonaId,
               resolvedPhaseId,
@@ -398,30 +398,30 @@ export const useJourneyStore = create<JourneyState>()(
               xpReward,
               resolvedPhaseTitle,
               phaseNumber
-            )
+            );
 
             if (proofData?.name) {
-              resolvedNftName = proofData.name
+              resolvedNftName = proofData.name;
             }
           } catch (metadataError) {
-            console.warn('Failed to derive proof metadata for NFT reward:', metadataError)
+            console.warn('Failed to derive proof metadata for NFT reward:', metadataError);
           }
         }
 
         const updatedPhases = Array.from(
           new Set([...state.userProgress.completedPhases, phaseIndex])
-        ).sort((a, b) => a - b)
+        ).sort((a, b) => a - b);
 
-        const nextPhaseIndex = Math.min(updatedPhases.length, Math.max(phases.length - 1, 0))
+        const nextPhaseIndex = Math.min(updatedPhases.length, Math.max(phases.length - 1, 0));
 
-        const newTotalXP = state.userProgress.totalXP + xpReward
-        let updatedNFTs = state.userProgress.nfts
+        const newTotalXP = state.userProgress.totalXP + xpReward;
+        let updatedNFTs = state.userProgress.nfts;
 
         if (resolvedNftName && !updatedNFTs.includes(resolvedNftName)) {
-          updatedNFTs = [...updatedNFTs, resolvedNftName]
+          updatedNFTs = [...updatedNFTs, resolvedNftName];
         }
 
-        const updatedPassLevel = derivePassLevel(undefined, newTotalXP, updatedNFTs.length)
+        const updatedPassLevel = derivePassLevel(undefined, newTotalXP, updatedNFTs.length);
 
         const updatedProgress: UserProgress = {
           ...state.userProgress,
@@ -431,16 +431,16 @@ export const useJourneyStore = create<JourneyState>()(
           votingPower: state.userProgress.votingPower + Math.floor(xpReward / 10),
           nfts: updatedNFTs,
           passLevel: updatedPassLevel,
-        }
+        };
 
         set({
           userProgress: updatedProgress,
           currentPhase: nextPhaseIndex,
-        })
+        });
 
-        const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
+        const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
         if (!accessToken) {
-          return
+          return;
         }
 
         try {
@@ -455,17 +455,17 @@ export const useJourneyStore = create<JourneyState>()(
             description: proofData?.description,
             image_url: proofData?.imageUrl,
             rarity: proofData?.rarity,
-          })
+          });
 
           if (response && response.ui_blocks) {
-            set({ lastStep: response })
+            set({ lastStep: response });
           } else {
-            set({ lastStep: null })
+            set({ lastStep: null });
           }
 
-          await get().loadUserProgress()
+          await get().loadUserProgress();
         } catch (error) {
-          console.error('Failed to sync phase completion with backend:', error)
+          console.error('Failed to sync phase completion with backend:', error);
         }
       },
 
@@ -505,11 +505,11 @@ export const useJourneyStore = create<JourneyState>()(
       mintNFT: async (nftName: string, wallet: any, options = {}) => {
         const resolveImage = (): string => {
           if (options.imageUrl) {
-            return options.imageUrl
+            return options.imageUrl;
           }
 
           if (options.personaId && options.phaseId) {
-            const proofType = getProofType(options.personaId, options.phaseId)
+            const proofType = getProofType(options.personaId, options.phaseId);
             const proof = getPersonaProofData(
               options.personaId,
               options.phaseId,
@@ -517,18 +517,18 @@ export const useJourneyStore = create<JourneyState>()(
               options.xpEarned ?? 0,
               options.phaseId,
               options.phaseNumber ?? 1
-            )
-            return proof.imageUrl
+            );
+            return proof.imageUrl;
           }
 
-          const normalizedName = nftName.toLowerCase()
+          const normalizedName = nftName.toLowerCase();
 
           if (
             normalizedName.includes('proof-of-skill') ||
             normalizedName.includes('cognitive') ||
             normalizedName.includes('activation')
           ) {
-            return '/images/nfts/cognitive-activation-hub/cognitive-orientation.png'
+            return '/images/nfts/cognitive-activation-hub/cognitive-orientation.png';
           }
 
           if (
@@ -537,7 +537,7 @@ export const useJourneyStore = create<JourneyState>()(
             normalizedName.includes('solana') ||
             normalizedName.includes('neuro-dividend')
           ) {
-            return '/images/nfts/capital-foundry/capital-discovery.png'
+            return '/images/nfts/capital-foundry/capital-discovery.png';
           }
 
           if (
@@ -546,7 +546,7 @@ export const useJourneyStore = create<JourneyState>()(
             normalizedName.includes('tokenomics') ||
             normalizedName.includes('architect')
           ) {
-            return '/images/nfts/system-architect/architecture-scan.png'
+            return '/images/nfts/system-architect/architecture-scan.png';
           }
 
           if (
@@ -554,7 +554,7 @@ export const useJourneyStore = create<JourneyState>()(
             normalizedName.includes('experience') ||
             normalizedName.includes('creator')
           ) {
-            return '/images/nfts/experience-studio/experience-discovery.png'
+            return '/images/nfts/experience-studio/experience-discovery.png';
           }
 
           if (
@@ -562,7 +562,7 @@ export const useJourneyStore = create<JourneyState>()(
             normalizedName.includes('impact') ||
             normalizedName.includes('governance')
           ) {
-            return '/images/nfts/impact-engine/impact-charter.png'
+            return '/images/nfts/impact-engine/impact-charter.png';
           }
 
           if (
@@ -570,21 +570,21 @@ export const useJourneyStore = create<JourneyState>()(
             normalizedName.includes('resilience') ||
             normalizedName.includes('guardian')
           ) {
-            return '/images/nfts/resilience-master/security-baseline.png'
+            return '/images/nfts/resilience-master/security-baseline.png';
           }
 
           if (normalizedName.includes('proof-of-design')) {
-            return '/images/nfts/experience-studio/experience-discovery.png'
+            return '/images/nfts/experience-studio/experience-discovery.png';
           }
 
           if (normalizedName.includes('proof-of-invest')) {
-            return '/images/nfts/capital-foundry/capital-discovery.png'
+            return '/images/nfts/capital-foundry/capital-discovery.png';
           }
 
-          return '/images/logo_mfai.png'
-        }
+          return '/images/logo_mfai.png';
+        };
 
-        const proofTypeTrait = options.proofType ? `Proof-of-${options.proofType}™` : 'Proof-of-Skill'
+        const proofTypeTrait = options.proofType ? `Proof-of-${options.proofType}™` : 'Proof-of-Skill';
 
         const metadata = {
           name: nftName,
@@ -596,7 +596,7 @@ export const useJourneyStore = create<JourneyState>()(
             ...(options.xpEarned !== undefined ? [{ trait_type: 'XP Earned', value: options.xpEarned }] : []),
             ...(options.phaseNumber !== undefined ? [{ trait_type: 'Phase', value: options.phaseNumber }] : []),
           ],
-        }
+        };
 
         const result = await mintProofOfSkill(wallet, metadata);
 
@@ -605,19 +605,19 @@ export const useJourneyStore = create<JourneyState>()(
         }
 
         set((state) => {
-          const hasNFT = state.userProgress.nfts.includes(nftName)
+          const hasNFT = state.userProgress.nfts.includes(nftName);
           const updatedNFTs = hasNFT
             ? state.userProgress.nfts
-            : [...state.userProgress.nfts, nftName]
+            : [...state.userProgress.nfts, nftName];
 
           const updatedPassLevel = derivePassLevel(
             undefined,
             state.userProgress.totalXP,
             updatedNFTs.length
-          )
+          );
 
-          const existingMints = state.userProgress.nftMints || []
-          const filteredMints = existingMints.filter((mint) => mint.name !== nftName)
+          const existingMints = state.userProgress.nftMints || [];
+          const filteredMints = existingMints.filter((mint) => mint.name !== nftName);
 
           return {
             userProgress: {
@@ -629,8 +629,8 @@ export const useJourneyStore = create<JourneyState>()(
                 { name: nftName, address: result.mintAddress!, signature: result.signature!, imageUrl: metadata.image },
               ],
             },
-          }
-        })
+          };
+        });
 
         return { mintAddress: result.mintAddress, signature: result.signature };
       },
@@ -655,40 +655,40 @@ export const useJourneyStore = create<JourneyState>()(
           testnetFeatures: { ...initialTestnetFeatures },
           isModalOpen: false,
           modalContent: null,
-        })
+        });
 
         if (typeof window !== 'undefined') {
           try {
-            window.localStorage.removeItem('mfai-journey-storage')
+            window.localStorage.removeItem('mfai-journey-storage');
           } catch (error) {
-            console.error('Failed to clear persisted journey data:', error)
+            console.error('Failed to clear persisted journey data:', error);
           }
         }
 
         const hasAccessToken = typeof window !== 'undefined'
           ? window.localStorage.getItem('accessToken')
-          : null
+          : null;
 
         if (hasAccessToken) {
           try {
-            await api.resetProgress()
+            await api.resetProgress();
           } catch (error) {
-            console.error('Failed to reset progress on server:', error)
+            console.error('Failed to reset progress on server:', error);
           }
         }
       },
 
       downloadNFT: async (nftName: string) => {
         // Simulate download process and log the requested NFT name for analytics
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        console.info(`Simulated download for NFT: ${nftName}`)
-        return true
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        console.info(`Simulated download for NFT: ${nftName}`);
+        return true;
       },
 
       viewNFTOnExplorer: (tokenId: string) => {
         // Generate explorer URL
-        const explorerUrl = `https://explorer.solana.com/address/${tokenId}?cluster=devnet`
-        return explorerUrl
+        const explorerUrl = `https://explorer.solana.com/address/${tokenId}?cluster=devnet`;
+        return explorerUrl;
       },
 
       completeMission: () => set((state) => {
@@ -709,79 +709,79 @@ export const useJourneyStore = create<JourneyState>()(
       }),
 
       loadUserProgress: async () => {
-        const currentState = get()
+        const currentState = get();
 
         try {
-          const response = await api.getUserProgress()
+          const response = await api.getUserProgress();
 
           if (!response?.success) {
-            return
+            return;
           }
 
-          const progress = response.progress || {}
-          const totalXP: number = progress.total_xp ?? 0
-          const normalizedBackend = normalizeCompletedPhases(progress)
-          let backendCompletedPhases = normalizedBackend.completedPhases
+          const progress = response.progress || {};
+          const totalXP: number = progress.total_xp ?? 0;
+          const normalizedBackend = normalizeCompletedPhases(progress);
+          let backendCompletedPhases = normalizedBackend.completedPhases;
 
           if (backendCompletedPhases.length === 0 && normalizedBackend.completedCount > 0) {
-            backendCompletedPhases = Array.from({ length: normalizedBackend.completedCount }, (_, index) => index)
+            backendCompletedPhases = Array.from({ length: normalizedBackend.completedCount }, (_, index) => index);
           }
 
-          const backendPersonaId: string | undefined = progress.persona || currentState.userProgress.currentPersona || undefined
+          const backendPersonaId: string | undefined = progress.persona || currentState.userProgress.currentPersona || undefined;
           const matchedPersona = backendPersonaId
             ? personas.find((persona) => persona.id === backendPersonaId)
-            : null
+            : null;
 
           // Persona used to normalize phase counts/progress math.
           // We intentionally do NOT auto-select a persona here, otherwise the UI can
           // oscillate between /journeys list and an auto-selected workspace.
-          const progressPersona = currentState.selectedPersona ?? matchedPersona ?? null
+          const progressPersona = currentState.selectedPersona ?? matchedPersona ?? null;
           const mergedPhaseIndexes = Array.from(new Set([
             ...backendCompletedPhases,
             ...currentState.userProgress.completedPhases
-          ])).sort((a, b) => a - b)
+          ])).sort((a, b) => a - b);
 
           const personaPhaseCount = progressPersona?.phases?.length
-            ?? Math.max(mergedPhaseIndexes.length, normalizedBackend.completedCount)
+            ?? Math.max(mergedPhaseIndexes.length, normalizedBackend.completedCount);
 
-          const completedPhases = mergedPhaseIndexes.filter((index) => index < personaPhaseCount)
+          const completedPhases = mergedPhaseIndexes.filter((index) => index < personaPhaseCount);
 
-          const safeCompletedCount = completedPhases.length
+          const safeCompletedCount = completedPhases.length;
 
           const rawCertificates: any[] = Array.isArray(progress.nft_certificates)
             ? progress.nft_certificates
-            : []
+            : [];
 
           const mappedNfts = rawCertificates.map((certificate) => {
             if (certificate?.title) {
-              return certificate.title as string
+              return certificate.title as string;
             }
 
             if (certificate?.phase) {
-              return `Phase ${certificate.phase} NFT`
+              return `Phase ${certificate.phase} NFT`;
             }
 
             if (certificate?.mint_address) {
-              return certificate.mint_address as string
+              return certificate.mint_address as string;
             }
 
             if (certificate?.nft_address) {
-              return certificate.nft_address as string
+              return certificate.nft_address as string;
             }
 
-            return 'NFT Certificate'
-          })
+            return 'NFT Certificate';
+          });
 
           const dedupedNfts = Array.from(new Set([
             ...currentState.userProgress.nfts,
             ...mappedNfts,
-          ]))
+          ]));
 
           const passLevel = derivePassLevel(
             progress.subscription,
             totalXP,
             dedupedNfts.length
-          )
+          );
 
           const mappedProgress: UserProgress = {
             ...initialUserProgress,
@@ -801,16 +801,16 @@ export const useJourneyStore = create<JourneyState>()(
             socialShareCount: currentState.userProgress.socialShareCount,
             nftMints: currentState.userProgress.nftMints,
             demoModeEnabled: Boolean(progress.demo_mode?.enabled)
-          }
+          };
 
           set({
             // Keep current selection; do not auto-select from backend progress.
             selectedPersona: currentState.selectedPersona,
             currentPhase: safeCompletedCount,
             userProgress: mappedProgress,
-          })
+          });
         } catch (error) {
-          console.error('Failed to load user progress from backend:', error)
+          console.error('Failed to load user progress from backend:', error);
         }
       },
 
@@ -819,12 +819,12 @@ export const useJourneyStore = create<JourneyState>()(
       setDemoMode: (enabled: boolean) => {
         if (enabled) {
           const demoPersona = personas[0]; // Cognitive Activation Hub
-          const state = get()
-          const journeyId = state.apiJourneyId ?? state.ensureApiJourneyId()
+          const state = get();
+          const journeyId = state.apiJourneyId ?? state.ensureApiJourneyId();
 
-          resetEntireDemoDatabase()
-          setActiveDemoPersona(demoPersona.id)
-          resetDemoPersonaProgress(demoPersona.id)
+          resetEntireDemoDatabase();
+          setActiveDemoPersona(demoPersona.id);
+          resetDemoPersonaProgress(demoPersona.id);
 
           set({
             selectedPersona: demoPersona,
@@ -863,7 +863,7 @@ export const useJourneyStore = create<JourneyState>()(
       }),
     }
   )
-)
+);
 
 // Expose store to window for non-production testing helpers
 const shouldExposeStore =

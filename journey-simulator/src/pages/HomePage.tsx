@@ -251,7 +251,7 @@ const HomePage = () => {
             <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/10 via-indigo-500/10 to-purple-500/10 blur-3xl" aria-hidden="true" />
             <div className="relative z-10 space-y-4 text-sm text-white/80">
               <div className="flex items-center justify-between text-xs uppercase tracking-[0.35em] text-white/50">
-                <span>Mission control — Solana mainnet</span>
+                <span>Mission control — Solana devnet/testnet</span>
                 <span>DAO readiness 76%</span>
               </div>
               <div className="rounded-2xl border border-white/10 bg-[#0f0f21]/80 p-5">

@@ -188,7 +188,7 @@ const GuidePage = () => {
                                         { title: '3. Prove', desc: 'Validate knowledge through practical application.' },
                                         { title: '4. Activate', desc: 'Deploy and activate community participation.' },
                                         { title: '5. Scale', desc: 'Expand governance and scale solutions.' },
-                                        { title: '6. Launch', desc: 'Simulate mainnet launch via Collaterize and graduate to the Core Track.' }
+                                        { title: '6. Launch', desc: 'Simulate launch readiness via Collaterize (devnet/testnet) and graduate to the Core Track.' }
                                     ].map((phase, idx) => (
                                         <div key={idx} className="relative">
                                             <span className="absolute -left-[41px] flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">
@@ -613,7 +613,7 @@ const GuidePage = () => {
                                 },
                                 {
                                     step: '6. Launch & Graduation',
-                                    text: 'Upon achieving a high Eligibility Score, simulate your mainnet launch via Collaterize. Graduate to the Core Track by reaching market cap targets.'
+                                    text: 'Upon achieving a high Eligibility Score, simulate your launch via Collaterize on devnet/testnet. Graduate to the Core Track by reaching market cap targets.'
                                 }
                             ].map((item, idx) => (
                                 <div key={idx} className="relative">

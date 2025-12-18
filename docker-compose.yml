@@ -9,7 +9,7 @@ services:
         INSTALL_DEV: "true"
     command: npm run dev
     env_file:
-      - ./mf-back/env.production.example
+      - ./mf-back/env.development.example
     environment:
       NODE_ENV: development
       PORT: 3000

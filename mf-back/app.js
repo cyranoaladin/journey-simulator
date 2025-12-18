@@ -26,7 +26,41 @@ const app = express();
 
 // Middleware
 app.use(helmet());
-app.use(cors()); // En production, restreindre l'origine si possible
+
+// CORS
+// - In prod, restrict origins via CORS_ALLOWED_ORIGINS="https://journey.mfai.app,https://mfai.app"
+// - In dev, allow localhost UI ports.
+function parseAllowedOrigins(raw) {
+  if (!raw) return [];
+  return raw
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+const allowedOrigins = [
+  // Defaults (safe-ish); can be overridden/extended via env
+  'https://journey.mfai.app',
+  'https://mfai.app',
+  'http://localhost:3003',
+  'http://127.0.0.1:3003',
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  ...parseAllowedOrigins(process.env.CORS_ALLOWED_ORIGINS),
+];
+
+app.use(
+  cors({
+    origin: (origin, cb) => {
+      // Allow same-origin / server-to-server / curl (no Origin header)
+      if (!origin) return cb(null, true);
+      if (allowedOrigins.includes(origin)) return cb(null, true);
+      // Keep error readable for debugging.
+      return cb(new Error(`CORS blocked origin: ${origin}`));
+    },
+    credentials: true,
+  })
+);
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

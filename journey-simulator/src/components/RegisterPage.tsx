@@ -23,10 +23,12 @@ const RegisterPage: React.FC = () => {
   const [success, setSuccess] = useState('');
 
   const personas = [
-    { value: 'student', label: 'Student', description: 'Learning and building skills' },
-    { value: 'entrepreneur', label: 'Entrepreneur', description: 'Building businesses and startups' },
-    { value: 'developer', label: 'Developer', description: 'Creating software and applications' },
-    { value: 'creator', label: 'Creator', description: 'Creating content and digital assets' }
+    { value: 'cognitive-activation-hub', label: 'Cognitive Activation Hub', description: 'Mental models + Solana fluency + activation rituals' },
+    { value: 'capital-foundry', label: 'Capital Foundry', description: 'DeFi, capital design, risk, and launch preparation' },
+    { value: 'system-architect', label: 'System Architect', description: 'Infra, DePIN, architecture, scaling, production hardening' },
+    { value: 'experience-studio', label: 'Experience Studio', description: 'Product/UX, NFT systems, community loops' },
+    { value: 'impact-engine', label: 'Impact Engine', description: 'Governance design, reputation, coordination' },
+    { value: 'resilience-master', label: 'Resilience Master', description: 'Security, audits, resilience drills, launch readiness' }
   ];
 
   // Redirect if already authenticated
@@ -98,7 +100,7 @@ const RegisterPage: React.FC = () => {
         wallet_address: formData.wallet_address,
         persona: formData.persona
       });
-      
+
       if (success) {
         setSuccess('Account created successfully! Redirecting to your journey...');
         // Navigation will be handled by the auth context
@@ -152,7 +154,7 @@ const RegisterPage: React.FC = () => {
           >
             <span className="text-2xl font-bold text-white">M</span>
           </motion.div>
-          
+
           <motion.h2
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -161,7 +163,7 @@ const RegisterPage: React.FC = () => {
           >
             Join the Revolution
           </motion.h2>
-          
+
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}

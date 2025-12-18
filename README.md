@@ -1,45 +1,47 @@
-# journey-simulator
+# Money Factory AI — Journey Monorepo
 
-Brève description du projet (une ligne).
+Monorepo “journey.mfai.app” : backend API (`mf-back`), UI React/Vite (`journey-simulator`), et portail Next.js (`web`).
 
-## Installation
+## 🧭 Produit (source de vérité)
 
-Prérequis : Node.js >= 18, npm (ou pnpm/yarn)
+- **6 personas**: `cognitive-activation-hub`, `capital-foundry`, `system-architect`, `experience-studio`, `impact-engine`, `resilience-master`
+- **6 phases (Launch last)**: Learn → Build → Prove → Activate → Scale → **Launch (Collaterize simulation)**
+- **MVP**: testnet/devnet, “building in public”
+
+La source de vérité des personas/phases côté UI est `journey-simulator/src/data/personas.ts`.
+
+## ✅ Prérequis
+
+- Node.js **>= 18**
+- Docker + Docker Compose (recommandé pour un run complet)
+
+## 🚀 Démarrage rapide (Docker, recommandé)
 
 ```bash
-# installer dépendances
-npm ci
+# depuis la racine
+./start_dev.sh
 ```
 
-## Usage
+Services (dev) :
+- **API (mf-back)**: `http://localhost:3002`
+- **UI (journey-simulator)**: `http://localhost:3003`
 
-Exemples d'utilisation et commandes utiles :
+## 🧪 Tests / Lint
 
 ```bash
-# lint
-npm run lint
-
-# typecheck
-npm run typecheck
-
-# tests
-npm test
-
-# build
-npm run build
+npm run install:all
+npm run lint:all
+npm run test:all
+npm run build:all
 ```
 
-## Scripts recommandés (package.json)
-- "lint": "eslint 'src/**/*.{ts,tsx}' --max-warnings=0"
-- "format": "prettier --write ."
-- "typecheck": "tsc --noEmit"
-- "test": "vitest" (ou "jest")
-- "build": "tsc -p tsconfig.build.json" (ou bundler)
+## 🔐 Variables d'environnement
 
-## Contribuer
+- Dev backend: `mf-back/env.development.example`
+- Prod backend: `mf-back/env.production.example`
+- Déploiement: `.deploy.env` / `.deploy.env.example`
 
-Voir CONTRIBUTING.md (ajouter un guide court ici).
+## 📚 Docs clés
 
-## Licence
-
-Choisir et indiquer une licence (ex : MIT).
+- Deep dive: `docs/PLATFORM_DEEP_DIVE_FR.md`
+- Déploiement: `DEPLOY.md`, `DEPLOY_SERVER.md`, `docker-compose.prod.yml`
