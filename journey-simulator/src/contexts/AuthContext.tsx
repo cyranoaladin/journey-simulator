@@ -107,7 +107,14 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         // Use secure flow with challenge-response
         data = await loginWithWalletFlow({ walletPublicKey: wallet_address, signMessage });
       } else {
-        // Legacy flow (insecure)
+        // Legacy flow (insecure) - disabled by default.
+        const allowInsecure =
+          (import.meta as any).env?.VITE_ALLOW_INSECURE_WALLET_LOGIN === 'true';
+        if (!allowInsecure) {
+          logger.warn('[AuthContext] Wallet login requires a signature (insecure login disabled).');
+          return false;
+        }
+
         logger.warn('[AuthContext] Using insecure wallet login (no signature provided)');
         data = await api.loginWithWallet(wallet_address);
       }

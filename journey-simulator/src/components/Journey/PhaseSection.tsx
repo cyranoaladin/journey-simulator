@@ -29,6 +29,7 @@ import PhaseInteractionBlock from './PhaseInteractionBlock';
 import UIBlocksRenderer from '../UIBlocks/UIBlocksRenderer';
 import MintCelebrationBanner from '../MintCelebrationBanner';
 import type { JourneyStepResponse } from '../../types/uiBlocks';
+import { renderHighlightedText } from '../../utils/renderHighlightedText';
 
 interface PhaseSectionProps {
   phase: JourneyPhase;
@@ -59,16 +60,6 @@ const PhaseSection: FC<PhaseSectionProps> = ({
 }) => {
   const { selectedPersona, lastStep, runInteractiveStep, uiMode, uiTone, setUiMode, setUiTone, openModal, isStepLoading } = useJourneyStore();
   const [stepError, setStepError] = useState<string | null>(null);
-
-  const highlightText = (text: string) =>
-    text.replace(
-      /("([^"]+)")|(\*([^*]+)\*)/g,
-      (match, _p1, highlighted, _p3, emphasized) => {
-        if (highlighted) return `<span class="text-accent-cyan">"${highlighted}"</span>`;
-        if (emphasized) return `<span class="font-semibold text-accent-gold">${emphasized}</span>`;
-        return match;
-      }
-    );
 
   const getButtonState = () => {
     if (isProcessing) {
@@ -191,10 +182,7 @@ const PhaseSection: FC<PhaseSectionProps> = ({
 
       <div className="bg-white/5 rounded-lg p-3 mb-4">
         <h4 className="font-semibold text-sm mb-2">Mission</h4>
-        <p
-          className="text-sm"
-          dangerouslySetInnerHTML={{ __html: highlightText(phase.mission) }}
-        />
+        <p className="text-sm">{renderHighlightedText(phase.mission)}</p>
       </div>
 
       {phase.modules && phase.modules.length > 0 && (
@@ -386,10 +374,9 @@ const PhaseSection: FC<PhaseSectionProps> = ({
           </div>
           <div>
             <h4 className="font-semibold text-xs mb-1">Zyno says:</h4>
-            <p
-              className="text-xs italic opacity-90"
-              dangerouslySetInnerHTML={{ __html: highlightText(phase.zynoTip) }}
-            />
+            <p className="text-xs italic opacity-90">
+              {renderHighlightedText(phase.zynoTip)}
+            </p>
           </div>
         </div>
       </div>

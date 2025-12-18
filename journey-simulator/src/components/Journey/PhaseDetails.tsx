@@ -1,31 +1,21 @@
 import { FC } from 'react';
 import { JourneyPhase } from '../../types/journey';
 import { CheckCircle } from 'lucide-react';
+import { renderHighlightedText } from '../../utils/renderHighlightedText';
 
 interface PhaseDetailsProps {
     phase: JourneyPhase;
 }
 
 const PhaseDetails: FC<PhaseDetailsProps> = ({ phase }) => {
-    const highlightText = (text: string) =>
-        text.replace(
-            /("([^"]+)")|(\*([^*]+)\*)/g,
-            (match, _p1, highlighted, _p3, emphasized) => {
-                if (highlighted) return `<span class="text-accent-cyan">"${highlighted}"</span>`;
-                if (emphasized) return `<span class="font-semibold text-accent-gold">${emphasized}</span>`;
-                return match;
-            }
-        );
-
     return (
         <div className="space-y-6 animate-fadeIn">
             {/* Mission Section */}
             <div className="bg-white/5 rounded-xl p-4 border border-white/10">
                 <h4 className="font-semibold text-sm mb-2 text-accent-cyan uppercase tracking-wider">Mission Objective</h4>
-                <p
-                    className="text-sm leading-relaxed opacity-90"
-                    dangerouslySetInnerHTML={{ __html: highlightText(phase.mission) }}
-                />
+                <p className="text-sm leading-relaxed opacity-90">
+                    {renderHighlightedText(phase.mission)}
+                </p>
             </div>
 
             {/* Modules & Deliverables */}
