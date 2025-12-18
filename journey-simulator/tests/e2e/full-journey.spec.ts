@@ -13,30 +13,6 @@ test.describe('Full Journey & Collaterize Launch', () => {
       tokens: 480,
       mockMint: true,
     });
-
-    await page.route('**/journeys/*/phases/launch-collaterize/simulate', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          ok: true,
-          simulation: {
-            tier: 'CORE',
-            accepted: true,
-            eligibilityScore: 92,
-            communityScore: 88,
-            riskScore: 0.1,
-            targetRaiseUSD: 750000,
-            softCapUSD: 350000,
-            hardCapUSD: 1200000,
-            liquidityUSD: 250000,
-            initialPriceUSD: 0.18,
-            notes: ['Focus on liquidity coordination', 'Investor interest strong across DeFi funds'],
-            simulatedLaunchUrl: 'https://collaterize.example/simulation'
-          }
-        })
-      });
-    });
   });
 
   test('simulates collaterize launch results in demo mode', async ({ page }) => {
@@ -83,8 +59,31 @@ test.describe('Full Journey & Collaterize Launch', () => {
     await expect(page.getByRole('heading', { name: 'Ready to Launch?' })).toBeVisible();
 
     await page.evaluate(() => {
-      localStorage.setItem('accessToken', 'e2e-token');
+      // Access token is stored in sessionStorage (TokenStore hardening)
+      sessionStorage.setItem('accessToken', 'e2e-token');
       localStorage.setItem('refreshToken', 'e2e-refresh-token');
+
+      // Demo mode endpoints read from the demo mock DB in localStorage (see src/utils/api.ts).
+      // Seed it so the collaterize simulation becomes deterministic (XP influences the result).
+      const DEMO_DB_VERSION = 2;
+      const DEMO_DB_KEY = 'demo_mock_db';
+      const DEMO_ACTIVE_PERSONA_KEY = 'demo_active_persona';
+
+      localStorage.setItem(DEMO_ACTIVE_PERSONA_KEY, 'cognitive-activation-hub');
+      localStorage.setItem(
+        DEMO_DB_KEY,
+        JSON.stringify({
+          version: DEMO_DB_VERSION,
+          personas: {
+            'cognitive-activation-hub': {
+              xp: 5200,
+              tokens: 480,
+              completedPhases: [0, 1, 2, 3, 4],
+              nfts: ['Proof-of-Skill™: Activation', 'Solana Fluency Patch'],
+            },
+          },
+        }),
+      );
     });
 
     await page.getByRole('button', { name: /Simulate Launch with Collaterize/i }).click();
@@ -97,7 +96,8 @@ test.describe('Full Journey & Collaterize Launch', () => {
     });
 
     expect(simulationState).toBeTruthy();
-    expect(simulationState?.targetRaiseUSD).toBe(750000);
-    await expect(page.getByRole('link', { name: /Open Collaterize/i })).toHaveAttribute('href', 'https://collaterize.example/simulation');
+    // Demo simulation is computed as: 1_000_000 + xp * 5 (see src/utils/api.ts)
+    expect(simulationState?.targetRaiseUSD).toBe(1026000);
+    await expect(page.getByRole('link', { name: /Open Collaterize/i })).toHaveAttribute('href', 'https://launchpad.collaterize.com/');
   });
 });

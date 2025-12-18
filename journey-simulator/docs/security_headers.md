@@ -28,5 +28,3 @@ Notes:
 
 - **HSTS** (`Strict-Transport-Security`) doit être ajouté uniquement derrière HTTPS.
 - Une CSP **en header** est préférable à une CSP via meta (priorité + report-only), mais la meta permet un baseline “portable”.
-
-

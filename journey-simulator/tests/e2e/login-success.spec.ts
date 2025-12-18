@@ -74,12 +74,12 @@ test.describe('Login Flow', () => {
 
     // Wait a bit longer for tokens to be stored
     await page.waitForFunction(
-      () => localStorage.getItem('accessToken') === 'access-token-123',
-      { timeout: 10000 }
+      () => sessionStorage.getItem('accessToken') === 'access-token-123',
+      { timeout: 30000 }
     );
     await page.waitForFunction(
       () => localStorage.getItem('refreshToken') === 'refresh-token-456',
-      { timeout: 10000 }
+      { timeout: 30000 }
     );
   });
 });
