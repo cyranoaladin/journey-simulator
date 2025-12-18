@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { FileText, Github, MessageCircle, Send, Twitter, Users } from 'lucide-react';
+import { FileText, Github, Send, Twitter, Users } from 'lucide-react';
 
 const Footer = () => {
   const footerLinks = {
