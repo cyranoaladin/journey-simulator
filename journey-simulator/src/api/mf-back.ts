@@ -1,13 +1,14 @@
 import createClient from "openapi-fetch";
 import type { paths } from "./mf-back-client"; // Generated types
 import { API_BASE_URL } from "../utils/api";
+import { tokenStore } from "../utils/tokenStore";
 
 export const client = createClient<paths>({ baseUrl: API_BASE_URL });
 
 // Add Authorization header if token exists
 client.use({
   onRequest: async ({ request }) => {
-    const token = localStorage.getItem("accessToken");
+    const token = tokenStore.getAccessToken();
     if (token) {
       request.headers.set("Authorization", `Bearer ${token}`);
     }

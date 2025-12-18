@@ -2,6 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, Mocked, vi } from 'vitest';
 import { personas } from '../../data/personas';
 import { api } from '../../utils/api';
+import { tokenStore } from '../../utils/tokenStore';
 import { useJourneyStore } from '../journeyStore';
 
 // Mock the entire api module
@@ -27,13 +28,14 @@ describe('Journey Store - Phase Completion', () => {
     await useJourneyStore.getState().resetProgress();
     vi.clearAllMocks();
 
+    tokenStore.setAccessToken('test-token');
     if (typeof window !== 'undefined' && window.localStorage) {
-      window.localStorage.setItem('accessToken', 'test-token');
       window.localStorage.setItem('userId', 'test-user');
     }
   });
 
   afterEach(() => {
+    tokenStore.clearTokens();
     if (typeof window !== 'undefined' && window.localStorage) {
       window.localStorage.clear();
     }

@@ -14,6 +14,7 @@ import { api, LoginResponse } from "../utils/api";
 import { useJourneyStore } from "../store/journeyStore";
 import { loginWithWalletFlow } from "../lib/walletAuth";
 import { logger } from "../utils/logger";
+import { tokenStore } from "../utils/tokenStore";
 
 // User interface matching your backend schema
 type User = LoginResponse["user"];
@@ -64,8 +65,8 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       const data = await api.login(email, password);
 
       // Store tokens
-      localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("refreshToken", data.refreshToken);
+      tokenStore.setAccessToken(data.accessToken);
+      tokenStore.setRefreshToken(data.refreshToken);
 
       // Set user
       setUser(data.user);
@@ -120,8 +121,8 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       }
 
       // Store tokens
-      localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("refreshToken", data.refreshToken);
+      tokenStore.setAccessToken(data.accessToken);
+      tokenStore.setRefreshToken(data.refreshToken);
 
       // Set user
       setUser(data.user);
@@ -150,8 +151,8 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       const data = await api.register(userData);
 
       // Store tokens
-      localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("refreshToken", data.refreshToken);
+      tokenStore.setAccessToken(data.accessToken);
+      tokenStore.setRefreshToken(data.refreshToken);
 
       // Set user
       setUser(data.user);
@@ -175,12 +176,12 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
   const refreshToken = useCallback(async (): Promise<boolean> => {
     try {
-      const token = localStorage.getItem("refreshToken");
+      const token = tokenStore.getRefreshToken();
       if (!token) throw new Error("No refresh token available");
       const data = await api.refreshToken();
-      localStorage.setItem("accessToken", data.accessToken);
+      tokenStore.setAccessToken(data.accessToken);
       if (data.refreshToken) {
-        localStorage.setItem("refreshToken", data.refreshToken);
+        tokenStore.setRefreshToken(data.refreshToken);
       }
       return true;
     } catch (error) {
@@ -196,9 +197,8 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     } catch (error) {
       logger.error("Logout error:", error);
     } finally {
-      // Clear local storage
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
+      // Clear tokens
+      tokenStore.clearTokens();
       setUser(null);
       try {
         localStorage.removeItem("userId");
@@ -211,14 +211,14 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   }, [navigate, resetProgress]);
 
   const checkAuth = useCallback((): boolean => {
-    const token = localStorage.getItem("accessToken");
+    const token = tokenStore.getAccessToken();
     return !!token && !!user;
   }, [user]);
 
   const checkAuthStatus = async () => {
     logger.debug("AuthContext: checkAuthStatus started");
-    const token = localStorage.getItem("accessToken");
-    const refreshTokenValue = localStorage.getItem("refreshToken");
+    const token = tokenStore.getAccessToken();
+    const refreshTokenValue = tokenStore.getRefreshToken();
     logger.debug("AuthContext: token present?", !!token, "refresh token present?", !!refreshTokenValue);
 
     if (token) {
@@ -257,7 +257,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         logger.error("Token verification failed:", verifyError);
 
         // Check if token was already cleared by api.ts (401 error)
-        const tokenStillExists = localStorage.getItem("accessToken");
+        const tokenStillExists = tokenStore.getAccessToken();
 
         // If token was auto-cleared, don't try to refresh
         if (!tokenStillExists) {
@@ -278,7 +278,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
               logger.debug("AuthContext: Token refresh successful");
               // Retry the verification after refresh
               try {
-                const newToken = localStorage.getItem("accessToken");
+                const newToken = tokenStore.getAccessToken();
                 if (!newToken) throw new Error("No access token available after refresh");
                 const data = await api.verifyToken();
                 setUser(data.user);
@@ -310,8 +310,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
         // If refresh failed or no refresh token, clear everything
         logger.debug("AuthContext: Clearing auth state");
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
+        tokenStore.clearTokens();
         localStorage.removeItem("userId");
         setUser(null);
         await resetProgress();
@@ -353,8 +352,8 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         persona: "cognitive-activation-hub" as const
       };
       setUser(demoUser);
-      localStorage.setItem("accessToken", "demo-token");
-      localStorage.setItem("refreshToken", "demo-refresh-token");
+      tokenStore.setAccessToken("demo-token");
+      tokenStore.setRefreshToken("demo-refresh-token");
       localStorage.setItem("userId", demoUser.id);
       await resetProgress();
       // Mock loading progress for demo

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { API_BASE_URL } from '../utils/api'
 import { useJourneyStore } from '../store/journeyStore'
+import { tokenStore } from '../utils/tokenStore'
 
 interface AgentLogItem {
   ts: number
@@ -43,14 +44,7 @@ const buildDemoLogs = (): AgentLogItem[] => {
 }
 
 const isDemoSession = (): boolean => {
-  if (typeof window === 'undefined') {
-    return false
-  }
-  try {
-    return localStorage.getItem('accessToken') === 'demo-token'
-  } catch (error) {
-    return false
-  }
+  return tokenStore.getAccessToken() === 'demo-token'
 }
 
 export default function AgentActivityFeed() {

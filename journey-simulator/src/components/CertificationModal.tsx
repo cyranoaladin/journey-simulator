@@ -56,7 +56,7 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
     try {
       setIsLoading(true)
       setError(null)
-      
+
       // Track download in backend (simulated for now)
       logger.debug('Tracking certification download:', {
         certification_id: certification.id,
@@ -64,7 +64,7 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
         user_persona: selectedPersona?.id,
         download_timestamp: new Date().toISOString()
       })
-      
+
       // Simulate download
       const link = document.createElement('a')
       link.href = certification.imageUrl || '#'
@@ -72,7 +72,7 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
-      
+
     } catch (err) {
       console.error('Failed to track download:', err)
       setError('Failed to track download. Please try again.')
@@ -86,7 +86,7 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
     try {
       setIsLoading(true)
       setError(null)
-      
+
       // Track share in backend (simulated for now)
       logger.debug('Tracking certification share:', {
         certification_id: certification.id,
@@ -95,17 +95,17 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
         user_persona: selectedPersona?.id,
         share_timestamp: new Date().toISOString()
       })
-      
+
       // Simulate sharing
       const shareUrl = `https://mfai.app/certification/${certification.id}`
       const shareText = `I just earned my ${certification.name} certification! 🎉 #MFAI #ProofOfSkill`
-      
+
       if (platform === 'twitter') {
         window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank')
       } else if (platform === 'linkedin') {
         window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank')
       }
-      
+
     } catch (err) {
       console.error('Failed to track share:', err)
       setError('Failed to track share. Please try again.')
@@ -119,10 +119,10 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
     try {
       setMintedAddress(mintAddress)
       setShowMinting(false)
-      
+
       // Reload user progress to get updated NFT count
       await loadUserProgress()
-      
+
     } catch (err) {
       console.error('Failed to reload progress after minting:', err)
     }
@@ -139,7 +139,7 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
   // Get persona-specific styling
   const getPersonaStyle = () => {
     if (!selectedPersona) return {}
-    
+
     switch (selectedPersona.id) {
       case 'cognitive-activation-hub':
         return {
@@ -263,9 +263,9 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
                 {/* NFT Image */}
                 <div className="w-full h-48 bg-black/20 rounded-lg mb-4 flex items-center justify-center">
                   {certification.imageUrl ? (
-                    <img 
-                      src={certification.imageUrl} 
-                      alt={certification.name} 
+                    <img
+                      src={certification.imageUrl}
+                      alt={certification.name}
                       className="w-full h-full object-cover rounded-lg"
                     />
                   ) : (

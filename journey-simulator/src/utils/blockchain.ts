@@ -4,6 +4,7 @@ import {
   LAMPORTS_PER_SOL,
 } from '@solana/web3.js';
 import { logger } from './logger';
+import { tokenStore } from './tokenStore';
 
 // Constants
 const SOLANA_CLUSTER = 'devnet';
@@ -72,7 +73,7 @@ const shouldMockMintRequests = (error?: unknown): boolean => {
 
   if (typeof window !== 'undefined') {
     try {
-      if (localStorage.getItem('accessToken') === 'demo-token') {
+      if (tokenStore.getAccessToken() === 'demo-token') {
         return true
       }
     } catch (storageError) {

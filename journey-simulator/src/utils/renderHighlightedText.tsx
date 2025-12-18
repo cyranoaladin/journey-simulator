@@ -46,5 +46,3 @@ export function renderHighlightedText(text: string): React.ReactNode {
 
   return <>{nodes}</>;
 }
-
-

@@ -3,6 +3,7 @@
 // - /journey/*  (mf-back)
 // - /user/*, /dao/*, /api/* (mf-back aliases)
 import { logger } from './logger';
+import { tokenStore } from './tokenStore';
 
 function normalizeApiBaseUrl(input: string): string {
   // Strip trailing slashes
@@ -35,6 +36,9 @@ function resolveApiBaseUrl(): string {
 }
 
 export const API_BASE_URL = resolveApiBaseUrl()
+
+// Storage hardening: migrate legacy accessToken from localStorage -> sessionStorage (once per load)
+tokenStore.migrateLegacyAccessToken();
 
 export const SOLANA_API_BASE_URL =
   import.meta.env.VITE_SOLANA_API_BASE_URL || 'http://127.0.0.1:3001';
@@ -165,7 +169,7 @@ export interface ApiError {
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('accessToken');
+  const token = tokenStore.getAccessToken();
   return {
     'Content-Type': 'application/json',
     ...(token && { 'Authorization': `Bearer ${token}` }),
@@ -308,7 +312,7 @@ const request = async <T>(
   retryOnUnauthorized: boolean = true
 ): Promise<T> => {
   // Mock response for demo mode
-  const token = localStorage.getItem('accessToken');
+  const token = tokenStore.getAccessToken();
   logger.debug(`[API] Requesting: ${path} (Base: ${API_BASE_URL})`);
 
   // CRITICAL: Allow real backend calls for AI agents even in demo mode
@@ -779,7 +783,7 @@ const request = async <T>(
 
   if (response.status === 401 && retryOnUnauthorized) {
     // Attempt token refresh once
-    const storedRefreshToken = localStorage.getItem('refreshToken');
+    const storedRefreshToken = tokenStore.getRefreshToken();
     if (!storedRefreshToken) {
       const errorData: ApiError = await response.json().catch(() => ({
         success: false,
@@ -791,7 +795,7 @@ const request = async <T>(
     // Refresh token
     // Handle demo refresh token specifically
     if (storedRefreshToken === 'demo-refresh-token') {
-      localStorage.setItem('accessToken', 'demo-token');
+      tokenStore.setAccessToken('demo-token');
       return request<T>(path, options, false);
     }
 
@@ -804,10 +808,10 @@ const request = async <T>(
     if (refreshResp.ok) {
       const refreshData = await refreshResp.json();
       if (refreshData?.accessToken) {
-        localStorage.setItem('accessToken', refreshData.accessToken);
+        tokenStore.setAccessToken(refreshData.accessToken);
       }
       if (refreshData?.refreshToken) {
-        localStorage.setItem('refreshToken', refreshData.refreshToken);
+        tokenStore.setRefreshToken(refreshData.refreshToken);
       }
 
       // Retry original request once with updated Authorization header
@@ -822,8 +826,7 @@ const request = async <T>(
     }
 
     // Refresh failed
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    tokenStore.clearTokens();
     const errorData: ApiError = await refreshResp.json().catch(() => ({
       success: false,
       message: 'Token refresh failed',
@@ -888,7 +891,7 @@ export const api = {
   },
 
   logout: async (): Promise<void> => {
-    const refreshToken = localStorage.getItem('refreshToken');
+    const refreshToken = tokenStore.getRefreshToken();
     if (refreshToken) {
       try {
         await request<void>('/user/logout', {
@@ -897,13 +900,13 @@ export const api = {
           body: JSON.stringify({ refreshToken }),
         }, false);
       } catch (error) {
-        console.error('Logout error:', error);
+        logger.error('Logout error:', error);
       }
     }
   },
 
   refreshToken: async (): Promise<{ accessToken: string; refreshToken?: string }> => {
-    const refreshToken = localStorage.getItem('refreshToken');
+    const refreshToken = tokenStore.getRefreshToken();
     if (!refreshToken) {
       throw new Error('No refresh token available');
     }
@@ -1206,7 +1209,7 @@ export const api = {
   // Solana mint functions (simulated)
   solanaMintSimulate: async (mintData: any): Promise<any> => {
     // Simulated function for demo mode
-    if (localStorage.getItem('accessToken') === 'demo-token') {
+    if (tokenStore.getAccessToken() === 'demo-token') {
       return {
         ok: true,
         sim: {
@@ -1226,7 +1229,7 @@ export const api = {
 
   solanaMintExecute: async (mintData: any): Promise<any> => {
     // Simulated function for demo mode
-    if (localStorage.getItem('accessToken') === 'demo-token') {
+    if (tokenStore.getAccessToken() === 'demo-token') {
       return {
         ok: true,
         jobId: 'demo-job-' + Date.now(),
@@ -1244,7 +1247,7 @@ export const api = {
   // Agent scoreboard
   getAgentScoreboard: async (): Promise<any> => {
     // Simulated function for demo mode
-    if (localStorage.getItem('accessToken') === 'demo-token') {
+    if (tokenStore.getAccessToken() === 'demo-token') {
       return {
         users: [
           { userId: 'demo-user-1', aepo: 95, aeco: 92, historyCount: 15, updatedAt: new Date().toISOString(), profile: {} },
@@ -1271,7 +1274,7 @@ export const api = {
   // RAG functions
   listRagDocuments: async (): Promise<any> => {
     // Simulated function for demo mode
-    if (localStorage.getItem('accessToken') === 'demo-token') {
+    if (tokenStore.getAccessToken() === 'demo-token') {
       return {
         documents: [
           { name: 'Demo Doc 1', path: '/demo/doc1' },
@@ -1288,7 +1291,7 @@ export const api = {
   // DAO functions
   createDaoProposal: async (proposalData: any): Promise<any> => {
     // Simulated function for demo mode
-    if (localStorage.getItem('accessToken') === 'demo-token') {
+    if (tokenStore.getAccessToken() === 'demo-token') {
       return {
         proposal: {
           id: 'demo-proposal-' + Date.now(),

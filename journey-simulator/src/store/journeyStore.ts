@@ -7,6 +7,7 @@ import { api, API_BASE_URL } from '../utils/api';
 import { mintProofOfSkill } from '../utils/blockchain';
 import { normalizeCompletedPhases } from '../utils/progress';
 import { logger } from '../utils/logger';
+import { tokenStore } from '../utils/tokenStore';
 
 import type { JourneyStepResponse, Mode, Tone } from '../types/uiBlocks';
 
@@ -163,12 +164,7 @@ const writeDemoDatabase = (db: DemoDatabase) => {
 };
 
 const isDemoSession = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  try {
-    return window.localStorage.getItem('accessToken') === 'demo-token';
-  } catch {
-    return false;
-  }
+  return tokenStore.getAccessToken() === 'demo-token';
 };
 
 const resetDemoPersonaProgress = (personaId: string | undefined | null) => {
@@ -439,7 +435,7 @@ export const useJourneyStore = create<JourneyState>()(
           currentPhase: nextPhaseIndex,
         });
 
-        const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+        const accessToken = tokenStore.getAccessToken();
         if (!accessToken) {
           return;
         }
@@ -667,7 +663,7 @@ export const useJourneyStore = create<JourneyState>()(
         }
 
         const hasAccessToken = typeof window !== 'undefined'
-          ? window.localStorage.getItem('accessToken')
+          ? tokenStore.getAccessToken()
           : null;
 
         if (hasAccessToken) {

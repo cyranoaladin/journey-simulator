@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from 'vites
 import { MemoryRouter } from 'react-router-dom'
 import JourneyWorkspace from '../JourneyWorkspace'
 import { useJourneyStore } from '../../../store/journeyStore'
+import { tokenStore } from '../../../utils/tokenStore'
 
 // Partially mock API layer used by JourneyWorkspace when validating/completing phases
 vi.mock('../../../utils/api', async (importOriginal) => {
@@ -103,14 +104,9 @@ describe('JourneyWorkspace', () => {
     beforeEach(() => {
         vi.clearAllMocks()
 
-        // Complete phase requires an auth token in localStorage
-        try {
-            window.localStorage.setItem('accessToken', 'demo-token')
-            window.localStorage.setItem('refreshToken', 'demo-refresh-token')
-        } catch (e) {
-            // ignore jsdom storage failures
-            void e
-        }
+        // Complete phase requires an auth token (now via tokenStore/sessionStorage)
+        tokenStore.setAccessToken('demo-token')
+        tokenStore.setRefreshToken('demo-refresh-token')
 
         layoutMock.toggleFocusMode.mockClear()
         layoutMock.setLeftPanelOpen.mockClear()
@@ -163,7 +159,7 @@ describe('JourneyWorkspace', () => {
     it('calls runInteractiveStep when Start button is clicked', () => {
         // This test asserts single-step behavior; disable demo autoplay for it.
         try {
-            window.localStorage.setItem('accessToken', 'real-token')
+            tokenStore.setAccessToken('real-token')
         } catch (e) {
             void e
         }

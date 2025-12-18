@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import JourneyWorkspace from '../JourneyWorkspace';
 import { useJourneyStore } from '../../../store/journeyStore';
 import { getPersonaProofData } from '../../../data/proofsData';
+import { tokenStore } from '../../../utils/tokenStore';
 
 // Partially mock API layer used by JourneyWorkspace when validating/completing phases
 vi.mock('../../../utils/api', async (importOriginal) => {
@@ -82,13 +83,9 @@ describe('NFT Integration in JourneyWorkspace', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        // Complete phase requires an auth token in localStorage
-        try {
-            window.localStorage.setItem('accessToken', 'demo-token')
-            window.localStorage.setItem('refreshToken', 'demo-refresh-token')
-        } catch (e) {
-            void e
-        }
+        // Complete phase requires an auth token (now via tokenStore/sessionStorage)
+        tokenStore.setAccessToken('demo-token')
+        tokenStore.setRefreshToken('demo-refresh-token')
         layoutMock.toggleFocusMode.mockClear();
         layoutMock.setLeftPanelOpen.mockClear();
         layoutMock.setRightPanelOpen.mockClear();

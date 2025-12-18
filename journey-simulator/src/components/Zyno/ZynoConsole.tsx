@@ -24,6 +24,7 @@ import ZynoAgentScoreboard from './ZynoAgentScoreboard';
 import ZynoDAOAdminPanel from './ZynoDAOAdminPanel';
 import AgentFeedbackForm from './AgentFeedbackForm';
 import { API_BASE_URL } from '../../utils/api';
+import { logger } from '../../utils/logger';
 import { AgentScoreboardProvider } from './AgentScoreboardContext';
 import ResourceUploader from './ResourceUploader';
 import ZynoDecisionPanel from './ZynoDecisionPanel';
@@ -70,6 +71,7 @@ interface ProbeState {
 }
 
 const HEALTH_POLL_INTERVAL_MS = 60000;
+const MAX_PROMPT_HISTORY = 50;
 
 const probeConfig = {
   healthz: { label: 'Live', path: '/healthz' },
@@ -180,8 +182,15 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
   }, []);
 
   useEffect(() => {
-    refreshHealthStatus();
-    const interval = setInterval(refreshHealthStatus, HEALTH_POLL_INTERVAL_MS);
+    const tick = () => {
+      if (typeof document !== 'undefined' && document.hidden) {
+        return;
+      }
+      refreshHealthStatus();
+    };
+
+    tick();
+    const interval = setInterval(tick, HEALTH_POLL_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [refreshHealthStatus]);
 
@@ -223,10 +232,12 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
     }
 
     const entryId = generatePromptId();
-    setHistory((prev) => [
-      { id: entryId, text: trimmed, createdAt: new Date().toISOString(), status: 'pending' },
-      ...prev,
-    ]);
+    setHistory((prev) =>
+      [
+        { id: entryId, text: trimmed, createdAt: new Date().toISOString(), status: 'pending' },
+        ...prev,
+      ].slice(0, MAX_PROMPT_HISTORY),
+    );
 
     setStatus('loading');
 
@@ -263,7 +274,7 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
       }
     } catch (error: any) {
       clearTimeout(timeoutId);
-      console.error('Simulation error:', error);
+      logger.error('Simulation error:', error);
 
       let errorMessage = 'An unexpected error occurred.';
       if (error.name === 'AbortError') {

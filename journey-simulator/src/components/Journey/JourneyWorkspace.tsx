@@ -30,6 +30,7 @@ import { getProofType, getPersonaProofData } from '../../data/proofsData';
 import { resources, getResourceIcon } from '../../data/resources';
 import PhaseDetails from './PhaseDetails';
 import { api } from '../../utils/api';
+import { tokenStore } from '../../utils/tokenStore';
 
 import StakingModal from '../StakingModal';
 import DAOVoteModal from '../DAOVoteModal';
@@ -199,7 +200,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
       return;
     }
 
-    const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    const accessToken = tokenStore.getAccessToken();
     if (!accessToken) {
       toast.error('Please sign in before completing this phase.');
       return;
@@ -309,14 +310,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
       const runner = isE2EDebug ? runInteractiveStepDebug : runInteractiveStep;
       const isDemo =
         Boolean(userProgress.demoModeEnabled) ||
-        (typeof window !== 'undefined' &&
-          (() => {
-            try {
-              return window.localStorage.getItem('accessToken') === 'demo-token'
-            } catch {
-              return false
-            }
-          })())
+        tokenStore.getAccessToken() === 'demo-token'
 
       // In demo mode, "Run Simulation" should autoplay phases sequentially.
       if (isDemo) {

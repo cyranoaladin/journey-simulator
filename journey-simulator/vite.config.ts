@@ -24,6 +24,23 @@ export default defineConfig({
     {
       name: 'inject-polyfills',
       transformIndexHtml(html) {
+        // CSP (best-effort). Note: we still allow inline scripts because we inject polyfills inline
+        // and `index.html` contains an inline init script.
+        const csp = [
+          "default-src 'self'",
+          "base-uri 'self'",
+          "object-src 'none'",
+          "frame-ancestors 'none'",
+          "form-action 'self'",
+          "img-src 'self' data: blob: https:",
+          "font-src 'self' https://fonts.gstatic.com data:",
+          "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+          "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+          "connect-src 'self' https: http: ws: wss:",
+        ].join('; ');
+
+        const cspMeta = `\n<meta http-equiv="Content-Security-Policy" content="${csp}">\n`;
+
         // Inject a conditional polyfill script that checks if functions are already defined
         const polyfillScript = `
 <script>
@@ -74,7 +91,7 @@ Object.assign(window.process, {
 });
 </script>`;
         // Insert the polyfill script as the very first thing in the head
-        return html.replace('<head>', '<head>' + polyfillScript);
+        return html.replace('<head>', '<head>' + cspMeta + polyfillScript);
       }
     }
   ],
