@@ -9,8 +9,8 @@ test.describe('DAO Governance', () => {
         // Inject auth token before any navigation (TokenStore uses sessionStorage for accessToken)
         await page.addInitScript(() => {
             sessionStorage.setItem('accessToken', 'e2e-token');
-            localStorage.setItem('refreshToken', 'e2e-refresh-token');
-            localStorage.setItem('userId', 'user-123');
+            sessionStorage.setItem('refreshToken', 'e2e-refresh-token');
+            sessionStorage.setItem('userId', 'user-123');
         });
 
         // Mock profile

@@ -78,7 +78,8 @@ test.describe('Login Flow', () => {
       { timeout: 30000 }
     );
     await page.waitForFunction(
-      () => localStorage.getItem('refreshToken') === 'refresh-token-456',
+      // TokenStore hardened: refreshToken stored in sessionStorage by default
+      () => sessionStorage.getItem('refreshToken') === 'refresh-token-456',
       { timeout: 30000 }
     );
   });
