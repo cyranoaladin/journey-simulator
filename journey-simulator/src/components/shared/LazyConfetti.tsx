@@ -15,5 +15,3 @@ export default function LazyConfetti(props: ConfettiProps) {
     </Suspense>
   )
 }
-
-

@@ -149,7 +149,7 @@ Object.assign(window.process, {
               // Celebration FX (loaded only on completion/mint flows)
               { name: 'celebration', pattern: /react-confetti|tween-functions/ },
               // Keep heavy "export" tooling out of the main vendor bundle.
-              { name: 'media-tools', pattern: /html-to-image|html2canvas|jspdf|file-saver|qrcode/ },
+              { name: 'media-tools', pattern: /html-to-image|html2canvas|jspdf|file-saver|qrcode|canvg/ },
               // Routing libs are used widely, but splitting them keeps the default vendor chunk smaller.
               { name: 'router', pattern: /react-router|@remix-run\/router/ },
               // Solana stack is big; keep it separate.
@@ -157,7 +157,7 @@ Object.assign(window.process, {
               // Wallet adapters / embedded wallet UIs tend to be large.
               { name: 'wallet-adapter', pattern: /wallet-adapter|@solana-mobile\/|@toruslabs\// },
               // Mermaid pulls in a big graphing stack.
-              { name: 'mermaid', pattern: /mermaid|d3-|d3\// },
+              { name: 'mermaid', pattern: /mermaid|d3-|d3\/|cytoscape|cytoscape-fcose|layout-base|cose-base|katex|dompurify|marked|chevrotain|langium|vscode-languageserver-types|roughjs|svg-pathdata|@chevrotain\/regexp-to-ast/ },
               // API client wrapper.
               { name: 'openapi', pattern: /openapi-fetch/ },
             ]
