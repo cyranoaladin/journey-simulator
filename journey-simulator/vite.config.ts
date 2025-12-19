@@ -32,7 +32,7 @@ export default defineConfig(({ mode }) => ({
           "default-src 'self'",
           "base-uri 'self'",
           "object-src 'none'",
-          "frame-ancestors 'none'",
+          // NOTE: `frame-ancestors` is ignored when delivered via `<meta http-equiv=...>`; enforce via HTTP header (Nginx/CDN).
           "form-action 'self'",
           "img-src 'self' data: blob: https:",
           "font-src 'self' https://fonts.gstatic.com data:",
@@ -99,8 +99,10 @@ export default defineConfig(({ mode }) => ({
               { name: 'icons', pattern: /lucide-react/ },
               // UI notifications / toasts (keep them out of the main vendor chunk)
               { name: 'notifications', pattern: /sonner|react-hot-toast/ },
-              // Celebration FX (loaded only on completion/mint flows)
-              { name: 'celebration', pattern: /react-confetti|tween-functions/ },
+              // Celebration FX is already lazy-loaded via dynamic import in `LazyConfetti`.
+              // Do NOT force a manual chunk here: it can create a circular dependency
+              // (vendor -> celebration -> vendor) and crash at runtime with
+              // `Cannot access '<import>' before initialization`.
               // Keep heavy "export" tooling out of the main vendor bundle (split by feature).
               // - "image-export" is used by NFTProofModal download.
               { name: 'image-export', pattern: /html-to-image|file-saver/ },
