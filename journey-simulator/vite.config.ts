@@ -132,7 +132,10 @@ export default defineConfig(({ mode }) => ({
               }
             }
 
-            return 'vendor'
+            // Let Rollup decide the remaining node_modules chunking.
+            // Returning a fixed fallback chunk name (like 'vendor') can create cyclic chunk graphs
+            // when shared deps straddle manual chunks (e.g. solana/wallet-adapter).
+            return undefined
           }
         }
       }
