@@ -114,10 +114,12 @@ export default defineConfig(({ mode }) => ({
               { name: 'svg-render', pattern: /canvg/ },
               // Routing libs are used widely, but splitting them keeps the default vendor chunk smaller.
               { name: 'router', pattern: /react-router|@remix-run\/router/ },
+              // Wallet adapters / embedded wallet UIs tend to be large.
+              // IMPORTANT: keep this entry BEFORE `solana` to avoid chunk cycles like:
+              // solana -> wallet-adapter -> solana (TDZ errors: "Cannot access <x> before initialization").
+              { name: 'wallet-adapter', pattern: /wallet-adapter|@solana-mobile\/|@toruslabs\/|@wallet-standard\/|@solana\/wallet-standard|@solana\/wallet-adapter/ },
               // Solana stack is big; keep it separate.
               { name: 'solana', pattern: /@solana\/|@metaplex\/|bs58|tweetnacl/ },
-              // Wallet adapters / embedded wallet UIs tend to be large.
-              { name: 'wallet-adapter', pattern: /wallet-adapter|@solana-mobile\/|@toruslabs\// },
               // Mermaid pulls in a big graphing stack.
               { name: 'mermaid', pattern: /mermaid|d3-|d3\/|cytoscape|cytoscape-fcose|layout-base|cose-base|katex|dompurify|marked|chevrotain|langium|vscode-languageserver-types|roughjs|svg-pathdata|@chevrotain\/regexp-to-ast/ },
               // API client wrapper.
