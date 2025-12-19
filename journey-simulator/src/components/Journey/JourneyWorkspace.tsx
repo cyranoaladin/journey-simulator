@@ -164,6 +164,38 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
     cycleDensity,
   } = useWorkspaceLayout();
 
+  // NOTE: Hooks must run unconditionally (before any early returns).
+  const artifactCatalog = useMemo(() => {
+    const fallback = [
+      { key: 'litepaper', title: 'Litepaper', category: 'Strategy', agent: 'Growth Agent', version: 'v1.0.0' },
+      { key: 'protocol-architecture', title: 'Protocol Architecture', category: 'Technical', agent: 'Architect Agent', version: 'v1.0.0' },
+      { key: 'tokenomics', title: 'Tokenomics', category: 'Finance', agent: 'CFO Agent', version: 'v1.0.0' },
+      { key: 'go-to-market', title: 'Go-to-Market', category: 'Fundraising', agent: 'Marketing Agent', version: 'v1.0.0' },
+      { key: 'sql-spec', title: 'SQL Spec', category: 'Technical', agent: 'Architect Agent', version: 'v1.0.0' },
+      { key: 'proof-certificate', title: 'Proof Certificate', category: 'Certificate', agent: 'Education Agent', version: 'v1.0.0' },
+      { key: 'alpha-analysis', title: 'Alpha Analysis', category: 'Analysis', agent: 'Analyst Agent', version: 'v1.0.0' },
+      { key: 'rwa-model', title: 'RWA Model', category: 'Finance', agent: 'RWA Agent', version: 'v1.0.0' },
+    ];
+
+    // Enrich with demo metadata from artifacts.json when available.
+    return fallback.map((item) => {
+      const match = artifactsData.find((a: any) =>
+        (a.title && a.title.toLowerCase().includes(item.title.toLowerCase())) ||
+        (a.id && a.id.toLowerCase().includes(item.key))
+      ) as any;
+      return {
+        ...item,
+        id: match?.id ?? item.key,
+        fileUrl: match?.fileUrl ?? match?.url ?? '',
+      };
+    });
+  }, []);
+
+  const selectedArtifact = useMemo(() => {
+    if (!selectedArtifactKey) return null;
+    return artifactCatalog.find((a) => a.key === selectedArtifactKey) ?? null;
+  }, [artifactCatalog, selectedArtifactKey]);
+
   if (!selectedPersona) return null;
 
   const activePhaseIndex = currentPhaseIndex ?? userProgress.completedPhases.length;
@@ -493,37 +525,6 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
       toast.info("Viewing Simulation Artifact", { description: "This is a placeholder for the generated document." });
     }
   };
-
-  const artifactCatalog = useMemo(() => {
-    const fallback = [
-      { key: 'litepaper', title: 'Litepaper', category: 'Strategy', agent: 'Growth Agent', version: 'v1.0.0' },
-      { key: 'protocol-architecture', title: 'Protocol Architecture', category: 'Technical', agent: 'Architect Agent', version: 'v1.0.0' },
-      { key: 'tokenomics', title: 'Tokenomics', category: 'Finance', agent: 'CFO Agent', version: 'v1.0.0' },
-      { key: 'go-to-market', title: 'Go-to-Market', category: 'Fundraising', agent: 'Marketing Agent', version: 'v1.0.0' },
-      { key: 'sql-spec', title: 'SQL Spec', category: 'Technical', agent: 'Architect Agent', version: 'v1.0.0' },
-      { key: 'proof-certificate', title: 'Proof Certificate', category: 'Certificate', agent: 'Education Agent', version: 'v1.0.0' },
-      { key: 'alpha-analysis', title: 'Alpha Analysis', category: 'Analysis', agent: 'Analyst Agent', version: 'v1.0.0' },
-      { key: 'rwa-model', title: 'RWA Model', category: 'Finance', agent: 'RWA Agent', version: 'v1.0.0' },
-    ];
-
-    // Enrich with demo metadata from artifacts.json when available.
-    return fallback.map((item) => {
-      const match = artifactsData.find((a: any) =>
-        (a.title && a.title.toLowerCase().includes(item.title.toLowerCase())) ||
-        (a.id && a.id.toLowerCase().includes(item.key))
-      ) as any;
-      return {
-        ...item,
-        id: match?.id ?? item.key,
-        fileUrl: match?.fileUrl ?? match?.url ?? '',
-      };
-    });
-  }, []);
-
-  const selectedArtifact = useMemo(() => {
-    if (!selectedArtifactKey) return null;
-    return artifactCatalog.find((a) => a.key === selectedArtifactKey) ?? null;
-  }, [artifactCatalog, selectedArtifactKey]);
 
   const handleViewReport = () => {
     toast.success("Generating Full Report...", {
