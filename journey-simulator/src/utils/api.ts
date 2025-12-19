@@ -43,6 +43,9 @@ tokenStore.migrateLegacyAccessToken();
 export const SOLANA_API_BASE_URL =
   import.meta.env.VITE_SOLANA_API_BASE_URL || 'http://127.0.0.1:3001';
 
+// Avoid a "refresh stampede" when multiple requests hit 401 concurrently.
+let refreshInFlight: Promise<Response> | null = null;
+
 // API response interfaces
 export interface AgentScoreboardEntry {
   userId: string;
@@ -799,11 +802,17 @@ const request = async <T>(
       return request<T>(path, options, false);
     }
 
-    const refreshResp = await fetch(`${API_BASE_URL}/user/refresh`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken: storedRefreshToken }),
-    });
+    if (!refreshInFlight) {
+      refreshInFlight = fetch(`${API_BASE_URL}/user/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken: storedRefreshToken }),
+      }).finally(() => {
+        refreshInFlight = null;
+      });
+    }
+
+    const refreshResp = await refreshInFlight;
 
     if (refreshResp.ok) {
       const refreshData = await refreshResp.json();

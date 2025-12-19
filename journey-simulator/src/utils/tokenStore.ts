@@ -2,6 +2,8 @@ type NullableString = string | null;
 
 let inMemoryAccessToken: NullableString = null;
 
+let inMemoryRefreshToken: NullableString = null;
+
 const safeSessionStorage = {
   getItem(key: string): NullableString {
     try {
@@ -58,7 +60,16 @@ const safeLocalStorage = {
 
 const ACCESS_TOKEN_SESSION_KEY = 'accessToken';
 const ACCESS_TOKEN_LEGACY_LOCAL_KEY = 'accessToken';
-const REFRESH_TOKEN_LOCAL_KEY = 'refreshToken';
+const REFRESH_TOKEN_SESSION_KEY = 'refreshToken';
+const REFRESH_TOKEN_LEGACY_LOCAL_KEY = 'refreshToken';
+
+const shouldPersistRefreshToken = (): boolean => {
+  try {
+    return (import.meta as any)?.env?.VITE_PERSIST_REFRESH_TOKEN === 'true';
+  } catch {
+    return false;
+  }
+};
 
 export const tokenStore = {
   /**
@@ -85,21 +96,54 @@ export const tokenStore = {
   },
 
   getRefreshToken(): NullableString {
-    return safeLocalStorage.getItem(REFRESH_TOKEN_LOCAL_KEY);
+    if (inMemoryRefreshToken) return inMemoryRefreshToken;
+
+    const fromSession = safeSessionStorage.getItem(REFRESH_TOKEN_SESSION_KEY);
+    if (fromSession) {
+      inMemoryRefreshToken = fromSession;
+      return fromSession;
+    }
+
+    // Legacy: refreshToken used to be stored in localStorage. Migrate to sessionStorage by default.
+    const legacy = safeLocalStorage.getItem(REFRESH_TOKEN_LEGACY_LOCAL_KEY);
+    if (!legacy) return null;
+
+    if (shouldPersistRefreshToken()) {
+      // Explicit opt-in: keep legacy persistence (higher XSS blast radius).
+      inMemoryRefreshToken = legacy;
+      return legacy;
+    }
+
+    // Default: move to sessionStorage (reduces persistence + limits multi-tab exposure).
+    inMemoryRefreshToken = legacy;
+    safeSessionStorage.setItem(REFRESH_TOKEN_SESSION_KEY, legacy);
+    safeLocalStorage.removeItem(REFRESH_TOKEN_LEGACY_LOCAL_KEY);
+    return legacy;
   },
 
   setRefreshToken(token: NullableString) {
     if (!token) {
-      safeLocalStorage.removeItem(REFRESH_TOKEN_LOCAL_KEY);
+      inMemoryRefreshToken = null;
+      safeSessionStorage.removeItem(REFRESH_TOKEN_SESSION_KEY);
+      safeLocalStorage.removeItem(REFRESH_TOKEN_LEGACY_LOCAL_KEY);
       return;
     }
-    safeLocalStorage.setItem(REFRESH_TOKEN_LOCAL_KEY, token);
+
+    inMemoryRefreshToken = token;
+    if (shouldPersistRefreshToken()) {
+      safeLocalStorage.setItem(REFRESH_TOKEN_LEGACY_LOCAL_KEY, token);
+      return;
+    }
+
+    safeSessionStorage.setItem(REFRESH_TOKEN_SESSION_KEY, token);
   },
 
   clearTokens() {
     inMemoryAccessToken = null;
+    inMemoryRefreshToken = null;
     safeSessionStorage.removeItem(ACCESS_TOKEN_SESSION_KEY);
-    safeLocalStorage.removeItem(REFRESH_TOKEN_LOCAL_KEY);
+    safeSessionStorage.removeItem(REFRESH_TOKEN_SESSION_KEY);
+    safeLocalStorage.removeItem(REFRESH_TOKEN_LEGACY_LOCAL_KEY);
     // Also clear legacy access token if it still exists
     safeLocalStorage.removeItem(ACCESS_TOKEN_LEGACY_LOCAL_KEY);
   },
