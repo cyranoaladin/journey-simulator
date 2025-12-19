@@ -22,9 +22,19 @@ const GuidePage = lazy(() => import('./pages/GuidePage'));
 
 const ProtectedLayout = () => (
   <ProtectedRoute>
-    <Layout>
+    <Layout enableWallet={false}>
       <Outlet />
     </Layout>
+  </ProtectedRoute>
+);
+
+const WalletProtectedLayout = () => (
+  <ProtectedRoute>
+    <WalletContextProvider>
+      <Layout enableWallet={true}>
+        <Outlet />
+      </Layout>
+    </WalletContextProvider>
   </ProtectedRoute>
 );
 
@@ -55,50 +65,53 @@ function App() {
   }, [isDark]);
 
   return (
-    <WalletContextProvider>
-      <AuthProvider>
-        <TutorialProvider>
+    <AuthProvider>
+      <TutorialProvider>
 
+        <div
+          className={`min-h-screen transition-colors duration-300 ${isDark
+            // ... existing code ...
+            ? 'bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 text-white'
+            : 'bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 text-gray-900'
+            }`}
+        >
           <div
-            className={`min-h-screen transition-colors duration-300 ${isDark
-              // ... existing code ...
-              ? 'bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 text-white'
-              : 'bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 text-gray-900'
-              }`}
-          >
-            <div
-              id="particles-js"
-              className="pointer-events-none fixed inset-0 -z-10"
-              aria-hidden="true"
-            />
-            <Suspense fallback={<RouteSkeleton />}>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
+            id="particles-js"
+            className="pointer-events-none fixed inset-0 -z-10"
+            aria-hidden="true"
+          />
+          <Suspense fallback={<RouteSkeleton />}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
 
-                <Route element={<ProtectedLayout />}>
-                  <Route path="debug/mint" element={<DebugMint />} />
-                  <Route path="dashboard" element={<Dashboard />} />
-                  <Route path="journeys" element={<Journey />} />
-                  <Route path="journeys/:journeyId" element={<Journey />} />
-                  <Route path="journeys/demo" element={<Journey />} />
-                  <Route path="journeys/completed" element={<JourneyCompleted />} />
-                  <Route path="playground" element={<Playground />} />
-                  <Route path="dao" element={<Dao />} />
-                  <Route path="resources" element={<Resources />} />
-                  <Route path="support" element={<Support />} />
-                  <Route path="zyno" element={<Zyno />} />
-                  <Route path="guide" element={<GuidePage />} />
-                </Route>
+              {/* Protected routes without wallet stack (lighter initial load) */}
+              <Route element={<ProtectedLayout />}>
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="playground" element={<Playground />} />
+                <Route path="resources" element={<Resources />} />
+                <Route path="support" element={<Support />} />
+                <Route path="zyno" element={<Zyno />} />
+                <Route path="guide" element={<GuidePage />} />
+              </Route>
 
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </Suspense>
-          </div>
-        </TutorialProvider>
-      </AuthProvider>
-    </WalletContextProvider>
+              {/* Protected routes that need wallet/NFT features */}
+              <Route element={<WalletProtectedLayout />}>
+                <Route path="debug/mint" element={<DebugMint />} />
+                <Route path="journeys" element={<Journey />} />
+                <Route path="journeys/:journeyId" element={<Journey />} />
+                <Route path="journeys/demo" element={<Journey />} />
+                <Route path="journeys/completed" element={<JourneyCompleted />} />
+                <Route path="dao" element={<Dao />} />
+              </Route>
+
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </div>
+      </TutorialProvider>
+    </AuthProvider>
   );
 }
 

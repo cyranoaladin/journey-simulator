@@ -12,9 +12,10 @@ import { logger } from '../../utils/logger';
 
 type LayoutProps = {
   children: ReactNode;
+  enableWallet?: boolean;
 };
 
-const LayoutShell = ({ children }: LayoutProps) => {
+const LayoutShell = ({ children, enableWallet = true }: LayoutProps) => {
   const {
     focusMode,
     leftPanelOpen,
@@ -27,7 +28,7 @@ const LayoutShell = ({ children }: LayoutProps) => {
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-[#09081a] via-[#0D0B1F] to-[#0D0B1F] text-slate-100" data-focus-mode={focusMode}>
-      <Header />
+      <Header enableWallet={enableWallet} />
       <div className="relative flex w-full justify-center">
         <div className="relative flex w-full flex-col pt-[calc(var(--header-height,4rem)+var(--skillchain-banner-offset,0px)+var(--wallet-banner-offset,0px)+1.5rem)]">
           <div className={`relative mx-auto flex w-full max-w-[1600px] gap-6 px-3 pb-16 transition-[padding] duration-300 sm:px-4 lg:px-6 ${focusMode ? 'justify-center gap-0 px-4 sm:px-6 lg:px-8' : ''}`}>
@@ -67,11 +68,11 @@ const LayoutShell = ({ children }: LayoutProps) => {
   );
 };
 
-const Layout = ({ children }: LayoutProps) => {
+const Layout = ({ children, enableWallet = true }: LayoutProps) => {
   logger.debug('Layout: render');
   return (
     <WorkspaceLayoutProvider>
-      <LayoutShell>{children}</LayoutShell>
+      <LayoutShell enableWallet={enableWallet}>{children}</LayoutShell>
     </WorkspaceLayoutProvider>
   );
 };

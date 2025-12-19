@@ -2,14 +2,10 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, Sparkles, TrendingUp, Users, Award } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import SkillchainCard from './SkillchainCard';
-import WalletConnectionGuide from './WalletConnectionGuide';
-import { useWallet } from '@solana/wallet-adapter-react';
 // import { api } from '../utils/api' // Will be used when backend is ready
 import { logger } from '../utils/logger';
 
 const HeroSection = () => {
-  const { connected } = useWallet();
   const navigate = useNavigate();
   const [platformStats, setPlatformStats] = useState({
     totalUsers: 0,
@@ -29,7 +25,7 @@ const HeroSection = () => {
         activeJourneys: 89,
       });
     } catch (err) {
-      console.error('Failed to load platform stats:', err);
+      logger.error('Failed to load platform stats:', err);
     }
   };
 
@@ -195,15 +191,25 @@ const HeroSection = () => {
             transition={{ delay: 0.4, duration: 0.8 }}
             className="flex flex-col items-center justify-center lg:justify-end space-y-6"
           >
-            <div className="w-80">
-              <SkillchainCard />
-            </div>
-
-            {!connected && (
-              <div className="w-full max-w-md">
-                <WalletConnectionGuide />
+            <div className="w-full max-w-md rounded-2xl border border-white/15 bg-white/5 p-6 backdrop-blur-md">
+              <h2 className="text-xl font-space font-bold mb-2">
+                Wallet & NFTs — chargés uniquement dans Journey
+              </h2>
+              <p className="text-sm opacity-80 leading-relaxed">
+                Pour garder la homepage ultra légère (perf + CSP), la stack Solana/wallet-adapter est chargée
+                uniquement quand tu entres dans <span className="font-semibold">Journeys</span>.
+              </p>
+              <div className="mt-4">
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={handleUnlockSovereignty}
+                  className="btn-primary w-full"
+                >
+                  Ouvrir Journeys
+                </motion.button>
               </div>
-            )}
+            </div>
           </motion.div>
         </div>
       </div>

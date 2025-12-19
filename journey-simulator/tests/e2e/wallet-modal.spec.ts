@@ -59,6 +59,12 @@ test.describe('Wallet Modal', () => {
     })
 
     await page.goto('/login')
+    await page.locator('input[name="email"]').fill('demo@mfai.com')
+    await page.locator('input[name="password"]').fill('demo123')
+    await page.getByRole('button', { name: 'Sign In' }).click()
+
+    await page.waitForURL('**/journeys', { timeout: 15000 })
+    await expect(page).toHaveURL(/\/journeys$/)
 
     const adapters = await page.evaluate(() => {
       return new Promise<string[]>((resolve) => {
@@ -81,13 +87,6 @@ test.describe('Wallet Modal', () => {
 
     expect(adapters).toEqual(expect.arrayContaining(['Solflare', 'Torus']))
 
-    await page.locator('input[name="email"]').fill('demo@mfai.com')
-    await page.locator('input[name="password"]').fill('demo123')
-    await page.getByRole('button', { name: 'Sign In' }).click()
-
-    await page.waitForURL('**/journeys', { timeout: 15000 })
-    await expect(page).toHaveURL(/\/journeys$/)
-
     const networkMeta = await page.evaluate(() => {
       const globalWindow = window as typeof window & {
         __MFAI_SOLANA_NETWORK__?: string
@@ -104,6 +103,7 @@ test.describe('Wallet Modal', () => {
     expect(networkMeta.endpoint).toMatch(/devnet/i)
 
     const connectButton = page.getByRole('button', { name: /Connect Wallet/i })
+    await expect(connectButton).toBeVisible({ timeout: 15000 })
     await connectButton.evaluate((button: HTMLButtonElement) => button.click())
 
     await expect(page.getByRole('button', { name: 'Solflare' })).toBeVisible()

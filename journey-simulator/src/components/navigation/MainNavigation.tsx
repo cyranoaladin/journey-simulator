@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, lazy, Suspense } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
@@ -20,11 +20,12 @@ import {
   Award
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import WalletButton from '../WalletButton'
 import { useThemeStore } from '../../store/themeStore'
 import { useAuth } from '../../contexts/AuthContext'
 import { useJourneyStoreShallow } from '../../store/journeyStore'
 import UserMetricsPanel from './UserMetricsPanel'
+
+const WalletButton = lazy(() => import('../WalletButton'))
 
 type NavItem = {
   label: string
@@ -46,7 +47,11 @@ const MORE_ITEMS: NavItem[] = [
   { label: 'Help', href: '/support', icon: LifeBuoy, badge: 'Guide' },
 ]
 
-const MainNavigation = () => {
+type MainNavigationProps = {
+  enableWallet?: boolean
+}
+
+const MainNavigation = ({ enableWallet = true }: MainNavigationProps) => {
   const { isDark, toggleTheme } = useThemeStore()
   const { logout, user } = useAuth()
   const { selectedPersona, userProgress } = useJourneyStoreShallow((state) => ({
@@ -413,7 +418,11 @@ const MainNavigation = () => {
               <UserMetricsPanel />
             </div>
 
-            <WalletButton />
+            {enableWallet ? (
+              <Suspense fallback={<div className="h-10 w-[160px]" />}>
+                <WalletButton />
+              </Suspense>
+            ) : null}
 
             <div className="hidden lg:flex items-center gap-3">
               <div className="w-px h-6 bg-white/20"></div>

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
@@ -11,13 +12,14 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useJourneyStore } from '../../store/journeyStore';
-import CertificationModal from '../CertificationModal';
-import StakingModal from '../StakingModal';
-import DAOVoteModal from '../DAOVoteModal';
-import AgentFeedbackModal from '../Zyno/AgentFeedbackModal';
-import SkillchainCard from '../SkillchainCard';
 import { personas } from '../../data/personas';
 import type { AccessPassHolder } from '../../types/journey';
+
+const CertificationModal = lazy(() => import('../CertificationModal'));
+const StakingModal = lazy(() => import('../StakingModal'));
+const DAOVoteModal = lazy(() => import('../DAOVoteModal'));
+const AgentFeedbackModal = lazy(() => import('../Zyno/AgentFeedbackModal'));
+const SkillchainCard = lazy(() => import('../SkillchainCard'));
 
 const JourneyModal = () => {
   const navigate = useNavigate();
@@ -251,7 +253,9 @@ const JourneyModal = () => {
                 <h3 className="font-semibold text-lg mb-3">Skillchain Card™</h3>
                 <div className="flex justify-center">
                   <div className="w-full max-w-xs">
-                    <SkillchainCard />
+                    <Suspense fallback={<div className="h-[280px] w-full rounded-2xl bg-white/5" />}>
+                      <SkillchainCard />
+                    </Suspense>
                   </div>
                 </div>
               </div>
@@ -333,34 +337,42 @@ const JourneyModal = () => {
           return null;
         }
         return (
-          <AgentFeedbackModal
-            step={modalContent.step}
-            userId={modalContent.userId || 'demo_user'}
-            missionId={modalContent.missionId}
-          />
+          <Suspense fallback={<div className="w-full max-w-2xl rounded-2xl bg-white/5 p-8">Loading…</div>}>
+            <AgentFeedbackModal
+              step={modalContent.step}
+              userId={modalContent.userId || 'demo_user'}
+              missionId={modalContent.missionId}
+            />
+          </Suspense>
         );
       case 'certification':
         return (
-          <CertificationModal
-            certification={modalContent.certification}
-            onClose={closeModal}
-          />
+          <Suspense fallback={<div className="w-full max-w-2xl rounded-2xl bg-white/5 p-8">Loading…</div>}>
+            <CertificationModal
+              certification={modalContent.certification}
+              onClose={closeModal}
+            />
+          </Suspense>
         );
       case 'staking':
         return (
-          <StakingModal
-            availableAmount={modalContent.availableAmount || 0}
-            currentStaked={modalContent.currentStaked || 0}
-            onClose={closeModal}
-          />
+          <Suspense fallback={<div className="w-full max-w-2xl rounded-2xl bg-white/5 p-8">Loading…</div>}>
+            <StakingModal
+              availableAmount={modalContent.availableAmount || 0}
+              currentStaked={modalContent.currentStaked || 0}
+              onClose={closeModal}
+            />
+          </Suspense>
         );
       case 'daoVote':
         return (
-          <DAOVoteModal
-            phase={modalContent.phase}
-            votingPower={modalContent.votingPower || 0}
-            onClose={closeModal}
-          />
+          <Suspense fallback={<div className="w-full max-w-2xl rounded-2xl bg-white/5 p-8">Loading…</div>}>
+            <DAOVoteModal
+              phase={modalContent.phase}
+              votingPower={modalContent.votingPower || 0}
+              onClose={closeModal}
+            />
+          </Suspense>
         );
       default:
         return null;
