@@ -64,9 +64,11 @@ test.describe('DAO Governance', () => {
             });
         });
 
-        // Mock Proposals List (GET)
+        // Mock Proposals List (GET) + Create Proposal (POST)
         await page.route('**/dao/proposals', async (route) => {
-            if (route.request().method() === 'GET') {
+            const method = route.request().method();
+
+            if (method === 'GET') {
                 await route.fulfill({
                     status: 200,
                     contentType: 'application/json',
@@ -86,35 +88,39 @@ test.describe('DAO Governance', () => {
                         ]
                     })
                 });
+                return;
             }
+
+            if (method === 'POST') {
+                const postData = route.request().postDataJSON() as any;
+                await route.fulfill({
+                    status: 201,
+                    contentType: 'application/json',
+                    body: JSON.stringify({
+                        proposal: {
+                            id: 'prop-new',
+                            title: postData.title,
+                            description: postData.description,
+                            createdAt: new Date().toISOString(),
+                            status: 'active',
+                            votes: { yes: 0, no: 0 },
+                            quorumMet: false,
+                            voterDetails: {}
+                        }
+                    })
+                });
+                return;
+            }
+
+            await route.fulfill({
+                status: 405,
+                contentType: 'application/json',
+                body: JSON.stringify({ error: 'method_not_allowed' })
+            });
         });
 
-        // Mock Create Proposal (actual endpoint)
-        await page.route('**/dao/proposal', async (route) => {
-            if (route.request().method() !== 'POST') {
-                await route.fulfill({ status: 405, contentType: 'application/json', body: JSON.stringify({ error: 'method_not_allowed' }) })
-                return
-            }
-            const postData = route.request().postDataJSON() as any
-            await route.fulfill({
-                status: 201,
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    success: true,
-                    proposal: {
-                        id: 'prop-new',
-                        title: postData.title,
-                        description: postData.description,
-                        createdAt: new Date().toISOString(),
-                        status: 'active',
-                        votes: { yes: 0, no: 0 },
-                    }
-                })
-            });
-        })
-
-        // Mock Vote (actual endpoint)
-        await page.route('**/dao/vote', async (route) => {
+        // Mock Vote (mf-back canonical endpoint)
+        await page.route('**/dao/proposals/*/vote', async (route) => {
             await route.fulfill({
                 status: 200,
                 contentType: 'application/json',
@@ -143,20 +149,27 @@ test.describe('DAO Governance', () => {
         // Open Admin Panel
         const adminBtn = page.getByRole('button', { name: /Open Admin Console/i });
         await expect(adminBtn).toBeVisible({ timeout: 30000 });
-        try {
-            await adminBtn.click({ force: true, timeout: 15000 });
-        } catch {
-            // Firefox can detach DOM nodes during motion/layout shifts; fallback to a direct DOM click.
-            await page.evaluate(() => {
-                const buttons = Array.from(document.querySelectorAll('button'));
-                const target = buttons.find((b) =>
-                    /open\s+admin\s+console/i.test((b.textContent || '').replace(/\s+/g, ' ').trim())
-                ) as HTMLButtonElement | undefined;
-                target?.click();
-            });
+
+        const adminPanelHeading = page.getByRole('heading', { name: /Advanced Console/i });
+        for (let i = 0; i < 3; i++) {
+            if (await adminPanelHeading.isVisible()) break;
+            try {
+                await adminBtn.click({ force: true, timeout: 15000 });
+            } catch {
+                // Firefox can detach DOM nodes during motion/layout shifts; fallback to a direct DOM click.
+                await page.evaluate(() => {
+                    const buttons = Array.from(document.querySelectorAll('button'));
+                    const target = buttons.find((b) =>
+                        /open\s+admin\s+console/i.test((b.textContent || '').replace(/\s+/g, ' ').trim())
+                    ) as HTMLButtonElement | undefined;
+                    target?.click();
+                });
+            }
+            await page.waitForTimeout(250);
         }
 
-        // Wait for panel to appear
+        // Wait for panel to appear (stable heading in the collapsible container)
+        await expect(adminPanelHeading).toBeVisible({ timeout: 30000 });
         await expect(page.getByRole('heading', { name: /Zyno DAO Console/i })).toBeVisible({ timeout: 30000 });
         const apiKeyInput = page.getByLabel(/Admin API Key/i);
         await expect(apiKeyInput).toBeVisible({ timeout: 15000 });
@@ -197,8 +210,14 @@ test.describe('DAO Governance', () => {
         // Open Admin Panel to access voter selection
         const adminBtn = page.getByRole('button', { name: /Open Admin Console/i });
         await expect(adminBtn).toBeVisible();
-        await page.waitForTimeout(500);
-        await adminBtn.click();
+
+        const adminPanelHeading = page.getByRole('heading', { name: /Advanced Console/i });
+        for (let i = 0; i < 3; i++) {
+            if (await adminPanelHeading.isVisible()) break;
+            await page.waitForTimeout(250);
+            await adminBtn.click({ force: true });
+        }
+        await expect(adminPanelHeading).toBeVisible({ timeout: 30000 });
 
         // Select a voter
         const voterSelect = page.locator('select[name="dao-voter"]');

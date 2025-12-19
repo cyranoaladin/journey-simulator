@@ -1116,11 +1116,30 @@ export const api = {
   },
 
   // Cast DAO vote
-  castDaoVote: async (proposalId: string, vote: 'yes' | 'no'): Promise<DaoProposalResponse> => {
-    return request<DaoProposalResponse>('/dao/vote', {
+  castDaoVote: async (
+    proposalId: string,
+    voterId: string,
+    support: 'yes' | 'no'
+  ): Promise<DaoProposalResponse> => {
+    // Demo mode: keep DAO interactions non-blocking even if backend responses are mocked.
+    if (tokenStore.getAccessToken() === 'demo-token') {
+      return {
+        proposal: {
+          id: proposalId,
+          title: 'Demo Proposal',
+          createdAt: new Date().toISOString(),
+          status: 'active',
+          votes: { yes: 0, no: 0 },
+          voterDetails: {},
+          quorumMet: false,
+        },
+      };
+    }
+
+    return request<DaoProposalResponse>(`/dao/proposals/${proposalId}/vote`, {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ proposalId, vote }),
+      body: JSON.stringify({ voterId, support }),
     });
   },
 
@@ -1133,13 +1152,20 @@ export const api = {
   },
 
   // Submit DAO proposal
-  submitDaoProposal: async (proposalData: {
-    title: string;
-    description: string;
-  }): Promise<DaoProposalResponse> => {
-    return request<DaoProposalResponse>('/dao/proposal', {
+  submitDaoProposal: async (
+    proposalData: {
+      title: string;
+      description: string;
+    },
+    apiKey?: string
+  ): Promise<DaoProposalResponse> => {
+    if (!apiKey) {
+      throw new Error('Missing admin API key');
+    }
+
+    return request<DaoProposalResponse>('/dao/proposals', {
       method: 'POST',
-      headers: getAuthHeaders(),
+      headers: { ...getAuthHeaders(), 'x-api-key': apiKey },
       body: JSON.stringify(proposalData),
     });
   },
@@ -1298,7 +1324,7 @@ export const api = {
   },
 
   // DAO functions
-  createDaoProposal: async (proposalData: any): Promise<any> => {
+  createDaoProposal: async (proposalData: any, apiKey?: string): Promise<any> => {
     // Simulated function for demo mode
     if (tokenStore.getAccessToken() === 'demo-token') {
       return {
@@ -1311,17 +1337,31 @@ export const api = {
         }
       };
     }
-    return request<any>('/dao/proposal', {
+
+    if (!apiKey) {
+      throw new Error('Missing admin API key');
+    }
+
+    return request<any>('/dao/proposals', {
       method: 'POST',
-      headers: getAuthHeaders(),
+      headers: { ...getAuthHeaders(), 'x-api-key': apiKey },
       body: JSON.stringify(proposalData),
     });
   },
 
-  closeDaoProposal: async (proposalId: string): Promise<any> => {
-    return request<any>(`/dao/proposal/${proposalId}/close`, {
+  closeDaoProposal: async (proposalId: string, apiKey?: string): Promise<any> => {
+    // Demo mode: no-op
+    if (tokenStore.getAccessToken() === 'demo-token') {
+      return { proposal: { id: proposalId, status: 'closed' } };
+    }
+
+    if (!apiKey) {
+      throw new Error('Missing admin API key');
+    }
+
+    return request<any>(`/dao/proposals/${proposalId}/close`, {
       method: 'POST',
-      headers: getAuthHeaders(),
+      headers: { ...getAuthHeaders(), 'x-api-key': apiKey },
     });
   },
 };
