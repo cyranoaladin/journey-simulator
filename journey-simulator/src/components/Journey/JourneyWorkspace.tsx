@@ -180,6 +180,30 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
   const activePhaseNumber = activePhaseIndex + 1;
   const isPhaseCompleted = userProgress.completedPhases.includes(activePhaseIndex);
 
+  const getCompletionCtaLabel = () => {
+    const hasNft = Boolean(activePhase.nftReward)
+    const stakingAmount =
+      typeof activePhase.stakingRequired === 'number' && activePhase.stakingRequired > 0
+        ? activePhase.stakingRequired
+        : null
+    const requiresVote = Boolean(activePhase.daoVoteRequired)
+    const isLaunchPhase = activePhase.id === 'launch-collaterize'
+
+    if (isLaunchPhase) {
+      return hasNft ? 'Simulate Launch & Mint NFT' : 'Simulate Launch'
+    }
+
+    if (stakingAmount !== null) {
+      return hasNft ? `Stake ${stakingAmount} $MFAI & Mint NFT` : `Stake ${stakingAmount} $MFAI`
+    }
+
+    if (requiresVote) {
+      return hasNft ? 'Vote & Mint NFT' : 'Vote'
+    }
+
+    return hasNft ? 'Mint NFT' : 'Complete'
+  }
+
   // UI Helpers
   const densityLabel = density === 'compact' ? 'Compact' : 'Comfortable';
   const focusButtonCopy = focusMode ? 'Exit Focus' : 'Focus Mode';
@@ -674,7 +698,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
                       ) : (
                         <>
                           {activePhase.nftReward ? <Award size={20} className="text-accent-cyan" /> : <CheckCircle2 size={20} />}
-                          <span>{activePhase.nftReward ? 'Mint NFT' : 'Complete'}</span>
+                          <span>{getCompletionCtaLabel()}</span>
                         </>
                       )}
                     </button>
