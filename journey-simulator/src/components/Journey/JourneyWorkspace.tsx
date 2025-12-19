@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import JourneyTimeline from './JourneyTimeline';
 import { JourneyProgressBar } from './JourneyProgressBar';
@@ -85,6 +85,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
   const [isThinking, setIsThinking] = useState(false);
   const [currentTask, setCurrentTask] = useState({ agent: '', task: '' });
   const [viewingArtifact, setViewingArtifact] = useState<any>(null);
+  const [selectedArtifactKey, setSelectedArtifactKey] = useState<string | null>(null);
   const [unlockedArtifacts, setUnlockedArtifacts] = useState<string[]>([]);
   const [isAutoSimulating, setIsAutoSimulating] = useState(false);
   const autoSimAbortRef = useRef(false);
@@ -493,6 +494,37 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
     }
   };
 
+  const artifactCatalog = useMemo(() => {
+    const fallback = [
+      { key: 'litepaper', title: 'Litepaper', category: 'Strategy', agent: 'Growth Agent', version: 'v1.0.0' },
+      { key: 'protocol-architecture', title: 'Protocol Architecture', category: 'Technical', agent: 'Architect Agent', version: 'v1.0.0' },
+      { key: 'tokenomics', title: 'Tokenomics', category: 'Finance', agent: 'CFO Agent', version: 'v1.0.0' },
+      { key: 'go-to-market', title: 'Go-to-Market', category: 'Fundraising', agent: 'Marketing Agent', version: 'v1.0.0' },
+      { key: 'sql-spec', title: 'SQL Spec', category: 'Technical', agent: 'Architect Agent', version: 'v1.0.0' },
+      { key: 'proof-certificate', title: 'Proof Certificate', category: 'Certificate', agent: 'Education Agent', version: 'v1.0.0' },
+      { key: 'alpha-analysis', title: 'Alpha Analysis', category: 'Analysis', agent: 'Analyst Agent', version: 'v1.0.0' },
+      { key: 'rwa-model', title: 'RWA Model', category: 'Finance', agent: 'RWA Agent', version: 'v1.0.0' },
+    ];
+
+    // Enrich with demo metadata from artifacts.json when available.
+    return fallback.map((item) => {
+      const match = artifactsData.find((a: any) =>
+        (a.title && a.title.toLowerCase().includes(item.title.toLowerCase())) ||
+        (a.id && a.id.toLowerCase().includes(item.key))
+      ) as any;
+      return {
+        ...item,
+        id: match?.id ?? item.key,
+        fileUrl: match?.fileUrl ?? match?.url ?? '',
+      };
+    });
+  }, []);
+
+  const selectedArtifact = useMemo(() => {
+    if (!selectedArtifactKey) return null;
+    return artifactCatalog.find((a) => a.key === selectedArtifactKey) ?? null;
+  }, [artifactCatalog, selectedArtifactKey]);
+
   const handleViewReport = () => {
     toast.success("Generating Full Report...", {
       description: "Compiling simulation metrics and risk analysis."
@@ -602,7 +634,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
       </div>
 
       {/* MAIN GRID LAYOUT */}
-      <div className="mx-auto mt-8 grid max-w-6xl gap-8 px-6 lg:grid-cols-[2fr_1fr] items-start">
+      <div className="mx-auto mt-8 grid w-full max-w-[1600px] gap-8 px-4 sm:px-6 lg:grid-cols-[2.2fr_1fr] items-start">
 
         {/* LEFT COLUMN - WORK AREA */}
         <div className="space-y-8">
@@ -776,28 +808,113 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
             </div>
           </section>
 
-          {/* KEY ARTIFACTS */}
+          {/* PROJECT ARTIFACTS (Master–Detail) */}
           <section className="rounded-2xl border border-white/5 bg-white/5 p-6">
-            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-              <Briefcase size={20} className="text-accent-gold" />
-              Project Artifacts
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Artifacts Grid */}
-              {['Litepaper', 'Tokenomics', 'Pitch Deck', 'Legal Opinion', 'Go-to-Market', 'Audit Report'].map((art, i) => (
-                <button
-                  key={i}
-                  onClick={() => handleArtifactClick(art)}
-                  data-testid={`artifact-card-${art.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
-                  className="w-full text-left group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 p-4 transition hover:bg-white/10 hover:border-white/20 hover:shadow-xl cursor-pointer"
-                >
-                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-accent-purple/10 text-accent-purple group-hover:bg-accent-purple group-hover:text-white transition">
-                    <FileText size={20} />
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <Briefcase size={20} className="text-accent-gold" />
+                Project Artifacts
+              </h2>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-purple-300 border border-purple-500/30 px-2 py-1 rounded bg-purple-500/10">
+                Generated by Zyno
+              </span>
+            </div>
+
+            <div className="mt-5 grid gap-5 lg:grid-cols-[340px_1fr]">
+              {/* List */}
+              <div className="space-y-3">
+                <p className="text-xs text-white/60">
+                  Select an artifact to preview it. Use full-screen for reading and exporting.
+                </p>
+                <div className="max-h-[420px] overflow-y-auto pr-1 custom-scrollbar space-y-2">
+                  {artifactCatalog.map((art) => {
+                    const isActive = art.key === selectedArtifactKey
+                    return (
+                      <button
+                        key={art.key}
+                        type="button"
+                        onClick={() => setSelectedArtifactKey(art.key)}
+                        className={`w-full text-left rounded-xl border p-4 transition ${
+                          isActive
+                            ? 'border-accent-cyan/50 bg-accent-cyan/10 shadow-[0_0_24px_rgba(34,211,238,0.12)]'
+                            : 'border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20'
+                        }`}
+                        aria-label={`Select ${art.title}`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white/10">
+                                <FileText size={18} className={isActive ? 'text-accent-cyan' : 'text-white/70'} />
+                              </span>
+                              <div className="min-w-0">
+                                <p className="truncate text-sm font-semibold text-white">{art.title}</p>
+                                <p className="truncate text-[11px] text-white/50">{art.agent} • {art.category}</p>
+                              </div>
+                            </div>
+                          </div>
+                          <span className="text-[10px] font-mono text-white/40">{art.version}</span>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Preview */}
+              <div className="rounded-2xl border border-white/10 bg-black/20 overflow-hidden">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-[#0A0A1F]/60 px-4 py-3">
+                  <div className="min-w-0">
+                    <p className="text-[10px] uppercase tracking-[0.3em] text-white/50">Artifact preview</p>
+                    <p className="truncate text-sm font-semibold text-white">
+                      {selectedArtifact ? selectedArtifact.title : 'Select an artifact'}
+                    </p>
                   </div>
-                  <h3 className="font-bold text-white group-hover:text-accent-cyan transition text-sm">{art}</h3>
-                  <p className="text-[10px] text-white/40 mt-1">Version 1.{i}</p>
-                </button>
-              ))}
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => selectedArtifact && handleArtifactClick(selectedArtifact.title)}
+                      disabled={!selectedArtifact}
+                      className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-bold text-white transition hover:bg-white/20 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Open full screen
+                      <ArrowRight size={14} />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="h-[420px] bg-black">
+                  {selectedArtifact ? (
+                    selectedArtifact.fileUrl ? (
+                      <iframe
+                        src={selectedArtifact.fileUrl}
+                        title={`Preview ${selectedArtifact.title}`}
+                        className="h-full w-full border-none"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full flex-col items-center justify-center gap-3 px-6 text-center">
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                          <FileText size={22} className="text-accent-purple" />
+                        </div>
+                        <p className="text-sm font-semibold text-white">No preview available yet</p>
+                        <p className="text-xs text-white/60 max-w-sm">
+                          This artifact is available in simulation mode. Once generated by the backend, you’ll be able to preview and export it here.
+                        </p>
+                      </div>
+                    )
+                  ) : (
+                    <div className="flex h-full w-full flex-col items-center justify-center gap-3 px-6 text-center">
+                      <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                        <Briefcase size={22} className="text-accent-gold" />
+                      </div>
+                      <p className="text-sm font-semibold text-white">Select a Project Artifact</p>
+                      <p className="text-xs text-white/60 max-w-sm">
+                        Pick an artifact from the left panel to preview it. Use full screen for a distraction-free reader.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </section>
 
