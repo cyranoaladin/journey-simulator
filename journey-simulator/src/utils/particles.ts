@@ -5,6 +5,7 @@ declare global {
 }
 
 const PARTICLES_SCRIPT_ID = 'particles-js-script'
+const PARTICLES_LOCAL_SRC = '/vendor/particles.min.js'
 
 const initialiseParticles = () => {
   if (!window.particlesJS) {
@@ -121,6 +122,21 @@ const initialiseParticles = () => {
 }
 
 export const initParticles = () => {
+  // Disabled by default: enable explicitly with `VITE_ENABLE_PARTICLES=true`.
+  // Also skip in automation (Playwright/webdriver) to avoid flaky external script loads.
+  try {
+    if (typeof navigator !== 'undefined' && (navigator as any).webdriver) {
+      return () => {}
+    }
+  } catch {
+    // ignore
+  }
+
+  const enabled = (import.meta as any).env?.VITE_ENABLE_PARTICLES === 'true'
+  if (!enabled) {
+    return () => {}
+  }
+
   const existingScript = document.getElementById(PARTICLES_SCRIPT_ID) as HTMLScriptElement | null
 
   if (existingScript) {
@@ -143,7 +159,8 @@ export const initParticles = () => {
 
   const script = document.createElement('script')
   script.id = PARTICLES_SCRIPT_ID
-  script.src = 'https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'
+  // Prefer same-origin to comply with strict CSP; ship `public/vendor/particles.min.js` if enabled.
+  script.src = PARTICLES_LOCAL_SRC
   script.async = true
 
   const onLoad = () => {

@@ -4,7 +4,7 @@ import { resolve } from 'path'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     nodePolyfills({
@@ -114,7 +114,7 @@ Object.assign(window.process, {
   },
 
   build: {
-    sourcemap: true,
+    sourcemap: mode !== 'production',
     modulePreload: false, // Disable modulepreload to prevent scripts from executing before polyfills
     rollupOptions: {
       output: {
@@ -139,4 +139,4 @@ Object.assign(window.process, {
       }
     }
   }
-})
+}))
