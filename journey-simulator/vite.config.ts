@@ -148,8 +148,15 @@ Object.assign(window.process, {
               { name: 'notifications', pattern: /sonner|react-hot-toast/ },
               // Celebration FX (loaded only on completion/mint flows)
               { name: 'celebration', pattern: /react-confetti|tween-functions/ },
-              // Keep heavy "export" tooling out of the main vendor bundle.
-              { name: 'media-tools', pattern: /html-to-image|html2canvas|jspdf|file-saver|qrcode|canvg/ },
+              // Keep heavy "export" tooling out of the main vendor bundle (split by feature).
+              // - "image-export" is used by NFTProofModal download.
+              { name: 'image-export', pattern: /html-to-image|file-saver/ },
+              // - "pdf-tools" is used by JourneyCompleted export PDF.
+              { name: 'pdf-tools', pattern: /html2canvas|jspdf/ },
+              // - "qrcode" is optional.
+              { name: 'qrcode', pattern: /qrcode/ },
+              // - "svg-render" is used for SVG→canvas export (e.g. canvg).
+              { name: 'svg-render', pattern: /canvg/ },
               // Routing libs are used widely, but splitting them keeps the default vendor chunk smaller.
               { name: 'router', pattern: /react-router|@remix-run\/router/ },
               // Solana stack is big; keep it separate.
