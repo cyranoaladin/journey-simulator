@@ -472,8 +472,14 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
 
   // Handlers for Interactivity
   const handleExitDemo = () => {
-    // In a real app, this might clear session or navigate to a dashboard
-    window.location.href = '/';
+    // Exit demo by clearing demo tokens and returning to the public landing page.
+    // (Demo mode is inferred from tokenStore + backend progress flags.)
+    try {
+      tokenStore.clearTokens()
+    } catch {
+      // ignore
+    }
+    window.location.href = '/'
   };
 
   const handleNextActionClick = (actionType: string, actionId: string) => {
@@ -562,7 +568,11 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
 
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-3">
           <h1 className="text-sm font-bold uppercase tracking-wider text-white">{selectedPersona.title}</h1>
-          <span className="rounded-full bg-accent-cyan/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-accent-cyan border border-accent-cyan/20">Demo Mode</span>
+          {(tokenStore.getAccessToken() === 'demo-token' || Boolean(userProgress.demoModeEnabled)) && (
+            <span className="rounded-full bg-accent-cyan/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-accent-cyan border border-accent-cyan/20">
+              Demo Mode
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
@@ -598,14 +608,17 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
             <PanelRight size={18} />
           </button>
 
-          <div className="h-6 w-px bg-white/10 mx-1"></div>
-
-          <button
-            onClick={handleExitDemo}
-            className="rounded-full bg-white text-black px-4 py-1.5 text-xs font-bold hover:bg-gray-200 transition"
-          >
-            Exit Demo
-          </button>
+          {(tokenStore.getAccessToken() === 'demo-token' || Boolean(userProgress.demoModeEnabled)) && (
+            <>
+              <div className="h-6 w-px bg-white/10 mx-1"></div>
+              <button
+                onClick={handleExitDemo}
+                className="rounded-full bg-white text-black px-4 py-1.5 text-xs font-bold hover:bg-gray-200 transition"
+              >
+                Exit Demo
+              </button>
+            </>
+          )}
         </div>
       </header>
 
