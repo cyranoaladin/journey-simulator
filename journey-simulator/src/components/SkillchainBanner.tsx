@@ -1,14 +1,18 @@
 import { motion } from 'framer-motion'
-import { useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { Ticket as Pickaxe, Coins } from 'lucide-react'
 import { useJourneyStore } from '../store/journeyStore'
 import { useWallet } from '@solana/wallet-adapter-react'
+import { useLocation } from 'react-router-dom'
 import WalletFaucetButton from './WalletFaucetButton'
 
 const SKILLCHAIN_TOP_GAP = 16
 const SKILLCHAIN_BOTTOM_GAP = 12
 
-const SkillchainBanner = () => {
+const shouldShowWalletUi = (path: string) =>
+  path.startsWith('/journeys') || path.startsWith('/dao') || path.startsWith('/debug/mint')
+
+const SkillchainBannerInner = () => {
   const { userProgress, completeMission } = useJourneyStore()
   const { connected } = useWallet()
   const bannerRef = useRef<HTMLDivElement | null>(null)
@@ -120,6 +124,21 @@ const SkillchainBanner = () => {
       </div>
     </motion.div>
   )
+}
+
+const SkillchainBanner = () => {
+  const location = useLocation()
+  const enabled = shouldShowWalletUi(location.pathname)
+
+  // Ensure layout offset is cleared on routes where the banner is disabled.
+  useEffect(() => {
+    if (!enabled) {
+      document.documentElement.style.setProperty('--skillchain-banner-offset', '0px')
+    }
+  }, [enabled])
+
+  if (!enabled) return null
+  return <SkillchainBannerInner />
 }
 
 export default SkillchainBanner

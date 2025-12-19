@@ -1,13 +1,17 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { AlertCircle, X, Loader } from 'lucide-react'
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import LazyWalletMultiButton from '../wallet/LazyWalletMultiButton'
 
 const WALLET_TOP_GAP = 12
 const WALLET_BOTTOM_GAP = 16
 
-const WalletConnectionBanner = () => {
+const shouldShowWalletUi = (path: string) =>
+  path.startsWith('/journeys') || path.startsWith('/dao') || path.startsWith('/debug/mint')
+
+const WalletConnectionBannerInner = () => {
   const { connected, connecting } = useWallet()
   const [isDismissed, setIsDismissed] = useState(false)
   const bannerRef = useRef<HTMLDivElement | null>(null)
@@ -105,6 +109,21 @@ const WalletConnectionBanner = () => {
       </motion.div>
     </AnimatePresence>
   )
+}
+
+const WalletConnectionBanner = () => {
+  const location = useLocation()
+  const enabled = shouldShowWalletUi(location.pathname)
+
+  // Ensure layout offset is cleared on routes where the wallet UI is disabled.
+  useEffect(() => {
+    if (!enabled) {
+      document.documentElement.style.setProperty('--wallet-banner-offset', '0px')
+    }
+  }, [enabled])
+
+  if (!enabled) return null
+  return <WalletConnectionBannerInner />
 }
 
 export default WalletConnectionBanner
