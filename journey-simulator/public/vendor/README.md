@@ -8,5 +8,3 @@ L'effet de particules est **désactivé par défaut**.
 
 - Pour l'activer, définir `VITE_ENABLE_PARTICLES=true`
 - Fournir `public/vendor/particles.min.js` (lib compatible `window.particlesJS`)
-
-

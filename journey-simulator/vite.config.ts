@@ -124,7 +124,18 @@ Object.assign(window.process, {
               { name: 'polyfills', pattern: /readable-stream|stream-browserify|events|buffer|string_decoder/ },
               { name: 'ui-motion', pattern: /framer-motion|zustand/ },
               { name: 'icons', pattern: /lucide-react/ },
-              { name: 'media-tools', pattern: /html-to-image|qrcode/ }
+              // Keep heavy "export" tooling out of the main vendor bundle.
+              { name: 'media-tools', pattern: /html-to-image|html2canvas|jspdf|file-saver|qrcode/ },
+              // Routing libs are used widely, but splitting them keeps the default vendor chunk smaller.
+              { name: 'router', pattern: /react-router|@remix-run\/router/ },
+              // Solana stack is big; keep it separate.
+              { name: 'solana', pattern: /@solana\/|@metaplex\/|bs58|tweetnacl/ },
+              // Wallet adapters / embedded wallet UIs tend to be large.
+              { name: 'wallet-adapter', pattern: /wallet-adapter|@solana-mobile\/|@toruslabs\// },
+              // Mermaid pulls in a big graphing stack.
+              { name: 'mermaid', pattern: /mermaid|d3-|d3\// },
+              // API client wrapper.
+              { name: 'openapi', pattern: /openapi-fetch/ },
             ]
 
             for (const { name, pattern } of chunkMap) {
