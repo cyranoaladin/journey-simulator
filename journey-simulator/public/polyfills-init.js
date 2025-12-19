@@ -1,3 +1,40 @@
+// Loaded before Vite modules to provide minimal globals required by some libraries.
+// This file is referenced from index.html so we can keep CSP strict (no inline scripts).
+
+(() => {
+  try {
+    // global/globalThis shim
+    window.global = window.globalThis || window
+
+    // process shim (minimal)
+    if (!window.process) {
+      window.process = {}
+    }
+
+    Object.assign(window.process, {
+      env: window.process.env || { NODE_ENV: 'production' },
+      browser: true,
+      version: '',
+      versions: {},
+      nextTick: function (fn) {
+        setTimeout(fn, 0)
+      },
+      cwd: function () {
+        return '/'
+      },
+      chdir: function () {},
+      umask: function () {
+        return 0
+      },
+    })
+
+    // Buffer placeholder (vite-plugin-node-polyfills will provide the real impl in bundles when needed)
+    window.Buffer = window.Buffer || []
+  } catch {
+    // no-op
+  }
+})()
+
 // Critical polyfills that MUST load before any other code
 // This file is loaded as a regular script (not module) to ensure it executes first
 

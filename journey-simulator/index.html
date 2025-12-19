@@ -11,15 +11,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">
-  <script>
-    window.global = window;
-    window.process = {
-      env: { DEBUG: undefined },
-      version: '',
-      nextTick: function (fn) { setTimeout(fn, 0); }
-    };
-    window.Buffer = window.Buffer || [];
-  </script>
+  <script src="/polyfills-init.js"></script>
 </head>
 
 <body>

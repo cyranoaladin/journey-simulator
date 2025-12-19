@@ -12,6 +12,7 @@ export default defineConfig(({ mode }) => ({
       // To exclude specific polyfills, add them to this list.
       exclude: [
         'fs', // Exclude fs polyfill
+        'vm', // Avoid vm-browserify (eval). Keeps CSP script-src free of unsafe-eval in production.
       ],
       // Whether to polyfill specific globals.
       globals: {
@@ -25,8 +26,8 @@ export default defineConfig(({ mode }) => ({
     {
       name: 'inject-polyfills',
       transformIndexHtml(html) {
-        // CSP (best-effort). Note: we still allow inline scripts because we inject polyfills inline
-        // and `index.html` contains an inline init script.
+        // CSP (best-effort via meta). Prefer enforcing the same policy at the CDN/Nginx layer.
+        // In production, keep script-src strict (no inline, no eval).
         const csp = [
           "default-src 'self'",
           "base-uri 'self'",
@@ -36,63 +37,15 @@ export default defineConfig(({ mode }) => ({
           "img-src 'self' data: blob: https:",
           "font-src 'self' https://fonts.gstatic.com data:",
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-          "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+          ...(mode === 'production'
+            ? ["script-src 'self'"]
+            : ["script-src 'self' 'unsafe-inline' 'unsafe-eval'"]),
           "connect-src 'self' https: http: ws: wss:",
         ].join('; ');
 
         const cspMeta = `\n<meta http-equiv="Content-Security-Policy" content="${csp}">\n`;
-
-        // Inject a conditional polyfill script that checks if functions are already defined
-        const polyfillScript = `
-<script>
-// Critical polyfills - Execute immediately at the highest priority
-window.global = window.globalThis || window;
-
-// Define utility function for setting global properties only if it doesn't exist
-if (typeof window.defineGlobalProperty$2 !== 'function') {
-  window.defineGlobalProperty$2 = function(name, value) {
-    try {
-      Object.defineProperty(window, name, {
-        value: value,
-        writable: true,
-        enumerable: false,
-        configurable: true
-      });
-    } catch (e) {
-      window[name] = value;
-    }
-  };
-}
-
-if (typeof window.defineGlobalProperty !== 'function') {
-  window.defineGlobalProperty = window.defineGlobalProperty$2;
-}
-
-// Only set up process if it doesn't exist
-if (!window.process) {
-  window.process = {};
-}
-Object.assign(window.process, {
-  env: window.process.env || { NODE_ENV: 'production' },
-  browser: true,
-  version: '',
-  versions: {},
-  bind: function() { return this; },
-  nextTick: function(fn) { setTimeout(fn, 0); },
-  cwd: function() { return '/'; },
-  chdir: function() {},
-  umask: function() { return 0; },
-  on: function() { return this; },
-  once: function() { return this; },
-  off: function() { return this; },
-  emit: function() { return false; },
-  removeListener: function() { return this; },
-  removeAllListeners: function() { return this; },
-  listeners: function() { return []; }
-});
-</script>`;
-        // Insert the polyfill script as the very first thing in the head
-        return html.replace('<head>', '<head>' + cspMeta + polyfillScript);
+        // Insert CSP meta as the very first thing in the head (polyfills are loaded from /polyfills-init.js).
+        return html.replace('<head>', '<head>' + cspMeta);
       }
     }
     ,
