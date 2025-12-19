@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useJourneyStore } from "../../store/journeyStore";
 import { API_BASE_URL } from '../../utils/api';
 import { logger } from '../../utils/logger';
@@ -826,15 +826,22 @@ function Xp({ block }: { block: XpBlock; }) {
 }
 
 function Diagram({ block }: { block: DiagramBlock; }) {
-  const [svg, setSvg] = useState<string>(
-    '<div class="text-xs opacity-70">Loading diagram...</div>'
-  );
+  const [shouldRender, setShouldRender] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [svg, setSvg] = useState<string>("");
+
+  const diagramId = useMemo(() => `mermaid-${block.id}`, [block.id]);
 
   useEffect(() => {
+    if (!shouldRender) {
+      return;
+    }
+
     let cancelled = false;
 
     const renderDiagram = async () => {
       try {
+        setIsLoading(true);
         const mermaid = await loadMermaid();
 
         if (!mermaidInitialized) {
@@ -842,14 +849,18 @@ function Diagram({ block }: { block: DiagramBlock; }) {
           mermaidInitialized = true;
         }
 
-        const result = await mermaid.render(`mermaid-${block.id}`, block.content);
+        const result = await mermaid.render(diagramId, block.content);
         if (!cancelled) {
           setSvg(result.svg);
         }
       } catch (e) {
-        console.error("Mermaid render error:", e);
+        logger.error("Mermaid render error:", e);
         if (!cancelled) {
           setSvg(`<div class="text-red-400 text-xs">Failed to render diagram</div>`);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
         }
       }
     };
@@ -859,15 +870,40 @@ function Diagram({ block }: { block: DiagramBlock; }) {
     return () => {
       cancelled = true;
     };
-  }, [block.content, block.id]);
+  }, [block.content, diagramId, shouldRender]);
 
   return (
     <div className="bg-white/5 rounded-xl p-4">
       <h4 className="font-semibold mb-2">{block.title}</h4>
-      <div
-        className="overflow-x-auto flex justify-center bg-black/20 rounded-lg p-4"
-        dangerouslySetInnerHTML={{ __html: svg }}
-      />
+      {!shouldRender ? (
+        <div className="rounded-lg border border-white/10 bg-black/20 p-4">
+          <div className="text-xs opacity-80">
+            Diagramme Mermaid (chargement à la demande pour perf).
+          </div>
+          <div className="mt-3 flex items-center gap-2">
+            <button
+              type="button"
+              className="px-3 py-2 rounded bg-white/10 hover:bg-white/15 transition-colors text-sm"
+              onClick={() => setShouldRender(true)}
+              data-testid={`render-diagram-${block.id}`}
+            >
+              Rendre le diagramme
+            </button>
+            <span className="text-[11px] opacity-60">
+              (charge Mermaid uniquement au clic)
+            </span>
+          </div>
+        </div>
+      ) : (
+        <div
+          className="overflow-x-auto flex justify-center bg-black/20 rounded-lg p-4 min-h-[120px]"
+          dangerouslySetInnerHTML={{
+            __html: isLoading
+              ? '<div class="text-xs opacity-70">Loading diagram…</div>'
+              : (svg || '<div class="text-xs opacity-70">Diagram empty.</div>'),
+          }}
+        />
+      )}
       {block.caption && (
         <div className="text-xs opacity-70 mt-2 text-center">{block.caption}</div>
       )}
