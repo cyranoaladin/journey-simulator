@@ -564,7 +564,15 @@ function Resources({ block }: { block: ResourceBlock; }) {
 }
 
 function renderBasicMarkdown(md: string) {
-  const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  // Escape user-controlled text first to prevent HTML/entity injection, then add a tiny subset of
+  // safe markup (headers, lists, paragraphs).
+  const esc = (s: string) =>
+    s
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   const lines = md.split(/\r?\n/);
   const out: string[] = [];
   let inList = false;
@@ -845,13 +853,28 @@ function Diagram({ block }: { block: DiagramBlock; }) {
         const mermaid = await loadMermaid();
 
         if (!mermaidInitialized) {
-          mermaid.initialize({ startOnLoad: false, theme: "dark", securityLevel: "loose" });
+          // Strict mode avoids allowing raw HTML/links injection in the generated SVG.
+          mermaid.initialize({ startOnLoad: false, theme: "dark", securityLevel: "strict" });
           mermaidInitialized = true;
         }
 
         const result = await mermaid.render(diagramId, block.content);
         if (!cancelled) {
-          setSvg(result.svg);
+          // Mermaid returns SVG. Sanitize before injecting into the DOM.
+          try {
+            const dompurifyMod: any = await import("dompurify");
+            const DOMPurify: any = dompurifyMod?.default ?? dompurifyMod;
+            const sanitized =
+              typeof DOMPurify?.sanitize === "function"
+                ? DOMPurify.sanitize(result.svg, {
+                    USE_PROFILES: { svg: true, svgFilters: true },
+                  })
+                : result.svg;
+            setSvg(sanitized);
+          } catch (sanitizeError) {
+            logger.warn("Mermaid SVG sanitize failed, rendering raw SVG", sanitizeError);
+            setSvg(result.svg);
+          }
         }
       } catch (e) {
         logger.error("Mermaid render error:", e);
