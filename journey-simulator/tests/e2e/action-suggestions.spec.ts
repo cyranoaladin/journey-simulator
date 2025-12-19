@@ -39,7 +39,7 @@ test.describe('ActionSuggestions flow', () => {
     await disablePageAnimations(page)
 
     await page.addInitScript((persona) => {
-      window.localStorage.setItem('accessToken', 'e2e-access-token')
+      window.sessionStorage.setItem('accessToken', 'e2e-access-token')
       window.localStorage.setItem('refreshToken', 'e2e-refresh-token')
       const persisted = {
         state: {

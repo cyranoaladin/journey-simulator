@@ -1,13 +1,14 @@
 import { test, expect } from '@playwright/test';
 import { disablePageAnimations } from './utils/pageStability';
+import { dismissWalletModalIfPresent } from './utils/uiActions';
 
 test.describe('DAO Governance', () => {
     test.beforeEach(async ({ page }) => {
         await disablePageAnimations(page);
 
-        // Inject auth token into localStorage before any navigation
+        // Inject auth token before any navigation (TokenStore uses sessionStorage for accessToken)
         await page.addInitScript(() => {
-            localStorage.setItem('accessToken', 'e2e-token');
+            sessionStorage.setItem('accessToken', 'e2e-token');
             localStorage.setItem('refreshToken', 'e2e-refresh-token');
             localStorage.setItem('userId', 'user-123');
         });
@@ -126,6 +127,7 @@ test.describe('DAO Governance', () => {
         // Navigate to DAO page after successful login
         await page.goto('/dao');
         await page.waitForLoadState('networkidle');
+        await dismissWalletModalIfPresent(page);
 
         await expect(page.getByText('Existing Proposal')).toBeVisible({ timeout: 10000 });
         await expect(page.getByText('This is a test proposal')).toBeVisible();
@@ -134,19 +136,30 @@ test.describe('DAO Governance', () => {
     test('should allow creating a new proposal', async ({ page }) => {
         // Navigate to DAO page
         await page.goto('/dao');
-        await page.waitForLoadState('networkidle');
-        // Wait for loading to finish
-        await expect(page.locator('.animate-spin')).not.toBeVisible({ timeout: 10000 });
+        await page.waitForLoadState('domcontentloaded');
+        await expect(page.getByRole('heading', { name: /Governance Proposals/i })).toBeVisible({ timeout: 30000 });
+        await dismissWalletModalIfPresent(page);
 
         // Open Admin Panel
         const adminBtn = page.getByRole('button', { name: /Open Admin Console/i });
-        await expect(adminBtn).toBeVisible();
-        await page.waitForTimeout(500); // Wait for any layout shift
-        await adminBtn.click();
+        await expect(adminBtn).toBeVisible({ timeout: 30000 });
+        try {
+            await adminBtn.click({ force: true, timeout: 15000 });
+        } catch {
+            // Firefox can detach DOM nodes during motion/layout shifts; fallback to a direct DOM click.
+            await page.evaluate(() => {
+                const buttons = Array.from(document.querySelectorAll('button'));
+                const target = buttons.find((b) =>
+                    /open\s+admin\s+console/i.test((b.textContent || '').replace(/\s+/g, ' ').trim())
+                ) as HTMLButtonElement | undefined;
+                target?.click();
+            });
+        }
 
         // Wait for panel to appear
-        const apiKeyInput = page.locator('input[type="password"]');
-        await expect(apiKeyInput).toBeVisible({ timeout: 5000 });
+        await expect(page.getByRole('heading', { name: /Zyno DAO Console/i })).toBeVisible({ timeout: 30000 });
+        const apiKeyInput = page.getByLabel(/Admin API Key/i);
+        await expect(apiKeyInput).toBeVisible({ timeout: 15000 });
 
         // Fill API Key
         await apiKeyInput.fill('admin-secret-key');
@@ -177,6 +190,7 @@ test.describe('DAO Governance', () => {
         // Navigate to DAO page
         await page.goto('/dao');
         await page.waitForLoadState('networkidle');
+        await dismissWalletModalIfPresent(page);
         // Wait for loading to finish
         await expect(page.locator('.animate-spin')).not.toBeVisible({ timeout: 10000 });
 

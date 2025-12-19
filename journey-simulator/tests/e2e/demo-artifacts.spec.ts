@@ -17,7 +17,7 @@ test.describe('Demo Day artifacts', () => {
     // Use a non-demo token to avoid demo-mode auto-mocking/auto-advancement.
     await page.addInitScript(() => {
       localStorage.clear();
-      localStorage.setItem('accessToken', 'mock-access-token');
+      sessionStorage.setItem('accessToken', 'mock-access-token');
       localStorage.setItem('refreshToken', 'mock-refresh-token');
       localStorage.setItem('userId', 'e2e-user-id');
       // Keep persisted store minimal and let /journeys/:journeyId hydrate persona from catalogue.

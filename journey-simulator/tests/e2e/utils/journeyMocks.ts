@@ -302,7 +302,7 @@ export const seedDemoUser = async (
   accessToken: string = 'demo-token'
 ) => {
   await page.addInitScript(({ persona, token }) => {
-    localStorage.setItem('accessToken', token);
+    sessionStorage.setItem('accessToken', token);
     localStorage.setItem('refreshToken', 'demo-refresh-token');
     localStorage.setItem('userId', 'demo-user-id');
     if (persona) {

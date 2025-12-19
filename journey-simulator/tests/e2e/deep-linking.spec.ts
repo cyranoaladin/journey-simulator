@@ -37,9 +37,9 @@ test.describe('Deep Linking Functionality', () => {
             }
         });
 
-        // Inject auth token into localStorage before any navigation
+        // Inject auth token before any navigation (TokenStore uses sessionStorage for accessToken)
         await page.addInitScript(() => {
-            localStorage.setItem('accessToken', 'mock-access-token');
+            sessionStorage.setItem('accessToken', 'mock-access-token');
             localStorage.setItem('userId', 'user-123');
         });
     });

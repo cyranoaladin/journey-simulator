@@ -27,7 +27,7 @@ const LazyLoadList = <T,>({
 
   const loadMoreItems = useCallback(() => {
     if (allLoadedRef.current) return;
-    
+
     const nextBatch = items.slice(0, batchSize);
     setVisibleItems(nextBatch);
 
@@ -56,7 +56,7 @@ const LazyLoadList = <T,>({
     };
 
     observerRef.current = new IntersectionObserver(handleObserver, options);
-    
+
     // Observer le dernier élément visible
     if (visibleItems.length > 0 && visibleItems.length < items.length) {
       const lastItemIndex = visibleItems.length - 1;
@@ -85,8 +85,8 @@ const LazyLoadList = <T,>({
   }, [batchSize, loadMoreItems]);
 
   return (
-    <div 
-      ref={containerRef} 
+    <div
+      ref={containerRef}
       className={className}
       style={{ height: containerHeight, overflowY: 'auto' }}
     >

@@ -51,7 +51,7 @@ test.describe('Resource Validation in Journey Steps', () => {
         // Inject auth token
         await page.addInitScript(() => {
             localStorage.clear();
-            localStorage.setItem('accessToken', 'mock-access-token');
+            sessionStorage.setItem('accessToken', 'mock-access-token');
             localStorage.setItem('userId', 'user-123');
         });
 
