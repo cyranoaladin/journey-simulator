@@ -251,6 +251,82 @@ Endpoints (dossier `web/app/api`) :
 - **Endpoints**
   - `mf-back`: `POST /journey/:journeyId/submit` (selon implémentation)
   - `web`: `POST /api/journeys/[id]/submit` (LLM/demo path)
+- **Specs endpoints (payloads / codes / headers + curl)**
+  - `POST /journey/:journeyId/step` (mf-back)
+    - **Auth**: aucune (route non protégée). Optionnel: si `Authorization: Bearer demo-token` est fourni, `req.user` sera set.
+    - **Headers**: `Content-Type: application/json`
+    - **Body (utilisé par l’UI)**
+      - Provenance `journeyStore.runInteractiveStep`:
+        - `phaseId: string`
+        - `trackId: string`
+        - `userInput: string`
+        - `language: 'en' | 'fr'` (UI met souvent `'en'`)
+        - `mode: string` (ex: `discovery|builder|expert`)
+        - `tone: string` (ex: `pedagogical|investor_pitch|critical`)
+        - `journeyState: object` (UI met au minimum `{ xp, completed }`, parfois tout `userProgress`)
+      - Champs additionnels envoyés par certains blocs UI : `actionId` (ignoré côté backend si non utilisé)
+    - **200**: payload Zyno (ex: `{ metadata, ui_blocks, agent_actions, next_state }`)
+    - **500**: `{ success:false, message, error }`
+    - **curl (local)**
+
+```bash
+curl -sS -X POST http://127.0.0.1:3002/journey/LOCAL-JOURNEY-ID/step   -H 'Content-Type: application/json'   -d '{
+    "phaseId": "learn",
+    "trackId": "builder",
+    "userInput": "hello",
+    "language": "en",
+    "mode": "discovery",
+    "tone": "pedagogical",
+    "journeyState": { "xp": 0, "completed": [] }
+  }'
+```
+
+
+  - `POST /journey/:journeyId/submit` (mf-back)
+    - **Auth**: requis (`Authorization: Bearer <token>`). Le `demo-token` est accepté.
+    - **Headers**: `Authorization: Bearer <token>`, `Content-Type: application/json`
+    - **Body (utilisé par l’UI)** (depuis `JourneyWorkspace.tsx` + `api.submitMission`):
+      - `missionId: string`
+      - `inputType: string` (ex: `confirmation|text|link|...`)
+      - `submission: string`
+      - `language: string` (UI met souvent `'en'`)
+      - `mode: string`
+      - `tone: string`
+      - `trackId: string` (persona id)
+      - `phaseId: string`
+      - `phaseNumber: number`
+      - `journeyState: object` (UI envoie un snapshot riche : xp/totalXP/completed/completedCount/nfts/mfaiTokens/currentPhase…)
+    - **200**: 
+      - `{ success:true, message, phase_number, xp_awarded, evaluation, progress }`
+    - **404**: `{ success:false, message:'User not found' }` (si token réel mais user absent)
+    - **500**: `{ success:false, message, error }`
+    - **curl (demo-token)**
+
+```bash
+curl -sS -X POST http://127.0.0.1:3002/journey/LOCAL-JOURNEY-ID/submit   -H 'Authorization: Bearer demo-token'   -H 'Content-Type: application/json'   -d '{
+    "missionId": "activation-mission",
+    "inputType": "confirmation",
+    "submission": "I confirm completion.",
+    "language": "en",
+    "mode": "discovery",
+    "tone": "pedagogical",
+    "trackId": "capital-foundry",
+    "phaseId": "activation",
+    "phaseNumber": 1,
+    "journeyState": {
+      "xp": 0,
+      "totalXP": 0,
+      "completed": [],
+      "completedCount": 0,
+      "nfts": [],
+      "mfaiTokens": 0,
+      "currentPhase": 1
+    }
+  }'
+```
+
+
+
 - **Tests existants**
   - UI E2E :
     - `journey-simulator/tests/e2e/submit-mission.spec.ts`
@@ -297,6 +373,72 @@ Endpoints (dossier `web/app/api`) :
     - `POST /dao/proposals/:id/close` (close)
   - UI (`journey-simulator/src/utils/api.ts`) appelle aussi :
     - `POST /dao/proposal` et `POST /dao/vote` (⚠️ possible mismatch)
+- **Specs endpoints (payloads / codes / headers + curl)**
+
+  #### Endpoints *canoniques* `mf-back` (ce qui existe réellement)
+
+  - `GET /dao/config`
+    - **Headers**: aucun
+    - **200**: `{ quorumPercent, totalVotingPower, voters, proposalSettings }`
+
+  - `GET /dao/proposals`
+    - **Query**: `?status=active|closed` (optionnel)
+    - **200**: `{ proposals: [{ id, title, description, createdBy, createdAt, status, votes, voterDetails, quorumMet, outcome }] }`
+
+  - `POST /dao/proposals` (create)
+    - **Auth admin**: requis via `x-api-key: <ADMIN_API_KEY>`
+    - **Headers**: `x-api-key`, `Content-Type: application/json`
+    - **Body (backend)**: `{ title: string, description?: string, createdBy?: string }`
+    - **201**: `{ proposal: { id, title, description, createdAt, status, votes, quorumMet, voterDetails:{} } }`
+    - **403**: `{ error:'Unauthorized' }`
+    - **400**: `{ error:'Title is required' }`
+
+  - `POST /dao/proposals/:id/vote`
+    - **Headers**: `Content-Type: application/json`
+    - **Body (backend)**: `{ voterId: string, support: true|false|'yes'|'no' }`
+    - **200**: `{ proposal: {...} }`
+    - **404**: `{ error:'Proposal not found', id }`
+    - **400**: `{ error:'voterId and support are required' }` / `{ error:'Voter has already voted' }` / `{ error:'Voter not registered' }`
+
+  - `POST /dao/proposals/:id/close`
+    - **Auth admin**: requis via `x-api-key: <ADMIN_API_KEY>`
+    - **200**: `{ proposal: {..., status:'closed', outcome } }`
+
+  #### Endpoints actuellement appelés par l’UI (⚠️ mismatch à corriger)
+
+  - `POST /dao/proposal`
+    - **Body (UI)**: `{ title: string, description?: string }`
+    - **Headers (UI aujourd’hui)**: `Authorization: Bearer <token>` (pas de `x-api-key`)
+    - **Statut actuel côté backend**: **n’existe pas** dans `mf-back` → risque 404 en prod.
+
+  - `POST /dao/vote`
+    - **Body (UI)**: `{ proposalId: string, vote: 'yes'|'no' }`
+    - **Problème**: le backend attend `{ voterId, support }` sur `POST /dao/proposals/:id/vote`. L’UI a un `selectedVoter` mais ne l’envoie pas via `api.castDaoVote`.
+
+  - `POST /dao/proposal/:id/close`
+    - **Statut backend**: endpoint backend réel est `POST /dao/proposals/:id/close` + `x-api-key`.
+
+  #### cURL copy/paste (backend canonique)
+
+```bash
+# DAO config
+curl -sS http://127.0.0.1:3002/dao/config
+
+# List proposals
+curl -sS http://127.0.0.1:3002/dao/proposals
+
+# Create proposal (admin)
+curl -sS -X POST http://127.0.0.1:3002/dao/proposals   -H 'Content-Type: application/json'   -H 'x-api-key: admin-secret-key'   -d '{"title":"Launch Community Treasury","description":"Allocate 10% to grants"}'
+
+# Vote (weighted voter)
+curl -sS -X POST http://127.0.0.1:3002/dao/proposals/prop_123/vote   -H 'Content-Type: application/json'   -d '{"voterId":"voter_1","support":"yes"}'
+
+# Close proposal (admin)
+curl -sS -X POST http://127.0.0.1:3002/dao/proposals/prop_123/close   -H 'x-api-key: admin-secret-key'
+```
+
+
+
 - **Tests existants**
   - UI E2E :
     - `journey-simulator/tests/e2e/dao-governance.spec.ts`
