@@ -4,12 +4,17 @@ const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
+const JWT_SECRET = process.env.JWT_SECRET || (process.env.NODE_ENV === 'test' ? 'test-secret' : null);
+if (!JWT_SECRET) {
+    throw new Error('JWT_SECRET environment variable is not defined');
+}
+
 // Helper to generate JWT
 const generateToken = (user) => {
     return jwt.sign(
         { id: user._id, wallet: user.wallet_address, role: user.role },
-        process.env.JWT_SECRET || 'dev-secret-key',
-        { expiresIn: '7d' }
+        JWT_SECRET,
+        { expiresIn: '1h' }
     );
 };
 

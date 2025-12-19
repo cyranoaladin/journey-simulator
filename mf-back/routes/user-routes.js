@@ -2,14 +2,29 @@ var express = require('express');
 var router = express.Router();
 const userController = require('../controllers/user-controller');
 const { protect, adminOnly } = require('../middleware/auth');
+const rateLimit = require('express-rate-limit');
 
 /* Authentication routes */
-router.post('/register', userController.registerUser);
-router.post('/login', userController.loginUser);
-router.post('/wallet-challenge', userController.createWalletChallenge);
-router.post('/login-wallet', userController.loginWithWallet);
-router.post('/logout', userController.logoutUser);
-router.post('/refresh', userController.refreshToken);
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 60, // shared bucket for auth endpoints
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const refreshLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 120, // refresh may be called by multiple tabs/dev tools
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+router.post('/register', authLimiter, userController.registerUser);
+router.post('/login', authLimiter, userController.loginUser);
+router.post('/wallet-challenge', authLimiter, userController.createWalletChallenge);
+router.post('/login-wallet', authLimiter, userController.loginWithWallet);
+router.post('/logout', authLimiter, userController.logoutUser);
+router.post('/refresh', refreshLimiter, userController.refreshToken);
 
 /* Protected user routes */
 router.get('/profile', protect, userController.getUserProfile);

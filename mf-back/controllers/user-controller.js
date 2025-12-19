@@ -30,6 +30,9 @@ const generateAccessToken = (user) => {
 };
 
 // Generate refresh token - longer lived (days/weeks)
+const hashRefreshToken = (token) =>
+  crypto.createHash('sha256').update(String(token)).digest('hex');
+
 const generateRefreshToken = (user) => {
   // Create a random token
   const refreshToken = crypto.randomBytes(40).toString('hex');
@@ -38,9 +41,11 @@ const generateRefreshToken = (user) => {
   const refreshTokenExpiry = new Date();
   refreshTokenExpiry.setDate(refreshTokenExpiry.getDate() + 7);
 
-  // Save to user
-  user.refreshToken = refreshToken;
+  // Save to user (store hash, not raw token)
+  user.refreshTokenHash = hashRefreshToken(refreshToken);
   user.refreshTokenExpiry = refreshTokenExpiry;
+  // Clear legacy raw token storage once we rotate.
+  user.refreshToken = undefined;
 
   return refreshToken;
 };
@@ -152,12 +157,8 @@ exports.loginUser = async (req, res) => {
     // Generate tokens
     const accessToken = generateAccessToken(user);
 
-    // Create a refresh token
-    const refreshToken = crypto.randomBytes(40).toString('hex');
-
-    // Save refresh token to user
-    user.refreshToken = refreshToken;
-    user.refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+    // Create & store refresh token (hashed in DB)
+    const refreshToken = generateRefreshToken(user);
     await user.save();
 
     // Clear sensitive data
@@ -256,11 +257,7 @@ exports.loginWithWallet = async (req, res) => {
 
     // Generate tokens
     const accessToken = generateAccessToken(user);
-    const refreshToken = crypto.randomBytes(40).toString('hex');
-
-    // Save refresh token
-    user.refreshToken = refreshToken;
-    user.refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const refreshToken = generateRefreshToken(user);
     await user.save();
 
     // Clear sensitive data
@@ -532,10 +529,14 @@ exports.logoutUser = async (req, res) => {
       });
     }
 
-    // Find user by refresh token and clear it
-    const user = await User.findOne({ refreshToken });
+    const refreshTokenHash = hashRefreshToken(refreshToken);
+    // Find user by hashed refresh token (preferred) or legacy raw token (temporary)
+    const user = await User.findOne({
+      $or: [{ refreshTokenHash }, { refreshToken }],
+    });
     if (user) {
       user.refreshToken = undefined;
+      user.refreshTokenHash = undefined;
       user.refreshTokenExpiry = undefined;
       await user.save();
     }
@@ -564,10 +565,11 @@ exports.refreshToken = async (req, res) => {
       });
     }
 
-    // Find user by refresh token
+    const refreshTokenHash = hashRefreshToken(refreshToken);
+    // Find user by hashed refresh token (preferred) or legacy raw token (temporary)
     const user = await User.findOne({
-      refreshToken,
-      refreshTokenExpiry: { $gt: new Date() }
+      refreshTokenExpiry: { $gt: new Date() },
+      $or: [{ refreshTokenHash }, { refreshToken }],
     });
 
     if (!user) {
@@ -577,12 +579,15 @@ exports.refreshToken = async (req, res) => {
       });
     }
 
-    // Generate new access token
     const accessToken = generateAccessToken(user);
+    // Rotate refresh token on every refresh to reduce replay window
+    const nextRefreshToken = generateRefreshToken(user);
+    await user.save();
 
     res.status(200).json({
       success: true,
-      accessToken
+      accessToken,
+      refreshToken: nextRefreshToken,
     });
   } catch (error) {
     res.status(500).json({

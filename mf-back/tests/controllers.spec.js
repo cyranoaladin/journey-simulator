@@ -8,9 +8,13 @@ jest.mock('jsonwebtoken', () => ({
   sign: jest.fn(),
 }));
 
-jest.mock('crypto', () => ({
-  randomBytes: jest.fn(),
-}));
+jest.mock('crypto', () => {
+  const actual = jest.requireActual('crypto');
+  return {
+    ...actual,
+    randomBytes: jest.fn(),
+  };
+});
 
 jest.mock('../models/user', () => {
   const mock = {
@@ -573,6 +577,7 @@ describe('User Controller', () => {
       _id: 'user-1',
       email: 'alice@example.com',
       role: 'user',
+      save: jest.fn().mockResolvedValueOnce(),
     };
     User.findOne.mockResolvedValueOnce(userDoc);
 
@@ -582,11 +587,15 @@ describe('User Controller', () => {
     await userController.refreshToken(req, res);
 
     expect(User.findOne).toHaveBeenCalledWith(
-      expect.objectContaining({ refreshToken: 'refresh-token' })
+      expect.objectContaining({
+        $or: expect.arrayContaining([
+          expect.objectContaining({ refreshToken: 'refresh-token' }),
+        ]),
+      })
     );
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ accessToken: 'access-token' })
+      expect.objectContaining({ accessToken: 'access-token', refreshToken: 'refresh-token' })
     );
   });
 

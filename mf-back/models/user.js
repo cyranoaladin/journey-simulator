@@ -175,6 +175,12 @@ const userSchema = new mongoose.Schema({
     },
 
     // JWT refresh token fields
+    // Prefer storing a hash of the refresh token (not the raw token).
+    refreshTokenHash: {
+        type: String,
+        default: null,
+    },
+    // Legacy (kept temporarily for backward compatibility during token rotation).
     refreshToken: {
         type: String,
         default: null,

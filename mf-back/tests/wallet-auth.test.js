@@ -17,9 +17,13 @@ jest.mock('jsonwebtoken', () => ({
   sign: jest.fn().mockReturnValue('mock-jwt-token'),
 }));
 
-jest.mock('crypto', () => ({
-  randomBytes: jest.fn().mockReturnValue({ toString: () => 'mock-refresh-token' }),
-}));
+jest.mock('crypto', () => {
+  const actual = jest.requireActual('crypto');
+  return {
+    ...actual,
+    randomBytes: jest.fn().mockReturnValue({ toString: () => 'mock-refresh-token' }),
+  };
+});
 
 const userController = require('../controllers/user-controller');
 const User = require('../models/user');

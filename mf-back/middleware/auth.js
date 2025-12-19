@@ -57,7 +57,7 @@ const protect = async (req, res, next) => {
 
     try {
       // Verify real JWT token
-      const decoded = jwt.verify(token, JWT_SECRET);
+      const decoded = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] });
 
       // Get user from token
       const user = await User.findById(decoded.id).select('-password');
@@ -139,7 +139,7 @@ const optionalAuth = async (req, res, next) => {
 
     try {
       // Verify real JWT token
-      const decoded = jwt.verify(token, JWT_SECRET);
+      const decoded = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] });
       const user = await User.findById(decoded.id).select('-password');
 
       if (user && user.is_active) {
