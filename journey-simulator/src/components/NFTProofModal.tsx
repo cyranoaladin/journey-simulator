@@ -20,14 +20,37 @@ import {
 } from 'lucide-react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { useJourneyStore } from '../store/journeyStore';
-import * as htmlToImage from 'html-to-image';
-import { saveAs } from 'file-saver';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { getPersonaProofData } from '../data/proofsData';
 
 const normalizePersonaId = (id?: string | null) => {
   if (!id) return undefined;
   return id.replace(/_/g, '-').toLowerCase();
+};
+
+type HtmlToImageModule = typeof import('html-to-image');
+type SaveAsFn = (data: Blob | string, filename?: string) => void;
+
+let htmlToImageLoader: Promise<HtmlToImageModule> | null = null;
+const loadHtmlToImage = async (): Promise<HtmlToImageModule> => {
+  if (!htmlToImageLoader) {
+    htmlToImageLoader = import('html-to-image');
+  }
+  return htmlToImageLoader;
+};
+
+let saveAsLoader: Promise<SaveAsFn> | null = null;
+const loadSaveAs = async (): Promise<SaveAsFn> => {
+  if (!saveAsLoader) {
+    saveAsLoader = import('file-saver').then((mod: any) => {
+      const candidate: any = mod?.saveAs ?? mod?.default?.saveAs ?? mod?.default;
+      if (typeof candidate !== 'function') {
+        throw new Error('Unable to load file-saver saveAs()');
+      }
+      return candidate as SaveAsFn;
+    });
+  }
+  return saveAsLoader;
 };
 
 interface NFTProofModalProps {
@@ -386,8 +409,13 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
     setIsDownloading(true);
 
     try {
+      const [{ toPng }, saveAs] = await Promise.all([
+        loadHtmlToImage(),
+        loadSaveAs(),
+      ]);
+
       // Add watermark text
-      const dataUrl = await htmlToImage.toPng(nftCardRef.current, {
+      const dataUrl = await toPng(nftCardRef.current, {
         quality: 0.95,
         backgroundColor: '#000000',
         canvasWidth: nftCardRef.current.offsetWidth * 2,
