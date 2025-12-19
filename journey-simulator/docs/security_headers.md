@@ -10,8 +10,8 @@ Le projet injecte une balise:
 
 Notes importantes:
 
-- La CSP inclut actuellement **`'unsafe-inline'`** pour `script-src` car le projet injecte des polyfills en inline (et `index.html` contient un script inline).
-- Pour une CSP plus stricte, il faudra **externaliser** ces scripts ou passer à une stratégie **nonce/hash** côté headers serveur.
+- Une CSP **en header** est préférable à une CSP via meta (priorité + report-only).
+- Le projet a été durci pour éviter **`unsafe-inline`** côté `script-src` en production (polyfills externalisés).
 
 ## Headers Nginx recommandés
 
@@ -27,4 +27,33 @@ add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
 Notes:
 
 - **HSTS** (`Strict-Transport-Security`) doit être ajouté uniquement derrière HTTPS.
-- Une CSP **en header** est préférable à une CSP via meta (priorité + report-only), mais la meta permet un baseline “portable”.
+- **COEP** : `credentialless` est souvent plus simple à adopter que `require-corp`.
+
+## Variante COEP = credentialless (recommandée si compatible)
+
+Objectif: activer l’isolation cross-origin (COOP/COEP) tout en limitant les régressions.
+
+Headers:
+
+```nginx
+add_header Cross-Origin-Opener-Policy "same-origin" always;
+add_header Cross-Origin-Embedder-Policy "credentialless" always;
+add_header Cross-Origin-Resource-Policy "same-site" always;
+```
+
+Points d’attention:
+
+- Les ressources cross-origin (fonts Google, images Cloudinary, etc.) doivent être servies avec des headers compatibles (CORS/CORP).
+- Si une ressource tierce casse, désactiver temporairement COEP ou basculer sur une stratégie `require-corp` après audit complet.
+
+## CSP prod (exemple allowlist)
+
+Exemple CSP alignée avec:
+
+- `journey.mfai.app`, `mfai.app`
+- Cloudinary
+- RPC Solana
+
+```nginx
+add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob: https://res.cloudinary.com https://*.cloudinary.com; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self'; connect-src 'self' https://journey.mfai.app https://mfai.app https://api.devnet.solana.com https://api.testnet.solana.com https://api.mainnet-beta.solana.com;" always;
+```
