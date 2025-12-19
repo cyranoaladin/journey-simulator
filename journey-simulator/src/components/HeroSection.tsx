@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, Sparkles, TrendingUp, Users, Award } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 // import { api } from '../utils/api' // Will be used when backend is ready
 import { logger } from '../utils/logger';
+import { useAuth } from '../contexts/AuthContext';
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthenticated, isLoading } = useAuth();
   const [platformStats, setPlatformStats] = useState({
     totalUsers: 0,
     totalNFTs: 0,
@@ -50,6 +53,19 @@ const HeroSection = () => {
   };
 
   const handleUnlockSovereignty = () => {
+    // If we're already on /journeys, make the CTA feel responsive by scrolling to the list.
+    if (location.pathname.startsWith('/journeys')) {
+      const list = document.querySelector('[data-testid="journeys-page"]');
+      list?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+
+    // Journeys is a protected route: for unauthenticated users, go through login.
+    if (!isLoading && !isAuthenticated) {
+      navigate('/login?demo=1', { state: { from: { pathname: '/journeys' } } });
+      return;
+    }
+
     navigate('/journeys');
   };
 
@@ -193,11 +209,11 @@ const HeroSection = () => {
           >
             <div className="w-full max-w-md rounded-2xl border border-white/15 bg-white/5 p-6 backdrop-blur-md">
               <h2 className="text-xl font-space font-bold mb-2">
-                Wallet & NFTs — chargés uniquement dans Journey
+                Wallet & NFTs — loaded only inside Journeys
               </h2>
               <p className="text-sm opacity-80 leading-relaxed">
-                Pour garder la homepage ultra légère (perf + CSP), la stack Solana/wallet-adapter est chargée
-                uniquement quand tu entres dans <span className="font-semibold">Journeys</span>.
+                To keep the landing page ultra-light (performance + CSP), the Solana/wallet-adapter stack is loaded
+                only when you enter <span className="font-semibold">Journeys</span>.
               </p>
               <div className="mt-4">
                 <motion.button
@@ -206,7 +222,7 @@ const HeroSection = () => {
                   onClick={handleUnlockSovereignty}
                   className="btn-primary w-full"
                 >
-                  Ouvrir Journeys
+                  Open Journeys
                 </motion.button>
               </div>
             </div>
