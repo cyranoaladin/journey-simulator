@@ -226,7 +226,7 @@ describe('JourneyWorkspace', () => {
                 <JourneyWorkspace />
             </MemoryRouter>
         )
-        expect(screen.getAllByText('Complete')[0]).toBeInTheDocument()
+        expect(screen.getByTestId('complete-phase')).toBeInTheDocument()
     })
 
     it('calls completePhase when Complete Phase button is clicked', async () => {
@@ -247,7 +247,7 @@ describe('JourneyWorkspace', () => {
             </MemoryRouter>
         )
 
-        const completeButton = screen.getAllByText('Complete')[0]
+        const completeButton = screen.getByTestId('complete-phase')
         fireEvent.click(completeButton)
 
         // handleCompletePhase is async (submitMission -> completePhase), so wait for it.

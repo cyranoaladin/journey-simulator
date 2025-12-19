@@ -145,8 +145,8 @@ describe('NFT Integration in JourneyWorkspace', () => {
             </MemoryRouter>
         );
 
-        // Find and click the Complete Phase button
-        const completeButton = screen.getAllByText('Mint NFT')[0];
+        // Find and click the Complete Phase button (stable test id; label can evolve)
+        const completeButton = screen.getByTestId('mint-nft');
         fireEvent.click(completeButton);
 
         // completePhase is called after an async submitMission, so wait for it

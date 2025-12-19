@@ -214,7 +214,6 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
   const isPhaseCompleted = userProgress.completedPhases.includes(activePhaseIndex);
 
   const getCompletionCtaLabel = () => {
-    const hasNft = Boolean(activePhase.nftReward)
     const stakingAmount =
       typeof activePhase.stakingRequired === 'number' && activePhase.stakingRequired > 0
         ? activePhase.stakingRequired
@@ -223,18 +222,20 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
     const isLaunchPhase = activePhase.id === 'launch-collaterize'
 
     if (isLaunchPhase) {
-      return hasNft ? 'Simulate Launch & Mint NFT' : 'Simulate Launch'
+      // Launch simulation CTA should describe the phase action; minting (if any) happens in the modal after completion.
+      return 'Simulate Launch'
     }
 
     if (stakingAmount !== null) {
-      return hasNft ? `Stake ${stakingAmount} $MFAI & Mint NFT` : `Stake ${stakingAmount} $MFAI`
+      return `Stake ${stakingAmount} $MFAI`
     }
 
     if (requiresVote) {
-      return hasNft ? 'Vote & Mint NFT' : 'Vote'
+      return 'Vote'
     }
 
-    return hasNft ? 'Mint NFT' : 'Complete'
+    // Default: completing the phase triggers evaluation + rewards (including NFT mint via modal if applicable).
+    return 'Complete Phase'
   }
 
   // UI Helpers
@@ -718,8 +719,9 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
                 )}
 
                   {!isPhaseCompleted && (
-                    <button
-                      onClick={() => {
+                    <div className="flex flex-col gap-2">
+                      <button
+                        onClick={() => {
                         if (isSubmittingPhase) return;
                         if (activePhase.stakingRequired) {
                           setShowStakingModal(true);
@@ -732,22 +734,43 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
 
                         void handleCompletePhase();
                       }}
-                      disabled={isSubmittingPhase}
-                      data-testid={activePhase.nftReward ? 'mint-nft' : 'complete-phase'}
-                      className={`inline-flex items-center gap-2 rounded-full bg-white/10 px-8 py-4 text-base font-bold text-white border border-white/10 transition ${isSubmittingPhase ? 'cursor-wait opacity-70' : 'hover:bg-white/20'}`}
-                    >
-                      {isSubmittingPhase ? (
-                        <>
-                          <Loader2 size={20} className="animate-spin" />
-                          <span>Submitting…</span>
-                        </>
-                      ) : (
-                        <>
-                          {activePhase.nftReward ? <Award size={20} className="text-accent-cyan" /> : <CheckCircle2 size={20} />}
-                          <span>{getCompletionCtaLabel()}</span>
-                        </>
+                        disabled={isSubmittingPhase}
+                        data-testid={activePhase.nftReward ? 'mint-nft' : 'complete-phase'}
+                        className={`inline-flex items-center gap-2 rounded-full bg-white/10 px-8 py-4 text-base font-bold text-white border border-white/10 transition ${isSubmittingPhase ? 'cursor-wait opacity-70' : 'hover:bg-white/20'}`}
+                      >
+                        {isSubmittingPhase ? (
+                          <>
+                            <Loader2 size={20} className="animate-spin" />
+                            <span>Submitting…</span>
+                          </>
+                        ) : (
+                          <>
+                            {activePhase.nftReward ? <Award size={20} className="text-accent-cyan" /> : <CheckCircle2 size={20} />}
+                            <span>{getCompletionCtaLabel()}</span>
+                          </>
+                        )}
+                      </button>
+
+                      {(activePhase.nftReward || activePhase.stakingRequired || activePhase.daoVoteRequired) && (
+                        <div className="flex flex-wrap items-center gap-2 text-[11px] text-white/60">
+                          {activePhase.stakingRequired ? (
+                            <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                              Requires staking
+                            </span>
+                          ) : null}
+                          {activePhase.daoVoteRequired ? (
+                            <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                              Requires DAO vote
+                            </span>
+                          ) : null}
+                          {activePhase.nftReward ? (
+                            <span className="rounded-full border border-accent-cyan/20 bg-accent-cyan/10 px-3 py-1 text-accent-cyan">
+                              NFT reward available
+                            </span>
+                          ) : null}
+                        </div>
                       )}
-                    </button>
+                    </div>
                   )}
               </div>
 
