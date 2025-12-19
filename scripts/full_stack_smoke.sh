@@ -38,7 +38,10 @@ wait_for "http://127.0.0.1:3002/readyz" "API readiness"
 wait_for "http://127.0.0.1:3003" "Frontend shell" 40 3
 
 printf 'Running API smoke probes…\n'
-curl -fsS http://127.0.0.1:3002/auth/verify | tee /tmp/smoke_auth_verify.json >/dev/null
+curl -fsS -X POST http://127.0.0.1:3002/auth/verify \
+  -H "Content-Type: application/json" \
+  -d "{\"token\": \"${SMOKE_BEARER}\"}" \
+  | tee /tmp/smoke_auth_verify.json >/dev/null
 curl -fsS http://127.0.0.1:3002/journey/all-journey >/dev/null
 demo_payload=$(printf '{"personaId":"%s"}' "$SMOKE_PERSONA")
 curl -fsS -X POST http://127.0.0.1:3002/journey/load-demo \

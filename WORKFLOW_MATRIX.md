@@ -1,4 +1,4 @@
-# WORKFLOW_MATRIX — Journey Simulator / mf-back / web
+# WORKFLOW_MATRIX v2 — Journey Simulator / mf-back / web (workflows ↔ routes ↔ API specs ↔ tests)
 
 Ce document relie chaque **workflow utilisateur** à :
 - **Routes UI** (`journey-simulator`)
@@ -14,6 +14,31 @@ Ce document relie chaque **workflow utilisateur** à :
 - **Prod local (DB + services + simulator preview)** : `bash scripts/prod-local-up.sh` / `bash scripts/prod-local-down.sh`
 - **E2E UI (Playwright)** : `cd journey-simulator && npm run test:e2e`
 
+
+
+### 0.1) Conventions API (headers, auth, CORS) — à utiliser dans les tests
+
+#### `mf-back` (Express)
+
+- **Auth (routes protégées)** : header `Authorization: Bearer <accessToken>`
+  - Le middleware `protect` accepte aussi `Bearer demo-token` (mode démo) et injecte un user fictif.
+- **Admin key (routes admin)** : header `x-api-key: <ADMIN_API_KEY>`
+- **CORS**
+  - En local, autorise notamment `http://127.0.0.1:3003` / `http://localhost:3003` (voir `mf-back/app.js`).
+  - En prod, restreindre via `CORS_ALLOWED_ORIGINS`.
+
+#### `web` (Next.js /app/api)
+
+- **Sessions/cookies**
+  - `/api/auth/verify` pose un cookie `mfai_session` (httpOnly; `secure` en prod; `sameSite=strict`).
+- **Auth SIWS**
+  - `/api/auth/siws/*` retourne un `token` “jwt-like” côté API (pas forcément identique à `mf-back`).
+
+### 0.2) Scripts QA par workflow (référence)
+
+- **Stack prod-like locale** : `scripts/prod-local-up.sh` (DB + `mf-back` + `web` + worker mint + `journey-simulator` preview)
+- **Smoke full-stack** : `scripts/full_stack_smoke.sh` (probes API + shell UI)
+- **Arrêt/cleanup** : `scripts/prod-local-down.sh`
 ## 1) Cartographie des routes UI (journey-simulator)
 
 Routes définies dans `journey-simulator/src/App.tsx` :
@@ -84,6 +109,32 @@ Endpoints (dossier `web/app/api`) :
   - Routes protégées : `/journeys`, `/dashboard`, `/dao`, etc.
 - **Endpoints**
   - `mf-back`: `POST /user/register`, `POST /user/login`, `GET /user/profile`, `POST /user/refresh`, `POST /user/logout`
+
+- **Specs endpoints (payloads / codes / headers)**
+  - `POST /user/register`
+    - **Headers**: `Content-Type: application/json`
+    - **Body**: `{ name, email, password, wallet_address?, persona? }`
+    - **201**: `{ success: true, accessToken, refreshToken, user }`
+    - **400**: validation/duplicate
+  - `POST /user/login`
+    - **Headers**: `Content-Type: application/json`
+    - **Body**: `{ email, password }`
+    - **200**: `{ success: true, accessToken, refreshToken, user }`
+    - **401**: invalid credentials
+  - `GET /user/profile`
+    - **Headers**: `Authorization: Bearer <token>`
+    - **200**: `{ user }` (format exact selon controller)
+    - **401**: token manquant/invalide
+  - `POST /user/refresh`
+    - **Headers**: `Content-Type: application/json`
+    - **Body**: `{ refreshToken }`
+    - **200**: `{ accessToken, refreshToken? }`
+    - **400/401**: refresh absent/invalide/expiré
+  - `POST /user/logout`
+    - **Headers**: `Content-Type: application/json`
+    - **Body**: `{ refreshToken }`
+    - **200**: `{ success: true }`
+
 - **Tests existants**
   - UI E2E :
     - `journey-simulator/tests/e2e/login.spec.ts` (UI login fields)
@@ -105,6 +156,26 @@ Endpoints (dossier `web/app/api`) :
 - **Endpoints**
   - `mf-back`: `POST /user/wallet-challenge`, `POST /user/login-wallet`
   - (Selon produit) `web`: `POST /api/auth/siws/challenge`, `POST /api/auth/siws/verify`
+
+- **Specs endpoints (payloads / codes / headers)**
+  - `mf-back POST /user/wallet-challenge`
+    - **Headers**: `Content-Type: application/json`
+    - **Body**: `{ wallet_address }`
+    - **200**: `{ success: true, nonce, message }` (selon controller)
+  - `mf-back POST /user/login-wallet`
+    - **Headers**: `Content-Type: application/json`
+    - **Body**: `{ wallet_address, signature?, message? }`
+    - **200**: `{ success: true, accessToken, refreshToken, user }`
+    - **400/401**: signature invalide / champs manquants
+  - `web POST /api/auth/siws/challenge`
+    - **Body (optionnel)**: `{ address?: string }`
+    - **200**: `{ challengeId, message, nonce, expiresAt }`
+  - `web POST /api/auth/siws/verify`
+    - **Body**: `{ address, signature, challengeId }`
+    - **200**: `{ ok: true, address, token, issuedAt, expiresIn }`
+    - **400**: `bad_request` / `invalid_or_expired_challenge`
+    - **401**: `invalid_signature`
+
 - **Tests existants**
   - Backend :
     - `mf-back/tests/wallet-auth.test.js`
@@ -137,6 +208,22 @@ Endpoints (dossier `web/app/api`) :
 - **Endpoints**
   - `mf-back`: `GET/PUT /journey/user-progress`, `POST /journey/reset-progress`, `GET /journey/artifacts`
   - (optionnel selon le parcours) `web`: `/api/journeys/[id]/state`, `/api/journeys/[id]/step`
+
+- **Specs endpoints (payloads / codes / headers)**
+  - `GET /journey/user-progress`
+    - **Headers**: `Authorization: Bearer <token>`
+    - **200**: `{ success: true, progress: {...} }`
+  - `PUT /journey/user-progress`
+    - **Headers**: `Authorization: Bearer <token>`, `Content-Type: application/json`
+    - **Body**: `{ total_xp?, current_level?, completed_phases? }`
+    - **200**: `{ success: true }` (ou `{ progress: ... }`)
+  - `POST /journey/reset-progress`
+    - **Headers**: `Authorization: Bearer <token>`
+    - **200**: `{ success: true }`
+  - `GET /journey/artifacts`
+    - **Headers**: `Authorization: Bearer <token>`
+    - **200**: `{ success: true, artifacts: [...], currentPhase? }`
+
 - **Tests existants**
   - UI E2E :
     - `journey-simulator/tests/e2e/journey-flow.spec.ts`
@@ -243,6 +330,29 @@ Endpoints (dossier `web/app/api`) :
 - **Endpoints**
   - `mf-back`: `/solana/mint/simulate`, `/solana/mint/execute` (UI `api.ts`)
   - `web`: `/api/mint/simulate`, `/api/mint/execute`, `/api/mint/status`, `/api/mint/last` (pour pipeline worker)
+
+- **Specs endpoints (payloads / codes / headers)**
+  - `mf-back POST /solana/mint/simulate`
+    - **Headers**: `Authorization: Bearer <token>`
+    - **Body**: `{ nftId?, destinationWallet?, metadata? }`
+    - **200**: `{ ok: true, sim: { ok, estFeeLamports, riskScore, network, estimatedTimeSeconds } }`
+  - `mf-back POST /solana/mint/execute`
+    - **Headers**: `Authorization: Bearer <token>`
+    - **Body**: `{ nftId?, destinationWallet?, metadata?, transactionSignature? }`
+    - **200**: `{ ok:true, jobId, status, tx: { mintAddress, txSig } }`
+    - **400**: verification failed
+  - `web POST /api/mint/simulate`
+    - **Body**: `{ recipient, name, symbol, uri }`
+    - **200**: `{ ok:true, sim }`
+    - **400**: `{ error:'bad_request' }`
+  - `web POST /api/mint/execute`
+    - **Body**: `{ spec: { recipient,type:'CERT_NFT',name,symbol,uri }, sim: { ok, estFeeLamports, riskScore, network, txB64? } }`
+    - **200**: `{ ok:true, jobId, status:'queued' }`
+    - **400**: `{ error:'bad_request', details }`
+    - **403**: `{ error:'killswitch' }`
+  - `web GET /api/mint/status?jobId=...|mintAddress=...`
+    - **200/404/400** selon query
+
 - **Tests existants**
   - UI E2E :
     - `journey-simulator/tests/e2e/mint-debug.spec.ts`
@@ -279,3 +389,9 @@ Endpoints (dossier `web/app/api`) :
 5. **Mint worker async end-to-end** (si prod dépend du pipeline Next/Redis)
 
 
+
+
+## 5) TODO “alignement scripts”
+
+- `scripts/full_stack_smoke.sh` appelle `/auth/verify` en **GET**, mais `mf-back` expose `/auth/verify` en **POST** avec body `{ token }`.
+  - Action : aligner le script sur l’API.
