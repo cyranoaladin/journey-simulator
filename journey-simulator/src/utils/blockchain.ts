@@ -1,24 +1,23 @@
-import {
-  Connection,
-  PublicKey,
-  LAMPORTS_PER_SOL,
-} from '@solana/web3.js';
+import type { PublicKey } from '@solana/web3.js';
 import { logger } from './logger';
 import { tokenStore } from './tokenStore';
+import { loadSolanaWeb3 } from './solanaWeb3';
 
 // Constants
 const SOLANA_CLUSTER = 'devnet';
 const SOLANA_ENDPOINT = `https://api.${SOLANA_CLUSTER}.solana.com`;
 
 // Initialize connection
-export const getConnection = () => {
+export const getConnection = async () => {
+  const { Connection } = await loadSolanaWeb3()
   return new Connection(SOLANA_ENDPOINT);
 };
 
 // Request airdrop of testnet SOL
 export const requestAirdrop = async (publicKey: PublicKey): Promise<string> => {
   try {
-    const connection = getConnection();
+    const connection = await getConnection();
+    const { LAMPORTS_PER_SOL } = await loadSolanaWeb3()
     const signature = await connection.requestAirdrop(publicKey, LAMPORTS_PER_SOL);
     await connection.confirmTransaction(signature);
     return signature;
@@ -31,7 +30,8 @@ export const requestAirdrop = async (publicKey: PublicKey): Promise<string> => {
 // Get wallet balance
 export const getWalletBalance = async (publicKey: PublicKey): Promise<number> => {
   try {
-    const connection = getConnection();
+    const connection = await getConnection();
+    const { LAMPORTS_PER_SOL } = await loadSolanaWeb3()
     const balance = await connection.getBalance(publicKey);
     return balance / LAMPORTS_PER_SOL;
   } catch (error) {
@@ -321,7 +321,7 @@ export const getWalletNFTs = async (publicKey: PublicKey): Promise<any[]> => {
 // Verify transaction
 export const verifyTransaction = async (signature: string): Promise<boolean> => {
   try {
-    const connection = getConnection();
+    const connection = await getConnection();
     const transaction = await connection.getTransaction(signature);
     return transaction !== null;
   } catch (error) {
@@ -333,7 +333,7 @@ export const verifyTransaction = async (signature: string): Promise<boolean> => 
 // Get transaction details
 export const getTransactionDetails = async (signature: string): Promise<any> => {
   try {
-    const connection = getConnection();
+    const connection = await getConnection();
     const transaction = await connection.getTransaction(signature);
     return transaction;
   } catch (error) {

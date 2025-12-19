@@ -12,9 +12,9 @@ const WalletConnectionGuide: React.FC = () => {
       <p className="text-sm opacity-80 mb-6">
         Connect your Solana wallet to activate your Skillchain Card™ and start your journey in the Proof Economy.
       </p>
-      
+
       <div className="space-y-6">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.1 }}
@@ -29,18 +29,18 @@ const WalletConnectionGuide: React.FC = () => {
               Install Phantom or Solflare wallet browser extension.
             </p>
             <div className="flex space-x-2">
-              <a 
-                href="https://phantom.app/" 
-                target="_blank" 
+              <a
+                href="https://phantom.app/"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs bg-gradient-primary hover:opacity-90 px-3 py-1 rounded-full flex items-center space-x-1 text-white"
               >
                 <Download size={12} />
                 <span>Phantom</span>
               </a>
-              <a 
-                href="https://solflare.com/" 
-                target="_blank" 
+              <a
+                href="https://solflare.com/"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full flex items-center space-x-1"
               >
@@ -50,8 +50,8 @@ const WalletConnectionGuide: React.FC = () => {
             </div>
           </div>
         </motion.div>
-        
-        <motion.div 
+
+        <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
@@ -71,8 +71,8 @@ const WalletConnectionGuide: React.FC = () => {
             </div>
           </div>
         </motion.div>
-        
-        <motion.div 
+
+        <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
@@ -86,9 +86,9 @@ const WalletConnectionGuide: React.FC = () => {
             <p className="text-sm opacity-80 mb-2">
               You'll need some testnet SOL to pay for transaction fees.
             </p>
-            <a 
-              href="https://solfaucet.com/" 
-              target="_blank" 
+            <a
+              href="https://solfaucet.com/"
+              target="_blank"
               rel="noopener noreferrer"
               className="text-xs bg-gradient-primary hover:opacity-90 px-3 py-1 rounded-full flex items-center space-x-1 inline-block text-white"
             >
@@ -97,8 +97,8 @@ const WalletConnectionGuide: React.FC = () => {
             </a>
           </div>
         </motion.div>
-        
-        <motion.div 
+
+        <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.4 }}
@@ -121,7 +121,7 @@ const WalletConnectionGuide: React.FC = () => {
           </div>
         </motion.div>
       </div>
-      
+
       <div className="mt-6 p-3 bg-gradient-primary/20 border border-primary-500/30 rounded-lg">
         <div className="flex items-start space-x-2">
           <AlertCircle className="text-accent-cyan mt-0.5" size={16} />

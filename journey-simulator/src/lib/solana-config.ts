@@ -5,11 +5,22 @@
  * Used by both journey-simulator (frontend) and web (Next.js portal)
  */
 
-import { clusterApiUrl, Connection } from '@solana/web3.js';
 import type { Cluster } from '@solana/web3.js';
 
 // Network configuration
 export const SOLANA_NETWORK: Cluster = (process.env.VITE_SOLANA_NETWORK as Cluster) || 'devnet';
+
+const clusterRpcUrl = (cluster: Cluster): string => {
+    switch (cluster) {
+        case 'mainnet-beta':
+            return 'https://api.mainnet-beta.solana.com';
+        case 'testnet':
+            return 'https://api.testnet.solana.com';
+        case 'devnet':
+        default:
+            return 'https://api.devnet.solana.com';
+    }
+};
 
 // RPC Endpoints
 export const getRPCEndpoint = (): string => {
@@ -22,12 +33,13 @@ export const getRPCEndpoint = (): string => {
         return process.env.NEXT_PUBLIC_SOLANA_RPC_URL;
     }
 
-    return clusterApiUrl(SOLANA_NETWORK);
+    return clusterRpcUrl(SOLANA_NETWORK);
 };
 
 // Create connection instance
-export const createConnection = (): Connection => {
+export const createConnection = async () => {
     const endpoint = getRPCEndpoint();
+    const { Connection } = await import('@solana/web3.js');
     return new Connection(endpoint, 'confirmed');
 };
 

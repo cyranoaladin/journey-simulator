@@ -2,7 +2,7 @@ import { type ReactNode, useEffect, useMemo, useState } from 'react'
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import { WalletAdapterNetwork, type WalletAdapter } from '@solana/wallet-adapter-base'
-import { clusterApiUrl } from '@solana/web3.js'
+import { logger } from '../utils/logger'
 
 // Import wallet adapter CSS
 import '@solana/wallet-adapter-react-ui/styles.css'
@@ -34,7 +34,21 @@ export const resolveNetwork = (): WalletAdapterNetwork => {
 
 export const resolveEndpoint = (network: WalletAdapterNetwork): string => {
   const override = (import.meta.env.VITE_SOLANA_RPC_URL ?? '').toString().trim()
-  return override.length > 0 ? override : clusterApiUrl(network)
+  if (override.length > 0) {
+    return override
+  }
+
+  // Avoid importing @solana/web3.js just to get clusterApiUrl.
+  // Keep the mapping explicit so the "solana" chunk loads only when we actually need web3 features.
+  switch (network) {
+    case WalletAdapterNetwork.Mainnet:
+      return 'https://api.mainnet-beta.solana.com'
+    case WalletAdapterNetwork.Testnet:
+      return 'https://api.testnet.solana.com'
+    case WalletAdapterNetwork.Devnet:
+    default:
+      return 'https://api.devnet.solana.com'
+  }
 }
 
 export const WalletContextProvider = ({ children }: WalletContextProviderProps) => {
@@ -85,7 +99,7 @@ export const WalletContextProvider = ({ children }: WalletContextProviderProps) 
           }
         }
       } catch (error) {
-        console.error('Wallet adapter initialization failed:', error)
+        logger.error('Wallet adapter initialization failed:', error)
 
         if (typeof window !== 'undefined') {
           const detail = error instanceof Error ? error : new Error('Wallet initialization failed')
@@ -105,7 +119,7 @@ export const WalletContextProvider = ({ children }: WalletContextProviderProps) 
 
   // Handle wallet errors
   const onError = (error: Error) => {
-    console.error('Wallet error:', error)
+    logger.error('Wallet error:', error)
 
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('walletError', { detail: error }))
