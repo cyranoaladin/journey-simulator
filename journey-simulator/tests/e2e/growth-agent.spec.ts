@@ -10,7 +10,7 @@ test.describe('Growth Agent Integration', () => {
         // Inject auth token before any navigation (TokenStore uses sessionStorage for accessToken)
         await page.addInitScript(() => {
             sessionStorage.setItem('accessToken', 'e2e-token');
-            localStorage.setItem('refreshToken', 'e2e-refresh-token');
+            sessionStorage.setItem('refreshToken', 'e2e-refresh-token');
             localStorage.setItem('userId', 'user-123');
         });
 

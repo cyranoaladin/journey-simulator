@@ -35,7 +35,7 @@ test.describe('Mint flow (frontend debug)', () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript((persona) => {
       window.sessionStorage.setItem('accessToken', 'e2e-access-token')
-      window.localStorage.setItem('refreshToken', 'e2e-refresh-token')
+      window.sessionStorage.setItem('refreshToken', 'e2e-refresh-token')
       const persisted = {
         state: {
           selectedPersona: persona,

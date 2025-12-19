@@ -18,7 +18,7 @@ test.describe('Demo Day artifacts', () => {
     await page.addInitScript(() => {
       localStorage.clear();
       sessionStorage.setItem('accessToken', 'mock-access-token');
-      localStorage.setItem('refreshToken', 'mock-refresh-token');
+      sessionStorage.setItem('refreshToken', 'mock-refresh-token');
       localStorage.setItem('userId', 'e2e-user-id');
       // Keep persisted store minimal and let /journeys/:journeyId hydrate persona from catalogue.
       localStorage.setItem('mfai-journey-storage', JSON.stringify({

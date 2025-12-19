@@ -61,7 +61,7 @@ test.describe('Full Journey & Collaterize Launch', () => {
     await page.evaluate(() => {
       // Access token is stored in sessionStorage (TokenStore hardening)
       sessionStorage.setItem('accessToken', 'e2e-token');
-      localStorage.setItem('refreshToken', 'e2e-refresh-token');
+      sessionStorage.setItem('refreshToken', 'e2e-refresh-token');
 
       // Demo mode endpoints read from the demo mock DB in localStorage (see src/utils/api.ts).
       // Seed it so the collaterize simulation becomes deterministic (XP influences the result).
