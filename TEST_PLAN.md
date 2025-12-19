@@ -1,5 +1,45 @@
 # Money Factory AI – Global Test & Validation Plan (MVP Journey Simulator + Web3 Stack)
 
+## 🚀 Commandes “source de vérité” (local + CI)
+
+Le repo contient déjà des scripts pour exécuter **les validations CI-like** et démarrer une stack **prod-like locale** pour QA manuelle.
+
+### Validation CI-like (recommandé avant tout déploiement)
+
+Depuis la racine :
+
+```bash
+bash scripts/ci-verify.sh
+```
+
+Inclut : install (`npm ci`), lint, build, unit tests, puis E2E (Playwright).
+
+### Environnement “prod local” (QA manuelle en conditions prod)
+
+Démarre DB (Mongo + Postgres), Redis (si dispo), puis :
+- `mf-back` (API)
+- `web` (Next API) + worker mint
+- `journey-simulator` en `vite preview` (build prod)
+
+```bash
+bash scripts/prod-local-up.sh
+```
+
+Arrêt :
+
+```bash
+bash scripts/prod-local-down.sh
+```
+
+Logs/PIDs : `tmp/prod-local/*`.
+
+### E2E (Playwright) – local
+
+```bash
+cd journey-simulator
+npm run test:e2e
+```
+
 ## 0. Objectif du document
 
 Ce document définit **tout ce qui doit être testé et vérifié** pour considérer le MVP Money Factory AI / Journey Simulator comme réellement fonctionnel :
