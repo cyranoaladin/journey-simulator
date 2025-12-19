@@ -124,7 +124,7 @@ const HomePage = () => {
     <div className="relative min-h-screen overflow-hidden bg-[#0d0d1a] text-white">
       <AnimatedBackground />
 
-      <MainNavigation />
+      <MainNavigation enableWallet={false} />
 
       <main className="relative z-10 flex flex-col gap-24 pb-24 pt-[calc(var(--header-height,4rem)+1.5rem)]">
         <section id="hero" className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 pt-24 sm:px-6 lg:px-12 lg:flex-row lg:items-center">

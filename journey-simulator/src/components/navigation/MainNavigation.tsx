@@ -51,7 +51,7 @@ type MainNavigationProps = {
   enableWallet?: boolean
 }
 
-const MainNavigation = ({ enableWallet = true }: MainNavigationProps) => {
+const MainNavigation = ({ enableWallet = false }: MainNavigationProps) => {
   const { isDark, toggleTheme } = useThemeStore()
   const { logout, user } = useAuth()
   const { selectedPersona, userProgress } = useJourneyStoreShallow((state) => ({
