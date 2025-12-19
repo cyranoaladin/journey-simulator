@@ -103,9 +103,7 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            const chunkMap = [
-              { name: 'polyfills', pattern: /readable-stream|stream-browserify|events|buffer|string_decoder/ },
-              { name: 'ui-motion', pattern: /framer-motion|zustand/ },
+            const chunkMap = [              { name: 'ui-motion', pattern: /framer-motion|zustand/ },
               { name: 'icons', pattern: /lucide-react/ },
               // UI notifications / toasts (keep them out of the main vendor chunk)
               { name: 'notifications', pattern: /sonner|react-hot-toast/ },
