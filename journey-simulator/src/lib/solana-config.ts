@@ -1,6 +1,6 @@
 /**
  * Shared Solana Configuration Module
- * 
+ *
  * Centralizes wallet configuration, RPC endpoints, and network settings
  * Used by both journey-simulator (frontend) and web (Next.js portal)
  */

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate, Navigate } from 'react-router-dom'
-import Confetti from 'react-confetti'
+import LazyConfetti from './shared/LazyConfetti'
 import { Download, PenSquare, RefreshCw, Sparkles, Trophy } from 'lucide-react'
 import { exportToPDF } from '../utils/exportToPDF'
 import { sendToNotion } from '../utils/sendToNotion'
@@ -245,7 +245,7 @@ const JourneyCompletedPage = () => {
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-primary-900 via-primary-800 to-primary-950 text-white">
       {showConfetti && width > 0 && height > 0 && (
-        <Confetti width={width} height={height} recycle={false} numberOfPieces={450} gravity={0.18} />
+        <LazyConfetti width={width} height={height} recycle={false} numberOfPieces={450} gravity={0.18} />
       )}
 
       <section className="relative mx-auto flex max-w-6xl flex-col gap-10 px-4 py-16">

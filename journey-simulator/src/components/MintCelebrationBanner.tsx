@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import Confetti from 'react-confetti'
+import LazyConfetti from './shared/LazyConfetti'
 
 interface Props {
   score: number
@@ -30,7 +30,7 @@ export default function MintCelebrationBanner({ score, maxScore, phaseId, onMint
       >
         {confetti && (
           <div className="absolute -inset-x-4 -top-2 pointer-events-none">
-            <Confetti numberOfPieces={180} recycle={false} width={typeof window!=='undefined'? window.innerWidth: 800} height={160} />
+            <LazyConfetti numberOfPieces={180} recycle={false} width={typeof window!=='undefined'? window.innerWidth: 800} height={160} />
           </div>
         )}
         <div className="relative flex items-center justify-between gap-3">

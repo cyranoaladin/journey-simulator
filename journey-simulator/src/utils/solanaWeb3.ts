@@ -13,5 +13,3 @@ export const loadSolanaWeb3 = async (): Promise<SolanaWeb3> => {
 
   return loader
 }
-
-

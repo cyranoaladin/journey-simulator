@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -94,6 +95,25 @@ Object.assign(window.process, {
         return html.replace('<head>', '<head>' + cspMeta + polyfillScript);
       }
     }
+    ,
+    ...(mode === 'analyze'
+      ? [
+          visualizer({
+            filename: 'dist/bundle-stats.html',
+            template: 'treemap',
+            gzipSize: true,
+            brotliSize: true,
+            open: false,
+          }),
+          visualizer({
+            filename: 'dist/bundle-stats.json',
+            template: 'raw-data',
+            gzipSize: true,
+            brotliSize: true,
+            open: false,
+          }),
+        ]
+      : []),
   ],
   server: {
     host: '127.0.0.1',
@@ -124,6 +144,10 @@ Object.assign(window.process, {
               { name: 'polyfills', pattern: /readable-stream|stream-browserify|events|buffer|string_decoder/ },
               { name: 'ui-motion', pattern: /framer-motion|zustand/ },
               { name: 'icons', pattern: /lucide-react/ },
+              // UI notifications / toasts (keep them out of the main vendor chunk)
+              { name: 'notifications', pattern: /sonner|react-hot-toast/ },
+              // Celebration FX (loaded only on completion/mint flows)
+              { name: 'celebration', pattern: /react-confetti|tween-functions/ },
               // Keep heavy "export" tooling out of the main vendor bundle.
               { name: 'media-tools', pattern: /html-to-image|html2canvas|jspdf|file-saver|qrcode/ },
               // Routing libs are used widely, but splitting them keeps the default vendor chunk smaller.
