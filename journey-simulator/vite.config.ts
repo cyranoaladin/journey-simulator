@@ -72,10 +72,20 @@ export default defineConfig(({ mode }) => ({
     host: '127.0.0.1',
     port: 5173,
     strictPort: true,
+    // Prevent browser caching during local dev to avoid stale chunk issues.
+    headers: {
+      'Cache-Control': 'no-store',
+    },
     hmr: {
       host: '127.0.0.1',
       port: 5173
     }
+  },
+  preview: {
+    // Prevent browser caching during local preview to avoid stale dist/assets being reused.
+    headers: {
+      'Cache-Control': 'no-store',
+    },
   },
   resolve: {
     alias: {
