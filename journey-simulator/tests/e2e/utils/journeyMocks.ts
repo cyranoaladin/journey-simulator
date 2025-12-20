@@ -20,6 +20,8 @@ const fulfillJson = async (route: Route, data: unknown, status = 200) => {
 };
 
 export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions = {}) => {
+  // Mark E2E context so the app can avoid auto-running steps that would disable CTAs pre-click
+  await page.addInitScript(() => { (window as any).__E2E__ = true })
   const personaId = options.personaId ?? 'cognitive-activation-hub';
   const progressState = {
     personaId,

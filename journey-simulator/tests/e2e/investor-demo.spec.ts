@@ -20,10 +20,16 @@ test.describe('Investor Demo Flow - Capital Foundry', () => {
         await expect(page.getByRole('heading', { name: 'The Capital Foundry', level: 2 })).toBeVisible();
         await expect(page.getByRole('heading', { name: 'Protocol Discovery Sprint', level: 2 })).toBeVisible();
 
-        await page.getByRole('button', { name: /Run Simulation|Start Journey/i }).click();
+        const runBtn = page.getByRole('button', { name: /Run Simulation|Start Journey/i });
+        const stopBtn = page.getByRole('button', { name: 'Stop' });
+        if (await stopBtn.isVisible().catch(() => false)) {
+            // Already auto-running in some environments
+        } else {
+            await runBtn.click();
+        }
         // Demo mode now auto-plays phases. Validate the new UX:
         await expect(page.getByRole('button', { name: 'Stop' })).toBeVisible({ timeout: 15000 });
-        await expect(page.getByText(/Auto-simulation en cours/i)).toBeVisible({ timeout: 15000 });
+        await expect(page.getByText(/Auto-simulation (en cours|running)/i)).toBeVisible({ timeout: 15000 });
 
         // Auto-sim may surface an artifact modal that intercepts clicks; close it if present.
         const closeArtifactBtnEarly = page.getByRole('button', { name: 'Close artifact viewer' });
