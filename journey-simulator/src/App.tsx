@@ -39,6 +39,13 @@ const WalletProtectedLayout = () => (
   </ProtectedRoute>
 );
 
+// Public demo flow: no real auth required; demo page will bootstrap a demo session.
+const DemoLayout = () => (
+  <Layout enableWallet={false}>
+    <Outlet />
+  </Layout>
+);
+
 const DebugMint = lazy(() => import('./pages/DebugMint'));
 
 const RouteSkeleton = () => (
@@ -87,6 +94,12 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
 
+              {/* Public demo routes (explicitly separated from real journeys) */}
+              <Route element={<DemoLayout />}>
+                <Route path="journeys/demo" element={<JourneyDemo />} />
+                <Route path="journeys/demo/:journeyId" element={<JourneyDemo />} />
+              </Route>
+
               {/* Protected routes without wallet stack (lighter initial load) */}
               <Route element={<ProtectedLayout />}>
                 <Route path="dashboard" element={<Dashboard />} />
@@ -102,8 +115,6 @@ function App() {
                 <Route path="debug/mint" element={<DebugMint />} />
                 <Route path="journeys" element={<Journey />} />
                 <Route path="journeys/:journeyId" element={<Journey />} />
-                <Route path="journeys/demo" element={<JourneyDemo />} />
-                <Route path="journeys/demo/:journeyId" element={<JourneyDemo />} />
                 <Route path="journeys/completed" element={<JourneyCompleted />} />
                 <Route path="dao" element={<Dao />} />
               </Route>

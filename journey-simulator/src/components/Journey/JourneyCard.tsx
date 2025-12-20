@@ -4,8 +4,6 @@ import { Sparkles, Compass, Target, RefreshCw } from 'lucide-react';
 import { useJourneyStore } from '../../store/journeyStore';
 import { Persona } from '../../types/journey';
 import { api } from '../../utils/api';
-import { normalizeCompletedPhases } from '../../utils/progress';
-import { logger } from '../../utils/logger';
 
 interface JourneyCardProps {
   persona: Persona;
@@ -13,9 +11,8 @@ interface JourneyCardProps {
 }
 
 const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
-  const { setSelectedPersona, userProgress, loadUserProgress, setUserProgress } = useJourneyStore();
+  const { setSelectedPersona, userProgress, loadUserProgress } = useJourneyStore();
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingDemo, setIsLoadingDemo] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const shouldReduceMotion = useReducedMotion();
 
@@ -75,71 +72,8 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
     }
   };
 
-  const handleLoadDemo = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click
-
-    try {
-      setIsLoadingDemo(true);
-      setError(null);
-
-      // Load demo state from backend
-      const result = await api.loadDemoState(persona.id);
-
-      if (result.success) {
-        // Set persona FIRST to initialize the workspace (this resets progress in store)
-        setSelectedPersona(persona);
-
-        if (result.progress) {
-          // Map backend progress to frontend UserProgress directly
-          const backendProgress = result.progress;
-          const { completedCount, completedPhases } = normalizeCompletedPhases(backendProgress);
-
-          const rawCertificates = Array.isArray(backendProgress.nft_certificates)
-            ? backendProgress.nft_certificates
-            : [];
-
-          const mappedNfts = rawCertificates.map((certificate: any) => {
-            return certificate?.title || certificate?.nft_address || `Phase ${certificate?.phase} NFT`;
-          });
-
-          const mappedProgress = {
-            ...userProgress, // Note: this might be stale if we just called setSelectedPersona, but we are overwriting the important parts
-            totalXP: backendProgress.total_xp || 0,
-            nfts: mappedNfts,
-            mfaiTokens: backendProgress.token_transactions?.mfai_tokens || 0,
-            completedPhases,
-            currentPersona: persona.id,
-            votingPower: Math.floor((backendProgress.total_xp || 0) / 10),
-            // Preserve client-side only state
-            walletConnected: userProgress.walletConnected,
-            walletAddress: userProgress.walletAddress,
-          };
-
-          // Update progress (overwriting the reset state from setSelectedPersona)
-          setUserProgress(mappedProgress);
-
-          // Update current phase to match progress
-          const { setCurrentPhase } = useJourneyStore.getState();
-          setCurrentPhase(completedCount);
-        } else {
-          // Fallback to standard reload if no progress returned
-          await loadUserProgress();
-        }
-
-        // Show success message
-        logger.debug('Demo state loaded:', result.demo_state);
-
-        onSelected?.();
-      } else {
-        setError('Failed to load demo state');
-      }
-    } catch (error) {
-      console.error('Failed to load demo:', error);
-      setError('Failed to load demo. Please try again.');
-    } finally {
-      setIsLoadingDemo(false);
-    }
-  };
+  // NOTE: Demo is now a separate, explicit workflow under /journeys/demo.
+  // We intentionally do not expose "Load Demo State" in the real journeys list to avoid UX confusion.
 
   const getPersonaIcon = () => {
     switch (persona.id) {
@@ -329,25 +263,6 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
                   className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(197,148,255,0.25),transparent_60%)] opacity-0 transition-opacity duration-300 hover:opacity-100"
                 />
               )}
-            </motion.button>
-
-            {/* Load Demo Button */}
-            <motion.button
-              type="button"
-              whileHover={{ scale: isLoadingDemo ? 1 : 1.03 }}
-              whileTap={{ scale: isLoadingDemo ? 1 : 0.97 }}
-              onClick={handleLoadDemo}
-              disabled={isLoadingDemo}
-              className={`relative inline-flex w-full items-center justify-center overflow-hidden rounded-2xl border px-4 py-2 text-xs font-medium transition-all duration-300 ease-out-quart focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${isLoadingDemo
-                ? 'cursor-wait border-mfai-border bg-mfai-surfaceMuted text-slate-500 dark:text-mfai-text/50'
-                : 'border-yellow-500/40 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/20'
-                }`}
-              title="Load pre-populated demo state for investor presentations"
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                {isLoadingDemo ? <RefreshCw size={14} className="animate-spin" /> : '🎬'}
-                {isLoadingDemo ? 'Loading Demo...' : 'Load Demo State'}
-              </span>
             </motion.button>
           </div>
 

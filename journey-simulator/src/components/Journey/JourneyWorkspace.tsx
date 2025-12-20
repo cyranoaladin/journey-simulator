@@ -429,9 +429,9 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
           }
 
           if (!autoSimAbortRef.current) {
-            toast.success('Simulation démo terminée : phases déroulées automatiquement.')
+            toast.success('Demo simulation complete: phases were played automatically.')
           } else {
-            toast.message('Auto-simulation arrêtée.')
+            toast.message('Auto-simulation stopped.')
           }
         } finally {
           setIsAutoSimulating(false)

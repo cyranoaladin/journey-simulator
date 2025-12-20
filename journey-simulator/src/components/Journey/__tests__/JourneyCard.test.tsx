@@ -1,9 +1,8 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { JSX } from 'react';
 import JourneyCard from '../JourneyCard';
 import { useJourneyStore } from '../../../store/journeyStore';
-import { api } from '../../../utils/api';
 
 // Mock dependencies
 vi.mock('../../../store/journeyStore');
@@ -145,21 +144,7 @@ describe('JourneyCard', () => {
         consoleLogSpy?.mockRestore();
     });
 
-    it('should call api.loadDemoState and update store on "Load Demo State" click', async () => {
-        // Mock API response
-        (api.loadDemoState as any).mockResolvedValue({
-            success: true,
-            message: 'Success',
-            journey: {},
-            demo_state: {},
-            progress: {
-                total_xp: 1000,
-                completed_phases: 2,
-                nft_certificates: [],
-                token_transactions: { mfai_tokens: 50 },
-            },
-        });
-
+    it('does not expose demo controls in the real journeys list', async () => {
         render(
             <JourneyCard
                 persona={mockPersona}
@@ -167,24 +152,6 @@ describe('JourneyCard', () => {
             />
         );
 
-        const demoButton = screen.getByRole('button', { name: /Load Demo State/i });
-        fireEvent.click(demoButton);
-
-        await waitFor(() => {
-            expect(api.loadDemoState).toHaveBeenCalled();
-        });
-
-        await waitFor(() => {
-            expect(mockSetSelectedPersona).toHaveBeenCalledWith(mockPersona);
-        });
-
-        await waitFor(() => {
-            expect(mockSetUserProgress).toHaveBeenCalledWith(expect.objectContaining({
-                totalXP: 1000,
-                completedPhases: [0, 1],
-                mfaiTokens: 50,
-                currentPersona: 'test-persona',
-            }));
-        });
+        expect(screen.queryByRole('button', { name: /Load Demo State/i })).toBeNull();
     });
 });

@@ -62,11 +62,15 @@ const HeroSection = () => {
 
     // Journeys is a protected route: for unauthenticated users, go through login.
     if (!isLoading && !isAuthenticated) {
-      navigate('/login?demo=1', { state: { from: { pathname: '/journeys' } } });
+      navigate('/login', { state: { from: { pathname: '/journeys' } } });
       return;
     }
 
     navigate('/journeys');
+  };
+
+  const handleTryDemo = () => {
+    navigate('/journeys/demo');
   };
 
   return (
@@ -126,6 +130,15 @@ const HeroSection = () => {
               >
                 <Sparkles size={20} />
                 <span>Unlock your digital sovereignty</span>
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="btn-secondary flex items-center justify-center space-x-2"
+                onClick={handleTryDemo}
+              >
+                <span>Try Demo</span>
               </motion.button>
             </motion.div>
 
@@ -223,6 +236,14 @@ const HeroSection = () => {
                   className="btn-primary w-full"
                 >
                   Open Journeys
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={handleTryDemo}
+                  className="btn-secondary w-full mt-3"
+                >
+                  Try Demo
                 </motion.button>
               </div>
             </div>
