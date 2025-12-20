@@ -193,49 +193,61 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
     return artifactCatalog.find((a) => a.key === selectedArtifactKey) ?? null;
   }, [artifactCatalog, selectedArtifactKey]);
 
-  if (!selectedPersona) return null;
-
   const activePhaseIndex = currentPhaseIndex ?? userProgress.completedPhases.length;
+  const phases = selectedPersona?.phases ?? [];
+  const activePhase = phases[activePhaseIndex] ?? phases[0] ?? null;
+  const selectedPersonaId = selectedPersona?.id ?? 'unknown';
 
   // Auto-bootstrap the interaction blocks (missions/quizzes/deliverables/evaluation) for the active phase.
-  // This matches the expected UX: after "Launch with Zyno", the interaction area is immediately available.
+  // Hooks must run unconditionally; we guard inside.
   useEffect(() => {
     if (isDemo) return
+    if (!selectedPersona) return
+    if (!activePhase) return
     if (isStepLoading || isAutoSimulating) return
-    if (activePhaseIndex >= selectedPersona.phases.length) return
-
-    const phase = selectedPersona.phases[activePhaseIndex]
-    if (!phase) return
+    if (activePhaseIndex >= phases.length) return
 
     const lastStepPhaseId = lastStep?.metadata?.phase_id
     const lastStepPersonaId = lastStep?.metadata?.persona_id
     const matchesCurrent =
-      lastStepPhaseId === phase.id &&
+      lastStepPhaseId === activePhase.id &&
       lastStepPersonaId === selectedPersona.id
 
     if (matchesCurrent) return
 
-    const key = `${selectedPersona.id}:${phase.id}`
+    const key = `${selectedPersona.id}:${activePhase.id}`
     if (autoInteractionKeyRef.current === key) return
     autoInteractionKeyRef.current = key
 
     void handleRunInteractiveStep()
   }, [
+    activePhase,
     activePhaseIndex,
     isAutoSimulating,
     isDemo,
     isStepLoading,
     lastStep?.metadata?.persona_id,
     lastStep?.metadata?.phase_id,
+    phases.length,
     selectedPersona,
   ])
 
-  // Check if journey is completed
-  if (activePhaseIndex >= selectedPersona.phases.length) {
-    return <JourneyCompletedPage />;
-  }
+  // NOTE: No early returns before hooks below (React Hooks rules).
 
-  const activePhase = selectedPersona.phases[activePhaseIndex] || selectedPersona.phases[0];
+  // NOTE: We keep hooks below unconditional by using a safe fallback object.
+  // If the persona has no phases (shouldn't happen), we will early-return later.
+  const safeActivePhase = (activePhase ?? {
+    id: 'unknown',
+    title: 'Current Phase',
+    description: '',
+    mission: '',
+    tools: [],
+    xpReward: 0,
+    mfaiReward: 0,
+    nftReward: undefined,
+    stakingRequired: 0,
+    daoVoteRequired: false,
+  }) as typeof activePhase;
 
   const { completedPhases } = userProgress;
   const activePhaseNumber = activePhaseIndex + 1;
@@ -243,11 +255,11 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
 
   const getCompletionCtaLabel = () => {
     const stakingAmount =
-      typeof activePhase.stakingRequired === 'number' && activePhase.stakingRequired > 0
-        ? activePhase.stakingRequired
+      typeof safeActivePhase.stakingRequired === 'number' && safeActivePhase.stakingRequired > 0
+        ? safeActivePhase.stakingRequired
         : null
-    const requiresVote = Boolean(activePhase.daoVoteRequired)
-    const isLaunchPhase = activePhase.id === 'launch-collaterize'
+    const requiresVote = Boolean(safeActivePhase.daoVoteRequired)
+    const isLaunchPhase = safeActivePhase.id === 'launch-collaterize'
 
     if (isLaunchPhase) {
       // Launch simulation CTA should describe the phase action; minting (if any) happens in the modal after completion.
@@ -271,12 +283,12 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
 
     blocks.push({
       kind: 'text_block',
-      id: `${selectedPersona.id}:${activePhase.id}:intro`,
+      id: `${selectedPersonaId}:${activePhase.id}:intro`,
       title: 'Zyno Mission Brief',
       body_markdown: [
-        `**Phase:** ${activePhase.title}`,
+        `**Phase:** ${safeActivePhase.title}`,
         ``,
-        activePhase.mission ? `**Objective:** ${activePhase.mission}` : `**Objective:** Complete the phase deliverable.`,
+        safeActivePhase.mission ? `**Objective:** ${safeActivePhase.mission}` : `**Objective:** Complete the phase deliverable.`,
         ``,
         `Run a simulation to get a richer agent-generated plan, then submit your deliverable below for evaluation.`,
       ].join('\n'),
@@ -284,20 +296,20 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
 
     blocks.push({
       kind: 'mission_block',
-      id: `${selectedPersona.id}:${activePhase.id}:deliverable`,
+      id: `${selectedPersonaId}:${activePhase.id}:deliverable`,
       title: 'Deliverable Submission',
-      description: activePhase.mission || activePhase.description || 'Submit your phase deliverable for evaluation.',
+      description: safeActivePhase.mission || safeActivePhase.description || 'Submit your phase deliverable for evaluation.',
       mission_type: 'deliverable',
       expected_input_type: 'markdown_document',
-      xp_reward: activePhase.xpReward ?? 0,
-      nft_reward_id: activePhase.nftReward,
+      xp_reward: safeActivePhase.xpReward ?? 0,
+      nft_reward_id: safeActivePhase.nftReward,
       is_mandatory: true,
     })
 
-    const resourceItems = (Array.isArray(activePhase.tools) ? activePhase.tools : [])
+    const resourceItems = (Array.isArray(safeActivePhase.tools) ? safeActivePhase.tools : [])
       .filter(Boolean)
       .map((tool: string, index: number) => ({
-        id: `${selectedPersona.id}:${activePhase.id}:tool:${index}`,
+        id: `${selectedPersonaId}:${activePhase.id}:tool:${index}`,
         label: tool,
         description: 'Recommended tool for this phase.',
         resource_type: 'tool_link' as const,
@@ -307,7 +319,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
     if (resourceItems.length > 0) {
       blocks.push({
         kind: 'resource_block',
-        id: `${selectedPersona.id}:${activePhase.id}:resources`,
+        id: `${selectedPersonaId}:${activePhase.id}:resources`,
         title: 'Tools & Resources',
         resources: resourceItems,
       })
@@ -315,14 +327,14 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
 
     blocks.push({
       kind: 'quiz_block',
-      id: `${selectedPersona.id}:${activePhase.id}:quiz`,
+      id: `${selectedPersonaId}:${activePhase.id}:quiz`,
       title: 'Phase Checkpoint Quiz',
       questions: [
         {
           id: 'q1',
           question: 'What is the primary deliverable for this phase?',
           options: [
-            activePhase.mission || 'A phase deliverable aligned with the objective',
+            safeActivePhase.mission || 'A phase deliverable aligned with the objective',
             'A DAO proposal',
             'A wallet connection',
             'A marketing campaign',
@@ -359,28 +371,28 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
 
     return {
       metadata: {
-        persona_id: selectedPersona.id,
-        journey_track: selectedPersona.id,
-        phase_id: activePhase.id,
+        persona_id: selectedPersonaId,
+        journey_track: selectedPersonaId,
+        phase_id: safeActivePhase.id,
         language: 'en',
         mode: uiMode,
         tone: uiTone,
-        title: `${activePhase.title} — Interaction`,
-        summary: activePhase.mission || activePhase.description,
+        title: `${safeActivePhase.title} — Interaction`,
+        summary: safeActivePhase.mission || safeActivePhase.description,
       },
       ui_blocks: blocks,
       agent_actions: [],
-      next_state: { phase_id: activePhase.id, completed_missions: [], xp_delta: 0 },
+      next_state: { phase_id: safeActivePhase.id, completed_missions: [], xp_delta: 0 },
     }
   }, [
-    activePhase.description,
-    activePhase.id,
-    activePhase.mission,
-    activePhase.nftReward,
-    activePhase.title,
-    activePhase.tools,
-    activePhase.xpReward,
-    selectedPersona.id,
+    safeActivePhase.description,
+    safeActivePhase.id,
+    safeActivePhase.mission,
+    safeActivePhase.nftReward,
+    safeActivePhase.title,
+    safeActivePhase.tools,
+    safeActivePhase.xpReward,
+    selectedPersonaId,
     uiMode,
     uiTone,
   ])
@@ -388,8 +400,8 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
   const interactionResponse = useMemo<JourneyStepResponse>(() => {
     const candidate = lastStep as unknown as JourneyStepResponse | null
     const hasBlocks = Boolean(candidate?.ui_blocks && candidate.ui_blocks.length > 0)
-    const matchesPhase = candidate?.metadata?.phase_id === activePhase.id
-    const matchesPersona = candidate?.metadata?.persona_id === selectedPersona.id
+    const matchesPhase = candidate?.metadata?.phase_id === safeActivePhase.id
+    const matchesPersona = candidate?.metadata?.persona_id === selectedPersonaId
     const looksLikeMock = candidate?.ui_blocks?.length === 1 && (candidate.ui_blocks[0] as any)?.title === 'Mock'
 
     if (hasBlocks && matchesPhase && matchesPersona && !looksLikeMock) {
@@ -397,7 +409,16 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
     }
 
     return localInteractionStep
-  }, [activePhase.id, lastStep, localInteractionStep, selectedPersona.id])
+  }, [lastStep, localInteractionStep, safeActivePhase.id, selectedPersonaId])
+
+  // Safe returns AFTER hooks.
+  if (!selectedPersona) return null;
+  if (activePhaseIndex >= phases.length) return <JourneyCompletedPage />;
+
+  // If persona has no phases (should never happen), stop here after hooks.
+  if (!activePhase) {
+    return null
+  }
 
   // UI Helpers
   const densityLabel = density === 'compact' ? 'Compact' : 'Comfortable';

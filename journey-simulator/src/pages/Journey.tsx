@@ -16,18 +16,10 @@ const Journey = () => {
   const { selectedPersona, setSelectedPersona } = useJourneyStore();
   const { startTutorial } = useTutorial();
   const { journeyId } = useParams();
-
-  // Hard separation: demo sessions should not live under real journey routes.
-  if (isDemoSession()) {
-    return (
-      <Navigate
-        to={journeyId ? `/journeys/demo/${journeyId}` : '/journeys/demo'}
-        replace
-      />
-    );
-  }
+  const demo = isDemoSession()
 
   useEffect(() => {
+    if (demo) return
     if (journeyId) {
       const persona = personas.find(p => p.id === journeyId);
       if (persona && persona.id !== selectedPersona?.id) {
@@ -42,7 +34,17 @@ const Journey = () => {
       // This ensures /journeys route always shows the list
       setSelectedPersona(null);
     }
-  }, [journeyId, selectedPersona, setSelectedPersona]);
+  }, [demo, journeyId, selectedPersona, setSelectedPersona]);
+
+  // Hard separation: demo sessions should not live under real journey routes.
+  if (demo) {
+    return (
+      <Navigate
+        to={journeyId ? `/journeys/demo/${journeyId}` : '/journeys/demo'}
+        replace
+      />
+    );
+  }
 
   const showJourneyTutorial = () => {
     startTutorial([
