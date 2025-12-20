@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { Artifact } from '../types/artifact';
 import { api } from '../utils/api';
 
-export const useArtifacts = () => {
+export const useArtifacts = (options?: { fallbackToStatic?: boolean }) => {
+  const fallbackToStatic = options?.fallbackToStatic ?? false;
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,25 +22,33 @@ export const useArtifacts = () => {
             setArtifacts(normalizedArtifacts);
             return;
           }
-          // No artifacts returned even though call succeeded; fall back to static set for demo
+          // No artifacts returned even though call succeeded.
+          if (!fallbackToStatic) {
+            setArtifacts([]);
+            setError(null);
+            return;
+          }
           console.warn('Artifacts endpoint returned empty list, loading static demo assets instead.');
         }
         throw new Error(data?.message || 'Failed to fetch artifacts');
       } catch (err) {
         console.error('Error fetching artifacts:', err);
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        const message = err instanceof Error ? err.message : 'An unknown error occurred';
+        setError(message);
 
-        // Fallback to static JSON if API fails
-        try {
-          const staticArtifacts = await import('../data/artifacts.json');
-          const fallbackArtifacts = (staticArtifacts.default as Artifact[]).map((artifact) => ({
-            ...artifact,
-            status: 'unlocked' as const,
-          }));
-          setArtifacts(fallbackArtifacts);
-          setError(null);
-        } catch (fallbackErr) {
-          console.error('Error loading fallback artifacts:', fallbackErr);
+        // Optional fallback to static JSON
+        if (fallbackToStatic) {
+          try {
+            const staticArtifacts = await import('../data/artifacts.json');
+            const fallbackArtifacts = (staticArtifacts.default as Artifact[]).map((artifact) => ({
+              ...artifact,
+              status: 'unlocked' as const,
+            }));
+            setArtifacts(fallbackArtifacts);
+            setError(null);
+          } catch (fallbackErr) {
+            console.error('Error loading fallback artifacts:', fallbackErr);
+          }
         }
       } finally {
         setLoading(false);
@@ -47,7 +56,7 @@ export const useArtifacts = () => {
     };
 
     fetchArtifacts();
-  }, []);
+  }, [fallbackToStatic]);
 
   return { artifacts, loading, error };
 };

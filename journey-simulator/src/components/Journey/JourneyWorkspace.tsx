@@ -41,9 +41,9 @@ import { LaunchCollaterizePhase } from './LaunchCollaterizePhase';
 
 import { NeuralOverlay } from '../Artifacts/NeuralOverlay';
 import { ArtifactModal } from '../Artifacts/ArtifactModal';
-import artifactsData from '../../data/artifacts.json';
 import { toast } from 'sonner';
 import { useWorkspaceLayout } from '../../contexts/WorkspaceLayoutContext';
+import { useArtifacts } from '../../hooks/useArtifacts';
 
 interface JourneyWorkspaceProps {
   onBack?: () => void;
@@ -92,6 +92,10 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
   const [autoSimProgress, setAutoSimProgress] = useState<{ current: number; total: number } | null>(null);
   // Prevent Firefox/StrictMode rerenders from re-triggering the same artifact generation overlay forever.
   const pendingArtifactIdsRef = useRef<Set<string>>(new Set())
+  const isDemo = tokenStore.getAccessToken() === 'demo-token'
+  const { artifacts, loading: artifactsLoading, error: artifactsError } = useArtifacts({
+    fallbackToStatic: isDemo,
+  })
 
   const DEMO_SCENARIOS: Record<string, Record<number, string>> = {
     'cognitive-activation-hub': {
@@ -117,6 +121,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
   useEffect(() => {
     // NOTE: This is a simplified logic for demo purposes.
     // A more robust implementation would check the step completion status from the store.
+    if (!isDemo) return;
     if (lastStep && lastStep.ui_blocks && lastStep.ui_blocks.length > 0) {
       const personaId = selectedPersona?.id || 'web3_builder';
       const currentStepIndex = userProgress.completedPhases.length + 1;
@@ -127,7 +132,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
         !unlockedArtifacts.includes(artifactId) &&
         !pendingArtifactIdsRef.current.has(artifactId)
       ) {
-        const artifact = artifactsData.find(a => a.id === artifactId);
+        const artifact = artifacts.find(a => a.id === artifactId);
         if (!artifact) return;
 
         // Mark pending immediately to avoid duplicate timeouts on rerender.
@@ -141,7 +146,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
         setViewingArtifact(artifact);
       }
     }
-  }, [lastStep, selectedPersona, userProgress.completedPhases, unlockedArtifacts]);
+  }, [artifacts, isDemo, lastStep, selectedPersona, unlockedArtifacts, userProgress.completedPhases]);
 
   useEffect(() => {
     return () => {
@@ -166,30 +171,21 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
 
   // NOTE: Hooks must run unconditionally (before any early returns).
   const artifactCatalog = useMemo(() => {
-    const fallback = [
-      { key: 'litepaper', title: 'Litepaper', category: 'Strategy', agent: 'Growth Agent', version: 'v1.0.0' },
-      { key: 'protocol-architecture', title: 'Protocol Architecture', category: 'Technical', agent: 'Architect Agent', version: 'v1.0.0' },
-      { key: 'tokenomics', title: 'Tokenomics', category: 'Finance', agent: 'CFO Agent', version: 'v1.0.0' },
-      { key: 'go-to-market', title: 'Go-to-Market', category: 'Fundraising', agent: 'Marketing Agent', version: 'v1.0.0' },
-      { key: 'sql-spec', title: 'SQL Spec', category: 'Technical', agent: 'Architect Agent', version: 'v1.0.0' },
-      { key: 'proof-certificate', title: 'Proof Certificate', category: 'Certificate', agent: 'Education Agent', version: 'v1.0.0' },
-      { key: 'alpha-analysis', title: 'Alpha Analysis', category: 'Analysis', agent: 'Analyst Agent', version: 'v1.0.0' },
-      { key: 'rwa-model', title: 'RWA Model', category: 'Finance', agent: 'RWA Agent', version: 'v1.0.0' },
-    ];
-
-    // Enrich with demo metadata from artifacts.json when available.
-    return fallback.map((item) => {
-      const match = artifactsData.find((a: any) =>
-        (a.title && a.title.toLowerCase().includes(item.title.toLowerCase())) ||
-        (a.id && a.id.toLowerCase().includes(item.key))
-      ) as any;
-      return {
-        ...item,
-        id: match?.id ?? item.key,
-        fileUrl: match?.fileUrl ?? match?.url ?? '',
-      };
-    });
-  }, []);
+    return (artifacts ?? [])
+      .map((artifact) => ({
+        key: artifact.id,
+        title: artifact.title,
+        category: artifact.agent?.role ?? artifact.type,
+        agent: artifact.agent?.name ?? 'Zyno Agent',
+        version: 'v1.0.0',
+        fileUrl: artifact.fileUrl ?? '',
+        status: artifact.status ?? 'unlocked',
+      }))
+      .sort((a, b) => {
+        if (a.status === b.status) return a.title.localeCompare(b.title)
+        return a.status === 'unlocked' ? -1 : 1
+      })
+  }, [artifacts]);
 
   const selectedArtifact = useMemo(() => {
     if (!selectedArtifactKey) return null;
@@ -505,32 +501,12 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
     }
   };
 
-  const handleArtifactClick = (artifactName: string) => {
-    const fallbackFileUrlByName: Record<string, string> = {
-      Litepaper: '/generated/litepaper_sim.html',
-      Tokenomics: '/generated/tokenomics_sim.html',
-      'Pitch Deck': '/generated/pitch_deck_slide.html',
-      'Legal Opinion': '/generated/investor_memo.html',
-      'Go-to-Market': '/generated/business_model.html',
-      'Audit Report': '/generated/migration_blueprint.html',
-    }
-
-    // Mock lookup for artifacts based on string name
-    // In real app, `artifactsData` would be used properly
-    const mockArtifact = {
-      title: artifactName,
-      fileUrl: fallbackFileUrlByName[artifactName] ?? '', // Would be a real URL in production
-      type: 'document'
-    };
-
-    // If we have a specific mock for it in artifacts.json, use it
-    const realMatch = artifactsData.find(a => a.title.includes(artifactName) || a.id.includes(artifactName.toLowerCase()));
-
-    setViewingArtifact(realMatch || mockArtifact);
-
-    if (!realMatch) {
-      toast.info("Viewing Simulation Artifact", { description: "This is a placeholder for the generated document." });
-    }
+  const handleOpenArtifactFullScreen = () => {
+    if (!selectedArtifact) return
+    setViewingArtifact({
+      title: selectedArtifact.title,
+      fileUrl: selectedArtifact.fileUrl,
+    })
   };
 
   const handleViewReport = () => {
@@ -569,7 +545,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
 
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-3">
           <h1 className="text-sm font-bold uppercase tracking-wider text-white">{selectedPersona.title}</h1>
-          {(tokenStore.getAccessToken() === 'demo-token' || Boolean(userProgress.demoModeEnabled)) && (
+          {isDemo && (
             <span className="rounded-full bg-accent-cyan/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-accent-cyan border border-accent-cyan/20">
               Demo Mode
             </span>
@@ -609,7 +585,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
             <PanelRight size={18} />
           </button>
 
-          {(tokenStore.getAccessToken() === 'demo-token' || Boolean(userProgress.demoModeEnabled)) && (
+          {isDemo && (
             <>
               <div className="h-6 w-px bg-white/10 mx-1"></div>
               <button
@@ -817,6 +793,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
           </section>
 
           {/* SIMULATION RESULTS (New) */}
+          {isDemo ? (
           <section className="rounded-2xl border border-white/5 bg-white/5 p-6">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
@@ -844,6 +821,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
               ))}
             </div>
           </section>
+          ) : null}
 
           {/* PROJECT ARTIFACTS (Master–Detail) */}
           <section className="rounded-2xl border border-white/5 bg-white/5 p-6">
@@ -864,7 +842,19 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
                   Select an artifact to preview it. Use full-screen for reading and exporting.
                 </p>
                 <div className="max-h-[420px] overflow-y-auto pr-1 custom-scrollbar space-y-2">
-                  {artifactCatalog.map((art) => {
+                  {artifactsLoading ? (
+                    <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-xs text-white/60">
+                      Loading artifacts…
+                    </div>
+                  ) : artifactsError ? (
+                    <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-xs text-red-200">
+                      Unable to load artifacts: {artifactsError}
+                    </div>
+                  ) : artifactCatalog.length === 0 ? (
+                    <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-xs text-white/60">
+                      No artifacts yet. Run an interactive step and submit deliverables to generate artifacts.
+                    </div>
+                  ) : artifactCatalog.map((art) => {
                     const isActive = art.key === selectedArtifactKey
                     return (
                       <button
@@ -910,8 +900,8 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => selectedArtifact && handleArtifactClick(selectedArtifact.title)}
-                      disabled={!selectedArtifact}
+                      onClick={handleOpenArtifactFullScreen}
+                      disabled={!selectedArtifact || !selectedArtifact.fileUrl}
                       className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-bold text-white transition hover:bg-white/20 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       Open full screen
