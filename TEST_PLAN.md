@@ -14,6 +14,22 @@ bash scripts/ci-verify.sh
 
 Inclut : install (`npm ci`), lint, build, unit tests, puis E2E (Playwright).
 
+### Clean restart “prod-like” (recommandé quand vous suspectez un cache / port conflict)
+
+```bash
+# Soft clean + restart stack
+bash scripts/local-restart-prod.sh
+
+# Hard clean (node_modules + playwright cache) + restart stack
+bash scripts/local-restart-prod.sh --hard
+```
+
+### Validation locale complète (unit + build + E2E Chromium + Firefox)
+
+```bash
+bash scripts/local-verify.sh
+```
+
 ### Environnement “prod local” (QA manuelle en conditions prod)
 
 Démarre DB (Mongo + Postgres), Redis (si dispo), puis :
