@@ -130,10 +130,29 @@ start_bg "worker-mint" "cd '$ROOT_DIR' && NODE_ENV=production DATABASE_URL='${DA
 start_bg "simulator" "cd '$ROOT_DIR' && NODE_ENV=production npm run preview --prefix journey-simulator -- --host 0.0.0.0 --port '${PORT_SIM}'"
 
 echo "[prod-local] smoke-check"
-curl -s -o /dev/null -w " - mf-back /healthz: %{http_code}\n" "http://127.0.0.1:${PORT_BACKEND}/healthz" || true
-curl -s -o /dev/null -w " - mf-back /readyz: %{http_code}\n" "http://127.0.0.1:${PORT_BACKEND}/readyz" || true
-curl -s -o /dev/null -w " - web /api/health: %{http_code}\n" "http://127.0.0.1:${PORT_WEB}/api/health" || true
-curl -s -o /dev/null -w " - simulator: %{http_code}\n" "http://127.0.0.1:${PORT_SIM}/" || true
+
+wait_http() {
+  local url="$1"
+  local label="$2"
+  local attempts="${3:-30}"
+  local delay="${4:-1}"
+  local code=""
+  for ((i=1; i<=attempts; i++)); do
+    code="$(curl -s -o /dev/null -w "%{http_code}" "$url" || true)"
+    if [[ "$code" != "000" ]] && [[ "$code" != "502" ]] && [[ "$code" != "503" ]]; then
+      printf ' - %s: %s\n' "$label" "$code"
+      return 0
+    fi
+    sleep "$delay"
+  done
+  printf ' - %s: %s (timed out)\n' "$label" "$code"
+  return 1
+}
+
+wait_http "http://127.0.0.1:${PORT_BACKEND}/healthz" "mf-back /healthz"
+wait_http "http://127.0.0.1:${PORT_BACKEND}/readyz" "mf-back /readyz"
+wait_http "http://127.0.0.1:${PORT_WEB}/api/health" "web /api/health"
+wait_http "http://127.0.0.1:${PORT_SIM}/" "simulator /" 60 1 || true
 
 echo ""
 echo "✅ PROD LOCAL UP"
