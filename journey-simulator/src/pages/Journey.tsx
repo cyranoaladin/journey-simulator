@@ -6,15 +6,26 @@ import JourneysPage from '../components/JourneysPage';
 import { useJourneyStore } from '../store/journeyStore';
 import { useTutorial } from '../contexts/TutorialContext';
 import { HelpCircle } from 'lucide-react';
-import { useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { personas } from '../data/personas';
 import JourneyWorkspace from '../components/Journey/JourneyWorkspace';
+import { isDemoSession } from '../utils/demoSession';
 
 const Journey = () => {
   const { selectedPersona, setSelectedPersona } = useJourneyStore();
   const { startTutorial } = useTutorial();
   const { journeyId } = useParams();
+
+  // Hard separation: demo sessions should not live under real journey routes.
+  if (isDemoSession()) {
+    return (
+      <Navigate
+        to={journeyId ? `/journeys/demo/${journeyId}` : '/journeys/demo'}
+        replace
+      />
+    );
+  }
 
   useEffect(() => {
     if (journeyId) {
@@ -74,7 +85,7 @@ const Journey = () => {
         <button
           onClick={showJourneyTutorial}
           className="fixed bottom-6 right-6 z-50 p-3 rounded-full bg-gradient-to-r from-cyan-600 to-purple-600 shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 transition-all"
-          aria-label="Démarrer le tutoriel"
+          aria-label="Start tutorial"
         >
           <HelpCircle size={20} className="text-white" />
         </button>

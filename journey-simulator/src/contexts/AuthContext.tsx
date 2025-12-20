@@ -71,7 +71,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       // Set user
       setUser(data.user);
       try {
-        localStorage.setItem("userId", data.user.id);
+        sessionStorage.setItem("userId", data.user.id);
       } catch (storageError) {
         logger.warn("Unable to persist userId after login", storageError);
       }
@@ -127,7 +127,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       // Set user
       setUser(data.user);
       try {
-        localStorage.setItem("userId", data.user.id);
+        sessionStorage.setItem("userId", data.user.id);
       } catch (storageError) {
         logger.warn("Unable to persist userId after login", storageError);
       }
@@ -157,7 +157,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       // Set user
       setUser(data.user);
       try {
-        localStorage.setItem("userId", data.user.id);
+        sessionStorage.setItem("userId", data.user.id);
       } catch (storageError) {
         logger.warn(
           "Unable to persist userId after registration",
@@ -201,7 +201,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       tokenStore.clearTokens();
       setUser(null);
       try {
-        localStorage.removeItem("userId");
+        sessionStorage.removeItem("userId");
       } catch (storageError) {
         logger.warn("Unable to clear userId on logout", storageError);
       }
@@ -229,7 +229,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         logger.debug("AuthContext: Token verified successfully");
         setUser(data.user);
         try {
-          localStorage.setItem("userId", data.user.id);
+          sessionStorage.setItem("userId", data.user.id);
         } catch (storageError) {
           logger.warn(
             "Unable to persist userId after auth check",
@@ -311,7 +311,11 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         // If refresh failed or no refresh token, clear everything
         logger.debug("AuthContext: Clearing auth state");
         tokenStore.clearTokens();
-        localStorage.removeItem("userId");
+        try {
+          sessionStorage.removeItem("userId");
+        } catch {
+          // ignore
+        }
         setUser(null);
         await resetProgress();
       }
@@ -354,7 +358,11 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       setUser(demoUser);
       tokenStore.setAccessToken("demo-token");
       tokenStore.setRefreshToken("demo-refresh-token");
-      localStorage.setItem("userId", demoUser.id);
+      try {
+        sessionStorage.setItem("userId", demoUser.id);
+      } catch {
+        // ignore
+      }
       await resetProgress();
       // Mock loading progress for demo
       useJourneyStore.getState().setDemoMode(true);

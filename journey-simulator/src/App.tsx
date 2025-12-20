@@ -11,6 +11,7 @@ import { initParticles } from './utils/particles';
 import Layout from './components/layout/Layout';
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Journey = lazy(() => import('./pages/Journey'));
+const JourneyDemo = lazy(() => import('./pages/JourneyDemo'));
 const Playground = lazy(() => import('./pages/Playground'));
 const Dao = lazy(() => import('./pages/Dao'));
 const Resources = lazy(() => import('./pages/Resources'));
@@ -101,7 +102,8 @@ function App() {
                 <Route path="debug/mint" element={<DebugMint />} />
                 <Route path="journeys" element={<Journey />} />
                 <Route path="journeys/:journeyId" element={<Journey />} />
-                <Route path="journeys/demo" element={<Journey />} />
+                <Route path="journeys/demo" element={<JourneyDemo />} />
+                <Route path="journeys/demo/:journeyId" element={<JourneyDemo />} />
                 <Route path="journeys/completed" element={<JourneyCompleted />} />
                 <Route path="dao" element={<Dao />} />
               </Route>

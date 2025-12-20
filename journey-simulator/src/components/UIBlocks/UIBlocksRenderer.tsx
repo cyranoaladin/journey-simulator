@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { useJourneyStore } from "../../store/journeyStore";
-import { API_BASE_URL } from '../../utils/api';
+import { api } from '../../utils/api';
 import { logger } from '../../utils/logger';
 // TEMPORARILY DISABLED - import { useFavoritesStore } from "../../store/favoritesStore";
 import type {
@@ -167,15 +167,7 @@ function Quiz({ block }: { block: QuizBlock; }) {
         phaseId: lastStep?.metadata?.phase_id,
         journeyState: useJourneyStore.getState().userProgress,
       };
-
-      const resp = await fetch(`${API_BASE_URL}/journey/${id}/submit`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      if (!resp.ok) throw new Error(`submit failed: ${resp.status}`);
-      const json = await resp.json();
+      const json = await api.submitMission(id, body);
 
       // Extract next_step from the response
       const nextStep = json.next_step || json;
@@ -349,13 +341,7 @@ function Mission({ block }: { block: MissionBlock; }) {
         phaseId: lastStep?.metadata?.phase_id,
         journeyState: useJourneyStore.getState().userProgress,
       };
-      const resp = await fetch(`${API_BASE_URL}/journey/${id}/submit`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      if (!resp.ok) throw new Error(`submit failed: ${resp.status}`);
-      const json = await resp.json();
+      const json = await api.submitMission(id, body);
 
       // Extract next_step from the response
       const nextStep = json.next_step || json;
