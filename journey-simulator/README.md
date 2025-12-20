@@ -3099,6 +3099,14 @@ Issues non bloquantes (perf, UX, compat) qui peuvent être planifiées et trait�
 **Status**: Considering CDN implementation
 **Priority**: Low
 
+#### 6. Noisy console errors from browser extensions (dev only)
+
+**Issue**: In local development, extensions may inject scripts (e.g., AdUnit) that trigger errors like `index.browser.js:507 Cannot access <x> before initialization`.
+**Workaround**: A dev-only guard ignores errors from `chrome-extension://` / `moz-extension://` script origins to keep the console clean.
+**Disable the guard**: set `VITE_DISABLE_EXTENSION_ERROR_FILTER=true` or run `localStorage.setItem('debug:allow-extension-errors','1')` then refresh.
+**Status**: Documented; production not affected.
+**Priority**: Low
+
 ### Browser Compatibility
 
 Navigateurs supportés et limitations connues. Objectif : éviter des surprises lors de démos sur environnements variés.

@@ -14,9 +14,13 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
 import './index.css'
+import { setupIgnoreExtensionErrors } from './utils/ignoreExtensionErrors'
 
 // Initial loading optimization
 const rootElement = document.getElementById('root')!;
+
+// Dev guard: ignore noisy extension errors in local runs
+const teardownIgnore = setupIgnoreExtensionErrors()
 
 const root = ReactDOM.createRoot(rootElement);
 
@@ -33,6 +37,11 @@ const performantRender = () => {
 
 // Direct rendering without delay
 performantRender();
+
+// Optional: clean up on hot-reload dispose
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => teardownIgnore?.())
+}
 
 // Service worker registration for offline caching (temporarily disabled)
 // if ('serviceWorker' in navigator) {
