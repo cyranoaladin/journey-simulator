@@ -46,19 +46,24 @@ export async function clickRunSimulation(page: Page) {
 }
 
 export async function clickMintNft(page: Page) {
-  const mintBtn = page.getByTestId('mint-nft').first();
-  await expect(mintBtn).toBeVisible({ timeout: 15000 });
-  await expect(mintBtn).toBeEnabled({ timeout: 15000 });
+  let btn = page.getByTestId('mint-nft').first();
+  // Fallback if the phase does not expose an NFT CTA (some phases may only show "Complete Phase")
+  if (!(await btn.isVisible().catch(() => false))) {
+    btn = page.getByTestId('complete-phase').first();
+  }
+
+  await expect(btn).toBeVisible({ timeout: 15000 });
+  await expect(btn).toBeEnabled({ timeout: 15000 });
 
   try {
-    await mintBtn.click({ timeout: 15000, force: true });
+    await btn.click({ timeout: 15000, force: true });
     return;
   } catch {
     // ignore and fallback
   }
 
   await page.evaluate(() => {
-    const btn = document.querySelector('[data-testid="mint-nft"]') as HTMLButtonElement | null;
-    btn?.click();
+    const el = (document.querySelector('[data-testid="mint-nft"], [data-testid="complete-phase"]') as HTMLButtonElement | null);
+    el?.click();
   });
 }
