@@ -150,6 +150,9 @@ function Quiz({ block }: { block: QuizBlock; }) {
       setSubmitting(true);
       setError(null);
       const id = ensureApiJourneyId();
+      const phaseId = lastStep?.metadata?.phase_id ?? "unknown";
+      const phaseNumber = (useJourneyStore.getState().currentPhase ?? 0) + 1;
+      const trackId = selectedPersona?.id ?? "unknown";
 
       const body = {
         missionId: block.id, // Using block ID as mission ID for quiz
@@ -163,8 +166,9 @@ function Quiz({ block }: { block: QuizBlock; }) {
         language: "en",
         mode: "builder",
         tone: "pedagogical",
-        trackId: selectedPersona?.id,
-        phaseId: lastStep?.metadata?.phase_id,
+        trackId,
+        phaseId,
+        phaseNumber,
         journeyState: useJourneyStore.getState().userProgress,
       };
       const json = await api.submitMission(id, body);
@@ -330,6 +334,9 @@ function Mission({ block }: { block: MissionBlock; }) {
       setSubmitting(true);
       setError(null);
       const id = ensureApiJourneyId();
+      const phaseId = lastStep?.metadata?.phase_id ?? "unknown";
+      const phaseNumber = (useJourneyStore.getState().currentPhase ?? 0) + 1;
+      const trackId = selectedPersona?.id ?? "unknown";
       const body = {
         missionId: block.id,
         inputType: block.expected_input_type,
@@ -337,8 +344,9 @@ function Mission({ block }: { block: MissionBlock; }) {
         language: "en",
         mode: "builder",
         tone: "pedagogical",
-        trackId: selectedPersona?.id,
-        phaseId: lastStep?.metadata?.phase_id,
+        trackId,
+        phaseId,
+        phaseNumber,
         journeyState: useJourneyStore.getState().userProgress,
       };
       const json = await api.submitMission(id, body);
