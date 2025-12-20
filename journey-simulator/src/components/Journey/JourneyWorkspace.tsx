@@ -24,12 +24,11 @@ import {
   CheckCircle2,
   FileText
 } from 'lucide-react';
-import type { JourneyStepResponse } from '../../types/uiBlocks';
+import type { JourneyStepResponse, UIBlock } from '../../types/uiBlocks';
 // import confetti from 'canvas-confetti';
 import NFTProofModal from '../NFTProofModal';
 import { getProofType, getPersonaProofData } from '../../data/proofsData';
 import { resources, getResourceIcon } from '../../data/resources';
-import PhaseDetails from './PhaseDetails';
 import { api } from '../../utils/api';
 import { tokenStore } from '../../utils/tokenStore';
 
@@ -266,6 +265,139 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
     // Default: completing the phase triggers evaluation + rewards (including NFT mint via modal if applicable).
     return 'Complete Phase'
   }
+
+  const localInteractionStep = useMemo<JourneyStepResponse>(() => {
+    const blocks: UIBlock[] = []
+
+    blocks.push({
+      kind: 'text_block',
+      id: `${selectedPersona.id}:${activePhase.id}:intro`,
+      title: 'Zyno Mission Brief',
+      body_markdown: [
+        `**Phase:** ${activePhase.title}`,
+        ``,
+        activePhase.mission ? `**Objective:** ${activePhase.mission}` : `**Objective:** Complete the phase deliverable.`,
+        ``,
+        `Run a simulation to get a richer agent-generated plan, then submit your deliverable below for evaluation.`,
+      ].join('\n'),
+    })
+
+    blocks.push({
+      kind: 'mission_block',
+      id: `${selectedPersona.id}:${activePhase.id}:deliverable`,
+      title: 'Deliverable Submission',
+      description: activePhase.mission || activePhase.description || 'Submit your phase deliverable for evaluation.',
+      mission_type: 'deliverable',
+      expected_input_type: 'markdown_document',
+      xp_reward: activePhase.xpReward ?? 0,
+      nft_reward_id: activePhase.nftReward,
+      is_mandatory: true,
+    })
+
+    const resourceItems = (Array.isArray(activePhase.tools) ? activePhase.tools : [])
+      .filter(Boolean)
+      .map((tool: string, index: number) => ({
+        id: `${selectedPersona.id}:${activePhase.id}:tool:${index}`,
+        label: tool,
+        description: 'Recommended tool for this phase.',
+        resource_type: 'tool_link' as const,
+        agent_owner: 'Zyno',
+      }))
+
+    if (resourceItems.length > 0) {
+      blocks.push({
+        kind: 'resource_block',
+        id: `${selectedPersona.id}:${activePhase.id}:resources`,
+        title: 'Tools & Resources',
+        resources: resourceItems,
+      })
+    }
+
+    blocks.push({
+      kind: 'quiz_block',
+      id: `${selectedPersona.id}:${activePhase.id}:quiz`,
+      title: 'Phase Checkpoint Quiz',
+      questions: [
+        {
+          id: 'q1',
+          question: 'What is the primary deliverable for this phase?',
+          options: [
+            activePhase.mission || 'A phase deliverable aligned with the objective',
+            'A DAO proposal',
+            'A wallet connection',
+            'A marketing campaign',
+          ],
+          correct_option_index: 0,
+          explanation: 'The deliverable should match the phase objective and be evaluated by Zyno.',
+        },
+        {
+          id: 'q2',
+          question: 'What happens after you submit your deliverable?',
+          options: [
+            'Zyno evaluates it and returns feedback + score',
+            'The app automatically stakes $MFAI',
+            'The phase is completed without review',
+            'It only updates local storage',
+          ],
+          correct_option_index: 0,
+          explanation: 'Submissions are evaluated and feedback is returned in the interaction blocks.',
+        },
+        {
+          id: 'q3',
+          question: 'When should you mint the NFT reward?',
+          options: [
+            'After the phase is evaluated/validated',
+            'Before doing the mission',
+            'Only on the landing page',
+            'Never',
+          ],
+          correct_option_index: 0,
+          explanation: 'NFT minting is part of the reward flow after phase completion.',
+        },
+      ],
+    })
+
+    return {
+      metadata: {
+        persona_id: selectedPersona.id,
+        journey_track: selectedPersona.id,
+        phase_id: activePhase.id,
+        language: 'en',
+        mode: uiMode,
+        tone: uiTone,
+        title: `${activePhase.title} — Interaction`,
+        summary: activePhase.mission || activePhase.description,
+      },
+      ui_blocks: blocks,
+      agent_actions: [],
+      next_state: { phase_id: activePhase.id, completed_missions: [], xp_delta: 0 },
+    }
+  }, [
+    activePhase.description,
+    activePhase.id,
+    activePhase.mission,
+    activePhase.nftReward,
+    activePhase.title,
+    activePhase.tools,
+    activePhase.xpReward,
+    selectedPersona.id,
+    uiMode,
+    uiTone,
+  ])
+
+  const interactionResponse = useMemo<JourneyStepResponse>(() => {
+    const candidate = lastStep as unknown as JourneyStepResponse | null
+    const hasBlocks = Boolean(candidate?.ui_blocks && candidate.ui_blocks.length > 0)
+    const matchesPhase = candidate?.metadata?.phase_id === activePhase.id
+    const matchesPersona = candidate?.metadata?.persona_id === selectedPersona.id
+    const looksLikeMock = candidate?.ui_blocks?.length === 1 && (candidate.ui_blocks[0] as any)?.title === 'Mock'
+
+    if (hasBlocks && matchesPhase && matchesPersona && !looksLikeMock) {
+      return candidate as JourneyStepResponse
+    }
+
+    return localInteractionStep
+  }, [activePhase.id, lastStep, localInteractionStep, selectedPersona.id])
 
   // UI Helpers
   const densityLabel = density === 'compact' ? 'Compact' : 'Comfortable';
@@ -817,10 +949,8 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
                 </div>
               ) : activePhase.id === 'launch-collaterize' ? (
                 <LaunchCollaterizePhase />
-              ) : lastStep ? (
-                <UIBlocksRenderer response={lastStep as JourneyStepResponse} />
               ) : (
-                <PhaseDetails phase={activePhase} />
+                <UIBlocksRenderer response={interactionResponse} />
               )}
             </div>
           </section>
