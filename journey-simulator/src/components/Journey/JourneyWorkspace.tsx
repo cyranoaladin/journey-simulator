@@ -92,6 +92,8 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
   const [autoSimProgress, setAutoSimProgress] = useState<{ current: number; total: number } | null>(null);
   // Prevent Firefox/StrictMode rerenders from re-triggering the same artifact generation overlay forever.
   const pendingArtifactIdsRef = useRef<Set<string>>(new Set())
+  // Keep the “interaction” panel populated automatically (once per persona+phase).
+  const autoInteractionKeyRef = useRef<string | null>(null)
   const isDemo = tokenStore.getAccessToken() === 'demo-token'
   const { artifacts, loading: artifactsLoading, error: artifactsError } = useArtifacts({
     fallbackToStatic: isDemo,
@@ -196,7 +198,38 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
 
   const activePhaseIndex = currentPhaseIndex ?? userProgress.completedPhases.length;
 
+  // Auto-bootstrap the interaction blocks (missions/quizzes/deliverables/evaluation) for the active phase.
+  // This matches the expected UX: after "Launch with Zyno", the interaction area is immediately available.
+  useEffect(() => {
+    if (isDemo) return
+    if (isStepLoading || isAutoSimulating) return
+    if (activePhaseIndex >= selectedPersona.phases.length) return
 
+    const phase = selectedPersona.phases[activePhaseIndex]
+    if (!phase) return
+
+    const lastStepPhaseId = lastStep?.metadata?.phase_id
+    const lastStepPersonaId = lastStep?.metadata?.persona_id
+    const matchesCurrent =
+      lastStepPhaseId === phase.id &&
+      lastStepPersonaId === selectedPersona.id
+
+    if (matchesCurrent) return
+
+    const key = `${selectedPersona.id}:${phase.id}`
+    if (autoInteractionKeyRef.current === key) return
+    autoInteractionKeyRef.current = key
+
+    void handleRunInteractiveStep()
+  }, [
+    activePhaseIndex,
+    isAutoSimulating,
+    isDemo,
+    isStepLoading,
+    lastStep?.metadata?.persona_id,
+    lastStep?.metadata?.phase_id,
+    selectedPersona,
+  ])
 
   // Check if journey is completed
   if (activePhaseIndex >= selectedPersona.phases.length) {
@@ -754,7 +787,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
                 <div className="mt-4 rounded-xl border border-white/10 bg-white/5 p-4">
                   <div className="flex items-center justify-between gap-3">
                     <div className="text-sm text-white/80 font-semibold">
-                      Auto-simulation en cours : phase {autoSimProgress.current}/{autoSimProgress.total}
+                      Auto-simulation running: phase {autoSimProgress.current}/{autoSimProgress.total}
                     </div>
                     <div className="text-xs text-white/50">
                       {Math.round((autoSimProgress.current / autoSimProgress.total) * 100)}%
