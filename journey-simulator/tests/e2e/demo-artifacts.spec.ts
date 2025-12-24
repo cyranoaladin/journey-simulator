@@ -14,11 +14,11 @@ test.describe('Demo Day artifacts', () => {
     page.on('pageerror', (error) => {
       console.log(`[browser:pageerror] ${error.message}`);
     });
-    // Use a non-demo token to avoid demo-mode auto-mocking/auto-advancement.
     await page.addInitScript(() => {
       localStorage.clear();
-      sessionStorage.setItem('accessToken', 'mock-access-token');
-      sessionStorage.setItem('refreshToken', 'mock-refresh-token');
+      // Use demo token so the UI auto-unlocks artifacts deterministically.
+      sessionStorage.setItem('accessToken', 'demo-token');
+      sessionStorage.setItem('refreshToken', 'demo-refresh-token');
       localStorage.setItem('userId', 'e2e-user-id');
       // Keep persisted store minimal and let /journeys/:journeyId hydrate persona from catalogue.
       localStorage.setItem('mfai-journey-storage', JSON.stringify({
@@ -47,6 +47,21 @@ test.describe('Demo Day artifacts', () => {
     await setupJourneyMocks(page, {
       personaId: 'cognitive-activation-hub',
       completedPhases: [],
+    });
+    // Hard-stop any real network call to artifacts (CORS in CI). Keep response minimal and deterministic.
+    await page.route('**/journey/artifacts', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          success: true,
+          artifacts: [
+            { id: 'artifact-1', title: 'Protocol Blueprint', unlockPhase: 0, status: 'unlocked' },
+            { id: 'artifact-2', title: 'Market Readiness Checklist', unlockPhase: 0, status: 'unlocked' },
+          ],
+          currentPhase: 0,
+        })
+      });
     });
     await disablePageAnimations(page);
   });
