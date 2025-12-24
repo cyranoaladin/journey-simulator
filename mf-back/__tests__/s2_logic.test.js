@@ -63,22 +63,44 @@ describe('S2.3 Journey Engine Logic', () => {
             .rejects.toThrow(/already active/);
     });
 
-    test('Submit Phase: Should transition form UNLOCKED to SUBMITTED', async () => {
+    test('Submit Phase (S2.4 Auto-Eval): Should transition UNLOCKED -> VALIDATED immediately', async () => {
         const { run } = await JourneyEngine.startJourney(userId, defId);
 
         const payload = { answer: 'test' };
-        const { submission, phase } = await JourneyEngine.submitPhase(
+
+        // S2.4: submitPhase now triggers evaluation internally.
+        // Since payload is non-empty, EvaluationService (Deterministic) returns PASS.
+        // So we expect VALIDATED.
+
+        const { submission, phase, evaluation } = await JourneyEngine.submitPhase(
             userId, run._id, 'phase-1', 'step-1', payload
         );
 
         expect(submission).toBeDefined();
         expect(submission.payload).toEqual(payload);
 
-        expect(phase.status).toBe('SUBMITTED');
+        // Phase should be VALIDATED (skipped SUBMITTED state effectively in sync-mode)
+        expect(phase.status).toBe('VALIDATED');
+        expect(phase.score).toBe(100);
+
+        expect(evaluation).toBeDefined();
+        expect(evaluation.decision).toBe('PASS');
 
         // Run should move to IN_PROGRESS
         const updatedRun = await JourneyRun.findById(run._id);
         expect(updatedRun.status).toBe('IN_PROGRESS');
+    });
+
+    test('Submit Phase (S2.4 Auto-Eval): Should transition UNLOCKED -> REJECTED if bad payload', async () => {
+        const { run } = await JourneyEngine.startJourney(userId, defId);
+
+        // Empty payload -> Deterministic FAIL
+        const { phase, evaluation } = await JourneyEngine.submitPhase(
+            userId, run._id, 'phase-1', 'step-1', {}
+        );
+
+        expect(evaluation.decision).toBe('FAIL');
+        expect(phase.status).toBe('REJECTED');
     });
 
     test('Submit Phase: Should FAIL if phase is LOCKED', async () => {
@@ -97,58 +119,10 @@ describe('S2.3 Journey Engine Logic', () => {
         )).rejects.toThrow(/status LOCKED/);
     });
 
-    test('Evaluation (S2.3 Mock): Should transition SUBMITTED -> VALIDATED and Unlock Phase 2', async () => {
-        const { run } = await JourneyEngine.startJourney(userId, defId);
-        const { submission } = await JourneyEngine.submitPhase(
-            userId, run._id, 'phase-1', 'step-1', { text: 'good work' }
-        );
-
-        // Evaluate PASS
-        const { phase, evaluation } = await JourneyEngine.mockEvaluate(
-            submission._id, 'PASS', 95
-        );
-
-        expect(evaluation.score).toBe(95);
-        expect(phase.status).toBe('VALIDATED');
-        expect(phase.score).toBe(95);
-
-        // Check XP
-        const ledger = await XpLedger.findOne({ runId: run._id });
-        expect(ledger).toBeDefined();
-        expect(ledger.amount).toBe(950); // 95 * 10
-
-        // Check Phase 2 Unlocking
-        const phase2 = await PhaseProgress.findOne({ runId: run._id, phaseId: 'phase-2' });
-        expect(phase2).toBeDefined();
-        expect(phase2.status).toBe('UNLOCKED');
-    });
-
-    test('Evaluation (S2.3 Mock): Should transition SUBMITTED -> REJECTED and Allow Retry', async () => {
-        const { run } = await JourneyEngine.startJourney(userId, defId);
-        let { submission } = await JourneyEngine.submitPhase(
-            userId, run._id, 'phase-1', 'step-1', { text: 'bad work' }
-        );
-
-        // Evaluate FAIL
-        const result = await JourneyEngine.mockEvaluate(
-            submission._id, 'FAIL', 20
-        );
-        expect(result.phase.status).toBe('REJECTED');
-
-        // Allow Retry
-        const retry = await JourneyEngine.submitPhase(
-            userId, run._id, 'phase-1', 'step-1', { text: 'better work' }
-        );
-        expect(retry.phase.status).toBe('SUBMITTED');
-
-        // New submission ID
-        expect(retry.submission._id.toString()).not.toBe(submission._id.toString());
-    });
-
     test('Submit Phase: Should FAIL if invalid User/Run', async () => {
         const fakeRunId = newId();
         await expect(JourneyEngine.submitPhase(
-            userId, fakeRunId, 'phase-1', 'step-1', {}
+            userId, fakeRunId, 'phase-1', 'step-1', { a: 1 }
         )).rejects.toThrow();
     });
 
