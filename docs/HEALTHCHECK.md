@@ -53,5 +53,6 @@
 
 ### Logging
 
--   All agent executions via `BaseAgent` are now logged to the `AgentRun` collection in MongoDB.
+-   All agent executions via `BaseAgent` are now logged to the `AgentRun` collection in MongoDB (voir [docs/AGENT_RUNS.md](docs/AGENT_RUNS.md)).
+-   Les flux RAG associés (ingestion, snippets) suivent le runbook [docs/RAG_OPERATIONS.md](docs/RAG_OPERATIONS.md) pour les contrôles et alertes.
 -   Tracks inputs, outputs, success/failure status, and duration.

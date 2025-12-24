@@ -2,21 +2,20 @@
   "version": 1,
   "servers": [
     {
-      "name": "filesystem_ro",
+      "name": "mfai-repo",
       "transport": "stdio",
       "command": "node",
       "args": [
         "./tools/mcp/filesystem-ro.mjs",
-        "./docs",
+        "./journey-simulator",
         "./mf-back",
         "./web",
-        "./journey-simulator",
         "./scripts",
-        "./tmp"
+        "./tools"
       ]
     },
     {
-      "name": "git",
+      "name": "mfai-git",
       "transport": "stdio",
       "command": "node",
       "args": [
@@ -25,7 +24,7 @@
       ]
     },
     {
-      "name": "postgres_ro",
+      "name": "mfai-postgres_ro_local",
       "transport": "stdio",
       "command": "npx",
       "args": [
@@ -35,11 +34,52 @@
       ]
     },
     {
-      "name": "fetch",
+      "name": "mfai-fetch",
       "transport": "stdio",
       "command": "node",
       "args": [
         "./tools/mcp/fetch-server.mjs"
+      ]
+    },
+    {
+      "name": "mfai-docs",
+      "transport": "stdio",
+      "command": "node",
+      "args": [
+        "./tools/mcp/filesystem-ro.mjs",
+        "./docs"
+      ]
+    },
+    {
+      "name": "mfai-runtime",
+      "transport": "stdio",
+      "command": "node",
+      "args": [
+        "./tools/mcp/filesystem-ro.mjs",
+        "./docker-compose.prod.yml",
+        "./docker-compose.deploy.yml",
+        "./docker-compose.yml",
+        "./DEPLOY_SERVER.md",
+        "./DEPLOYMENT_INSTRUCTIONS.md",
+        "./docs/HEALTHCHECK.md",
+        "./docs/security/hardening.md",
+        "./docs/cicd/rollback.md",
+        "./docs/PLATFORM_DEEP_DIVE_FR.md",
+        "./docs/ARCHITECTURE.md"
+      ]
+    },
+    {
+      "name": "mfai-ops",
+      "transport": "stdio",
+      "command": "node",
+      "args": [
+        "./tools/mcp/filesystem-ro.mjs",
+        "./docs/MCP_RUNBOOK_FR.md",
+        "./docs/cicd",
+        "./docs/observability",
+        "./scripts",
+        "./verify-production.sh",
+        "./start_dev.sh"
       ]
     }
   ]

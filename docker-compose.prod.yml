@@ -1,6 +1,14 @@
 version: "3.9"
 
 services:
+  mfai-redis:
+    container_name: mfai-redis
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports: ["127.0.0.1:6379:6379"]
+    networks:
+      - mfai-network
+
   mfai-api:
     container_name: mfai-api
     build:
