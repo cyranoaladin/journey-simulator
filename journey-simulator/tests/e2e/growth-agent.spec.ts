@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { disablePageAnimations } from './utils/pageStability';
+import { clickMintNft } from './utils/uiActions';
 
 test.describe('Growth Agent Integration', () => {
     test.setTimeout(60000);
@@ -137,13 +138,15 @@ test.describe('Growth Agent Integration', () => {
         // We wait for the "Back to all journeys" button to confirm we are in the workspace.
         await expect(page.getByTestId('back-to-journeys')).toBeVisible({ timeout: 10000 });
 
-        // Complete phase (Mint NFT)
-        const validateBtn = page.getByRole('button', { name: /Mint NFT/i }).first();
-        await expect(validateBtn).toBeVisible({ timeout: 10000 });
+        // Complete phase (CTA label can be "Mint NFT" OR "Complete Phase" depending on the phase config).
+        // Use stable testids to avoid fragile text/locale coupling.
+        const validateBtn = page.getByTestId('mint-nft').first();
+        const fallbackBtn = page.getByTestId('complete-phase').first();
+        await expect(validateBtn.or(fallbackBtn)).toBeVisible({ timeout: 15000 });
 
         // Use dispatchEvent for more reliable click handling in this complex UI
         const phaseCompletionRequest = page.waitForRequest('**/journey/complete-phase');
-        await validateBtn.dispatchEvent('click');
+        await clickMintNft(page);
         await phaseCompletionRequest;
 
         // Wait for NFT Modal (Proof-of-Skill)

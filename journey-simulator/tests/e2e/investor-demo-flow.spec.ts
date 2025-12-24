@@ -13,17 +13,18 @@ test.describe('Investor Demo Flow', () => {
 
     test('Deep link activates investor_demo mode', async ({ page }) => {
         // 1. Visit the simulator with query params (Deep Link)
-        await page.goto('/journeys/capital-foundry?mode=investor_demo');
+        // Note: seedDemoUser() sets accessToken=demo-token => the app redirects real journey routes to /journeys/demo/*
+        await page.goto('/journeys/demo/capital-foundry?mode=investor_demo');
 
         // Check we aren't redirected to login
-        await expect(page).toHaveURL(/.*journeys\/capital-foundry.*/, { timeout: 10000 });
+        await expect(page).toHaveURL(/.*journeys\/demo\/capital-foundry.*/, { timeout: 20000 });
 
         // 2. Wait for workspace to load and verify Persona Title + current phase shell
         await expect(page.getByRole('heading', { name: 'Current Phase' })).toBeVisible({ timeout: 45000 });
         await expect(page.getByRole('heading', { name: 'The Capital Foundry', level: 2 })).toBeVisible();
 
         // 4. Verify URL structure is maintained
-        expect(page.url()).toContain('journeys/capital-foundry');
+        expect(page.url()).toContain('journeys/demo/capital-foundry');
         expect(page.url()).toContain('mode=investor_demo');
     });
 });

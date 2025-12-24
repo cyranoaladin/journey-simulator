@@ -22,7 +22,8 @@ test.describe('Demo Mode Workflow', () => {
 
         // In demo mode, "Run Simulation" now auto-plays phases sequentially.
         await page.getByRole('button', { name: /Run Simulation/i }).click();
-        await expect(page.getByText(/Auto-simulation en cours/i)).toBeVisible({ timeout: 15000 });
+        // UI string is English in the app ("Auto-simulation running...") but keep the check language-agnostic.
+        await expect(page.getByText(/Auto-simulation/i)).toBeVisible({ timeout: 15000 });
         await expect(page.getByRole('button', { name: 'Stop' })).toBeVisible({ timeout: 15000 });
 
         // Wait for the launch phase to appear (end of auto-sim)
