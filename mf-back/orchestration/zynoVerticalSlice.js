@@ -30,7 +30,7 @@ const STATUS_BASE_SCORE = {
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
-const computeScores = (agentResult, meta) => {
+const computeScores = (agentResult, meta, effectiveWeight) => {
   const base = STATUS_BASE_SCORE[agentResult.status] ?? STATUS_BASE_SCORE.FAIL;
   const hasActions = Array.isArray(agentResult.actions) && agentResult.actions.length > 0;
   const hasErrors = Array.isArray(agentResult.errors) && agentResult.errors.length > 0;
@@ -38,7 +38,7 @@ const computeScores = (agentResult, meta) => {
   if (hasActions) raw += 10;
   if (hasErrors) raw -= 10;
   raw = clamp(raw, 0, 100);
-  const weight = typeof meta?.confidenceWeight === 'number' ? meta.confidenceWeight : 1;
+  const weight = typeof effectiveWeight === 'number' ? effectiveWeight : typeof meta?.confidenceWeight === 'number' ? meta.confidenceWeight : 1;
   const weighted = clamp(Math.round(raw * weight), 0, 100);
   return { raw, weighted };
 };
@@ -122,6 +122,57 @@ const detectContradictions = (runs) => {
   return contradictions;
 };
 
+const computeLearningScores = (selected, registryIndex, memoryEntries) => {
+  const history = Array.isArray(memoryEntries) ? memoryEntries : [];
+  const result = {};
+  const WINDOW = 5;
+
+  selected.forEach((sel) => {
+    const meta = registryIndex[sel.agentId] || {};
+    const base = typeof meta.confidenceWeight === 'number' ? meta.confidenceWeight : 1;
+    const perAgent = history
+      .filter((entry) => entry?.data?.agents?.some((a) => a.agentId === sel.agentId))
+      .sort((a, b) => b.ts - a.ts)
+      .slice(0, WINDOW);
+
+    let okCount = 0;
+    let failCount = 0;
+    let timeoutCount = 0;
+    let contradictionCount = 0;
+
+    perAgent.forEach((entry) => {
+      const agentRes = (entry.data.agents || []).find((a) => a.agentId === sel.agentId);
+      if (agentRes?.status === 'OK') okCount += 1;
+      if (agentRes?.status === 'FAIL') failCount += 1;
+      if (agentRes?.status === 'TIMEOUT') timeoutCount += 1;
+      const contras = entry.data.contradictions || [];
+      if (contras.some((c) => Array.isArray(c.agents) && c.agents.includes(sel.agentId))) {
+        contradictionCount += 1;
+      } else if (contras.length > 0) {
+        // if contradictions are present but agents list not explicit, apply a small penalty
+        contradictionCount += 1;
+      }
+    });
+
+    const successBonus = okCount * 0.03 * base;
+    const failurePenalty = failCount * 0.06 * base;
+    const timeoutPenalty = timeoutCount * 0.08 * base;
+    const contradictionPenalty = contradictionCount * 0.08 * base;
+    let learningScore = base + successBonus - failurePenalty - timeoutPenalty - contradictionPenalty;
+    learningScore = clamp(learningScore, 0.1, base * 1.5);
+    const delta = learningScore - base;
+
+    result[sel.agentId] = {
+      agentId: sel.agentId,
+      baseConfidence: base,
+      learningScore,
+      delta,
+    };
+  });
+
+  return result;
+};
+
 const timeoutGuard = (promise, ms, agentId, traceId) => {
   return Promise.race([
     promise,
@@ -151,6 +202,8 @@ async function orchestrateVerticalSlice(payload) {
   const routed = routeIntent({ intent: req.intent, input: req.input, context: req.context });
   const selected = routed.selectedAgents || [];
   const previous = memoryStore.get(req.runId);
+  const memoryEntries = memoryStore.values();
+  const learningMap = computeLearningScores(selected, registryIndex, memoryEntries);
 
   let ragContext = null;
   try {
@@ -202,7 +255,8 @@ async function orchestrateVerticalSlice(payload) {
           req.traceId
         );
 
-        return {
+        const effectiveWeight = learningMap[sel.agentId]?.learningScore;
+        const resWithScores = {
           ...res,
           agentId: sel.agentId,
           traceId: req.traceId,
@@ -210,8 +264,9 @@ async function orchestrateVerticalSlice(payload) {
             ...(res.metrics || {}),
             latencyMs: res.metrics?.latencyMs ?? Date.now() - started,
           },
-          scores: computeScores(res, meta),
+          scores: computeScores(res, meta, effectiveWeight),
         };
+        return resWithScores;
       } catch (error) {
         logger.error('Agent execution failed', { traceId: req.traceId, agentId: sel.agentId, error: error.message });
         return {
@@ -223,7 +278,7 @@ async function orchestrateVerticalSlice(payload) {
           citations: [],
           metrics: { latencyMs: Date.now() - started },
           errors: [error.message],
-          scores: computeScores({ status: 'FAIL', actions: [], errors: [error.message] }, meta),
+          scores: computeScores({ status: 'FAIL', actions: [], errors: [error.message] }, meta, learningMap[sel.agentId]?.learningScore),
         };
       }
     })
@@ -293,6 +348,10 @@ async function orchestrateVerticalSlice(payload) {
     memory: {
       reused: Boolean(previous),
       previousActionsCount: previous?.recommendedActions?.length || previous?.decision?.recommendedActions?.length || 0,
+    },
+    learning: {
+      enabled: true,
+      agents: Object.values(learningMap),
     },
     metrics: {
       agentsCount: runsWithScores.length,

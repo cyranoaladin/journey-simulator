@@ -30,6 +30,7 @@ jest.mock('../agents/ProductSpecAgent', () => {
 const { __mockSearch: ragSearchMock } = require('../orchestration/ragClient');
 const { orchestrateVerticalSlice } = require('../orchestration/zynoVerticalSlice');
 const registry = require('../agents/registry');
+const memoryStore = require('../orchestration/memoryStore');
 
 describe('Vertical Slice Orchestration', () => {
   beforeAll(() => {
@@ -38,6 +39,7 @@ describe('Vertical Slice Orchestration', () => {
   });
 
   beforeEach(() => {
+    memoryStore.clear();
     ragSearchMock.mockClear();
     mockSecurityRun = jest.fn(async ({ traceId }) => ({
       agentId: 'SecurityAuditAgent',
@@ -220,5 +222,60 @@ describe('Vertical Slice Orchestration', () => {
     const actions = second.decision.actionPlan.steps.map((s) => s.action);
     const unique = new Set(actions);
     expect(unique.size).toBe(actions.length);
+  });
+
+  it('penalizes agents on repeated contradictions (learningScore decreases)', async () => {
+    memoryStore.save('hist-contradict-1', {
+      agents: [
+        { agentId: 'SecurityAuditAgent', status: 'OK' },
+        { agentId: 'ProductSpecAgent', status: 'OK' },
+      ],
+      contradictions: [{ agents: ['SecurityAuditAgent', 'ProductSpecAgent'], reason: 'test' }],
+      decision: { recommendedActions: [] },
+    });
+    memoryStore.save('hist-contradict-2', {
+      agents: [
+        { agentId: 'SecurityAuditAgent', status: 'OK' },
+        { agentId: 'ProductSpecAgent', status: 'OK' },
+      ],
+      contradictions: [{ agents: ['SecurityAuditAgent', 'ProductSpecAgent'], reason: 'test2' }],
+      decision: { recommendedActions: [] },
+    });
+
+    const res = await orchestrateVerticalSlice({
+      traceId: 'c3',
+      runId: 'c3',
+      intent: 'security.audit+product.spec',
+      input: 'c3',
+    });
+    const learningSec = res.learning.agents.find((a) => a.agentId === 'SecurityAuditAgent');
+    expect(learningSec.learningScore).toBeLessThan(learningSec.baseConfidence);
+  });
+
+  it('rewards agents with consistent OK (learningScore increases) and reorders actionPlan', async () => {
+    memoryStore.save('hist-ok-1', {
+      agents: [{ agentId: 'SecurityAuditAgent', status: 'OK' }],
+      contradictions: [],
+      decision: { recommendedActions: [{ agentId: 'SecurityAuditAgent', action: 'allow uploads', score: 90 }] },
+    });
+    memoryStore.save('hist-ok-2', {
+      agents: [{ agentId: 'SecurityAuditAgent', status: 'OK' }],
+      contradictions: [],
+      decision: { recommendedActions: [{ agentId: 'SecurityAuditAgent', action: 'allow uploads', score: 90 }] },
+    });
+
+    const res = await orchestrateVerticalSlice({
+      traceId: 's3',
+      runId: 's3',
+      intent: 'security.audit+product.spec',
+      input: 's3',
+    });
+
+    const learningSec = res.learning.agents.find((a) => a.agentId === 'SecurityAuditAgent');
+    const learningProd = res.learning.agents.find((a) => a.agentId === 'ProductSpecAgent');
+    expect(learningSec.learningScore).toBeGreaterThan(learningSec.baseConfidence);
+    // Action plan should start with highest score (likely Security)
+    const firstStep = res.decision.actionPlan.steps[0];
+    expect(firstStep.sourceAgent).toBe('SecurityAuditAgent');
   });
 });

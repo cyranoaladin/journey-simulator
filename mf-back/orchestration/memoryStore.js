@@ -44,6 +44,15 @@ class MemoryStore {
     this.store.set(runId, { data, ts: Date.now() });
     this.prune();
   }
+
+  values() {
+    this.prune();
+    return Array.from(this.store.values()).map((v) => v);
+  }
+
+  clear() {
+    this.store.clear();
+  }
 }
 
 module.exports = new MemoryStore();
