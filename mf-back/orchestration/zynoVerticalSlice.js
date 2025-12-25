@@ -20,6 +20,107 @@ const registryIndex = registry.reduce((acc, agent) => {
   return acc;
 }, {});
 
+const STATUS_BASE_SCORE = {
+  OK: 80,
+  WARN: 55,
+  FAIL: 20,
+  TIMEOUT: 10,
+};
+
+const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
+const computeScores = (agentResult, meta) => {
+  const base = STATUS_BASE_SCORE[agentResult.status] ?? STATUS_BASE_SCORE.FAIL;
+  const hasActions = Array.isArray(agentResult.actions) && agentResult.actions.length > 0;
+  const hasErrors = Array.isArray(agentResult.errors) && agentResult.errors.length > 0;
+  let raw = base;
+  if (hasActions) raw += 10;
+  if (hasErrors) raw -= 10;
+  raw = clamp(raw, 0, 100);
+  const weight = typeof meta?.confidenceWeight === 'number' ? meta.confidenceWeight : 1;
+  const weighted = clamp(Math.round(raw * weight), 0, 100);
+  return { raw, weighted };
+};
+
+const OPPOSITES = [
+  ['allow', 'deny'],
+  ['enable', 'disable'],
+  ['add', 'remove'],
+  ['permit', 'block'],
+];
+
+const tokenize = (text) =>
+  (text || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter(
+      (t) =>
+        t.length > 3 && !['allow', 'deny', 'enable', 'disable', 'add', 'remove', 'permit', 'block'].includes(t)
+    );
+
+const detectOppositePair = (a, b) => {
+  const aText = (typeof a === 'string' ? a : JSON.stringify(a || '')).toLowerCase();
+  const bText = (typeof b === 'string' ? b : JSON.stringify(b || '')).toLowerCase();
+  for (const [pos, neg] of OPPOSITES) {
+    const hasPos = aText.includes(pos) || bText.includes(pos);
+    const hasNeg = aText.includes(neg) || bText.includes(neg);
+    if (hasPos && hasNeg) {
+      const tokensA = tokenize(aText);
+      const tokensB = tokenize(bText);
+      const topic = tokensA.find((t) => tokensB.includes(t));
+      if (topic) {
+        return { pos, neg, topic };
+      }
+    }
+  }
+  const hasMust = aText.includes('must ') || bText.includes('must ');
+  const hasMustNot = aText.includes('must not') || bText.includes('must not') || aText.includes("mustn't") || bText.includes("mustn't");
+  if (hasMust && hasMustNot) {
+    const tokensA = tokenize(aText);
+    const tokensB = tokenize(bText);
+    const topic = tokensA.find((t) => tokensB.includes(t));
+    if (topic) return { pos: 'must', neg: 'must_not', topic };
+  }
+  return null;
+};
+
+const detectContradictions = (runs) => {
+  const contradictions = [];
+  for (let i = 0; i < runs.length; i++) {
+    for (let j = i + 1; j < runs.length; j++) {
+      const a = runs[i];
+      const b = runs[j];
+      const actionsA = Array.isArray(a.actions) ? a.actions : [];
+      const actionsB = Array.isArray(b.actions) ? b.actions : [];
+      let found = false;
+      for (const actA of actionsA) {
+        for (const actB of actionsB) {
+          const opp = detectOppositePair(actA, actB);
+          if (opp) {
+            contradictions.push({
+              agents: [a.agentId, b.agentId],
+              reason: `Opposite actions (${opp.pos} vs ${opp.neg}) on topic "${opp.topic}"`,
+            });
+            found = true;
+            break;
+          }
+        }
+        if (found) break;
+      }
+      if (found) continue;
+      const oppSummary = detectOppositePair(a.summary || '', b.summary || '');
+      if (oppSummary) {
+        contradictions.push({
+          agents: [a.agentId, b.agentId],
+          reason: `Opposite summaries (${oppSummary.pos} vs ${oppSummary.neg}) on topic "${oppSummary.topic}"`,
+        });
+      }
+    }
+  }
+  return contradictions;
+};
+
 const timeoutGuard = (promise, ms, agentId, traceId) => {
   return Promise.race([
     promise,
@@ -107,6 +208,7 @@ async function orchestrateVerticalSlice(payload) {
             ...(res.metrics || {}),
             latencyMs: res.metrics?.latencyMs ?? Date.now() - started,
           },
+          scores: computeScores(res, meta),
         };
       } catch (error) {
         logger.error('Agent execution failed', { traceId: req.traceId, agentId: sel.agentId, error: error.message });
@@ -119,27 +221,75 @@ async function orchestrateVerticalSlice(payload) {
           citations: [],
           metrics: { latencyMs: Date.now() - started },
           errors: [error.message],
+          scores: computeScores({ status: 'FAIL', actions: [], errors: [error.message] }, meta),
         };
       }
     })
   );
+
+  const runsWithScores = runs.map((r) => {
+    if (r.scores) return r;
+    const meta = registryIndex[r.agentId] || {};
+    return { ...r, scores: computeScores(r, meta) };
+  });
 
   const summary = runs
     .map((r) => r.summary || r.details || r.status || r.agentId)
     .filter(Boolean)
     .join(' | ');
 
-  const actions = runs.flatMap((r) => (Array.isArray(r.actions) ? r.actions : []));
+  const actions = runsWithScores.flatMap((r) => (Array.isArray(r.actions) ? r.actions : []));
+  const contradictions = detectContradictions(runsWithScores);
+
+  const severity = { FAIL: 3, TIMEOUT: 2, WARN: 1, OK: 0 };
+  const hasOk = runsWithScores.some((r) => r.status === 'OK');
+  const hasFailOrTimeout = runsWithScores.some((r) => r.status === 'FAIL' || r.status === 'TIMEOUT');
+  let overallStatus = 'WARN';
+  if (hasOk && !hasFailOrTimeout) {
+    overallStatus = 'OK';
+  } else {
+    overallStatus =
+      runsWithScores.reduce((worst, r) => (severity[r.status] > severity[worst] ? r.status : worst), 'OK') || 'OK';
+  }
+
+  const topFindings = runsWithScores
+    .slice()
+    .sort((a, b) => (b.scores?.weighted || 0) - (a.scores?.weighted || 0))
+    .slice(0, 5)
+    .map((r) => ({
+      agentId: r.agentId,
+      summary: r.summary || r.status,
+      score: r.scores?.weighted || 0,
+    }));
+
+  const recommendedActions = runsWithScores
+    .slice()
+    .sort((a, b) => (b.scores?.weighted || 0) - (a.scores?.weighted || 0))
+    .flatMap((r) =>
+      (Array.isArray(r.actions) ? r.actions : []).map((action) => ({
+        agentId: r.agentId,
+        action,
+        score: r.scores?.weighted || 0,
+      }))
+    )
+    .slice(0, 10);
 
   const aggregated = {
     traceId: req.traceId,
     intent: routed.intentNormalized,
     runId: req.runId,
-    agents: runs,
+    agents: runsWithScores,
     summary,
     actions,
+    contradictions,
+    decision: {
+      overallStatus,
+      topFindings,
+      recommendedActions,
+      rationale: `Selected actions from highest weighted agents. Contradictions detected: ${contradictions.length}.`,
+    },
     metrics: {
-      agentsCount: runs.length,
+      agentsCount: runsWithScores.length,
       durationMs: Date.now() - startedAll,
     },
   };

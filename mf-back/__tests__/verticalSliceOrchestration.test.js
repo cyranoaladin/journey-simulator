@@ -43,7 +43,7 @@ describe('Vertical Slice Orchestration', () => {
       agentId: 'SecurityAuditAgent',
       status: 'OK',
       summary: 'Security review executed',
-      actions: [],
+      actions: ['allow uploads'],
       citations: [],
       metrics: { latencyMs: 1 },
       errors: [],
@@ -54,7 +54,7 @@ describe('Vertical Slice Orchestration', () => {
       agentId: 'ProductSpecAgent',
       status: 'OK',
       summary: 'Product spec generated',
-      actions: [],
+      actions: ['enable checklist'],
       citations: [],
       metrics: { latencyMs: 1 },
       errors: [],
@@ -80,6 +80,7 @@ describe('Vertical Slice Orchestration', () => {
     expect(res.metrics.agentsCount).toBe(1);
     expect(typeof res.summary).toBe('string');
     expect(ragSearchMock).toHaveBeenCalledTimes(1);
+    expect(res.agents[0].scores).toBeDefined();
   });
 
   it('executes two agents for composite intent and calls RAG once', async () => {
@@ -94,6 +95,9 @@ describe('Vertical Slice Orchestration', () => {
     expect(res.intent).toBe('security_audit+product_spec');
     expect(res.metrics.agentsCount).toBe(2);
     expect(ragSearchMock).toHaveBeenCalledTimes(1);
+    expect(res.decision.overallStatus).toBeDefined();
+    expect(res.decision.topFindings.length).toBeGreaterThan(0);
+    expect(res.decision.recommendedActions.length).toBeGreaterThan(0);
   });
 
   it('falls back to ProductSpecAgent on unknown intent', async () => {
@@ -114,13 +118,16 @@ describe('Vertical Slice Orchestration', () => {
     const res = await orchestrateVerticalSlice({
       traceId: 'trace-timeout',
       runId: 'run-timeout',
-      intent: 'security.audit',
+      intent: 'security.audit+product.spec',
       input: 'long',
       constraints: { timeoutMs: 5 },
     });
-    expect(res.agents[0].status).toBe('TIMEOUT');
-    expect(res.agents[0].traceId).toBe('trace-timeout');
-    expect(res.metrics.agentsCount).toBe(1);
+    expect(res.agents.length).toBe(2);
+    const statuses = res.agents.map((a) => a.status);
+    expect(statuses).toContain('TIMEOUT');
+    expect(res.metrics.agentsCount).toBe(2);
+    expect(res.decision.overallStatus).toBe('TIMEOUT');
+    expect(res.decision.topFindings.length).toBe(2);
   });
 
   it('marks FAIL when agent throws and continues', async () => {
@@ -137,5 +144,54 @@ describe('Vertical Slice Orchestration', () => {
     expect(statuses).toContain('FAIL');
     expect(res.traceId).toBe('trace-fail');
     expect(res.metrics.agentsCount).toBe(2);
+    expect(res.decision.overallStatus).toBe('FAIL');
+  });
+
+  it('creates decision with scoring and ordered actions', async () => {
+    const res = await orchestrateVerticalSlice({
+      traceId: 'trace-decision',
+      runId: 'run-decision',
+      intent: 'security.audit+product.spec',
+      input: 'decision test',
+    });
+    expect(res.decision).toBeDefined();
+    expect(res.decision.topFindings.length).toBeGreaterThan(0);
+    const scores = res.agents.map((a) => a.scores.weighted);
+    expect(scores.every((s) => typeof s === 'number')).toBe(true);
+    expect(res.decision.recommendedActions.length).toBeGreaterThan(0);
+    expect(res.decision.recommendedActions.length).toBeLessThanOrEqual(10);
+  });
+
+  it('detects contradictions between agents', async () => {
+    mockSecurityRun.mockImplementationOnce(async ({ traceId }) => ({
+      agentId: 'SecurityAuditAgent',
+      status: 'OK',
+      summary: 'Must allow uploads',
+      actions: ['allow uploads'],
+      citations: [],
+      metrics: { latencyMs: 1 },
+      errors: [],
+      traceId,
+    }));
+    mockProductRun.mockImplementationOnce(async ({ traceId }) => ({
+      agentId: 'ProductSpecAgent',
+      status: 'OK',
+      summary: 'Must not allow uploads',
+      actions: ['deny uploads'],
+      citations: [],
+      metrics: { latencyMs: 1 },
+      errors: [],
+      traceId,
+    }));
+
+    const res = await orchestrateVerticalSlice({
+      traceId: 'trace-contradiction',
+      runId: 'run-contradiction',
+      intent: 'security.audit+product.spec',
+      input: 'contradiction test',
+    });
+
+    expect(res.contradictions.length).toBeGreaterThan(0);
+    expect(res.decision.topFindings.length).toBeGreaterThan(0);
   });
 });
