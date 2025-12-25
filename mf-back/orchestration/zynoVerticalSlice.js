@@ -20,20 +20,48 @@ const registryIndex = registry.reduce((acc, agent) => {
   return acc;
 }, {});
 
+const timeoutGuard = (promise, ms, agentId, traceId) => {
+  return Promise.race([
+    promise,
+    new Promise((resolve) =>
+      setTimeout(
+        () =>
+          resolve({
+            agentId,
+            status: 'TIMEOUT',
+            summary: 'Agent execution timed out',
+            actions: [],
+            citations: [],
+            metrics: { latencyMs: ms },
+            errors: ['timeout'],
+            mock: false,
+            traceId,
+          }),
+        ms
+      )
+    ),
+  ]);
+};
+
 async function orchestrateVerticalSlice(payload) {
   const startedAll = Date.now();
   const req = normalizeRequest(payload);
   const routed = routeIntent({ intent: req.intent, input: req.input, context: req.context });
   const selected = routed.selectedAgents || [];
 
-  const needsRag = selected.some((a) => (registryIndex[a.agentId]?.requiresRag ?? false) !== false);
   let ragContext = null;
-  if (needsRag) {
-    ragContext = await ragClient.search({
-      query: req.input || routed.intentNormalized || req.intent,
-      topK: req.context?.rag?.topK || 4,
-      traceId: req.traceId,
-    });
+  try {
+    const needsRag = selected.some((a) => (registryIndex[a.agentId]?.requiresRag ?? false) !== false);
+    if (needsRag) {
+      ragContext = await ragClient.search({
+        query: req.input || routed.intentNormalized || req.intent,
+        topK: req.context?.rag?.topK || 4,
+        traceId: req.traceId,
+      });
+    }
+  } catch (error) {
+    logger.warn('RAG failed, continuing without context', { traceId: req.traceId, error: error.message });
+    ragContext = null;
   }
 
   const runs = await Promise.all(
@@ -41,6 +69,7 @@ async function orchestrateVerticalSlice(payload) {
       const meta = registryIndex[sel.agentId] || {};
       const agentInstance = agentsPool[sel.agentId];
       const started = Date.now();
+      const timeoutMs = req.constraints?.timeoutMs ?? meta.timeouts?.agentMs ?? meta.timeoutMs ?? 6000;
 
       if (!agentInstance) {
         return {
@@ -51,26 +80,47 @@ async function orchestrateVerticalSlice(payload) {
           citations: [],
           metrics: { latencyMs: 0 },
           errors: ['agent_not_registered'],
+          traceId: req.traceId,
         };
       }
 
-      const res = await agentInstance.run({
-        traceId: req.traceId,
-        runId: req.runId,
-        input: req.input,
-        ragContext: meta.requiresRag === false ? null : ragContext,
-        constraints: req.constraints,
-        intentNormalized: routed.intentNormalized,
-      });
+      try {
+        const res = await timeoutGuard(
+          agentInstance.run({
+            traceId: req.traceId,
+            runId: req.runId,
+            input: req.input,
+            ragContext: meta.requiresRag === false ? null : ragContext,
+            constraints: req.constraints,
+            intentNormalized: routed.intentNormalized,
+          }),
+          timeoutMs,
+          sel.agentId,
+          req.traceId
+        );
 
-      return {
-        ...res,
-        agentId: sel.agentId,
-        metrics: {
-          ...(res.metrics || {}),
-          latencyMs: res.metrics?.latencyMs ?? Date.now() - started,
-        },
-      };
+        return {
+          ...res,
+          agentId: sel.agentId,
+          traceId: req.traceId,
+          metrics: {
+            ...(res.metrics || {}),
+            latencyMs: res.metrics?.latencyMs ?? Date.now() - started,
+          },
+        };
+      } catch (error) {
+        logger.error('Agent execution failed', { traceId: req.traceId, agentId: sel.agentId, error: error.message });
+        return {
+          agentId: sel.agentId,
+          traceId: req.traceId,
+          status: 'FAIL',
+          summary: 'Agent execution failed',
+          actions: [],
+          citations: [],
+          metrics: { latencyMs: Date.now() - started },
+          errors: [error.message],
+        };
+      }
     })
   );
 
