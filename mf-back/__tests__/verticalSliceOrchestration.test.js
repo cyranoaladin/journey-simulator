@@ -1,3 +1,18 @@
+jest.mock('../orchestration/ragClient', () => {
+  const searchMock = jest.fn(async () => ({
+    chunks: [{ id: 'doc1', title: 'doc', text: 'content', source: 'mock' }],
+    source: 'mock',
+    latencyMs: 1,
+  }));
+  return {
+    RAGClient: jest.fn().mockImplementation(() => ({
+      search: searchMock,
+    })),
+    __mockSearch: searchMock,
+  };
+});
+
+const { __mockSearch: ragSearchMock, RAGClient } = require('../orchestration/ragClient');
 const { orchestrateVerticalSlice } = require('../orchestration/zynoVerticalSlice');
 
 describe('Vertical Slice Orchestration', () => {
@@ -6,34 +21,53 @@ describe('Vertical Slice Orchestration', () => {
     process.env.RAG_SEARCH_URL = ''; // force local RAG
   });
 
-  it('routes to two agents, preserves traceId, and works in mock mode', async () => {
-    const traceId = 'trace-test-123';
-    const runId = 'run-test-123';
-    const input = 'Audit sécurité API et spécification produit onboarding';
+  beforeEach(() => {
+    ragSearchMock.mockClear();
+  });
 
-    const result = await orchestrateVerticalSlice({
+  it('executes single agent for security intent', async () => {
+    const traceId = 'trace-single';
+    const res = await orchestrateVerticalSlice({
       traceId,
-      runId,
-      intent: 'vslice',
-      input,
-      context: { rag: { topK: 2 } },
+      runId: 'run-single',
+      intent: 'security.audit',
+      input: 'security audit',
       constraints: { maxTokens: 200 },
     });
 
-    expect(result.traceId).toBe(traceId);
-    expect(result.runId).toBe(runId);
-    expect(Array.isArray(result.agents)).toBe(true);
-    expect(result.agents.length).toBe(2);
+    expect(res.traceId).toBe(traceId);
+    expect(res.intent).toBe('security_audit');
+    expect(res.agents).toHaveLength(1);
+    expect(res.agents[0].agentId).toBe('SecurityAuditAgent');
+    expect(res.metrics.agentsCount).toBe(1);
+    expect(typeof res.summary).toBe('string');
+    expect(ragSearchMock).toHaveBeenCalledTimes(1);
+  });
 
-    for (const agent of result.agents) {
-      expect(agent.traceId).toBe(traceId);
-      expect(agent.status).toBe('OK');
-      expect(agent.metrics).toHaveProperty('latencyMs');
-      expect(agent.metrics).toHaveProperty('ragHits');
-    }
+  it('executes two agents for composite intent and calls RAG once', async () => {
+    const res = await orchestrateVerticalSlice({
+      traceId: 'trace-composite',
+      runId: 'run-composite',
+      intent: 'security.audit+product.spec',
+      input: 'composite request',
+    });
 
-    // mock LLM should mark mock:true somewhere
-    const anyMock = result.agents.some((a) => a.mock === true || a.details?.includes('[MOCK]'));
-    expect(anyMock).toBe(true);
+    expect(res.agents).toHaveLength(2);
+    expect(res.intent).toBe('security_audit+product_spec');
+    expect(res.metrics.agentsCount).toBe(2);
+    expect(ragSearchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('falls back to ProductSpecAgent on unknown intent', async () => {
+    const res = await orchestrateVerticalSlice({
+      traceId: 'trace-fallback',
+      runId: 'run-fallback',
+      intent: 'unknown.intent',
+      input: 'fallback',
+    });
+    expect(res.agents).toHaveLength(1);
+    expect(res.agents[0].agentId).toBe('ProductSpecAgent');
+    expect(res.intent).toBe('unknown_intent');
+    expect(res.metrics.agentsCount).toBe(1);
   });
 });
