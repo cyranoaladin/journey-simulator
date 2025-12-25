@@ -32,6 +32,7 @@ const { orchestrateVerticalSlice } = require('../orchestration/zynoVerticalSlice
 const registry = require('../agents/registry');
 const memoryStore = require('../orchestration/memoryStore');
 const executionGate = require('../orchestration/executionGate');
+const toolsRegistry = require('../orchestration/toolsRegistry');
 
 describe('Vertical Slice Orchestration', () => {
   beforeAll(() => {
@@ -349,6 +350,7 @@ describe('Vertical Slice Orchestration', () => {
       input: 'no gate',
     });
     expect(res.executionGate).toBeNull();
+    expect(res.executionResult).toBeNull();
   });
 
   it('allows approving and rejecting a gate', async () => {
@@ -376,5 +378,60 @@ describe('Vertical Slice Orchestration', () => {
     executionGate._debugForceExpire(gateId);
     const status = executionGate.review(gateId, { approve: true });
     expect(status.status).toBe('EXPIRED');
+  });
+
+  it('runs dry-run execution when gate is approved (ordered, simulatable)', async () => {
+    const first = await orchestrateVerticalSlice({
+      traceId: 'trace-gate-dry',
+      runId: 'run-gate-dry',
+      intent: 'security.audit+product.spec',
+      input: 'gate dry',
+    });
+    const gateId = first.executionGate.gateId;
+    executionGate.review(gateId, { approve: true });
+
+    const second = await orchestrateVerticalSlice({
+      traceId: 'trace-gate-dry',
+      runId: 'run-gate-dry',
+      intent: 'security.audit+product.spec',
+      input: 'gate dry',
+    });
+
+    expect(second.executionResult).toBeDefined();
+    expect(second.executionResult.mode).toBe('DRY_RUN');
+    expect(second.executionResult.steps.length).toBe(second.executionPlan.tools.length);
+    expect(second.executionResult.steps[0].status).toBe('SIMULATED');
+  });
+
+  it('marks unexecutable step as SKIPPED in dry-run', async () => {
+    mockProductRun.mockImplementation(async ({ traceId }) => ({
+      agentId: 'ProductSpecAgent',
+      status: 'OK',
+      summary: 'unknown',
+      actions: ['do something unknown'],
+      citations: [],
+      metrics: { latencyMs: 1 },
+      errors: [],
+      traceId,
+    }));
+
+    const first = await orchestrateVerticalSlice({
+      traceId: 'trace-gate-dry-unknown',
+      runId: 'run-gate-dry-unknown',
+      intent: 'security.audit+product.spec',
+      input: 'gate dry unknown',
+    });
+    const gateId = first.executionGate.gateId;
+    executionGate.review(gateId, { approve: true });
+
+    const second = await orchestrateVerticalSlice({
+      traceId: 'trace-gate-dry-unknown',
+      runId: 'run-gate-dry-unknown',
+      intent: 'security.audit+product.spec',
+      input: 'gate dry unknown',
+    });
+
+    const skipped = second.executionResult.steps.find((s) => s.status === 'SKIPPED');
+    expect(skipped).toBeDefined();
   });
 });

@@ -9,6 +9,7 @@ const createLogger = loggerFactory.createLogger || loggerFactory.default || logg
 const memoryStore = require('./memoryStore');
 const executionGate = require('./executionGate');
 const toolsRegistry = require('./toolsRegistry');
+const executionEngine = require('./executionEngine');
 
 const ragClient = new RAGClient();
 const logger = createLogger(__filename);
@@ -449,11 +450,31 @@ async function orchestrateVerticalSlice(payload) {
   };
 
   let executionGateInfo = null;
+  let gateId = previous?.executionGateId || null;
   const needsGate = executionTools.some((t) => t.requiresConfirmation);
-  if (needsGate) {
-    const gateId = executionGate.submit({ traceId: req.traceId, runId: req.runId, executionPlan: executionTools });
+  const existingGate = gateId ? executionGate.get(gateId) : null;
+
+  if (existingGate && (existingGate.status === 'APPROVED' || existingGate.status === 'PENDING' || existingGate.status === 'REJECTED')) {
+    executionGateInfo = {
+      gateId,
+      status: existingGate.status,
+      requiresHuman: true,
+    };
+  } else if (needsGate) {
+    gateId = executionGate.submit({ traceId: req.traceId, runId: req.runId, executionPlan: executionTools });
     executionGateInfo = { gateId, status: 'PENDING', requiresHuman: true };
   }
+
+  let executionResult = null;
+  if (executionGateInfo?.gateId) {
+    const state = executionGate.get(executionGateInfo.gateId);
+    if (state?.status === 'APPROVED') {
+      executionResult = executionEngine.simulate({ executionPlan: executionTools, traceId: req.traceId });
+      executionGateInfo.status = 'APPROVED';
+    }
+  }
+
+  aggregated.executionResult = executionResult;
   aggregated.executionGate = executionGateInfo;
 
   memoryStore.save(req.runId, {
@@ -462,6 +483,7 @@ async function orchestrateVerticalSlice(payload) {
     recommendedActions: recommendedActions,
     contradictions,
     timestamp: Date.now(),
+    executionGateId: gateId || executionGateInfo?.gateId || null,
   });
 
   logger.info('Vertical slice completed', {
