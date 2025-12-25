@@ -43,6 +43,7 @@ describe('Agent registry', () => {
       expect(typeof agent.timeoutMs).toBe('number');
       expect(agent.inputSchema).toBeInstanceOf(Object);
       expect(agent.outputSchema).toBeInstanceOf(Object);
+      expect(typeof agent.enabled).toBe('boolean');
     }
   });
 

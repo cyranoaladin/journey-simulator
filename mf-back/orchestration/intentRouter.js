@@ -33,7 +33,7 @@ function selectAgentsForIntents(intents = []) {
 
   for (const intent of wanted) {
     let intentMatched = false;
-    for (const agent of registry) {
+    for (const agent of registry.filter((a) => a.enabled !== false)) {
       if (agent.intents.includes(intent)) {
         matches.set(agent.agentId, agent);
         intentMatched = true;

@@ -34,17 +34,17 @@ const registryIndex = registry.reduce((acc, agent) => {
   return acc;
 }, {});
 
+const getAgentIdForIntent = (intent) => {
+  const match = registry.find((a) => a.enabled !== false && a.intents.includes(intent));
+  return match ? match.agentId : null;
+};
+
 const resolveWorkflowIntents = (journey = null) => {
   if (!journey?.journeyType || !journey?.phaseId) return [];
   const journeyDef = workflowMap[journey.journeyType];
   if (!journeyDef?.phases) return [];
   const intents = journeyDef.phases[journey.phaseId] || [];
   return Array.isArray(intents) ? intents : [];
-};
-
-const getAgentIdForIntent = (intent) => {
-  const match = registry.find((a) => a.intents.includes(intent));
-  return match ? match.agentId : null;
 };
 
 const dedupeAndOrderIntents = (intents = []) => {
@@ -254,7 +254,16 @@ const timeoutGuard = (promise, ms, agentId, traceId) => {
 async function orchestrateVerticalSlice(payload) {
   const startedAll = Date.now();
   const req = normalizeRequest(payload);
-  const workflowIntents = resolveWorkflowIntents(req.context?.journey);
+  const journeyPhases = Array.isArray(req.context?.journey?.phases) && req.context?.journey?.phases.length > 0
+    ? req.context.journey.phases
+    : req.context?.journey?.phaseId
+      ? [req.context.journey.phaseId]
+      : [];
+
+  const workflowIntents = journeyPhases.flatMap((phaseId) =>
+    resolveWorkflowIntents({ ...req.context?.journey, phaseId })
+  );
+
   const intentsCombined = [req.intent, ...workflowIntents].filter(Boolean);
   const intentsDeduped = dedupeAndOrderIntents(intentsCombined);
   const routed = routeIntent({
@@ -361,6 +370,8 @@ async function orchestrateVerticalSlice(payload) {
 
   runsWithScores = applyRagPolicy(runsWithScores);
 
+  runsWithScores = applyRagPolicy(runsWithScores);
+
   const summary = runsWithScores
     .map((r) => r.summary || r.details || r.status || r.agentId)
     .filter(Boolean)
@@ -402,6 +413,11 @@ async function orchestrateVerticalSlice(payload) {
     )
     .slice(0, 10);
 
+  const agentsMeta = {
+    enabled: registry.filter((a) => a.enabled !== false).map((a) => a.agentId),
+    disabled: registry.filter((a) => a.enabled === false).map((a) => a.agentId),
+  };
+
   const aggregated = {
     traceId: req.traceId,
     intent: routed.intentNormalized,
@@ -439,9 +455,20 @@ async function orchestrateVerticalSlice(payload) {
         return [sel.agentId, { maxTokens: effectiveMaxTokens, timeoutMs: effectiveTimeout }];
       })
     ),
+    agentsMeta,
+    journeyProgress: {
+      phasesExecuted: journeyPhases,
+      currentPhase: journeyPhases[journeyPhases.length - 1] || null,
+    },
     executionPlan: null,
     executionGate: null,
     executionResult: null,
+    systemStatus: {
+      llm: process.env.OPENAI_API_KEY ? 'openai' : 'mock',
+      rag: ragContext ? ragContext.source || 'unknown' : 'disabled',
+      execution: process.env.EXECUTION_ENABLED === 'true' ? 'real-enabled' : 'dry-run',
+      agentsActiveCount: agentsMeta.enabled.length,
+    },
     metrics: {
       agentsCount: runsWithScores.length,
       durationMs: Date.now() - startedAll,

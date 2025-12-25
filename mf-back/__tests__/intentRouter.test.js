@@ -42,6 +42,12 @@ describe('Intent Router', () => {
     expect(res.intentNormalized).toBe('product_spec');
   });
 
+  it('ignores disabled agents and falls back gracefully', () => {
+    const res = routeIntent({ intent: 'risk.fraud' });
+    expect(res.selectedAgents.every((a) => a.agentId !== 'RiskFraudAgent')).toBe(true);
+    expect(res.selectedAgents.some((a) => a.agentId === 'ProductSpecAgent')).toBe(true);
+  });
+
   it('normalizeIntents splits strings and trims', () => {
     expect(normalizeIntents('a+b + c')).toEqual(['a', 'b', 'c']);
     expect(normalizeIntents(['x', 'y+z'])).toEqual(['x', 'y', 'z']);

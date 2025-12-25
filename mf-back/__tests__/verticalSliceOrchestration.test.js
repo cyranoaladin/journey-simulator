@@ -275,6 +275,74 @@ describe('Vertical Slice Orchestration', () => {
     expect(res.metrics.ragUsed).toBe(false);
   });
 
+  it('reports system status, agentsMeta and ignores disabled agents', async () => {
+    const res = await orchestrateVerticalSlice({
+      traceId: 'trace-system',
+      runId: 'run-system',
+      intent: 'risk.fraud',
+      input: 'disabled agent test',
+      context: { journey: { journeyType: 'audit', phaseId: 'governance' } },
+    });
+
+    expect(res.agents.every((a) => a.agentId !== 'RiskFraudAgent')).toBe(true);
+    expect(res.agentsMeta.disabled).toContain('RiskFraudAgent');
+    expect(res.agentsMeta.enabled.length).toBeGreaterThan(0);
+    expect(res.systemStatus).toMatchObject({
+      llm: 'mock',
+      execution: 'dry-run',
+    });
+    expect(res.systemStatus.agentsActiveCount).toBe(res.agentsMeta.enabled.length);
+  });
+
+  it('chains multiple journey phases in order', async () => {
+    const res = await orchestrateVerticalSlice({
+      traceId: 'trace-multi-phase',
+      runId: 'run-multi-phase',
+      intent: 'product.spec',
+      input: 'multi phase',
+      context: { journey: { journeyType: 'audit', phases: ['governance', 'tech'] } },
+    });
+
+    expect(res.journeyProgress).toEqual({
+      phasesExecuted: ['governance', 'tech'],
+      currentPhase: 'tech',
+    });
+    expect(res.agents.every((a) => a.agentId !== 'RiskFraudAgent')).toBe(true);
+    expect(res.intent).toContain('governance_dao');
+    expect(res.intent).toContain('security_audit');
+  });
+
+  it('responds with WARN when all agents warn', async () => {
+    mockSecurityRun.mockResolvedValueOnce({
+      agentId: 'SecurityAuditAgent',
+      status: 'WARN',
+      summary: 'warned',
+      actions: [],
+      citations: [],
+      metrics: { latencyMs: 1 },
+      errors: [],
+    });
+    mockProductRun.mockResolvedValueOnce({
+      agentId: 'ProductSpecAgent',
+      status: 'WARN',
+      summary: 'warned',
+      actions: [],
+      citations: [],
+      metrics: { latencyMs: 1 },
+      errors: [],
+    });
+
+    const res = await orchestrateVerticalSlice({
+      traceId: 'trace-all-warn',
+      runId: 'run-all-warn',
+      intent: 'security.audit+product.spec',
+      input: 'warn everywhere',
+    });
+
+    expect(res.decision.overallStatus).toBe('WARN');
+    expect(res.decision).toBeDefined();
+  });
+
   it('reuses memory when same runId is called twice and keeps deduped plan', async () => {
     const runId = 'run-memory';
     const first = await orchestrateVerticalSlice({
