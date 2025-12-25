@@ -235,6 +235,8 @@ describe('Vertical Slice Orchestration', () => {
     const agentIds = res.agents.map((a) => a.agentId);
     expect(agentIds).toContain('ProductSpecAgent');
     expect(agentIds).toContain('UXWritingAgent');
+    expect(res.intent).toBe('product_spec+ux_writing');
+    expect(res.intentMeta.deduplicated).toBe(true);
   });
 
   it('passes domain into RAG query for best-effort contextualization', async () => {
@@ -246,6 +248,31 @@ describe('Vertical Slice Orchestration', () => {
     });
     const call = ragSearchMock.mock.calls[0][0];
     expect(call.query).toContain('security');
+  });
+
+  it('applies rag policy (max citations, trimmed quotes)', async () => {
+    const res = await orchestrateVerticalSlice({
+      traceId: 'trace-rag-policy',
+      runId: 'run-rag-policy',
+      intent: 'governance.dao',
+      input: 'policy test',
+    });
+    const gov = res.agents.find((a) => a.agentId === 'GovernanceDAOAgent');
+    expect(gov.citations.length).toBeLessThanOrEqual(3);
+    expect(gov.citations.every((c) => (c.quote || '').length <= 160)).toBe(true);
+  });
+
+  it('exposes budgets per agent and completes even with WARN', async () => {
+    const res = await orchestrateVerticalSlice({
+      traceId: 'trace-budget',
+      runId: 'run-budget',
+      intent: 'marketplace',
+      input: 'budget test',
+    });
+    expect(res.budgets).toBeDefined();
+    expect(res.budgets.MarketplaceAgent).toBeDefined();
+    expect(res.agents.every((a) => a.status === 'WARN' || a.status === 'OK')).toBe(true);
+    expect(res.metrics.ragUsed).toBe(false);
   });
 
   it('reuses memory when same runId is called twice and keeps deduped plan', async () => {

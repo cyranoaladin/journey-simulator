@@ -9,6 +9,7 @@ const executionGate = require('./executionGate');
 const toolsRegistry = require('./toolsRegistry');
 const executionEngine = require('./executionEngine');
 const workflowMap = require('./workflowMap');
+const { applyRagPolicy } = require('./ragPolicy');
 
 const ragClient = new RAGClient();
 const logger = createLogger(__filename);
@@ -39,6 +40,25 @@ const resolveWorkflowIntents = (journey = null) => {
   if (!journeyDef?.phases) return [];
   const intents = journeyDef.phases[journey.phaseId] || [];
   return Array.isArray(intents) ? intents : [];
+};
+
+const getAgentIdForIntent = (intent) => {
+  const match = registry.find((a) => a.intents.includes(intent));
+  return match ? match.agentId : null;
+};
+
+const dedupeAndOrderIntents = (intents = []) => {
+  const unique = new Map();
+  intents.forEach((i) => {
+    const key = (i || '').toLowerCase().trim().replace(/\./g, '_');
+    if (key) unique.set(key, key);
+  });
+  return Array.from(unique.values()).sort((a, b) => {
+    const pa = registryIndex[getAgentIdForIntent(a)]?.priority || 0;
+    const pb = registryIndex[getAgentIdForIntent(b)]?.priority || 0;
+    if (pb !== pa) return pb - pa;
+    return a.localeCompare(b);
+  });
 };
 
 const STATUS_BASE_SCORE = {
@@ -235,8 +255,10 @@ async function orchestrateVerticalSlice(payload) {
   const startedAll = Date.now();
   const req = normalizeRequest(payload);
   const workflowIntents = resolveWorkflowIntents(req.context?.journey);
+  const intentsCombined = [req.intent, ...workflowIntents].filter(Boolean);
+  const intentsDeduped = dedupeAndOrderIntents(intentsCombined);
   const routed = routeIntent({
-    intent: [req.intent, ...workflowIntents].filter(Boolean),
+    intent: intentsDeduped,
     input: req.input,
     context: req.context,
   });
@@ -331,13 +353,15 @@ async function orchestrateVerticalSlice(payload) {
     })
   );
 
-  const runsWithScores = runs.map((r) => {
+  let runsWithScores = runs.map((r) => {
     if (r.scores) return r;
     const meta = registryIndex[r.agentId] || {};
     return { ...r, scores: computeScores(r, meta) };
   });
 
-  const summary = runs
+  runsWithScores = applyRagPolicy(runsWithScores);
+
+  const summary = runsWithScores
     .map((r) => r.summary || r.details || r.status || r.agentId)
     .filter(Boolean)
     .join(' | ');
@@ -381,6 +405,10 @@ async function orchestrateVerticalSlice(payload) {
   const aggregated = {
     traceId: req.traceId,
     intent: routed.intentNormalized,
+    intentMeta: {
+      deduplicated: intentsDeduped.length !== intentsCombined.length,
+      source: ['input', workflowIntents.length ? 'workflowMap' : null].filter(Boolean),
+    },
     runId: req.runId,
     agents: runsWithScores,
     summary,
@@ -400,9 +428,25 @@ async function orchestrateVerticalSlice(payload) {
       enabled: true,
       agents: Object.values(learningMap),
     },
+    budgets: Object.fromEntries(
+      selected.map((sel) => {
+        const meta = registryIndex[sel.agentId] || {};
+        const effectiveMaxTokens = Math.min(
+          req.constraints?.maxTokens || meta.maxTokens || 800,
+          meta.maxTokens || 800
+        );
+        const effectiveTimeout = req.constraints?.timeoutMs || meta.timeoutMs || 6000;
+        return [sel.agentId, { maxTokens: effectiveMaxTokens, timeoutMs: effectiveTimeout }];
+      })
+    ),
+    executionPlan: null,
+    executionGate: null,
+    executionResult: null,
     metrics: {
       agentsCount: runsWithScores.length,
       durationMs: Date.now() - startedAll,
+      ragUsed: Boolean(ragContext),
+      realExecutionAttempted: process.env.EXECUTION_ENABLED === 'true',
     },
   };
 

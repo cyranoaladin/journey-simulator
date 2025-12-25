@@ -100,6 +100,10 @@ const normalizeRequest = (payload = {}) => ({
     },
     journey: payload.context?.journey || payload.journeyContext || null,
   },
+  intentSource: {
+    input: payload.intent || null,
+    workflow: payload.context?.journey ? `${payload.context?.journey?.journeyType || ''}/${payload.context?.journey?.phaseId || ''}` : null,
+  },
   constraints: {
     timeoutMs: payload.constraints?.timeoutMs || 6000,
     maxTokens: payload.constraints?.maxTokens || 800,
