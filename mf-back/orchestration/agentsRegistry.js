@@ -5,6 +5,8 @@ module.exports = {
   Web3LegalAgent: require('../agents/Web3LegalAgent'),
   NFTAgent: require('../agents/NFTAgent'),
   TokenAgent: require('../agents/TokenAgent'),
+  SecurityAuditAgent: require('../agents/SecurityAuditAgent'),
+  ProductSpecAgent: require('../agents/ProductSpecAgent'),
   LaunchpadAgent: require('../agents/LaunchpadAgent'),
   BuilderAgent: require('../agents/BuilderAgent'),
   DAOAgent: require('../agents/DAOAgent'),
@@ -17,4 +19,3 @@ module.exports = {
   CommunityAgent: require('../agents/CommunityAgent'),
   ReflectionAgent: require('../agents/ReflectionAgent')
 };
-
