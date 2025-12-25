@@ -53,6 +53,17 @@ describe('Intent Router', () => {
     expect(normalizeIntents(['x', 'y+z'])).toEqual(['x', 'y', 'z']);
   });
 
+  it('routes new coverage agents by intent', () => {
+    expect(routeIntent({ intent: 'api.contract' }).selectedAgents[0].agentId).toBe('APIContractAgent');
+    expect(routeIntent({ intent: 'journey.design' }).selectedAgents[0].agentId).toBe('JourneyDesignAgent');
+    expect(routeIntent({ intent: 'evaluation' }).selectedAgents[0].agentId).toBe('EvaluationAgent');
+    expect(routeIntent({ intent: 'rag.ops' }).selectedAgents[0].agentId).toBe('RAGOpsAgent');
+    expect(routeIntent({ intent: 'data.integrity' }).selectedAgents[0].agentId).toBe('DataIntegrityAgent');
+    expect(routeIntent({ intent: 'tokenomics' }).selectedAgents[0].agentId).toBe('TokenomicsAgent');
+    expect(routeIntent({ intent: 'growth' }).selectedAgents[0].agentId).toBe('GrowthAgent');
+    expect(routeIntent({ intent: 'observability' }).selectedAgents[0].agentId).toBe('ObservabilityAgent');
+  });
+
   it('routes to stub agent without crashing', () => {
     const res = routeIntent({ intent: 'governance.dao' });
     expect(res.selectedAgents.some((a) => a.agentId === 'GovernanceDAOAgent')).toBe(true);

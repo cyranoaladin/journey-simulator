@@ -52,4 +52,25 @@ describe('Agent registry', () => {
     const sorted = [...priorities].sort((a, b) => b - a);
     expect(priorities).toEqual(sorted);
   });
+
+  it('coverage agents are enabled and non-stub', () => {
+    const coverage = [
+      'APIContractAgent',
+      'JourneyDesignAgent',
+      'EvaluationAgent',
+      'RAGOpsAgent',
+      'DataIntegrityAgent',
+      'TokenomicsAgent',
+      'GrowthAgent',
+      'ObservabilityAgent',
+    ];
+    coverage.forEach((id) => {
+      const meta = registry.find((a) => a.agentId === id);
+      expect(meta).toBeDefined();
+      expect(meta.enabled).toBe(true);
+      expect(typeof meta.requiresRag).toBe('boolean');
+      expect(meta.maxTokens).toBeGreaterThan(0);
+      expect(meta.timeoutMs).toBeGreaterThan(0);
+    });
+  });
 });

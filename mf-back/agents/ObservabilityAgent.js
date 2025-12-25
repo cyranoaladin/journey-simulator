@@ -1,15 +1,62 @@
 class ObservabilityAgent {
-  async run({ traceId }) {
-    return {
-      agentId: 'ObservabilityAgent',
-      status: 'WARN',
-      summary: 'Not implemented yet',
-      actions: [],
-      citations: [],
-      metrics: { latencyMs: 0 },
-      errors: [],
-      traceId,
-    };
+  constructor() {
+    this.id = 'ObservabilityAgent';
+  }
+
+  async run(request = {}) {
+    const started = Date.now();
+    try {
+      const { traceId, intentNormalized, input = '', journey = {} } = request;
+      const journeyType = journey?.journeyType || 'generic';
+      const phaseId = journey?.phaseId || journey?.phases?.[0] || 'unspecified';
+      const objectives = journey?.objectives || [];
+      const artifacts = journey?.artifacts || [];
+      const hasInput = Boolean(input && input.trim());
+
+      const summary = hasInput ? 'Observability plan generated' : 'Observability plan drafted with limited input';
+
+      const details = {
+        intent: intentNormalized || 'observability',
+        journeyType,
+        phaseId,
+        objectives,
+        artifacts,
+        telemetry: ['logs', 'metrics', 'traces'],
+        sre: {
+          slos: ['latency p95', 'error rate', 'availability'],
+          alerts: ['p95 > budget', '5xx spike', 'queue backlog'],
+        },
+      };
+
+      const actions = [
+        'Define SLIs/SLOs for critical paths',
+        'Instrument tracing for key flows',
+        'Add alert runbooks with owners',
+      ];
+
+      return {
+        agentId: this.id,
+        status: hasInput ? 'OK' : 'WARN',
+        summary,
+        details,
+        actions,
+        citations: [],
+        metrics: { latencyMs: Date.now() - started },
+        errors: hasInput ? [] : ['missing_input'],
+        traceId,
+      };
+    } catch (error) {
+      return {
+        agentId: this.id,
+        status: 'FAIL',
+        summary: 'Observability agent failed',
+        actions: [],
+        citations: [],
+        metrics: { latencyMs: Date.now() - started },
+        errors: [error.message],
+        traceId: request?.traceId,
+      };
+    }
   }
 }
 

@@ -714,4 +714,38 @@ describe('Vertical Slice Orchestration', () => {
   it('never throws even on malformed input', async () => {
     await expect(orchestrateVerticalSlice(null)).resolves.toBeDefined();
   });
+
+  it('executes coverage agents (no stubs) with concrete actions', async () => {
+    const res = await orchestrateVerticalSlice({
+      traceId: 'trace-coverage',
+      runId: 'run-coverage',
+      intent:
+        'api.contract+journey.design+evaluation+rag.ops+data.integrity+tokenomics+growth+observability',
+      input: 'coverage scenario',
+      context: { journey: { journeyType: 'audit', phaseId: 'tech', objectives: ['ship'], artifacts: ['doc'] } },
+    });
+
+    const coverageIds = [
+      'APIContractAgent',
+      'JourneyDesignAgent',
+      'EvaluationAgent',
+      'RAGOpsAgent',
+      'DataIntegrityAgent',
+      'TokenomicsAgent',
+      'GrowthAgent',
+      'ObservabilityAgent',
+    ];
+
+    coverageIds.forEach((id) => {
+      const agent = res.agents.find((a) => a.agentId === id);
+      expect(agent).toBeDefined();
+      expect(['OK', 'WARN']).toContain(agent.status);
+      expect(agent.summary).not.toMatch(/Not implemented yet/i);
+      expect(Array.isArray(agent.actions)).toBe(true);
+      expect(agent.actions.length).toBeGreaterThan(0);
+    });
+
+    expect(res.ops.disabledAgents).not.toContain('APIContractAgent');
+    expect(res.decision.overallStatus).toBeDefined();
+  });
 });
