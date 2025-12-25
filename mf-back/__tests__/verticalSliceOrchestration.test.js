@@ -33,6 +33,7 @@ const registry = require('../agents/registry');
 const memoryStore = require('../orchestration/memoryStore');
 const executionGate = require('../orchestration/executionGate');
 const toolsRegistry = require('../orchestration/toolsRegistry');
+const auditTrailStore = require('../orchestration/auditTrailStore');
 
 describe('Vertical Slice Orchestration', () => {
   beforeAll(() => {
@@ -42,6 +43,7 @@ describe('Vertical Slice Orchestration', () => {
 
   beforeEach(() => {
     memoryStore.clear();
+    auditTrailStore.clear();
     if (executionGate.clear) executionGate.clear();
     ragSearchMock.mockClear();
     mockSecurityRun = jest.fn(async ({ traceId }) => ({
@@ -343,6 +345,54 @@ describe('Vertical Slice Orchestration', () => {
     expect(res.decision).toBeDefined();
   });
 
+  it('exposes ops diagnostics with disabled agents and warnings', async () => {
+    const res = await orchestrateVerticalSlice({
+      traceId: 'trace-ops',
+      runId: 'run-ops',
+      intent: 'risk.fraud',
+      input: 'ops test',
+    });
+
+    expect(res.ops).toBeDefined();
+    expect(res.ops.disabledAgents).toContain('RiskFraudAgent');
+    expect(Array.isArray(res.ops.warnings)).toBe(true);
+    expect(res.ops.rag.mode).toBeDefined();
+  });
+
+  it('blocks REAL via productionGuards when contradictions exist', async () => {
+    mockSecurityRun.mockResolvedValueOnce({
+      agentId: 'SecurityAuditAgent',
+      status: 'OK',
+      summary: 'allow',
+      actions: ['allow uploads'],
+      citations: [],
+      metrics: { latencyMs: 1 },
+      errors: [],
+    });
+    mockProductRun.mockResolvedValueOnce({
+      agentId: 'ProductSpecAgent',
+      status: 'OK',
+      summary: 'deny',
+      actions: ['deny uploads'],
+      citations: [],
+      metrics: { latencyMs: 1 },
+      errors: [],
+    });
+
+    const res = await orchestrateVerticalSlice({
+      traceId: 'trace-guards-contradiction',
+      runId: 'run-guards-contradiction',
+      intent: 'security.audit+product.spec',
+      input: 'conflict',
+    });
+
+    expect(res.contradictions.length).toBeGreaterThan(0);
+    expect(res.productionGuards.realExecutionAllowed).toBe(false);
+    expect(res.productionGuards.reasons).toContain('contradictions_present');
+    expect(res.ops.execution.blocked).toBe(true);
+    expect(res.ops.execution.mode).toBe('DRY_RUN');
+  });
+
   it('reuses memory when same runId is called twice and keeps deduped plan', async () => {
     const runId = 'run-memory';
     const first = await orchestrateVerticalSlice({
@@ -484,7 +534,7 @@ describe('Vertical Slice Orchestration', () => {
       input: 'no gate',
     });
     expect(res.executionGate).toBeNull();
-    expect(res.executionResult).toBeNull();
+    expect(res.executionResult.mode).toBe('DRY_RUN');
   });
 
   it('allows approving and rejecting a gate', async () => {
@@ -588,6 +638,9 @@ describe('Vertical Slice Orchestration', () => {
       input: 'real blocked',
     });
     expect(second.executionResult.mode).toBe('DRY_RUN');
+    expect(second.productionGuards.realExecutionAllowed).toBe(false);
+    expect(second.productionGuards.reasons).toContain('execution_disabled');
+    expect(second.ops.execution.blocked).toBe(true);
   });
 
   it('blocks real execution when gate not approved', async () => {
@@ -638,5 +691,27 @@ describe('Vertical Slice Orchestration', () => {
     expect(executed.length).toBe(1);
     expect(skipped.length).toBeGreaterThan(0);
     process.env.EXECUTION_ENABLED = undefined;
+  });
+
+  it('keeps an audit trail across runs', async () => {
+    await orchestrateVerticalSlice({
+      traceId: 'audit-one',
+      runId: 'audit-one',
+      intent: 'security.audit',
+      input: 'first',
+    });
+    await orchestrateVerticalSlice({
+      traceId: 'audit-two',
+      runId: 'audit-two',
+      intent: 'product.spec',
+      input: 'second',
+    });
+    const summary = auditTrailStore.summary();
+    expect(summary.enabled).toBe(true);
+    expect(summary.entriesStored).toBeGreaterThanOrEqual(2);
+  });
+
+  it('never throws even on malformed input', async () => {
+    await expect(orchestrateVerticalSlice(null)).resolves.toBeDefined();
   });
 });
