@@ -209,7 +209,7 @@ describe('Vertical Slice Orchestration', () => {
     expect(hasUnexecutable).toBe(false);
   });
 
-  it('returns WARN stub agent when intent targets stubbed agent', async () => {
+  it('returns GovernanceDAOAgent OK (real) when intent targets governance DAO', async () => {
     const res = await orchestrateVerticalSlice({
       traceId: 'trace-stub',
       runId: 'run-stub',
@@ -218,7 +218,8 @@ describe('Vertical Slice Orchestration', () => {
     });
     const stubAgent = res.agents.find((a) => a.agentId === 'GovernanceDAOAgent');
     expect(stubAgent).toBeDefined();
-    expect(stubAgent.status).toBe('WARN');
+    expect(stubAgent.status).toBe('OK');
+    expect(Array.isArray(stubAgent.citations)).toBe(true);
   });
 
   it('uses workflow mapping to add agents per journey phase', async () => {
