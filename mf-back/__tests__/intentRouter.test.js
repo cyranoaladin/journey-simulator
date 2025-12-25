@@ -1,16 +1,49 @@
-const { selectAgents, routeIntent } = require('../orchestration/intentRouter');
+const { normalizeIntents, selectAgentsForIntents, routeIntent } = require('../orchestration/intentRouter');
 
 describe('Intent Router', () => {
-  it('selects agents by intent with priority order', () => {
-    const agents = selectAgents('security_audit');
-    expect(Array.isArray(agents)).toBe(true);
-    expect(agents[0].agentId).toBe('SecurityAuditAgent');
+  it('selects security agent for security.audit', () => {
+    const res = routeIntent({ intent: 'security.audit' });
+    expect(res.selectedAgents.length).toBe(1);
+    expect(res.selectedAgents[0].agentId).toBe('SecurityAuditAgent');
+    expect(res.intentNormalized).toBe('security_audit');
   });
 
-  it('routes default intent and returns context', () => {
-    const res = routeIntent({ intent: 'default', input: 'hello', context: { phase: 'Learn' } });
-    expect(res.intent).toBe('default');
-    expect(res.context.phase).toBe('Learn');
-    expect(res.agents.length).toBeGreaterThan(0);
+  it('selects product agent for product.spec', () => {
+    const res = routeIntent({ intent: 'product.spec' });
+    expect(res.selectedAgents.length).toBe(1);
+    expect(res.selectedAgents[0].agentId).toBe('ProductSpecAgent');
+    expect(res.intentNormalized).toBe('product_spec');
+  });
+
+  it('supports composite intent array (security + product)', () => {
+    const res = routeIntent({ intent: ['product.spec', 'security.audit'] });
+    expect(res.selectedAgents.length).toBe(2);
+    expect(res.selectedAgents[0].agentId).toBe('SecurityAuditAgent'); // higher priority
+    expect(res.selectedAgents[1].agentId).toBe('ProductSpecAgent');
+    expect(res.intentNormalized).toBe('product_spec+security_audit');
+  });
+
+  it('supports composite intent string with + separator', () => {
+    const res = routeIntent({ intent: 'security.audit+product.spec' });
+    expect(res.selectedAgents.length).toBe(2);
+  });
+
+  it('falls back to ProductSpecAgent on unknown intent', () => {
+    const res = routeIntent({ intent: 'foo.bar' });
+    expect(res.selectedAgents.length).toBe(1);
+    expect(res.selectedAgents[0].agentId).toBe('ProductSpecAgent');
+    expect(res.intentNormalized).toBe('foo_bar');
+  });
+
+  it('falls back to ProductSpecAgent on missing intent', () => {
+    const res = routeIntent({ });
+    expect(res.selectedAgents.length).toBe(1);
+    expect(res.selectedAgents[0].agentId).toBe('ProductSpecAgent');
+    expect(res.intentNormalized).toBe('product_spec');
+  });
+
+  it('normalizeIntents splits strings and trims', () => {
+    expect(normalizeIntents('a+b + c')).toEqual(['a', 'b', 'c']);
+    expect(normalizeIntents(['x', 'y+z'])).toEqual(['x', 'y', 'z']);
   });
 });
