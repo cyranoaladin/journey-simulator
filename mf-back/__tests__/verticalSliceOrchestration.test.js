@@ -209,6 +209,18 @@ describe('Vertical Slice Orchestration', () => {
     expect(hasUnexecutable).toBe(false);
   });
 
+  it('returns WARN stub agent when intent targets stubbed agent', async () => {
+    const res = await orchestrateVerticalSlice({
+      traceId: 'trace-stub',
+      runId: 'run-stub',
+      intent: 'governance.dao',
+      input: 'stub test',
+    });
+    const stubAgent = res.agents.find((a) => a.agentId === 'GovernanceDAOAgent');
+    expect(stubAgent).toBeDefined();
+    expect(stubAgent.status).toBe('WARN');
+  });
+
   it('reuses memory when same runId is called twice and keeps deduped plan', async () => {
     const runId = 'run-memory';
     const first = await orchestrateVerticalSlice({

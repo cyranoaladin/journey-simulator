@@ -36,7 +36,7 @@ describe('Intent Router', () => {
   });
 
   it('falls back to ProductSpecAgent on missing intent', () => {
-    const res = routeIntent({ });
+    const res = routeIntent({});
     expect(res.selectedAgents.length).toBe(1);
     expect(res.selectedAgents[0].agentId).toBe('ProductSpecAgent');
     expect(res.intentNormalized).toBe('product_spec');
@@ -45,5 +45,10 @@ describe('Intent Router', () => {
   it('normalizeIntents splits strings and trims', () => {
     expect(normalizeIntents('a+b + c')).toEqual(['a', 'b', 'c']);
     expect(normalizeIntents(['x', 'y+z'])).toEqual(['x', 'y', 'z']);
+  });
+
+  it('routes to stub agent without crashing', () => {
+    const res = routeIntent({ intent: 'governance.dao' });
+    expect(res.selectedAgents.some((a) => a.agentId === 'GovernanceDAOAgent')).toBe(true);
   });
 });

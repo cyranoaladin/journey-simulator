@@ -1,9 +1,36 @@
 const registry = require('../agents/registry');
 
 describe('Agent registry', () => {
-  it('contains required fields for each agent', () => {
+  const expectedAgentIds = [
+    'SecurityAuditAgent',
+    'ProductSpecAgent',
+    'JourneyDesignAgent',
+    'EvaluationAgent',
+    'RAGOpsAgent',
+    'DataIntegrityAgent',
+    'APIContractAgent',
+    'TokenomicsAgent',
+    'GovernanceDAOAgent',
+    'GrowthAgent',
+    'InvestorDemoAgent',
+    'UXWritingAgent',
+    'QAPlaywrightAgent',
+    'DevOpsAgent',
+    'ObservabilityAgent',
+    'ComplianceAgent',
+    'RiskFraudAgent',
+    'CurriculumAgent',
+    'MarketplaceAgent',
+    'AnalyticsAgent',
+    'PerformanceAgent',
+    'WalletAuthAgent',
+    'SolanaAnchorAgent',
+    'MintingAgent',
+  ];
+
+  it('contains all expected agents with required fields', () => {
     expect(Array.isArray(registry)).toBe(true);
-    expect(registry.length).toBeGreaterThanOrEqual(2);
+    expect(registry.map((a) => a.agentId)).toEqual(expectedAgentIds);
 
     for (const agent of registry) {
       expect(typeof agent.agentId).toBe('string');

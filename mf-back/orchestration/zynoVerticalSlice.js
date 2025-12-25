@@ -2,8 +2,6 @@ const { normalizeRequest } = require('./agentProtocol');
 const { RAGClient } = require('./ragClient');
 const { routeIntent } = require('./intentRouter');
 const registry = require('../agents/registry');
-const SecurityAuditAgent = require('../agents/SecurityAuditAgent');
-const ProductSpecAgent = require('../agents/ProductSpecAgent');
 const loggerFactory = require('../utils/logger');
 const createLogger = loggerFactory.createLogger || loggerFactory.default || loggerFactory;
 const memoryStore = require('./memoryStore');
@@ -14,10 +12,20 @@ const executionEngine = require('./executionEngine');
 const ragClient = new RAGClient();
 const logger = createLogger(__filename);
 
-const agentsPool = {
-  SecurityAuditAgent: new SecurityAuditAgent(),
-  ProductSpecAgent: new ProductSpecAgent(),
+const buildAgentsPool = () => {
+  const pool = {};
+  registry.forEach((meta) => {
+    try {
+      const AgentClass = require(`../agents/${meta.agentId}`);
+      pool[meta.agentId] = new AgentClass();
+    } catch (err) {
+      logger.warn('Agent module load failed', { agentId: meta.agentId, error: err.message });
+    }
+  });
+  return pool;
 };
+
+const agentsPool = buildAgentsPool();
 
 const registryIndex = registry.reduce((acc, agent) => {
   acc[agent.agentId] = agent;

@@ -1,7 +1,7 @@
-class GrowthAgent {
+class EvaluationAgent {
   async run({ traceId }) {
     return {
-      agentId: 'GrowthAgent',
+      agentId: 'EvaluationAgent',
       status: 'WARN',
       summary: 'Not implemented yet',
       actions: [],
@@ -13,5 +13,4 @@ class GrowthAgent {
   }
 }
 
-module.exports = GrowthAgent;
-
+module.exports = EvaluationAgent;

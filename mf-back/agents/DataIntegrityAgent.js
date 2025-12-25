@@ -1,7 +1,7 @@
-class GrowthAgent {
+class DataIntegrityAgent {
   async run({ traceId }) {
     return {
-      agentId: 'GrowthAgent',
+      agentId: 'DataIntegrityAgent',
       status: 'WARN',
       summary: 'Not implemented yet',
       actions: [],
@@ -13,5 +13,4 @@ class GrowthAgent {
   }
 }
 
-module.exports = GrowthAgent;
-
+module.exports = DataIntegrityAgent;
