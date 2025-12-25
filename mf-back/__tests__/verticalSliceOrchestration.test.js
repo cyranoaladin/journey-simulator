@@ -84,6 +84,7 @@ describe('Vertical Slice Orchestration', () => {
     expect(ragSearchMock).toHaveBeenCalledTimes(1);
     expect(res.agents[0].scores).toBeDefined();
     expect(res.decision.actionPlan.steps.length).toBeGreaterThan(0);
+    expect(res.executionPlan.tools.length).toBeGreaterThan(0);
   });
 
   it('executes two agents for composite intent and calls RAG once', async () => {
@@ -102,6 +103,7 @@ describe('Vertical Slice Orchestration', () => {
     expect(res.decision.topFindings.length).toBeGreaterThan(0);
     expect(res.decision.recommendedActions.length).toBeGreaterThan(0);
     expect(res.decision.actionPlan.steps.length).toBeGreaterThan(0);
+    expect(res.executionPlan.tools.length).toBeGreaterThan(0);
   });
 
   it('falls back to ProductSpecAgent on unknown intent', async () => {
@@ -164,6 +166,7 @@ describe('Vertical Slice Orchestration', () => {
     expect(scores.every((s) => typeof s === 'number')).toBe(true);
     expect(res.decision.recommendedActions.length).toBeGreaterThan(0);
     expect(res.decision.recommendedActions.length).toBeLessThanOrEqual(10);
+    expect(res.executionPlan.tools.length).toBeGreaterThan(0);
   });
 
   it('detects contradictions between agents', async () => {
@@ -199,6 +202,8 @@ describe('Vertical Slice Orchestration', () => {
     expect(res.decision.topFindings.length).toBeGreaterThan(0);
     const hasConflictStep = res.decision.actionPlan.steps.some((s) => s.conflict);
     expect(hasConflictStep).toBe(true);
+    const hasUnexecutable = res.executionPlan.tools.some((t) => t.unexecutable);
+    expect(hasUnexecutable).toBe(false);
   });
 
   it('reuses memory when same runId is called twice and keeps deduped plan', async () => {
@@ -277,5 +282,28 @@ describe('Vertical Slice Orchestration', () => {
     // Action plan should start with highest score (likely Security)
     const firstStep = res.decision.actionPlan.steps[0];
     expect(firstStep.sourceAgent).toBe('SecurityAuditAgent');
+    expect(res.executionPlan.tools[0].toolId).toBeDefined();
+  });
+
+  it('marks unexecutable actions when no tool mapping is found', async () => {
+    mockSecurityRun.mockImplementationOnce(async ({ traceId }) => ({
+      agentId: 'SecurityAuditAgent',
+      status: 'OK',
+      summary: 'Custom action',
+      actions: ['do something unknown'],
+      citations: [],
+      metrics: { latencyMs: 1 },
+      errors: [],
+      traceId,
+    }));
+    const res = await orchestrateVerticalSlice({
+      traceId: 'trace-unknown-action',
+      runId: 'run-unknown-action',
+      intent: 'security.audit',
+      input: 'unknown action',
+    });
+    const unexec = res.executionPlan.tools.find((t) => t.unexecutable);
+    expect(unexec).toBeDefined();
+    expect(unexec.toolId).toBeNull();
   });
 });

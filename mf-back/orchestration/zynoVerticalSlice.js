@@ -7,6 +7,7 @@ const ProductSpecAgent = require('../agents/ProductSpecAgent');
 const loggerFactory = require('../utils/logger');
 const createLogger = loggerFactory.createLogger || loggerFactory.default || loggerFactory;
 const memoryStore = require('./memoryStore');
+const toolsRegistry = require('./toolsRegistry');
 
 const ragClient = new RAGClient();
 const logger = createLogger(__filename);
@@ -171,6 +172,21 @@ const computeLearningScores = (selected, registryIndex, memoryEntries) => {
   });
 
   return result;
+};
+
+const toolIndex = toolsRegistry.reduce((acc, t) => {
+  acc[(t.toolId || '').toLowerCase()] = t;
+  return acc;
+}, {});
+
+const normalizeActionKey = (action) => (action || '').toLowerCase().trim();
+
+const mapActionToTool = (action) => {
+  const key = normalizeActionKey(action);
+  if (key.includes('allow uploads')) return toolsRegistry.find((t) => t.toolId === 'allow_uploads');
+  if (key.includes('deny uploads')) return toolsRegistry.find((t) => t.toolId === 'deny_uploads');
+  if (key.includes('enable checklist')) return toolsRegistry.find((t) => t.toolId === 'enable_checklist');
+  return toolIndex[key] || null;
 };
 
 const timeoutGuard = (promise, ms, agentId, traceId) => {
@@ -402,6 +418,33 @@ async function orchestrateVerticalSlice(payload) {
   aggregated.decision.actionPlan = {
     steps: actionPlanSteps,
     strategy: contradictions.length > 0 ? 'resolve-contradictions-first' : 'highest-confidence-first',
+  };
+
+  // Execution plan (declarative, no side effects)
+  const executionTools = actionPlanSteps.map((step) => {
+    const tool = mapActionToTool(step.action);
+    if (!tool) {
+      return {
+        toolId: null,
+        action: step.action,
+        sourceAgent: step.sourceAgent,
+        priority: step.priority,
+        unexecutable: true,
+        requiresConfirmation: false,
+      };
+    }
+    return {
+      toolId: tool.toolId,
+      action: step.action,
+      sourceAgent: step.sourceAgent,
+      priority: step.priority,
+      requiresConfirmation: tool.requiresConfirmation || tool.sideEffects === 'external' || tool.sideEffects === 'irreversible',
+      sideEffects: tool.sideEffects,
+    };
+  });
+
+  aggregated.executionPlan = {
+    tools: executionTools,
   };
 
   memoryStore.save(req.runId, {
