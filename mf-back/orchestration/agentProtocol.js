@@ -26,6 +26,16 @@ const REQUEST_SCHEMA = {
             model: { type: 'string', default: 'gpt-4o' },
           },
         },
+        journey: {
+          type: 'object',
+          properties: {
+            journeyId: { type: 'string' },
+            journeyType: { type: 'string' },
+            phaseId: { type: 'string' },
+            objectives: { type: 'array', items: { type: 'string' } },
+            artifacts: { type: 'array', items: { type: 'string' } },
+          },
+        },
       },
     },
     constraints: {
@@ -88,6 +98,7 @@ const normalizeRequest = (payload = {}) => ({
       provider: payload.context?.llm?.provider || 'openai',
       model: payload.context?.llm?.model || 'gpt-4o',
     },
+    journey: payload.context?.journey || payload.journeyContext || null,
   },
   constraints: {
     timeoutMs: payload.constraints?.timeoutMs || 6000,

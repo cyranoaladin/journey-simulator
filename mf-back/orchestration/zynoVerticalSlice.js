@@ -8,6 +8,7 @@ const memoryStore = require('./memoryStore');
 const executionGate = require('./executionGate');
 const toolsRegistry = require('./toolsRegistry');
 const executionEngine = require('./executionEngine');
+const workflowMap = require('./workflowMap');
 
 const ragClient = new RAGClient();
 const logger = createLogger(__filename);
@@ -31,6 +32,14 @@ const registryIndex = registry.reduce((acc, agent) => {
   acc[agent.agentId] = agent;
   return acc;
 }, {});
+
+const resolveWorkflowIntents = (journey = null) => {
+  if (!journey?.journeyType || !journey?.phaseId) return [];
+  const journeyDef = workflowMap[journey.journeyType];
+  if (!journeyDef?.phases) return [];
+  const intents = journeyDef.phases[journey.phaseId] || [];
+  return Array.isArray(intents) ? intents : [];
+};
 
 const STATUS_BASE_SCORE = {
   OK: 80,
@@ -225,7 +234,12 @@ const timeoutGuard = (promise, ms, agentId, traceId) => {
 async function orchestrateVerticalSlice(payload) {
   const startedAll = Date.now();
   const req = normalizeRequest(payload);
-  const routed = routeIntent({ intent: req.intent, input: req.input, context: req.context });
+  const workflowIntents = resolveWorkflowIntents(req.context?.journey);
+  const routed = routeIntent({
+    intent: [req.intent, ...workflowIntents].filter(Boolean),
+    input: req.input,
+    context: req.context,
+  });
   const selected = routed.selectedAgents || [];
   const previous = memoryStore.get(req.runId);
   const memoryEntries = memoryStore.values();
@@ -235,10 +249,16 @@ async function orchestrateVerticalSlice(payload) {
   try {
     const needsRag = selected.some((a) => (registryIndex[a.agentId]?.requiresRag ?? false) !== false);
     if (needsRag) {
+      const domains = selected
+        .map((a) => registryIndex[a.agentId]?.domain)
+        .filter(Boolean)
+        .filter((v, i, arr) => arr.indexOf(v) === i)
+        .join(' ');
       ragContext = await ragClient.search({
         query: req.input || routed.intentNormalized || req.intent,
         topK: req.context?.rag?.topK || 4,
         traceId: req.traceId,
+        domain: domains,
       });
     }
   } catch (error) {
@@ -275,6 +295,7 @@ async function orchestrateVerticalSlice(payload) {
             ragContext: meta.requiresRag === false ? null : ragContext,
             constraints: req.constraints,
             intentNormalized: routed.intentNormalized,
+            journey: req.context?.journey || null,
           }),
           timeoutMs,
           sel.agentId,

@@ -221,6 +221,32 @@ describe('Vertical Slice Orchestration', () => {
     expect(stubAgent.status).toBe('WARN');
   });
 
+  it('uses workflow mapping to add agents per journey phase', async () => {
+    const res = await orchestrateVerticalSlice({
+      traceId: 'trace-workflow',
+      runId: 'run-workflow',
+      intent: 'product.spec',
+      input: 'phase mapping test',
+      context: {
+        journey: { journeyType: 'onboarding', phaseId: 'design', objectives: ['spec'], artifacts: ['wireframe'] },
+      },
+    });
+    const agentIds = res.agents.map((a) => a.agentId);
+    expect(agentIds).toContain('ProductSpecAgent');
+    expect(agentIds).toContain('UXWritingAgent');
+  });
+
+  it('passes domain into RAG query for best-effort contextualization', async () => {
+    await orchestrateVerticalSlice({
+      traceId: 'trace-rag-domain',
+      runId: 'run-rag-domain',
+      intent: 'security.audit',
+      input: 'security test',
+    });
+    const call = ragSearchMock.mock.calls[0][0];
+    expect(call.query).toContain('security');
+  });
+
   it('reuses memory when same runId is called twice and keeps deduped plan', async () => {
     const runId = 'run-memory';
     const first = await orchestrateVerticalSlice({

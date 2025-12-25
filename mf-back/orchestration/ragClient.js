@@ -13,13 +13,14 @@ class RAGClient {
     this.logger = createLogger(__filename);
   }
 
-  async search({ query, topK = 4, traceId }) {
+  async search({ query, topK = 4, traceId, domain }) {
     const started = Date.now();
+    const domainQuery = domain ? `${query} ${domain}` : query;
     if (RAG_SEARCH_URL) {
       try {
         const res = await axios.post(
           RAG_SEARCH_URL,
-          { q: query, k: topK },
+          { q: domainQuery, k: topK },
           { headers: { 'x-api-key': RAG_API_KEY }, timeout: 5000 }
         );
         const latencyMs = Date.now() - started;
@@ -39,7 +40,7 @@ class RAGClient {
     }
 
     const latencyStart = Date.now();
-    const chunks = this.readLocal(query, topK);
+    const chunks = this.readLocal(domainQuery, topK);
     const latencyMs = Date.now() - latencyStart;
     this.logger.info('RAG local fallback', { traceId, latencyMs, count: chunks.length });
     return { chunks, latencyMs, source: 'local' };
