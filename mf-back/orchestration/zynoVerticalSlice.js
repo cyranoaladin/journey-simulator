@@ -469,8 +469,28 @@ async function orchestrateVerticalSlice(payload) {
   if (executionGateInfo?.gateId) {
     const state = executionGate.get(executionGateInfo.gateId);
     if (state?.status === 'APPROVED') {
-      executionResult = executionEngine.simulate({ executionPlan: executionTools, traceId: req.traceId });
-      executionGateInfo.status = 'APPROVED';
+      try {
+        if (process.env.EXECUTION_ENABLED === 'true') {
+          logger.info('Real execution enabled, attempting guarded execution', { traceId: req.traceId, gateId: executionGateInfo.gateId });
+          executionResult = executionEngine.execute({
+            executionPlan: executionTools,
+            traceId: req.traceId,
+            gateApproved: true,
+          });
+          executionGateInfo.status = 'APPROVED';
+        } else {
+          executionResult = executionEngine.simulate({ executionPlan: executionTools, traceId: req.traceId });
+          executionGateInfo.status = 'APPROVED';
+        }
+      } catch (err) {
+        logger.warn('Execution (real) blocked or failed, falling back to dry-run', {
+          traceId: req.traceId,
+          gateId: executionGateInfo.gateId,
+          error: err.message,
+        });
+        executionResult = executionEngine.simulate({ executionPlan: executionTools, traceId: req.traceId });
+        executionGateInfo.status = state?.status || executionGateInfo.status;
+      }
     }
   }
 

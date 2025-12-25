@@ -381,6 +381,7 @@ describe('Vertical Slice Orchestration', () => {
   });
 
   it('runs dry-run execution when gate is approved (ordered, simulatable)', async () => {
+    delete process.env.EXECUTION_ENABLED;
     const first = await orchestrateVerticalSlice({
       traceId: 'trace-gate-dry',
       runId: 'run-gate-dry',
@@ -404,6 +405,7 @@ describe('Vertical Slice Orchestration', () => {
   });
 
   it('marks unexecutable step as SKIPPED in dry-run', async () => {
+    delete process.env.EXECUTION_ENABLED;
     mockProductRun.mockImplementation(async ({ traceId }) => ({
       agentId: 'ProductSpecAgent',
       status: 'OK',
@@ -433,5 +435,74 @@ describe('Vertical Slice Orchestration', () => {
 
     const skipped = second.executionResult.steps.find((s) => s.status === 'SKIPPED');
     expect(skipped).toBeDefined();
+  });
+
+  it('blocks real execution when EXECUTION_ENABLED is not true', async () => {
+    process.env.EXECUTION_ENABLED = 'false';
+    const first = await orchestrateVerticalSlice({
+      traceId: 'trace-real-blocked',
+      runId: 'run-real-blocked',
+      intent: 'security.audit+product.spec',
+      input: 'real blocked',
+    });
+    const gateId = first.executionGate.gateId;
+    executionGate.review(gateId, { approve: true });
+    const second = await orchestrateVerticalSlice({
+      traceId: 'trace-real-blocked',
+      runId: 'run-real-blocked',
+      intent: 'security.audit+product.spec',
+      input: 'real blocked',
+    });
+    expect(second.executionResult.mode).toBe('DRY_RUN');
+  });
+
+  it('blocks real execution when gate not approved', async () => {
+    process.env.EXECUTION_ENABLED = 'true';
+    const res = await orchestrateVerticalSlice({
+      traceId: 'trace-real-gate-pending',
+      runId: 'run-real-gate-pending',
+      intent: 'security.audit+product.spec',
+      input: 'pending gate',
+    });
+    // gate is pending, so no real execution result yet
+    expect(res.executionResult).toBeNull();
+  });
+
+  it('executes exactly one tool in REAL mode when enabled and gate approved', async () => {
+    process.env.EXECUTION_ENABLED = 'true';
+    const first = await orchestrateVerticalSlice({
+      traceId: 'trace-real-ok',
+      runId: 'run-real-ok',
+      intent: 'security.audit+product.spec',
+      input: 'real ok',
+    });
+    const gateId = first.executionGate.gateId;
+    executionGate.review(gateId, { approve: true });
+
+    // Ensure both allow_uploads (skip) and enable_checklist (real) are present
+    mockSecurityRun.mockImplementationOnce(async ({ traceId }) => ({
+      agentId: 'SecurityAuditAgent',
+      status: 'OK',
+      summary: 'Allow uploads',
+      actions: ['allow uploads'],
+      citations: [],
+      metrics: { latencyMs: 1 },
+      errors: [],
+      traceId,
+    }));
+
+    const second = await orchestrateVerticalSlice({
+      traceId: 'trace-real-ok',
+      runId: 'run-real-ok',
+      intent: 'security.audit+product.spec',
+      input: 'real ok',
+    });
+
+    expect(second.executionResult.mode).toBe('REAL');
+    const executed = second.executionResult.steps.filter((s) => s.status === 'EXECUTED');
+    const skipped = second.executionResult.steps.filter((s) => s.status === 'SKIPPED_REAL_EXECUTION');
+    expect(executed.length).toBe(1);
+    expect(skipped.length).toBeGreaterThan(0);
+    process.env.EXECUTION_ENABLED = undefined;
   });
 });
