@@ -2,6 +2,7 @@ const express = require('express');
 const AgentLog = require('../models/agentFeedbackLog');
 const { orchestrateZyno } = require('../orchestration/zynoOrchestrator');
 const { orchestrateVerticalSlice } = require('../orchestration/zynoVerticalSlice');
+const gateRouter = require('./orchestration-gate');
 const { listTemplates } = require('../data/parcoursTemplates');
 const agentMemory = require('../memory/agent_memory');
 const { getOrchestrationGlossary } = require('../utils/aepoAeco');
@@ -93,6 +94,8 @@ router.post('/vslice', async (req, res) => {
     res.status(500).json({ error: 'Vertical slice orchestration failed.' });
   }
 });
+
+router.use('/', gateRouter);
 
 router.get('/orchestration/logs', async (req, res) => {
   try {

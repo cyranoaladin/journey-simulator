@@ -31,6 +31,7 @@ const { __mockSearch: ragSearchMock } = require('../orchestration/ragClient');
 const { orchestrateVerticalSlice } = require('../orchestration/zynoVerticalSlice');
 const registry = require('../agents/registry');
 const memoryStore = require('../orchestration/memoryStore');
+const executionGate = require('../orchestration/executionGate');
 
 describe('Vertical Slice Orchestration', () => {
   beforeAll(() => {
@@ -40,6 +41,7 @@ describe('Vertical Slice Orchestration', () => {
 
   beforeEach(() => {
     memoryStore.clear();
+    if (executionGate.clear) executionGate.clear();
     ragSearchMock.mockClear();
     mockSecurityRun = jest.fn(async ({ traceId }) => ({
       agentId: 'SecurityAuditAgent',
@@ -305,5 +307,74 @@ describe('Vertical Slice Orchestration', () => {
     const unexec = res.executionPlan.tools.find((t) => t.unexecutable);
     expect(unexec).toBeDefined();
     expect(unexec.toolId).toBeNull();
+  });
+
+  it('creates an execution gate when a tool requires confirmation', async () => {
+    const res = await orchestrateVerticalSlice({
+      traceId: 'trace-gate',
+      runId: 'run-gate',
+      intent: 'security.audit+product.spec',
+      input: 'gate test',
+    });
+    expect(res.executionGate).toBeDefined();
+    expect(res.executionGate.requiresHuman).toBe(true);
+    expect(res.executionGate.status).toBe('PENDING');
+  });
+
+  it('does not create gate when no critical tool is present', async () => {
+    mockSecurityRun.mockImplementationOnce(async ({ traceId }) => ({
+      agentId: 'SecurityAuditAgent',
+      status: 'OK',
+      summary: 'Checklist only',
+      actions: ['enable checklist'],
+      citations: [],
+      metrics: { latencyMs: 1 },
+      errors: [],
+      traceId,
+    }));
+    mockProductRun.mockImplementationOnce(async ({ traceId }) => ({
+      agentId: 'ProductSpecAgent',
+      status: 'OK',
+      summary: 'Checklist only',
+      actions: ['enable checklist'],
+      citations: [],
+      metrics: { latencyMs: 1 },
+      errors: [],
+      traceId,
+    }));
+    const res = await orchestrateVerticalSlice({
+      traceId: 'trace-no-gate',
+      runId: 'run-no-gate',
+      intent: 'security.audit+product.spec',
+      input: 'no gate',
+    });
+    expect(res.executionGate).toBeNull();
+  });
+
+  it('allows approving and rejecting a gate', async () => {
+    const res = await orchestrateVerticalSlice({
+      traceId: 'trace-gate-review',
+      runId: 'run-gate-review',
+      intent: 'security.audit+product.spec',
+      input: 'gate review',
+    });
+    const gateId = res.executionGate.gateId;
+    const approved = executionGate.review(gateId, { approve: true });
+    expect(approved.status).toBe('APPROVED');
+    const rejected = executionGate.review(gateId, { approve: false });
+    expect(rejected.status).toBe('REJECTED');
+  });
+
+  it('expires gate after TTL', async () => {
+    const res = await orchestrateVerticalSlice({
+      traceId: 'trace-gate-expire',
+      runId: 'run-gate-expire',
+      intent: 'security.audit+product.spec',
+      input: 'gate expire',
+    });
+    const gateId = res.executionGate.gateId;
+    executionGate._debugForceExpire(gateId);
+    const status = executionGate.review(gateId, { approve: true });
+    expect(status.status).toBe('EXPIRED');
   });
 });

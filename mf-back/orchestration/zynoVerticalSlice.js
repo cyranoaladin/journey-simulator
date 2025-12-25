@@ -7,6 +7,7 @@ const ProductSpecAgent = require('../agents/ProductSpecAgent');
 const loggerFactory = require('../utils/logger');
 const createLogger = loggerFactory.createLogger || loggerFactory.default || loggerFactory;
 const memoryStore = require('./memoryStore');
+const executionGate = require('./executionGate');
 const toolsRegistry = require('./toolsRegistry');
 
 const ragClient = new RAGClient();
@@ -446,6 +447,14 @@ async function orchestrateVerticalSlice(payload) {
   aggregated.executionPlan = {
     tools: executionTools,
   };
+
+  let executionGateInfo = null;
+  const needsGate = executionTools.some((t) => t.requiresConfirmation);
+  if (needsGate) {
+    const gateId = executionGate.submit({ traceId: req.traceId, runId: req.runId, executionPlan: executionTools });
+    executionGateInfo = { gateId, status: 'PENDING', requiresHuman: true };
+  }
+  aggregated.executionGate = executionGateInfo;
 
   memoryStore.save(req.runId, {
     runId: req.runId,
