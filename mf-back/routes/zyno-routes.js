@@ -1,6 +1,7 @@
 const express = require('express');
 const AgentLog = require('../models/agentFeedbackLog');
 const { orchestrateZyno } = require('../orchestration/zynoOrchestrator');
+const { orchestrateVerticalSlice } = require('../orchestration/zynoVerticalSlice');
 const { listTemplates } = require('../data/parcoursTemplates');
 const agentMemory = require('../memory/agent_memory');
 const { getOrchestrationGlossary } = require('../utils/aepoAeco');
@@ -69,6 +70,27 @@ router.post('/orchestration', async (req, res) => {
   } catch (error) {
     console.error('Orchestration error:', error);
     res.status(500).json({ error: 'Zyno orchestration failed.' });
+  }
+});
+
+// Vertical slice orchestrator (SecurityAuditAgent + ProductSpecAgent)
+// Mounted at /orchestration → final path: POST /orchestration/vslice
+router.post('/vslice', async (req, res) => {
+  try {
+    const traceId = req.body?.traceId || req.headers['x-trace-id'] || undefined;
+    const result = await orchestrateVerticalSlice({
+      traceId,
+      runId: req.body?.runId,
+      userId: req.body?.userId,
+      intent: req.body?.intent || 'vslice',
+      input: req.body?.input || '',
+      context: req.body?.context || {},
+      constraints: req.body?.constraints || {},
+    });
+    res.json(result);
+  } catch (error) {
+    console.error('Vertical slice orchestration error:', error);
+    res.status(500).json({ error: 'Vertical slice orchestration failed.' });
   }
 });
 
