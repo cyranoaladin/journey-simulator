@@ -81,6 +81,7 @@ describe('Vertical Slice Orchestration', () => {
     expect(typeof res.summary).toBe('string');
     expect(ragSearchMock).toHaveBeenCalledTimes(1);
     expect(res.agents[0].scores).toBeDefined();
+    expect(res.decision.actionPlan.steps.length).toBeGreaterThan(0);
   });
 
   it('executes two agents for composite intent and calls RAG once', async () => {
@@ -98,6 +99,7 @@ describe('Vertical Slice Orchestration', () => {
     expect(res.decision.overallStatus).toBeDefined();
     expect(res.decision.topFindings.length).toBeGreaterThan(0);
     expect(res.decision.recommendedActions.length).toBeGreaterThan(0);
+    expect(res.decision.actionPlan.steps.length).toBeGreaterThan(0);
   });
 
   it('falls back to ProductSpecAgent on unknown intent', async () => {
@@ -193,5 +195,30 @@ describe('Vertical Slice Orchestration', () => {
 
     expect(res.contradictions.length).toBeGreaterThan(0);
     expect(res.decision.topFindings.length).toBeGreaterThan(0);
+    const hasConflictStep = res.decision.actionPlan.steps.some((s) => s.conflict);
+    expect(hasConflictStep).toBe(true);
+  });
+
+  it('reuses memory when same runId is called twice and keeps deduped plan', async () => {
+    const runId = 'run-memory';
+    const first = await orchestrateVerticalSlice({
+      traceId: 'trace-memory-1',
+      runId,
+      intent: 'security.audit+product.spec',
+      input: 'memory test 1',
+    });
+    const second = await orchestrateVerticalSlice({
+      traceId: 'trace-memory-2',
+      runId,
+      intent: 'security.audit+product.spec',
+      input: 'memory test 2',
+    });
+
+    expect(second.memory.reused).toBe(true);
+    expect(second.memory.previousActionsCount).toBeGreaterThanOrEqual(1);
+    // dedup: actionPlan should not have duplicated actions
+    const actions = second.decision.actionPlan.steps.map((s) => s.action);
+    const unique = new Set(actions);
+    expect(unique.size).toBe(actions.length);
   });
 });

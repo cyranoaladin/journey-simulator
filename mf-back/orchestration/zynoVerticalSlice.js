@@ -6,6 +6,7 @@ const SecurityAuditAgent = require('../agents/SecurityAuditAgent');
 const ProductSpecAgent = require('../agents/ProductSpecAgent');
 const loggerFactory = require('../utils/logger');
 const createLogger = loggerFactory.createLogger || loggerFactory.default || loggerFactory;
+const memoryStore = require('./memoryStore');
 
 const ragClient = new RAGClient();
 const logger = createLogger(__filename);
@@ -149,6 +150,7 @@ async function orchestrateVerticalSlice(payload) {
   const req = normalizeRequest(payload);
   const routed = routeIntent({ intent: req.intent, input: req.input, context: req.context });
   const selected = routed.selectedAgents || [];
+  const previous = memoryStore.get(req.runId);
 
   let ragContext = null;
   try {
@@ -288,11 +290,68 @@ async function orchestrateVerticalSlice(payload) {
       recommendedActions,
       rationale: `Selected actions from highest weighted agents. Contradictions detected: ${contradictions.length}.`,
     },
+    memory: {
+      reused: Boolean(previous),
+      previousActionsCount: previous?.recommendedActions?.length || previous?.decision?.recommendedActions?.length || 0,
+    },
     metrics: {
       agentsCount: runsWithScores.length,
       durationMs: Date.now() - startedAll,
     },
   };
+
+  // Action plan consolidation (current + previous)
+  const currentActionEntries = recommendedActions.map((r) => ({
+    action: r.action,
+    agentId: r.agentId,
+    score: r.score,
+    conflict: contradictions.some((c) => c.agents.includes(r.agentId)),
+  }));
+
+  const previousActionEntries = (previous?.decision?.recommendedActions || []).map((r) => ({
+    action: r.action,
+    agentId: r.agentId,
+    score: r.score || 0,
+    conflict: contradictions.some((c) => c.agents.includes(r.agentId)),
+    fromMemory: true,
+  }));
+
+  const mergedActions = [...currentActionEntries, ...previousActionEntries];
+  const dedup = new Map(); // key by action string lowercase
+  for (const item of mergedActions) {
+    const key = (item.action || '').toLowerCase().trim();
+    if (!key) continue;
+    if (!dedup.has(key) || (dedup.get(key)?.score || 0) < (item.score || 0)) {
+      dedup.set(key, item);
+    }
+  }
+
+  const stepsOrdered = Array.from(dedup.values()).sort((a, b) => {
+    if (a.conflict !== b.conflict) return a.conflict ? 1 : -1; // non-conflict first
+    return (b.score || 0) - (a.score || 0);
+  });
+
+  const actionPlanSteps = stepsOrdered.map((s, idx) => ({
+    action: s.action,
+    sourceAgent: s.agentId,
+    score: s.score,
+    priority: idx + 1,
+    conflict: Boolean(s.conflict),
+    fromMemory: Boolean(s.fromMemory),
+  }));
+
+  aggregated.decision.actionPlan = {
+    steps: actionPlanSteps,
+    strategy: contradictions.length > 0 ? 'resolve-contradictions-first' : 'highest-confidence-first',
+  };
+
+  memoryStore.save(req.runId, {
+    runId: req.runId,
+    lastDecision: aggregated.decision,
+    recommendedActions: recommendedActions,
+    contradictions,
+    timestamp: Date.now(),
+  });
 
   logger.info('Vertical slice completed', {
     traceId: req.traceId,
