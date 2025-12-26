@@ -555,7 +555,7 @@ async function orchestrateVerticalSlice(payload) {
     });
 
     const buildIdempotencyKey = () => {
-      const baseKey = req.traceId || req.runId || 'unknown';
+      const baseKey = getTraceId(req, payload) || (req?.runId || payload?.runId || 'unknown');
       const safePayload = { ...payload };
       delete safePayload.headers;
       const explicitPhase = payload?.constraints?.phase || payload?.context?.journey?.phaseId || null;
@@ -640,7 +640,7 @@ async function orchestrateVerticalSlice(payload) {
       addUnique(ops.fallbacks, 'load_shed');
       selected = selected.slice(0, quotaDecision.quota.maxAgentsPerRun);
     }
-    const previous = memoryStore.get(req.runId, tenantId);
+    const previous = memoryStore.get(req?.runId || payload?.runId || getTraceId(req, payload), tenantId);
     const memoryEntries = memoryStore.values(tenantId);
     const learningMap = computeLearningScores(selected, registryIndex, memoryEntries);
     const defaultModel = registryIndex[selected[0]?.agentId]?.llmProfile?.model || 'gpt-4o';
@@ -1216,7 +1216,7 @@ async function orchestrateVerticalSlice(payload) {
     }
 
     // Apply Web3 pipeline actions (after guards and kill switch, before execution)
-    const pipelineContext = { tenantId, runId: req.runId || req.traceId || 'unknown' };
+    const pipelineContext = { tenantId, runId: req?.runId || payload?.runId || getTraceId(req, payload) };
     let web3PipelineState = web3Pipeline.getState(pipelineContext);
     let web3PipelineResult = null;
     // Re-check payload.web3.action here in case it wasn't detected earlier
@@ -1247,7 +1247,7 @@ async function orchestrateVerticalSlice(payload) {
             executionResult = executionEngine.execute({
               executionPlan: executionTools,
               traceId: getTraceId(req, payload),
-              runId: req.runId || req.traceId || 'unknown',
+              runId: req?.runId || payload?.runId || getTraceId(req, payload),
               tenantId,
               gateApproved: true,
             });
@@ -1258,14 +1258,14 @@ async function orchestrateVerticalSlice(payload) {
             const dryRun = executionEngine.simulate({
               executionPlan: executionTools,
               traceId: getTraceId(req, payload),
-              runId: req.runId || req.traceId || 'unknown',
+              runId: req?.runId || payload?.runId || getTraceId(req, payload),
               tenantId,
               gateApproved: true,
             });
             const realSimulated = executionEngine.simulate({
               executionPlan: executionTools,
               traceId: getTraceId(req, payload),
-              runId: req.runId || req.traceId || 'unknown',
+              runId: req?.runId || payload?.runId || getTraceId(req, payload),
               tenantId,
               gateApproved: true,
             });
@@ -1309,7 +1309,7 @@ async function orchestrateVerticalSlice(payload) {
             executionResult = executionEngine.simulate({
               executionPlan: executionTools,
               traceId: getTraceId(req, payload),
-              runId: req.runId || req.traceId || 'unknown',
+              runId: req?.runId || payload?.runId || getTraceId(req, payload),
               tenantId,
               gateApproved: true,
             });
@@ -1327,7 +1327,7 @@ async function orchestrateVerticalSlice(payload) {
           executionResult = executionEngine.simulate({
             executionPlan: executionTools,
             traceId: getTraceId(req, payload),
-            runId: req.runId || req.traceId || 'unknown',
+            runId: req?.runId || payload?.runId || getTraceId(req, payload),
             tenantId,
             gateApproved: state?.status === 'APPROVED',
           });
