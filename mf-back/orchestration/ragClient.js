@@ -36,6 +36,7 @@ class RAGClient {
         return { chunks: snippets.slice(0, topK), latencyMs, source: 'remote' };
       } catch (error) {
         this.logger.warn('RAG remote failed, fallback to local', { traceId, error: error.message });
+        // Continue to local fallback below
       }
     }
 

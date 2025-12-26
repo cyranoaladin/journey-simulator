@@ -16,7 +16,7 @@ const readLocalFallback = (query = '') => {
   }
 
   const normalized = query.toLowerCase();
-  return fs
+  const allFiles = fs
     .readdirSync(RAG_DATA_PATH)
     .filter((file) => /\.(md|txt)$/i.test(file))
     .map((file) => {
@@ -58,10 +58,12 @@ module.exports.getRagSnippets = async (options = {}) => {
       { q: normalizedQuery, collection: RAG_COLLECTION, k: 5, include_documents: true, metadata: { user: authorId } },
       { headers: { 'x-api-key': RAG_API_KEY }, timeout: 5000 }
     );
-    return res.data.snippets || [];
+    return Array.isArray(res.data?.snippets) ? res.data.snippets : [];
   } catch (e) {
     console.warn('RAG search failed:', e.message);
-    return readLocalFallback(normalizedQuery);
+    // Return local fallback, ensuring it's always an array
+    const fallback = readLocalFallback(normalizedQuery);
+    return Array.isArray(fallback) ? fallback : [];
   }
 };
 

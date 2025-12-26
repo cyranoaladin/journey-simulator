@@ -43,6 +43,11 @@ describe('NFT Verification Logic', () => {
     test('should successfully add certificate when transaction is verified', async () => {
         // Mock successful verification
         verifyTransaction.mockResolvedValue(true);
+        // Ensure User.findByIdAndUpdate returns a user with nft_certificates
+        const mockUser = { _id: 'user123', nft_certificates: [] };
+        User.findByIdAndUpdate.mockReturnValue({
+            select: jest.fn().mockResolvedValue(mockUser)
+        });
 
         await addNFTCertificate(req, res);
 
@@ -68,15 +73,17 @@ describe('NFT Verification Logic', () => {
     });
 
     test('should reject when verification fails (wallet mismatch)', async () => {
-        // Mock verification failure
-        verifyTransaction.mockRejectedValue(new Error('Transaction signer does not match user wallet'));
+        // Mock verification failure with the exact error message format
+        verifyTransaction.mockRejectedValue(new Error('Transaction signer (DifferentWallet) does not match user wallet (ValidWalletAddress)'));
 
         await addNFTCertificate(req, res);
 
+        expect(verifyTransaction).toHaveBeenCalledWith('ValidTxSignature', 'ValidWalletAddress');
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
             success: false,
-            error: expect.stringContaining('Transaction signer does not match')
+            message: expect.stringContaining('NFT Verification Failed'),
+            error: expect.stringContaining('Transaction signer')
         }));
     });
 
