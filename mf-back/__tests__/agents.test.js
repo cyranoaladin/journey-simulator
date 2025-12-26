@@ -113,8 +113,9 @@ describe('Agent outputs stay consistent', () => {
       }
 
       // Only check ragEnriched if it's explicitly set (some agents may not set it)
-      // For new-style agents, ragEnriched might not be set, so skip the check
-      if (ragEnriched !== undefined && ragEnriched !== null && !result?.agentId) {
+      // For new-style agents (agentId present), ragEnriched is not expected
+      // For BaseAgent-based agents, ragEnriched should be truthy if set
+      if (!result?.agentId && ragEnriched !== undefined && ragEnriched !== null) {
         // Only check for BaseAgent-based agents, not new-style agents
         expect(ragEnriched).toBeTruthy();
       }
