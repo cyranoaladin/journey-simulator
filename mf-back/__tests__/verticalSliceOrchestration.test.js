@@ -1,6 +1,18 @@
 let mockSecurityRun;
 let mockProductRun;
 
+// Mock all orchestration dependencies to prevent module loading errors
+jest.mock('../orchestration/vsliceSchema', () => ({
+  validateRequest: jest.fn((payload) => ({
+    req: payload || {},
+    warnings: []
+  })),
+  sanitizeAgentResponse: jest.fn((raw) => ({
+    response: raw || {},
+    warnings: []
+  }))
+}));
+
 jest.mock('../orchestration/ragClient', () => {
   const searchMock = jest.fn(async () => ({
     chunks: [{ id: 'doc1', title: 'doc', text: 'content', source: 'mock' }],

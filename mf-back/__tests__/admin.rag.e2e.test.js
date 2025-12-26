@@ -33,12 +33,25 @@ describe('Admin RAG routes end-to-end', () => {
     process.env.RAG_DATA_PATH = tempDocsDir;
     process.env.MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost/test-e2e';
 
+    // Re-require after env vars are set to ensure mocks are applied
+    jest.resetModules();
     app = require('../app');
-    ({ ingestDocument } = require('../rag/ragClient'));
+    const ragClient = require('../rag/ragClient');
+    ingestDocument = ragClient.ingestDocument;
+    
+    // Ensure ingestDocument is a mock function
+    if (typeof ingestDocument !== 'function' || !ingestDocument.mock) {
+      throw new Error('ingestDocument is not properly mocked');
+    }
   });
 
   afterEach(() => {
-    ingestDocument.mockReset();
+    // Only call mockReset if ingestDocument is actually a mock
+    if (ingestDocument && typeof ingestDocument.mockReset === 'function') {
+      ingestDocument.mockReset();
+    } else if (ingestDocument && typeof ingestDocument.mockClear === 'function') {
+      ingestDocument.mockClear();
+    }
     if (tempDocsDir && fs.existsSync(tempDocsDir)) {
       for (const file of fs.readdirSync(tempDocsDir)) {
         fs.rmSync(path.join(tempDocsDir, file), { force: true });
