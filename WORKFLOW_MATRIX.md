@@ -1,6 +1,7 @@
 # WORKFLOW_MATRIX v2 — Journey Simulator / mf-back / web (workflows ↔ routes ↔ API specs ↔ tests)
 
 Ce document relie chaque **workflow utilisateur** à :
+
 - **Routes UI** (`journey-simulator`)
 - **Endpoints backend** (`mf-back` et/ou `web`)
 - **Tests existants** (Playwright / Jest / Vitest)
@@ -13,8 +14,6 @@ Ce document relie chaque **workflow utilisateur** à :
 - **CI-like (lint/build/unit/E2E)** : `bash scripts/ci-verify.sh`
 - **Prod local (DB + services + simulator preview)** : `bash scripts/prod-local-up.sh` / `bash scripts/prod-local-down.sh`
 - **E2E UI (Playwright)** : `cd journey-simulator && npm run test:e2e`
-
-
 
 ### 0.1) Conventions API (headers, auth, CORS) — à utiliser dans les tests
 
@@ -39,6 +38,7 @@ Ce document relie chaque **workflow utilisateur** à :
 - **Stack prod-like locale** : `scripts/prod-local-up.sh` (DB + `mf-back` + `web` + worker mint + `journey-simulator` preview)
 - **Smoke full-stack** : `scripts/full_stack_smoke.sh` (probes API + shell UI)
 - **Arrêt/cleanup** : `scripts/prod-local-down.sh`
+
 ## 1) Cartographie des routes UI (journey-simulator)
 
 Routes définies dans `journey-simulator/src/App.tsx` :
@@ -67,6 +67,7 @@ Routes définies dans `journey-simulator/src/App.tsx` :
 ### 2.1 `mf-back` (Express)
 
 Montage global (voir `mf-back/app.js`) :
+
 - `/user/*` (auth + profile + refresh + wallet)
 - `/journey/*` (progression, missions, artifacts, etc.)
 - `/dao/*` (governance)
@@ -75,6 +76,7 @@ Montage global (voir `mf-back/app.js`) :
 - probes : `/healthz`, `/readyz`
 
 Exemples clés utilisés par la UI (voir `journey-simulator/src/utils/api.ts`) :
+
 - Auth : `POST /user/register`, `POST /user/login`, `POST /user/logout`, `POST /user/refresh`
 - Wallet auth : `POST /user/wallet-challenge`, `POST /user/login-wallet`
 - Profile : `GET /user/profile`
@@ -86,6 +88,7 @@ Exemples clés utilisés par la UI (voir `journey-simulator/src/utils/api.ts`) :
 ### 2.2 `web` (Next.js /app/api)
 
 Endpoints (dossier `web/app/api`) :
+
 - Auth SIWS : `POST /api/auth/siws/challenge`, `POST /api/auth/siws/verify`, `POST /api/auth/verify`, `POST /api/auth/nonce`
 - Journeys : `GET /api/journeys`, `POST /api/journeys/audit`, `GET /api/journeys/[id]/state`, `POST /api/journeys/[id]/step`, `POST /api/journeys/[id]/submit`
 - Mint : `POST /api/mint/simulate`, `POST /api/mint/execute`, `GET /api/mint/status`, `GET /api/mint/last`
@@ -281,26 +284,25 @@ curl -sS -X POST http://127.0.0.1:3002/journey/LOCAL-JOURNEY-ID/step   -H 'Conte
   }'
 ```
 
-
-  - `POST /journey/:journeyId/submit` (mf-back)
-    - **Auth**: requis (`Authorization: Bearer <token>`). Le `demo-token` est accepté.
-    - **Headers**: `Authorization: Bearer <token>`, `Content-Type: application/json`
-    - **Body (utilisé par l’UI)** (depuis `JourneyWorkspace.tsx` + `api.submitMission`):
-      - `missionId: string`
-      - `inputType: string` (ex: `confirmation|text|link|...`)
-      - `submission: string`
-      - `language: string` (UI met souvent `'en'`)
-      - `mode: string`
-      - `tone: string`
-      - `trackId: string` (persona id)
-      - `phaseId: string`
-      - `phaseNumber: number`
-      - `journeyState: object` (UI envoie un snapshot riche : xp/totalXP/completed/completedCount/nfts/mfaiTokens/currentPhase…)
-    - **200**: 
-      - `{ success:true, message, phase_number, xp_awarded, evaluation, progress }`
-    - **404**: `{ success:false, message:'User not found' }` (si token réel mais user absent)
-    - **500**: `{ success:false, message, error }`
-    - **curl (demo-token)**
+- `POST /journey/:journeyId/submit` (mf-back)
+  - **Auth**: requis (`Authorization: Bearer <token>`). Le `demo-token` est accepté.
+  - **Headers**: `Authorization: Bearer <token>`, `Content-Type: application/json`
+  - **Body (utilisé par l’UI)** (depuis `JourneyWorkspace.tsx` + `api.submitMission`):
+    - `missionId: string`
+    - `inputType: string` (ex: `confirmation|text|link|...`)
+    - `submission: string`
+    - `language: string` (UI met souvent `'en'`)
+    - `mode: string`
+    - `tone: string`
+    - `trackId: string` (persona id)
+    - `phaseId: string`
+    - `phaseNumber: number`
+    - `journeyState: object` (UI envoie un snapshot riche : xp/totalXP/completed/completedCount/nfts/mfaiTokens/currentPhase…)
+  - **200**:
+    - `{ success:true, message, phase_number, xp_awarded, evaluation, progress }`
+  - **404**: `{ success:false, message:'User not found' }` (si token réel mais user absent)
+  - **500**: `{ success:false, message, error }`
+  - **curl (demo-token)**
 
 ```bash
 curl -sS -X POST http://127.0.0.1:3002/journey/LOCAL-JOURNEY-ID/submit   -H 'Authorization: Bearer demo-token'   -H 'Content-Type: application/json'   -d '{
@@ -324,8 +326,6 @@ curl -sS -X POST http://127.0.0.1:3002/journey/LOCAL-JOURNEY-ID/submit   -H 'Aut
     }
   }'
 ```
-
-
 
 - **Tests existants**
   - UI E2E :
@@ -437,8 +437,6 @@ curl -sS -X POST http://127.0.0.1:3002/dao/proposals/prop_123/vote   -H 'Content
 curl -sS -X POST http://127.0.0.1:3002/dao/proposals/prop_123/close   -H 'x-api-key: admin-secret-key'
 ```
 
-
-
 - **Tests existants**
   - UI E2E :
     - `journey-simulator/tests/e2e/dao-governance.spec.ts`
@@ -524,14 +522,11 @@ curl -sS -X POST http://127.0.0.1:3002/dao/proposals/prop_123/close   -H 'x-api-
 
 ## 4) Gaps prioritaires (ordre recommandé)
 
-1. **DAO endpoint coherence** (UI vs mf-back) : éviter divergence prod (priorité haute)
+1. **DAO endpoint coherence** (UI vs mf-back) : éviter divergence prod (priorité haute) - **Gap #1**
 2. **E2E refresh token rotation / stampede** (fiabilité + sécurité)
 3. **Unit tests UIBlocksRenderer** (XSS/mermaid)
 4. **Perf assertion “no wallet libs on non-wallet routes”**
 5. **Mint worker async end-to-end** (si prod dépend du pipeline Next/Redis)
-
-
-
 
 ## 5) TODO “alignement scripts”
 
