@@ -4,10 +4,24 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const journeyEngineRoutes = require('../routes/journey-engine-routes');
 
+// Mock RAG to avoid network errors in tests
+jest.mock('../rag/ragClient', () => ({
+  getRagSnippets: jest.fn().mockResolvedValue([])
+}));
+
+// Mock OpenAI to avoid API calls in tests
+jest.mock('../utils/openaiClient', () => ({
+  callGpt5: jest.fn().mockResolvedValue({
+    message: { content: '{"test": "mock"}' }
+  })
+}));
+
 // Mock specific logic of auth middleware or use it directly if independent enough
 // We'll trust the real middleware handles 'demo-token' as seen in the file view
 // but we need to ensure JWT_SECRET is set.
 process.env.JWT_SECRET = 'test-secret';
+process.env.OPENAI_API_KEY = ''; // Force mock mode
+process.env.RAG_SEARCH_URL = ''; // Force local fallback
 
 const app = express();
 app.use(bodyParser.json());

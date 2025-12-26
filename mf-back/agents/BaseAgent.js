@@ -154,8 +154,10 @@ class BaseAgent {
             ragContext = ragResult.context;
             ragSources = ragResult.hits;
         } catch (err) {
-            // Propagate the error to block execution
-            throw err;
+            // RAG failure should not block execution - continue without context
+            console.warn(`[${this.name}] RAG retrieval failed, continuing without context:`, err.message);
+            ragContext = "";
+            ragSources = [];
         }
 
         // 2. Build Prompts
