@@ -46,14 +46,6 @@ describe('Vertical Slice Orchestration', () => {
   beforeAll(() => {
     process.env.OPENAI_API_KEY = ''; // force mock LLM
     process.env.RAG_SEARCH_URL = ''; // force local RAG
-    // Reset all stores before tests
-    metricsStore.reset();
-    memoryStore.reset();
-    idempotencyStore.clear();
-    auditTrailStore.reset();
-    llmCache.reset();
-    circuitBreaker.coldReset();
-    concurrencyManager.reset();
   });
 
   beforeEach(() => {

@@ -33,6 +33,13 @@ jest.mock('../utils/aepoAeco', () => ({
   getOrchestrationGlossary: jest.fn().mockReturnValue({})
 }));
 
+jest.mock('../routes/orchestration-gate', () => {
+  const express = require('express');
+  const router = express.Router();
+  // Add minimal gate routes if needed
+  return router;
+});
+
 const AgentLog = require('../models/agentFeedbackLog');
 const { orchestrateZyno } = require('../orchestration/zynoOrchestrator');
 const { listTemplates } = require('../data/parcoursTemplates');
