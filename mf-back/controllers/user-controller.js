@@ -671,11 +671,15 @@ exports.addNFTCertificate = async (req, res) => {
       try {
         await verifyTransaction(resolvedAddress, req.user.wallet_address);
       } catch (verificationError) {
-        console.error(`NFT Verification Failed for user ${userId}:`, verificationError.message);
+        const errorMsg = verificationError instanceof Error ? verificationError.message : String(verificationError);
+        // Only log in non-test environment to reduce CI noise
+        if (process.env.NODE_ENV !== 'test') {
+          console.error(`NFT Verification Failed for user ${userId}:`, errorMsg);
+        }
         return res.status(400).json({
           success: false,
           message: 'NFT Verification Failed: Invalid transaction or wallet mismatch.',
-          error: verificationError.message
+          error: errorMsg
         });
       }
     }
