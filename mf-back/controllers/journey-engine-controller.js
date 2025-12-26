@@ -9,7 +9,8 @@ exports.startJourney = async (req, res) => {
         const result = await JourneyEngine.startJourney(req.user.id, journeyDefinitionId);
         res.status(201).json({ success: true, data: result });
     } catch (error) {
-        res.status(409).json({ success: false, message: error.message });
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        res.status(409).json({ success: false, message: errorMsg });
     }
 };
 
@@ -23,7 +24,8 @@ exports.submitPhase = async (req, res) => {
         const result = await JourneyEngine.submitPhase(req.user.id, runId, phaseId, stepId, payload);
         res.status(200).json({ success: true, data: result });
     } catch (error) {
-        res.status(400).json({ success: false, message: error.message });
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        res.status(400).json({ success: false, message: errorMsg });
     }
 };
 
@@ -46,6 +48,7 @@ exports.devAdvance = async (req, res) => {
         const result = await JourneyEngine.mockEvaluate(submissionId, decision, score);
         res.status(200).json({ success: true, data: result });
     } catch (error) {
-        res.status(400).json({ success: false, message: error.message });
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        res.status(400).json({ success: false, message: errorMsg });
     }
 };
