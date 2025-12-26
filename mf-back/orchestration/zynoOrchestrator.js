@@ -250,7 +250,7 @@ async function triggerAgents(agentNames, mode, context, intent) {
         durationMs,
         success: false,
         errorCount: 1,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       }, missionId);
       agentMemory.saveInteraction(agentName, userId, {
         type: 'AEPO',
@@ -259,7 +259,7 @@ async function triggerAgents(agentNames, mode, context, intent) {
         durationMs,
         success: false,
         errorCount: 1,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
       timeline.push({
         agent: agentName,
@@ -272,7 +272,7 @@ async function triggerAgents(agentNames, mode, context, intent) {
         prompt: context.input ?? context.objective ?? null,
         reasoning: null,
         action: null,
-        summary: error?.message ?? 'Erreur non spécifiée',
+        summary: (error instanceof Error ? error.message : String(error)) || 'Erreur non spécifiée',
         sources: [],
         feedback: {
           ae_summary: null,

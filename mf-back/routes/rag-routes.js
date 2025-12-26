@@ -34,7 +34,8 @@ router.post('/admin/rag/upload', upload.single('document'), async (req, res) => 
 
     return res.status(200).json({ status: 'success', details });
   } catch (error) {
-    console.error('RAG Upload error:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error('RAG Upload error:', errorMsg);
     return res.status(500).json({ error: 'Upload failed' });
   }
 });
@@ -59,7 +60,8 @@ router.get('/admin/rag/documents', async (req, res) => {
 
     return res.json({ documents });
   } catch (error) {
-    console.error('RAG list error:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error('RAG list error:', errorMsg);
     return res.status(500).json({ error: 'Unable to list documents' });
   }
 });

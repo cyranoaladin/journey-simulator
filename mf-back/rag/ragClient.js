@@ -60,7 +60,10 @@ module.exports.getRagSnippets = async (options = {}) => {
     );
     return Array.isArray(res.data?.snippets) ? res.data.snippets : [];
   } catch (e) {
-    console.warn('RAG search failed:', e.message);
+    const errorMsg = e instanceof Error ? e.message : String(e);
+    if (process.env.NODE_ENV !== 'test') {
+      console.warn('RAG search failed:', errorMsg);
+    }
     // Return local fallback, ensuring it's always an array
     const fallback = readLocalFallback(normalizedQuery);
     return Array.isArray(fallback) ? fallback : [];
@@ -87,7 +90,10 @@ module.exports.ingestDocumentsIfNeeded = async ({ userId, phase }) => {
     );
     return res.data.documents || [];
   } catch (e) {
-    console.warn('RAG ingestion failed:', e.message);
+    const errorMsg = e instanceof Error ? e.message : String(e);
+    if (process.env.NODE_ENV !== 'test') {
+      console.warn('RAG ingestion failed:', errorMsg);
+    }
     return docsToIngest;
   }
 };
@@ -116,7 +122,10 @@ module.exports.ingestDocument = async (content, metadata = {}) => {
 
     remoteDocuments = res.data.documents || [];
   } catch (e) {
-    console.warn('RAG single document ingestion failed:', e.message);
+    const errorMsg = e instanceof Error ? e.message : String(e);
+    if (process.env.NODE_ENV !== 'test') {
+      console.warn('RAG single document ingestion failed:', errorMsg);
+    }
   }
 
   try {
@@ -130,7 +139,10 @@ module.exports.ingestDocument = async (content, metadata = {}) => {
     fs.mkdirSync(RAG_DATA_PATH, { recursive: true });
     fs.writeFileSync(targetPath, content, 'utf8');
   } catch (error) {
-    console.warn('Failed to persist RAG document locally:', error.message);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    if (process.env.NODE_ENV !== 'test') {
+      console.warn('Failed to persist RAG document locally:', errorMsg);
+    }
   }
 
   return remoteDocuments.length > 0

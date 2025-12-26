@@ -33,7 +33,8 @@ jest.mock('../memory/agent_memory', () => ({
   update: jest.fn(),
   pushHistory: jest.fn(),
   listAll: jest.fn().mockReturnValue([]),
-  reset: jest.fn()
+  reset: jest.fn(),
+  saveInteraction: jest.fn()
 }));
 
 jest.mock('../utils/aepoAeco', () => ({
@@ -70,7 +71,7 @@ describe('admin routes', () => {
 
     tempDocsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rag-docs-'));
     process.env.RAG_DATA_PATH = tempDocsDir;
-    
+
     // Ensure ADMIN_API_KEY is deleted before each test (will be set in specific tests)
     delete process.env.ADMIN_API_KEY;
 

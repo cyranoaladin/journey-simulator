@@ -69,7 +69,8 @@ router.post('/orchestration', async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Orchestration error:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error('Orchestration error:', errorMsg);
     res.status(500).json({ error: 'Zyno orchestration failed.' });
   }
 });
@@ -87,10 +88,14 @@ router.post('/vslice', async (req, res) => {
       input: req.body?.input || '',
       context: req.body?.context || {},
       constraints: req.body?.constraints || {},
+      preset: req.body?.preset,
+      web3: req.body?.web3,
+      headers: req.headers,
     });
     res.json(result);
   } catch (error) {
-    console.error('Vertical slice orchestration error:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error('Vertical slice orchestration error:', errorMsg);
     res.status(500).json({ error: 'Vertical slice orchestration failed.' });
   }
 });
@@ -119,7 +124,8 @@ router.get('/orchestration/logs', async (req, res) => {
       items: logs,
     });
   } catch (error) {
-    console.error('Agent logs fetch error:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error('Agent logs fetch error:', errorMsg);
     res.status(500).json({ error: 'Unable to retrieve orchestration logs.' });
   }
 });
@@ -155,7 +161,8 @@ router.get('/orchestration/current-step', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Current step retrieval error:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error('Current step retrieval error:', errorMsg);
     res.status(500).json({ error: 'Unable to retrieve current step.' });
   }
 });
@@ -176,7 +183,8 @@ router.get('/admin/agent-logs', async (req, res) => {
     const logs = await AgentLog.find(filters).sort({ timestamp: -1 }).limit(100);
     res.json(logs);
   } catch (error) {
-    console.error('Agent logs error:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error('Agent logs error:', errorMsg);
     res.status(500).json({ error: 'Unable to retrieve agent logs.' });
   }
 });
@@ -199,7 +207,8 @@ router.get('/admin/agent-scoreboard', (req, res) => {
 
     return res.json({ users });
   } catch (error) {
-    console.error('Agent scoreboard error:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error('Agent scoreboard error:', errorMsg);
     return res.status(500).json({ error: 'Unable to retrieve agent scoreboard' });
   }
 });

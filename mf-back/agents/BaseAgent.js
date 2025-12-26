@@ -110,8 +110,8 @@ class BaseAgent {
             const hits = await getRagSnippets({
                 query: query,
                 userContext: { id: ctx.userId },
-                // We might want to pass domain/collection if ragClient supports it, 
-                // but ragClient currently uses env RAG_COLLECTION. 
+                // We might want to pass domain/collection if ragClient supports it,
+                // but ragClient currently uses env RAG_COLLECTION.
                 // For now, we rely on ragClient's logic.
             });
 
@@ -218,8 +218,8 @@ class BaseAgent {
                     };
                 }
 
-                // If not new but failed, we retry (status was reset to 'started' by findOrCreate if we implemented retry logic there, 
-                // but currently findOrCreate just returns existing failed run? 
+                // If not new but failed, we retry (status was reset to 'started' by findOrCreate if we implemented retry logic there,
+                // but currently findOrCreate just returns existing failed run?
                 // Wait, findOrCreate implementation:
                 // if (existing && existing.status !== 'failed') return existing;
                 // else create new.
@@ -267,7 +267,12 @@ class BaseAgent {
                 agentRun.status = 'succeeded';
                 agentRun.output = { raw: text, payload };
                 agentRun.durationMs = Date.now() - startTime;
-                await agentRun.save().catch(e => console.warn('Failed to update AgentRun success:', e.message));
+                await agentRun.save().catch(e => {
+                  const errorMsg = e instanceof Error ? e.message : String(e);
+                  if (process.env.NODE_ENV !== 'test') {
+                    console.warn('Failed to update AgentRun success:', errorMsg);
+                  }
+                });
             }
 
             return {
@@ -282,7 +287,12 @@ class BaseAgent {
                 agentRun.status = 'failed';
                 agentRun.error = { message: error.message, stack: error.stack };
                 agentRun.durationMs = Date.now() - startTime;
-                await agentRun.save().catch(e => console.warn('Failed to update AgentRun failure:', e.message));
+                await agentRun.save().catch(e => {
+                  const errorMsg = e instanceof Error ? e.message : String(e);
+                  if (process.env.NODE_ENV !== 'test') {
+                    console.warn('Failed to update AgentRun failure:', errorMsg);
+                  }
+                });
             }
             throw error;
         }

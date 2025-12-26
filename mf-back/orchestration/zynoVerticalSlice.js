@@ -672,7 +672,8 @@ async function orchestrateVerticalSlice(payload) {
       }
     } catch (error) {
       const safeTraceId = req?.traceId || payload?.traceId || 'unknown';
-      logger.warn('RAG failed, continuing without context', { traceId: safeTraceId, error: error.message });
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      logger.warn('RAG failed, continuing without context', { traceId: safeTraceId, error: errorMsg });
       ragContext = null;
       addUnique(ops.fallbacks, 'rag_disabled');
     }
@@ -760,7 +761,8 @@ async function orchestrateVerticalSlice(payload) {
           circuitBreaker.recordSuccess(tenantId, 'execution');
           return resWithScores;
         } catch (error) {
-          logger.error('Agent execution failed', { traceId: getTraceId(req, payload), agentId: sel.agentId, error: error.message });
+          const errorMsg = error instanceof Error ? error.message : String(error);
+          logger.error('Agent execution failed', { traceId: getTraceId(req, payload), agentId: sel.agentId, error: errorMsg });
           circuitBreaker.recordFailure(tenantId, 'execution', 'agent_failure');
           return {
             agentId: sel.agentId,
@@ -770,8 +772,8 @@ async function orchestrateVerticalSlice(payload) {
             actions: [],
             citations: [],
             metrics: { latencyMs: Date.now() - started },
-            errors: [error.message],
-            scores: computeScores({ status: 'FAIL', actions: [], errors: [error.message] }, meta, learningMap[sel.agentId]?.learningScore),
+            errors: [errorMsg],
+            scores: computeScores({ status: 'FAIL', actions: [], errors: [errorMsg] }, meta, learningMap[sel.agentId]?.learningScore),
           };
         }
       })
@@ -1578,8 +1580,8 @@ async function orchestrateVerticalSlice(payload) {
     }, tenantId);
 
     auditTrailStore.add({
-              traceId: getTraceId(req, payload),
-              runId: req?.runId || payload?.runId || 'unknown',
+      traceId: getTraceId(req, payload),
+      runId: req?.runId || payload?.runId || 'unknown',
       intent: aggregated.intent,
       agents: runsWithScores.map((r) => ({ agentId: r.agentId, status: r.status })),
       contradictions: contradictions.length,
@@ -1733,8 +1735,8 @@ async function orchestrateVerticalSlice(payload) {
           steps: stepsCount,
           blocked: blockedCount,
           toolsUsed: toolsUsed.length,
-              traceId: getTraceId(req, payload),
-              runId: req?.runId || payload?.runId || 'unknown',
+          traceId: getTraceId(req, payload),
+          runId: req?.runId || payload?.runId || 'unknown',
           tenantId,
         },
       });
