@@ -102,7 +102,10 @@ class BaseAgent {
         const domain = ctx.trackId || "general";
 
         try {
-            console.log(`[${this.name}] Querying RAG with: "${query.substring(0, 50)}..." (Domain: ${domain})`);
+            // Only log in non-test environments to reduce noise in CI
+            if (process.env.NODE_ENV !== 'test') {
+                console.log(`[${this.name}] Querying RAG with: "${query.substring(0, 50)}..." (Domain: ${domain})`);
+            }
 
             const hits = await getRagSnippets({
                 query: query,
@@ -113,7 +116,9 @@ class BaseAgent {
             });
 
             if (hits.length === 0) {
-                console.log(`[${this.name}] RAG returned 0 hits.`);
+                if (process.env.NODE_ENV !== 'test') {
+                    console.log(`[${this.name}] RAG returned 0 hits.`);
+                }
                 return { context: "", hits: [] };
             }
 
@@ -128,7 +133,11 @@ class BaseAgent {
             };
 
         } catch (error) {
-            console.error(`[${this.name}] RAG Error:`, error.message);
+            // Only log errors in non-test environments to reduce noise in CI
+            // RAG errors are non-blocking - continue without context
+            if (process.env.NODE_ENV !== 'test') {
+                console.error(`[${this.name}] RAG Error:`, error.message);
+            }
             // ragClient handles fallback, so if we get here, it's a critical error
             return { context: "", hits: [] };
         }

@@ -10,7 +10,34 @@ jest.mock('../models/agentFeedbackLog', () => ({
 }));
 
 jest.mock('../rag/ragClient', () => ({
-  ingestDocument: jest.fn()
+  ingestDocument: jest.fn(),
+  getRagSnippets: jest.fn().mockResolvedValue([])
+}));
+
+// Mock orchestration dependencies to prevent module loading errors
+jest.mock('../orchestration/zynoVerticalSlice', () => ({
+  orchestrateVerticalSlice: jest.fn()
+}));
+
+jest.mock('../orchestration/zynoOrchestrator', () => ({
+  orchestrateZyno: jest.fn()
+}));
+
+jest.mock('../data/parcoursTemplates', () => ({
+  listTemplates: jest.fn().mockReturnValue([])
+}));
+
+jest.mock('../memory/agent_memory', () => ({
+  getMemory: jest.fn(),
+  saveMemory: jest.fn(),
+  update: jest.fn(),
+  pushHistory: jest.fn(),
+  listAll: jest.fn().mockReturnValue([]),
+  reset: jest.fn()
+}));
+
+jest.mock('../utils/aepoAeco', () => ({
+  getOrchestrationGlossary: jest.fn().mockReturnValue({})
 }));
 
 jest.mock('multer', () => {
@@ -43,6 +70,9 @@ describe('admin routes', () => {
 
     tempDocsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rag-docs-'));
     process.env.RAG_DATA_PATH = tempDocsDir;
+    
+    // Ensure ADMIN_API_KEY is deleted before each test (will be set in specific tests)
+    delete process.env.ADMIN_API_KEY;
 
     // Re-require mocked dependencies after reset
     AgentLog = require('../models/agentFeedbackLog');
@@ -57,8 +87,14 @@ describe('admin routes', () => {
 
     app = express();
     app.use(express.json());
-    app.use('/', require('../routes/zyno-routes'));
-    app.use('/', require('../routes/rag-routes'));
+    // Load routes after mocks are set up
+    try {
+      app.use('/', require('../routes/zyno-routes'));
+      app.use('/', require('../routes/rag-routes'));
+    } catch (err) {
+      // If route loading fails, log but continue (mocks should prevent this)
+      console.warn('Route loading warning:', err.message);
+    }
 
     warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});

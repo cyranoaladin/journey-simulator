@@ -92,18 +92,31 @@ describe('Agent outputs stay consistent', () => {
       const response = { ...result, ...payload };
 
       // Extract values with fallbacks
-      const agent = response.agent || payload.agent;
-      const phase = response.phase || payload.phase;
+      // For new-style agents (GrowthAgent, etc.), result has agentId, status, summary, etc.
+      // For BaseAgent-based agents, result has payload, sources, etc.
+      const agent = response.agent || payload.agent || result?.agentId || result?.agent;
+      const phase = response.phase || payload.phase || result?.phase;
       const ragEnriched = response.ragEnriched !== undefined ? response.ragEnriched : (payload.ragEnriched !== undefined ? payload.ragEnriched : (result?.sources?.length > 0));
-      // references can be in payload or result.sources (from RAG)
-      const references = response.references || payload.references || result?.sources || [];
+      // references can be in payload or result.sources (from RAG) or result.citations
+      const references = response.references || payload.references || result?.sources || result?.citations || [];
 
-      expect(agent).toBe(agentName);
-      if (phase) expect(phase).toBe(sharedContext.phase);
+      // For new-style agents, check agentId instead of agent
+      if (result?.agentId) {
+        expect(result.agentId).toBe(agentName);
+      } else {
+        expect(agent).toBe(agentName);
+      }
+      
+      // Phase check is optional - some agents don't set it
+      if (phase && sharedContext.phase) {
+        expect(phase).toBe(sharedContext.phase);
+      }
+      
       // Only check ragEnriched if it's explicitly set (some agents may not set it)
       if (ragEnriched !== undefined && ragEnriched !== null) {
         expect(ragEnriched).toBeTruthy();
       }
+      
       // Check references only if they exist (RAG may return empty)
       if (references && Array.isArray(references) && references.length > 0) {
         expect(references.length).toBeGreaterThanOrEqual(1);
@@ -114,13 +127,33 @@ describe('Agent outputs stay consistent', () => {
           );
         }
       }
-      expect(payload || result?.payload).toBeDefined();
-
-      if (isClassBased) {
-        expect(callGpt5).toHaveBeenCalled();
-        const args = callGpt5.mock.calls[callGpt5.mock.calls.length - 1][0];
-        expect(args.metadata).toEqual(expect.objectContaining({ agent: agentName }));
+      
+      // For new-style agents, check status and summary instead of payload
+      if (result?.status) {
+        expect(result.status).toMatch(/^(OK|WARN|FAIL|TIMEOUT)$/);
+        expect(result.summary).toBeDefined();
+        expect(typeof result.summary).toBe('string');
       } else {
+        expect(payload || result?.payload).toBeDefined();
+      }
+
+      // For new-style agents (GrowthAgent, etc.), they don't use callGpt5 or getRagSnippets
+      // They return structured responses directly
+      if (isClassBased) {
+        // Check if it's a BaseAgent subclass (uses LLM) or new-style agent (returns structured)
+        if (result?.status && result?.agentId) {
+          // New-style agent - no LLM call expected
+          // Just verify the structure is correct
+          expect(result.agentId).toBe(agentName);
+          expect(result.status).toBeDefined();
+        } else {
+          // BaseAgent subclass - should call LLM
+          expect(callGpt5).toHaveBeenCalled();
+          const args = callGpt5.mock.calls[callGpt5.mock.calls.length - 1][0];
+          expect(args.metadata).toEqual(expect.objectContaining({ agent: agentName }));
+        }
+      } else {
+        // Legacy function-based agent
         expect(getRagSnippets).toHaveBeenCalled();
       }
     });
