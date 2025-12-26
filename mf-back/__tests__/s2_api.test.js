@@ -14,12 +14,19 @@ app.use(bodyParser.json());
 app.use('/api/engine', journeyEngineRoutes);
 
 // DB Setup (Same as s2_logic)
+// Increase timeout for CI environments
+jest.setTimeout(20000);
+
 beforeAll(async () => {
     const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/mf_back_test_s2_api';
     try {
-        await mongoose.connect(mongoUri);
+        await mongoose.connect(mongoUri, {
+            serverSelectionTimeoutMS: 10000,
+            socketTimeoutMS: 45000,
+        });
     } catch (err) {
         console.warn("MongoDB fail", err);
+        throw err; // Fail fast in CI
     }
 });
 

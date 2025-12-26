@@ -7,11 +7,20 @@ const XpLedger = require('../models/XpLedger');
 // Mock helpers
 const newId = () => new mongoose.Types.ObjectId();
 
+// Increase timeout for CI environments
+jest.setTimeout(20000);
+
 beforeAll(async () => {
     const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/mf_back_test_s2_eval';
     try {
-        await mongoose.connect(mongoUri);
-    } catch (err) { console.warn(err); }
+        await mongoose.connect(mongoUri, {
+            serverSelectionTimeoutMS: 10000,
+            socketTimeoutMS: 45000,
+        });
+    } catch (err) {
+        console.warn(err);
+        throw err; // Fail fast in CI
+    }
 });
 
 afterAll(async () => {

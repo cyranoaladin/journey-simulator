@@ -9,15 +9,22 @@ const XpLedger = require('../models/XpLedger');
 // We need a real DB to test pre('save') hooks and strict constraints
 let mongoServer;
 
+// Increase timeout for CI environments where MongoDB may take time to start
+jest.setTimeout(20000);
+
 beforeAll(async () => {
     // Try to connect to local test DB since we don't have memory server in package.json
     // and we cannot add dependencies easily.
     const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/mf_back_test_s2';
 
     try {
-        await mongoose.connect(mongoUri);
+        await mongoose.connect(mongoUri, {
+            serverSelectionTimeoutMS: 10000, // 10 seconds timeout for connection
+            socketTimeoutMS: 45000,
+        });
     } catch (err) {
         console.warn("MongoDB connection failed. Tests requiring DB will fail.", err);
+        throw err; // Fail fast in CI
     }
 });
 
