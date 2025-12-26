@@ -37,6 +37,9 @@ jest.mock('../routes/orchestration-gate', () => {
   const express = require('express');
   const router = express.Router();
   // Add minimal gate routes if needed
+  router.post('/gate/:gateId/review', (req, res) => {
+    res.json({ status: 'mocked' });
+  });
   return router;
 });
 
