@@ -1,16 +1,36 @@
 const express = require('express');
 const request = require('supertest');
 
-jest.mock('../models/agentFeedbackLog', () => ({
-  create: jest.fn().mockResolvedValue({ _id: 'log-1' })
+// Mock all orchestration dependencies to prevent module loading errors
+jest.mock('../orchestration/zynoVerticalSlice', () => ({
+  orchestrateVerticalSlice: jest.fn()
+}));
+
+jest.mock('../orchestration/ragClient', () => ({
+  RAGClient: jest.fn().mockImplementation(() => ({
+    search: jest.fn().mockResolvedValue({ chunks: [], source: 'mock', latencyMs: 0 })
+  }))
 }));
 
 jest.mock('../orchestration/zynoOrchestrator', () => ({
   orchestrateZyno: jest.fn()
 }));
 
+jest.mock('../models/agentFeedbackLog', () => ({
+  create: jest.fn().mockResolvedValue({ _id: 'log-1' })
+}));
+
 jest.mock('../data/parcoursTemplates', () => ({
   listTemplates: jest.fn()
+}));
+
+jest.mock('../memory/agent_memory', () => ({
+  getMemory: jest.fn(),
+  saveMemory: jest.fn()
+}));
+
+jest.mock('../utils/aepoAeco', () => ({
+  getOrchestrationGlossary: jest.fn().mockReturnValue({})
 }));
 
 const AgentLog = require('../models/agentFeedbackLog');
