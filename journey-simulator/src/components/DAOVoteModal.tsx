@@ -116,11 +116,16 @@ const DAOVoteModal: FC<DAOVoteModalProps> = ({
         <div className="bg-white/5 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold">{proposal.title}</h3>
-            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-              proposal.type === 'Incubation' ? 'bg-purple-500/20 text-purple-400' :
-              proposal.type === 'Launchpad' ? 'bg-gold-500/20 text-gold-400' :
-              'bg-blue-500/20 text-blue-400'
-            }`}>
+            <span className={(() => {
+              // Extract nested ternary into explicit variable
+              let badgeClass = 'bg-blue-500/20 text-blue-400';
+              if (proposal.type === 'Incubation') {
+                badgeClass = 'bg-purple-500/20 text-purple-400';
+              } else if (proposal.type === 'Launchpad') {
+                badgeClass = 'bg-gold-500/20 text-gold-400';
+              }
+              return `px-2 py-1 rounded-full text-xs font-semibold ${badgeClass}`;
+            })()}>
               {proposal.type}
             </span>
           </div>
@@ -206,7 +211,18 @@ const DAOVoteModal: FC<DAOVoteModalProps> = ({
         </div>
 
         {/* Voting Buttons */}
-        {!hasVoted ? (
+        {hasVoted ? (
+          <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-4 text-center">
+            <CheckCircle className="mx-auto mb-2 text-green-400" size={24} />
+            <h3 className="font-semibold mb-1">Vote recorded!</h3>
+            <p className="text-sm opacity-80">
+              Your "{selectedVote === 'approve' ? 'Approve' : 'Reject'}" vote has been counted.
+            </p>
+            <p className="text-xs opacity-60 mt-2">
+              Voting power increased by +10 points
+            </p>
+          </div>
+        ) : (
           <div className="grid grid-cols-2 gap-4">
             <motion.button
               whileHover={{ scale: 1.02 }}
@@ -237,17 +253,6 @@ const DAOVoteModal: FC<DAOVoteModalProps> = ({
               )}
               <span>Reject</span>
             </motion.button>
-          </div>
-        ) : (
-          <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-4 text-center">
-            <CheckCircle className="mx-auto mb-2 text-green-400" size={24} />
-            <h3 className="font-semibold mb-1">Vote recorded!</h3>
-            <p className="text-sm opacity-80">
-              Your "{selectedVote === 'approve' ? 'Approve' : 'Reject'}" vote has been counted.
-            </p>
-            <p className="text-xs opacity-60 mt-2">
-              Voting power increased by +10 points
-            </p>
           </div>
         )}
 

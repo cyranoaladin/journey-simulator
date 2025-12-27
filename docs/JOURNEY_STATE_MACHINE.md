@@ -53,3 +53,11 @@ We calculate aggregate metrics to track product health:
 -   **Per-Journey Metrics**: Detailed stats for a single user journey.
 
 These are exposed via `/api/journeys/metrics` and computed on-demand using Mongo aggregations.
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

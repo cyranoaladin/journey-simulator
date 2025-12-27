@@ -52,7 +52,7 @@ exports.advanceJourneyStep = async ({ journeyId, fromStepId, toStepId, trigger, 
     // Sync legacy field current_phase if toStepId matches "phase-N" pattern
     const phaseMatch = toStepId.match(/phase-(\d+)/);
     if (phaseMatch) {
-        journey.current_phase = parseInt(phaseMatch[1]);
+        journey.current_phase = Number.parseInt(phaseMatch[1], 10);
     }
 
     // TODO: We could log transition metadata (trigger, agentRunId) to a separate collection here

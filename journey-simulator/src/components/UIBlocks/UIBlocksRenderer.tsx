@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { useJourneyStore } from "../../store/journeyStore";
 import { api } from '../../utils/api';
+import { generateStableKey } from '../../utils/generateStableKey';
 import { logger } from '../../utils/logger';
 // TEMPORARILY DISABLED - import { useFavoritesStore } from "../../store/favoritesStore";
 import type {
@@ -95,28 +96,30 @@ function Checklist({ block }: { block: ChecklistBlock; }) {
     <div className="bg-white/5 rounded-xl p-4">
       <h4 className="font-semibold mb-2">{block.title}</h4>
       <ul className="space-y-2">
-        {items.map((it, i) => (
-          <li key={i}>
-            <label
-              htmlFor={`${block.id}-check-${i}`}
-              className="flex items-center gap-2 cursor-pointer"
-            >
-              <input
-                id={`${block.id}-check-${i}`}
-                type="checkbox"
-                checked={!!it.checked}
-                onChange={() =>
-                  setItems((prev) =>
-                    prev.map((p, idx) =>
-                      idx === i ? { ...p, checked: !p.checked } : p,
-                    ),
-                  )
-                }
-              />
-              <span>{it.label}</span>
-            </label>
-          </li>
-        ))}
+        {items.map((it, i) => {
+          const itemKey = generateStableKey(it, 'checklist-item', ['label', 'id']);
+          return (
+            <li key={itemKey}>
+              <label
+                htmlFor={`${block.id || 'block'}-${itemKey}`}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <input
+                  id={`${block.id}-${itemKey}`}
+                  type="checkbox"
+                  checked={!!it.checked}
+                  onChange={() => {
+                    // Extract nested function to reduce nesting depth
+                    const toggleItem = (prev: typeof items) =>
+                      prev.map((p, idx) => (idx === i ? { ...p, checked: !p.checked } : p));
+                    setItems(toggleItem);
+                  }}
+                />
+                <span>{it.label}              </span>
+              </label>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
@@ -182,7 +185,7 @@ function Quiz({ block }: { block: QuizBlock; }) {
       // Apply XP delta locally
       const xpDelta = Number(json?.rewards?.xp_delta || json?.next_state?.xp_delta || 0);
       if (
-        !isNaN(xpDelta) &&
+        !Number.isNaN(xpDelta) &&
         xpDelta > 0 &&
         typeof updateProgress === "function"
       ) {
@@ -248,18 +251,31 @@ function Quiz({ block }: { block: QuizBlock; }) {
 
                 // In certifying mode, don't show colors until submitted (showExplain is true)
                 const showColors = showExplain;
+                const optionKey = generateStableKey({ text: opt, questionId: q.id, index: idx }, 'quiz-option', ['text', 'questionId']);
 
                 return (
                   <button
-                    key={idx}
+                    key={optionKey}
                     onClick={() =>
                       setAnswers((prev) => ({ ...prev, [q.id]: idx }))
                     }
                     disabled={mode === "certifying" && showExplain} // Disable changes after submission
-                    className={`w-full text-left px-3 py-2 rounded-md transition border ${selected
-                      ? "border-accent-cyan/60 bg-accent-cyan/10"
-                      : "border-white/10 hover:border-white/20"
-                      } ${showColors && isCorrect ? "bg-green-600/20 border-green-500/50" : ""} ${showColors && isWrong ? "bg-red-600/20 border-red-500/50" : ""}`}
+                    className={(() => {
+                      // Simplify nested template literals
+                      let baseClass = "w-full text-left px-3 py-2 rounded-md transition border";
+                      if (selected) {
+                        baseClass += " border-accent-cyan/60 bg-accent-cyan/10";
+                      } else {
+                        baseClass += " border-white/10 hover:border-white/20";
+                      }
+                      if (showColors && isCorrect) {
+                        baseClass += " bg-green-600/20 border-green-500/50";
+                      }
+                      if (showColors && isWrong) {
+                        baseClass += " bg-red-600/20 border-red-500/50";
+                      }
+                      return baseClass;
+                    })()}
                   >
                     {opt}
                   </button>
@@ -360,7 +376,7 @@ function Mission({ block }: { block: MissionBlock; }) {
       // Apply XP delta locally
       const xpDelta = Number(json?.rewards?.xp_delta || json?.next_state?.xp_delta || 0);
       if (
-        !isNaN(xpDelta) &&
+        !Number.isNaN(xpDelta) &&
         xpDelta > 0 &&
         typeof updateProgress === "function"
       ) {
@@ -439,7 +455,11 @@ function Mission({ block }: { block: MissionBlock; }) {
 function Resources({ block }: { block: ResourceBlock; }) {
   const isFlashcards = (r: ResourceItem) => r.resource_type === 'flashcard';
   const copyDeck = (r: ResourceItem) => {
-    const content = `# ${r.label}\n\n${r.description ?? ""}\n${r.url ?? ""}`;
+    // Simplify nested template literal
+    const label = r.label || "";
+    const description = r.description ?? "";
+    const url = r.url ?? "";
+    const content = `# ${label}\n\n${description}\n${url}`;
     navigator.clipboard.writeText(content);
   };
   const resources = Array.isArray(block.resources) ? block.resources : [];
@@ -536,11 +556,13 @@ function Resources({ block }: { block: ResourceBlock; }) {
                 */}
                 <button
                   className="px-3 py-1.5 rounded-md border border-white/10 text-xs hover:bg-white/5 transition-colors"
-                  onClick={() =>
-                    navigator.clipboard.writeText(
-                      `${r.label}\n${r.description ?? ""}\n${r.url ?? ""}`,
-                    )
-                  }
+                  onClick={() => {
+                    // Simplify nested template literal
+                    const label = r.label || "";
+                    const description = r.description ?? "";
+                    const url = r.url ?? "";
+                    navigator.clipboard.writeText(`${label}\n${description}\n${url}`);
+                  }}
                   title="Copy information"
                 >
                   Copy
@@ -557,63 +579,96 @@ function Resources({ block }: { block: ResourceBlock; }) {
   );
 }
 
+// Helper to escape HTML entities
+function escapeHtml(s: string): string {
+  return s
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+// Helper to close list if open
+function closeListIfOpen(out: string[], inList: boolean): boolean {
+  if (inList) {
+    out.push("</ul>");
+    return false;
+  }
+  return inList;
+}
+
+// Helper to process header lines
+function processHeader(line: string, pattern: RegExp, tag: string, out: string[], inList: boolean): { processed: boolean; newInList: boolean } {
+  if (pattern.test(line)) {
+    const newInList = closeListIfOpen(out, inList);
+    const content = line.replace(pattern, "");
+    out.push(`<${tag}>${escapeHtml(content)}</${tag}>`);
+    return { processed: true, newInList };
+  }
+  return { processed: false, newInList: inList };
+}
+
+// Helper to process list items
+function processListItem(line: string, out: string[], inList: boolean): { processed: boolean; newInList: boolean } {
+  if (/^[-*]\s+/.test(line)) {
+    if (!inList) {
+      out.push("<ul>");
+    }
+    const content = line.replace(/^[-*]\s+/, "");
+    out.push(`<li>${escapeHtml(content)}</li>`);
+    return { processed: true, newInList: true };
+  }
+  return { processed: false, newInList: inList };
+}
+
 function renderBasicMarkdown(md: string) {
   // Escape user-controlled text first to prevent HTML/entity injection, then add a tiny subset of
   // safe markup (headers, lists, paragraphs).
-  const esc = (s: string) =>
-    s
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
   const lines = md.split(/\r?\n/);
   const out: string[] = [];
   let inList = false;
+
   for (const raw of lines) {
     const line = raw.trim();
-    if (/^###\s+/.test(line)) {
-      if (inList) {
-        out.push("</ul>");
-        inList = false;
-      }
-      out.push(`<h3>${esc(line.replace(/^###\s+/, ""))}</h3>`);
+
+    // Process headers (h3, h2, h1)
+    const h3Result = processHeader(line, /^###\s+/, "h3", out, inList);
+    if (h3Result.processed) {
+      inList = h3Result.newInList;
       continue;
     }
-    if (/^##\s+/.test(line)) {
-      if (inList) {
-        out.push("</ul>");
-        inList = false;
-      }
-      out.push(`<h2>${esc(line.replace(/^##\s+/, ""))}</h2>`);
+
+    const h2Result = processHeader(line, /^##\s+/, "h2", out, inList);
+    if (h2Result.processed) {
+      inList = h2Result.newInList;
       continue;
     }
-    if (/^#\s+/.test(line)) {
-      if (inList) {
-        out.push("</ul>");
-        inList = false;
-      }
-      out.push(`<h1>${esc(line.replace(/^#\s+/, ""))}</h1>`);
+
+    const h1Result = processHeader(line, /^#\s+/, "h1", out, inList);
+    if (h1Result.processed) {
+      inList = h1Result.newInList;
       continue;
     }
-    if (/^[-*]\s+/.test(line)) {
-      if (!inList) {
-        out.push("<ul>");
-        inList = true;
-      }
-      out.push(`<li>${esc(line.replace(/^[-*]\s+/, ""))}</li>`);
+
+    // Process list items
+    const listResult = processListItem(line, out, inList);
+    if (listResult.processed) {
+      inList = listResult.newInList;
       continue;
     }
+
+    // Process empty lines
     if (line === "") {
-      if (inList) {
-        out.push("</ul>");
-        inList = false;
-      }
+      inList = closeListIfOpen(out, inList);
       out.push("<br/>");
       continue;
     }
-    out.push(`<p>${esc(line)}</p>`);
+
+    // Default: paragraph
+    out.push(`<p>${escapeHtml(line)}</p>`);
   }
+
   if (inList) out.push("</ul>");
   return out.join("\n");
 }
@@ -647,11 +702,12 @@ function Evaluation({ block }: { block: EvaluationBlock; }) {
       </div>
       <p className="text-sm opacity-90 mb-2">{block.feedback}</p>
       <div className="grid gap-2">
-        {(block.axes || []).map((ax, i) => {
+        {(block.axes || []).map((ax) => {
           const maxScore = Math.max(ax.max_score ?? 0, 1);
           const scoreValue = Math.max(0, Math.min(ax.score ?? 0, maxScore));
+          const axisKey = generateStableKey(ax, 'evaluation-axis', ['name', 'id']);
           return (
-            <div key={i} className="text-xs">
+            <div key={axisKey} className="text-xs">
               <div className="flex items-center justify-between">
                 <span className="font-medium">{ax.name}</span>
                 <span>
@@ -714,20 +770,24 @@ function ActionSuggestions({ block }: { block: ActionSuggestionsBlock; }) {
         journeyState: useJourneyStore.getState().userProgress,
       };
       setIsStepLoading(true);
-      const resp = await fetch(`${base}/journey/${id}/step`, {
+      const response = await fetch(`${base}/journey/${id}/step`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      if (!resp.ok) throw new Error(`step failed: ${resp.status}`);
-      const json = await resp.json();
+      if (!response.ok) throw new Error(`step failed: ${response.status}`);
+      const json = await response.json();
       useJourneyStore.setState({ lastStep: json });
     } catch (e: any) {
       console.error("ActionSuggestions step failed", e);
+      // Simplify nested template literal
       const code = /step failed: (\d+)/.exec(e?.message || "")?.[1];
-      setToastMsg(
-        `Action failed${code ? ` (HTTP ${code})` : ""}. Please try again.`,
-      );
+      let toastMessage = "Action failed";
+      if (code) {
+        toastMessage += ` (HTTP ${code})`;
+      }
+      toastMessage += ". Please try again.";
+      setToastMsg(toastMessage);
       setLastFailedActionId(actionId);
     } finally {
       setBusy(null);
@@ -739,16 +799,19 @@ function ActionSuggestions({ block }: { block: ActionSuggestionsBlock; }) {
     <div className="bg-white/5 rounded-xl p-4 relative">
       <h4 className="font-semibold mb-3">{block.title}</h4>
       <div className="flex flex-wrap gap-2">
-        {(block.suggestions || []).map((s, i) => (
-          <button
-            key={i}
-            onClick={() => onChoose(s.action_id)}
-            disabled={!!busy}
-            className={`px-3 py-2 rounded-md bg-gradient-primary text-white text-xs ${busy === s.action_id ? "opacity-60 cursor-wait" : ""}`}
-          >
-            {s.label}
-          </button>
-        ))}
+        {(block.suggestions || []).map((s) => {
+          const suggestionKey = generateStableKey(s, 'suggestion', ['action_id', 'label']);
+          return (
+            <button
+              key={suggestionKey}
+              onClick={() => onChoose(s.action_id)}
+              disabled={!!busy}
+              className={`px-3 py-2 rounded-md bg-gradient-primary text-white text-xs ${busy === s.action_id ? "opacity-60 cursor-wait" : ""}`}
+            >
+              {s.label}
+            </button>
+          );
+        })}
       </div>
       <AnimatePresence>
         {toastMsg && (
@@ -861,8 +924,8 @@ function Diagram({ block }: { block: DiagramBlock; }) {
             const sanitized =
               typeof DOMPurify?.sanitize === "function"
                 ? DOMPurify.sanitize(result.svg, {
-                    USE_PROFILES: { svg: true, svgFilters: true },
-                  })
+                  USE_PROFILES: { svg: true, svgFilters: true },
+                })
                 : result.svg;
             setSvg(sanitized);
           } catch (sanitizeError) {
@@ -936,10 +999,12 @@ function ProjectSelection({ block }: { block: ProjectSelectionBlock; }) {
       <h4 className="font-semibold mb-4">{block.title}</h4>
       <div className="grid gap-4 md:grid-cols-2">
         {projects.map((p) => (
-          <div
+          <button
             key={p.id}
             onClick={() => setSelected(p.id)}
-            className={`p-4 rounded-lg border cursor-pointer transition-all ${selected === p.id
+            type="button"
+            aria-label={`Select project ${p.name || p.id}`}
+            className={`p-4 rounded-lg border cursor-pointer transition-all text-left w-full ${selected === p.id
               ? "border-accent-cyan bg-accent-cyan/10"
               : "border-white/10 hover:border-white/20"
               }`}
@@ -960,7 +1025,7 @@ function ProjectSelection({ block }: { block: ProjectSelectionBlock; }) {
                 </span>
               ))}
             </div>
-          </div>
+          </button>
         ))}
         {projects.length === 0 && (
           <div className="text-xs opacity-70">No projects available.</div>
@@ -1056,7 +1121,10 @@ export default function UIBlocksRenderer({ response }: { response: JourneyStepRe
       <AnimatePresence>
         {response.ui_blocks.map((b, index) => {
           logger.debug('Rendering block:', b);
-          const blockKey = b.id ? `${b.id}` : `${b.kind}-${index}`;
+          // Simplify nested template literal
+          const blockId = b.id || "";
+          const blockKind = b.kind || "block";
+          const blockKey = blockId ? blockId : `${blockKind}-${index}`;
 
           return (
             <motion.div

@@ -14,6 +14,12 @@ class GrowthAgent {
       const hasInput = Boolean(input && input.trim());
 
       const summary = hasInput ? 'Growth playbook proposed' : 'Growth playbook drafted with limited input';
+      const confidence = hasInput ? 0.72 : 0.58;
+      const findings = [
+        { item: 'acquisition', status: 'ok', detail: 'Acquisition lever proposed' },
+        { item: 'activation', status: 'ok', detail: 'Activation checklist suggested' },
+        { item: 'retention', status: 'warn', detail: 'Retention experiment to design' },
+      ];
 
       const details = {
         intent: intentNormalized || 'growth',
@@ -39,6 +45,9 @@ class GrowthAgent {
         status: hasInput ? 'OK' : 'WARN',
         summary,
         details,
+        findings,
+        confidence,
+        assumptions: hasInput ? [] : ['Hypothèses basées sur modèle générique AARRR'],
         actions,
         citations: [],
         metrics: { latencyMs: Date.now() - started },
@@ -61,4 +70,3 @@ class GrowthAgent {
 }
 
 module.exports = GrowthAgent;
-

@@ -16,3 +16,11 @@ Manuel (avant push)
 
 Couverture backend
 - Collecte via Jest (report JSON/LCOV). Gate CI conseillé à ≥85% pour app/api/** et src/server/**.
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

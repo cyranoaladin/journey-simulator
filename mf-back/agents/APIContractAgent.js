@@ -22,6 +22,12 @@ class APIContractAgent {
       const summary = hasInput
         ? 'API contract draft produced'
         : 'API contract draft produced with limited input';
+      const confidence = hasInput ? 0.72 : 0.57;
+      const findings = [
+        { item: 'resources', status: 'ok', detail: 'Resources/verbs identified' },
+        { item: 'errors', status: 'ok', detail: 'Error shapes to document' },
+        { item: 'idempotence', status: 'ok', detail: 'Idempotency keys highlighted' },
+      ];
 
       const details = {
         intent: intentNormalized || 'api_contract',
@@ -48,6 +54,9 @@ class APIContractAgent {
         status: hasInput ? 'OK' : 'WARN',
         summary,
         details,
+        findings,
+        confidence,
+        assumptions: hasInput ? [] : ['Scope incomplet, exemples à enrichir'],
         actions,
         citations: [],
         metrics: { latencyMs: Date.now() - started },

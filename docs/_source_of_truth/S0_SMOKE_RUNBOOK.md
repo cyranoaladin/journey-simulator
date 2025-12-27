@@ -140,3 +140,11 @@ Public :
 curl -sv https://journey.mfai.app/ 2>&1 | tail -n 80
 curl -sv https://journey.mfai.app/api/health 2>&1 | tail -n 120
 ```
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

@@ -1,12 +1,16 @@
 # Money Factory AI — Journey Monorepo
 
-Monorepo “journey.mfai.app” : backend API (`mf-back`), UI React/Vite (`journey-simulator`), et portail Next.js (`web`).
+Monorepo "journey.mfai.app" : backend API (`mf-back`), UI React/Vite (`journey-simulator`), et portail Next.js (`web`).
+
+**Version actuelle** : 0.0.1
+**Dernière mise à jour** : Décembre 2025
+**État** : Production-ready, 0 Bugs, Dette technique : 59.8h
 
 ## 🧭 Produit (source de vérité)
 
-- **6 personas**: `cognitive-activation-hub`, `capital-foundry`, `system-architect`, `experience-studio`, `impact-engine`, `resilience-master`
-- **6 phases (Launch last)**: Learn → Build → Prove → Activate → Scale → **Launch (Collaterize simulation)**
-- **MVP**: testnet/devnet, “building in public”
+- **6 personas** : `cognitive-activation-hub`, `capital-foundry`, `system-architect`, `experience-studio`, `impact-engine`, `resilience-master`
+- **6 phases (Launch last)** : Learn → Build → Prove → Activate → Scale → **Launch (Collaterize simulation)**
+- **MVP** : testnet/devnet, "building in public"
 
 La source de vérité des personas/phases côté UI est `journey-simulator/src/data/personas.ts`.
 
@@ -16,7 +20,7 @@ Le monorepo est structuré en trois composants principaux qui interagissent pour
 
 #### A. Front-end (`journey-simulator/`)
 
-**Stack** : React + Vite + TypeScript, React Router, Framer Motion, Zustand, Lucide Icons, Solana Wallet Adapter
+**Stack** : React 19 + Vite 4.5 + TypeScript 5.3, React Router 7, Framer Motion 12, Zustand 4, Lucide Icons 0.556, Solana Wallet Adapter
 
 **Structure UI - Trinity Layout** :
 
@@ -44,7 +48,7 @@ Le monorepo est structuré en trois composants principaux qui interagissent pour
 
 #### B. Back-end Orchestration (`mf-back/`)
 
-**Stack** : Express + MongoDB, Zod validation, Pino logging
+**Stack** : Express 4.21 + MongoDB (Mongoose 8.10), Zod 3.25 validation, Pino 10 logging, OpenAI 6.9
 
 **Orchestration Agentique (R2.x)** :
 
@@ -74,7 +78,7 @@ Le monorepo est structuré en trois composants principaux qui interagissent pour
 
 #### C. Services Web3 (`web/`)
 
-**Stack** : Next.js + Prisma + PostgreSQL + Redis, BullMQ, UMI/Metaplex
+**Stack** : Next.js 14.2 + Prisma 5.22 + PostgreSQL + Redis 5.10, BullMQ 5.65, UMI/Metaplex 3.4
 
 **Auth SIWS (Sign-In With Solana)** :
 
@@ -105,8 +109,11 @@ Le monorepo est structuré en trois composants principaux qui interagissent pour
 
 ## ✅ Prérequis
 
-- Node.js **>= 18**
+- Node.js **>= 18.0.0** (recommandé : 18.17.0+)
 - Docker + Docker Compose (recommandé pour un run complet)
+- MongoDB (local ou distant)
+- PostgreSQL (pour `web/`)
+- Redis (pour `web/` - queues et SIWS)
 
 ## 🚀 Démarrage rapide (Docker, recommandé)
 
@@ -119,6 +126,7 @@ Services (dev) :
 
 - **API (mf-back)**: `http://localhost:3002`
 - **UI (journey-simulator)**: `http://localhost:3003`
+- **Web Portal (web)**: `http://localhost:3001`
 
 ## 🧪 Tests / Lint
 
@@ -129,13 +137,25 @@ npm run test:all
 npm run build:all
 ```
 
+### Scripts disponibles
+
+- `npm run dev:back` : Démarrer le backend uniquement
+- `npm run dev:simulator` : Démarrer le frontend uniquement
+- `npm run dev:web` : Démarrer le portail web uniquement
+- `npm run lint:all` : Linter tous les projets
+- `npm run test:all` : Exécuter tous les tests
+- `npm run build:all` : Builder tous les projets
+- `npm run release:preflight` : Vérifications pré-release
+- `npm run release:smoke` : Tests de smoke post-release
+- `npm run compliance:check` : Vérification de conformité
+
 ## 🔐 Variables d'environnement
 
 - Dev backend: `mf-back/env.development.example`
 - Prod backend: `mf-back/env.production.example`
 - Déploiement: `.deploy.env` / `.deploy.env.example`
 - Orchestration Zyno (exécution réelle opt-in) :
-  - `EXECUTION_ENABLED`: `true` pour autoriser l’exécution réelle des tools (par défaut dry-run). Ne l’activez qu’avec un `executionGate` **APPROVED**.
+  - `EXECUTION_ENABLED`: `true` pour autoriser l'exécution réelle des tools (par défaut dry-run). Ne l'activez qu'avec un `executionGate` **APPROVED**.
   - Les autres variables restent inchangées (LLM mock/RAG local si non fournis).
 
 ## 📚 Docs clés
@@ -147,8 +167,12 @@ npm run build:all
 - **Produit** :
   - Deep dive: `docs/PLATFORM_DEEP_DIVE_FR.md`
   - Test plan: `TEST_PLAN.md`
+  - MVP Status: `MVP_STATUS.md`
 - **Déploiement** :
   - `DEPLOY.md`, `DEPLOY_SERVER.md`, `docker-compose.prod.yml`
+- **Audit & Qualité** :
+  - `FINAL_COMPLETE_AUDIT.md` : Audit technique exhaustif (SonarQube)
+  - `docs/audit/` : Rapports d'audit détaillés
 
 ## 🧠 Orchestration agentique (R2.x)
 
@@ -161,3 +185,44 @@ npm run build:all
   - Mode par défaut : `DRY_RUN` (SIMULATED), aucun side-effect.
   - Mode réel (opt-in) : uniquement si `EXECUTION_ENABLED=true` **et** gate `APPROVED`, un seul tool réellement exécuté, autres `SKIPPED_REAL_EXECUTION`. Fallback automatique en dry-run.
 - **Traçabilité** : logs structurés avec `traceId`, statut des steps (SIMULATED/EXECUTED/SKIPPED), réponse toujours structurée (pas de throw).
+
+## 🛡️ Qualité & Conformité
+
+- **0 Bugs** : Aucun bug critique détecté
+- **Dette technique** : 59.8h (en réduction continue)
+- **Issues totales** : 466 (en cours de correction systématique)
+- **Linting** : ESLint strict avec 0 warnings autorisés
+- **TypeScript** : Type checking strict activé
+- **Tests** : Unitaires, E2E (Playwright), smoke tests
+
+## 📦 Structure du Monorepo
+
+```
+journey_mfai_back_front/
+├── mf-back/              # Backend API (Express + MongoDB)
+├── journey-simulator/    # Frontend React (Vite + TypeScript)
+├── web/                  # Web Portal (Next.js + Prisma)
+├── docs/                 # Documentation complète
+├── scripts/              # Scripts utilitaires
+└── tools/                # Outils MCP et autres
+```
+
+## 🤝 Contribution
+
+Voir `CONTRIBUTING.md` pour les guidelines de contribution.
+
+## 📄 Licence
+
+Voir `LICENSE` pour les détails.
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer
+
+---
+
+**Note** : Ce monorepo est en développement actif. Pour les dernières mises à jour, consultez `CHANGELOG.md` et les fichiers de documentation dans `docs/`.

@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server'
-import { z } from 'zod'
+import { getSiwsChallenge, markSiwsChallengeUsed } from '@/server/siwsStore'
 import { PublicKey } from '@solana/web3.js'
 import bs58 from 'bs58'
+import { NextResponse } from 'next/server'
 import nacl from 'tweetnacl'
-import { getSiwsChallenge, markSiwsChallengeUsed } from '@/server/siwsStore'
+import { z } from 'zod'
 
 const Body = z.object({
   address: z.string().min(32).max(64), // publicKey base58
@@ -13,7 +13,7 @@ const Body = z.object({
 
 function base64Url(input: Buffer | Uint8Array | string): string {
   const buf = Buffer.isBuffer(input) ? input : Buffer.from(input as any)
-  return buf.toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
+  return buf.toString('base64').replaceAll('=', '').replaceAll('+', '-').replaceAll('/', '_')
 }
 
 // NB: comme Next ne supporte pas await import('crypto') dans une fonction sync,

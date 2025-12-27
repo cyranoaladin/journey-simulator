@@ -228,9 +228,14 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
               />
             </div>
             <p className="text-xs text-slate-700 dark:text-white/75">
-              {hasStarted
-                ? `You have validated ${completedCount} mission${completedCount === 1 ? '' : 's'} with Zyno.`
-                : 'Select this journey to activate guided missions and scoring telemetry.'}
+              {(() => {
+                // Extract nested ternary into explicit variable
+                if (!hasStarted) {
+                  return 'Select this journey to activate guided missions and scoring telemetry.';
+                }
+                const missionText = completedCount === 1 ? 'mission' : 'missions';
+                return `You have validated ${completedCount} ${missionText} with Zyno.`;
+              })()}
             </p>
           </div>
 
@@ -241,22 +246,31 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
               whileTap={{ scale: isLoading ? 1 : 0.97 }}
               onClick={handlePersonaSelection}
               disabled={isLoading}
-              className={`relative inline-flex w-full items-center justify-center overflow-hidden rounded-2xl px-6 py-3 text-sm font-semibold transition-all duration-300 ease-out-quart focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${isLoading
-                ? 'cursor-wait bg-mfai-surfaceMuted text-slate-500 dark:text-mfai-text/50'
-                : isActivePersona
-                  ? 'bg-gradient-accent text-white shadow-neon-ring'
-                  : 'border border-accent/40 bg-transparent text-accent hover:bg-accent/10'
-                }`}
+              className={(() => {
+                // Extract nested ternary into explicit variable
+                let buttonClass = 'relative inline-flex w-full items-center justify-center overflow-hidden rounded-2xl px-6 py-3 text-sm font-semibold transition-all duration-300 ease-out-quart focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
+                if (isLoading) {
+                  buttonClass += ' cursor-wait bg-mfai-surfaceMuted text-slate-500 dark:text-mfai-text/50';
+                } else if (isActivePersona) {
+                  buttonClass += ' bg-gradient-accent text-white shadow-neon-ring';
+                } else {
+                  buttonClass += ' border border-accent/40 bg-transparent text-accent hover:bg-accent/10';
+                }
+                return buttonClass;
+              })()}
             >
               <span className="relative z-10 flex items-center gap-2">
                 {isLoading ? <RefreshCw size={16} className="animate-spin" /> : <Sparkles size={16} />}
-                {isLoading
-                  ? 'Syncing with Zyno...'
-                  : isActivePersona
-                    ? hasStarted
-                      ? 'Continue journey'
-                      : 'Resume onboarding'
-                    : 'Launch with Zyno'}
+                {(() => {
+                  // Extract nested ternary into explicit variable
+                  if (isLoading) {
+                    return 'Syncing with Zyno...';
+                  }
+                  if (isActivePersona) {
+                    return hasStarted ? 'Continue journey' : 'Resume onboarding';
+                  }
+                  return 'Launch with Zyno';
+                })()}
               </span>
               {!isLoading && (
                 <span

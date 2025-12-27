@@ -393,3 +393,11 @@ await logMintEvent({
 
 **Last Updated**: 2025-11-29  
 **Version**: 1.0
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

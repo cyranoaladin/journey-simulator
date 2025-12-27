@@ -1,66 +1,66 @@
-import { FormEvent, useState, useRef, useEffect } from 'react'
-import { API_BASE_URL } from '../utils/api'
-import UIBlocksRenderer from './UIBlocks/UIBlocksRenderer'
+import { FormEvent, useEffect, useRef, useState } from 'react';
+import { API_BASE_URL } from '../utils/api';
+import UIBlocksRenderer from './UIBlocks/UIBlocksRenderer';
 
 interface Message {
-  role: 'user' | 'assistant'
-  content: any 
-  timestamp: number
+  role: 'user' | 'assistant';
+  content: any;
+  timestamp: number;
 }
 
 const PlaygroundPage = () => {
-  const [input, setInput] = useState('')
-  const [history, setHistory] = useState<Message[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [showJsonMap, setShowJsonMap] = useState<Record<number, boolean>>({})
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const [input, setInput] = useState('');
+  const [history, setHistory] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showJsonMap, setShowJsonMap] = useState<Record<number, boolean>>({});
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: 'smooth' })
+      scrollRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [history, isLoading])
+  }, [history, isLoading]);
 
   const toggleJson = (index: number) => {
-    setShowJsonMap(prev => ({ ...prev, [index]: !prev[index] }))
-  }
+    setShowJsonMap(prev => ({ ...prev, [index]: !prev[index] }));
+  };
 
   const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
-    const trimmedInput = input.trim()
-    if (!trimmedInput) return
+    event.preventDefault();
+    const trimmedInput = input.trim();
+    if (!trimmedInput) return;
 
-    const userMsg: Message = { role: 'user', content: trimmedInput, timestamp: Date.now() }
-    setHistory(prev => [...prev, userMsg])
-    setInput('')
-    setIsLoading(true)
+    const userMsg: Message = { role: 'user', content: trimmedInput, timestamp: Date.now() };
+    setHistory(prev => [...prev, userMsg]);
+    setInput('');
+    setIsLoading(true);
 
     try {
       const response = await fetch(`${API_BASE_URL}/orchestration`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          input: trimmedInput, 
-          userId: 'playground_session_v1' 
+        body: JSON.stringify({
+          input: trimmedInput,
+          userId: 'playground_session_v1'
         })
-      })
+      });
 
-      if (!response.ok) throw new Error(`Request failed (status ${response.status}).`)
-      const data = await response.json()
-      const botMsg: Message = { role: 'assistant', content: data, timestamp: Date.now() }
-      setHistory(prev => [...prev, botMsg])
+      if (!response.ok) throw new Error(`Request failed (status ${response.status}).`);
+      const data = await response.json();
+      const botMsg: Message = { role: 'assistant', content: data, timestamp: Date.now() };
+      setHistory(prev => [...prev, botMsg]);
 
     } catch (fetchError) {
-      const errorMsg = fetchError instanceof Error ? fetchError.message : 'Unknown error.'
-      setHistory(prev => [...prev, { 
-        role: 'assistant', 
-        content: { results: { error: { output: `Error: ${errorMsg}` } } }, 
-        timestamp: Date.now() 
-      }])
+      const errorMsg = fetchError instanceof Error ? fetchError.message : 'Unknown error.';
+      setHistory(prev => [...prev, {
+        role: 'assistant',
+        content: { results: { error: { output: `Error: ${errorMsg}` } } },
+        timestamp: Date.now()
+      }]);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <section className="max-w-5xl mx-auto px-4 py-4 flex flex-col h-full">
@@ -71,7 +71,7 @@ const PlaygroundPage = () => {
 
       {/* --- FENÊTRE DE CHAT (Bordure ajoutée + Hauteur réduite) --- */}
       <div className="flex-1 flex flex-col bg-slate-900/30 border border-white/10 rounded-2xl overflow-hidden h-[calc(100vh-220px)] shadow-xl relative">
-        
+
         {/* Zone des messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-thin scrollbar-thumb-slate-700">
           {history.length === 0 && (
@@ -80,38 +80,41 @@ const PlaygroundPage = () => {
             </div>
           )}
 
-          {history.map((msg, index) => (
-            <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              
-              {/* User Message */}
-              {msg.role === 'user' && (
-                <div className="bg-primary-600 text-white px-4 py-3 rounded-2xl rounded-tr-sm max-w-[85%] shadow-md text-sm whitespace-pre-wrap">
-                  {msg.content}
-                </div>
-              )}
+          {history.map((msg, index) => {
+            const msgKey = `msg-${msg.role}-${index}-${typeof msg.content === 'string' ? msg.content.substring(0, 20) : 'empty'}`;
+            return (
+              <div key={msgKey} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
 
-              {/* Assistant Message */}
-              {msg.role === 'assistant' && (
-                <div className="w-full max-w-[95%] bg-slate-900/80 border border-white/10 rounded-xl p-4 shadow-sm">
-                  <div className="flex justify-between items-center mb-2 border-b border-white/5 pb-2">
-                    <span className="text-xs font-bold text-accent-cyan uppercase tracking-wider">Zyno Agent</span>
-                    <button 
-                      onClick={() => toggleJson(index)}
-                      className="text-[10px] px-2 py-0.5 rounded border border-white/10 hover:bg-white/5 text-slate-400 transition"
-                    >
-                      {showJsonMap[index] ? "{}" : "{...}"}
-                    </button>
+                {/* User Message */}
+                {msg.role === 'user' && (
+                  <div className="bg-primary-600 text-white px-4 py-3 rounded-2xl rounded-tr-sm max-w-[85%] shadow-md text-sm whitespace-pre-wrap">
+                    {msg.content}
                   </div>
-                  <UIBlocksRenderer response={msg.content} />
-                  {showJsonMap[index] && (
-                    <pre className="mt-4 text-[10px] font-mono bg-black/50 p-2 rounded text-green-400 overflow-x-auto max-h-60">
-                      {JSON.stringify(msg.content, null, 2)}
-                    </pre>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
+                )}
+
+                {/* Assistant Message */}
+                {msg.role === 'assistant' && (
+                  <div className="w-full max-w-[95%] bg-slate-900/80 border border-white/10 rounded-xl p-4 shadow-sm">
+                    <div className="flex justify-between items-center mb-2 border-b border-white/5 pb-2">
+                      <span className="text-xs font-bold text-accent-cyan uppercase tracking-wider">Zyno Agent</span>
+                      <button
+                        onClick={() => toggleJson(index)}
+                        className="text-[10px] px-2 py-0.5 rounded border border-white/10 hover:bg-white/5 text-slate-400 transition"
+                      >
+                        {showJsonMap[index] ? "{}" : "{...}"}
+                      </button>
+                    </div>
+                    <UIBlocksRenderer response={msg.content} />
+                    {showJsonMap[index] && (
+                      <pre className="mt-4 text-[10px] font-mono bg-black/50 p-2 rounded text-green-400 overflow-x-auto max-h-60">
+                        {JSON.stringify(msg.content, null, 2)}
+                      </pre>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
 
           {isLoading && (
             <div className="flex justify-start">
@@ -152,7 +155,7 @@ const PlaygroundPage = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default PlaygroundPage
+export default PlaygroundPage;

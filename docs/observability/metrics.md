@@ -39,3 +39,11 @@ curl -sf ${API_BASE_URL:-http://localhost:3000}/readyz >/dev/null
 ```
 
 Déployez la commande ci-dessus dans vos cron/agents Ansible pour alimenter vos tableaux de bord SIEM.
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

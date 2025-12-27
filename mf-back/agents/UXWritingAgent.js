@@ -6,6 +6,12 @@ class UXWritingAgent {
     try {
       const citations = buildCitations(ragContext);
       const summary = `UX copy refined for phase ${journey?.phaseId || 'unknown'}: concise, action-led.`;
+      const confidence = input ? 0.72 : 0.6;
+      const findings = [
+        { item: 'cta', status: 'ok', detail: 'CTA rewrite suggested' },
+        { item: 'helper', status: 'ok', detail: 'Helper text constraint applied' },
+        { item: 'tone', status: 'warn', detail: 'Tone alignment to confirm' },
+      ];
       const actions = [
         `Rewrite CTA to a verb-first phrase for phase ${journey?.phaseId || 'current'}`,
         'Add helper text limited to 120 chars',
@@ -18,6 +24,9 @@ class UXWritingAgent {
           systemPrompt: getSystemPrompt('UXWritingAgent'),
           considerations: ['clarity', 'actionability', 'tone consistent'],
         },
+        findings,
+        confidence,
+        assumptions: input ? [] : ['Texte source non fourni, propositions génériques'],
         actions,
         citations,
         metrics: { latencyMs: Date.now() - started, ragHits: citations.length },

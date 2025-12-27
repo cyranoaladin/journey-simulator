@@ -1,6 +1,6 @@
 const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 const loggerFactory = require('../utils/logger');
 const createLogger = loggerFactory.createLogger || loggerFactory.default || loggerFactory;
 

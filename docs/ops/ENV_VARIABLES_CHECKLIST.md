@@ -9,6 +9,7 @@ Ce document liste toutes les variables d'environnement nécessaires pour le fonc
 ## Variables RAG (Retrieval Augmented Generation)
 
 ### Obligatoires pour RAG Remote
+
 - **`RAG_SEARCH_URL`** : URL du service RAG pour les recherches
   - Exemple : `http://127.0.0.1:8001/rag/query` ou `https://rag-api.nexusreussite.academy/search`
   - Utilisé dans : `mf-back/rag/ragClient.js`, `mf-back/orchestration/ragClient.js`
@@ -25,6 +26,7 @@ Ce document liste toutes les variables d'environnement nécessaires pour le fonc
   - Fallback : `mfai-knowledge`
 
 ### Optionnelles pour RAG
+
 - **`RAG_INGEST_URL`** : URL pour l'ingestion de documents
   - Exemple : `http://127.0.0.1:8001/rag/ingest` ou `https://rag-api.nexusreussite.academy/ingest`
   - Utilisé dans : `mf-back/rag/ragClient.js`
@@ -48,6 +50,7 @@ Ce document liste toutes les variables d'environnement nécessaires pour le fonc
 ## Variables LLM (Large Language Model)
 
 ### Obligatoires pour LLM Réel
+
 - **`OPENAI_API_KEY`** : Clé API OpenAI
   - Format : `sk-...`
   - Utilisé dans : `mf-back/utils/openaiClient.js`, `mf-back/orchestration/zynoVerticalSlice.js`
@@ -55,6 +58,7 @@ Ce document liste toutes les variables d'environnement nécessaires pour le fonc
   - Fallback : mode mock activé automatiquement
 
 ### Optionnelles pour LLM
+
 - **`LLM_MODEL_NAME`** : Modèle LLM à utiliser
   - Exemple : `gpt-4o`, `gpt-4o-mini`, `gpt-3.5-turbo`
   - Utilisé dans : `mf-back/utils/openaiClient.js`
@@ -75,6 +79,7 @@ Ce document liste toutes les variables d'environnement nécessaires pour le fonc
 ## Variables Autres (Sécurité, Base de données, etc.)
 
 ### Obligatoires
+
 - **`NODE_ENV`** : Environnement d'exécution
   - Valeurs : `development`, `production`, `test`
   - Utilisé partout
@@ -95,6 +100,7 @@ Ce document liste toutes les variables d'environnement nécessaires pour le fonc
   - **⚠️ CRITIQUE** : Requis pour les opérations admin
 
 ### Optionnelles
+
 - **`CORS_ALLOWED_ORIGINS`** : Origines autorisées pour CORS
   - Format : liste séparée par des virgules
   - Exemple : `http://localhost:3003,http://localhost:5173`
@@ -124,6 +130,7 @@ Ce document liste toutes les variables d'environnement nécessaires pour le fonc
 ## Fichiers .env à vérifier
 
 ### Fichiers existants
+
 1. **`.env`** (racine du projet) - ⚠️ Non versionné (gitignore)
 2. **`mf-back/.env`** - ⚠️ Non versionné (gitignore)
 3. **`mf-back/env.example`** - ✅ Versionné (template minimal)
@@ -131,6 +138,7 @@ Ce document liste toutes les variables d'environnement nécessaires pour le fonc
 5. **`mf-back/env.production.example`** - ✅ Versionné (template prod)
 
 ### Fichiers à créer/mettre à jour
+
 - `.env` (local, non versionné) - doit contenir toutes les variables nécessaires
 - `.env.local` (local, non versionné) - peut être utilisé pour override
 
@@ -139,6 +147,7 @@ Ce document liste toutes les variables d'environnement nécessaires pour le fonc
 ## Checklist de Vérification
 
 ### Pour RAG Remote
+
 - [ ] `RAG_SEARCH_URL` est défini et accessible
 - [ ] `RAG_API_KEY` est défini et valide
 - [ ] `RAG_COLLECTION` est défini (ou utilise le fallback)
@@ -146,11 +155,13 @@ Ce document liste toutes les variables d'environnement nécessaires pour le fonc
 - [ ] Test de connexion : `node mf-back/scripts/check-rag-connection.js`
 
 ### Pour LLM Réel
+
 - [ ] `OPENAI_API_KEY` est défini et valide (commence par `sk-`)
 - [ ] `LLM_MODEL_NAME` est défini si différent de `gpt-4o`
 - [ ] Test de connexion : vérifier que `ops.llm.mode === 'openai'` dans les réponses
 
 ### Pour Production
+
 - [ ] `NODE_ENV=production`
 - [ ] `JWT_SECRET` est unique et sécurisé
 - [ ] `ADMIN_API_KEY` est unique et sécurisé
@@ -200,3 +211,11 @@ required.forEach(v => {
 - `mf-back/orchestration/ragClient.js` : Client RAG pour orchestration
 - `mf-back/utils/openaiClient.js` : Client OpenAI/LLM
 - `mf-back/orchestration/zynoVerticalSlice.js` : Utilisation des variables dans l'orchestrateur
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

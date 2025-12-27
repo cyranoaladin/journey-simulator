@@ -482,3 +482,11 @@ curl -i -X OPTIONS http://localhost:3000/user/register \
 - Backend: `mf-back`.
 
 This blueprint onboards contributors, architects, and product leads by outlining the flows, structure, and future evolution of the Money Factory AI journey simulator.
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

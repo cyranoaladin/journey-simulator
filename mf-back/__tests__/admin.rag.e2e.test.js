@@ -1,7 +1,7 @@
 const request = require('supertest');
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
 
 jest.mock('../rag/ragClient', () => ({
   ingestDocument: jest.fn()
@@ -13,6 +13,35 @@ jest.mock('mongoose', () => {
     ...actual,
     connect: jest.fn().mockResolvedValue(undefined)
   };
+});
+
+// Mock orchestration dependencies to prevent module loading errors when app.js loads routes
+jest.mock('../orchestration/vsliceSchema', () => ({
+  validateRequest: jest.fn((payload) => ({
+    req: payload || {},
+    warnings: []
+  })),
+  sanitizeAgentResponse: jest.fn((raw) => ({
+    response: raw || {},
+    warnings: []
+  }))
+}));
+
+jest.mock('../orchestration/zynoVerticalSlice', () => ({
+  orchestrateVerticalSlice: jest.fn()
+}));
+
+jest.mock('../orchestration/zynoOrchestrator', () => ({
+  orchestrateZyno: jest.fn()
+}));
+
+jest.mock('../routes/orchestration-gate', () => {
+  const express = require('express');
+  const router = express.Router();
+  router.post('/gate/:gateId/review', (req, res) => {
+    res.json({ status: 'mocked' });
+  });
+  return router;
 });
 
 describe('Admin RAG routes end-to-end', () => {
@@ -38,7 +67,7 @@ describe('Admin RAG routes end-to-end', () => {
     app = require('../app');
     const ragClient = require('../rag/ragClient');
     ingestDocument = ragClient.ingestDocument;
-    
+
     // Ensure ingestDocument is a mock function
     if (typeof ingestDocument !== 'function' || !ingestDocument.mock) {
       throw new Error('ingestDocument is not properly mocked');

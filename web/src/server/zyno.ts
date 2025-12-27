@@ -82,6 +82,7 @@ export async function callZynoStep(input: JourneyStepInput) {
   const { apiKey, url, model, maxTokens, temperature } = (
     await import('@/infra/openaiConfig')
   ).getOpenAIConfig('step')
+  // Guard: Missing API key
   if (!apiKey) throw new Error('OPENAI_API_KEY missing')
 
   const payload = {
@@ -107,6 +108,7 @@ export async function callZynoStep(input: JourneyStepInput) {
         fetch(url, { method: 'POST', headers, body: JSON.stringify(payload) }),
         30000
       )
+      // Guard: Retry on rate limit or server error
       if (!res.ok) {
         if (res.status === 429 || res.status >= 500) {
           attempt++
@@ -117,7 +119,6 @@ export async function callZynoStep(input: JourneyStepInput) {
         throw new Error(text)
       }
       const json = await res.json()
-      // Responses API format: pick first output content if needed
       const content = json?.output?.[0]?.content?.[0]?.text ?? json?.output_text ?? json
       const out = typeof content === 'string' ? JSON.parse(content) : content
       const meta = {
@@ -133,6 +134,7 @@ export async function callZynoStep(input: JourneyStepInput) {
       return { out, meta }
     } catch (e: any) {
       attempt++
+      // Guard: Max attempts reached
       if (attempt >= maxAttempts) throw e
       await new Promise((r) => setTimeout(r, 600 * attempt))
     }
@@ -183,6 +185,7 @@ export async function callZynoEvaluate(input: EvaluateInput) {
   const { apiKey, url, model, maxTokens, temperature } = (
     await import('@/infra/openaiConfig')
   ).getOpenAIConfig('eval')
+  // Guard: Missing API key
   if (!apiKey) throw new Error('OPENAI_API_KEY missing')
 
   const payload = {
@@ -208,6 +211,7 @@ export async function callZynoEvaluate(input: EvaluateInput) {
         fetch(url, { method: 'POST', headers, body: JSON.stringify(payload) }),
         30000
       )
+      // Guard: Retry on rate limit or server error
       if (!res.ok) {
         if (res.status === 429 || res.status >= 500) {
           attempt++
@@ -233,6 +237,7 @@ export async function callZynoEvaluate(input: EvaluateInput) {
       return { out, meta }
     } catch (e: any) {
       attempt++
+      // Guard: Max attempts reached
       if (attempt >= maxAttempts) throw e
       await new Promise((r) => setTimeout(r, 600 * attempt))
     }

@@ -1,22 +1,23 @@
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { ExternalLink, Copy, CheckCircle, Trophy, Coins, Award, Lock, Unlock, AlertCircle } from 'lucide-react'
-import { useJourneyStore } from '../store/journeyStore'
-import { useWallet } from '@solana/wallet-adapter-react'
-import './SkillchainCard.css'
+import { useWallet } from '@solana/wallet-adapter-react';
+import { motion } from 'framer-motion';
+import { AlertCircle, Award, CheckCircle, Coins, Copy, ExternalLink, Lock, Trophy, Unlock } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useJourneyStore } from '../store/journeyStore';
+import { generateStableKey } from '../utils/generateStableKey';
+import './SkillchainCard.css';
 
 interface SkillchainCardProps {
-  className?: string
+  className?: string;
 }
 
 const SkillchainCard: React.FC<SkillchainCardProps> = ({
   className = '',
 }) => {
-  const { userProgress, selectedPersona } = useJourneyStore()
-  const { publicKey, connected, connecting } = useWallet()
-  const [isFlipped, setIsFlipped] = useState(false)
-  const [copied, setCopied] = useState(false)
-  const [connectionError, setConnectionError] = useState<string | null>(null)
+  const { userProgress, selectedPersona } = useJourneyStore();
+  const { publicKey, connected, connecting } = useWallet();
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
 
   // Listen for wallet errors
   useEffect(() => {
@@ -25,80 +26,80 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
       setConnectionError(error?.message || 'Connection failed');
     };
 
-    window.addEventListener('walletError', handleWalletError);
-    return () => window.removeEventListener('walletError', handleWalletError);
+    globalThis.window.addEventListener('walletError', handleWalletError);
+    return () => globalThis.window.removeEventListener('walletError', handleWalletError);
   }, []);
 
   // Get persona-specific card styling
   const getPersonaGradient = () => {
-    if (!selectedPersona) return 'bg-gradient-diamond'
+    if (!selectedPersona) return 'bg-gradient-diamond';
 
     switch (selectedPersona.id) {
       case 'cognitive-activation-hub':
-        return 'bg-gradient-to-br from-sky-500 to-cyan-400'
+        return 'bg-gradient-to-br from-sky-500 to-cyan-400';
       case 'capital-foundry':
-        return 'bg-gradient-to-br from-emerald-500 to-teal-500'
+        return 'bg-gradient-to-br from-emerald-500 to-teal-500';
       case 'system-architect':
-        return 'bg-gradient-to-br from-purple-500 to-indigo-500'
+        return 'bg-gradient-to-br from-purple-500 to-indigo-500';
       case 'experience-studio':
-        return 'bg-gradient-to-br from-rose-500 to-fuchsia-500'
+        return 'bg-gradient-to-br from-rose-500 to-fuchsia-500';
       case 'impact-engine':
-        return 'bg-gradient-to-br from-amber-500 to-lime-500'
+        return 'bg-gradient-to-br from-amber-500 to-lime-500';
       case 'resilience-master':
-        return 'bg-gradient-to-br from-slate-500 to-cyan-600'
+        return 'bg-gradient-to-br from-slate-500 to-cyan-600';
       default:
-        return 'bg-gradient-diamond'
+        return 'bg-gradient-diamond';
     }
-  }
+  };
 
   // Get persona icon
   const getPersonaIcon = () => {
-    if (!selectedPersona) return '💎'
-    
+    if (!selectedPersona) return '💎';
+
     switch (selectedPersona.id) {
       case 'cognitive-activation-hub':
-        return '🧠'
+        return '🧠';
       case 'capital-foundry':
-        return '🏛️'
+        return '🏛️';
       case 'system-architect':
-        return '🛠️'
+        return '🛠️';
       case 'experience-studio':
-        return '🎮'
+        return '🎮';
       case 'impact-engine':
-        return '🌍'
+        return '🌍';
       case 'resilience-master':
-        return '🛡️'
+        return '🛡️';
       default:
-        return selectedPersona.icon
+        return selectedPersona.icon;
     }
-  }
+  };
 
   // Get card tier based on XP
   const getCardTier = () => {
-    const xp = userProgress.totalXP
-    
-    if (xp >= 2000) return { name: 'Diamond', color: 'text-blue-300', gradient: 'bg-gradient-diamond' }
-    if (xp >= 1000) return { name: 'Platinum', color: 'text-gray-300', gradient: 'bg-gradient-platinum' }
-    if (xp >= 500) return { name: 'Gold', color: 'text-yellow-400', gradient: 'bg-gradient-gold' }
-    return { name: 'Bronze', color: 'text-amber-600', gradient: 'bg-gradient-primary' }
-  }
+    const xp = userProgress.totalXP;
 
-  const tier = getCardTier()
+    if (xp >= 2000) return { name: 'Diamond', color: 'text-blue-300', gradient: 'bg-gradient-diamond' };
+    if (xp >= 1000) return { name: 'Platinum', color: 'text-gray-300', gradient: 'bg-gradient-platinum' };
+    if (xp >= 500) return { name: 'Gold', color: 'text-yellow-400', gradient: 'bg-gradient-gold' };
+    return { name: 'Bronze', color: 'text-amber-600', gradient: 'bg-gradient-primary' };
+  };
+
+  const tier = getCardTier();
 
   // Calculate progress percentage
-  const progressPercentage = selectedPersona 
+  const progressPercentage = selectedPersona
     ? Math.min((userProgress.completedPhases.length / selectedPersona.phases.length) * 100, 100)
-    : 0
+    : 0;
 
   // Calculate progress to next tier
   const getNextTierProgress = () => {
     const xp = userProgress.totalXP;
-    
+
     if (xp >= 2000) return 100; // Already at Diamond
     if (xp >= 1000) return ((xp - 1000) / 1000) * 100; // Progress to Diamond
     if (xp >= 500) return ((xp - 500) / 500) * 100; // Progress to Platinum
     return (xp / 500) * 100; // Progress to Gold
-  }
+  };
 
   const nextTierProgress = getNextTierProgress();
   const nextTierProgressRatio = Math.max(0, Math.min(1, nextTierProgress / 100));
@@ -112,70 +113,70 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
 
   const personaMissions = selectedPersona
     ? selectedPersona.phases.map((phase, index) => {
-        const isCompleted = userProgress.completedPhases.includes(index)
-        const isCurrent = !isCompleted && index === userProgress.completedPhases.length
-      const status: 'completed' | 'active' | 'locked' = isCompleted ? 'completed' : isCurrent ? 'active' : 'locked'
+      const isCompleted = userProgress.completedPhases.includes(index);
+      const isCurrent = !isCompleted && index === userProgress.completedPhases.length;
+      const status: 'completed' | 'active' | 'locked' = isCompleted ? 'completed' : isCurrent ? 'active' : 'locked';
 
-        return {
-          index,
-          title: phase.title,
-          mission: phase.mission,
-          xpReward: phase.xpReward,
-          nftReward: phase.nftReward,
-          status,
-        }
-      })
-    : []
+      return {
+        index,
+        title: phase.title,
+        mission: phase.mission,
+        xpReward: phase.xpReward,
+        nftReward: phase.nftReward,
+        status,
+      };
+    })
+    : [];
 
   const getMissionStatusStyles = (status: 'completed' | 'active' | 'locked') => {
     switch (status) {
       case 'completed':
-        return 'text-green-300 bg-green-500/20 border-green-500/30'
+        return 'text-green-300 bg-green-500/20 border-green-500/30';
       case 'active':
-        return 'text-yellow-200 bg-yellow-400/20 border-yellow-400/30'
+        return 'text-yellow-200 bg-yellow-400/20 border-yellow-400/30';
       default:
-        return 'text-white/50 bg-white/10 border-white/10'
+        return 'text-white/50 bg-white/10 border-white/10';
     }
-  }
+  };
 
   const renderMissionStatusIcon = (status: 'completed' | 'active' | 'locked') => {
     if (status === 'completed') {
-      return <CheckCircle size={12} className="mr-1" />
+      return <CheckCircle size={12} className="mr-1" />;
     }
 
     if (status === 'active') {
-      return <Unlock size={12} className="mr-1" />
+      return <Unlock size={12} className="mr-1" />;
     }
 
-    return <Lock size={12} className="mr-1" />
-  }
+    return <Lock size={12} className="mr-1" />;
+  };
 
   // Format wallet address
   const formatAddress = (address: string) => {
-    return `${address.slice(0, 4)}...${address.slice(-4)}`
-  }
+    return `${address.slice(0, 4)}...${address.slice(-4)}`;
+  };
 
   // Copy wallet address
   const copyAddress = async () => {
     if (publicKey) {
-      await navigator.clipboard.writeText(publicKey.toString())
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      await navigator.clipboard.writeText(publicKey.toString());
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
-  }
+  };
 
   // Open Solana explorer
   const openExplorer = () => {
     if (publicKey) {
-      window.open(`https://explorer.solana.com/address/${publicKey.toString()}?cluster=devnet`, '_blank')
+      globalThis.window.open(`https://explorer.solana.com/address/${publicKey.toString()}?cluster=devnet`, '_blank');
     }
-  }
+  };
 
   // Generate QR code URL (using a simple external service)
   const getQrCodeUrl = () => {
-    if (!publicKey) return ''
-    return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${publicKey.toString()}`
-  }
+    if (!publicKey) return '';
+    return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${publicKey.toString()}`;
+  };
 
   // Get wallet connection status display
   const getWalletStatusDisplay = () => {
@@ -187,7 +188,7 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
         </div>
       );
     }
-    
+
     if (connecting) {
       return (
         <div className="flex items-center">
@@ -196,7 +197,7 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
         </div>
       );
     }
-    
+
     if (connected && publicKey) {
       return (
         <>
@@ -204,10 +205,10 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
           <span className="font-mono">
             {formatAddress(publicKey.toString())}
           </span>
-          <button 
+          <button
             onClick={(e) => {
-              e.stopPropagation()
-              copyAddress()
+              e.stopPropagation();
+              copyAddress();
             }}
             className="ml-1 p-1 hover:bg-white/10 rounded transition-colors"
             type="button"
@@ -218,7 +219,7 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
         </>
       );
     }
-    
+
     return (
       <>
         <Lock size={12} className="mr-1 text-yellow-400" />
@@ -236,12 +237,12 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
         onClick={() => setIsFlipped(!isFlipped)}
       >
         {/* Front of Card */}
-        <div 
+        <div
           className={`relative w-full ${getPersonaGradient()} rounded-2xl p-6 shadow-2xl border border-white/20 overflow-hidden backface-hidden skillchain-card-face skillchain-card-front`}
         >
           {/* Holographic effect */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 animate-pulse" />
-          
+
           <div className="relative z-10">
             {/* Header */}
             <div className="flex justify-between items-start mb-4">
@@ -253,7 +254,7 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
                 <span className="text-2xl">{getPersonaIcon()}</span>
               </div>
             </div>
-            
+
             {/* Wallet & Persona */}
             <div className="mb-4">
               <div className="flex justify-between items-center text-sm text-white/90">
@@ -267,7 +268,7 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
                 <span className="font-medium">{selectedPersona?.title || 'None selected'}</span>
               </div>
             </div>
-            
+
             {/* Stats */}
             <div className="space-y-2 text-white/90 text-sm mb-4">
               <div className="flex justify-between">
@@ -292,15 +293,15 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
                 <span className="font-mono">{userProgress.nfts.length}</span>
               </div>
             </div>
-            
+
             {/* Next Tier Progress */}
             <div className="mb-4">
               <div className="flex justify-between text-xs text-white/80 mb-1">
                 <span>Next Tier: {nextTierName(userProgress.totalXP)}</span>
                 <span>{nextTierProgress.toFixed(0)}%</span>
               </div>
-                <div className="w-full h-2 bg-black/30 rounded-full overflow-hidden">
-                <motion.div 
+              <div className="w-full h-2 bg-black/30 rounded-full overflow-hidden">
+                <motion.div
                   className="h-full bg-white origin-left"
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: nextTierProgressRatio }}
@@ -308,7 +309,7 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
                 />
               </div>
             </div>
-            
+
             {/* Skillchain Mining Progress */}
             {selectedPersona && (
               <div className="mb-4">
@@ -317,7 +318,7 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
                   <span>{progressPercentage.toFixed(0)}%</span>
                 </div>
                 <div className="w-full h-2 bg-black/30 rounded-full overflow-hidden">
-                  <motion.div 
+                  <motion.div
                     className="h-full bg-white origin-left"
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: personaProgressRatio }}
@@ -326,13 +327,13 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
                 </div>
               </div>
             )}
-            
+
             {/* Card ID */}
             <div className="mt-4 text-xs text-white/60 font-mono flex justify-between">
-              <span>ID: MFAI-{Math.random().toString(36).substr(2, 8).toUpperCase()}</span>
+              <span>ID: MFAI-{Math.random().toString(36).slice(2, 10).toUpperCase()}</span>
               <span>{new Date().toLocaleDateString()}</span>
             </div>
-            
+
             {/* Flip hint */}
             <div className="absolute bottom-2 right-2 text-xs text-white/40">
               Tap to flip
@@ -341,53 +342,56 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
         </div>
 
         {/* Back of Card */}
-        <div 
+        <div
           className={`absolute inset-0 w-full ${getPersonaGradient()} rounded-2xl p-6 shadow-2xl border border-white/20 overflow-hidden backface-hidden skillchain-card-face skillchain-card-back`}
         >
           {/* Holographic effect */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 animate-pulse" />
-          
+
           <div className="relative z-10 flex h-full flex-col">
             <h3 className="font-space font-bold text-white text-lg mb-3">Mission Briefing</h3>
 
             <div className="flex-1 overflow-hidden">
               {personaMissions.length > 0 ? (
                 <div className="space-y-2 h-full overflow-y-auto pr-1">
-                  {personaMissions.map((mission) => (
-                    <div
-                      key={mission.index}
-                      className="rounded-xl border border-white/10 bg-black/25 p-3"
-                    >
-                      <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-white/60">
-                        <span>Phase {mission.index + 1}</span>
-                        <span
-                          className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold ${getMissionStatusStyles(mission.status)}`}
-                        >
-                          {renderMissionStatusIcon(mission.status)}
-                          {mission.status === 'completed'
-                            ? 'Completed'
-                            : mission.status === 'active'
-                              ? 'In Progress'
-                              : 'Locked'}
-                        </span>
-                      </div>
-                      <div className="mt-2 text-sm font-semibold text-white">
-                        {mission.title}
-                      </div>
-                      <p className="mt-1 text-xs text-white/70 line-clamp-2">
-                        {mission.mission}
-                      </p>
-                      <div className="mt-2 flex items-center justify-between text-[11px] text-white/60">
-                        <span>{mission.xpReward} XP</span>
-                        {mission.nftReward && (
-                          <span className="inline-flex items-center gap-1">
-                            <Award size={12} className="text-yellow-300" />
-                            {mission.nftReward}
+                  {personaMissions.map((mission) => {
+                    const missionKey = generateStableKey(mission, 'persona-mission', ['index', 'title', 'id']);
+                    return (
+                      <div
+                        key={missionKey}
+                        className="rounded-xl border border-white/10 bg-black/25 p-3"
+                      >
+                        <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-white/60">
+                          <span>Phase {mission.index + 1}</span>
+                          <span
+                            className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold ${getMissionStatusStyles(mission.status)}`}
+                          >
+                            {renderMissionStatusIcon(mission.status)}
+                            {mission.status === 'completed'
+                              ? 'Completed'
+                              : mission.status === 'active'
+                                ? 'In Progress'
+                                : 'Locked'}
                           </span>
-                        )}
+                        </div>
+                        <div className="mt-2 text-sm font-semibold text-white">
+                          {mission.title}
+                        </div>
+                        <p className="mt-1 text-xs text-white/70 line-clamp-2">
+                          {mission.mission}
+                        </p>
+                        <div className="mt-2 flex items-center justify-between text-[11px] text-white/60">
+                          <span>{mission.xpReward} XP</span>
+                          {mission.nftReward && (
+                            <span className="inline-flex items-center gap-1">
+                              <Award size={12} className="text-yellow-300" />
+                              {mission.nftReward}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="flex h-full items-center justify-center rounded-xl border border-dashed border-white/15 bg-white/5 text-center text-sm text-white/60">
@@ -400,12 +404,15 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
               <h4 className="text-sm font-semibold text-white/80 mb-2">Proof Certifications</h4>
               <div className="space-y-2">
                 {userProgress.nfts.length > 0 ? (
-                  userProgress.nfts.map((nft, index) => (
-                    <div key={index} className="flex items-center rounded-lg border border-white/10 bg-black/20 p-2 text-sm text-white">
-                      <Award className="mr-2 text-yellow-300" size={16} />
-                      <span className="truncate">{nft}</span>
-                    </div>
-                  ))
+                  userProgress.nfts.map((nft) => {
+                    const nftKey = generateStableKey({ name: nft }, 'nft', ['name']);
+                    return (
+                      <div key={nftKey} className="flex items-center rounded-lg border border-white/10 bg-black/20 p-2 text-sm text-white">
+                        <Award className="mr-2 text-yellow-300" size={16} />
+                        <span className="truncate">{nft}</span>
+                      </div>
+                    );
+                  })
                 ) : (
                   <div className="rounded-lg border border-dashed border-white/15 bg-white/5 py-2 text-center text-sm text-white/60">
                     No certifications minted yet
@@ -428,8 +435,8 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
                 </div>
                 <button
                   onClick={(e) => {
-                    e.stopPropagation()
-                    openExplorer()
+                    e.stopPropagation();
+                    openExplorer();
                   }}
                   className="mt-3 flex w-full items-center justify-center gap-1 rounded-lg bg-black/40 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-black/60"
                 >
@@ -451,7 +458,7 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
         </div>
       </motion.div>
     </div>
-  )
-}
+  );
+};
 
-export default SkillchainCard
+export default SkillchainCard;

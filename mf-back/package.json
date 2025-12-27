@@ -7,7 +7,8 @@
     "dev": "nodemon ./bin/www",
     "test": "cross-env NODE_ENV=test SKIP_DB_CONNECTION=true jest --passWithNoTests --runInBand",
     "test:coverage": "cross-env NODE_ENV=test SKIP_DB_CONNECTION=true jest --coverage --passWithNoTests --runInBand",
-    "rag:upload": "node scripts/rag_upload.js"
+    "rag:upload": "node scripts/rag_upload.js",
+    "compliance:check": "node ../scripts/compliance/check-compliance.js"
   },
   "dependencies": {
     "@solana/web3.js": "^1.98.4",

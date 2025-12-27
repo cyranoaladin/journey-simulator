@@ -1,7 +1,7 @@
 const axios = require("axios");
 const dotenv = require("dotenv");
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
 
 const DEFAULT_BASE_URL = "https://rag-api.nexusreussite.academy";
 const envCandidates = [

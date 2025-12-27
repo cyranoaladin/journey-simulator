@@ -3,7 +3,7 @@
  * Do not make direct changes to the file.
  */
 
-export interface paths {
+export interface Paths {
     "/user/wallet-challenge": {
         parameters: {
             query?: never;
@@ -90,7 +90,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["LoginResponse"];
+                        "application/json": Components["schemas"]["LoginResponse"];
                     };
                 };
                 /** @description Invalid signature or challenge expired */
@@ -133,7 +133,7 @@ export interface paths {
                     content: {
                         "application/json": {
                             success?: boolean;
-                            user?: components["schemas"]["User"];
+                            user?: Components["schemas"]["User"];
                         };
                     };
                 };
@@ -172,7 +172,7 @@ export interface paths {
                     content: {
                         "application/json": {
                             success?: boolean;
-                            progress?: components["schemas"]["UserProgress"];
+                            progress?: Components["schemas"]["UserProgress"];
                         };
                     };
                 };
@@ -214,7 +214,7 @@ export interface paths {
                     content: {
                         "application/json": {
                             success?: boolean;
-                            data?: components["schemas"]["GlobalMetrics"];
+                            data?: Components["schemas"]["GlobalMetrics"];
                         };
                     };
                 };
@@ -260,7 +260,7 @@ export interface paths {
                     content: {
                         "application/json": {
                             success?: boolean;
-                            data?: components["schemas"]["JourneyMetrics"];
+                            data?: Components["schemas"]["JourneyMetrics"];
                         };
                     };
                 };
@@ -301,7 +301,7 @@ export interface paths {
                     content: {
                         "application/json": {
                             success?: boolean;
-                            data?: components["schemas"]["AgentRun"][];
+                            data?: Components["schemas"]["AgentRun"][];
                         };
                     };
                 };
@@ -356,7 +356,7 @@ export interface paths {
     };
 }
 export type webhooks = Record<string, never>;
-export interface components {
+export interface Components {
     schemas: {
         User: {
             id?: string;
@@ -368,7 +368,7 @@ export interface components {
         };
         LoginResponse: {
             success?: boolean;
-            user?: components["schemas"]["User"];
+            user?: Components["schemas"]["User"];
             accessToken?: string;
             refreshToken?: string;
         };

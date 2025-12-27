@@ -227,3 +227,11 @@ Puis ré-importer `mcp.json` dans Cursor.
 - **Utilité** : pilotage navigateur depuis l’agent (repro mobile wallet, deep links).
 - **Risque** : actions “réelles” automatisées → limiter aux environnements locaux/CI.
 - **Activation** : ajouter MCP Playwright/Puppeteer uniquement si besoin de pilotage interactif.
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

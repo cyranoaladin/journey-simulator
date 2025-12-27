@@ -1,10 +1,11 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { useJourneyStore } from '../../store/journeyStore';
 import { Persona } from '../../types/journey';
+import { generateStableKey } from '../../utils/generateStableKey';
 
 interface InvestorDemoModeProps {
-  personas: Persona[];
+  readonly personas: Persona[];
 }
 
 export default function InvestorDemoMode({ personas }: InvestorDemoModeProps) {
@@ -123,15 +124,18 @@ export default function InvestorDemoMode({ personas }: InvestorDemoModeProps) {
               ></div>
             </div>
             <div className="flex justify-between mt-2 text-xs text-gray-500">
-              {demoSteps.map((_, index) => (
-                <span
-                  key={index}
-                  className={`text-center ${index <= currentStep ? 'text-cyan-400' : 'text-gray-600'}`}
-                  style={{ width: `${100 / demoSteps.length}%` }}
-                >
-                  {index + 1}
-                </span>
-              ))}
+              {demoSteps.map((step, index) => {
+                const stepKey = `demo-step-${index}-${step}`;
+                return (
+                  <span
+                    key={stepKey}
+                    className={`text-center ${index <= currentStep ? 'text-cyan-400' : 'text-gray-600'}`}
+                    style={{ width: `${100 / demoSteps.length}%` }}
+                  >
+                    {index + 1}
+                  </span>
+                );
+              })}
             </div>
           </div>
 
@@ -215,17 +219,20 @@ export default function InvestorDemoMode({ personas }: InvestorDemoModeProps) {
               <div className="bg-white/5 rounded-xl p-4">
                 <h4 className="font-medium mb-3">Proof-of-* NFTs Obtained</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {demoData.nftCertificates.map((nft: any, index: number) => (
-                    <div key={index} className="flex items-center p-3 bg-black/30 rounded-lg border border-white/10">
-                      <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg flex items-center justify-center mr-3">
-                        <span className="text-lg">🏆</span>
+                  {demoData.nftCertificates.map((nft: any) => {
+                    const nftKey = generateStableKey(nft, 'nft-certificate', ['name', 'id', 'mint_address']);
+                    return (
+                      <div key={nftKey} className="flex items-center p-3 bg-black/30 rounded-lg border border-white/10">
+                        <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg flex items-center justify-center mr-3">
+                          <span className="text-lg">🏆</span>
+                        </div>
+                        <div>
+                          <div className="font-medium">{nft.name}</div>
+                          <div className="text-xs text-gray-500">{nft.description}</div>
+                        </div>
                       </div>
-                      <div>
-                        <div className="font-medium">{nft.name}</div>
-                        <div className="text-xs text-gray-500">{nft.description}</div>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 

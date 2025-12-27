@@ -268,10 +268,10 @@ class BaseAgent {
                 agentRun.output = { raw: text, payload };
                 agentRun.durationMs = Date.now() - startTime;
                 await agentRun.save().catch(e => {
-                  const errorMsg = e instanceof Error ? e.message : String(e);
-                  if (process.env.NODE_ENV !== 'test') {
-                    console.warn('Failed to update AgentRun success:', errorMsg);
-                  }
+                    const errorMsg = e instanceof Error ? e.message : String(e);
+                    if (process.env.NODE_ENV !== 'test') {
+                        console.warn('Failed to update AgentRun success:', errorMsg);
+                    }
                 });
             }
 
@@ -288,10 +288,10 @@ class BaseAgent {
                 agentRun.error = { message: error.message, stack: error.stack };
                 agentRun.durationMs = Date.now() - startTime;
                 await agentRun.save().catch(e => {
-                  const errorMsg = e instanceof Error ? e.message : String(e);
-                  if (process.env.NODE_ENV !== 'test') {
-                    console.warn('Failed to update AgentRun failure:', errorMsg);
-                  }
+                    const errorMsg = e instanceof Error ? e.message : String(e);
+                    if (process.env.NODE_ENV !== 'test') {
+                        console.warn('Failed to update AgentRun failure:', errorMsg);
+                    }
                 });
             }
             throw error;

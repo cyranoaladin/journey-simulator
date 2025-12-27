@@ -184,7 +184,7 @@ const HeroSection = () => {
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1.0, duration: 0.8 }}
+              transition={{ delay: 1, duration: 0.8 }}
               className="text-sm italic opacity-70 font-space"
             >
               "You don't pitch. You prove. And your proof becomes capital."
@@ -193,7 +193,7 @@ const HeroSection = () => {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1.0, duration: 0.8 }}
+              transition={{ delay: 1, duration: 0.8 }}
               className="mt-8 flex justify-center lg:justify-start"
             >
               <img

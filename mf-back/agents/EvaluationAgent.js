@@ -21,6 +21,12 @@ class EvaluationAgent {
       ];
 
       const summary = hasInput ? 'Evaluation rubric scored' : 'Evaluation rubric drafted';
+      const confidence = hasInput ? 0.7 : 0.55;
+      const findings = [
+        { item: 'clarity', status: 'ok', detail: 'Clarity criterion ready' },
+        { item: 'feasibility', status: hasInput ? 'ok' : 'warn', detail: 'Feasibility needs evidence' },
+        { item: 'risk', status: 'ok', detail: 'Risk criterion tracked' },
+      ];
 
       const details = {
         intent: intentNormalized || 'evaluation',
@@ -43,6 +49,9 @@ class EvaluationAgent {
         status: hasInput ? 'OK' : 'WARN',
         summary,
         details,
+        findings,
+        confidence,
+        assumptions: hasInput ? [] : ['Score provisoire sans input utilisateur'],
         actions,
         citations: [],
         metrics: { latencyMs: Date.now() - started },

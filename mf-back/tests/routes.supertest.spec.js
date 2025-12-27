@@ -63,7 +63,7 @@ jest.mock('../models/userCoursProgress', () => {
 });
 
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
+const crypto = require('node:crypto');
 const User = require('../models/user');
 const Journey = require('../models/Journeys');
 const Cours = require('../models/cours');

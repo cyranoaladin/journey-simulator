@@ -7,8 +7,8 @@ const { verifyTransaction } = require('../utils/solana');
 // In a real implementation, this would connect to actual Solana RPC
 router.post('/mint/simulate', protect, async (req, res) => {
   try {
-    const { nftId, destinationWallet, metadata } = req.body;
-    
+    // Variables extracted but not used in demo mode implementation
+
     // In demo mode (when req.user._id === '507f1f77bcf86cd799439011'), return mock response
     if (req.user._id === '507f1f77bcf86cd799439011') {
       return res.json({
@@ -47,17 +47,17 @@ router.post('/mint/simulate', protect, async (req, res) => {
 // Mock Solana mint execution endpoint
 router.post('/mint/execute', protect, async (req, res) => {
   try {
-    const { nftId, destinationWallet, metadata, transactionSignature } = req.body;
-    
+    const { destinationWallet, transactionSignature } = req.body;
+
     // In demo mode, return mock response
     if (req.user._id === '507f1f77bcf86cd799439011') {
       return res.json({
         ok: true,
         jobId: 'demo-job-' + Date.now(),
         status: 'queued',
-        tx: { 
-          mintAddress: 'DemoMintAddress' + Date.now(), 
-          txSig: 'DemoTxSig' + Date.now() 
+        tx: {
+          mintAddress: 'DemoMintAddress' + Date.now(),
+          txSig: 'DemoTxSig' + Date.now()
         }
       });
     }
@@ -80,8 +80,8 @@ router.post('/mint/execute', protect, async (req, res) => {
       ok: true,
       jobId: Date.now().toString(),
       status: 'processing',
-      tx: { 
-        mintAddress: 'DemoMintAddress' + Date.now(), 
+      tx: {
+        mintAddress: 'DemoMintAddress' + Date.now(),
         txSig: transactionSignature || 'mock-tx-sig-' + Date.now()
       }
     });
@@ -98,7 +98,7 @@ router.post('/mint/execute', protect, async (req, res) => {
 router.get('/mint/status/:jobId', protect, async (req, res) => {
   try {
     const { jobId } = req.params;
-    
+
     // In demo mode, return completed status
     if (req.user._id === '507f1f77bcf86cd799439011') {
       return res.json({

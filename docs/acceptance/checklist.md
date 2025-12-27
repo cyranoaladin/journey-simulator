@@ -12,3 +12,11 @@ Cette page sert de vue consolidée et coche chaque point lorsque vérifié:
 - Observabilité: health, metrics, admin (x-api-key): OK
 
 Plan d’exécution: docs/acceptance/validation_plan.md
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

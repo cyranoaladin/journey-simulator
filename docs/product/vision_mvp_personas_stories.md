@@ -12,3 +12,11 @@ MVP (parcours critiques)
 
 KPIs démo
 - Latence orchestrateur, % steps OK, latence TX, erreurs critiques = 0
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

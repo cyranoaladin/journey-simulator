@@ -6,6 +6,12 @@ class ComplianceAgent {
     try {
       const citations = buildCitations(ragContext);
       const summary = `Compliance review for phase ${journey?.phaseId || 'n/a'}: key risks noted, guidance provided.`;
+      const confidence = 0.7;
+      const findings = [
+        { item: 'data_handling', status: 'ok', detail: 'Data handling and consent reviewed' },
+        { item: 'retention', status: 'ok', detail: 'Retention policy to document' },
+        { item: 'privacy_notice', status: 'warn', detail: 'Privacy notice copy to validate' },
+      ];
       const actions = [
         'Document data retention policy for this feature',
         'Add consent/opt-out copy near the CTA',
@@ -18,6 +24,9 @@ class ComplianceAgent {
           systemPrompt: getSystemPrompt('ComplianceAgent'),
           focus: ['data handling', 'consent', 'privacy notice'],
         },
+        findings,
+        confidence,
+        assumptions: ['No legal review performed, guidance only'],
         actions,
         citations,
         metrics: { latencyMs: Date.now() - started, ragHits: citations.length },

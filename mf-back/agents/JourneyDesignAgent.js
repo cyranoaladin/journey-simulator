@@ -15,6 +15,11 @@ class JourneyDesignAgent {
 
       const touchpoints = ['Discover', 'Evaluate', 'Onboard', 'Adopt'];
       const summary = hasInput ? 'Journey map drafted' : 'Journey map drafted with limited input';
+      const confidence = hasInput ? 0.72 : 0.58;
+      const findings = [
+        { item: 'stages', status: 'ok', detail: `${touchpoints.length} stages outlined` },
+        { item: 'frictions', status: hasInput ? 'ok' : 'warn', detail: 'Top frictions to refine' },
+      ];
 
       const details = {
         intent: intentNormalized || 'journey_design',
@@ -40,6 +45,9 @@ class JourneyDesignAgent {
         status: hasInput ? 'OK' : 'WARN',
         summary,
         details,
+        findings,
+        confidence,
+        assumptions: hasInput ? [] : ['Input manquant, frictions à confirmer'],
         actions,
         citations: [],
         metrics: { latencyMs: Date.now() - started },

@@ -22,7 +22,7 @@ graph TB
     end
 
     subgraph "External Services"
-        LLM[🧠 OpenAI GPT-4o]
+        LLM[🧠 OpenAI GPT-4o<br/>SDK 6.9.1]
         RAG[📚 RAG Service<br/>Vector Search]
         SOLANA[⛓️ Solana Blockchain<br/>Devnet/Mainnet]
         DB[(🗄️ MongoDB)]
@@ -32,19 +32,19 @@ graph TB
     USER -->|Connects| WALLET
     USER -->|Interacts| JOURNEY
     USER -->|Mints NFT| WEB
-    
+
     JOURNEY -->|API Calls| API
     WEB -->|API Calls| API
     WEB -->|Transactions| SOLANA
     WALLET -->|Signs| SOLANA
-    
+
     API -->|Stores Progress| DB
     API -->|Orchestrates| AGENTS
     WEB -->|Stores Users| POSTGRES
-    
+
     AGENTS -->|Queries| LLM
     AGENTS -->|Retrieves Context| RAG
-    
+
     style USER fill:#e1f5ff
     style WALLET fill:#ffe1e1
     style JOURNEY fill:#e8f5e9
@@ -62,9 +62,20 @@ graph TB
 
 ### 1. Journey Simulator (Frontend)
 
-**Tech Stack**: Vite + React + TypeScript + Zustand
+**Tech Stack**:
+
+- React 19.0.0
+- TypeScript 5.3.3
+- Vite 4.5.14
+- Zustand 4.4.1
+- React Router 7.6.3
+- Tailwind CSS 3.3.5
+- Framer Motion 12.23.0
+- Lucide React 0.556.0
+- Solana Wallet Adapter (various)
 
 **Responsibilities**:
+
 - User interface for Cognitive Activation Protocol™
 - Journey selection and navigation
 - Phase progression tracking
@@ -72,6 +83,7 @@ graph TB
 - Resource/artifact display
 
 **Key Features**:
+
 - Wallet integration (`@solana/wallet-adapter`)
 - Real-time agent feedback
 - Progress persistence (localStorage + API)
@@ -79,6 +91,7 @@ graph TB
 - E2E tests (Playwright)
 
 **API Endpoints Used**:
+
 - `GET /journeys` - List available journeys
 - `POST /journey/{id}/step` - Execute next step
 - `POST /journey/{id}/submit` - Submit user input
@@ -89,9 +102,18 @@ graph TB
 
 ### 2. Web Portal (Next.js)
 
-**Tech Stack**: Next.js 14 (App Router) + Prisma + PostgreSQL
+**Tech Stack**:
+
+- Next.js 14.2.33 (App Router)
+- React 18.3.1
+- Prisma 5.22.0
+- PostgreSQL
+- Redis 5.10.0
+- BullMQ 5.65.0
+- UMI/Metaplex 3.4.0
 
 **Responsibilities**:
+
 - NFT minting interface
 - Access pass management
 - Admin dashboard
@@ -99,6 +121,7 @@ graph TB
 - Web3 gating
 
 **Key Features**:
+
 - Server-side rendering (SSR)
 - Solana wallet integration
 - NFT mint flow (Candy Machine or custom)
@@ -106,6 +129,7 @@ graph TB
 - Admin tools
 
 **Database Schema** (Prisma):
+
 ```prisma
 model User {
   id        String   @id @default(cuid())
@@ -131,9 +155,18 @@ model NftMint {
 
 ### 3. API Server (Backend)
 
-**Tech Stack**: Node.js + Express + MongoDB + JWT
+**Tech Stack**:
+
+- Node.js >= 18.0.0
+- Express 4.21.2
+- MongoDB (Mongoose 8.10.0)
+- JWT (jsonwebtoken 9.0.2)
+- OpenAI 6.9.1
+- Zod 3.25.76
+- Pino 10.1.0
 
 **Responsibilities**:
+
 - User authentication & authorization
 - Journey orchestration
 - Multi-agent coordination
@@ -155,6 +188,7 @@ model NftMint {
 | GET | `/agents/logs` | Get agent logs |
 
 **MongoDB Collections**:
+
 - `users` - User accounts
 - `journeys` - Journey instances
 - `agentRuns` - Agent execution logs
@@ -168,6 +202,7 @@ model NftMint {
 **Architecture**: Multi-agent orchestration with specialized agents
 
 **Agent Types**:
+
 - **CoachAgent**: Guidance & coaching
 - **BuilderAgent**: Technical architecture
 - **GrowthAgent**: Marketing & growth
@@ -176,6 +211,7 @@ model NftMint {
 - **PitchAgent**: Investor pitch preparation
 
 **Agent Workflow**:
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -198,6 +234,7 @@ sequenceDiagram
 ```
 
 **Agent Configuration** (example):
+
 ```json
 {
   "agentId": "CoachAgent",
@@ -333,12 +370,12 @@ sequenceDiagram
 
 | Layer | Technologies |
 |-------|-------------|
-| **Frontend** | Vite, React, TypeScript, Zustand, TailwindCSS |
-| **Web Portal** | Next.js 14, Prisma, PostgreSQL |
-| **Backend** | Node.js, Express, MongoDB, JWT |
-| **AI** | OpenAI GPT-4o, RAG (vector search) |
-| **Web3** | Solana, @solana/wallet-adapter, Metaplex |
-| **Testing** | Vitest, Playwright, Jest |
+| **Frontend** | React 19, TypeScript 5.3, Vite 4.5, Zustand 4.4, Tailwind CSS 3.3, Framer Motion 12.23 |
+| **Web Portal** | Next.js 14.2, React 18.3, Prisma 5.22, PostgreSQL, Redis 5.10, BullMQ 5.65 |
+| **Backend** | Node.js 18+, Express 4.21, MongoDB (Mongoose 8.10), JWT 9.0, OpenAI 6.9 |
+| **AI** | OpenAI GPT-4o (SDK 6.9.1), RAG (vector search), 23 Zyno Agents |
+| **Web3** | Solana, @solana/wallet-adapter, UMI/Metaplex 3.4 |
+| **Testing** | Vitest 4.0, Playwright 1.56+, Jest 29.7 |
 | **DevOps** | Docker, Docker Compose, Nginx |
 | **Docs** | Storybook, Markdown |
 
@@ -382,5 +419,16 @@ sequenceDiagram
 
 ---
 
-**Last Updated**: 2025-11-29  
-**Version**: 1.0
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer
+
+---
+
+**Last Updated**: 2025-12-27
+**Version**: 0.0.1
+**Status**: Production-ready, 0 Bugs, Technical Debt: 59.8h

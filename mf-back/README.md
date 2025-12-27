@@ -1,13 +1,17 @@
 # Money Factory AI - Backend API (mf-back)
 
+*Version*: 0.0.0
+*Dernière mise à jour*: Décembre 2025
+*Stack*: Node.js >= 18.0.0, Express 4.21.2, MongoDB (Mongoose 8.10.0), OpenAI 6.9.1
+
 The core backend service for Money Factory AI, responsible for agent orchestration, user management, and journey execution state.
 
 ## Role & Scope
 
--   **Agent Orchestration**: Hosts the Zyno Orchestrator and specialized AI agents.
--   **Execution State**: Tracks the detailed progress of user journeys in MongoDB.
--   **Authentication**: Issues JWTs and manages shadow user accounts for simulator access.
--   **RAG**: Handles document ingestion and retrieval for context-aware responses.
+- **Agent Orchestration**: Hosts the Zyno Orchestrator and specialized AI agents.
+- **Execution State**: Tracks the detailed progress of user journeys in MongoDB.
+- **Authentication**: Issues JWTs and manages shadow user accounts for simulator access.
+- **RAG**: Handles document ingestion and retrieval for context-aware responses.
 
 ## AEPO / AECO (Unified Definitions)
 
@@ -108,14 +112,15 @@ Below is a simplified response shape showing how observers can interpret AEPO/AE
 ```
 
 Interpretation guide:
+
 - **AEPO**: watch `feedback.aepo` (per-agent execution signal) + the agent outputs (roadmap, deliverables).
 - **AECO**: in MVP it is primarily a feedback signal (rating/comment) and will expand to cohort-level analytics.
 
 ## Requirements
 
--   Node.js 18+
--   MongoDB (local or Atlas)
--   `tweetnacl`, `bs58` (for wallet auth)
+- Node.js 18+
+- MongoDB (local or Atlas)
+- `tweetnacl`, `bs58` (for wallet auth)
 
 ## Common Commands
 
@@ -128,14 +133,25 @@ Interpretation guide:
 
 ## API Integration
 
--   **Base URL**: `http://localhost:3000` (default dev)
--   **Consumers**:
-    -   `journey-simulator`: Main consumer for interactive journeys.
-    -   `web` (optional): May consume agent stats or logs.
+- **Base URL**: `http://localhost:3000` (default dev)
+- **Consumers**:
+  - `journey-simulator`: Main consumer for interactive journeys.
+  - `web` (optional): May consume agent stats or logs.
 
 ## Environment Variables
 
 See `.env.example` for full list. Key vars:
--   `MONGO_URI`: Connection string.
--   `JWT_SECRET`: Security key for tokens.
--   `ENABLE_STRICT_WALLET_LOGIN`: Set to `true` to enforce signature verification.
+
+- `MONGO_URI`: Connection string.
+- `JWT_SECRET`: Security key for tokens.
+- `ENABLE_STRICT_WALLET_LOGIN`: Set to `true` to enforce signature verification.
+
+---
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

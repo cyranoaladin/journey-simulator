@@ -1,5 +1,5 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const journeyController = require('../controllers/journey-controller');
 const metricsController = require('../controllers/journey-metrics-controller');
 const { protect } = require('../middleware/auth');
@@ -38,4 +38,3 @@ router.get('/metrics', protect, metricsController.getGlobalMetrics);
 router.get('/:id/metrics', protect, metricsController.getJourneyMetrics);
 
 module.exports = router;
-

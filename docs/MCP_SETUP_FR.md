@@ -79,3 +79,11 @@ Meilleur ROI long terme : exposer en MCP des commandes sûres et idempotentes, p
 
 - healthchecks (web/mf-back), status BullMQ, diagnostics Redis (SIWS nonces), scripts `prod-local-*.sh`
 - appels OpenAPI (smoke tests)
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

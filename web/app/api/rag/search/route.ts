@@ -20,16 +20,13 @@ export async function POST(req: Request) {
     })
   }
 
-  const response = await fetch(
-    `http://localhost:8000/documents/?limit=50&order_by=created_at_desc`,
-    {
-      // TODO: Replace with actual FastAPI URL
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  )
+  const fastApiUrl = process.env.FASTAPI_URL || 'http://localhost:8000'
+  const response = await fetch(`${fastApiUrl}/documents/?limit=50&order_by=created_at_desc`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
   const docs = await response.json()
   if (!response.ok) {
     return NextResponse.json(

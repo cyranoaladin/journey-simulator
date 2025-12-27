@@ -20,4 +20,26 @@ module.exports = {
       curriculum: ['curriculum'],
     },
   },
+  product_launch: {
+    phases: {
+      discovery: ['product_spec'],
+      design: ['ux_writing'],
+      validation: ['security_audit'],
+      execution: ['qa_playwright'],
+    },
+  },
+  dao_readiness: {
+    phases: {
+      discovery: ['governance_dao'],
+      validation: ['compliance'],
+      audit: ['risk_fraud'],
+    },
+  },
+  investor_fundraise: {
+    phases: {
+      discovery: ['investor_demo'],
+      validation: ['risk_fraud'],
+      execution: ['product_spec'],
+    },
+  },
 };

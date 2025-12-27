@@ -11,9 +11,9 @@ interface Proposal {
 }
 
 interface DAODashboardProps {
-    votingPower: number;
-    proposals: Proposal[];
-    onVote: (proposalId: string, vote: "for" | "against") => void;
+    readonly votingPower: number;
+    readonly proposals: Proposal[];
+    readonly onVote: (proposalId: string, vote: "for" | "against") => void;
 }
 
 export default function GovernanceDashboard({

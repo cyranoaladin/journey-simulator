@@ -102,7 +102,7 @@ class JourneyEngine {
             phase.completedAt = new Date();
 
             // Unlock next phase
-            const currentNum = parseInt(phase.phaseId.split('-')[1]);
+            const currentNum = Number.parseInt(phase.phaseId.split('-')[1], 10);
             const nextPhaseId = `phase-${currentNum + 1}`;
 
             await PhaseProgress.findOneAndUpdate(

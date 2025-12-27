@@ -6,14 +6,14 @@ const journeyEngineRoutes = require('../routes/journey-engine-routes');
 
 // Mock RAG to avoid network errors in tests
 jest.mock('../rag/ragClient', () => ({
-  getRagSnippets: jest.fn().mockResolvedValue([])
+    getRagSnippets: jest.fn().mockResolvedValue([])
 }));
 
 // Mock OpenAI to avoid API calls in tests
 jest.mock('../utils/openaiClient', () => ({
-  callGpt5: jest.fn().mockResolvedValue({
-    message: { content: '{"test": "mock"}' }
-  })
+    callGpt5: jest.fn().mockResolvedValue({
+        message: { content: '{"test": "mock"}' }
+    })
 }));
 
 // Mock specific logic of auth middleware or use it directly if independent enough
@@ -122,11 +122,11 @@ describe('S2.3 Engine API Endpoints', () => {
         // Check phase status if it exists in the response
         // JourneyEngine.submitPhase returns { submission, phase, evaluation, xpEntry }
         if (res.body.data?.phase) {
-          // Phase should be SUBMITTED (initial) or VALIDATED/REJECTED (after evaluation)
-          expect(['SUBMITTED', 'VALIDATED', 'REJECTED']).toContain(res.body.data.phase.status);
+            // Phase should be SUBMITTED (initial) or VALIDATED/REJECTED (after evaluation)
+            expect(['SUBMITTED', 'VALIDATED', 'REJECTED']).toContain(res.body.data.phase.status);
         } else {
-          // If phase is not directly in data, check if it's nested or verify submission exists
-          expect(res.body.data.submission || res.body.data.phase || res.body.data).toBeDefined();
+            // If phase is not directly in data, check if it's nested or verify submission exists
+            expect(res.body.data.submission || res.body.data.phase || res.body.data).toBeDefined();
         }
     });
 

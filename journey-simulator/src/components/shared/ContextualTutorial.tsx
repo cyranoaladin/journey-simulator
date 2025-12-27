@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronRight, ChevronLeft } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface TutorialStep {
   id: string;
@@ -148,15 +148,18 @@ const ContextualTutorial = ({
 
           <div className="mt-4 flex justify-center">
             <div className="flex gap-1">
-              {steps.map((_, index) => (
-                <div
-                  key={index}
-                  className={`h-1.5 rounded-full transition-all ${index === currentStepIndex
+              {steps.map((step, index) => {
+                const stepKey = `tutorial-step-${index}`;
+                return (
+                  <div
+                    key={stepKey}
+                    className={`h-1.5 rounded-full transition-all ${index === currentStepIndex
                       ? 'w-4 bg-gradient-to-r from-cyan-500 to-purple-500'
                       : 'w-1.5 bg-gray-700'
-                    }`}
-                />
-              ))}
+                      }`}
+                  />
+                );
+              })}
             </div>
           </div>
         </motion.div>

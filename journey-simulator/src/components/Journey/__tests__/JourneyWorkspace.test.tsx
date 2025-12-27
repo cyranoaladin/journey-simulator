@@ -1,13 +1,13 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from 'vitest'
-import { MemoryRouter } from 'react-router-dom'
-import JourneyWorkspace from '../JourneyWorkspace'
-import { useJourneyStore } from '../../../store/journeyStore'
-import { tokenStore } from '../../../utils/tokenStore'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { useJourneyStore } from '../../../store/journeyStore';
+import { tokenStore } from '../../../utils/tokenStore';
+import JourneyWorkspace from '../JourneyWorkspace';
 
 // Partially mock API layer used by JourneyWorkspace when validating/completing phases
 vi.mock('../../../utils/api', async (importOriginal) => {
-    const actual: any = await importOriginal()
+    const actual: any = await importOriginal();
     return {
         ...actual,
         api: {
@@ -17,27 +17,42 @@ vi.mock('../../../utils/api', async (importOriginal) => {
                 evaluation: { global_score: 10, max_score: 10 }
             }),
         },
-    }
-})
+    };
+});
 
 // Mock child components to simplify testing
 vi.mock('../JourneyTimeline', () => ({
-    default: ({ onPhaseChange }: any) => <div data-testid="journey-timeline" onClick={() => onPhaseChange(1)}>Timeline</div>
-}))
+    default: ({ onPhaseChange }: any) => (
+        <div
+            data-testid="journey-timeline"
+            onClick={() => onPhaseChange(1)}
+            onKeyDown={(e: React.KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onPhaseChange(1);
+                }
+            }}
+            role="button"
+            tabIndex={0}
+        >
+            Timeline
+        </div>
+    )
+}));
 vi.mock('../../AgentActivityFeed', () => ({
     default: () => <div data-testid="agent-activity-feed">Agent Activity</div>
-}))
+}));
 vi.mock('../../UIBlocks/UIBlocksRenderer', () => ({
     default: () => <div data-testid="ui-blocks-renderer">UI Blocks</div>
-}))
+}));
 vi.mock('../../NFTProofModal', () => ({
     default: () => <div data-testid="nft-proof-modal">NFT Proof Modal</div>
-}))
+}));
 
 // Mock confetti
 vi.mock('canvas-confetti', () => ({
     default: vi.fn()
-}))
+}));
 
 const layoutMock = {
     focusMode: false,
@@ -48,19 +63,19 @@ const layoutMock = {
     setRightPanelOpen: vi.fn(),
     density: 'comfortable',
     cycleDensity: vi.fn(),
-}
+};
 
 vi.mock('../../../contexts/WorkspaceLayoutContext', () => ({
     useWorkspaceLayout: () => layoutMock,
-}))
+}));
 
 describe('JourneyWorkspace', () => {
     let consoleLogSpy: ReturnType<typeof vi.spyOn> | undefined;
     let consoleErrorSpy: ReturnType<typeof vi.spyOn> | undefined;
 
     beforeAll(() => {
-        consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => { });
-        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
+        consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     });
 
     afterAll(() => {
@@ -68,11 +83,11 @@ describe('JourneyWorkspace', () => {
         consoleErrorSpy?.mockRestore();
     });
 
-    const mockRunInteractiveStep = vi.fn()
-    const mockCompletePhase = vi.fn()
-    const mockSetCurrentPhase = vi.fn()
-    const mockSetUiMode = vi.fn()
-    const mockSetUiTone = vi.fn()
+    const mockRunInteractiveStep = vi.fn();
+    const mockCompletePhase = vi.fn();
+    const mockSetCurrentPhase = vi.fn();
+    const mockSetUiMode = vi.fn();
+    const mockSetUiTone = vi.fn();
 
     const mockPersona = {
         id: 'persona-1',
@@ -99,19 +114,19 @@ describe('JourneyWorkspace', () => {
                 outcomes: []
             }
         ]
-    }
+    };
 
     beforeEach(() => {
-        vi.clearAllMocks()
+        vi.clearAllMocks();
 
         // Complete phase requires an auth token (now via tokenStore/sessionStorage)
-        tokenStore.setAccessToken('demo-token')
-        tokenStore.setRefreshToken('demo-refresh-token')
+        tokenStore.setAccessToken('demo-token');
+        tokenStore.setRefreshToken('demo-refresh-token');
 
-        layoutMock.toggleFocusMode.mockClear()
-        layoutMock.setLeftPanelOpen.mockClear()
-        layoutMock.setRightPanelOpen.mockClear()
-        layoutMock.cycleDensity.mockClear()
+        layoutMock.toggleFocusMode.mockClear();
+        layoutMock.setLeftPanelOpen.mockClear();
+        layoutMock.setRightPanelOpen.mockClear();
+        layoutMock.cycleDensity.mockClear();
 
         // Setup default store state
         useJourneyStore.setState({
@@ -141,56 +156,57 @@ describe('JourneyWorkspace', () => {
             setCurrentPhase: mockSetCurrentPhase,
             setUiMode: mockSetUiMode,
             setUiTone: mockSetUiTone,
-        } as any)
-    })
+        } as any);
+    });
 
     it('renders correctly with selected persona', () => {
         render(
             <MemoryRouter>
                 <JourneyWorkspace />
             </MemoryRouter>
-        )
+        );
 
-        expect(screen.getAllByText('Test Persona')[0]).toBeInTheDocument()
-        expect(screen.getAllByText('Phase 1')[0]).toBeInTheDocument()
-        expect(screen.getByText('Run Simulation')).toBeInTheDocument()
-    })
+        expect(screen.getAllByText('Test Persona')[0]).toBeInTheDocument();
+        expect(screen.getAllByText('Phase 1')[0]).toBeInTheDocument();
+        expect(screen.getByText('Run Simulation')).toBeInTheDocument();
+    });
 
     it('calls runInteractiveStep when Start button is clicked', () => {
         // This test asserts single-step behavior; disable demo autoplay for it.
         try {
-            tokenStore.setAccessToken('real-token')
+            tokenStore.setAccessToken('real-token');
         } catch (e) {
-            void e
+            // Ignore error in test
+            expect(e).toBeDefined();
         }
 
         render(
             <MemoryRouter>
                 <JourneyWorkspace />
             </MemoryRouter>
-        )
+        );
 
-        const startButton = screen.getByText('Run Simulation')
-        fireEvent.click(startButton)
+        const startButton = screen.getByText('Run Simulation');
+        fireEvent.click(startButton);
 
         expect(mockRunInteractiveStep).toHaveBeenCalledWith({
             phaseId: 'phase-1',
             trackId: 'persona-1',
             userInput: ''
-        })
-    })
+        });
+    });
 
     it('shows loading state when isStepLoading is true', () => {
-        useJourneyStore.setState({ isStepLoading: true } as any)
+        useJourneyStore.setState({ isStepLoading: true } as any);
         render(
             <MemoryRouter>
                 <JourneyWorkspace />
             </MemoryRouter>
-        )
+        );
 
         // The button text changes to a loader, so "Start / Continue" should not be there
-        expect(screen.queryByText('Run Simulation')).not.toBeInTheDocument()
-    })
+        expect(screen.queryByText('Run Simulation')).not.toBeInTheDocument();
+    });
 
     it('renders UIBlocksRenderer when lastStep is present', () => {
         useJourneyStore.setState({
@@ -198,16 +214,16 @@ describe('JourneyWorkspace', () => {
                 type: 'text',
                 content: 'Hello'
             } as any
-        } as any)
+        } as any);
 
         render(
             <MemoryRouter>
                 <JourneyWorkspace />
             </MemoryRouter>
-        )
+        );
 
-        expect(screen.getByTestId('ui-blocks-renderer')).toBeInTheDocument()
-    })
+        expect(screen.getByTestId('ui-blocks-renderer')).toBeInTheDocument();
+    });
 
     it('shows Complete Phase button when current phase is the last completed one (active)', () => {
         useJourneyStore.setState({
@@ -219,15 +235,15 @@ describe('JourneyWorkspace', () => {
                 },
                 ui_blocks: [{ kind: 'text', content: 'test' }]
             } as any
-        } as any)
+        } as any);
 
         render(
             <MemoryRouter>
                 <JourneyWorkspace />
             </MemoryRouter>
-        )
-        expect(screen.getByTestId('complete-phase')).toBeInTheDocument()
-    })
+        );
+        expect(screen.getByTestId('complete-phase')).toBeInTheDocument();
+    });
 
     it('calls completePhase when Complete Phase button is clicked', async () => {
         useJourneyStore.setState({
@@ -239,20 +255,20 @@ describe('JourneyWorkspace', () => {
                 },
                 ui_blocks: [{ kind: 'text', content: 'test' }]
             } as any
-        } as any)
+        } as any);
 
         render(
             <MemoryRouter>
                 <JourneyWorkspace />
             </MemoryRouter>
-        )
+        );
 
-        const completeButton = screen.getByTestId('complete-phase')
-        fireEvent.click(completeButton)
+        const completeButton = screen.getByTestId('complete-phase');
+        fireEvent.click(completeButton);
 
         // handleCompletePhase is async (submitMission -> completePhase), so wait for it.
         await waitFor(() => {
-            expect(mockCompletePhase).toHaveBeenCalledWith(0, expect.objectContaining({ score: 100, phaseNumber: 1 }))
-        })
-    })
-})
+            expect(mockCompletePhase).toHaveBeenCalledWith(0, expect.objectContaining({ score: 100, phaseNumber: 1 }));
+        });
+    });
+});

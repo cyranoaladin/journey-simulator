@@ -1,6 +1,7 @@
+import { generateStableKey } from '../../utils/generateStableKey';
 import type { AgentResult } from './types';
 
-const renderReferenceLabel = (entry: { title?: string; content?: string } | undefined, index: number) => {
+const renderReferenceLabel = (entry: { title?: string; content?: string; } | undefined, index: number) => {
   if (!entry) {
     return `Reference ${index + 1}`;
   }
@@ -51,9 +52,12 @@ export default function AgentCard({ agent }: Props) {
         <section className="text-xs">
           <p className="font-semibold text-slate-700">RAG references</p>
           <ul className="list-disc list-inside space-y-1">
-            {agent.ragEnriched.map((entry, index) => (
-              <li key={index}>{renderReferenceLabel(entry, index)}</li>
-            ))}
+            {agent.ragEnriched.map((entry, index) => {
+              const entryKey = generateStableKey(entry || { index }, 'rag-entry', ['title', 'content']);
+              return (
+                <li key={entryKey}>{renderReferenceLabel(entry, index)}</li>
+              );
+            })}
           </ul>
         </section>
       )}

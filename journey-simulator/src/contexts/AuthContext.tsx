@@ -1,18 +1,18 @@
 
 import {
   createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
   FC,
-  useMemo,
+  ReactNode,
   useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import { api, LoginResponse } from "../utils/api";
-import { useJourneyStore } from "../store/journeyStore";
 import { loginWithWalletFlow } from "../lib/walletAuth";
+import { useJourneyStore } from "../store/journeyStore";
+import { api, LoginResponse } from "../utils/api";
 import { logger } from "../utils/logger";
 import { tokenStore } from "../utils/tokenStore";
 
@@ -104,13 +104,12 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     try {
       let data: LoginResponse;
 
+      // Guard: Secure flow with signature
       if (signMessage) {
-        // Use secure flow with challenge-response
         data = await loginWithWalletFlow({ walletPublicKey: wallet_address, signMessage });
       } else {
-        // Legacy flow (insecure) - disabled by default.
-        const allowInsecure =
-          (import.meta as any).env?.VITE_ALLOW_INSECURE_WALLET_LOGIN === 'true';
+        // Guard: Insecure flow disabled
+        const allowInsecure = (import.meta as any).env?.VITE_ALLOW_INSECURE_WALLET_LOGIN === 'true';
         if (!allowInsecure) {
           logger.warn('[AuthContext] Wallet login requires a signature (insecure login disabled).');
           return false;
@@ -215,116 +214,122 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     return !!token && !!user;
   }, [user]);
 
+  // Helper function to load user progress with timeout
+  const loadUserProgressWithTimeout = async () => {
+    try {
+      logger.debug("AuthContext: Loading user progress...");
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('User progress load timeout')), 10000);
+      });
+      const progressPromise = loadUserProgress();
+      await Promise.race([progressPromise, timeoutPromise]);
+      logger.debug("AuthContext: User progress loaded");
+    } catch (progressError) {
+      logger.error("Failed to load user progress:", progressError);
+      // Continue with default progress instead of blocking the UI
+    }
+  };
+
+  // Helper function to handle successful token verification
+  const handleTokenVerified = async (data: { user: User; }) => {
+    setUser(data.user);
+    try {
+      sessionStorage.setItem("userId", data.user.id);
+    } catch (storageError) {
+      logger.warn("Unable to persist userId after auth check", storageError);
+    }
+    await loadUserProgressWithTimeout();
+  };
+
+  // Helper function to handle token refresh and retry verification
+  const handleTokenRefresh = async (refreshTokenValue: string | null): Promise<boolean> => {
+    // Guard: No refresh token
+    if (!refreshTokenValue) return false;
+
+    try {
+      logger.debug("AuthContext: Attempting token refresh...");
+      const refreshResult = await refreshToken();
+
+      // Guard: Refresh failed
+      if (!refreshResult) {
+        logger.debug("AuthContext: Token refresh returned false");
+        return false;
+      }
+
+      logger.debug("AuthContext: Token refresh successful");
+      const newToken = tokenStore.getAccessToken();
+
+      // Guard: No access token after refresh
+      if (!newToken) throw new Error("No access token available after refresh");
+
+      const data = await api.verifyToken();
+      await handleTokenVerified(data);
+      logger.debug("AuthContext: setting isLoading false (after refresh success)");
+      setIsLoading(false);
+      return true;
+    } catch (refreshError) {
+      logger.error("Token refresh failed:", refreshError);
+      return false;
+    }
+  };
+
+  // Helper function to clear auth state
+  const clearAuthState = async () => {
+    logger.debug("AuthContext: Clearing auth state");
+    tokenStore.clearTokens();
+    try {
+      sessionStorage.removeItem("userId");
+    } catch {
+      // ignore
+    }
+    setUser(null);
+    await resetProgress();
+  };
+
   const checkAuthStatus = async () => {
     logger.debug("AuthContext: checkAuthStatus started");
     const token = tokenStore.getAccessToken();
     const refreshTokenValue = tokenStore.getRefreshToken();
     logger.debug("AuthContext: token present?", !!token, "refresh token present?", !!refreshTokenValue);
 
-    if (token) {
-      try {
-        logger.debug("AuthContext: Verifying token...");
-        // Verify token with backend
-        const data = await api.verifyToken();
-        logger.debug("AuthContext: Token verified successfully");
-        setUser(data.user);
-        try {
-          sessionStorage.setItem("userId", data.user.id);
-        } catch (storageError) {
-          logger.warn(
-            "Unable to persist userId after auth check",
-            storageError,
-          );
-        }
-
-        // Load user progress from backend with timeout protection
-        try {
-          logger.debug("AuthContext: Loading user progress...");
-          const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('User progress load timeout')), 10000); // 10 second timeout
-          });
-
-          const progressPromise = loadUserProgress();
-
-          // Race the API call with a timeout to prevent hanging
-          await Promise.race([progressPromise, timeoutPromise]);
-          logger.debug("AuthContext: User progress loaded");
-        } catch (progressError) {
-          logger.error("Failed to load user progress:", progressError);
-          // Continue with default progress instead of blocking the UI
-        }
-      } catch (verifyError) {
-        logger.error("Token verification failed:", verifyError);
-
-        // Check if token was already cleared by api.ts (401 error)
-        const tokenStillExists = tokenStore.getAccessToken();
-
-        // If token was auto-cleared, don't try to refresh
-        if (!tokenStillExists) {
-          logger.debug("AuthContext: Token was auto-cleared, skipping refresh");
-          setUser(null);
-          await resetProgress();
-          logger.debug("AuthContext: setting isLoading false (after auto-clear)");
-          setIsLoading(false);
-          return;
-        }
-
-        // Token is invalid, try to refresh only if refresh token exists
-        if (refreshTokenValue) {
-          try {
-            logger.debug("AuthContext: Attempting token refresh...");
-            const refreshResult = await refreshToken();
-            if (refreshResult) {
-              logger.debug("AuthContext: Token refresh successful");
-              // Retry the verification after refresh
-              try {
-                const newToken = tokenStore.getAccessToken();
-                if (!newToken) throw new Error("No access token available after refresh");
-                const data = await api.verifyToken();
-                setUser(data.user);
-
-                // Load user progress
-                try {
-                  const timeoutPromise = new Promise((_, reject) => {
-                    setTimeout(() => reject(new Error('User progress load timeout')), 10000);
-                  });
-
-                  const progressPromise = loadUserProgress();
-                  await Promise.race([progressPromise, timeoutPromise]);
-                } catch (progressError) {
-                  logger.error("Failed to load user progress after refresh:", progressError);
-                }
-                logger.debug("AuthContext: setting isLoading false (after refresh success)");
-                setIsLoading(false);
-                return; // Successfully refreshed and verified
-              } catch (retryError) {
-                logger.error("Token still invalid after refresh:", retryError);
-              }
-            } else {
-              logger.debug("AuthContext: Token refresh returned false");
-            }
-          } catch (refreshError) {
-            logger.error("Token refresh failed:", refreshError);
-          }
-        }
-
-        // If refresh failed or no refresh token, clear everything
-        logger.debug("AuthContext: Clearing auth state");
-        tokenStore.clearTokens();
-        try {
-          sessionStorage.removeItem("userId");
-        } catch {
-          // ignore
-        }
-        setUser(null);
-        await resetProgress();
-      }
-    } else {
+    // Guard: No token
+    if (!token) {
       logger.debug("AuthContext: No token found, resetting progress");
       await resetProgress();
+      logger.debug("AuthContext: setting isLoading false (final)");
+      setIsLoading(false);
+      return;
     }
-    logger.debug("AuthContext: setting isLoading false (final)");
-    setIsLoading(false);
+
+    try {
+      logger.debug("AuthContext: Verifying token...");
+      const data = await api.verifyToken();
+      logger.debug("AuthContext: Token verified successfully");
+      await handleTokenVerified(data);
+      logger.debug("AuthContext: setting isLoading false (final)");
+      setIsLoading(false);
+      return;
+    } catch (verifyError) {
+      logger.error("Token verification failed:", verifyError);
+      const tokenStillExists = tokenStore.getAccessToken();
+
+      // Guard: Token was auto-cleared
+      if (!tokenStillExists) {
+        logger.debug("AuthContext: Token was auto-cleared, skipping refresh");
+        await clearAuthState();
+        logger.debug("AuthContext: setting isLoading false (after auto-clear)");
+        setIsLoading(false);
+        return;
+      }
+
+      // Guard: Refresh failed
+      const refreshSuccess = await handleTokenRefresh(refreshTokenValue);
+      if (!refreshSuccess) {
+        await clearAuthState();
+      }
+      logger.debug("AuthContext: setting isLoading false (final)");
+      setIsLoading(false);
+    }
   };
 
   // Check authentication status on app load

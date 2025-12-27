@@ -46,3 +46,11 @@ The logging logic is integrated directly into the `BaseAgent` class in `mf-back`
 ### Health Check
 `GET /api/health`
 -   Returns service status, MongoDB connection state, and uptime.
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

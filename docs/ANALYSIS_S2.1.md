@@ -133,3 +133,11 @@ La phase S2.1 est validée et permet le passage à S2.2 SI ET SEULEMENT SI :
 **MENTION FINALE : READY FOR S2.2**
 Ce document est prêt pour validation humaine.
 En attente de GO pour démarrer l'implémentation S2.2 (Database Setup & Core Models).
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

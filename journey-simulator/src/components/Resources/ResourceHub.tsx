@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
+import { AECO, AEPO } from '@/content/aepoAeco';
+import { motion } from 'framer-motion';
 import {
   ArrowUpRight,
   BookCopy,
@@ -10,22 +10,22 @@ import {
   Library,
   Search,
   Sparkles
-} from 'lucide-react'
-import { AEPO, AECO } from '@/content/aepoAeco'
+} from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 const KNOWLEDGE_BASE_URL =
   import.meta.env.VITE_RESOURCE_LIBRARY_BASE_URL ??
-  '/documents'
+  '/documents';
 
 interface Resource {
-  id: string
-  title: string
-  summary: string
-  tags: string[]
-  format: 'PDF' | 'Guide' | 'Template' | 'Playbook'
-  slug: string
-  minutes: number
-  coverImage?: string
+  id: string;
+  title: string;
+  summary: string;
+  tags: string[];
+  format: 'PDF' | 'Guide' | 'Template' | 'Playbook';
+  slug: string;
+  minutes: number;
+  coverImage?: string;
 }
 
 const resourceLibrary: Resource[] = [
@@ -102,42 +102,42 @@ const resourceLibrary: Resource[] = [
     minutes: 7,
     coverImage: '/images/AECO_AEPO.png'
   }
-]
+];
 
 const ResourceHub = () => {
-  const [query, setQuery] = useState('')
-  const [activeTags, setActiveTags] = useState<string[]>([])
+  const [query, setQuery] = useState('');
+  const [activeTags, setActiveTags] = useState<string[]>([]);
 
   const tags = useMemo(() => {
-    const all = new Set<string>()
+    const all = new Set<string>();
     resourceLibrary.forEach((resource) => {
-      resource.tags.forEach((tag) => all.add(tag))
-    })
-    return Array.from(all).sort()
-  }, [])
+      resource.tags.forEach((tag) => all.add(tag));
+    });
+    return Array.from(all).sort((a, b) => a.localeCompare(b));
+  }, []);
 
   const toggleTag = (tag: string) => {
     setActiveTags((prev) =>
       prev.includes(tag)
         ? prev.filter((item) => item !== tag)
         : [...prev, tag]
-    )
-  }
+    );
+  };
 
   const filteredResources = useMemo(() => {
     return resourceLibrary.filter((resource) => {
       const matchesQuery = query.trim().length === 0
         ? true
         : resource.title.toLowerCase().includes(query.toLowerCase()) ||
-        resource.summary.toLowerCase().includes(query.toLowerCase())
+        resource.summary.toLowerCase().includes(query.toLowerCase());
 
       const matchesTags = activeTags.length === 0
         ? true
-        : activeTags.every((tag) => resource.tags.includes(tag))
+        : activeTags.every((tag) => resource.tags.includes(tag));
 
-      return matchesQuery && matchesTags
-    })
-  }, [query, activeTags])
+      return matchesQuery && matchesTags;
+    });
+  }, [query, activeTags]);
 
   return (
     <section className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 py-10 lg:px-6">
@@ -220,7 +220,7 @@ const ResourceHub = () => {
 
         <div className="flex flex-wrap gap-2">
           {tags.map((tag) => {
-            const isActive = activeTags.includes(tag)
+            const isActive = activeTags.includes(tag);
             return (
               <button
                 key={tag}
@@ -233,7 +233,7 @@ const ResourceHub = () => {
               >
                 {tag}
               </button>
-            )
+            );
           })}
           {activeTags.length > 0 && (
             <button
@@ -320,7 +320,7 @@ const ResourceHub = () => {
         )}
       </section>
     </section>
-  )
-}
+  );
+};
 
-export default ResourceHub
+export default ResourceHub;

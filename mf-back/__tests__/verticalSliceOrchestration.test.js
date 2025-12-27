@@ -1,17 +1,9 @@
 let mockSecurityRun;
 let mockProductRun;
 
-// Mock all orchestration dependencies to prevent module loading errors
-jest.mock('../orchestration/vsliceSchema', () => ({
-  validateRequest: jest.fn((payload) => ({
-    req: payload || {},
-    warnings: []
-  })),
-  sanitizeAgentResponse: jest.fn((raw) => ({
-    response: raw || {},
-    warnings: []
-  }))
-}));
+// Use the real vsliceSchema module instead of mocking it
+// This allows tests to verify actual validation and sanitization behavior
+// The module is lightweight and doesn't have external dependencies that need mocking
 
 jest.mock('../orchestration/ragClient', () => {
   const searchMock = jest.fn(async () => ({
@@ -61,7 +53,7 @@ describe('Vertical Slice Orchestration', () => {
   });
 
   beforeEach(() => {
-    delete global.__ZYNO_COLD_STARTED__;
+    delete globalThis.__ZYNO_COLD_STARTED__;
     memoryStore.clear();
     idempotencyStore.clear();
     auditTrailStore.clear();
@@ -760,7 +752,6 @@ describe('Vertical Slice Orchestration', () => {
     });
 
     const learningSec = res.learning.agents.find((a) => a.agentId === 'SecurityAuditAgent');
-    const learningProd = res.learning.agents.find((a) => a.agentId === 'ProductSpecAgent');
     expect(learningSec.learningScore).toBeGreaterThan(learningSec.baseConfidence);
     // Action plan should start with highest score (likely Security)
     const firstStep = res.decision.actionPlan.steps[0];
@@ -1165,7 +1156,7 @@ describe('Vertical Slice Orchestration', () => {
     metricsStore.reset();
     alertingEngine.reset();
     // Simulate slow runs by overriding duration in metrics
-    const res = await orchestrateVerticalSlice({
+    await orchestrateVerticalSlice({
       traceId: 'trace-slo-latency',
       runId: 'run-slo-latency',
       intent: 'security.audit',
@@ -1376,7 +1367,7 @@ describe('Vertical Slice Orchestration', () => {
   });
 
   it('trips circuit breaker and forces mock DRY_RUN', async () => {
-    global.__ZYNO_COLD_STARTED__ = true; // avoid cold reset wiping CB state
+    globalThis.__ZYNO_COLD_STARTED__ = true; // avoid cold reset wiping CB state
     circuitBreaker.trip('tenant-cb', 'llm', 'test');
     const res = await orchestrateVerticalSlice({
       traceId: 'trace-cb',

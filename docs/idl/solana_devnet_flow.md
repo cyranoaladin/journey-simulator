@@ -7,3 +7,11 @@
 Sécurité
 - Jamais de clé en clair côté client. Secret minter via .env serveur uniquement.
 - KILL_SWITCH pour bloquer en urgence.
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

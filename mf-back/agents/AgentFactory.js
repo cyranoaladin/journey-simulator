@@ -23,106 +23,191 @@ const CoachAgent = require('./CoachAgent');
 const ReflectionAgent = require('./ReflectionAgent');
 const LaunchpadAgent = require('./LaunchpadAgent');
 
+// Registry: Phase/Mission mappings to agents (high priority)
+const PHASE_MISSION_MAPPINGS = {
+  phases: {
+    guide: GuideAgent,
+    orientation: GuideAgent,
+    onboarding: OnboardingAgent,
+    setup: OnboardingAgent,
+    legal: Web3LegalAgent,
+    compliance: Web3LegalAgent,
+    pitch: PitchAgent,
+    investor_pitch: PitchAgent,
+    investor: InvestorAgent,
+    fundraising: InvestorAgent,
+    launchpad: LaunchpadAgent,
+    demo_day: LaunchpadAgent,
+    reflection: ReflectionAgent,
+    post_mortem: ReflectionAgent,
+    coach: CoachAgent,
+    community: CommunityAgent,
+    growth: GrowthAgent,
+    product: ProductAgent,
+  },
+  missionKeywords: {
+    welcome: GuideAgent,
+    wallet: OnboardingAgent,
+    legal: Web3LegalAgent,
+    audit: AuditAgent,
+    pitch: PitchAgent,
+    investor: InvestorAgent,
+    retrospective: ReflectionAgent,
+    feedback: CoachAgent,
+    security: SecurityAgent,
+    governance: GovernanceAgent,
+    community: CommunityAgent,
+    growth: GrowthAgent,
+    product: ProductAgent,
+  },
+};
+
+// Registry: Track and phase combinations
+const TRACK_PHASE_MAPPINGS = {
+  'cognitive-activation-hub': {
+    'cognitive-orientation': GuideAgent,
+    'solana-fluency': EducationAgent,
+    'token-design-lab': TokenomicsAgent,
+    'identity-proofing': SecurityAgent,
+    'ecosystem-engagement': CommunityAgent,
+    default: EducationAgent,
+  },
+  'capital-foundry': {
+    'capital-discovery': ProtocolAgent,
+    'program-forge': BuilderAgent,
+    'oracle-integration': ProtocolAgent,
+    'risk-command': TokenomicsAgent,
+    'capital-launchpad': InvestorAgent,
+    default: ProtocolAgent,
+  },
+  'system-architect': {
+    'architecture-scan': ProtocolAgent,
+    'depin-studio': BuilderAgent,
+    'onchain-ai': DevAgent,
+    'systems-hardening': SecurityAgent,
+    'synaptic-rollout': LaunchpadAgent,
+    default: ProtocolAgent,
+  },
+  'experience-studio': {
+    'experience-discovery': DesignAgent,
+    'nft-systems-lab': NFTAgent,
+    'gameplay-lab': ProductAgent,
+    'ux-elevation': DesignAgent,
+    'experience-launch': LaunchpadAgent,
+    default: DesignAgent,
+  },
+  'impact-engine': {
+    'impact-charter': GuideAgent,
+    'dao-design': DAOAgent,
+    'philanthropy-protocols': ProtocolAgent,
+    'identity-reputation': CommunityAgent,
+    'synaptic-impact': GovernanceAgent,
+    default: GovernanceAgent,
+  },
+  'resilience-master': {
+    'security-baseline': EducationAgent,
+    'exploit-hunt': AuditAgent,
+    'defense-systems': SecurityAgent,
+    'incident-response': SecurityAgent,
+    'redblue-evolution': CoachAgent,
+    default: SecurityAgent,
+  },
+};
+
+// Fallback: Phase keyword matching
+const PHASE_KEYWORD_MAPPINGS = {
+  dev: DevAgent,
+  token: TokenAgent,
+  guide: GuideAgent,
+  onboarding: OnboardingAgent,
+  pitch: PitchAgent,
+  legal: Web3LegalAgent,
+  reflection: ReflectionAgent,
+};
+
+// Helper: Check if missionId contains a keyword
+const missionContainsKeyword = (missionId, keyword) => {
+  return missionId && typeof missionId === 'string' && missionId.includes(keyword);
+};
+
+// Helper: Match phase/mission to agent (high priority)
+const matchPhaseMission = (phaseId, missionId) => {
+  // Check phase mappings
+  if (phaseId && PHASE_MISSION_MAPPINGS.phases[phaseId]) {
+    return PHASE_MISSION_MAPPINGS.phases[phaseId];
+  }
+
+  // Check mission keyword mappings
+  if (missionId) {
+    for (const [keyword, AgentClass] of Object.entries(PHASE_MISSION_MAPPINGS.missionKeywords)) {
+      if (missionContainsKeyword(missionId, keyword)) {
+        return AgentClass;
+      }
+    }
+  }
+
+  return null;
+};
+
+// Helper: Match track and phase combination
+const matchTrackPhase = (trackId, phaseId) => {
+  const trackMapping = TRACK_PHASE_MAPPINGS[trackId];
+  if (!trackMapping) {
+    return null;
+  }
+
+  if (phaseId && trackMapping[phaseId]) {
+    return trackMapping[phaseId];
+  }
+
+  return trackMapping.default || null;
+};
+
+// Helper: Match phase keywords (fallback)
+const matchPhaseKeywords = (phaseId) => {
+  if (!phaseId) {
+    return null;
+  }
+
+  for (const [keyword, AgentClass] of Object.entries(PHASE_KEYWORD_MAPPINGS)) {
+    if (phaseId.includes(keyword)) {
+      return AgentClass;
+    }
+  }
+
+  return null;
+};
+
 class AgentFactory {
-    static getAgentForContext(context) {
-        const { trackId, phaseId, missionId } = context;
+  static getAgentForContext(context) {
+    const { trackId, phaseId, missionId } = context;
 
-        // 1. Specific Phase/Mission Overrides (High Priority)
-
-        // Guide & Onboarding
-        if (phaseId === 'guide' || phaseId === 'orientation' || (missionId && missionId.includes('welcome'))) return new GuideAgent();
-        if (phaseId === 'onboarding' || phaseId === 'setup' || (missionId && missionId.includes('wallet'))) return new OnboardingAgent();
-
-        // Legal & Compliance
-        if (phaseId === 'legal' || phaseId === 'compliance' || (missionId && missionId.includes('legal'))) return new Web3LegalAgent();
-        if (missionId && missionId.includes('audit')) return new AuditAgent();
-
-        // Pitch & Investment
-        if (phaseId === 'pitch' || phaseId === 'investor_pitch' || (missionId && missionId.includes('pitch'))) return new PitchAgent();
-        if (phaseId === 'investor' || phaseId === 'fundraising' || (missionId && missionId.includes('investor'))) return new InvestorAgent();
-        if (phaseId === 'launchpad' || phaseId === 'demo_day') return new LaunchpadAgent();
-
-        // Reflection & Coaching
-        if (phaseId === 'reflection' || phaseId === 'post_mortem' || (missionId && missionId.includes('retrospective'))) return new ReflectionAgent();
-        if (phaseId === 'coach' || (missionId && missionId.includes('feedback'))) return new CoachAgent();
-
-        // Specific Domains
-        if (missionId && missionId.includes('security')) return new SecurityAgent();
-        if (missionId && missionId.includes('governance')) return new GovernanceAgent();
-        if (missionId && missionId.includes('community') || phaseId === 'community') return new CommunityAgent();
-        if (missionId && missionId.includes('growth') || phaseId === 'growth') return new GrowthAgent();
-        if (missionId && missionId.includes('product') || phaseId === 'product') return new ProductAgent();
-
-
-        // 2. Track-based Default Agents & Phase Mapping
-        switch (trackId) {
-            case 'cognitive-activation-hub':
-                if (phaseId === 'cognitive-orientation') return new GuideAgent();
-                if (phaseId === 'solana-fluency') return new EducationAgent();
-                if (phaseId === 'token-design-lab') return new TokenomicsAgent();
-                if (phaseId === 'identity-proofing') return new SecurityAgent();
-                if (phaseId === 'ecosystem-engagement') return new CommunityAgent();
-                return new EducationAgent();
-
-            case 'capital-foundry':
-                if (phaseId === 'capital-discovery') return new ProtocolAgent();
-                if (phaseId === 'program-forge') return new BuilderAgent();
-                if (phaseId === 'oracle-integration') return new ProtocolAgent();
-                if (phaseId === 'risk-command') return new TokenomicsAgent(); // Or RiskAgent
-                if (phaseId === 'capital-launchpad') return new InvestorAgent();
-                return new ProtocolAgent();
-
-            case 'system-architect':
-                if (phaseId === 'architecture-scan') return new ProtocolAgent();
-                if (phaseId === 'depin-studio') return new BuilderAgent();
-                if (phaseId === 'onchain-ai') return new DevAgent();
-                if (phaseId === 'systems-hardening') return new SecurityAgent();
-                if (phaseId === 'synaptic-rollout') return new LaunchpadAgent();
-                return new ProtocolAgent();
-
-            case 'experience-studio':
-                if (phaseId === 'experience-discovery') return new DesignAgent();
-                if (phaseId === 'nft-systems-lab') return new NFTAgent();
-                if (phaseId === 'gameplay-lab') return new ProductAgent();
-                if (phaseId === 'ux-elevation') return new DesignAgent();
-                if (phaseId === 'experience-launch') return new LaunchpadAgent();
-                return new DesignAgent();
-
-            case 'impact-engine':
-                if (phaseId === 'impact-charter') return new GuideAgent();
-                if (phaseId === 'dao-design') return new DAOAgent();
-                if (phaseId === 'philanthropy-protocols') return new ProtocolAgent();
-                if (phaseId === 'identity-reputation') return new CommunityAgent();
-                if (phaseId === 'synaptic-impact') return new GovernanceAgent();
-                return new GovernanceAgent();
-
-            case 'resilience-master':
-                if (phaseId === 'security-baseline') return new EducationAgent();
-                if (phaseId === 'exploit-hunt') return new AuditAgent();
-                if (phaseId === 'defense-systems') return new SecurityAgent();
-                if (phaseId === 'incident-response') return new SecurityAgent();
-                if (phaseId === 'redblue-evolution') return new CoachAgent();
-                return new SecurityAgent();
-
-            default:
-                // Fallback based on phase keywords if track is generic or unknown
-                if (phaseId && phaseId.includes('dev')) return new DevAgent();
-                if (phaseId && phaseId.includes('token')) return new TokenAgent();
-                if (phaseId && phaseId.includes('guide')) return new GuideAgent();
-                if (phaseId && phaseId.includes('onboarding')) return new OnboardingAgent();
-                if (phaseId && phaseId.includes('pitch')) return new PitchAgent();
-                if (phaseId && phaseId.includes('legal')) return new Web3LegalAgent();
-                if (phaseId && phaseId.includes('reflection')) return new ReflectionAgent();
-
-                // Final Fallback
-                console.warn(`Unknown trackId: ${trackId} or phaseId: ${phaseId}, defaulting to ZynoAgent.`);
-                return new ZynoAgent();
-        }
+    // 1. High priority: Phase/Mission specific mappings
+    const phaseMissionMatch = matchPhaseMission(phaseId, missionId);
+    if (phaseMissionMatch) {
+      return new phaseMissionMatch();
     }
 
-    static getOrchestrator() {
-        return new ZynoAgent();
+    // 2. Track-based mappings with phase
+    const trackPhaseMatch = matchTrackPhase(trackId, phaseId);
+    if (trackPhaseMatch) {
+      return new trackPhaseMatch();
     }
+
+    // 3. Fallback: Phase keyword matching
+    const phaseKeywordMatch = matchPhaseKeywords(phaseId);
+    if (phaseKeywordMatch) {
+      return new phaseKeywordMatch();
+    }
+
+    // 4. Final fallback
+    console.warn(`Unknown trackId: ${trackId} or phaseId: ${phaseId}, defaulting to ZynoAgent.`);
+    return new ZynoAgent();
+  }
+
+  static getOrchestrator() {
+    return new ZynoAgent();
+  }
 }
 
 module.exports = AgentFactory;

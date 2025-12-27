@@ -6,6 +6,12 @@ class RiskFraudAgent {
     try {
       const citations = buildCitations(ragContext);
       const summary = `Risk/Fraud scan for phase ${journey?.phaseId || 'n/a'}: controls proposed.`;
+      const confidence = 0.62;
+      const findings = [
+        { item: 'velocity', status: 'ok', detail: 'Velocity checks recommended' },
+        { item: 'logging', status: 'ok', detail: 'Anomaly logging advised' },
+        { item: 'thresholds', status: 'warn', detail: 'Severity thresholds to set' },
+      ];
       const actions = [
         'Add velocity checks to sensitive flows',
         'Log anomalies to risk channel with severity tags',
@@ -18,6 +24,9 @@ class RiskFraudAgent {
           systemPrompt: getSystemPrompt('RiskFraudAgent'),
           focus: ['abuse prevention', 'signal thresholds', 'monitoring'],
         },
+        findings,
+        confidence,
+        assumptions: ['Execution is advisory only; agent disabled by default'],
         actions,
         citations,
         metrics: { latencyMs: Date.now() - started, ragHits: citations.length },

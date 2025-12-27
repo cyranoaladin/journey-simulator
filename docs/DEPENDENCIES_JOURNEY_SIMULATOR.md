@@ -21,3 +21,11 @@ We have decided **NOT** to force upgrade these dependencies on the main branch a
 -   These vulnerabilities primarily affect build-time (esbuild) or specific client-side rendering scenarios.
 -   Risk is assessed as **Manageable** for a dev-tool/simulator in the short term.
 -   Developers should remain on the internal network or VPN when using the simulator.
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

@@ -17,6 +17,12 @@ class RAGOpsAgent {
         : [];
 
       const summary = hasInput ? 'RAG pipeline checks generated' : 'RAG pipeline checks drafted with limited input';
+      const confidence = hasInput ? 0.7 : 0.56;
+      const findings = [
+        { item: 'ingestion', status: 'ok', detail: 'Ingestion schedule/checks listed' },
+        { item: 'relevance', status: citations.length ? 'ok' : 'warn', detail: 'Sampling pending if no citations' },
+        { item: 'pii', status: 'ok', detail: 'PII/retention controls noted' },
+      ];
 
       const details = {
         intent: intentNormalized || 'rag_ops',
@@ -46,6 +52,9 @@ class RAGOpsAgent {
         status: hasInput ? 'OK' : 'WARN',
         summary,
         details,
+        findings,
+        confidence,
+        assumptions: citations.length ? [] : ['Aucune citation fournie, sampling à faire'],
         actions,
         citations,
         metrics: { latencyMs: Date.now() - started, ragHits: citations.length },

@@ -242,3 +242,11 @@ Toutes les corrections critiques identifiées dans l'audit ont été appliquées
 3. ✅ Déploiement progressif en production
 
 Le système est maintenant **robuste, sécurisé et prêt pour un MVP web3 réel**.
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

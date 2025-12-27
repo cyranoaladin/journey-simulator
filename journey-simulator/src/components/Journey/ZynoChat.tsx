@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
 import { useJourneyStore } from '../../store/journeyStore';
 
 interface ZynoChatProps {
@@ -10,7 +10,7 @@ export default function ZynoChat({ className = '' }: ZynoChatProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
-  const [conversation, setConversation] = useState<Array<{ role: string, content: string, timestamp: Date }>>([]);
+  const [conversation, setConversation] = useState<Array<{ role: string, content: string, timestamp: Date; }>>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -147,26 +147,29 @@ export default function ZynoChat({ className = '' }: ZynoChatProps) {
                 <p className="text-xs mt-2">Specialized AI for your {selectedPersona?.title} journey</p>
               </div>
             ) : (
-              conversation.map((msg, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[85%] rounded-2xl px-4 py-3 ${msg.role === 'user'
-                      ? 'bg-gradient-to-r from-cyan-600 to-cyan-700 rounded-br-none'
-                      : 'bg-gray-800/80 border border-white/10 rounded-bl-none'
-                      }`}
+              conversation.map((msg, index) => {
+                const msgKey = `msg-${msg.role}-${index}-${msg.content?.substring(0, 20) || 'empty'}`;
+                return (
+                  <motion.div
+                    key={msgKey}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
-                    <div className="text-sm whitespace-pre-wrap">{msg.content}</div>
-                    <div className={`text-xs mt-1 ${msg.role === 'user' ? 'text-cyan-200' : 'text-gray-500'}`}>
-                      {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    <div
+                      className={`max-w-[85%] rounded-2xl px-4 py-3 ${msg.role === 'user'
+                        ? 'bg-gradient-to-r from-cyan-600 to-cyan-700 rounded-br-none'
+                        : 'bg-gray-800/80 border border-white/10 rounded-bl-none'
+                        }`}
+                    >
+                      <div className="text-sm whitespace-pre-wrap">{msg.content}</div>
+                      <div className={`text-xs mt-1 ${msg.role === 'user' ? 'text-cyan-200' : 'text-gray-500'}`}>
+                        {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))
+                  </motion.div>
+                );
+              })
             )}
             <div ref={messagesEndRef} />
           </div>

@@ -43,7 +43,10 @@ const mockModel = {
 jest.mock('mongoose', () => ({
   connect: jest.fn(),
   Schema: class {
-    index() { }
+    index() {
+      // Mock method for testing
+      return this;
+    }
   },
   model: jest.fn(() => mockModel)
 }));

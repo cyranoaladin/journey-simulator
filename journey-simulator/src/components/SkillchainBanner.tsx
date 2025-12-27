@@ -37,7 +37,7 @@ const SkillchainBannerInner = () => {
     updateOffset()
 
     const handleResize = () => updateOffset()
-    window.addEventListener('resize', handleResize)
+    globalThis.window.addEventListener('resize', handleResize)
 
     let observer: ResizeObserver | null = null
     if (typeof ResizeObserver !== 'undefined') {
@@ -46,7 +46,7 @@ const SkillchainBannerInner = () => {
     }
 
     return () => {
-      window.removeEventListener('resize', handleResize)
+      globalThis.window.removeEventListener('resize', handleResize)
       observer?.disconnect()
       root.style.setProperty('--skillchain-banner-offset', '0px')
     }

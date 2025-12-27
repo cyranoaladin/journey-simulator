@@ -449,7 +449,7 @@ export const useJourneyStore = createWithEqualityFn<JourneyState>()(
           const response = await api.completePhase({
             phase_number: phaseNumber,
             score: options.score ?? 100,
-            nft_address: options.nftAddress || '0x' + Math.random().toString(16).substr(2, 40),
+            nft_address: options.nftAddress || '0x' + Math.random().toString(16).slice(2, 42),
             xp_reward: xpReward,
             mfai_reward: mfaiReward,
             nft_reward: resolvedNftName,

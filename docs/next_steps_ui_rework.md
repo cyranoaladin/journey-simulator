@@ -61,3 +61,11 @@
 ✅ Ne pas oublier de **cocher** une tâche seulement une fois testée localement.  
 📁 Ce fichier peut être inclus dans `docs/` ou à la racine du projet.  
 📌 GitHub Copilot peut le lire pour guider les développements futurs.
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

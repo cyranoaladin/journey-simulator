@@ -226,7 +226,7 @@ const MainNavigation = ({ enableWallet = false }: MainNavigationProps) => {
   useLayoutEffect(() => {
     updateHeaderHeight()
     const handleResize = () => updateHeaderHeight()
-    window.addEventListener('resize', handleResize)
+    globalThis.window.addEventListener('resize', handleResize)
 
     let observer: ResizeObserver | null = null
     if (typeof ResizeObserver !== 'undefined') {
@@ -237,7 +237,7 @@ const MainNavigation = ({ enableWallet = false }: MainNavigationProps) => {
     }
 
     return () => {
-      window.removeEventListener('resize', handleResize)
+      globalThis.window.removeEventListener('resize', handleResize)
       observer?.disconnect()
     }
   }, [updateHeaderHeight])
@@ -253,7 +253,7 @@ const MainNavigation = ({ enableWallet = false }: MainNavigationProps) => {
     }
 
     if (item.external) {
-      window.open(item.external, '_blank', 'noopener')
+      globalThis.window.open(item.external, '_blank', 'noopener')
     } else {
       navigate(item.href)
     }
@@ -274,11 +274,11 @@ const MainNavigation = ({ enableWallet = false }: MainNavigationProps) => {
       if (moreRef.current.contains(target)) return
       setIsMoreOpen(false)
     }
-    window.addEventListener('keydown', onKeyDown)
-    window.addEventListener('pointerdown', onPointerDown)
+    globalThis.window.addEventListener('keydown', onKeyDown)
+    globalThis.window.addEventListener('pointerdown', onPointerDown)
     return () => {
-      window.removeEventListener('keydown', onKeyDown)
-      window.removeEventListener('pointerdown', onPointerDown)
+      globalThis.window.removeEventListener('keydown', onKeyDown)
+      globalThis.window.removeEventListener('pointerdown', onPointerDown)
     }
   }, [isMoreOpen])
 

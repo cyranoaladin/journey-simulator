@@ -4,8 +4,42 @@
  * Usage: node scripts/check-env-vars.js
  */
 
-require('dotenv').config({ path: require('path').resolve(__dirname, '../mf-back/.env') });
-require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+const fs = require('fs');
+const path = require('path');
+
+// Fonction simple pour parser un fichier .env
+function parseEnvFile(filePath) {
+  if (!fs.existsSync(filePath)) return {};
+  const content = fs.readFileSync(filePath, 'utf8');
+  const env = {};
+  content.split('\n').forEach(line => {
+    line = line.trim();
+    if (line && !line.startsWith('#')) {
+      const match = line.match(/^([^=]+)=(.*)$/);
+      if (match) {
+        const key = match[1].trim();
+        let value = match[2].trim();
+        // Retirer les guillemets si présents
+        if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+          value = value.slice(1, -1);
+        }
+        env[key] = value;
+      }
+    }
+  });
+  return env;
+}
+
+// Charger les fichiers .env (si disponibles)
+const envFiles = [
+  path.resolve(__dirname, '../mf-back/.env'),
+  path.resolve(__dirname, '../.env'),
+];
+
+envFiles.forEach(envFile => {
+  const env = parseEnvFile(envFile);
+  Object.assign(process.env, env);
+});
 
 const required = {
   critical: ['NODE_ENV', 'MONGO_URI', 'JWT_SECRET', 'ADMIN_API_KEY'],

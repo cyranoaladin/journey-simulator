@@ -15,11 +15,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, count: docs.length, docs })
   }
 
+  const fastApiUrl = process.env.FASTAPI_URL || 'http://localhost:8000'
   const response = await fetch(
-    `http://localhost:8000/documents/?q=${q}&limit=10&order_by=created_at_desc`,
+    `${fastApiUrl}/documents/?q=${q}&limit=10&order_by=created_at_desc`,
     {
-      // TODO: Replace with actual FastAPI URL
-      method: 'GET', // Changed to GET as documents endpoint is GET
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },

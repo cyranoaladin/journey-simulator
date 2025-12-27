@@ -1,6 +1,6 @@
 // Persistent Agent Memory System with basic file persistence
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const MEMORY_FILE = path.join(__dirname, 'agent_memory.json');
 
@@ -153,4 +153,3 @@ module.exports = {
     }
   }
 };
-

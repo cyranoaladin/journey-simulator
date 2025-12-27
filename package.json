@@ -18,7 +18,15 @@
     "test:all": "npm run test:back && npm run test:simulator && npm run test:web",
     "lint:all": "npm run lint:simulator && npm run lint:web",
     "build:all": "npm run build --prefix journey-simulator && npm run build --prefix web",
-    "install:all": "npm install --prefix mf-back && npm install --prefix journey-simulator && npm install --prefix web"
+    "install:all": "npm install --prefix mf-back && npm install --prefix journey-simulator && npm install --prefix web",
+    "release:preflight": "node scripts/release/preflight.js",
+    "release:smoke": "node scripts/release/smoke.js",
+    "release:rollback": "node scripts/release/rollback.js",
+    "release:smoke-e2e": "node scripts/release/smoke-e2e.js",
+    "release:go-live": "node scripts/release/go-live.js",
+    "compliance:check": "node scripts/compliance/check-compliance.js",
+    "test:load:sim": "node scripts/testing/simulate-load.js",
+    "test:chaos:sim": "node scripts/testing/simulate-chaos.js"
   },
   "devDependencies": {
     "concurrently": "^8.0.0"

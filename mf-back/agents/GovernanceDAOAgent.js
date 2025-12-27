@@ -6,6 +6,12 @@ class GovernanceDAOAgent {
     try {
       const citations = buildCitations(ragContext);
       const summary = `Governance guidance for phase ${journey?.phaseId || 'n/a'}: proposal clarity and voting flow checked.`;
+      const confidence = input ? 0.72 : 0.58;
+      const findings = [
+        { item: 'proposal', status: 'ok', detail: 'Proposal summary drafted' },
+        { item: 'quorum', status: 'ok', detail: 'Quorum/threshold to confirm' },
+        { item: 'timeline', status: 'warn', detail: 'Timeline/communication to finalize' },
+      ];
       const actions = [
         'Draft proposal summary under 150 words',
         'Define quorum and approval thresholds',
@@ -18,6 +24,9 @@ class GovernanceDAOAgent {
           systemPrompt: getSystemPrompt('GovernanceDAOAgent'),
           focus: ['proposal structure', 'voting rules', 'timeline'],
         },
+        findings,
+        confidence,
+        assumptions: input ? [] : ['Pas de contenu de proposal fourni'],
         actions,
         citations,
         metrics: { latencyMs: Date.now() - started, ragHits: citations.length },

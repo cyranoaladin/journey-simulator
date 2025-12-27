@@ -1,8 +1,8 @@
 // 📄 rag/ragClient.js
 
 const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const RAG_SEARCH_URL = process.env.RAG_SEARCH_URL || 'http://localhost:8000/kb/search';
 const RAG_INGEST_URL = process.env.RAG_INGEST_URL || 'http://localhost:8000/kb/ingest';

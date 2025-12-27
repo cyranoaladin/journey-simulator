@@ -38,12 +38,14 @@ This document outlines the security policies and best practices for Money Factor
 ### API Keys
 
 #### OpenAI API Key (`OPENAI_API_KEY`)
+
 - **Location**: Backend only (`mf-back/.env`)
 - **Never expose**: Do not log, do not send to frontend
 - **Rotation**: Via OpenAI dashboard
 - **Monitoring**: Track usage via OpenAI dashboard
 
 #### RAG API Key (`RAG_API_KEY`)
+
 - **Location**: Backend only
 - **Purpose**: Access to RAG search service
 - **Rotation**: Coordinate with RAG service admin
@@ -51,12 +53,14 @@ This document outlines the security policies and best practices for Money Factor
 ### Database Credentials
 
 #### MongoDB (`MONGO_URI`)
+
 - **Format**: `mongodb://user:password@host:port/database`
 - **Storage**: Backend `.env` only
 - **Rotation**: Update password in MongoDB + update `.env`
 - **Backup**: Ensure backups use separate credentials
 
 #### PostgreSQL (`DATABASE_URL` for Prisma)
+
 - **Format**: `postgresql://user:password@host:port/database`
 - **Storage**: `web/.env` only
 - **Rotation**: Update via database admin tools
@@ -64,17 +68,19 @@ This document outlines the security policies and best practices for Money Factor
 ### Authentication Secrets
 
 #### JWT Secret (`JWT_SECRET`)
+
 - **Purpose**: Sign/verify JWT tokens
-- **Requirements**: 
+- **Requirements**:
   - Minimum 32 characters
   - Cryptographically random
   - Different for dev/staging/prod
-- **Rotation**: 
+- **Rotation**:
   - Invalidates all existing tokens
   - Plan rotation during low-traffic periods
   - Implement grace period if possible
 
 #### Admin API Key (`ADMIN_API_KEY`)
+
 - **Purpose**: Protect admin endpoints
 - **Usage**: Internal tools only
 - **Logging**: Log all admin operations with this key
@@ -96,7 +102,7 @@ This document outlines the security policies and best practices for Money Factor
 
 2. **Hot Wallet (if needed)**
    - Purpose: Automated operations (minting, airdrops)
-   - Storage: 
+   - Storage:
      - Production: Hardware Security Module (HSM) or cloud KMS
      - Development: Server-side `.env` only
    - Access: Restricted to specific server processes
@@ -111,11 +117,13 @@ This document outlines the security policies and best practices for Money Factor
 ### Solana RPC Endpoints
 
 #### Public RPC (`NEXT_PUBLIC_SOLANA_RPC_URL`)
+
 - Can be exposed to frontend
 - Use rate-limited public endpoints or paid RPC services
 - Monitor for abuse
 
 #### Private RPC (`SOLANA_RPC_URL`)
+
 - Backend only
 - Use authenticated endpoints if available
 - Higher rate limits for backend operations
@@ -216,7 +224,7 @@ This document outlines the security policies and best practices for Money Factor
 If you discover a security vulnerability:
 
 1. **Do NOT** open a public GitHub issue
-2. Email: security@mfai.app (or designated security contact)
+2. Email: <security@mfai.app> (or designated security contact)
 3. Include:
    - Description of the vulnerability
    - Steps to reproduce
@@ -235,6 +243,20 @@ We will respond within 48 hours and work with you to resolve the issue.
 
 ---
 
-**Last Updated**: 2025-11-29  
-**Version**: 1.0  
+## Plan d’Action — Checklist Sécurité (Partie III)
+
+Pour les actions vérifiables (auth, guards, RAG/LLM, web3, tests), consulter `docs/security/CHECKLISTS_SECURITY.md`.
+
+---
+
+**Last Updated**: 2025-11-29
+**Version**: 1.0
 **Owner**: Security Team
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

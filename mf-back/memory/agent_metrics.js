@@ -1,6 +1,6 @@
 // memory/agent_metrics.js
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 const agentMemory = require('./agent_memory');
 
 const METRIC_LOG_PATH = path.join(__dirname, 'agent_metrics.log.json');

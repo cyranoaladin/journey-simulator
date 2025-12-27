@@ -1634,3 +1634,13 @@ curl -sS "https://journey.mfai.app/api/dao/proposals/$PROPOSAL_ID/vote" \
   "journeyState": { "xp": 140, "completed": [0, 1] }
 }
 ```
+
+---
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

@@ -14,3 +14,11 @@
 12. Critères d’acceptation (docs/acceptance/checklist.md)
 13. Plan de démo & fallbacks (docs/demo/script.md)
 14. Roadmap vNext (docs/roadmap/vNext.md)
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

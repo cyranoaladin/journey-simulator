@@ -142,3 +142,11 @@ Chaque `phase` définie dans les fichiers de templates (journey-tasks.json, temp
 7. Vérifier l'UX côté React (`npm run test --prefix journey-simulator`)
 
 ---
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

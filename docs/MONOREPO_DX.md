@@ -66,3 +66,11 @@ We aim to migrate to a standard workspace structure to share dependencies and co
 ## API Contracts
 
 We use OpenAPI 3.1 to define the contract between `mf-back` and frontends. This enables automatic client generation (see `journey-simulator/src/api/mf-back-client.ts`), ensuring type safety across the network boundary.
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

@@ -21,3 +21,11 @@ This document is intended to prevent tooling (Cursor) and contributors from maki
   - `DEPLOYMENT_INSTRUCTIONS.md`
 - Health:
   - `docs/HEALTHCHECK.md`
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

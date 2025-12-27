@@ -16,7 +16,7 @@ exports.getAgentRuns = async (req, res) => {
         const runs = await AgentRun.find(query)
             .sort({ createdAt: -1 })
             .skip(skip)
-            .limit(parseInt(limit))
+            .limit(Number.parseInt(limit, 10))
             .select('-input -output'); // Hide potentially sensitive data in list view
 
         const total = await AgentRun.countDocuments(query);
@@ -25,8 +25,8 @@ exports.getAgentRuns = async (req, res) => {
             success: true,
             data: runs,
             pagination: {
-                page: parseInt(page),
-                limit: parseInt(limit),
+                page: Number.parseInt(page, 10),
+                limit: Number.parseInt(limit, 10),
                 total,
                 pages: Math.ceil(total / limit)
             }

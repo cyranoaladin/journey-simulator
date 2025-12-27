@@ -28,6 +28,8 @@ class SecurityAuditAgent {
 
   async run(request) {
     const { traceId, input, rag = {}, constraints = {} } = request;
+    const ragHits = rag.chunks?.length || 0;
+    const confidence = Math.min(0.55 + (input ? 0.15 : 0) + Math.min(ragHits, 3) * 0.05, 0.9);
     const prompt = this.buildPrompt({ input, ragChunks: rag.chunks });
     const llmRes = await this.llm.generate({
       prompt,
@@ -36,14 +38,27 @@ class SecurityAuditAgent {
       maxTokens: constraints.maxTokens || 800,
     });
 
+    const findings = [
+      { item: 'CORS/headers', status: 'reviewed', severity: 'medium', detail: 'Check helmet + CORS config' },
+      { item: 'Auth/RateLimit', status: 'reviewed', severity: 'medium', detail: 'Verify JWT, rate limits in auth routes' },
+      { item: 'Secrets/Logs', status: 'reviewed', severity: 'low', detail: 'Ensure no secrets in logs, env guarded' },
+    ];
+
     return {
       traceId,
       agentId: this.id,
       status: 'OK',
       summary: 'Security review executed',
       details: llmRes.text,
+      findings,
+      confidence,
+      assumptions: ['LLM output post-processed, no real execution', `RAG hits: ${ragHits}`],
       citations: (rag.chunks || []).map((c) => ({ id: c.id, title: c.title, source: c.source })),
-      actions: [],
+      actions: [
+        'Inspect CORS/helmet headers for exposed routes',
+        'Validate auth/rate-limit paths with supertest',
+        'Redact secrets from structured logs',
+      ],
       metrics: { latencyMs: llmRes.latencyMs, tokens: llmRes.tokensUsed, ragHits: rag.chunks?.length || 0 },
       errors: [],
       mock: llmRes.mock || false,

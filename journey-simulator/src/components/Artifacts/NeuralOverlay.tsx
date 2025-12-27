@@ -33,7 +33,7 @@ export const NeuralOverlay: React.FC<Props> = ({ isVisible, agentName, taskName 
           {agentName} is working...
         </h3>
         <p className="text-gray-400 font-mono text-sm animate-pulse" data-testid="neural-overlay-task">
-          {'>'} {taskName}
+          {'> '}{taskName}
         </p>
       </div>
     </div>

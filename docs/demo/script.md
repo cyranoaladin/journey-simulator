@@ -11,3 +11,11 @@ Séquence synthétique (10–12 min)
 6) Observabilité/admin (1–2m)
 
 Fallbacks: docs/demo/fallbacks.md
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

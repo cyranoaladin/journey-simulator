@@ -32,7 +32,8 @@ self.addEventListener('fetch', (event) => {
         .then(response => {
           // Check if response is valid
           if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response;
+            // If invalid, try cache fallback
+            return caches.match(event.request).then(cachedResponse => cachedResponse || response);
           }
 
           // Clone response to cache it

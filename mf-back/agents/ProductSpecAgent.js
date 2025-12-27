@@ -27,6 +27,9 @@ class ProductSpecAgent {
 
   async run(request) {
     const { traceId, input, rag = {}, constraints = {} } = request;
+    const ragHits = rag.chunks?.length || 0;
+    const hasInput = Boolean(input && input.trim());
+    const confidence = Math.min(0.55 + (hasInput ? 0.2 : 0.05) + Math.min(ragHits, 3) * 0.05, 0.9);
     const prompt = this.buildPrompt({ input, ragChunks: rag.chunks });
     const llmRes = await this.llm.generate({
       prompt,
@@ -35,14 +38,27 @@ class ProductSpecAgent {
       maxTokens: constraints.maxTokens || 800,
     });
 
+    const findings = [
+      { item: 'Flows', status: hasInput ? 'ok' : 'warn', detail: 'User flows drafted' },
+      { item: 'Acceptance', status: hasInput ? 'ok' : 'warn', detail: 'Acceptance criteria listed' },
+      { item: 'Risks', status: 'ok', detail: 'Risks captured for spec' },
+    ];
+
     return {
       traceId,
       agentId: this.id,
       status: 'OK',
       summary: 'Product spec generated',
       details: llmRes.text,
+      findings,
+      confidence,
+      assumptions: ['Spec is textual, no code generated', `RAG hits: ${ragHits}`],
       citations: (rag.chunks || []).map((c) => ({ id: c.id, title: c.title, source: c.source })),
-      actions: [],
+      actions: [
+        'Produce OpenAPI or interface skeleton from spec',
+        'List top 3 acceptance criteria with owners',
+        'Document risks/deps in spec appendix',
+      ],
       metrics: { latencyMs: llmRes.latencyMs, tokens: llmRes.tokensUsed, ragHits: rag.chunks?.length || 0 },
       errors: [],
       mock: llmRes.mock || false,

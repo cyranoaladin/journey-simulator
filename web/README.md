@@ -1,17 +1,25 @@
 # Journey Web (Next.js)
 
+*Version*: 0.1.2
+*Dernière mise à jour*: Décembre 2025
+*Stack*: Next.js 14.2.33, React 18.3.1, Prisma 5.22.0, PostgreSQL, Redis 5.10.0, BullMQ 5.65.0, UMI/Metaplex 3.4.0
+
 Premium, secure, browser-first (UI) + strict backend (API) architecture.
 
 ## Summary
 
-- Stack: Next.js 14 (app dir), TailwindCSS
-- Wallet: @solana/wallet-adapter (Phantom, extensible)
-- API: /api/tx/prepare (web3.js) — builds unsigned transactions server-side
-- Security: Strict CSP, security headers, no client-side secrets
-- Tests: unit (Jest + RTL) and E2E (Playwright)
-- DevOps: Multi-stage Dockerfile, Nginx + systemd samples
-- Observability: Sentry (client & server) via @sentry/nextjs (DSN via .env)
-- CI: GitHub Actions (lint, build, unit, E2E)
+- **Stack**: Next.js 14.2.33 (App Router), Tailwind CSS 3.4.13, TypeScript 5.5.4
+- **Wallet**: @solana/wallet-adapter (Phantom, extensible)
+- **API**: /api/tx/prepare (web3.js) — builds unsigned transactions server-side
+- **Auth**: SIWS (Sign-In With Solana) avec Redis pour challenge storage
+- **Minting**: Pipeline asynchrone avec BullMQ + UMI/Metaplex 3.4.0
+- **Database**: PostgreSQL avec Prisma 5.22.0 ORM
+- **Queue**: BullMQ 5.65.0 sur Redis 5.10.0 pour jobs asynchrones
+- **Security**: Strict CSP, security headers, no client-side secrets
+- **Tests**: unit (Jest 29.7 + RTL) and E2E (Playwright 1.57)
+- **DevOps**: Multi-stage Dockerfile, Nginx + systemd samples
+- **Observability**: Sentry 8.9.2 (client & server) via @sentry/nextjs (DSN via .env)
+- **CI**: GitHub Actions (lint, build, unit, E2E)
 
 ## Start
 
@@ -203,11 +211,14 @@ Note: In production, use a real secret value (vault/CI secrets), and do not leav
 - Specification: `docs/openapi/journey-simulator.yaml`
 - Preview locally (choose one option):
   - RapiDoc (web component)
+
     ```bash
     npm run openapi:rapidoc
     # Opens http://127.0.0.1:8089/preview.html
     ```
+
   - ReDoc (CLI)
+
     ```bash
     npm run openapi:redoc
     # Opens http://127.0.0.1:8088
@@ -225,7 +236,7 @@ Note: In production, use a real secret value (vault/CI secrets), and do not leav
 
 - Required/optional secrets (Repository Settings → Secrets and variables → Actions):
   - DATABASE_URL: used by deploy-migrate job (Prisma migrate deploy)
-  - HEALTHCHECK_BASE_URL: public base (e.g., https://app.example.com) for post-deploy-health job
+  - HEALTHCHECK_BASE_URL: public base (e.g., <https://app.example.com>) for post-deploy-health job
   - ADMIN_API_KEY: admin access key for smoke test /admin/state
   - (Optional) SENTRY*AUTH_TOKEN/SENTRY_ORG/SENTRY_PROJECT, DOCKER*\*
 - Jobs:
@@ -285,7 +296,7 @@ cp .env.example .env
 # - MINTER_SECRET_KEY (devnet) & KILL_SWITCH
 ```
 
-2. Build + Prisma migrations (production)
+1. Build + Prisma migrations (production)
 
 ```bash
 # Build Next.js
@@ -294,7 +305,7 @@ npm run build
 npx prisma migrate deploy --schema web/prisma/schema.prisma
 ```
 
-3. Launch via systemd (recommended)
+1. Launch via systemd (recommended)
 
 - Adapt service (deploy/systemd/journey-web.service) then copy it:
 
@@ -310,7 +321,7 @@ sudo systemctl status journey-web --no-pager
   - EnvironmentFile=/opt/journey-web/web/.env
   - ExecStart=npm start --prefix /opt/journey-web/web
 
-4. Nginx Reverse Proxy + TLS
+1. Nginx Reverse Proxy + TLS
 
 ```bash
 # Copy template and adapt server_name / proxy_pass
@@ -320,7 +331,7 @@ sudo nginx -t && sudo systemctl reload nginx
 # (Optional) Certbot / acme.sh for TLS
 ```
 
-5. Alternative pm2 (if you prefer pm2 to systemd)
+1. Alternative pm2 (if you prefer pm2 to systemd)
 
 ```bash
 npm i -g pm2
@@ -329,7 +340,7 @@ pm2 save
 pm2 startup  # generates command to execute for autostart
 ```
 
-6. Post-deployment checks
+1. Post-deployment checks
 
 - /api/healthz → { ok: true }
 - /api/metrics → JSON metrics
@@ -349,3 +360,13 @@ Security Note:
 - Strict CSP (hardened in production)
 - Sentry initialized (DSN via .env)
 - No hardcoded secrets (dotenv), HTTPS in prod
+
+---
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

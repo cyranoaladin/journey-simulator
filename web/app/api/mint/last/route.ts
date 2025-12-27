@@ -22,9 +22,9 @@ export async function GET(req: NextRequest) {
     })
   }
 
+  const fastApiUrl = process.env.FASTAPI_URL || 'http://localhost:8000'
   const queryParams = userId ? `?user_id=${userId}` : ''
-  const response = await fetch(`http://localhost:8000/mint/mintlogs/last${queryParams}`, {
-    // TODO: Replace with actual FastAPI URL
+  const response = await fetch(`${fastApiUrl}/mint/mintlogs/last${queryParams}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

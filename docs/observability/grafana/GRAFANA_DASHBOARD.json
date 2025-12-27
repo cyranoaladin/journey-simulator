@@ -1,0 +1,745 @@
+{
+  "id": null,
+  "uid": "mfai-orchestration",
+  "title": "Money Factory AI - Orchestration Metrics",
+  "tags": [
+    "mfai",
+    "orchestration",
+    "slo"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "30s",
+  "editable": true,
+  "graphTooltip": 1,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "tenant",
+        "type": "query",
+        "label": "Tenant",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(mfai_orchestration_runs_total, tenant)",
+        "query": {
+          "query": "label_values(mfai_orchestration_runs_total, tenant)",
+          "refId": "StandardVariableQuery"
+        },
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "options": [],
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".*"
+      },
+      {
+        "name": "preset",
+        "type": "query",
+        "label": "Preset",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(mfai_orchestration_runs_total, preset)",
+        "query": {
+          "query": "label_values(mfai_orchestration_runs_total, preset)",
+          "refId": "StandardVariableQuery"
+        },
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "options": [],
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".*"
+      },
+      {
+        "name": "env",
+        "type": "query",
+        "label": "Environment",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(mfai_orchestration_runs_total, env)",
+        "query": {
+          "query": "label_values(mfai_orchestration_runs_total, env)",
+          "refId": "StandardVariableQuery"
+        },
+        "current": {
+          "selected": true,
+          "text": "PROD",
+          "value": "PROD"
+        },
+        "options": [],
+        "includeAll": false,
+        "multi": false
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "type": "timeseries",
+      "title": "Latency (p95, p99)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "mfai_orchestration_latency_p95{tenant=~\"$tenant\",env=\"$env\"}",
+          "refId": "p95",
+          "legendFormat": "p95"
+        },
+        {
+          "expr": "mfai_orchestration_latency_p99{tenant=~\"$tenant\",env=\"$env\"}",
+          "refId": "p99",
+          "legendFormat": "p99"
+        },
+        {
+          "expr": "500",
+          "refId": "target",
+          "legendFormat": "SLO Target (500ms)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "Latency (ms)",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": false
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 400
+              },
+              {
+                "color": "red",
+                "value": 500
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "type": "stat",
+      "title": "Error Rate (WARN / FAIL / TIMEOUT)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "mfai_orchestration_status_rate{status=\"WARN\",tenant=~\"$tenant\",env=\"$env\"}",
+          "refId": "warn",
+          "legendFormat": "WARN"
+        },
+        {
+          "expr": "mfai_orchestration_status_rate{status=\"FAIL\",tenant=~\"$tenant\",env=\"$env\"}",
+          "refId": "fail",
+          "legendFormat": "FAIL"
+        },
+        {
+          "expr": "mfai_orchestration_status_rate{status=\"TIMEOUT\",tenant=~\"$tenant\",env=\"$env\"}",
+          "refId": "timeout",
+          "legendFormat": "TIMEOUT"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 2,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.1
+              },
+              {
+                "color": "red",
+                "value": 0.2
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "graphMode": "area",
+        "colorMode": "value",
+        "orientation": "auto"
+      }
+    },
+    {
+      "id": 3,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "type": "barchart",
+      "title": "Cost per Run (USD)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "mfai_orchestration_cost_usd_per_run{tenant=~\"$tenant\",env=\"$env\"}",
+          "refId": "cost",
+          "legendFormat": "{{tenant}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 4,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.03
+              },
+              {
+                "color": "red",
+                "value": 0.05
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "groupWidth": 0.7,
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "type": "timeseries",
+      "title": "LLM Calls & Cache Hit Rate",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "mfai_orchestration_llm_calls_total{tenant=~\"$tenant\",env=\"$env\"}",
+          "refId": "calls",
+          "legendFormat": "LLM Calls"
+        },
+        {
+          "expr": "mfai_orchestration_llm_cache_hit_rate{tenant=~\"$tenant\",env=\"$env\"} * 100",
+          "refId": "hitRate",
+          "legendFormat": "Cache Hit Rate (%)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "showPoints": "never"
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "type": "table",
+      "title": "Tenant Activity",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum(mfai_orchestration_runs_total{tenant=~\"$tenant\",env=\"$env\"}) by (tenant)",
+          "refId": "runs",
+          "format": "table",
+          "instant": true
+        },
+        {
+          "expr": "avg(mfai_orchestration_latency_p95{tenant=~\"$tenant\",env=\"$env\"}) by (tenant)",
+          "refId": "latency",
+          "format": "table",
+          "instant": true
+        },
+        {
+          "expr": "avg(mfai_orchestration_status_rate{status=\"WARN\",tenant=~\"$tenant\",env=\"$env\"}) by (tenant)",
+          "refId": "warnRate",
+          "format": "table",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto"
+          }
+        }
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Runs"
+          }
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "type": "logs",
+      "title": "Alerts Timeline",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "mfai_orchestration_alerts{tenant=~\"$tenant\",env=\"$env\",level=~\"WARN|CRITICAL\"}",
+          "refId": "alerts",
+          "legendFormat": "{{sloId}} - {{level}}"
+        }
+      ],
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": false
+      }
+    },
+    {
+      "id": 7,
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 24
+      },
+      "type": "stat",
+      "title": "Idempotent Replay Rate",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "mfai_orchestration_idempotent_replay_rate{tenant=~\"$tenant\",env=\"$env\"}",
+          "refId": "idempotent",
+          "legendFormat": "Replay Rate"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 2,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.05
+              },
+              {
+                "color": "red",
+                "value": 0.1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 8,
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 24
+      },
+      "type": "stat",
+      "title": "DRY_RUN Rate",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "mfai_orchestration_execution_mode_rate{mode=\"DRY_RUN\",tenant=~\"$tenant\",env=\"$env\"}",
+          "refId": "dryRun",
+          "legendFormat": "DRY_RUN"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 2,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.9
+              },
+              {
+                "color": "red",
+                "value": 0.8
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 9,
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 24
+      },
+      "type": "stat",
+      "title": "Web3 BLOCK Rate",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "mfai_orchestration_web3_block_rate{tenant=~\"$tenant\",env=\"$env\"}",
+          "refId": "web3Block",
+          "legendFormat": "Web3 Blocked"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 2,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.05
+              },
+              {
+                "color": "red",
+                "value": 0.1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 10,
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 30
+      },
+      "type": "stat",
+      "title": "Kill Switch Activations",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "mfai_orchestration_kill_switch_activations_total{tenant=~\"$tenant\",env=\"$env\"}",
+          "refId": "killSwitch",
+          "legendFormat": "Activations"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 11,
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 30
+      },
+      "type": "stat",
+      "title": "Circuit Breaker Open Rate",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "mfai_orchestration_circuit_breaker_open_rate{tenant=~\"$tenant\",env=\"$env\"}",
+          "refId": "cbOpen",
+          "legendFormat": "CB Open"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 2,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.05
+              },
+              {
+                "color": "red",
+                "value": 0.1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 12,
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 30
+      },
+      "type": "stat",
+      "title": "Quota Usage (Runs)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "mfai_orchestration_quota_usage{tenant=~\"$tenant\",quota=\"runs\",env=\"$env\"} / mfai_orchestration_quota_limit{tenant=~\"$tenant\",quota=\"runs\",env=\"$env\"} * 100",
+          "refId": "quotaUsage",
+          "legendFormat": "Usage %"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 1,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 80
+              },
+              {
+                "color": "red",
+                "value": 100
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "name": "SLO Violations",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "enable": true,
+        "expr": "mfai_orchestration_slo_violation{tenant=~\"$tenant\",env=\"$env\"}",
+        "iconColor": "red",
+        "title": "SLO Violation",
+        "type": "tags"
+      }
+    ]
+  },
+  "links": []
+}

@@ -43,29 +43,31 @@ const useWindowSize = () => {
     }
 
     const update = () => {
-      setSize({ width: window.innerWidth, height: window.innerHeight })
+      setSize({ width: globalThis.window.innerWidth, height: globalThis.window.innerHeight })
     }
 
     update()
-    window.addEventListener('resize', update)
-    return () => window.removeEventListener('resize', update)
+    globalThis.window.addEventListener('resize', update)
+    return () => globalThis.window.removeEventListener('resize', update)
   }, [])
 
   return size
 }
 
 function buildCompletionMarkdown(summary: JourneyCompletionSummary, phaseDetails: JourneyPhaseSnapshot[], userIdentifier: string) {
-  const lines: string[] = []
-  lines.push(`# Journey Completion – ${summary.personaTitle}`)
-  lines.push('')
-  lines.push(`- **User:** ${userIdentifier}`)
-  lines.push(`- **Completed:** ${summary.completedAt}`)
-  lines.push(`- **AEPO Score:** ${summary.aepoScore}`)
-  lines.push(`- **AECO Score:** ${summary.aecoScore}`)
-  lines.push(`- **Total XP:** ${summary.totalXP}`)
-  lines.push(`- **MFAI Tokens:** ${summary.mfaiTokens}`)
-  lines.push(`- **Voting Power:** ${summary.votingPower}`)
-  lines.push('')
+  // Use array literal instead of multiple push calls
+  const lines = [
+    `# Journey Completion – ${summary.personaTitle}`,
+    '',
+    `- **User:** ${userIdentifier}`,
+    `- **Completed:** ${summary.completedAt}`,
+    `- **AEPO Score:** ${summary.aepoScore}`,
+    `- **AECO Score:** ${summary.aecoScore}`,
+    `- **Total XP:** ${summary.totalXP}`,
+    `- **MFAI Tokens:** ${summary.mfaiTokens}`,
+    `- **Voting Power:** ${summary.votingPower}`,
+    ''
+  ];
 
   if (summary.mintedNfts.length > 0) {
     lines.push('## Proof-of-Skill™ Earned')
@@ -180,11 +182,11 @@ const JourneyCompletedPage = () => {
   }, [routeSummary, personaForUi, userProgress.completedPhases.length, userProgress.totalXP, userProgress.mfaiTokens, userProgress.votingPower, userProgress.nfts])
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
+    if (typeof globalThis.window === 'undefined') {
       return undefined
     }
-    const timeout = window.setTimeout(() => setShowConfetti(false), 6000)
-    return () => window.clearTimeout(timeout)
+    const timeout = globalThis.window.setTimeout(() => setShowConfetti(false), 6000)
+    return () => globalThis.window.clearTimeout(timeout)
   }, [])
 
   if (!summary || !personaForUi) {
@@ -205,6 +207,7 @@ const JourneyCompletedPage = () => {
     setNotionMessage(null)
     setIsGeneratingPdf(true)
     try {
+      // Note: Using replace() with regex is appropriate here (not replaceAll) as we need pattern matching
       await exportToPDF('journey-summary', `${summary.personaTitle.replace(/\s+/g, '-')}-completion.pdf`)
     } catch (error) {
       console.error('PDF export failed:', error)

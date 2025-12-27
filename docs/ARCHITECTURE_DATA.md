@@ -22,3 +22,11 @@
 -   `mf-back` owns the **state machine** (steps, progress).
 -   `web` owns the **access rights** (payment, gating).
 -   Linkage: `Journey.user_wallet` matches `User.wallet_address`.
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

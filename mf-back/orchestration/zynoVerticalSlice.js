@@ -6,8 +6,8 @@ const loggerFactory = require('../utils/logger');
 const createLogger = loggerFactory.createLogger || loggerFactory.default || loggerFactory;
 const memoryStore = require('./memoryStore');
 const executionGate = require('./executionGate');
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 const toolsRegistry = require('./toolsRegistry');
 const executionEngine = require('./executionEngine');
 const workflowMap = require('./workflowMap');
@@ -24,7 +24,7 @@ const circuitBreaker = require('./circuitBreaker');
 const concurrencyManager = require('./concurrencyManager');
 const secretsPolicy = require('./secretsPolicy');
 const idempotencyStore = require('./idempotencyStore');
-const crypto = require('crypto');
+const crypto = require('node:crypto');
 const web3Guards = require('./web3Guards');
 const web3Pipeline = require('./web3Pipeline');
 const killSwitch = require('./killSwitch');
@@ -32,6 +32,9 @@ const telemetryAdapter = require('./telemetryAdapter');
 const degradationPolicy = require('./degradationPolicy');
 const artifactStore = require('./artifactStore');
 const actionToolMapper = require('./actionToolMapper');
+const ValidationService = require('./services/validationService');
+const ExecutionService = require('./services/executionService');
+const LogicCheckService = require('./services/logicCheckService');
 
 const ragClient = new RAGClient();
 const logger = createLogger(__filename);
@@ -119,7 +122,7 @@ const dedupeAndOrderIntents = (intents = []) => {
     const raw = Array.isArray(i) ? i.join('+') : i;
     const parts = String(raw || '')
       .toLowerCase()
-      .replace(/\./g, '_')
+      .replaceAll('.', '_')
       .split('+')
       .filter(Boolean);
     parts.forEach((key) => {
@@ -138,6 +141,7 @@ const normalizeTenantId = (val) => {
   if (!val) return 'default';
   const str = String(val || '').trim().toLowerCase();
   if (!str) return 'default';
+  // ReplaceAll doesn't work with regex, use replace with global flag for character class replacement
   const sanitized = str.replace(/[^a-z0-9_-]/g, '-').slice(0, 32);
   return sanitized || 'default';
 };
@@ -165,7 +169,13 @@ const computeScores = (agentResult, meta, effectiveWeight) => {
   if (hasActions) raw += 10;
   if (hasErrors) raw -= 10;
   raw = clamp(raw, 0, 100);
-  const weight = typeof effectiveWeight === 'number' ? effectiveWeight : typeof meta?.confidenceWeight === 'number' ? meta.confidenceWeight : 1;
+  // Extract nested ternary into explicit variable
+  let weight = 1;
+  if (typeof effectiveWeight === 'number') {
+    weight = effectiveWeight;
+  } else if (typeof meta?.confidenceWeight === 'number') {
+    weight = meta.confidenceWeight;
+  }
   const weighted = clamp(Math.round(raw * weight), 0, 100);
   return { raw, weighted };
 };
@@ -213,36 +223,55 @@ const detectOppositePair = (a, b) => {
   return null;
 };
 
+// Helper function to check for contradictions in actions between two runs
+const checkActionsContradiction = (runA, runB) => {
+  const actionsA = Array.isArray(runA.actions) ? runA.actions : [];
+  const actionsB = Array.isArray(runB.actions) ? runB.actions : [];
+
+  for (const actA of actionsA) {
+    for (const actB of actionsB) {
+      const opp = detectOppositePair(actA, actB);
+      if (opp) {
+        return {
+          agents: [runA.agentId, runB.agentId],
+          reason: `Opposite actions (${opp.pos} vs ${opp.neg}) on topic "${opp.topic}"`,
+        };
+      }
+    }
+  }
+  return null;
+};
+
+// Helper function to check for contradictions in summaries between two runs
+const checkSummaryContradiction = (runA, runB) => {
+  const oppSummary = detectOppositePair(runA.summary || '', runB.summary || '');
+  if (oppSummary) {
+    return {
+      agents: [runA.agentId, runB.agentId],
+      reason: `Opposite summaries (${oppSummary.pos} vs ${oppSummary.neg}) on topic "${oppSummary.topic}"`,
+    };
+  }
+  return null;
+};
+
 const detectContradictions = (runs) => {
   const contradictions = [];
   for (let i = 0; i < runs.length; i++) {
     for (let j = i + 1; j < runs.length; j++) {
-      const a = runs[i];
-      const b = runs[j];
-      const actionsA = Array.isArray(a.actions) ? a.actions : [];
-      const actionsB = Array.isArray(b.actions) ? b.actions : [];
-      let found = false;
-      for (const actA of actionsA) {
-        for (const actB of actionsB) {
-          const opp = detectOppositePair(actA, actB);
-          if (opp) {
-            contradictions.push({
-              agents: [a.agentId, b.agentId],
-              reason: `Opposite actions (${opp.pos} vs ${opp.neg}) on topic "${opp.topic}"`,
-            });
-            found = true;
-            break;
-          }
-        }
-        if (found) break;
+      const runA = runs[i];
+      const runB = runs[j];
+
+      // Check actions first
+      const actionContradiction = checkActionsContradiction(runA, runB);
+      if (actionContradiction) {
+        contradictions.push(actionContradiction);
+        continue;
       }
-      if (found) continue;
-      const oppSummary = detectOppositePair(a.summary || '', b.summary || '');
-      if (oppSummary) {
-        contradictions.push({
-          agents: [a.agentId, b.agentId],
-          reason: `Opposite summaries (${oppSummary.pos} vs ${oppSummary.neg}) on topic "${oppSummary.topic}"`,
-        });
+
+      // Check summaries if no action contradiction found
+      const summaryContradiction = checkSummaryContradiction(runA, runB);
+      if (summaryContradiction) {
+        contradictions.push(summaryContradiction);
       }
     }
   }
@@ -273,10 +302,10 @@ const computeLearningScores = (selected, registryIndex, memoryEntries) => {
       if (agentRes?.status === 'FAIL') failCount += 1;
       if (agentRes?.status === 'TIMEOUT') timeoutCount += 1;
       const contras = entry.data.contradictions || [];
-      if (contras.some((c) => Array.isArray(c.agents) && c.agents.includes(sel.agentId))) {
-        contradictionCount += 1;
-      } else if (contras.length > 0) {
-        // if contradictions are present but agents list not explicit, apply a small penalty
+      // Check if agent is involved in contradictions (explicit or implicit)
+      const hasExplicitContradiction = contras.some((c) => Array.isArray(c.agents) && c.agents.includes(sel.agentId));
+      const hasImplicitContradiction = contras.length > 0;
+      if (hasExplicitContradiction || hasImplicitContradiction) {
         contradictionCount += 1;
       }
     });
@@ -329,6 +358,344 @@ const timeoutGuard = (promise, ms, agentId, traceId) => {
   ]);
 };
 
+// Helper function to detect Web3 actions from agent actions or payload
+const detectWeb3Actions = (actions, payload) => {
+  const web3Actions = [];
+  actions.forEach((action) => {
+    const actionStr = typeof action === 'string' ? action.toLowerCase() : String(action).toLowerCase();
+    if (actionStr.includes('web3:proof') || (actionStr.includes('proof') && actionStr.includes('web3'))) {
+      web3Actions.push('proof');
+    } else if (actionStr.includes('web3:anchor') || (actionStr.includes('anchor') && actionStr.includes('web3'))) {
+      web3Actions.push('anchor');
+    } else if (actionStr.includes('web3:mint') || (actionStr.includes('mint') && actionStr.includes('web3'))) {
+      web3Actions.push('mint');
+    }
+  });
+  if (payload?.web3?.action) {
+    const payloadAction = String(payload.web3.action).toLowerCase();
+    if (['proof', 'anchor', 'mint'].includes(payloadAction)) {
+      web3Actions.push(payloadAction);
+    }
+  }
+  return Array.from(new Set(web3Actions));
+};
+
+// Helper function to execute a single agent with retry logic
+const executeAgentWithRetry = async ({
+  agentInstance,
+  sel,
+  meta,
+  req,
+  payload,
+  routed,
+  journeyName,
+  currentPhase,
+  phaseIndex,
+  artifactsSoFar,
+  tenantId,
+  ragContext,
+  timeoutMs,
+  budget,
+  ops,
+  learningMap,
+  registryIndex,
+  getTraceId,
+  timeoutGuard,
+  sanitizeAgentResponse,
+  computeScores,
+  circuitBreaker,
+  logger,
+}) => {
+  const started = Date.now();
+
+  if (!agentInstance) {
+    ops.fallbacks.push('agent_stub');
+    return {
+      agentId: sel.agentId,
+      status: 'FAIL',
+      summary: 'Agent not registered',
+      actions: [],
+      citations: [],
+      metrics: { latencyMs: 0 },
+      errors: ['agent_not_registered'],
+      traceId: getTraceId(req, payload),
+    };
+  }
+
+  try {
+    const executeOnce = () =>
+      timeoutGuard(
+        agentInstance.run({
+          traceId: getTraceId(req, payload),
+          runId: req?.runId || payload?.runId || 'unknown',
+          input: req.input,
+          ragContext: meta.requiresRag === false ? null : ragContext,
+          constraints: req.constraints,
+          intentNormalized: routed.intentNormalized,
+          journey: req.context?.journey || null,
+          phaseContext: {
+            journey: journeyName,
+            phase: currentPhase,
+            phaseIndex,
+            artifacts: artifactsSoFar,
+            constraints: req.constraints,
+          },
+          tenantId,
+        }),
+        timeoutMs,
+        sel.agentId,
+        req.traceId
+      );
+
+    let res;
+    let retried = false;
+    try {
+      res = await executeOnce();
+    } catch (err) {
+      const transient = (err && /timeout|ECONNRESET|ETIMEDOUT/i.test(err.message)) || err === 'agent_timeout';
+      if (!retried && transient && !ops.retries.attempted) {
+        retried = true;
+        ops.retries = { attempted: true, count: 1, reason: 'transient_agent_timeout' };
+        res = await executeOnce();
+      } else {
+        throw err;
+      }
+    }
+
+    const { response: sanitized, warnings: agentWarnings } = sanitizeAgentResponse({
+      ...res,
+      agentId: sel.agentId,
+      traceId: getTraceId(req, payload),
+    });
+    ops.warnings.push(...agentWarnings);
+
+    const effectiveWeight = learningMap[sel.agentId]?.learningScore;
+    const resWithScores = {
+      ...sanitized,
+      metrics: {
+        ...(sanitized.metrics || {}),
+        latencyMs: sanitized.metrics?.latencyMs ?? Date.now() - started,
+      },
+      scores: computeScores(sanitized, meta, effectiveWeight),
+    };
+    circuitBreaker.recordSuccess(tenantId, 'execution');
+    return resWithScores;
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    logger.error('Agent execution failed', { traceId: getTraceId(req, payload), agentId: sel.agentId, error: errorMsg });
+    circuitBreaker.recordFailure(tenantId, 'execution', 'agent_failure');
+    return {
+      agentId: sel.agentId,
+      traceId: getTraceId(req, payload),
+      status: 'FAIL',
+      summary: 'Agent execution failed',
+      actions: [],
+      citations: [],
+      metrics: { latencyMs: Date.now() - started },
+      errors: [errorMsg],
+      scores: computeScores({ status: 'FAIL', actions: [], errors: [errorMsg] }, meta, learningMap[sel.agentId]?.learningScore),
+    };
+  }
+};
+
+// Helper function to build initial aggregated response structure
+const buildInitialAggregated = ({
+  req,
+  payload,
+  routed,
+  intentsDeduped,
+  intentsCombined,
+  workflowIntents,
+  runsWithScores,
+  summary,
+  actions,
+  contradictions,
+  aggregatedDecision,
+  previous,
+  learningMap,
+  selected,
+  registryIndex,
+  budget,
+  agentsMeta,
+  phasesExecuted,
+  currentPhase,
+  preset,
+  ragContext,
+  startedAll,
+  getTraceId,
+}) => {
+  return {
+    traceId: getTraceId(req, payload),
+    intent: routed.intentNormalized,
+    intentMeta: {
+      deduplicated: intentsDeduped.length !== intentsCombined.length,
+      source: ['input', workflowIntents.length ? 'workflowMap' : null].filter(Boolean),
+    },
+    runId: req.runId,
+    agents: runsWithScores,
+    summary,
+    actions,
+    contradictions,
+    decision: aggregatedDecision,
+    memory: {
+      reused: Boolean(previous),
+      previousActionsCount: previous?.recommendedActions?.length || previous?.decision?.recommendedActions?.length || 0,
+    },
+    learning: {
+      enabled: true,
+      agents: Object.values(learningMap),
+    },
+    budgets: Object.fromEntries(
+      selected.map((sel) => {
+        const meta = registryIndex[sel.agentId] || {};
+        const effectiveMaxTokens = Math.min(
+          req.constraints?.maxTokens || meta.maxTokens || budget.maxTokens,
+          meta.maxTokens || budget.maxTokens,
+          budget.maxTokens
+        );
+        const effectiveTimeout = Math.min(
+          req.constraints?.timeoutMs || meta.timeoutMs || budget.timeoutMs,
+          meta.timeoutMs || budget.timeoutMs,
+          budget.timeoutMs
+        );
+        return [sel.agentId, { maxTokens: effectiveMaxTokens, timeoutMs: effectiveTimeout }];
+      })
+    ),
+    agentsMeta,
+    journeyProgress: {
+      phasesExecuted: phasesExecuted,
+      currentPhase: currentPhase || null,
+    },
+    executionPlan: null,
+    executionGate: null,
+    executionResult: null,
+    systemStatus: {
+      llm: process.env.OPENAI_API_KEY ? 'openai' : 'mock',
+      rag: ragContext ? ragContext.source || 'unknown' : 'disabled',
+      execution: process.env.EXECUTION_ENABLED === 'true' ? 'real-enabled' : 'dry-run',
+      agentsActiveCount: agentsMeta.enabled.length,
+      agents: {},
+    },
+    metrics: {
+      agentsCount: runsWithScores.length,
+      durationMs: Date.now() - startedAll,
+      ragUsed: Boolean(ragContext),
+      realExecutionAttempted: process.env.EXECUTION_ENABLED === 'true',
+    },
+    presetMeta: preset
+      ? {
+        name: preset.name,
+        description: preset.description,
+        expectedDuration: preset.expectedDuration || 'n/a',
+        sampleInput: preset.sampleInput,
+        sampleOutput: preset.sampleOutput,
+      }
+      : null,
+  };
+};
+
+// Helper function to build systemStatus object
+const buildSystemStatus = ({
+  ops,
+  agentsMeta,
+  agentsStatus,
+  tenantId,
+  coldStart,
+  secretsDecision,
+  lastWeb3Guard,
+  web3PipelineState,
+  kill,
+  journeyName,
+  currentPhase,
+  phaseIndex,
+  phaseSequence,
+  artifactsSummary,
+  circuitBreaker,
+  auditTrailStore,
+  metricsStore,
+  metricsByTenant,
+  alertingEngine,
+  memoryStore,
+  idempotencyStore,
+  llmCache,
+  aggregated,
+}) => {
+  const metricsSummaryAll = metricsStore.summary();
+  const memorySummary = memoryStore.summary();
+  const idemSummary = idempotencyStore.summary();
+  const auditSummaryStore = auditTrailStore.summary();
+  const llmCacheSummary = llmCache.summary();
+
+  return {
+    llm: ops.llm.mode,
+    rag: ops.rag.mode,
+    execution: ops.execution.mode.toLowerCase() === 'real' ? 'real-enabled' : 'dry-run',
+    agentsActiveCount: agentsMeta.enabled.length,
+    audit: auditTrailStore.summary(),
+    idempotent: false,
+    agents: agentsStatus,
+    tenant: {
+      id: tenantId,
+      mode: 'isolated',
+      caches: ['llm', 'idempotency', 'metrics', 'audit', 'memory'],
+      memory: {
+        evictions: {
+          memory: memorySummary.evictions,
+          idempotency: idemSummary.evictions,
+          audit: auditSummaryStore.evictions || 0,
+          llmCache: llmCacheSummary.evictions || 0,
+        },
+        pressure: metricsStore.memoryPressure(),
+      },
+    },
+    circuitBreakers: circuitBreaker.summary(tenantId)[tenantId],
+    runtime: { coldStart },
+    secrets: secretsDecision,
+    web3: {
+      level: lastWeb3Guard.level,
+      allowed: lastWeb3Guard.allowed,
+      reasons: lastWeb3Guard.reasons,
+      diagnostics: lastWeb3Guard.diagnostics,
+    },
+    web3Pipeline: web3PipelineState
+      ? {
+        state: web3PipelineState.state,
+        proof: web3PipelineState.proof,
+        anchor: web3PipelineState.anchor,
+        mint: web3PipelineState.mint,
+        history: web3PipelineState.history,
+      }
+      : {
+        state: 'NONE',
+        proof: null,
+        anchor: null,
+        mint: null,
+        history: [],
+      },
+    killSwitch: {
+      active: kill.active,
+      scope: kill.scope,
+      triggeredBy: kill.triggeredBy,
+      reasons: kill.reasons,
+    },
+    journey: {
+      name: journeyName,
+      phase: currentPhase,
+      phaseIndex,
+      phases: phaseSequence,
+      artifactsSummary,
+    },
+    slo: {
+      window: metricsSummaryAll.window,
+      latency: metricsSummaryAll.latency,
+      rates: metricsSummaryAll.rates,
+      byTenant: metricsByTenant,
+    },
+    alerts: alertingEngine.recentAlerts(5),
+    cost: aggregated.ops.costs || null,
+  };
+};
+
 async function orchestrateVerticalSlice(payload) {
   const startedAll = Date.now();
   let aggregated = null;
@@ -342,13 +709,12 @@ async function orchestrateVerticalSlice(payload) {
   };
   let idempotentReplays = 0;
   const demoMode = process.env.DEMO_MODE === 'true';
-  const originalOpenAIKey = process.env.OPENAI_API_KEY;
   const tenantId = resolveTenantId(payload || {});
-  const coldStart = !global.__ZYNO_COLD_STARTED__;
+  const coldStart = !globalThis.__ZYNO_COLD_STARTED__;
   if (coldStart) {
     circuitBreaker.coldReset();
     concurrencyManager.reset();
-    global.__ZYNO_COLD_STARTED__ = true;
+    globalThis.__ZYNO_COLD_STARTED__ = true;
   }
 
   const addUnique = (arr, value) => {
@@ -361,26 +727,8 @@ async function orchestrateVerticalSlice(payload) {
     return reqObj?.traceId || payloadObj?.traceId || 'unknown';
   };
 
-  const resolveJourneyName = (req, preset) => {
-    if (preset?.journey) return preset.journey;
-    if (req.context?.journey?.journeyType && workflowMap[req.context.journey.journeyType]) {
-      return req.context.journey.journeyType;
-    }
-    const intents =
-      Array.isArray(req.intent) ? req.intent : typeof req.intent === 'string' ? req.intent.split('+') : [];
-    const normalized = intents.map((i) => (i || '').toLowerCase().replace(/\./g, '_'));
-    if (normalized.some((i) => i.includes('governance') || i.includes('compliance') || i.includes('risk_fraud'))) return 'dao_readiness';
-    if (normalized.some((i) => i.includes('investor'))) return 'investor_fundraise';
-    if (normalized.some((i) => i.includes('product_spec') || i.includes('ux_writing'))) return 'product_launch';
-    return 'generic';
-  };
-
-  const resolvePhaseSequence = (journeyName) => {
-    const phases = workflowMap[journeyName]?.phases || {};
-    return Object.keys(phases);
-  };
-
-  const validation = validateRequest(payload);
+  // Validation phase - using ValidationService
+  const validation = ValidationService.validatePayload(payload);
   let validationWarnings = validation.warnings || [];
 
   try {
@@ -406,60 +754,25 @@ async function orchestrateVerticalSlice(payload) {
     };
     ops.warnings.push(...validation.warnings);
 
+    // Apply preset using ValidationService
+    const { req: reqWithPreset, preset } = ValidationService.applyPreset(req, payload, ops);
+    req = reqWithPreset;
 
-    const presetName = payload?.preset;
-    const preset = presetName ? PRESETS[presetName] : null;
-    if (preset) {
-      const originalIntent = payload?.intent;
-      const usePresetIntents = originalIntent == null || originalIntent === 'default' || (typeof originalIntent === 'string' && originalIntent.trim() === 'default');
-      req = {
-        ...req,
-        intent: usePresetIntents ? (preset.intents || req.intent) : req.intent,
-        input: req.input || preset.sampleInput || payload?.input,
-        context: {
-          ...(req.context || {}),
-          journey: preset.journey || req.context?.journey,
-        },
-      };
-      ops.warnings = ops.warnings.filter((w) => w !== 'invalid_input_schema');
-      addUnique(ops.warnings, 'preset_applied');
-    }
-
-    const journeyName = resolveJourneyName(req, preset);
-    const phaseSequence = resolvePhaseSequence(journeyName);
-    const runKey = req?.runId || req?.traceId || payload?.runId || payload?.traceId || 'unknown';
+    // Resolve journey and phase using ValidationService
+    const journeyName = ValidationService.resolveJourneyName(req, preset);
+    const phaseSequence = ValidationService.resolvePhaseSequence(journeyName);
+    const runKey = req.runId || req.traceId || payload?.runId || payload?.traceId || 'unknown';
     const completedPhases = artifactStore.phasesCompleted({ tenantId, runId: runKey, journey: journeyName });
-    const requestedPhase = req?.constraints?.phase || req?.context?.journey?.phaseId;
-    const contextPhases = Array.isArray(req?.context?.journey?.phases) ? req.context.journey.phases : [];
-    let currentPhase = requestedPhase && phaseSequence.includes(requestedPhase) ? requestedPhase : null;
-    if (!currentPhase && contextPhases.length > 0) {
-      currentPhase = contextPhases[contextPhases.length - 1] || null;
-    }
-    if (!currentPhase) {
-      currentPhase = phaseSequence[completedPhases.length] || phaseSequence[0] || null;
-    }
-    const phaseIndex = currentPhase ? phaseSequence.indexOf(currentPhase) : 0;
-    const phasesExecuted = contextPhases.length > 0 ? contextPhases : completedPhases;
+    const { currentPhase, phaseIndex, phasesExecuted } = ValidationService.resolveCurrentPhase(req, phaseSequence, completedPhases);
     const artifactsSoFar = artifactStore.getArtifacts({ tenantId, runId: runKey, journey: journeyName });
     const phaseSnapshot = currentPhase
       ? artifactStore.getPhaseSnapshot({ tenantId, runId: runKey, journey: journeyName, phase: currentPhase })
       : null;
 
-    req = {
-      ...req,
-      context: {
-        ...(req.context || {}),
-        journey: {
-          ...(req.context?.journey || {}),
-          journeyType: journeyName,
-          phaseId: currentPhase || req.context?.journey?.phaseId,
-          phases: phaseSequence,
-        },
-      },
-    };
+    // Enrich request with journey context using ValidationService
+    req = ValidationService.enrichRequestWithJourney(req, journeyName, currentPhase, phaseSequence);
 
     const demoMode = process.env.DEMO_MODE === 'true';
-    const originalOpenAIKey = process.env.OPENAI_API_KEY;
     if (demoMode) {
       process.env.OPENAI_API_KEY = '';
       ops.llm.mode = 'mock';
@@ -482,8 +795,6 @@ async function orchestrateVerticalSlice(payload) {
       addUnique(ops.fallbacks, 'circuit_breaker_llm');
     }
     let allowRag = circuitBreaker.canProceed(tenantId, 'rag');
-
-    const journeyPhases = currentPhase ? [currentPhase] : [];
 
     // Concurrency gate per tenant (only if not already idempotent replay, no shed before acquire)
     slot = await concurrencyManager.acquire(tenantId);
@@ -539,9 +850,13 @@ async function orchestrateVerticalSlice(payload) {
     }
 
     const explicitPhaseForIntents = payload?.constraints?.phase || payload?.context?.journey?.phaseId || null;
-    const phasesForIntents = explicitPhaseForIntents
-      ? (contextPhases.length > 0 ? contextPhases : [explicitPhaseForIntents])
-      : (contextPhases.length > 0 ? contextPhases : []);
+    // Extract nested ternary into explicit variable
+    let phasesForIntents = [];
+    if (explicitPhaseForIntents) {
+      phasesForIntents = contextPhases.length > 0 ? contextPhases : [explicitPhaseForIntents];
+    } else {
+      phasesForIntents = contextPhases.length > 0 ? contextPhases : [];
+    }
     const workflowIntents = phasesForIntents.flatMap((phaseId) =>
       resolveWorkflowIntents({ ...req.context?.journey, phaseId })
     );
@@ -582,8 +897,8 @@ async function orchestrateVerticalSlice(payload) {
       if (gateIdCached && gateState && !gatePending && gateState.status !== cached.executionGate?.status) {
         // continue to re-execute
       } else {
-        idempotentReplays += 1;
-        const replay = JSON.parse(JSON.stringify(cached));
+        idempotentReplays = (idempotentReplays || 0) + 1;
+        const replay = structuredClone(cached);
         const fallbacks = new Set([...(replay.ops?.fallbacks || []), 'idempotent_replay']);
         replay.ops = {
           ...replay.ops,
@@ -611,7 +926,7 @@ async function orchestrateVerticalSlice(payload) {
     }
 
     if (phaseSnapshot && currentPhase) {
-      const replay = JSON.parse(JSON.stringify(phaseSnapshot));
+      const replay = structuredClone(phaseSnapshot);
       replay.ops = replay.ops || {};
       replay.ops.fallbacks = Array.from(new Set([...(replay.ops.fallbacks || []), 'idempotent_phase_replay']));
       replay.systemStatus = replay.systemStatus || {};
@@ -682,175 +997,54 @@ async function orchestrateVerticalSlice(payload) {
       selected.map(async (sel) => {
         const meta = registryIndex[sel.agentId] || {};
         const agentInstance = agentsPool[sel.agentId];
-        const started = Date.now();
         const timeoutMs = Math.min(
           req.constraints?.timeoutMs ?? meta.timeouts?.agentMs ?? meta.timeoutMs ?? 6000,
           budget.timeoutMs
         );
 
-        if (!agentInstance) {
-          addUnique(ops.fallbacks, 'agent_stub');
-          return {
-            agentId: sel.agentId,
-            status: 'FAIL',
-            summary: 'Agent not registered',
-            actions: [],
-            citations: [],
-            metrics: { latencyMs: 0 },
-            errors: ['agent_not_registered'],
-            traceId: getTraceId(req, payload),
-          };
-        }
-
-        try {
-          const executeOnce = () =>
-            timeoutGuard(
-              agentInstance.run({
-                traceId: getTraceId(req, payload),
-                runId: req?.runId || payload?.runId || 'unknown',
-                input: req.input,
-                ragContext: meta.requiresRag === false ? null : ragContext,
-                constraints: req.constraints,
-                intentNormalized: routed.intentNormalized,
-                journey: req.context?.journey || null,
-                phaseContext: {
-                  journey: journeyName,
-                  phase: currentPhase,
-                  phaseIndex,
-                  artifacts: artifactsSoFar,
-                  constraints: req.constraints,
-                },
-                tenantId,
-              }),
-              timeoutMs,
-              sel.agentId,
-              req.traceId
-            );
-
-          let res;
-          let retried = false;
-          try {
-            res = await executeOnce();
-          } catch (err) {
-            const transient = (err && /timeout|ECONNRESET|ETIMEDOUT/i.test(err.message)) || err === 'agent_timeout';
-            if (!retried && transient && !ops.retries.attempted) {
-              retried = true;
-              ops.retries = { attempted: true, count: 1, reason: 'transient_agent_timeout' };
-              res = await executeOnce();
-            } else {
-              throw err;
-            }
-          }
-
-          const { response: sanitized, warnings: agentWarnings } = sanitizeAgentResponse({
-            ...res,
-            agentId: sel.agentId,
-            traceId: getTraceId(req, payload),
-          });
-          ops.warnings.push(...agentWarnings);
-
-          const effectiveWeight = learningMap[sel.agentId]?.learningScore;
-          const resWithScores = {
-            ...sanitized,
-            metrics: {
-              ...(sanitized.metrics || {}),
-              latencyMs: sanitized.metrics?.latencyMs ?? Date.now() - started,
-            },
-            scores: computeScores(sanitized, meta, effectiveWeight),
-          };
-          circuitBreaker.recordSuccess(tenantId, 'execution');
-          return resWithScores;
-        } catch (error) {
-          const errorMsg = error instanceof Error ? error.message : String(error);
-          logger.error('Agent execution failed', { traceId: getTraceId(req, payload), agentId: sel.agentId, error: errorMsg });
-          circuitBreaker.recordFailure(tenantId, 'execution', 'agent_failure');
-          return {
-            agentId: sel.agentId,
-            traceId: getTraceId(req, payload),
-            status: 'FAIL',
-            summary: 'Agent execution failed',
-            actions: [],
-            citations: [],
-            metrics: { latencyMs: Date.now() - started },
-            errors: [errorMsg],
-            scores: computeScores({ status: 'FAIL', actions: [], errors: [errorMsg] }, meta, learningMap[sel.agentId]?.learningScore),
-          };
-        }
+        return executeAgentWithRetry({
+          agentInstance,
+          sel,
+          meta,
+          req,
+          payload,
+          routed,
+          journeyName,
+          currentPhase,
+          phaseIndex,
+          artifactsSoFar,
+          tenantId,
+          ragContext,
+          timeoutMs,
+          budget,
+          ops,
+          learningMap,
+          registryIndex,
+          getTraceId,
+          timeoutGuard,
+          sanitizeAgentResponse,
+          computeScores,
+          circuitBreaker,
+          logger,
+        });
       })
     );
 
-    let runsWithScores = runs.map((r) => {
-      if (r.scores) return r;
-      const meta = registryIndex[r.agentId] || {};
-      return { ...r, scores: computeScores(r, meta) };
-    });
-
-    runsWithScores = applyRagPolicy(runsWithScores);
-    runsWithScores = applyRagPolicy(runsWithScores);
+    // Logic check phase - using LogicCheckService
+    let runsWithScores = LogicCheckService.computeScoresForRuns(runs, registryIndex, computeScores);
+    runsWithScores = LogicCheckService.applyRagPolicyToRuns(runsWithScores);
 
     ops.llm.calls = runsWithScores.length;
     ops.llm.cacheHits = 0;
     ops.llm.deduplicatedCalls = 0;
 
-    const summary = runsWithScores
-      .map((r) => r.summary || r.details || r.status || r.agentId)
-      .filter(Boolean)
-      .join(' | ');
-
-    const actions = runsWithScores.flatMap((r) => (Array.isArray(r.actions) ? r.actions : []));
-    const contradictions = detectContradictions(runsWithScores);
-
-    // Detect Web3 actions from agent actions or payload (after actions are collected)
-    const web3Actions = [];
-    actions.forEach((action) => {
-      const actionStr = typeof action === 'string' ? action.toLowerCase() : String(action).toLowerCase();
-      if (actionStr.includes('web3:proof') || (actionStr.includes('proof') && actionStr.includes('web3'))) {
-        web3Actions.push('proof');
-      } else if (actionStr.includes('web3:anchor') || (actionStr.includes('anchor') && actionStr.includes('web3'))) {
-        web3Actions.push('anchor');
-      } else if (actionStr.includes('web3:mint') || (actionStr.includes('mint') && actionStr.includes('web3'))) {
-        web3Actions.push('mint');
-      }
-    });
-    if (payload.web3?.action) {
-      const payloadAction = String(payload.web3.action).toLowerCase();
-      if (['proof', 'anchor', 'mint'].includes(payloadAction)) {
-        web3Actions.push(payloadAction);
-      }
-    }
-
-    const severity = { FAIL: 3, TIMEOUT: 2, WARN: 1, OK: 0 };
-    const hasOk = runsWithScores.some((r) => r.status === 'OK');
-    const hasFailOrTimeout = runsWithScores.some((r) => r.status === 'FAIL' || r.status === 'TIMEOUT');
-    let overallStatus = 'WARN';
-    if (hasOk && !hasFailOrTimeout) {
-      overallStatus = 'OK';
-    } else {
-      overallStatus =
-        runsWithScores.reduce((worst, r) => (severity[r.status] > severity[worst] ? r.status : worst), 'OK') || 'OK';
-    }
-
-    const topFindings = runsWithScores
-      .slice()
-      .sort((a, b) => (b.scores?.weighted || 0) - (a.scores?.weighted || 0))
-      .slice(0, 5)
-      .map((r) => ({
-        agentId: r.agentId,
-        summary: r.summary || r.status,
-        score: r.scores?.weighted || 0,
-      }));
-
-    const recommendedActions = runsWithScores
-      .slice()
-      .sort((a, b) => (b.scores?.weighted || 0) - (a.scores?.weighted || 0))
-      .flatMap((r) =>
-        (Array.isArray(r.actions) ? r.actions : []).map((action) => ({
-          agentId: r.agentId,
-          action,
-          score: r.scores?.weighted || 0,
-        }))
-      )
-      .slice(0, 10);
+    const summary = LogicCheckService.generateSummary(runsWithScores);
+    const actions = LogicCheckService.collectActions(runsWithScores);
+    const contradictions = LogicCheckService.detectContradictionsInRuns(runsWithScores, detectContradictions);
+    const web3Actions = detectWeb3Actions(actions, payload);
+    const overallStatus = LogicCheckService.computeOverallStatus(runsWithScores);
+    const topFindings = LogicCheckService.extractTopFindings(runsWithScores, 5);
+    const recommendedActions = LogicCheckService.extractRecommendedActions(runsWithScores, 10);
 
     const agentsMeta = {
       enabled: registry.filter((a) => isAgentEnabled(a.agentId)).map((a) => a.agentId),
@@ -879,8 +1073,14 @@ async function orchestrateVerticalSlice(payload) {
     }
     if (!process.env.OPENAI_API_KEY) addUnique(ops.fallbacks, 'llm_mock');
 
+    // Extract nested ternary into explicit variable
+    let ragMode = 'disabled';
+    if (ragContext) {
+      const sourceStr = String(ragContext.source || '');
+      ragMode = sourceStr.includes('remote') ? 'remote' : 'local';
+    }
     ops.rag = {
-      mode: ragContext ? (String(ragContext.source || '').includes('remote') ? 'remote' : 'local') : 'disabled',
+      mode: ragMode,
       domain: ragDomains || null,
       hits: Array.isArray(ragContext?.chunks) ? ragContext.chunks.length : 0,
     };
@@ -888,105 +1088,58 @@ async function orchestrateVerticalSlice(payload) {
     const summaryMode = process.env.EXECUTION_ENABLED === 'true' ? 'REAL' : 'DRY_RUN';
     ops.execution.mode = summaryMode;
 
-    const confidenceFromScores = () => {
-      const confs = runsWithScores.map((r) => (typeof r.confidence === 'number' ? r.confidence : null)).filter((v) => v !== null);
-      const scoreAvg =
-        runsWithScores.reduce((acc, r) => acc + (r.scores?.weighted || 0), 0) / (runsWithScores.length || 1 || 1);
-      const base = confs.length ? confs.reduce((a, b) => a + b, 0) / confs.length : 0.55;
-      return Math.max(0, Math.min(0.95, base + Math.min(scoreAvg, 1) * 0.1));
-    };
-
     const aggregatedDecision = {
       overallStatus,
       topFindings,
       recommendedActions,
       rationale: `Selected actions from highest weighted agents. Contradictions detected: ${contradictions.length}.`,
-      confidence: confidenceFromScores(),
+      confidence: LogicCheckService.computeConfidence(runsWithScores),
     };
 
     const agentsStatus = registry.reduce((acc, meta) => {
       const enabled = isAgentEnabled(meta.agentId);
       const envKey = `AGENT_${meta.agentId.toUpperCase()}_ENABLED`;
-      const reason =
-        enabled === false
-          ? process.env[envKey] === 'false'
-            ? 'disabled_env_override'
-            : meta.enabled === false
-              ? 'registry_disabled'
-              : 'disabled'
-          : undefined;
+      // Extract nested ternary into explicit variable
+      let reason = undefined;
+      if (enabled === false) {
+        if (process.env[envKey] === 'false') {
+          reason = 'disabled_env_override';
+        } else if (meta.enabled === false) {
+          reason = 'registry_disabled';
+        } else {
+          reason = 'disabled';
+        }
+      }
       acc[meta.agentId] = { enabled, mode: enabled ? 'REAL_CAPABLE' : 'DISABLED', reason };
       return acc;
     }, {});
 
-    aggregated = {
-      traceId: getTraceId(req, payload),
-      intent: routed.intentNormalized,
-      intentMeta: {
-        deduplicated: intentsDeduped.length !== intentsCombined.length,
-        source: ['input', workflowIntents.length ? 'workflowMap' : null].filter(Boolean),
-      },
-      runId: req.runId,
-      agents: runsWithScores,
+    aggregated = buildInitialAggregated({
+      req,
+      payload,
+      routed,
+      intentsDeduped,
+      intentsCombined,
+      workflowIntents,
+      runsWithScores,
       summary,
       actions,
       contradictions,
-      decision: aggregatedDecision,
-      memory: {
-        reused: Boolean(previous),
-        previousActionsCount: previous?.recommendedActions?.length || previous?.decision?.recommendedActions?.length || 0,
-      },
-      learning: {
-        enabled: true,
-        agents: Object.values(learningMap),
-      },
-      budgets: Object.fromEntries(
-        selected.map((sel) => {
-          const meta = registryIndex[sel.agentId] || {};
-          const effectiveMaxTokens = Math.min(
-            req.constraints?.maxTokens || meta.maxTokens || budget.maxTokens,
-            meta.maxTokens || budget.maxTokens,
-            budget.maxTokens
-          );
-          const effectiveTimeout = Math.min(
-            req.constraints?.timeoutMs || meta.timeoutMs || budget.timeoutMs,
-            meta.timeoutMs || budget.timeoutMs,
-            budget.timeoutMs
-          );
-          return [sel.agentId, { maxTokens: effectiveMaxTokens, timeoutMs: effectiveTimeout }];
-        })
-      ),
+      aggregatedDecision,
+      previous,
+      learningMap,
+      selected,
+      registryIndex,
+      budget,
       agentsMeta,
-      journeyProgress: {
-        phasesExecuted: phasesExecuted,
-        currentPhase: currentPhase || null,
-      },
-      executionPlan: null,
-      executionGate: null,
-      executionResult: null,
-      systemStatus: {
-        llm: process.env.OPENAI_API_KEY ? 'openai' : 'mock',
-        rag: ragContext ? ragContext.source || 'unknown' : 'disabled',
-        execution: process.env.EXECUTION_ENABLED === 'true' ? 'real-enabled' : 'dry-run',
-        agentsActiveCount: agentsMeta.enabled.length,
-        agents: agentsStatus,
-      },
-      metrics: {
-        agentsCount: runsWithScores.length,
-        durationMs: Date.now() - startedAll,
-        ragUsed: Boolean(ragContext),
-        realExecutionAttempted: process.env.EXECUTION_ENABLED === 'true',
-      },
-      presetMeta: preset
-        ? {
-          name: preset.name,
-          description: preset.description,
-          expectedDuration: preset.expectedDuration || 'n/a',
-          sampleInput: preset.sampleInput,
-          sampleOutput: preset.sampleOutput,
-        }
-        : null,
-    };
+      phasesExecuted,
+      currentPhase,
+      preset,
+      ragContext,
+      startedAll,
+      getTraceId,
+    });
+    aggregated.systemStatus.agents = agentsStatus;
 
     // Action plan consolidation (current + previous)
     const currentActionEntries = recommendedActions.map((r) => ({
@@ -1055,89 +1208,49 @@ async function orchestrateVerticalSlice(payload) {
 
     const humanPlan = {
       objective: 'Execute the prioritized improvements',
-      steps: actionPlanSteps.slice(0, 10).map((s, idx) => ({
-        step: idx + 1,
-        action: s.action,
-        owner: s.sourceAgent || 'unassigned',
-        priority: idx < 3 ? 'HIGH' : idx < 6 ? 'MEDIUM' : 'LOW',
-      })),
+      steps: actionPlanSteps.slice(0, 10).map((s, idx) => {
+        // Extract nested ternary into explicit variable
+        let priority = 'LOW';
+        if (idx < 3) {
+          priority = 'HIGH';
+        } else if (idx < 6) {
+          priority = 'MEDIUM';
+        }
+        return {
+          step: idx + 1,
+          action: s.action,
+          owner: s.sourceAgent || 'unassigned',
+          priority,
+        };
+      }),
       warnings: contradictions.length ? ['Conflicting agent recommendations present'] : [],
     };
 
     aggregated.executiveSummary = executiveSummary;
     aggregated.humanPlan = humanPlan;
 
-    // Execution plan (declarative, no side effects) with tool mapping
-    const executionTools = actionPlanSteps.map((step, index) => {
-      const mapped = actionToolMapper.mapActionToTool(step.action);
-      const tool = mapped.tool;
-      if (!tool || mapped.toolId === 'noop') {
-        if (mapped.reason === 'unknown_action' && step.action && step.action.trim()) {
-          addUnique(ops.warnings, 'unknown_action_tool');
-        }
-        return {
-          toolId: 'noop',
-          action: step.action,
-          sourceAgent: step.sourceAgent,
-          priority: step.priority,
-          unexecutable: true,
-          requiresConfirmation: false,
-          requiresGate: false,
-          risk: 'LOW',
-          web3: false,
-          mappingConfidence: mapped.confidence,
-          mappingReason: mapped.reason,
-        };
-      }
-      return {
-        toolId: tool.toolId || tool.id,
-        action: step.action,
-        sourceAgent: step.sourceAgent,
-        priority: step.priority,
-        requiresConfirmation: tool.requiresConfirmation || tool.sideEffects === 'external' || tool.sideEffects === 'irreversible',
-        requiresGate: tool.requiresGate || false,
-        sideEffects: tool.sideEffects || 'none',
-        risk: tool.risk || 'LOW',
-        web3: tool.web3 || false,
-        mappingConfidence: mapped.confidence,
-        mappingReason: mapped.reason,
-      };
-    });
-
-    let executionGateInfo = null;
-    let gateId = previous?.executionGateId || null;
-    const needsGate = executionTools.some((t) => t.requiresConfirmation);
-    const existingGate = gateId ? executionGate.get(gateId) : null;
-
-    if (existingGate && (existingGate.status === 'APPROVED' || existingGate.status === 'PENDING' || existingGate.status === 'REJECTED')) {
-      executionGateInfo = {
-        gateId,
-        status: existingGate.status,
-        requiresHuman: true,
-      };
-    } else if (needsGate) {
-      gateId = executionGate.submit({ traceId: getTraceId(req, payload), runId: req?.runId || payload?.runId || 'unknown', executionPlan: executionTools });
-      executionGateInfo = { gateId, status: 'PENDING', requiresHuman: true };
-    }
+    // Execution phase - using ExecutionService
+    const executionTools = ExecutionService.buildExecutionPlan(actionPlanSteps, ops);
+    const { executionGateInfo, gateId } = ExecutionService.handleExecutionGate(executionTools, previous, req, payload, getTraceId);
 
     const shadowMode = process.env.REAL_EXECUTION_MODE === 'shadow';
     ops.execution.shadow = shadowMode;
 
-    // Pre-simulate execution plan steps (after gate info) - will be updated after execution if needed
+    // Pre-simulate execution plan steps
     const gateApprovedForSim = executionGateInfo?.status === 'APPROVED';
-    const preSimulation = executionEngine.simulate({
-      executionPlan: executionTools,
-      traceId: getTraceId(req, payload),
-      runId: req?.runId || payload?.runId || getTraceId(req, payload),
+    const preSimulation = ExecutionService.simulateExecution(
+      executionTools,
+      getTraceId(req, payload),
+      req?.runId || payload?.runId || getTraceId(req, payload),
       tenantId,
-      gateApproved: gateApprovedForSim,
-    });
+      gateApprovedForSim
+    );
 
     aggregated.executionPlan = {
       mode: shadowMode ? 'SHADOW' : 'DRY_RUN',
-      steps: preSimulation.steps,
-      summary: preSimulation.summary,
-      overallStatus: preSimulation.overallStatus,
+      steps: preSimulation?.steps || [],
+      summary: preSimulation?.summary || { total: 0, ok: 0, blocked: 0, failed: 0, skipped: 0 },
+      overallStatus: preSimulation?.overallStatus || 'SIMULATED',
     };
 
     const guardDecision = productionGuards.evaluateProductionGuards({
@@ -1222,8 +1335,19 @@ async function orchestrateVerticalSlice(payload) {
     let web3PipelineState = web3Pipeline.getState(pipelineContext);
     let web3PipelineResult = null;
     // Re-check payload.web3.action here in case it wasn't detected earlier
-    const directWeb3Action = payload?.web3?.action ? String(payload.web3.action).toLowerCase() : null;
-    const actionToApply = web3Actions && web3Actions.length > 0 ? web3Actions[0] : (directWeb3Action && ['proof', 'anchor', 'mint'].includes(directWeb3Action) ? directWeb3Action : null);
+    // Extract nested ternary into explicit variable
+    let directWeb3Action = null;
+    if (payload?.web3?.action) {
+      directWeb3Action = String(payload.web3.action).toLowerCase();
+    }
+
+    // Extract nested ternary into explicit variable
+    let actionToApply = null;
+    if (web3Actions && web3Actions.length > 0) {
+      actionToApply = web3Actions[0];
+    } else if (directWeb3Action && ['proof', 'anchor', 'mint'].includes(directWeb3Action)) {
+      actionToApply = directWeb3Action;
+    }
     if (actionToApply && web3Guard && web3Guard.level !== 'BLOCK') {
       web3PipelineResult = web3Pipeline.applyAction(actionToApply, pipelineContext);
       if (web3PipelineResult && web3PipelineResult.idempotent) {
@@ -1239,174 +1363,17 @@ async function orchestrateVerticalSlice(payload) {
       }
     }
 
-    let executionResult = null;
-    if (executionGateInfo?.gateId) {
-      const state = executionGate.get(executionGateInfo.gateId);
-      if (state?.status === 'APPROVED' && guardDecision.realExecutionAllowed) {
-        try {
-          if (process.env.EXECUTION_ENABLED === 'true' && !shadowMode) {
-            logger.info('Real execution enabled, attempting guarded execution', { traceId: getTraceId(req, payload), gateId: executionGateInfo.gateId });
-            executionResult = executionEngine.execute({
-              executionPlan: executionTools,
-              traceId: getTraceId(req, payload),
-              runId: req?.runId || payload?.runId || getTraceId(req, payload),
-              tenantId,
-              gateApproved: true,
-            });
-            executionGateInfo.status = 'APPROVED';
-            ops.execution.attempted = true;
-            ops.execution.mode = 'REAL';
-          } else if (process.env.EXECUTION_ENABLED === 'true' && shadowMode) {
-            const dryRun = executionEngine.simulate({
-              executionPlan: executionTools,
-              traceId: getTraceId(req, payload),
-              runId: req?.runId || payload?.runId || getTraceId(req, payload),
-              tenantId,
-              gateApproved: true,
-            });
-            const realSimulated = executionEngine.simulate({
-              executionPlan: executionTools,
-              traceId: getTraceId(req, payload),
-              runId: req?.runId || payload?.runId || getTraceId(req, payload),
-              tenantId,
-              gateApproved: true,
-            });
-            // Enriched shadow delta with step-by-step comparison
-            const stepsChanged = [];
-            const riskEscalation = [];
-            const blockedByGate = [];
-            dryRun.steps.forEach((dryStep, idx) => {
-              const realStep = realSimulated.steps[idx];
-              if (!realStep) return;
-              if (dryStep.status !== realStep.status) {
-                stepsChanged.push(idx + 1);
-              }
-              if (realStep.status === 'BLOCKED_BY_GATE') {
-                blockedByGate.push(realStep.toolId || 'unknown');
-              }
-              const dryRisk = executionTools.find((t) => t.toolId === dryStep.toolId)?.risk || 'LOW';
-              const realRisk = executionTools.find((t) => t.toolId === realStep.toolId)?.risk || 'LOW';
-              const riskLevels = { LOW: 1, MEDIUM: 2, HIGH: 3 };
-              if (riskLevels[realRisk] > riskLevels[dryRisk]) {
-                riskEscalation.push(realStep.toolId || 'unknown');
-              }
-            });
-            executionResult = {
-              shadow: true,
-              dryRun,
-              realSimulated,
-              delta: {
-                stepsChanged: stepsChanged.length > 0 ? stepsChanged : null,
-                riskEscalation: riskEscalation.length > 0 ? riskEscalation : null,
-                blockedByGate: blockedByGate.length > 0 ? blockedByGate : null,
-                summary: stepsChanged.length > 0 || riskEscalation.length > 0 || blockedByGate.length > 0 ? 'Differences detected between DRY_RUN and REAL simulated' : 'No differences',
-              },
-            };
-            executionGateInfo.status = 'APPROVED';
-            ops.execution.attempted = true;
-            ops.execution.mode = 'DRY_RUN';
-            ops.execution.shadowComparison = executionResult;
-            addUnique(ops.fallbacks, 'shadow_mode');
-          } else {
-            executionResult = executionEngine.simulate({
-              executionPlan: executionTools,
-              traceId: getTraceId(req, payload),
-              runId: req?.runId || payload?.runId || getTraceId(req, payload),
-              tenantId,
-              gateApproved: true,
-            });
-            executionGateInfo.status = 'APPROVED';
-            ops.execution.attempted = true;
-            ops.execution.mode = 'DRY_RUN';
-            addUnique(ops.fallbacks, 'real_disabled_flag');
-          }
-        } catch (err) {
-          logger.warn('Execution (real) blocked or failed, falling back to dry-run', {
-            traceId: getTraceId(req, payload),
-            gateId: executionGateInfo.gateId,
-            error: err.message,
-          });
-          executionResult = executionEngine.simulate({
-            executionPlan: executionTools,
-            traceId: getTraceId(req, payload),
-            runId: req?.runId || payload?.runId || getTraceId(req, payload),
-            tenantId,
-            gateApproved: state?.status === 'APPROVED',
-          });
-          executionGateInfo.status = state?.status || executionGateInfo.status;
-          ops.execution.attempted = true;
-          ops.execution.mode = 'DRY_RUN';
-          addUnique(ops.fallbacks, 'execution_fallback');
-        }
-      } else if (state?.status === 'APPROVED' && !guardDecision.realExecutionAllowed) {
-        executionResult = executionEngine.simulate({
-          executionPlan: executionTools,
-          traceId: getTraceId(req, payload),
-          runId: req.runId || req.traceId || 'unknown',
-          tenantId,
-          gateApproved: true,
-        });
-        ops.execution.attempted = true;
-        ops.execution.mode = 'DRY_RUN';
-        ops.execution.blocked = true;
-      }
-    } else if (executionTools.length > 0) {
-      // No gate needed, still simulate for preview
-      const baseSimulation = executionEngine.simulate({
-        executionPlan: executionTools,
-        traceId: getTraceId(req, payload),
-        runId: req.runId || req.traceId || 'unknown',
-        tenantId,
-        gateApproved: false,
-      });
-      if (guardDecision.realExecutionAllowed && process.env.EXECUTION_ENABLED === 'true' && shadowMode) {
-        const realSimulated = executionEngine.simulate({
-          executionPlan: executionTools,
-          traceId: getTraceId(req, payload),
-          runId: req.runId || req.traceId || 'unknown',
-          tenantId,
-          gateApproved: true,
-        });
-        // Enriched shadow delta
-        const stepsChanged = [];
-        const riskEscalation = [];
-        const blockedByGate = [];
-        baseSimulation.steps.forEach((dryStep, idx) => {
-          const realStep = realSimulated.steps[idx];
-          if (!realStep) return;
-          if (dryStep.status !== realStep.status) {
-            stepsChanged.push(idx + 1);
-          }
-          if (realStep.status === 'BLOCKED_BY_GATE') {
-            blockedByGate.push(realStep.toolId || 'unknown');
-          }
-          const dryRisk = executionTools.find((t) => t.toolId === dryStep.toolId)?.risk || 'LOW';
-          const realRisk = executionTools.find((t) => t.toolId === realStep.toolId)?.risk || 'LOW';
-          const riskLevels = { LOW: 1, MEDIUM: 2, HIGH: 3 };
-          if (riskLevels[realRisk] > riskLevels[dryRisk]) {
-            riskEscalation.push(realStep.toolId || 'unknown');
-          }
-        });
-        executionResult = {
-          shadow: true,
-          dryRun: baseSimulation,
-          realSimulated,
-          delta: {
-            stepsChanged: stepsChanged.length > 0 ? stepsChanged : null,
-            riskEscalation: riskEscalation.length > 0 ? riskEscalation : null,
-            blockedByGate: blockedByGate.length > 0 ? blockedByGate : null,
-            summary: stepsChanged.length > 0 || riskEscalation.length > 0 || blockedByGate.length > 0 ? 'Differences detected between DRY_RUN and REAL simulated' : 'No differences',
-          },
-        };
-        ops.execution.shadowComparison = executionResult;
-        addUnique(ops.fallbacks, 'shadow_mode');
-      } else {
-        executionResult = baseSimulation;
-      }
-      ops.execution.attempted = true;
-      ops.execution.mode = guardDecision.realExecutionAllowed ? ops.execution.mode : 'DRY_RUN';
-      if (!guardDecision.realExecutionAllowed) ops.execution.blocked = true;
-    }
+    // Execute using ExecutionService
+    const executionResult = ExecutionService.handleExecution(
+      executionTools,
+      executionGateInfo,
+      guardDecision,
+      req,
+      payload,
+      tenantId,
+      getTraceId,
+      ops
+    );
 
     aggregated.executionResult = executionResult;
 
@@ -1466,60 +1433,35 @@ async function orchestrateVerticalSlice(payload) {
       Object.entries(artifactsAggregated).map(([k, v]) => [k, Array.isArray(v) ? v.length : 0])
     );
 
-    aggregated.systemStatus = {
-      llm: ops.llm.mode,
-      rag: ops.rag.mode,
-      execution: ops.execution.mode.toLowerCase() === 'real' ? 'real-enabled' : 'dry-run',
-      agentsActiveCount: agentsMeta.enabled.length,
-      audit: auditTrailStore.summary(),
-      idempotent: false,
-      agents: agentsStatus,
-      tenant: {
-        id: tenantId,
-        mode: 'isolated',
-        caches: ['llm', 'idempotency', 'metrics', 'audit', 'memory'],
-      },
-      circuitBreakers: circuitBreaker.summary(tenantId)[tenantId],
-      runtime: { coldStart },
-      secrets: secretsDecision,
-      web3: {
-        level: lastWeb3Guard.level,
-        allowed: lastWeb3Guard.allowed,
-        reasons: lastWeb3Guard.reasons,
-        diagnostics: lastWeb3Guard.diagnostics,
-      },
-      web3Pipeline: web3PipelineState
-        ? {
-          state: web3PipelineState.state,
-          proof: web3PipelineState.proof,
-          anchor: web3PipelineState.anchor,
-          mint: web3PipelineState.mint,
-          history: web3PipelineState.history,
-        }
-        : {
-          state: 'NONE',
-          proof: null,
-          anchor: null,
-          mint: null,
-          history: [],
-        },
-      killSwitch: {
-        active: kill.active,
-        scope: kill.scope,
-        triggeredBy: kill.triggeredBy,
-        reasons: kill.reasons,
-      },
-      journey: {
-        name: journeyName,
-        phase: currentPhase,
-        phaseIndex,
-        phases: phaseSequence,
-        artifactsSummary,
-      },
-      slo: { window: 0, latency: { p95: 0, p99: 0 }, rates: {} },
-      alerts: [],
-      cost: aggregated.ops.costs || null,
-    };
+    // Compute metrics once before buildSystemStatus
+    const metricsSummaryAll = metricsStore.summary();
+    const metricsByTenant = metricsStore.summaryByTenant();
+
+    aggregated.systemStatus = buildSystemStatus({
+      ops,
+      agentsMeta,
+      agentsStatus,
+      tenantId,
+      coldStart,
+      secretsDecision,
+      lastWeb3Guard,
+      web3PipelineState,
+      kill,
+      journeyName,
+      currentPhase,
+      phaseIndex,
+      phaseSequence,
+      artifactsSummary,
+      circuitBreaker,
+      auditTrailStore,
+      metricsStore,
+      metricsByTenant,
+      alertingEngine,
+      memoryStore,
+      idempotencyStore,
+      llmCache,
+      aggregated,
+    });
 
     const agentContributionScore = runsWithScores.map((r) => ({
       agentId: r.agentId,
@@ -1550,7 +1492,13 @@ async function orchestrateVerticalSlice(payload) {
     aggregated.ops.costs = {
       estimatedUsd: costs.total,
       byAgent: costs.byAgent,
-      byPreset: preset?.name ? { [preset.name]: costs.total } : {},
+      byPreset: (() => {
+        // Extract nested ternary into explicit variable
+        if (preset?.name) {
+          return { [preset.name]: costs.total };
+        }
+        return {};
+      })(),
       budget: budgetDecision.budgetUsd,
       status: budgetDecision.status,
     };
@@ -1592,21 +1540,19 @@ async function orchestrateVerticalSlice(payload) {
     }, tenantId);
 
     metricsStore.record(aggregated, tenantId);
-    const metricsSummaryAll = metricsStore.summary();
-    const metricsByTenant = metricsStore.summaryByTenant();
-    const alertsAll = alertingEngine.evaluate({ ...metricsSummaryAll, tenantId: 'all' });
-    Object.values(metricsByTenant).forEach((ms) => alertingEngine.evaluate(ms));
-
-    aggregated.ops.metricsSummary = { ...metricsSummaryAll, byTenant: metricsByTenant };
-    aggregated.ops.costGuards = aggregated.ops.costGuards || [];
-    aggregated.systemStatus.slo = {
-      window: metricsSummaryAll.window,
-      latency: metricsSummaryAll.latency,
-      rates: metricsSummaryAll.rates,
-      byTenant: metricsByTenant,
+    // Reuse metricsSummaryAll and metricsByTenant already computed in buildSystemStatus
+    const currentMetricsSummary = {
+      window: aggregated.systemStatus.slo.window,
+      latency: aggregated.systemStatus.slo.latency,
+      rates: aggregated.systemStatus.slo.rates
     };
-    const recentAlerts = alertingEngine.recentAlerts(5);
-    aggregated.systemStatus.alerts = recentAlerts;
+    const currentMetricsByTenant = aggregated.systemStatus.slo.byTenant;
+    alertingEngine.evaluate({ ...currentMetricsSummary, tenantId: 'all' });
+    Object.values(currentMetricsByTenant).forEach((ms) => alertingEngine.evaluate(ms));
+
+    aggregated.ops.metricsSummary = { ...currentMetricsSummary, byTenant: currentMetricsByTenant };
+    aggregated.ops.costGuards = aggregated.ops.costGuards || [];
+    aggregated.systemStatus.alerts = alertingEngine.recentAlerts(5);
 
     const memorySummary = memoryStore.summary();
     const idemSummary = idempotencyStore.summary();
@@ -1870,12 +1816,15 @@ async function orchestrateVerticalSlice(payload) {
     }, tenantId);
 
     metricsStore.record(aggregated, tenantId);
-    const metricsSummaryAll = metricsStore.summary();
-    const metricsByTenant = metricsStore.summaryByTenant();
-    alertingEngine.evaluate({ ...metricsSummaryAll, tenantId: 'all' });
-    Object.values(metricsByTenant).forEach((ms) => alertingEngine.evaluate(ms));
-    aggregated.ops.metricsSummary = { ...metricsSummaryAll, byTenant: metricsByTenant };
-    aggregated.systemStatus.slo = { window: metricsSummaryAll.window, latency: metricsSummaryAll.latency, rates: metricsSummaryAll.rates, byTenant: metricsByTenant };
+    // Reuse metricsSummaryAll and metricsByTenant already computed in buildSystemStatus
+    alertingEngine.evaluate({ ...aggregated.ops.metricsSummary, tenantId: 'all' });
+    Object.values(aggregated.ops.metricsSummary.byTenant || {}).forEach((ms) => alertingEngine.evaluate(ms));
+    aggregated.systemStatus.slo = {
+      window: aggregated.ops.metricsSummary.window,
+      latency: aggregated.ops.metricsSummary.latency,
+      rates: aggregated.ops.metricsSummary.rates,
+      byTenant: aggregated.ops.metricsSummary.byTenant
+    };
     aggregated.systemStatus.alerts = alertingEngine.recentAlerts(5);
     const memorySummary = memoryStore.summary();
     const idemSummary = idempotencyStore.summary();
@@ -1892,9 +1841,7 @@ async function orchestrateVerticalSlice(payload) {
     };
     aggregated.systemStatus.tenant.memory = aggregated.ops.memory;
   } finally {
-    if (demoMode) {
-      process.env.OPENAI_API_KEY = originalOpenAIKey;
-    }
+    // Note: demoMode was already handled earlier, no need to restore API key here
     if (acquiredSlot && slot && typeof slot.release === 'function') {
       try {
         slot.release();

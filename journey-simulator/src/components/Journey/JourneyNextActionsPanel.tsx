@@ -49,7 +49,7 @@ export const JourneyNextActionsPanel: React.FC<Props> = ({
                 {currentPhase.nextActions.map((action) => (
                     <button
                         key={action.id}
-                        onClick={() => onActionClick && onActionClick(action.type, action.id)}
+                        onClick={() => onActionClick?.(action.type, action.id)}
                         className="w-full text-left group relative flex items-start gap-3 rounded-xl border border-white/5 bg-white/5 p-4 transition-all hover:bg-white/10 hover:border-accent-cyan/30 active:scale-[0.98] outline-none focus:ring-2 focus:ring-accent-cyan/50"
                         data-testid={`journey-next-action-${action.id}`}
                     >

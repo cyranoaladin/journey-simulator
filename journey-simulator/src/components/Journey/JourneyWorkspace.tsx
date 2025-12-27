@@ -1,48 +1,48 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import JourneyTimeline from './JourneyTimeline';
-import { JourneyProgressBar } from './JourneyProgressBar';
-import { JourneyNextActionsPanel } from './JourneyNextActionsPanel';
-import ZynoSignalSidebar from './ZynoSignalSidebar';
-import UIBlocksRenderer from '../UIBlocks/UIBlocksRenderer';
-import { useJourneyStore } from '../../store/journeyStore';
-import { shallow } from 'zustand/shallow';
 import {
-  Loader2,
-  Trophy,
-  Coins,
+  ArrowLeft,
+  ArrowRight,
   Award,
-  PanelLeft,
-  PanelRight,
+  Briefcase,
+  CheckCircle2,
+  Coins,
+  FileText,
+  LayoutGrid,
+  Loader2,
   Maximize2,
   Minimize2,
-  LayoutGrid,
-  ArrowLeft,
+  PanelLeft,
+  PanelRight,
   Target,
-  Briefcase,
-  ArrowRight,
-  CheckCircle2,
-  FileText
+  Trophy
 } from 'lucide-react';
-import type { JourneyStepResponse, UIBlock } from '../../types/uiBlocks';
-// import confetti from 'canvas-confetti';
-import NFTProofModal from '../NFTProofModal';
-import { getProofType, getPersonaProofData } from '../../data/proofsData';
-import { resources, getResourceIcon } from '../../data/resources';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { shallow } from 'zustand/shallow';
+import { getPersonaProofData, getProofType } from '../../data/proofsData';
+import { getResourceIcon, resources } from '../../data/resources';
+import { useJourneyStore } from '../../store/journeyStore';
+import type { JourneyStepResponse, UIBlock, TextBlock, ResourceBlock, QuizBlock, MissionBlock } from '../../types/uiBlocks';
 import { api } from '../../utils/api';
+import { generateStableKey } from '../../utils/generateStableKey';
 import { tokenStore } from '../../utils/tokenStore';
+import NFTProofModal from '../NFTProofModal';
+import UIBlocksRenderer from '../UIBlocks/UIBlocksRenderer';
+import { JourneyNextActionsPanel } from './JourneyNextActionsPanel';
+import { JourneyProgressBar } from './JourneyProgressBar';
+import JourneyTimeline from './JourneyTimeline';
+import ZynoSignalSidebar from './ZynoSignalSidebar';
 
-import StakingModal from '../StakingModal';
 import DAOVoteModal from '../DAOVoteModal';
+import StakingModal from '../StakingModal';
 
 import JourneyCompletedPage from '../JourneyCompletedPage';
 import { LaunchCollaterizePhase } from './LaunchCollaterizePhase';
 
-import { NeuralOverlay } from '../Artifacts/NeuralOverlay';
-import { ArtifactModal } from '../Artifacts/ArtifactModal';
 import { toast } from 'sonner';
 import { useWorkspaceLayout } from '../../contexts/WorkspaceLayoutContext';
 import { useArtifacts } from '../../hooks/useArtifacts';
+import { ArtifactModal } from '../Artifacts/ArtifactModal';
+import { NeuralOverlay } from '../Artifacts/NeuralOverlay';
 
 interface JourneyWorkspaceProps {
   onBack?: () => void;
@@ -65,18 +65,18 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
     uiTone,
   } = useJourneyStore(
     (state) => ({
-    selectedPersona: state.selectedPersona,
-    userProgress: state.userProgress,
-    currentPhaseIndex: state.currentPhase,
-    lastStep: state.lastStep,
-    isStepLoading: state.isStepLoading,
-    runInteractiveStep: state.runInteractiveStep,
-    runInteractiveStepDebug: state.runInteractiveStepDebug,
-    setCurrentPhase: state.setCurrentPhase,
-    completePhase: state.completePhase,
-    ensureApiJourneyId: state.ensureApiJourneyId,
-    uiMode: state.uiMode,
-    uiTone: state.uiTone,
+      selectedPersona: state.selectedPersona,
+      userProgress: state.userProgress,
+      currentPhaseIndex: state.currentPhase,
+      lastStep: state.lastStep,
+      isStepLoading: state.isStepLoading,
+      runInteractiveStep: state.runInteractiveStep,
+      runInteractiveStepDebug: state.runInteractiveStepDebug,
+      setCurrentPhase: state.setCurrentPhase,
+      completePhase: state.completePhase,
+      ensureApiJourneyId: state.ensureApiJourneyId,
+      uiMode: state.uiMode,
+      uiTone: state.uiTone,
     }),
     shallow
   );
@@ -88,15 +88,15 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
   const [unlockedArtifacts, setUnlockedArtifacts] = useState<string[]>([]);
   const [isAutoSimulating, setIsAutoSimulating] = useState(false);
   const autoSimAbortRef = useRef(false);
-  const [autoSimProgress, setAutoSimProgress] = useState<{ current: number; total: number } | null>(null);
+  const [autoSimProgress, setAutoSimProgress] = useState<{ current: number; total: number; } | null>(null);
   // Prevent Firefox/StrictMode rerenders from re-triggering the same artifact generation overlay forever.
-  const pendingArtifactIdsRef = useRef<Set<string>>(new Set())
+  const pendingArtifactIdsRef = useRef<Set<string>>(new Set());
   // Keep the “interaction” panel populated automatically (once per persona+phase).
-  const autoInteractionKeyRef = useRef<string | null>(null)
-  const isDemo = tokenStore.getAccessToken() === 'demo-token'
+  const autoInteractionKeyRef = useRef<string | null>(null);
+  const isDemo = tokenStore.getAccessToken() === 'demo-token';
   const { artifacts, loading: artifactsLoading, error: artifactsError } = useArtifacts({
     fallbackToStatic: isDemo,
-  })
+  });
 
   const DEMO_SCENARIOS: Record<string, Record<number, string>> = {
     'cognitive-activation-hub': {
@@ -123,7 +123,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
     // NOTE: This is a simplified logic for demo purposes.
     // A more robust implementation would check the step completion status from the store.
     if (!isDemo) return;
-    if (lastStep && lastStep.ui_blocks && lastStep.ui_blocks.length > 0) {
+    if ((lastStep?.ui_blocks?.length ?? 0) > 0) {
       const personaId = selectedPersona?.id || 'web3_builder';
       const currentStepIndex = userProgress.completedPhases.length + 1;
       const artifactId = DEMO_SCENARIOS[personaId]?.[currentStepIndex];
@@ -137,12 +137,12 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
         if (!artifact) return;
 
         // Mark pending immediately to avoid duplicate timeouts on rerender.
-        pendingArtifactIdsRef.current.add(artifactId)
+        pendingArtifactIdsRef.current.add(artifactId);
 
         // Keep demo artifacts deterministic: unlock + open the artifact immediately (no timers).
         // This avoids Firefox flakiness around setTimeout/overlay state during CI.
-        setUnlockedArtifacts((prev) => (prev.includes(artifactId) ? prev : [...prev, artifactId]))
-        pendingArtifactIdsRef.current.delete(artifactId)
+        setUnlockedArtifacts((prev) => (prev.includes(artifactId) ? prev : [...prev, artifactId]));
+        pendingArtifactIdsRef.current.delete(artifactId);
         toast.success("New Artifact Generated!");
         setViewingArtifact(artifact);
       }
@@ -151,9 +151,9 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
 
   useEffect(() => {
     return () => {
-      pendingArtifactIdsRef.current.clear()
-    }
-  }, [])
+      pendingArtifactIdsRef.current.clear();
+    };
+  }, []);
 
   const [proofModalData, setProofModalData] = useState<any>(null);
   const [showStakingModal, setShowStakingModal] = useState(false);
@@ -183,9 +183,9 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
         status: artifact.status ?? 'unlocked',
       }))
       .sort((a, b) => {
-        if (a.status === b.status) return a.title.localeCompare(b.title)
-        return a.status === 'unlocked' ? -1 : 1
-      })
+        if (a.status === b.status) return a.title.localeCompare(b.title);
+        return a.status === 'unlocked' ? -1 : 1;
+      });
   }, [artifacts]);
 
   const selectedArtifact = useMemo(() => {
@@ -201,29 +201,29 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
   // Auto-bootstrap the interaction blocks (missions/quizzes/deliverables/evaluation) for the active phase.
   // Hooks must run unconditionally; we guard inside.
   useEffect(() => {
-    if (isDemo) return
+    if (isDemo) return;
     // Keep E2E deterministic: explicitly honor an E2E flag set by the test harness.
-    if (typeof window !== 'undefined' && (window as any).__E2E__ === true) return
+    if (globalThis.window !== undefined && (globalThis.window as any).__E2E__ === true) return;
     // Also honor Playwright's navigator.webdriver when present.
-    if (typeof navigator !== 'undefined' && (navigator as any).webdriver) return
-    if (!selectedPersona) return
-    if (!activePhase) return
-    if (isStepLoading || isAutoSimulating) return
-    if (activePhaseIndex >= phases.length) return
+    if (typeof navigator !== 'undefined' && (navigator as any).webdriver) return;
+    if (!selectedPersona) return;
+    if (!activePhase) return;
+    if (isStepLoading || isAutoSimulating) return;
+    if (activePhaseIndex >= phases.length) return;
 
-    const lastStepPhaseId = lastStep?.metadata?.phase_id
-    const lastStepPersonaId = lastStep?.metadata?.persona_id
+    const lastStepPhaseId = lastStep?.metadata?.phase_id;
+    const lastStepPersonaId = lastStep?.metadata?.persona_id;
     const matchesCurrent =
       lastStepPhaseId === activePhase.id &&
-      lastStepPersonaId === selectedPersona.id
+      lastStepPersonaId === selectedPersona.id;
 
-    if (matchesCurrent) return
+    if (matchesCurrent) return;
 
-    const key = `${selectedPersona.id}:${activePhase.id}`
-    if (autoInteractionKeyRef.current === key) return
-    autoInteractionKeyRef.current = key
+    const key = `${selectedPersona.id}:${activePhase.id}`;
+    if (autoInteractionKeyRef.current === key) return;
+    autoInteractionKeyRef.current = key;
 
-    void handleRunInteractiveStep()
+    void handleRunInteractiveStep();
   }, [
     activePhase,
     activePhaseIndex,
@@ -234,7 +234,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
     lastStep?.metadata?.phase_id,
     phases.length,
     selectedPersona,
-  ])
+  ]);
 
   // NOTE: No early returns before hooks below (React Hooks rules).
 
@@ -261,32 +261,32 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
     const stakingAmount =
       typeof safeActivePhase.stakingRequired === 'number' && safeActivePhase.stakingRequired > 0
         ? safeActivePhase.stakingRequired
-        : null
-    const requiresVote = Boolean(safeActivePhase.daoVoteRequired)
-    const isLaunchPhase = safeActivePhase.id === 'launch-collaterize'
+        : null;
+    const requiresVote = Boolean(safeActivePhase.daoVoteRequired);
+    const isLaunchPhase = safeActivePhase.id === 'launch-collaterize';
 
     if (isLaunchPhase) {
       // Launch simulation CTA should describe the phase action; minting (if any) happens in the modal after completion.
-      return 'Simulate Launch'
+      return 'Simulate Launch';
     }
 
     if (stakingAmount !== null) {
-      return `Stake ${stakingAmount} $MFAI`
+      return `Stake ${stakingAmount} $MFAI`;
     }
 
     if (requiresVote) {
-      return 'Vote'
+      return 'Vote';
     }
 
     // Default: completing the phase triggers evaluation + rewards (including NFT mint via modal if applicable).
-    return 'Complete Phase'
-  }
+    return 'Complete Phase';
+  };
 
   const localInteractionStep = useMemo<JourneyStepResponse>(() => {
-    const blocks: UIBlock[] = []
+    const blocks: UIBlock[] = [];
 
-    blocks.push({
-      kind: 'text_block',
+    const introBlock: TextBlock = {
+      kind: 'text_block' as const,
       id: `${selectedPersonaId}:${activePhase.id}:intro`,
       title: 'Zyno Mission Brief',
       body_markdown: [
@@ -296,10 +296,9 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
         ``,
         `Run a simulation to get a richer agent-generated plan, then submit your deliverable below for evaluation.`,
       ].join('\n'),
-    })
-
-    blocks.push({
-      kind: 'mission_block',
+    };
+    const deliverableBlock: MissionBlock = {
+      kind: 'mission_block' as const,
       id: `${selectedPersonaId}:${activePhase.id}:deliverable`,
       title: 'Deliverable Submission',
       description: safeActivePhase.mission || safeActivePhase.description || 'Submit your phase deliverable for evaluation.',
@@ -308,7 +307,8 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
       xp_reward: safeActivePhase.xpReward ?? 0,
       nft_reward_id: safeActivePhase.nftReward,
       is_mandatory: true,
-    })
+    };
+    blocks.push(introBlock, deliverableBlock);
 
     const resourceItems = (Array.isArray(safeActivePhase.tools) ? safeActivePhase.tools : [])
       .filter(Boolean)
@@ -318,19 +318,20 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
         description: 'Recommended tool for this phase.',
         resource_type: 'tool_link' as const,
         agent_owner: 'Zyno',
-      }))
+      }));
 
     if (resourceItems.length > 0) {
-      blocks.push({
-        kind: 'resource_block',
+      const resourceBlock: ResourceBlock = {
+        kind: 'resource_block' as const,
         id: `${selectedPersonaId}:${activePhase.id}:resources`,
         title: 'Tools & Resources',
         resources: resourceItems,
-      })
+      };
+      blocks.push(resourceBlock);
     }
 
-    blocks.push({
-      kind: 'quiz_block',
+    const quizBlock: QuizBlock = {
+      kind: 'quiz_block' as const,
       id: `${selectedPersonaId}:${activePhase.id}:quiz`,
       title: 'Phase Checkpoint Quiz',
       questions: [
@@ -371,7 +372,8 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
           explanation: 'NFT minting is part of the reward flow after phase completion.',
         },
       ],
-    })
+    };
+    blocks.push(quizBlock);
 
     return {
       metadata: {
@@ -387,7 +389,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
       ui_blocks: blocks,
       agent_actions: [],
       next_state: { phase_id: safeActivePhase.id, completed_missions: [], xp_delta: 0 },
-    }
+    };
   }, [
     safeActivePhase.description,
     safeActivePhase.id,
@@ -399,31 +401,31 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
     selectedPersonaId,
     uiMode,
     uiTone,
-  ])
+  ]);
 
   const interactionResponse = useMemo<JourneyStepResponse>(() => {
-    const candidate = lastStep as unknown as JourneyStepResponse | null
-    const hasBlocks = Boolean(candidate?.ui_blocks && candidate.ui_blocks.length > 0)
-    const looksLikeMock = candidate?.ui_blocks?.length === 1 && (candidate.ui_blocks[0] as any)?.title === 'Mock'
+    const candidate = lastStep as unknown as JourneyStepResponse | null;
+    const hasBlocks = Boolean(candidate?.ui_blocks && candidate.ui_blocks.length > 0);
+    const looksLikeMock = candidate?.ui_blocks?.length === 1 && (candidate.ui_blocks[0] as any)?.title === 'Mock';
 
-    const isAutomated = typeof navigator !== 'undefined' && Boolean((navigator as any).webdriver)
+    const isAutomated = typeof navigator !== 'undefined' && Boolean((navigator as any).webdriver);
 
     // In E2E we often mock /step responses with synthetic metadata (phase_id like "learn").
     // Accept the response as long as it contains real blocks (and isn't the backend "Mock" placeholder),
     // otherwise many specs become brittle or silently fall back to local blocks.
     if (isAutomated && hasBlocks && !looksLikeMock) {
-      return candidate as JourneyStepResponse
+      return candidate as JourneyStepResponse;
     }
 
-    const matchesPhase = candidate?.metadata?.phase_id === safeActivePhase.id
-    const matchesPersona = candidate?.metadata?.persona_id === selectedPersonaId
+    const matchesPhase = candidate?.metadata?.phase_id === safeActivePhase.id;
+    const matchesPersona = candidate?.metadata?.persona_id === selectedPersonaId;
 
     if (hasBlocks && matchesPhase && matchesPersona && !looksLikeMock) {
-      return candidate as JourneyStepResponse
+      return candidate;
     }
 
-    return localInteractionStep
-  }, [lastStep, localInteractionStep, safeActivePhase.id, selectedPersonaId])
+    return localInteractionStep;
+  }, [lastStep, localInteractionStep, safeActivePhase.id, selectedPersonaId]);
 
   // Safe returns AFTER hooks.
   if (!selectedPersona) return null;
@@ -431,7 +433,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
 
   // If persona has no phases (should never happen), stop here after hooks.
   if (!activePhase) {
-    return null
+    return null;
   }
 
   // UI Helpers
@@ -562,58 +564,58 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
     if (!activePhase) return;
 
     const showNeuralOverlay = (task: string) => {
-      const startedAt = Date.now()
-      setIsThinking(true)
-      setCurrentTask({ agent: 'Zyno', task })
-      return startedAt
-    }
+      const startedAt = Date.now();
+      setIsThinking(true);
+      setCurrentTask({ agent: 'Zyno', task });
+      return startedAt;
+    };
 
     const hideNeuralOverlay = async (startedAt: number) => {
-      const elapsed = Date.now() - startedAt
+      const elapsed = Date.now() - startedAt;
       if (elapsed < 450) {
-        await new Promise((r) => setTimeout(r, 450 - elapsed))
+        await new Promise((r) => setTimeout(r, 450 - elapsed));
       }
-      setIsThinking(false)
-    }
+      setIsThinking(false);
+    };
 
     try {
-      const isE2EDebug = typeof window !== 'undefined' && Boolean((window as any).__e2eJourneyStepConfig);
+      const isE2EDebug = globalThis.window !== undefined && Boolean((globalThis.window as any).__e2eJourneyStepConfig);
       const runner = isE2EDebug ? runInteractiveStepDebug : runInteractiveStep;
       const isDemo =
         Boolean(userProgress.demoModeEnabled) ||
-        tokenStore.getAccessToken() === 'demo-token'
+        tokenStore.getAccessToken() === 'demo-token';
 
       // In demo mode, "Run Simulation" should autoplay phases sequentially.
       if (isDemo) {
-        autoSimAbortRef.current = false
-        setIsAutoSimulating(true)
-        setAutoSimProgress({ current: Math.max(1, activePhaseIndex + 1), total: selectedPersona.phases.length })
+        autoSimAbortRef.current = false;
+        setIsAutoSimulating(true);
+        setAutoSimProgress({ current: Math.max(1, activePhaseIndex + 1), total: selectedPersona.phases.length });
 
         try {
-          const phases = selectedPersona.phases
+          const phases = selectedPersona.phases;
           for (let i = activePhaseIndex; i < phases.length; i++) {
-            if (autoSimAbortRef.current) break
+            if (autoSimAbortRef.current) break;
 
-            const phase = phases[i]
-            setAutoSimProgress({ current: i + 1, total: phases.length })
-            setCurrentPhase(i)
+            const phase = phases[i];
+            setAutoSimProgress({ current: i + 1, total: phases.length });
+            setCurrentPhase(i);
 
             // Let React render the phase switch before requesting.
-            await new Promise((r) => setTimeout(r, 150))
+            await new Promise((r) => setTimeout(r, 150));
 
-            const overlayStart = showNeuralOverlay(`Generating ${phase.title}…`)
+            const overlayStart = showNeuralOverlay(`Generating ${phase.title}…`);
             try {
               await runner({
                 phaseId: phase.id,
                 trackId: selectedPersona.id,
                 userInput: '',
-              })
+              });
             } finally {
-              await hideNeuralOverlay(overlayStart)
+              await hideNeuralOverlay(overlayStart);
             }
 
             // Small delay so the user can see the generated blocks.
-            await new Promise((r) => setTimeout(r, 650))
+            await new Promise((r) => setTimeout(r, 650));
 
             // Mark phase as completed in demo so progress/artifacts can advance.
             await completePhase(i, {
@@ -622,48 +624,49 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
               xpReward: phase.xpReward,
               mfaiReward: phase.mfaiReward,
               nftReward: phase.nftReward,
-            })
+            });
 
             // Another small pause before moving to next phase.
-            await new Promise((r) => setTimeout(r, 450))
+            await new Promise((r) => setTimeout(r, 450));
           }
 
-          if (!autoSimAbortRef.current) {
-            toast.success('Demo simulation complete: phases were played automatically.')
+          if (autoSimAbortRef.current) {
+            // Auto-simulation was aborted
           } else {
-            toast.message('Auto-simulation stopped.')
+            toast.success('Demo simulation complete: phases were played automatically.');
+            toast.message('Auto-simulation stopped.');
           }
         } finally {
-          setIsAutoSimulating(false)
-          setAutoSimProgress(null)
+          setIsAutoSimulating(false);
+          setAutoSimProgress(null);
         }
 
-        return
+        return;
       }
 
       // Non-demo: run only current phase step.
-      const overlayStart = showNeuralOverlay(`Generating ${activePhase.title}…`)
+      const overlayStart = showNeuralOverlay(`Generating ${activePhase.title}…`);
       try {
         await runner({
           phaseId: activePhase.id,
           trackId: selectedPersona.id,
           userInput: '',
-        })
+        });
       } finally {
-        await hideNeuralOverlay(overlayStart)
+        await hideNeuralOverlay(overlayStart);
       }
     } catch (error) {
       console.error('Error running interactive step:', error);
-      setIsThinking(false)
+      setIsThinking(false);
     }
   };
 
   const handleStopAutoSimulation = () => {
-    if (!isAutoSimulating) return
-    autoSimAbortRef.current = true
-    setIsAutoSimulating(false)
-    setAutoSimProgress(null)
-  }
+    if (!isAutoSimulating) return;
+    autoSimAbortRef.current = true;
+    setIsAutoSimulating(false);
+    setAutoSimProgress(null);
+  };
 
   /* ... inside JourneyWorkspace component ... */
 
@@ -672,16 +675,16 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
     // Exit demo by clearing demo tokens and returning to the public landing page.
     // (Demo mode is inferred from tokenStore + backend progress flags.)
     try {
-      tokenStore.clearTokens()
+      tokenStore.clearTokens();
     } catch {
       // ignore
     }
-    window.location.href = '/'
+    globalThis.window.location.href = '/';
   };
 
   const handleNextActionClick = (actionType: string, actionId: string) => {
     if (actionType === 'tool') {
-      const toolName = actionId.replace(/-/g, ' ');
+      const toolName = actionId.replaceAll('-', ' ');
       toast.info(`Launching ${toolName}...`);
 
       // Simulate loading tool
@@ -702,11 +705,11 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
   };
 
   const handleOpenArtifactFullScreen = () => {
-    if (!selectedArtifact) return
+    if (!selectedArtifact) return;
     setViewingArtifact({
       title: selectedArtifact.title,
       fileUrl: selectedArtifact.fileUrl,
-    })
+    });
   };
 
   const handleViewReport = () => {
@@ -858,14 +861,17 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
                     <p className="text-sm text-white/80">{activePhase.mission}</p>
                   </div>
                 ) : (
-                  ['Analyze market requirements', 'Define token utility', 'Draft initial whitepaper'].map((item: string, i: number) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${i === 0 ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-500' : 'border-white/10'}`}>
-                        {i === 0 && <CheckCircle2 size={12} />}
+                  ['Analyze market requirements', 'Define token utility', 'Draft initial whitepaper'].map((item: string, i: number) => {
+                    const itemKey = generateStableKey({ text: item }, 'mission-item', ['text']);
+                    return (
+                      <div key={itemKey} className="flex items-center gap-3">
+                        <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${i === 0 ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-500' : 'border-white/10'}`}>
+                          {i === 0 && <CheckCircle2 size={12} />}
+                        </div>
+                        <span className={`text-sm ${i === 0 ? 'text-white/40 line-through' : 'text-white'}`}>{item}</span>
                       </div>
-                      <span className={`text-sm ${i === 0 ? 'text-white/40 line-through' : 'text-white'}`}>{item}</span>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
 
@@ -894,10 +900,10 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
                   </button>
                 )}
 
-                  {!isPhaseCompleted && (
-                    <div className="flex flex-col gap-2">
-                      <button
-                        onClick={() => {
+                {!isPhaseCompleted && (
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={() => {
                         if (isSubmittingPhase) return;
                         if (activePhase.stakingRequired) {
                           setShowStakingModal(true);
@@ -910,44 +916,44 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
 
                         void handleCompletePhase();
                       }}
-                        disabled={isSubmittingPhase}
-                        data-testid={activePhase.nftReward ? 'mint-nft' : 'complete-phase'}
-                        className={`inline-flex items-center gap-2 rounded-full bg-white/10 px-8 py-4 text-base font-bold text-white border border-white/10 transition ${isSubmittingPhase ? 'cursor-wait opacity-70' : 'hover:bg-white/20'}`}
-                      >
-                        {isSubmittingPhase ? (
-                          <>
-                            <Loader2 size={20} className="animate-spin" />
-                            <span>Submitting…</span>
-                          </>
-                        ) : (
-                          <>
-                            {activePhase.nftReward ? <Award size={20} className="text-accent-cyan" /> : <CheckCircle2 size={20} />}
-                            <span>{getCompletionCtaLabel()}</span>
-                          </>
-                        )}
-                      </button>
-
-                      {(activePhase.nftReward || activePhase.stakingRequired || activePhase.daoVoteRequired) && (
-                        <div className="flex flex-wrap items-center gap-2 text-[11px] text-white/60">
-                          {activePhase.stakingRequired ? (
-                            <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
-                              Requires staking
-                            </span>
-                          ) : null}
-                          {activePhase.daoVoteRequired ? (
-                            <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
-                              Requires DAO vote
-                            </span>
-                          ) : null}
-                          {activePhase.nftReward ? (
-                            <span className="rounded-full border border-accent-cyan/20 bg-accent-cyan/10 px-3 py-1 text-accent-cyan">
-                              NFT reward available
-                            </span>
-                          ) : null}
-                        </div>
+                      disabled={isSubmittingPhase}
+                      data-testid={activePhase.nftReward ? 'mint-nft' : 'complete-phase'}
+                      className={`inline-flex items-center gap-2 rounded-full bg-white/10 px-8 py-4 text-base font-bold text-white border border-white/10 transition ${isSubmittingPhase ? 'cursor-wait opacity-70' : 'hover:bg-white/20'}`}
+                    >
+                      {isSubmittingPhase ? (
+                        <>
+                          <Loader2 size={20} className="animate-spin" />
+                          <span>Submitting…</span>
+                        </>
+                      ) : (
+                        <>
+                          {activePhase.nftReward ? <Award size={20} className="text-accent-cyan" /> : <CheckCircle2 size={20} />}
+                          <span>{getCompletionCtaLabel()}</span>
+                        </>
                       )}
-                    </div>
-                  )}
+                    </button>
+
+                    {(activePhase.nftReward || activePhase.stakingRequired || activePhase.daoVoteRequired) && (
+                      <div className="flex flex-wrap items-center gap-2 text-[11px] text-white/60">
+                        {activePhase.stakingRequired ? (
+                          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                            Requires staking
+                          </span>
+                        ) : null}
+                        {activePhase.daoVoteRequired ? (
+                          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                            Requires DAO vote
+                          </span>
+                        ) : null}
+                        {activePhase.nftReward ? (
+                          <span className="rounded-full border border-accent-cyan/20 bg-accent-cyan/10 px-3 py-1 text-accent-cyan">
+                            NFT reward available
+                          </span>
+                        ) : null}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {isAutoSimulating && autoSimProgress && (
@@ -982,43 +988,48 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
                   <Loader2 size={32} className="animate-spin text-accent-cyan" />
                   <p className="text-sm text-white/60 animate-pulse">Processing Agent Interactions...</p>
                 </div>
-              ) : activePhase.id === 'launch-collaterize' ? (
-                <LaunchCollaterizePhase />
-              ) : (
-                <UIBlocksRenderer response={interactionResponse} />
-              )}
+              ) : (() => {
+                // Extract nested ternary into explicit variable
+                if (activePhase.id === 'launch-collaterize') {
+                  return <LaunchCollaterizePhase />;
+                }
+                return <UIBlocksRenderer response={interactionResponse} />;
+              })()}
             </div>
           </section>
 
           {/* SIMULATION RESULTS (New) */}
           {isDemo ? (
-          <section className="rounded-2xl border border-white/5 bg-white/5 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <LayoutGrid size={20} className="text-accent-purple" />
-                <h2 className="text-lg font-bold text-white">Simulation Results</h2>
-              </div>
-              <button
-                onClick={handleViewReport}
-                className="text-xs font-bold uppercase tracking-wider text-accent-cyan hover:underline"
-              >
-                View Full Report
-              </button>
-            </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {[
-                { label: 'Market Fit', value: '84%', color: 'text-emerald-400' },
-                { label: 'Risk Score', value: 'Low', color: 'text-emerald-400' },
-                { label: 'Proj. TVL', value: '$1.2M', color: 'text-white' },
-                { label: 'Sentiment', value: 'Bullish', color: 'text-accent-gold' }
-              ].map((stat, i) => (
-                <div key={i} className="rounded-xl bg-black/20 p-4 border border-white/5">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-1">{stat.label}</p>
-                  <p className={`text-2xl font-mono font-bold ${stat.color}`}>{stat.value}</p>
+            <section className="rounded-2xl border border-white/5 bg-white/5 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <LayoutGrid size={20} className="text-accent-purple" />
+                  <h2 className="text-lg font-bold text-white">Simulation Results</h2>
                 </div>
-              ))}
-            </div>
-          </section>
+                <button
+                  onClick={handleViewReport}
+                  className="text-xs font-bold uppercase tracking-wider text-accent-cyan hover:underline"
+                >
+                  View Full Report
+                </button>
+              </div>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {[
+                  { label: 'Market Fit', value: '84%', color: 'text-emerald-400' },
+                  { label: 'Risk Score', value: 'Low', color: 'text-emerald-400' },
+                  { label: 'Proj. TVL', value: '$1.2M', color: 'text-white' },
+                  { label: 'Sentiment', value: 'Bullish', color: 'text-accent-gold' }
+                ].map((stat) => {
+                  const statKey = generateStableKey(stat, 'stat', ['label']);
+                  return (
+                    <div key={statKey} className="rounded-xl bg-black/20 p-4 border border-white/5">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-1">{stat.label}</p>
+                      <p className={`text-2xl font-mono font-bold ${stat.color}`}>{stat.value}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
           ) : null}
 
           {/* PROJECT ARTIFACTS (Master–Detail) */}
@@ -1040,49 +1051,60 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
                   Select an artifact to preview it. Use full-screen for reading and exporting.
                 </p>
                 <div className="max-h-[420px] overflow-y-auto pr-1 custom-scrollbar space-y-2">
-                  {artifactsLoading ? (
-                    <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-xs text-white/60">
-                      Loading artifacts…
-                    </div>
-                  ) : artifactsError ? (
-                    <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-xs text-red-200">
-                      Unable to load artifacts: {artifactsError}
-                    </div>
-                  ) : artifactCatalog.length === 0 ? (
-                    <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-xs text-white/60">
-                      No artifacts yet. Run an interactive step and submit deliverables to generate artifacts.
-                    </div>
-                  ) : artifactCatalog.map((art) => {
-                    const isActive = art.key === selectedArtifactKey
-                    return (
-                      <button
-                        key={art.key}
-                        type="button"
-                        onClick={() => setSelectedArtifactKey(art.key)}
-                        className={`w-full text-left rounded-xl border p-4 transition ${
-                          isActive
+                  {(() => {
+                    // Extract nested ternary into explicit variables
+                    if (artifactsLoading) {
+                      return (
+                        <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-xs text-white/60">
+                          Loading artifacts…
+                        </div>
+                      );
+                    }
+                    if (artifactsError) {
+                      return (
+                        <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-xs text-red-200">
+                          Unable to load artifacts: {artifactsError}
+                        </div>
+                      );
+                    }
+                    if (artifactCatalog.length === 0) {
+                      return (
+                        <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-xs text-white/60">
+                          No artifacts yet. Run an interactive step and submit deliverables to generate artifacts.
+                        </div>
+                      );
+                    }
+                    return artifactCatalog.map((art) => {
+                      const isActive = art.key === selectedArtifactKey;
+                      return (
+                        <button
+                          key={art.key}
+                          type="button"
+                          onClick={() => setSelectedArtifactKey(art.key)}
+                          className={`w-full text-left rounded-xl border p-4 transition ${isActive
                             ? 'border-accent-cyan/50 bg-accent-cyan/10 shadow-[0_0_24px_rgba(34,211,238,0.12)]'
                             : 'border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20'
-                        }`}
-                        aria-label={`Select ${art.title}`}
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white/10">
-                                <FileText size={18} className={isActive ? 'text-accent-cyan' : 'text-white/70'} />
-                              </span>
-                              <div className="min-w-0">
-                                <p className="truncate text-sm font-semibold text-white">{art.title}</p>
-                                <p className="truncate text-[11px] text-white/50">{art.agent} • {art.category}</p>
+                            }`}
+                          aria-label={`Select ${art.title}`}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white/10">
+                                  <FileText size={18} className={isActive ? 'text-accent-cyan' : 'text-white/70'} />
+                                </span>
+                                <div className="min-w-0">
+                                  <p className="truncate text-sm font-semibold text-white">{art.title}</p>
+                                  <p className="truncate text-[11px] text-white/50">{art.agent} • {art.category}</p>
+                                </div>
                               </div>
                             </div>
+                            <span className="text-[10px] font-mono text-white/40">{art.version}</span>
                           </div>
-                          <span className="text-[10px] font-mono text-white/40">{art.version}</span>
-                        </div>
-                      </button>
-                    )
-                  })}
+                        </button>
+                      );
+                    });
+                  })()}
                 </div>
               </div>
 
@@ -1099,7 +1121,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
                     <button
                       type="button"
                       onClick={handleOpenArtifactFullScreen}
-                      disabled={!selectedArtifact || !selectedArtifact.fileUrl}
+                      disabled={!selectedArtifact?.fileUrl}
                       className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-bold text-white transition hover:bg-white/20 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       Open full screen
@@ -1169,7 +1191,7 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
           <JourneyNextActionsPanel
             personaId={selectedPersona.id}
             currentStepId={`phase-${activePhaseNumber}`}
-            journeyId={(userProgress as any)?.journey?._id || (userProgress as any)?.journeyId}
+            journeyId={selectedPersona?.id ? `${selectedPersona.id}-journey` : undefined}
             onActionClick={handleNextActionClick}
             className="w-full shadow-xl"
           />
@@ -1225,11 +1247,11 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
             availableAmount={1000}
             currentStaked={0}
             onClose={() => setShowStakingModal(false)}
-              onStake={(_amount) => {
+            onStake={(_amount) => {
               setShowStakingModal(false);
-                if (!isSubmittingPhase) {
-                  void handleCompletePhase();
-                }
+              if (!isSubmittingPhase) {
+                void handleCompletePhase();
+              }
             }}
           />
         )
@@ -1241,11 +1263,11 @@ const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
             phase={activePhase}
             votingPower={50}
             onClose={() => setShowVoteModal(false)}
-              onVote={(_vote) => {
+            onVote={(_vote) => {
               setShowVoteModal(false);
-                if (!isSubmittingPhase) {
-                  void handleCompletePhase();
-                }
+              if (!isSubmittingPhase) {
+                void handleCompletePhase();
+              }
             }}
           />
         )

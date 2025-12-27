@@ -5,8 +5,8 @@
  * Tracks: userId, journeyId, agent, duration, tokens, success/failure
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 class LLMLogger {
     constructor() {

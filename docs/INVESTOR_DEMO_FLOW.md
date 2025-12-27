@@ -31,3 +31,11 @@ The Investor Demo Flow ("Golden Path") allows investors to experience the platfo
 ## Maintenance
 - **Healthcheck**: Ensure `NEXT_PUBLIC_SIMULATOR_URL` is set in `web/.env`.
 - **Metrics**: Check admin dashboard for usage stats.
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

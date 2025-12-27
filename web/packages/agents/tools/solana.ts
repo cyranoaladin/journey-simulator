@@ -1,21 +1,21 @@
 import { clusterApiUrl, type Cluster } from '@solana/web3.js'
 import bs58 from 'bs58'
 
-import { createUmi } from '@metaplex-foundation/umi-bundle-defaults'
 import {
-  publicKey,
-  generateSigner,
-  createSignerFromKeypair,
-  signerIdentity,
-  percentAmount,
-  type Umi,
-} from '@metaplex-foundation/umi'
-import {
-  mplTokenMetadata,
-  createAndMint,
-  TokenStandard,
+    createAndMint,
+    mplTokenMetadata,
+    TokenStandard,
 } from '@metaplex-foundation/mpl-token-metadata'
-import { base58 } from '@metaplex-foundation/umi/serializers'
+import {
+    createSignerFromKeypair,
+    generateSigner,
+    percentAmount,
+    publicKey,
+    signerIdentity,
+    type Umi,
+} from '@metaplex-foundation/umi'
+import { createUmi } from '@metaplex-foundation/umi-bundle-defaults'
+// base58 import removed - using bs58 instead
 
 export type RewardSpec = {
   recipient: string

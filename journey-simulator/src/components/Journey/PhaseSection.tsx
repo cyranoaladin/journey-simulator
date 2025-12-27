@@ -1,35 +1,36 @@
-import type { FC } from 'react';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
-import { JourneyPhase } from '../../types/journey';
-import type { AgentTimelineEntry } from '../Zyno/types';
 import {
-  CheckCircle,
-  Trophy,
-  Coins,
-  Zap,
-  Play,
-  Lock,
   ArrowRight,
-  Rocket,
-  Vote,
   Award,
-  Palette,
-  MessageSquare,
-  Target,
   BarChart3,
+  CheckCircle,
+  Coins,
   DollarSign,
-  Loader2,
-  Shield,
   Hammer,
+  Loader2,
+  Lock,
+  MessageSquare,
+  Palette,
+  Play,
+  Rocket,
+  Shield,
+  Target,
+  Trophy,
+  Vote,
+  Zap,
 } from 'lucide-react';
+import type { FC } from 'react';
+import { useState } from 'react';
 import { getProofType } from '../../data/proofsData';
 import { useJourneyStore } from '../../store/journeyStore';
-import PhaseInteractionBlock from './PhaseInteractionBlock';
-import UIBlocksRenderer from '../UIBlocks/UIBlocksRenderer';
-import MintCelebrationBanner from '../MintCelebrationBanner';
+import { JourneyPhase } from '../../types/journey';
 import type { JourneyStepResponse } from '../../types/uiBlocks';
+import { generateStableKey } from '../../utils/generateStableKey';
 import { renderHighlightedText } from '../../utils/renderHighlightedText';
+import MintCelebrationBanner from '../MintCelebrationBanner';
+import UIBlocksRenderer from '../UIBlocks/UIBlocksRenderer';
+import type { AgentTimelineEntry } from '../Zyno/types';
+import PhaseInteractionBlock from './PhaseInteractionBlock';
 
 interface PhaseSectionProps {
   phase: JourneyPhase;
@@ -128,20 +129,33 @@ const PhaseSection: FC<PhaseSectionProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`border-2 rounded-xl p-6 transition-all duration-300 ${isCompleted
-        ? 'border-green-500 bg-green-500/10'
-        : isCurrent
-          ? 'border-primary-500 bg-primary-500/10'
-          : isLocked
-            ? 'border-gray-600 bg-gray-600/10'
-            : 'border-gray-500 bg-gray-500/10'
-        }`}
+      className={`border-2 rounded-xl p-6 transition-all duration-300 ${(() => {
+        // Extract nested ternary into explicit variable
+        if (isCompleted) {
+          return 'border-green-500 bg-green-500/10';
+        }
+        if (isCurrent) {
+          return 'border-primary-500 bg-primary-500/10';
+        }
+        if (isLocked) {
+          return 'border-gray-600 bg-gray-600/10';
+        }
+        return 'border-gray-500 bg-gray-500/10';
+      })()}`}
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
           <div
-            className={`p-2 rounded-lg ${isCompleted ? 'bg-green-500' : isCurrent ? 'bg-primary-500' : 'bg-gray-600'
-              }`}
+            className={`p-2 rounded-lg ${(() => {
+              // Extract nested ternary into explicit variable
+              if (isCompleted) {
+                return 'bg-green-500';
+              }
+              if (isCurrent) {
+                return 'bg-primary-500';
+              }
+              return 'bg-gray-600';
+            })()}`}
           >
             {getPhaseIcon()}
           </div>
@@ -189,20 +203,23 @@ const PhaseSection: FC<PhaseSectionProps> = ({
         <div className="mb-4">
           <h4 className="font-semibold text-sm mb-3">Modules & Deliverables</h4>
           <div className="space-y-2">
-            {phase.modules.map((module, index) => (
-              <div key={index} className="bg-white/5 rounded-lg p-3">
-                <div className="flex justify-between items-start mb-2">
-                  <h5 className="font-medium text-sm">{module.title}</h5>
-                  <span className="text-xs bg-accent-gold/20 text-accent-gold px-2 py-1 rounded-full">
-                    {module.reward}
-                  </span>
+            {phase.modules.map((module) => {
+              const moduleKey = generateStableKey(module, 'module', ['title', 'id']);
+              return (
+                <div key={moduleKey} className="bg-white/5 rounded-lg p-3">
+                  <div className="flex justify-between items-start mb-2">
+                    <h5 className="font-medium text-sm">{module.title}</h5>
+                    <span className="text-xs bg-accent-gold/20 text-accent-gold px-2 py-1 rounded-full">
+                      {module.reward}
+                    </span>
+                  </div>
+                  <p className="text-xs opacity-80 mb-2">{module.description}</p>
+                  <div className="text-xs">
+                    <span className="font-semibold">Deliverable:</span> {module.deliverable}
+                  </div>
                 </div>
-                <p className="text-xs opacity-80 mb-2">{module.description}</p>
-                <div className="text-xs">
-                  <span className="font-semibold">Deliverable:</span> {module.deliverable}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
@@ -210,11 +227,14 @@ const PhaseSection: FC<PhaseSectionProps> = ({
       <div className="mb-4">
         <h4 className="font-semibold text-sm mb-2">Tools & Resources</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-          {phase.tools.map((tool, index) => (
-            <div key={index} className="text-xs bg-white/5 rounded px-2 py-1">
-              {tool}
-            </div>
-          ))}
+          {phase.tools.map((tool) => {
+            const toolKey = generateStableKey({ name: tool }, 'tool', ['name']);
+            return (
+              <div key={toolKey} className="text-xs bg-white/5 rounded px-2 py-1">
+                {tool}
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -245,10 +265,10 @@ const PhaseSection: FC<PhaseSectionProps> = ({
               className="px-3 py-1.5 rounded bg-gradient-primary text-white"
               onClick={async () => {
                 try {
-                  setStepError(null)
-                  await runInteractiveStep({ phaseId: phase.id, trackId: selectedPersona?.id || 'track' })
+                  setStepError(null);
+                  await runInteractiveStep({ phaseId: phase.id, trackId: selectedPersona?.id || 'track' });
                 } catch (e: any) {
-                  setStepError(e?.message || 'Error loading phase.')
+                  setStepError(e?.message || 'Error loading phase.');
                 }
               }}
               disabled={isProcessing || isStepLoading}
@@ -267,13 +287,13 @@ const PhaseSection: FC<PhaseSectionProps> = ({
             {/* Mint celebration banner when evaluation score is high */}
             {(() => {
               try {
-                const evalBlock = (lastStep as any)?.ui_blocks?.find((b: any) => b.kind === 'evaluation_block')
-                if (!evalBlock) return null
-                const score = Number(evalBlock.global_score || 0)
-                const maxScore = Number(evalBlock.max_score || 100)
-                const threshold = Math.max(70, Math.round(maxScore * 0.6))
-                if (score < threshold) return null
-                const phaseId = (lastStep as any)?.metadata?.phase_id || 'phase'
+                const evalBlock = (lastStep as any)?.ui_blocks?.find((b: any) => b.kind === 'evaluation_block');
+                if (!evalBlock) return null;
+                const score = Number(evalBlock.global_score || 0);
+                const maxScore = Number(evalBlock.max_score || 100);
+                const threshold = Math.max(70, Math.round(maxScore * 0.6));
+                if (score < threshold) return null;
+                const phaseId = (lastStep as any)?.metadata?.phase_id || 'phase';
                 return (
                   <div className="mb-2">
                     <MintCelebrationBanner
@@ -290,13 +310,13 @@ const PhaseSection: FC<PhaseSectionProps> = ({
                             { trait_type: 'Score', value: `${score}/${maxScore}` },
                             { trait_type: 'Phase', value: phaseId },
                           ]
-                        }
-                        openModal({ type: 'certification', certification: cert })
+                        };
+                        openModal({ type: 'certification', certification: cert });
                       }}
                     />
                   </div>
-                )
-              } catch { return null }
+                );
+              } catch { return null; }
             })()}
             {isStepLoading ? (
               <div className="rounded-xl border border-white/10 p-4">
@@ -316,12 +336,15 @@ const PhaseSection: FC<PhaseSectionProps> = ({
       <div className="mb-4">
         <h4 className="font-semibold text-sm mb-2">Expected Outcomes</h4>
         <div className="grid gap-1">
-          {phase.outcomes.map((outcome, idx) => (
-            <div key={idx} className="flex items-center text-xs">
-              <CheckCircle size={12} className="mr-2 text-green-400 flex-shrink-0" />
-              <span>{outcome}</span>
-            </div>
-          ))}
+          {phase.outcomes.map((outcome) => {
+            const outcomeKey = generateStableKey({ text: outcome }, 'outcome', ['text']);
+            return (
+              <div key={outcomeKey} className="flex items-center text-xs">
+                <CheckCircle size={12} className="mr-2 text-green-400 flex-shrink-0" />
+                <span>{outcome}</span>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -357,12 +380,15 @@ const PhaseSection: FC<PhaseSectionProps> = ({
         <div className="mb-4">
           <h4 className="font-semibold text-sm mb-2">Prerequisites</h4>
           <ul className="text-xs space-y-1">
-            {phase.requirements.map((req, index) => (
-              <li key={index} className="flex items-center space-x-2">
-                <div className="w-1 h-1 bg-primary-500 rounded-full" />
-                <span>{req}</span>
-              </li>
-            ))}
+            {phase.requirements.map((req) => {
+              const reqKey = generateStableKey({ text: req }, 'requirement', ['text']);
+              return (
+                <li key={reqKey} className="flex items-center space-x-2">
+                  <div className="w-1 h-1 bg-primary-500 rounded-full" />
+                  <span>{req}</span>
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}

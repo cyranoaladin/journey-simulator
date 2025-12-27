@@ -39,3 +39,11 @@ Objectif: prouver un flux réel devnet minimal (simulate/execute), intégration 
 - IDL/Program SPL personnalisé pour NFT/stake (on-chain), documentation IDL et comptes
 - Intégration UMI complète (signer isolé, KMS/HSM)
 - Tests sur testnet/mainnet partitions (selon budget)
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

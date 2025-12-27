@@ -28,7 +28,7 @@ router.post('/orchestration', async (req, res) => {
       fileName: template.fileName
     }));
 
-    const { executedAgents = [], results = {}, timeline = [] } = orchestrationResult;
+    const { executedAgents = [], results = {} } = orchestrationResult;
 
     await Promise.all(
       executedAgents.map(async (agentName, index) => {

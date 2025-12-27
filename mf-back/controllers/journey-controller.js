@@ -1,11 +1,11 @@
 // Stub for demo mode route to fix test errors
-const path = require('path');
+const path = require('node:path');
 const fs = require('fs/promises');
 
 const Journey = require('../models/Journeys');
 const User = require('../models/user');
 const journeyStateService = require('../services/journey-state-service');
-const { generateIdempotencyKey } = require('../utils/agent-idempotence');
+const JourneyService = require('../services/journeyService');
 
 const DEMO_STATES_DIR = path.join(__dirname, '..', 'data', 'demo-states');
 const SAFE_PERSONA_ID = /^[a-z0-9-]+$/i;
@@ -442,7 +442,6 @@ exports.deleteJourney = async (req, res) => {
 
 const ZynoAgent = require('../agents/ZynoAgent');
 const TokenomicsAgent = require('../agents/TokenomicsAgent');
-// const GrowthAgent = require('../agents/GrowthAgent'); // Future use
 
 exports.step = async (req, res) => {
     try {
@@ -513,73 +512,28 @@ exports.submit = async (req, res) => {
             journeyState = {}
         } = req.body;
 
-        const parsePhaseNumber = (candidate) => {
-            const parsed = Number(candidate);
-            return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
-        };
-
-        const resolvedPhaseNumber =
-            parsePhaseNumber(phaseNumber)
-            ?? parsePhaseNumber(legacyPhaseNumber)
-            ?? parsePhaseNumber(journeyState?.currentPhase)
-            ?? 1;
-
-        const AgentFactory = require('../agents/AgentFactory');
-
-        const agent = AgentFactory.getAgentForContext({ trackId, phaseId, missionId });
-        console.log(`[Submit] Selected agent ${agent.name} for track ${trackId}, phase ${phaseId}`);
-
-        const ctx = {
-            userId: req.user ? req.user.id : 'anonymous',
-            journeyId,
-            phaseId,
-            trackId,
-            submission,
-            lastInput: submission,
-            inputType,
-            language: language || 'en',
-            mode: mode || 'discovery',
-            tone: tone || 'pedagogical',
-            journeyState
-        };
-
-        const idempotencyKey = generateIdempotencyKey(journeyId, phaseId, agent.name, { submission });
-        const result = await agent.run(ctx, { idempotencyKey });
+        const resolvedPhaseNumber = JourneyService.resolvePhaseNumber(phaseNumber, legacyPhaseNumber, journeyState);
+        const ctx = JourneyService.prepareAgentContext(req, journeyId, phaseId, trackId, submission, inputType, language, mode, tone, journeyState);
+        const { result } = await JourneyService.executeAgentSubmission(ctx, trackId, phaseId, missionId, journeyId);
 
         const evaluationPayload = result?.payload || {};
-        const rawScore = Number(evaluationPayload.global_score);
-        const xpDelta = Number.isFinite(rawScore) ? Math.max(0, Math.round(rawScore * 10)) : 0;
+        const xpDelta = JourneyService.calculateXpDelta(evaluationPayload);
 
         const authorizationHeader = req.headers.authorization || '';
-        const token = authorizationHeader.startsWith('Bearer ')
-            ? authorizationHeader.slice(7)
-            : null;
+        const token = authorizationHeader.startsWith('Bearer ') ? authorizationHeader.slice(7) : null;
         const isDemoToken = token === 'demo-token';
 
         let progressPayload;
-        let updatedUser = null;
-
         if (!isDemoToken && req.user?.id) {
-            const updateOps = {};
-
-            if (xpDelta > 0) {
-                updateOps.$inc = { total_xp: xpDelta };
-            }
-
-            updateOps.$set = {
-                last_ai_submission: {
-                    missionId,
-                    phaseId,
-                    trackId,
-                    journeyId,
-                    score: Number.isFinite(rawScore) ? rawScore : null,
-                    xp_awarded: xpDelta,
-                    phase_number: resolvedPhaseNumber,
-                    submitted_at: new Date()
-                }
-            };
-
-            updatedUser = await User.findByIdAndUpdate(req.user.id, updateOps, { new: true }).select('-password');
+            const updatedUser = await JourneyService.updateUserProgress(
+                req.user.id,
+                xpDelta,
+                missionId,
+                phaseId,
+                trackId,
+                journeyId,
+                resolvedPhaseNumber
+            );
 
             if (!updatedUser) {
                 return res.status(404).json({
@@ -588,51 +542,10 @@ exports.submit = async (req, res) => {
                 });
             }
 
-            progressPayload = {
-                total_xp: updatedUser.total_xp,
-                completed_phases: updatedUser.completed_phases,
-                nft_certificates: updatedUser.nft_certificates
-            };
+            progressPayload = JourneyService.prepareProgressPayload(updatedUser);
+            await JourneyService.syncJourneyState(req.user.id, resolvedPhaseNumber);
         } else {
-            const baseXp = Number(journeyState?.xp ?? journeyState?.totalXP ?? 0);
-            const completedCount = Array.isArray(journeyState?.completed)
-                ? journeyState.completed.length
-                : Number(journeyState?.completedCount ?? 0);
-            const nftCertificates = Array.isArray(journeyState?.nfts)
-                ? journeyState.nfts
-                : [];
-
-            progressPayload = {
-                total_xp: baseXp + xpDelta,
-                completed_phases: completedCount,
-                nft_certificates: nftCertificates
-            };
-        }
-
-        if (!isDemoToken && req.user?.id) {
-            try {
-                const journey = await Journey.findOne({ user_id: req.user.id }).sort({ start_date: -1 });
-
-                if (journey && Number.isInteger(resolvedPhaseNumber)) {
-                    const currentPhaseStep = `phase-${resolvedPhaseNumber}`;
-                    const nextPhaseStep = `phase-${resolvedPhaseNumber + 1}`;
-
-                    if (journey.currentStepId === currentPhaseStep) {
-                        await journeyStateService.advanceJourneyStep({
-                            journeyId: journey._id,
-                            fromStepId: currentPhaseStep,
-                            toStepId: nextPhaseStep,
-                            trigger: 'PHASE_COMPLETION'
-                        });
-                    } else {
-                        journey.currentStepId = nextPhaseStep;
-                        journey.current_phase = resolvedPhaseNumber + 1;
-                        await journey.save();
-                    }
-                }
-            } catch (stateError) {
-                console.warn('Failed to sync journey state:', stateError.message);
-            }
+            progressPayload = JourneyService.prepareDemoProgressPayload(journeyState, xpDelta);
         }
 
         res.status(200).json({

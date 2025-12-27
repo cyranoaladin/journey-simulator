@@ -2,16 +2,13 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 
 export async function GET() {
-  const response = await fetch(
-    `http://localhost:8000/journeys/?limit=20&order_by=created_at_desc`,
-    {
-      // TODO: Replace with actual FastAPI URL
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  )
+  const fastApiUrl = process.env.FASTAPI_URL || 'http://localhost:8000'
+  const response = await fetch(`${fastApiUrl}/journeys/?limit=20&order_by=created_at_desc`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
   const journeys = await response.json()
   if (!response.ok) {
     return NextResponse.json(
@@ -31,8 +28,8 @@ export async function POST(req: Request) {
 
   let userId: string | null = null
   if (userEmail) {
-    const userUpsertResponse = await fetch('http://localhost:8000/users/upsert', {
-      // TODO: Replace with actual FastAPI URL
+    const fastApiUrl = process.env.FASTAPI_URL || 'http://localhost:8000'
+    const userUpsertResponse = await fetch(`${fastApiUrl}/users/upsert`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -49,8 +46,8 @@ export async function POST(req: Request) {
     userId = user.id
   }
 
-  const journeyCreateResponse = await fetch('http://localhost:8000/journeys/', {
-    // TODO: Replace with actual FastAPI URL
+  const fastApiUrl = process.env.FASTAPI_URL || 'http://localhost:8000'
+  const journeyCreateResponse = await fetch(`${fastApiUrl}/journeys/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

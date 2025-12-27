@@ -1,4 +1,4 @@
-const { randomUUID } = require('crypto');
+const { randomUUID } = require('node:crypto');
 
 const DEFAULT_TTL_MS = 10 * 60 * 1000;
 const DEFAULT_MAX_ENTRIES = 50;

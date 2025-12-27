@@ -18,8 +18,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, doc })
   }
 
-  const response = await fetch('http://localhost:8000/documents/', {
-    // TODO: Replace with actual FastAPI URL
+  const fastApiUrl = process.env.FASTAPI_URL || 'http://localhost:8000'
+  const response = await fetch(`${fastApiUrl}/documents/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

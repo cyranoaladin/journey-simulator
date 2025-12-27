@@ -8,9 +8,9 @@ interface Phase {
 }
 
 interface JourneyTimelineProps {
-  phases: Phase[];
-  currentPhase: number;
-  onPhaseChange?: (index: number) => void;
+  readonly phases: Phase[];
+  readonly currentPhase: number;
+  readonly onPhaseChange?: (index: number) => void;
 }
 
 export default function JourneyTimeline({ phases, currentPhase, onPhaseChange }: JourneyTimelineProps) {
@@ -21,29 +21,82 @@ export default function JourneyTimeline({ phases, currentPhase, onPhaseChange }:
         const isActive = index === currentPhase;
         const isLocked = index > currentPhase;
 
+        const phaseKey = phase.id || `phase-${index}-${phase.name || phase.title || 'unknown'}`;
+        const handleKeyDown = (e: React.KeyboardEvent) => {
+          if (!isLocked && onPhaseChange && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            onPhaseChange(index);
+          }
+        };
+
+        const iconContent = (
+          <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors
+            ${(() => {
+              // Extract nested ternary into explicit variable
+              if (isActive) {
+                return 'bg-accent-cyan/20 text-accent-cyan ring-2 ring-accent-cyan/50';
+              }
+              if (isCompleted) {
+                return 'bg-green-500/20 text-green-400';
+              }
+              return 'bg-white/5 text-white/30';
+            })()}`}
+          >
+            {(() => {
+              // Extract nested ternary into explicit variable
+              if (isActive) {
+                return <PlayCircle size={16} />;
+              }
+              if (isCompleted) {
+                return <CheckCircle2 size={16} />;
+              }
+              return <Lock size={16} />;
+            })()}
+          </div>
+        );
+
+        const textContent = (
+          <div className="ml-3 flex-1 min-w-0 pt-1">
+            <div className="flex items-baseline justify-between">
+              <h4 className={`text-sm font-medium ${(() => {
+                // Extract nested ternary into explicit variable
+                if (isActive) {
+                  return 'text-accent-cyan';
+                }
+                if (isCompleted) {
+                  return 'text-green-400';
+                }
+                return 'text-white/50';
+              })()}`}>
+                {phase.title}
+              </h4>
+            </div>
+            <p className="text-xs text-white/40 mt-1 truncate">{phase.description}</p>
+          </div>
+        );
+
+        if (!isLocked && onPhaseChange) {
+          return (
+            <button
+              key={phaseKey}
+              type="button"
+              className="flex items-start w-full text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent-cyan/50"
+              onClick={() => onPhaseChange(index)}
+              onKeyDown={handleKeyDown}
+            >
+              {iconContent}
+              {textContent}
+            </button>
+          );
+        }
+
         return (
           <div
-            key={phase.id || index}
-            className={`flex items-start ${!isLocked && onPhaseChange ? 'cursor-pointer' : 'cursor-default'}`}
-            onClick={() => !isLocked && onPhaseChange && onPhaseChange(index)}
+            key={phaseKey}
+            className="flex items-start cursor-default"
           >
-            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors
-              ${isActive
-                ? 'bg-accent-cyan/20 text-accent-cyan ring-2 ring-accent-cyan/50'
-                : isCompleted
-                  ? 'bg-green-500/20 text-green-400'
-                  : 'bg-white/5 text-white/30'}`}
-            >
-              {isActive ? <PlayCircle size={16} /> : isCompleted ? <CheckCircle2 size={16} /> : <Lock size={16} />}
-            </div>
-            <div className="ml-3 flex-1 min-w-0 pt-1">
-              <div className="flex items-baseline justify-between">
-                <h4 className={`text-sm font-medium ${isActive ? 'text-accent-cyan' : isCompleted ? 'text-green-400' : 'text-white/50'}`}>
-                  {phase.title}
-                </h4>
-              </div>
-              <p className="text-xs text-white/40 mt-1 truncate">{phase.description}</p>
-            </div>
+            {iconContent}
+            {textContent}
           </div>
         );
       })}

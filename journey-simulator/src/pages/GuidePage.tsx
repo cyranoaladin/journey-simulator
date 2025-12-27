@@ -1,20 +1,21 @@
-import { useState, useEffect } from 'react';
+import { AECO, AEPO, AEPO_VS_AECO } from '@/content/aepoAeco';
+import { generateStableKey } from '@/utils/generateStableKey';
 import {
     Book,
-    Compass,
-    Trophy,
+    Brain,
+    ChevronRight,
     Coins,
+    Compass,
     Layers,
     Menu,
-    X,
-    ChevronRight,
-    Target,
-    Shield,
-    Zap,
     Rocket,
-    Brain
+    Shield,
+    Target,
+    Trophy,
+    X,
+    Zap
 } from 'lucide-react';
-import { AEPO, AECO, AEPO_VS_AECO } from '@/content/aepoAeco';
+import { useEffect, useState } from 'react';
 
 const GuidePage = () => {
     const [activeSection, setActiveSection] = useState('getting-started');
@@ -189,15 +190,18 @@ const GuidePage = () => {
                                         { title: '4. Activate', desc: 'Deploy and activate community participation.' },
                                         { title: '5. Scale', desc: 'Expand governance and scale solutions.' },
                                         { title: '6. Launch', desc: 'Simulate launch readiness via Collaterize (devnet/testnet) and graduate to the Core Track.' }
-                                    ].map((phase, idx) => (
-                                        <div key={idx} className="relative">
-                                            <span className="absolute -left-[41px] flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">
-                                                {idx + 1}
-                                            </span>
-                                            <h4 className="text-lg font-bold text-white">{phase.title}</h4>
-                                            <p className="text-white/60">{phase.desc}</p>
-                                        </div>
-                                    ))}
+                                    ].map((phase, idx) => {
+                                        const phaseKey = generateStableKey(phase, 'guide-phase', ['title']);
+                                        return (
+                                            <div key={phaseKey} className="relative">
+                                                <span className="absolute -left-[41px] flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">
+                                                    {idx + 1}
+                                                </span>
+                                                <h4 className="text-lg font-bold text-white">{phase.title}</h4>
+                                                <p className="text-white/60">{phase.desc}</p>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
 
                                 <div className="mt-8 rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-6">
@@ -565,17 +569,20 @@ const GuidePage = () => {
                                             { title: '2. Deployment', desc: 'Token Minting & Bonding Curve Creation' },
                                             { title: '3. Trading', desc: 'Public Buy/Sell on Curve (Price Discovery)' },
                                             { title: '4. Graduation', desc: 'DEX Listing & Liquidity Lock' }
-                                        ].map((step, idx) => (
-                                            <div key={idx} className="relative flex md:flex-col items-center gap-4 md:text-center">
-                                                <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0d0d1a] border-2 border-indigo-500 text-sm font-bold text-white">
-                                                    {idx + 1}
+                                        ].map((step, idx) => {
+                                            const stepKey = generateStableKey(step, 'guide-step', ['title']);
+                                            return (
+                                                <div key={stepKey} className="relative flex md:flex-col items-center gap-4 md:text-center">
+                                                    <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0d0d1a] border-2 border-indigo-500 text-sm font-bold text-white">
+                                                        {idx + 1}
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="font-bold text-white">{step.title}</h4>
+                                                        <p className="text-xs text-white/50">{step.desc}</p>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <h4 className="font-bold text-white">{step.title}</h4>
-                                                    <p className="text-xs text-white/50">{step.desc}</p>
-                                                </div>
-                                            </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             </div>
@@ -615,15 +622,18 @@ const GuidePage = () => {
                                     step: '6. Launch & Graduation',
                                     text: 'Upon achieving a high Eligibility Score, simulate your launch via Collaterize on devnet/testnet. Graduate to the Core Track by reaching market cap targets.'
                                 }
-                            ].map((item, idx) => (
-                                <div key={idx} className="relative">
-                                    <div className="absolute -left-[41px] flex h-6 w-6 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">
-                                        {idx + 1}
+                            ].map((item, idx) => {
+                                const itemKey = generateStableKey(item, 'guide-item', ['step', 'title']);
+                                return (
+                                    <div key={itemKey} className="relative">
+                                        <div className="absolute -left-[41px] flex h-6 w-6 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">
+                                            {idx + 1}
+                                        </div>
+                                        <h3 className="text-xl font-bold text-white">{item.step}</h3>
+                                        <p className="mt-2 text-white/70">{item.text}</p>
                                     </div>
-                                    <h3 className="text-xl font-bold text-white">{item.step}</h3>
-                                    <p className="mt-2 text-white/70">{item.text}</p>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </section>
 

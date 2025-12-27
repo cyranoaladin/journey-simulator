@@ -1,5 +1,5 @@
-import { memo } from 'react';
 import { BrainCircuit, MessageSquare, Sparkles } from 'lucide-react';
+import { memo } from 'react';
 import type { AgentTimelineEntry } from '../Zyno/types';
 
 interface PhaseInteractionBlockProps {
@@ -26,8 +26,8 @@ const PhaseInteractionBlock = ({ phaseId, currentStep, onFeedback }: PhaseIntera
   return (
     <div
       className={`rounded-2xl border p-4 transition-colors ${isActivePhase
-          ? 'border-accent-cyan/60 bg-accent-cyan/10 shadow-neon-ring'
-          : 'border-slate-700/50 bg-slate-900/40'
+        ? 'border-accent-cyan/60 bg-accent-cyan/10 shadow-neon-ring'
+        : 'border-slate-700/50 bg-slate-900/40'
         }`}
     >
       <div className="flex items-start justify-between gap-3">
@@ -64,12 +64,15 @@ const PhaseInteractionBlock = ({ phaseId, currentStep, onFeedback }: PhaseIntera
           <div>
             <p className="mb-1 font-semibold text-slate-100">Sources</p>
             <ul className="space-y-1">
-              {currentStep.sources.slice(0, 3).map((source, index) => (
-                <li key={`${source?.title ?? 'source'}-${index}`} className="flex items-center gap-2 text-slate-300">
-                  <Sparkles size={12} className="text-accent-cyan" />
-                  <span>{source?.title ?? source?.url ?? 'Anonymous source'}</span>
-                </li>
-              ))}
+              {currentStep.sources.slice(0, 3).map((source) => {
+                const sourceKey = source?.id || source?.title || source?.url || `source-${source?.title || 'unknown'}`;
+                return (
+                  <li key={String(sourceKey)} className="flex items-center gap-2 text-slate-300">
+                    <Sparkles size={12} className="text-accent-cyan" />
+                    <span>{source?.title ?? source?.url ?? 'Anonymous source'}</span>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         )}

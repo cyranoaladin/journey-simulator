@@ -64,7 +64,9 @@ const JourneyDemo = () => {
               </p>
             </div>
             <button
-              onClick={() => void logout()}
+              onClick={() => {
+                logout();
+              }}
               className="rounded-full bg-white text-black px-4 py-2 text-sm font-bold hover:bg-gray-200 transition"
             >
               Exit Demo
@@ -100,5 +102,3 @@ const JourneyDemo = () => {
 };
 
 export default JourneyDemo;
-
-

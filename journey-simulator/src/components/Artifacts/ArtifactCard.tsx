@@ -1,11 +1,11 @@
+import { Eye, Lock } from 'lucide-react';
 import React from 'react';
-import { Lock, Eye } from 'lucide-react';
 
 interface Artifact {
   id: string;
   title: string;
   type: string;
-  agent: { name: string; role: string; color: string };
+  agent: { name: string; role: string; color: string; };
   status: string;
   thumbnailIcon: string;
 }
@@ -18,14 +18,23 @@ interface Props {
 export const ArtifactCard: React.FC<Props> = ({ artifact, onClick }) => {
   const isLocked = artifact.status === 'locked';
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!isLocked && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
   return (
-    <div 
-      onClick={!isLocked ? onClick : undefined}
-      className={`relative group p-4 rounded-xl border transition-all duration-300 ${
-        isLocked 
-          ? 'bg-white/5 border-white/5 cursor-not-allowed opacity-60' 
-          : 'bg-[#13132B]/80 border-purple-500/20 hover:border-purple-500 hover:shadow-[0_0_20px_rgba(160,32,240,0.2)] cursor-pointer backdrop-blur-md'
-      }`}
+    <div
+      onClick={isLocked ? undefined : onClick}
+      onKeyDown={isLocked ? undefined : handleKeyDown}
+      role={isLocked ? undefined : 'button'}
+      tabIndex={isLocked ? undefined : 0}
+      className={`relative group p-4 rounded-xl border transition-all duration-300 ${isLocked
+          ? 'bg-white/5 border-white/5 cursor-not-allowed opacity-60'
+          : 'bg-[#13132B]/80 border-purple-500/20 hover:border-purple-500 hover:shadow-[0_0_20px_rgba(160,32,240,0.2)] cursor-pointer backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-purple-500/50'
+        }`}
     >
       {/* Badge Type */}
       <div className="flex justify-between items-start mb-3">

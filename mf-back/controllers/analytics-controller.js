@@ -4,7 +4,7 @@ const Journey = require('../models/Journeys');
 // Track certification downloads
 exports.trackCertificationDownload = async (req, res) => {
   try {
-    const { certification_id, phase, user_persona, download_timestamp } = req.body;
+    const { certification_id, phase, download_timestamp } = req.body;
     const userId = req.user.id;
 
     // Log the download event
@@ -38,7 +38,7 @@ exports.trackCertificationDownload = async (req, res) => {
 // Track certification shares
 exports.trackCertificationShare = async (req, res) => {
   try {
-    const { certification_id, platform, phase, user_persona, share_timestamp } = req.body;
+    const { certification_id, platform, phase, share_timestamp } = req.body;
     const userId = req.user.id;
 
     // Log the share event
@@ -142,15 +142,15 @@ exports.getPlatformStats = async (req, res) => {
   try {
     // Get total users
     const totalUsers = await User.countDocuments();
-    
+
     // Get total NFTs minted
     const usersWithNFTs = await User.find({ 'nft_certificates.0': { $exists: true } });
     const totalNFTs = usersWithNFTs.reduce((sum, user) => sum + (user.nft_certificates?.length || 0), 0);
-    
+
     // Get total XP across all users
     const users = await User.find({}, 'total_xp');
     const totalXP = users.reduce((sum, user) => sum + (user.total_xp || 0), 0);
-    
+
     // Get active journeys (users with completed phases)
     const activeJourneys = await User.countDocuments({
       'completed_phases': { $gt: 0 }

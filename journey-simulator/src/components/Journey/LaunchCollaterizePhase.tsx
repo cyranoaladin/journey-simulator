@@ -1,7 +1,8 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useJourneyStore } from '../../store/journeyStore';
 import { api } from '../../utils/api';
+import { generateStableKey } from '../../utils/generateStableKey';
 
 export const LaunchCollaterizePhase: React.FC = () => {
   const apiJourneyId = useJourneyStore((state) => state.apiJourneyId);
@@ -28,7 +29,7 @@ export const LaunchCollaterizePhase: React.FC = () => {
 
     try {
       const response = await api.simulateCollaterizeLaunch(journeyId);
-      
+
       if (response.ok && response.simulation) {
         setCollaterizeSimulation(response.simulation);
         setResults(response.simulation);
@@ -107,11 +108,10 @@ export const LaunchCollaterizePhase: React.FC = () => {
     <div className="w-full max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-white">Launch Simulation Results</h2>
-        <div className={`px-4 py-1 rounded-full text-sm font-bold ${
-          results.accepted 
-            ? 'bg-green-900/50 text-green-400 border border-green-500' 
+        <div className={`px-4 py-1 rounded-full text-sm font-bold ${results.accepted
+            ? 'bg-green-900/50 text-green-400 border border-green-500'
             : 'bg-red-900/50 text-red-400 border border-red-500'
-        }`}>
+          }`}>
           {results.accepted ? 'ELIGIBLE' : 'NOT ELIGIBLE'}
         </div>
       </div>
@@ -127,10 +127,9 @@ export const LaunchCollaterizePhase: React.FC = () => {
           <div className="w-full bg-gray-700 h-3 rounded-full overflow-hidden">
             <div
               ref={eligibilityBarRef}
-              className={`h-full transition-all duration-500 ${
-                results.eligibilityScore >= 80 ? 'bg-green-500' :
-                results.eligibilityScore >= 60 ? 'bg-yellow-500' : 'bg-red-500'
-              }`}
+              className={`h-full transition-all duration-500 ${results.eligibilityScore >= 80 ? 'bg-green-500' :
+                  results.eligibilityScore >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                }`}
             />
           </div>
           <p className="mt-2 text-sm text-gray-400">
@@ -205,12 +204,15 @@ export const LaunchCollaterizePhase: React.FC = () => {
         <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
           <h3 className="text-lg font-semibold text-gray-300 mb-4">Recommendations</h3>
           <ul className="space-y-2">
-            {results.notes.map((note: string, idx: number) => (
-              <li key={idx} className="flex items-start gap-2 text-sm text-gray-300">
-                <span className="text-blue-400 mt-1">•</span>
-                {note}
-              </li>
-            ))}
+            {results.notes.map((note: string) => {
+              const noteKey = generateStableKey({ text: note }, 'recommendation-note', ['text']);
+              return (
+                <li key={noteKey} className="flex items-start gap-2 text-sm text-gray-300">
+                  <span className="text-blue-400 mt-1">•</span>
+                  {note}
+                </li>
+              );
+            })}
           </ul>
         </div>
       </div>

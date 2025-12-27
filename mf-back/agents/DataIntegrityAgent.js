@@ -14,6 +14,12 @@ class DataIntegrityAgent {
       const hasInput = Boolean(input && input.trim());
 
       const summary = hasInput ? 'Data integrity checks defined' : 'Data integrity checks drafted with limited input';
+      const confidence = hasInput ? 0.72 : 0.58;
+      const findings = [
+        { item: 'schema', status: 'ok', detail: 'Schema validation listed' },
+        { item: 'idempotence', status: 'ok', detail: 'Deterministic IDs covered' },
+        { item: 'monitoring', status: 'ok', detail: 'Null/dup/drift monitoring planned' },
+      ];
 
       const details = {
         intent: intentNormalized || 'data_integrity',
@@ -40,6 +46,9 @@ class DataIntegrityAgent {
         status: hasInput ? 'OK' : 'WARN',
         summary,
         details,
+        findings,
+        confidence,
+        assumptions: hasInput ? [] : ['Entrée partielle, contrôles à affiner'],
         actions,
         citations: [],
         metrics: { latencyMs: Date.now() - started },

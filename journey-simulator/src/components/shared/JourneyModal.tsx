@@ -1,19 +1,20 @@
-import { lazy, Suspense } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
-  X,
+  ArrowRight,
   CheckCircle,
   Clock,
-  Trophy,
-  Zap,
   ExternalLink,
-  ArrowRight,
   TrendingUp,
+  Trophy,
+  X,
+  Zap,
 } from 'lucide-react';
+import { lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useJourneyStore } from '../../store/journeyStore';
 import { personas } from '../../data/personas';
+import { useJourneyStore } from '../../store/journeyStore';
 import type { AccessPassHolder } from '../../types/journey';
+import { generateStableKey } from '../../utils/generateStableKey';
 
 const CertificationModal = lazy(() => import('../CertificationModal'));
 const StakingModal = lazy(() => import('../StakingModal'));
@@ -124,11 +125,14 @@ const JourneyModal = () => {
                 Tools & Resources
               </h4>
               <div className="space-y-1">
-                {phase.tools.map((tool: string, idx: number) => (
-                  <div key={idx} className="text-sm bg-white/5 rounded px-2 py-1">
-                    {tool}
-                  </div>
-                ))}
+                {phase.tools.map((tool: string) => {
+                  const toolKey = generateStableKey({ name: tool }, 'tool', ['name']);
+                  return (
+                    <div key={toolKey} className="text-sm bg-white/5 rounded px-2 py-1">
+                      {tool}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -140,12 +144,15 @@ const JourneyModal = () => {
             </h3>
             <div className="grid gap-2">
               {phase.outcomes && Array.isArray(phase.outcomes) && phase.outcomes.length > 0 ? (
-                phase.outcomes.map((outcome: string, idx: number) => (
-                  <div key={idx} className="flex items-center text-sm">
-                    <CheckCircle size={16} className="mr-2 text-green-400" />
-                    {outcome}
-                  </div>
-                ))
+                phase.outcomes.map((outcome: string) => {
+                  const outcomeKey = generateStableKey({ text: outcome }, 'outcome', ['text']);
+                  return (
+                    <div key={outcomeKey} className="flex items-center text-sm">
+                      <CheckCircle size={16} className="mr-2 text-green-400" />
+                      {outcome}
+                    </div>
+                  );
+                })
               ) : (
                 <div className="text-sm italic text-gray-400">No expected outcomes listed.</div>
               )}
@@ -181,7 +188,7 @@ const JourneyModal = () => {
   };
 
   const renderHolderModal = () => {
-    const { holder } = modalContent as { holder: AccessPassHolder };
+    const { holder } = modalContent as { holder: AccessPassHolder; };
     return (
       <div className="max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="glass-effect rounded-2xl p-8">
@@ -198,8 +205,8 @@ const JourneyModal = () => {
                     {holder.passLevel === 'Gold'
                       ? '🥇'
                       : holder.passLevel === 'Platinum'
-                      ? '🥈'
-                      : '💎'}
+                        ? '🥈'
+                        : '💎'}
                   </span>
                   <span className="text-lg font-semibold">
                     {holder.passLevel} Skillchain Card™
@@ -232,17 +239,17 @@ const JourneyModal = () => {
                 <h3 className="font-semibold text-lg mb-3">Journey Metrics</h3>
                 <div className="grid grid-cols-2 gap-4">
                   {holder.metrics.map(
-                    (
-                      metric: { label: string; value: string },
-                      idx: number
-                    ) => (
-                      <div key={idx} className="bg-white/5 rounded-lg p-4">
-                        <div className="text-sm opacity-80">{metric.label}</div>
-                        <div className="text-lg font-mono font-semibold">
-                          {metric.value}
+                    (metric: { label: string; value: string; }) => {
+                      const metricKey = generateStableKey(metric, 'metric', ['label']);
+                      return (
+                        <div key={metricKey} className="bg-white/5 rounded-lg p-4">
+                          <div className="text-sm opacity-80">{metric.label}</div>
+                          <div className="text-lg font-mono font-semibold">
+                            {metric.value}
+                          </div>
                         </div>
-                      </div>
-                    )
+                      );
+                    }
                   )}
                 </div>
               </div>

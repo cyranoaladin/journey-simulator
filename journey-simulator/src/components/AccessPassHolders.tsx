@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { AlertCircle, ExternalLink, RefreshCw, TrendingUp, Trophy, Zap } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 import { holders } from '../data/holders';
 import { useJourneyStore } from '../store/journeyStore';
-import { Trophy, TrendingUp, Zap, ExternalLink, RefreshCw, AlertCircle } from 'lucide-react';
-// import { api } from '../utils/api'; // Will be used when backend is ready
 import { logger } from '../utils/logger';
 
 const AccessPassHolders: React.FC = () => {
@@ -141,26 +140,38 @@ const AccessPassHolders: React.FC = () => {
               onClick={() => openHolderModal(holder.id)}
               className="builders-circle-card card cursor-pointer"
             >
-              <div className={`builders-circle-badge bg-gradient-to-br ${
-                holder.passLevel === 'Diamond' ? 'from-blue-400 to-purple-600' :
-                holder.passLevel === 'Platinum' ? 'from-gray-300 to-blue-300' :
-                'from-yellow-400 to-orange-500'
-              }`}>
-                <div className="absolute top-2 right-2 text-xs font-bold bg-black/30 text-white px-2 py-1 rounded-full">
-                  {holder.passLevel} Pass Holder
-                </div>
+              {(() => {
+                let badgeGradient = 'from-yellow-400 to-orange-500';
+                if (holder.passLevel === 'Diamond') {
+                  badgeGradient = 'from-blue-400 to-purple-600';
+                } else if (holder.passLevel === 'Platinum') {
+                  badgeGradient = 'from-gray-300 to-blue-300';
+                }
+                return (
+                  <div className={`builders-circle-badge bg-gradient-to-br ${badgeGradient}`}>
+                    <div className="absolute top-2 right-2 text-xs font-bold bg-black/30 text-white px-2 py-1 rounded-full">
+                      {holder.passLevel} Pass Holder
+                    </div>
 
-                <div className={`builders-circle-avatar ${
-                  holder.passLevel === 'Diamond' ? 'bg-gradient-diamond' :
-                  holder.passLevel === 'Platinum' ? 'bg-gradient-platinum' :
-                  'bg-gradient-gold'
-                }`}>
-                  {holder.avatar}
-                </div>
+                    {(() => {
+                      let avatarGradient = 'bg-gradient-gold';
+                      if (holder.passLevel === 'Diamond') {
+                        avatarGradient = 'bg-gradient-diamond';
+                      } else if (holder.passLevel === 'Platinum') {
+                        avatarGradient = 'bg-gradient-platinum';
+                      }
+                      return (
+                        <div className={`builders-circle-avatar ${avatarGradient}`}>
+                          {holder.avatar}
+                        </div>
+                      );
+                    })()}
 
-                <h3 className="text-xl font-space font-bold text-white mb-1">{holder.name}</h3>
-                <p className="text-white/90 font-medium">{holder.title}</p>
-              </div>
+                    <h3 className="text-xl font-space font-bold text-white mb-1">{holder.name}</h3>
+                    <p className="text-white/90 font-medium">{holder.title}</p>
+                  </div>
+                );
+              })()}
 
               <div className="builders-circle-metrics">
                 <div className="builders-circle-metric">
@@ -211,13 +222,19 @@ const AccessPassHolders: React.FC = () => {
                   >
                     <div>
                       <div className="flex items-center space-x-3 mb-4">
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
-                          holder.passLevel === 'Diamond' ? 'bg-gradient-diamond' :
-                          holder.passLevel === 'Platinum' ? 'bg-gradient-platinum' :
-                          'bg-gradient-gold'
-                        }`}>
-                          {holder.avatar}
-                        </div>
+                        {(() => {
+                          let hoverAvatarGradient = 'bg-gradient-gold';
+                          if (holder.passLevel === 'Diamond') {
+                            hoverAvatarGradient = 'bg-gradient-diamond';
+                          } else if (holder.passLevel === 'Platinum') {
+                            hoverAvatarGradient = 'bg-gradient-platinum';
+                          }
+                          return (
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${hoverAvatarGradient}`}>
+                              {holder.avatar}
+                            </div>
+                          );
+                        })()}
                         <div>
                           <h3 className="font-space font-bold text-white">{holder.name}</h3>
                           <p className="text-white/80">{holder.title}</p>

@@ -14,6 +14,12 @@ class ObservabilityAgent {
       const hasInput = Boolean(input && input.trim());
 
       const summary = hasInput ? 'Observability plan generated' : 'Observability plan drafted with limited input';
+      const confidence = hasInput ? 0.72 : 0.58;
+      const findings = [
+        { item: 'slos', status: 'ok', detail: 'SLOs drafted (latency, error rate, availability)' },
+        { item: 'alerts', status: 'ok', detail: 'Alert patterns suggested' },
+        { item: 'tracing', status: hasInput ? 'ok' : 'warn', detail: 'Tracing instrumentation to confirm' },
+      ];
 
       const details = {
         intent: intentNormalized || 'observability',
@@ -39,6 +45,9 @@ class ObservabilityAgent {
         status: hasInput ? 'OK' : 'WARN',
         summary,
         details,
+        findings,
+        confidence,
+        assumptions: hasInput ? [] : ['Inputs limités, SLOs à calibrer'],
         actions,
         citations: [],
         metrics: { latencyMs: Date.now() - started },

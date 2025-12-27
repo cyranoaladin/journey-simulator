@@ -1,7 +1,7 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { getJourneyPhases } from '../../config/journeyPhases';
 import { Check, Zap } from 'lucide-react';
+import React from 'react';
+import { getJourneyPhases } from '../../config/journeyPhases';
 
 interface Props {
   personaId: string;
@@ -48,21 +48,27 @@ export const JourneyProgressBar: React.FC<Props> = ({ personaId, currentStepId }
                 transition={{ delay: index * 0.1 }}
                 className={`
                   relative flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-500
-                  ${isCompleted
-                    ? 'border-accent-cyan bg-accent-cyan text-black shadow-[0_0_20px_rgba(34,211,238,0.4)]'
-                    : isCurrent
-                      ? 'border-accent-cyan bg-[#0A0A1F] text-accent-cyan shadow-[0_0_30px_rgba(34,211,238,0.6)] ring-2 ring-accent-cyan/20 ring-offset-2 ring-offset-black'
-                      : 'border-white/10 bg-[#0A0A1F] text-white/20'
-                  }
+                  ${(() => {
+                    // Extract nested ternary into explicit variable
+                    if (isCompleted) {
+                      return 'border-accent-cyan bg-accent-cyan text-black shadow-[0_0_20px_rgba(34,211,238,0.4)]';
+                    }
+                    if (isCurrent) {
+                      return 'border-accent-cyan bg-[#0A0A1F] text-accent-cyan shadow-[0_0_30px_rgba(34,211,238,0.6)] ring-2 ring-accent-cyan/20 ring-offset-2 ring-offset-black';
+                    }
+                    return 'border-white/10 bg-[#0A0A1F] text-white/20';
+                  })()}
                 `}
               >
-                {isCompleted ? (
-                  <Check size={18} strokeWidth={3} />
-                ) : isCurrent ? (
-                  <Zap size={18} className="fill-current" />
-                ) : (
-                  <span className="text-xs font-mono">{index + 1}</span>
-                )}
+                {(() => {
+                  if (isCompleted) {
+                    return <Check size={18} strokeWidth={3} />;
+                  }
+                  if (isCurrent) {
+                    return <Zap size={18} className="fill-current" />;
+                  }
+                  return <span className="text-xs font-mono">{index + 1}</span>;
+                })()}
 
                 {/* Pulse Effect for Current */}
                 {isCurrent && (
@@ -74,15 +80,32 @@ export const JourneyProgressBar: React.FC<Props> = ({ personaId, currentStepId }
               <div
                 className={`
                   absolute top-14 w-32 flex flex-col items-center text-center transition-all duration-500
-                  ${isCurrent ? 'opacity-100 translate-y-0' : isCompleted ? 'opacity-60 hover:opacity-100' : 'opacity-30 hover:opacity-80'}
+                  ${(() => {
+                    // Extract nested ternary into explicit variable
+                    if (isCurrent) {
+                      return 'opacity-100 translate-y-0';
+                    }
+                    if (isCompleted) {
+                      return 'opacity-60 hover:opacity-100';
+                    }
+                    return 'opacity-30 hover:opacity-80';
+                  })()}
                 `}
               >
-                <span className={`
-                    text-[10px] uppercase tracking-widest font-bold leading-tight
-                    ${isCurrent ? 'text-accent-cyan drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]' : isCompleted ? 'text-white' : 'text-white'}
-                `}>
-                  {phase.label}
-                </span>
+                {(() => {
+                  // Determine label color based on phase state (extracted to avoid conditional returning same value)
+                  let labelColorClass = 'text-white/40'; // Default: future phase
+                  if (isCurrent) {
+                    labelColorClass = 'text-accent-cyan drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]';
+                  } else if (isCompleted) {
+                    labelColorClass = 'text-accent-cyan/80';
+                  }
+                  return (
+                    <span className={`text-[10px] uppercase tracking-widest font-bold leading-tight ${labelColorClass}`}>
+                      {phase.label}
+                    </span>
+                  );
+                })()}
 
                 {index === activeIndex && (
                   <motion.span

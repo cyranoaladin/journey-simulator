@@ -8,15 +8,15 @@ interface SkeletonProps {
   height?: number | string;
 }
 
-const Skeleton = ({ 
-  className = '', 
-  count = 1, 
-  variant = 'text', 
-  width, 
-  height 
+const Skeleton = ({
+  className = '',
+  count = 1,
+  variant = 'text',
+  width,
+  height
 }: SkeletonProps) => {
   const baseClasses = "bg-gray-700/50 animate-pulse rounded-md";
-  
+
   const getVariantStyles = () => {
     if (width || height) {
       return {
@@ -24,7 +24,7 @@ const Skeleton = ({
         height: height ? (typeof height === 'number' ? `${height}px` : height) : undefined,
       };
     }
-    
+
     switch (variant) {
       case 'circular':
         return {
@@ -56,16 +56,19 @@ const Skeleton = ({
 
   const style = getVariantStyles();
 
-  const skeletons = Array(count).fill(null).map((_, index) => (
-    <motion.div
-      key={index}
-      className={`${baseClasses} ${className}`}
-      style={style}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: index * 0.05 }}
-    />
-  ));
+  const skeletons = Array(count).fill(null).map((_, index) => {
+    const skeletonKey = `skeleton-${index}-${variant}`;
+    return (
+      <motion.div
+        key={skeletonKey}
+        className={`${baseClasses} ${className}`}
+        style={style}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: index * 0.05 }}
+      />
+    );
+  });
 
   return <>{skeletons}</>;
 };

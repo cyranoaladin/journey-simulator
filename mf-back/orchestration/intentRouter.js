@@ -6,8 +6,8 @@ const FALLBACK_AGENT_ID = 'ProductSpecAgent';
 const normalizeToken = (token = '') =>
   token
     .toLowerCase()
-    .replace(/\./g, '_')
-    .replace(/\s+/g, '')
+    .replaceAll('.', '_')
+    .replace(/\s+/g, '') // Regex for whitespace replacement
     .trim();
 
 function normalizeIntents(intent) {

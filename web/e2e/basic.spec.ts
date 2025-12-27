@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 test('home loads and links are visible', async ({ page }) => {
   // bump a visit metric via a simple GET on health as synthetic traffic
@@ -31,7 +31,7 @@ test('ai echo executes and renders result (resilient)', async ({ page }) => {
   const submit = page.getByTestId('ai-echo-submit')
   const result = page.getByTestId('ai-echo-result')
 
-  const [resp] = await Promise.all([
+  await Promise.all([
     page
       .waitForResponse(
         (r) => r.url().endsWith('/api/ai/echo') && r.status() >= 200 && r.status() < 500,

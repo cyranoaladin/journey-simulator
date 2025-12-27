@@ -1,4 +1,4 @@
-const { randomUUID } = require('crypto');
+const { randomUUID } = require('node:crypto');
 
 const REQUEST_SCHEMA = {
   type: 'object',
@@ -83,34 +83,39 @@ const RESPONSE_SCHEMA = {
   },
 };
 
-const normalizeRequest = (payload = {}) => ({
-  traceId: payload.traceId || randomUUID(),
-  runId: payload.runId || `run-${Date.now()}`,
-  userId: payload.userId || 'demo-user',
-  intent: payload.intent || 'default',
-  input: payload.input || '',
-  context: {
-    rag: {
-      enabled: payload.context?.rag?.enabled !== false,
-      topK: payload.context?.rag?.topK || 4,
+const normalizeRequest = (payload = {}) => {
+  let intent = payload.intent;
+  if (intent == null) intent = 'default';
+  else if (typeof intent !== 'string' && !Array.isArray(intent)) intent = String(intent);
+  return {
+    traceId: payload.traceId || randomUUID(),
+    runId: payload.runId || `run-${Date.now()}`,
+    userId: payload.userId || 'demo-user',
+    intent,
+    input: payload.input || '',
+    context: {
+      rag: {
+        enabled: payload.context?.rag?.enabled !== false,
+        topK: payload.context?.rag?.topK || 4,
+      },
+      llm: {
+        provider: payload.context?.llm?.provider || 'openai',
+        model: payload.context?.llm?.model || 'gpt-4o',
+      },
+      journey: payload.context?.journey || payload.journeyContext || null,
     },
-    llm: {
-      provider: payload.context?.llm?.provider || 'openai',
-      model: payload.context?.llm?.model || 'gpt-4o',
+    intentSource: {
+      input: payload.intent || null,
+      workflow: payload.context?.journey ? `${payload.context?.journey?.journeyType || ''}/${payload.context?.journey?.phaseId || ''}` : null,
     },
-    journey: payload.context?.journey || payload.journeyContext || null,
-  },
-  intentSource: {
-    input: payload.intent || null,
-    workflow: payload.context?.journey ? `${payload.context?.journey?.journeyType || ''}/${payload.context?.journey?.phaseId || ''}` : null,
-  },
-  constraints: {
-    timeoutMs: payload.constraints?.timeoutMs || 6000,
-    maxTokens: payload.constraints?.maxTokens || 800,
-  },
-  toolsAllowed: Array.isArray(payload.toolsAllowed) ? payload.toolsAllowed : [],
-  raw: payload,
-});
+    constraints: {
+      timeoutMs: payload.constraints?.timeoutMs || 6000,
+      maxTokens: payload.constraints?.maxTokens || 800,
+    },
+    toolsAllowed: Array.isArray(payload.toolsAllowed) ? payload.toolsAllowed : [],
+    raw: payload,
+  };
+};
 
 module.exports = {
   REQUEST_SCHEMA,

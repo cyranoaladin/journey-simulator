@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { generateStableKey } from '../../utils/generateStableKey';
 
 export interface InteractiveTemplateBlock {
   kind: 'interactive_template_block';
@@ -17,7 +18,7 @@ export interface InteractiveTemplateBlock {
 }
 
 interface InteractiveTemplateBlockProps {
-  block: InteractiveTemplateBlock;
+  readonly block: InteractiveTemplateBlock;
 }
 
 export default function InteractiveTemplate({ block }: InteractiveTemplateBlockProps) {
@@ -61,10 +62,11 @@ export default function InteractiveTemplate({ block }: InteractiveTemplateBlockP
     const element = document.createElement('a');
     const file = new Blob([generatedContent], { type: 'text/markdown' });
     element.href = URL.createObjectURL(file);
+    // ReplaceAll doesn't work with regex, use replace with global flag for whitespace replacement
     element.download = `${block.title.replace(/\s+/g, '_')}.md`;
     document.body.appendChild(element);
     element.click();
-    document.body.removeChild(element);
+    element.remove();
   };
 
   return (
@@ -83,42 +85,48 @@ export default function InteractiveTemplate({ block }: InteractiveTemplateBlockP
 
       {!isSubmitted ? (
         <form onSubmit={handleSubmit} className="space-y-4">
-          {block.fields.map((field, index) => (
-            <div key={index}>
-              <label className="block text-sm font-medium mb-1">
-                {field.label}
-                {field.type === 'select' && (
-                  <select
-                    value={formData[field.name] || ''}
-                    onChange={(e) => handleInputChange(field.name, e.target.value)}
-                    className="w-full mt-1 px-3 py-2 bg-gray-800/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
-                  >
-                    <option value="">Select an option</option>
-                    {field.options?.map((option, idx) => (
-                      <option key={idx} value={option}>{option}</option>
-                    ))}
-                  </select>
-                )}
-                {field.type === 'textarea' && (
-                  <textarea
-                    value={formData[field.name] || ''}
-                    onChange={(e) => handleInputChange(field.name, e.target.value)}
-                    placeholder={field.placeholder}
-                    className="w-full mt-1 px-3 py-2 bg-gray-800/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 min-h-[100px]"
-                  />
-                )}
-                {(field.type === 'text' || field.type === 'number') && (
-                  <input
-                    type={field.type}
-                    value={formData[field.name] || ''}
-                    onChange={(e) => handleInputChange(field.name, e.target.value)}
-                    placeholder={field.placeholder}
-                    className="w-full mt-1 px-3 py-2 bg-gray-800/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
-                  />
-                )}
-              </label>
-            </div>
-          ))}
+          {block.fields.map((field) => {
+            const fieldKey = generateStableKey(field, 'template-field', ['name', 'label']);
+            return (
+              <div key={fieldKey}>
+                <label className="block text-sm font-medium mb-1">
+                  {field.label}
+                  {field.type === 'select' && (
+                    <select
+                      value={formData[field.name] || ''}
+                      onChange={(e) => handleInputChange(field.name, e.target.value)}
+                      className="w-full mt-1 px-3 py-2 bg-gray-800/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                    >
+                      <option value="">Select an option</option>
+                      {field.options?.map((option) => {
+                        const optionKey = generateStableKey({ value: option }, 'option', ['value']);
+                        return (
+                          <option key={optionKey} value={option}>{option}</option>
+                        );
+                      })}
+                    </select>
+                  )}
+                  {field.type === 'textarea' && (
+                    <textarea
+                      value={formData[field.name] || ''}
+                      onChange={(e) => handleInputChange(field.name, e.target.value)}
+                      placeholder={field.placeholder}
+                      className="w-full mt-1 px-3 py-2 bg-gray-800/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 min-h-[100px]"
+                    />
+                  )}
+                  {(field.type === 'text' || field.type === 'number') && (
+                    <input
+                      type={field.type}
+                      value={formData[field.name] || ''}
+                      onChange={(e) => handleInputChange(field.name, e.target.value)}
+                      placeholder={field.placeholder}
+                      className="w-full mt-1 px-3 py-2 bg-gray-800/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                    />
+                  )}
+                </label>
+              </div>
+            );
+          })}
 
           <button
             type="submit"

@@ -1,13 +1,13 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { X, TrendingUp, Lock } from 'lucide-react'
-import { useJourneyStore } from '../store/journeyStore'
+import { motion } from 'framer-motion';
+import { Lock, TrendingUp, X } from 'lucide-react';
+import { useState } from 'react';
+import { useJourneyStore } from '../store/journeyStore';
 
 interface StakingModalProps {
-  onClose: () => void
-  availableAmount: number
-  currentStaked: number
-  onStake?: (amount: number) => void
+  onClose: () => void;
+  availableAmount: number;
+  currentStaked: number;
+  onStake?: (amount: number) => void;
 }
 
 const StakingModal: React.FC<StakingModalProps> = ({
@@ -16,39 +16,39 @@ const StakingModal: React.FC<StakingModalProps> = ({
   currentStaked,
   onStake
 }) => {
-  const [stakeAmount, setStakeAmount] = useState('')
-  const [isStaking, setIsStaking] = useState(false)
-  const { updateStaking } = useJourneyStore()
+  const [stakeAmount, setStakeAmount] = useState('');
+  const [isStaking, setIsStaking] = useState(false);
+  const { updateStaking } = useJourneyStore();
 
   const handleStake = async () => {
-    const amount = parseFloat(stakeAmount)
-    if (amount <= 0 || amount > availableAmount) return
+    const amount = parseFloat(stakeAmount);
+    if (amount <= 0 || amount > availableAmount) return;
 
-    setIsStaking(true)
-    
+    setIsStaking(true);
+
     // Simulate staking transaction
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
     if (onStake) {
-      onStake(amount)
+      onStake(amount);
     } else {
-      updateStaking(amount)
-      onClose()
+      updateStaking(amount);
+      onClose();
     }
-    
-    setIsStaking(false)
-  }
+
+    setIsStaking(false);
+  };
 
   const calculateRewards = (amount: number) => {
-    const apy = 0.125 // 12.5% APY
-    const dailyReward = (amount * apy) / 365
-    const monthlyReward = dailyReward * 30
-    const yearlyReward = amount * apy
-    
-    return { dailyReward, monthlyReward, yearlyReward }
-  }
+    const apy = 0.125; // 12.5% APY
+    const dailyReward = (amount * apy) / 365;
+    const monthlyReward = dailyReward * 30;
+    const yearlyReward = amount * apy;
 
-  const rewards = calculateRewards(parseFloat(stakeAmount) || 0)
+    return { dailyReward, monthlyReward, yearlyReward };
+  };
+
+  const rewards = calculateRewards(parseFloat(stakeAmount) || 0);
 
   return (
     <motion.div
@@ -98,9 +98,10 @@ const StakingModal: React.FC<StakingModalProps> = ({
 
         {/* Stake Input */}
         <div className="mb-6">
-          <label className="block text-sm font-medium mb-2">Amount to stake</label>
+          <label htmlFor="stake-amount-input" className="block text-sm font-medium mb-2">Amount to stake</label>
           <div className="relative">
             <input
+              id="stake-amount-input"
               type="number"
               value={stakeAmount}
               onChange={(e) => setStakeAmount(e.target.value)}
@@ -108,16 +109,19 @@ const StakingModal: React.FC<StakingModalProps> = ({
               className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 pr-16 focus:outline-none focus:border-primary-400"
               max={availableAmount}
               step="0.1"
+              aria-describedby="stake-amount-hint"
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm opacity-70">
               $MFAI
             </div>
           </div>
           <div className="flex justify-between text-xs mt-2">
-            <span className="opacity-70">Available: {availableAmount.toFixed(2)} $MFAI</span>
+            <span id="stake-amount-hint" className="opacity-70">Available: {availableAmount.toFixed(2)} $MFAI</span>
             <button
+              type="button"
               onClick={() => setStakeAmount(availableAmount.toString())}
               className="text-primary-400 hover:text-primary-300"
+              aria-label="Set maximum available amount"
             >
               Max
             </button>
@@ -193,7 +197,7 @@ const StakingModal: React.FC<StakingModalProps> = ({
         </motion.button>
       </motion.div>
     </motion.div>
-  )
-}
+  );
+};
 
-export default StakingModal
+export default StakingModal;

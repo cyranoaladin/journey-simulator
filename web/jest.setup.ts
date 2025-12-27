@@ -1,18 +1,18 @@
-import '@testing-library/jest-dom'
-import { TextEncoder, TextDecoder } from 'util'
-import { WritableStream } from 'web-streams-ponyfill'
+import '@testing-library/jest-dom';
+import { TextDecoder, TextEncoder } from 'util';
+import { WritableStream } from 'web-streams-ponyfill';
 
-if (typeof global.WritableStream === 'undefined') {
-  ;(global as any).WritableStream = WritableStream
+if (typeof globalThis.WritableStream === 'undefined') {
+  ;(globalThis as any).WritableStream = WritableStream
 }
 
 // Polyfill for libs requiring TextEncoder/TextDecoder (e.g., noble)
-;(global as any).TextEncoder = TextEncoder
-;(global as any).TextDecoder = TextDecoder as unknown as typeof globalThis.TextDecoder
+;(globalThis as any).TextEncoder = TextEncoder
+;(globalThis as any).TextDecoder = TextDecoder as unknown as typeof globalThis.TextDecoder
 
 // Polyfill for Request/Response in Jest environment
 if (typeof Request === 'undefined') {
-  global.Request = class Request {
+  globalThis.Request = class Request {
     constructor(input: any, init: any) {
       this.json = async () => (init?.body ? JSON.parse(init.body) : {})
     }
@@ -63,7 +63,7 @@ if (typeof BroadcastChannel === 'undefined') {
       // console.log('BroadcastChannelMock: closed');
     }
   }
-  ;(global as any).BroadcastChannel = BroadcastChannelMock
+  ;(globalThis as any).BroadcastChannel = BroadcastChannelMock
 }
 
 // Ensure tests use in-memory state store and demo fallbacks by default

@@ -1,40 +1,40 @@
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useWallet } from '@solana/wallet-adapter-react'
-import { useWalletModal } from '@solana/wallet-adapter-react-ui'
+import { useWallet } from '@solana/wallet-adapter-react';
+import { useWalletModal } from '@solana/wallet-adapter-react-ui';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Wallet,
+  AlertCircle,
+  CheckCircle,
   ChevronDown,
   Copy,
   ExternalLink,
-  LogOut,
-  CheckCircle,
-  AlertCircle,
-  Wifi,
-  WifiOff,
   Loader,
-  RefreshCw
-} from 'lucide-react'
-import { useJourneyStore } from '../store/journeyStore'
-import { useAuth } from '../contexts/AuthContext'
-import { logger } from '../utils/logger'
-import { shallow } from 'zustand/shallow'
+  LogOut,
+  RefreshCw,
+  Wallet,
+  Wifi,
+  WifiOff
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { shallow } from 'zustand/shallow';
+import { useAuth } from '../contexts/AuthContext';
+import { useJourneyStore } from '../store/journeyStore';
+import { logger } from '../utils/logger';
 
 const WalletButton = () => {
-  const { publicKey, wallet, disconnect, connected, connecting, signMessage } = useWallet()
-  const { setVisible } = useWalletModal()
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [copied, setCopied] = useState(false)
-  const [isConnecting, setIsConnecting] = useState(false)
-  const [connectError, setConnectError] = useState<string | null>(null)
+  const { publicKey, wallet, disconnect, connected, connecting, signMessage } = useWallet();
+  const { setVisible } = useWalletModal();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [connectError, setConnectError] = useState<string | null>(null);
   const { userProgress, updateWalletConnection } = useJourneyStore(
     (state) => ({
       userProgress: state.userProgress,
       updateWalletConnection: state.updateWalletConnection,
     }),
     shallow
-  )
-  const { loginWithWallet, isAuthenticated } = useAuth()
+  );
+  const { loginWithWallet, isAuthenticated } = useAuth();
 
   // Update store when connection changes
   useEffect(() => {
@@ -57,12 +57,12 @@ const WalletButton = () => {
 
       // Reset connecting state when connection status changes
       if (connected || (!connecting && isConnecting)) {
-        setIsConnecting(false)
+        setIsConnecting(false);
       }
     };
 
     handleConnection();
-  }, [connected, publicKey, connecting, isConnecting, updateWalletConnection, isAuthenticated, loginWithWallet])
+  }, [connected, publicKey, connecting, isConnecting, updateWalletConnection, isAuthenticated, loginWithWallet]);
 
   // Handle connection errors
   useEffect(() => {
@@ -78,10 +78,10 @@ const WalletButton = () => {
   }, []);
 
   const handleConnect = () => {
-    setIsConnecting(true)
-    setConnectError(null)
-    setVisible(true)
-  }
+    setIsConnecting(true);
+    setConnectError(null);
+    setVisible(true);
+  };
 
   const handleRetry = () => {
     setConnectError(null);
@@ -89,58 +89,58 @@ const WalletButton = () => {
   };
 
   const handleDisconnect = () => {
-    disconnect()
-    setIsDropdownOpen(false)
-    updateWalletConnection(false, undefined)
-  }
+    disconnect();
+    setIsDropdownOpen(false);
+    updateWalletConnection(false, undefined);
+  };
 
   const copyAddress = async () => {
     if (publicKey) {
-      await navigator.clipboard.writeText(publicKey.toString())
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      await navigator.clipboard.writeText(publicKey.toString());
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
-  }
+  };
 
   const formatAddress = (address: string) => {
-    return `${address.slice(0, 4)}...${address.slice(-4)}`
-  }
+    return `${address.slice(0, 4)}...${address.slice(-4)}`;
+  };
 
   const getWalletIcon = () => {
-    if (!wallet?.adapter.icon) return <Wallet size={20} />
+    if (!wallet?.adapter.icon) return <Wallet size={20} />;
     return (
       <img
         src={wallet.adapter.icon}
         alt={wallet.adapter.name}
         className="w-5 h-5"
       />
-    )
-  }
+    );
+  };
 
   const getConnectionStatus = () => {
     if (connectError) return {
       icon: <AlertCircle size={16} className="text-red-400" />,
       text: 'Connection failed',
       color: 'text-red-400'
-    }
+    };
     if (connecting || isConnecting) return {
       icon: <Loader size={16} className="animate-spin" />,
       text: 'Connecting...',
       color: 'text-yellow-400'
-    }
+    };
     if (connected) return {
       icon: <Wifi size={16} />,
       text: 'Connected',
       color: 'text-green-400'
-    }
+    };
     return {
       icon: <WifiOff size={16} />,
       text: 'Disconnected',
       color: 'text-gray-400'
-    }
-  }
+    };
+  };
 
-  const status = getConnectionStatus()
+  const status = getConnectionStatus();
 
   if (!connected) {
     return (
@@ -189,7 +189,7 @@ const WalletButton = () => {
           )}
         </AnimatePresence>
       </div>
-    )
+    );
   }
 
   return (
@@ -289,8 +289,8 @@ const WalletButton = () => {
               <div className="space-y-2">
                 <button
                   onClick={() => {
-                    window.open(`https://explorer.solana.com/address/${publicKey!.toString()}?cluster=devnet`, '_blank')
-                    setIsDropdownOpen(false)
+                    globalThis.window.open(`https://explorer.solana.com/address/${publicKey!.toString()}?cluster=devnet`, '_blank');
+                    setIsDropdownOpen(false);
                   }}
                   className="w-full flex items-center space-x-2 p-2 hover:bg-white/10 rounded-lg transition-colors"
                 >
@@ -313,13 +313,21 @@ const WalletButton = () => {
 
       {/* Click outside to close */}
       {isDropdownOpen && (
-        <div
-          className="fixed inset-0 z-40"
+        <button
+          type="button"
+          className="fixed inset-0 z-40 bg-transparent border-0 p-0 cursor-default"
           onClick={() => setIsDropdownOpen(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              e.preventDefault();
+              setIsDropdownOpen(false);
+            }
+          }}
+          aria-label="Close dropdown"
         />
       )}
     </div>
-  )
-}
+  );
+};
 
-export default WalletButton
+export default WalletButton;

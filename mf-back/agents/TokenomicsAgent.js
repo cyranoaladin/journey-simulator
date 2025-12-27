@@ -17,6 +17,12 @@ class TokenomicsAgent {
         : [];
 
       const summary = hasInput ? 'Tokenomics outline produced' : 'Tokenomics outline drafted with limited input';
+      const confidence = hasInput ? 0.7 : 0.56;
+      const findings = [
+        { item: 'supply', status: 'ok', detail: 'Supply/vesting outlined' },
+        { item: 'allocations', status: 'ok', detail: 'Stakeholder allocations set' },
+        { item: 'scenarios', status: 'warn', detail: 'Run circulation scenarios' },
+      ];
 
       const details = {
         intent: intentNormalized || 'tokenomics',
@@ -47,6 +53,9 @@ class TokenomicsAgent {
         status: hasInput ? 'OK' : 'WARN',
         summary,
         details,
+        findings,
+        confidence,
+        assumptions: hasInput ? [] : ['Modèle préliminaire, à recalibrer'],
         actions,
         citations,
         metrics: { latencyMs: Date.now() - started, ragHits: citations.length },

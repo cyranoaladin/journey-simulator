@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { generateStableKey } from '../../utils/generateStableKey';
 
 export interface IndicatorBlock {
   kind: 'indicator_block';
@@ -196,18 +197,21 @@ export default function IndicatorBlock({ block }: IndicatorBlockProps) {
 
       {block.type !== 'radar' && (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mt-4">
-          {block.indicators.map((indicator, index) => (
-            <div key={index} className="bg-black/30 rounded-lg p-3 border border-white/10">
-              <div className="text-sm font-medium text-cyan-400">{indicator.name}</div>
-              <div className="text-lg font-bold">{Math.round(indicator.value)}/{indicator.max}</div>
-              <div className="w-full bg-gray-700 rounded-full h-1.5 mt-1">
-                <div
-                  className="h-1.5 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500"
-                  style={{ width: `${(indicator.value / indicator.max) * 100}%` }}
-                ></div>
+          {block.indicators.map((indicator) => {
+            const indicatorKey = generateStableKey(indicator, 'indicator', ['name', 'id']);
+            return (
+              <div key={indicatorKey} className="bg-black/30 rounded-lg p-3 border border-white/10">
+                <div className="text-sm font-medium text-cyan-400">{indicator.name}</div>
+                <div className="text-lg font-bold">{Math.round(indicator.value)}/{indicator.max}</div>
+                <div className="w-full bg-gray-700 rounded-full h-1.5 mt-1">
+                  <div
+                    className="h-1.5 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500"
+                    style={{ width: `${(indicator.value / indicator.max) * 100}%` }}
+                  ></div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

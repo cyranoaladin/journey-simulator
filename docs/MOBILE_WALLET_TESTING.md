@@ -68,3 +68,11 @@ This guide outlines the steps to verify wallet connectivity and NFT minting on m
 
 - Use `ngrok http 3000` to expose your local server for mobile testing.
 - Check `console.log` via remote debugging (USB) if issues persist.
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

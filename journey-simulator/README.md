@@ -568,6 +568,19 @@ Le simulateur embarque une console “investor/dev” pour observer Zyno et l’
 
 ---
 
+## 🧠 Orchestration agentique (R2.x — résumé)
+
+- Intent router + registry enrichi : sélection déterministe d’agents (sécurité/produit), scoring pondéré par `confidenceWeight` + `learningScore`.
+- Arbitrage Zyno : contradictions détectées, décision structurée (`overallStatus`, `topFindings`, `recommendedActions`, `actionPlan` dédupliqué).
+- Mémoire & apprentissage : mémoire TTL/FIFO (in-memory), ajustement de confiance via historique (OK/FAIL/TIMEOUT/contradictions).
+- Tooling & executionPlan : mapping actions → tools (`enable_checklist` seul tool autorisé en exécution réelle, autres en dry-run/skipped).
+- Execution Gate (HITL) : gate PENDING/APPROVED/REJECTED/EXPIRED requis avant toute exécution réelle.
+- Execution Engine :
+  - Mode par défaut : `DRY_RUN` (SIMULATED), aucun side-effect.
+  - Mode réel (opt-in) : uniquement si `EXECUTION_ENABLED=true` **et** gate `APPROVED`, un seul tool exécuté, les autres `SKIPPED_REAL_EXECUTION`; fallback automatique en dry-run si blocage.
+- Observabilité : logs structurés avec `traceId`, statut des steps (SIMULATED/EXECUTED/SKIPPED), réponse toujours structurée (pas de throw).
+- Variables env : `EXECUTION_ENABLED` (par défaut false) pour autoriser le mode réel ; ne l’activer qu’avec un gate approuvé.
+
 ## 🚀 Quick Start
 
 Cette section te permet de lancer rapidement la stack de dev (frontend + backend), puis de valider un premier parcours (persona → phases → progression).

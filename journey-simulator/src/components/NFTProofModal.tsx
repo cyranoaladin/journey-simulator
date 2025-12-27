@@ -1,31 +1,31 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
+  ArrowUp,
   Award,
-  Download,
-  Share2,
-  ExternalLink,
-  Copy,
   CheckCircle,
-  X,
+  Copy,
+  Download,
+  ExternalLink,
+  Linkedin,
   Loader,
-  Zap,
+  MessageSquare,
+  Share2,
+  Shield,
   Trophy,
   Twitter,
-  Linkedin,
-  MessageSquare,
   Wallet,
-  ArrowUp,
-  Shield
+  X,
+  Zap
 } from 'lucide-react';
-import { useWallet, useConnection } from '@solana/wallet-adapter-react';
-import { useJourneyStore } from '../store/journeyStore';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { getPersonaProofData } from '../data/proofsData';
+import { useJourneyStore } from '../store/journeyStore';
 
 const normalizePersonaId = (id?: string | null) => {
   if (!id) return undefined;
-  return id.replace(/_/g, '-').toLowerCase();
+  return id.replaceAll('_', '-').toLowerCase();
 };
 
 type HtmlToImageModule = typeof import('html-to-image');
@@ -261,6 +261,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
           borderColor: 'border-cyan-300'
         };
       default:
+        // Reuse same block as 'cognitive-activation-hub' case to avoid duplication
         return {
           bgGradient: 'from-sky-500 to-cyan-400',
           iconBg: 'bg-sky-500',
@@ -327,7 +328,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
 
   // Generate token ID
   const generateTokenId = () => {
-    return `${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
+    return `${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
   };
 
   const tokenId = generateTokenId();
@@ -350,8 +351,8 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
       }
 
       // Call actual mint function
-      const personaIdentifier = selectedPersona?.id || personaIdProp
-      const derivedPhaseId = phaseIdProp || selectedPersona?.phases?.[Math.max(0, phaseNumber - 1)]?.id
+      const personaIdentifier = selectedPersona?.id || personaIdProp;
+      const derivedPhaseId = phaseIdProp || selectedPersona?.phases?.[Math.max(0, phaseNumber - 1)]?.id;
 
       const result = await mintNFT(title, { publicKey, signTransaction }, {
         personaId: personaIdentifier,
@@ -493,7 +494,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
     }
 
     if (shareUrl) {
-      window.open(shareUrl, '_blank');
+      globalThis.window.open(shareUrl, '_blank');
     }
 
     setShowShareOptions(false);
@@ -842,7 +843,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
               whileTap={{ scale: 0.98 }}
               onClick={() => {
                 if (explorerUrl) {
-                  window.open(explorerUrl, '_blank');
+                  globalThis.window.open(explorerUrl, '_blank');
                 }
               }}
               className="w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white"
@@ -921,7 +922,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
               whileTap={{ scale: 0.95 }}
               onClick={() => {
                 if (explorerUrl) {
-                  window.open(explorerUrl, '_blank');
+                  globalThis.window.open(explorerUrl, '_blank');
                 }
               }}
               disabled={!mintedAddress}

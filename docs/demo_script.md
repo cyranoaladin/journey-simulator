@@ -49,3 +49,11 @@ Parcours (séquence)
 Annexes
 - Admin: /admin/logs, /admin/users, /admin/state (header x-api-key)
 - OpenAPI: docs/openapi/journey-simulator.yaml (RapiDoc/ReDoc via npm scripts)
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

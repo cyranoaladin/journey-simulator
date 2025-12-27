@@ -1,94 +1,27 @@
 const User = require('../models/user');
-const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 const dotenv = require('dotenv');
-const nacl = require('tweetnacl');
-// bs58 v6 is ESM-first, so in CJS we access .default
-const bs58 = require('bs58').default || require('bs58');
+const AuthService = require('../services/authService');
 
 dotenv.config({
   quiet: true
 });
 
-const JWT_SECRET = process.env.JWT_SECRET || (process.env.NODE_ENV === 'test' ? 'test-secret' : null);
-
-if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is not defined');
-}
-
-// Generate access token - short lived (15-60 minutes)
-const generateAccessToken = (user) => {
-  return jwt.sign(
-    {
-      id: user._id,
-      email: user.email,
-      role: user.role
-    },
-    JWT_SECRET,
-    { expiresIn: '1h' } // Short-lived token
-  );
-};
-
-// Generate refresh token - longer lived (days/weeks)
-const hashRefreshToken = (token) =>
-  crypto.createHash('sha256').update(String(token)).digest('hex');
-
-const generateRefreshToken = (user) => {
-  // Create a random token
-  const refreshToken = crypto.randomBytes(40).toString('hex');
-
-  // Set expiry date - 7 days from now
-  const refreshTokenExpiry = new Date();
-  refreshTokenExpiry.setDate(refreshTokenExpiry.getDate() + 7);
-
-  // Save to user (store hash, not raw token)
-  user.refreshTokenHash = hashRefreshToken(refreshToken);
-  user.refreshTokenExpiry = refreshTokenExpiry;
-  // Clear legacy raw token storage once we rotate.
-  user.refreshToken = undefined;
-
-  return refreshToken;
-};
-
 exports.registerUser = async (req, res) => {
   try {
-    const { name, email, password, wallet_address, persona } = req.body;
-
-    // Check if user already exists
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.status(400).json({ success: false, message: 'User with this email already exists' });
+    const result = await AuthService.createUser(req.body);
+    if (!result.success) {
+      return res.status(result.error.status).json({ success: false, message: result.error.message });
     }
 
-    // Create user
-    const user = await User.create({
-      name,
-      email,
-      password,
-      wallet_address,
-      persona,
+    const refreshToken = AuthService.generateRefreshToken(result.user);
+    await result.user.save();
+
+    res.status(201).json({
+      success: true,
+      user: AuthService.sanitizeUserResponse(result.user),
+      accessToken: AuthService.generateAccessToken(result.user),
+      refreshToken
     });
-
-    if (user) {
-      // Generate refresh token
-      const refreshToken = generateRefreshToken(user);
-      await user.save(); // Save the refresh token to user
-
-      res.status(201).json({
-        success: true,
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          wallet_address: user.wallet_address,
-          persona: user.persona,
-        },
-        accessToken: generateAccessToken(user),
-        refreshToken
-      });
-    } else {
-      res.status(400).json({ success: false, message: 'Invalid user data' });
-    }
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -101,28 +34,19 @@ exports.registerUser = async (req, res) => {
 exports.createWalletChallenge = async (req, res) => {
   try {
     const { wallet_address } = req.body;
-
     if (!wallet_address) {
       return res.status(400).json({ success: false, message: 'Wallet address is required' });
     }
 
-    const user = await User.findOne({ wallet_address });
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+    const result = await AuthService.createWalletChallenge(wallet_address);
+    if (!result.success) {
+      return res.status(result.error.status).json({ success: false, message: result.error.message });
     }
-
-    // Generate nonce
-    const nonce = crypto.randomBytes(32).toString('hex');
-    user.wallet_nonce = nonce;
-    user.wallet_nonce_expiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
-    await user.save();
-
-    const message = `Sign this message to log in to Money Factory AI\n\nNonce: ${nonce}`;
 
     res.status(200).json({
       success: true,
-      message,
-      nonce
+      message: result.message,
+      nonce: result.nonce
     });
   } catch (error) {
     res.status(500).json({
@@ -136,44 +60,19 @@ exports.createWalletChallenge = async (req, res) => {
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    // Find user by email
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ success: false, message: 'Invalid email or password' });
+    const validation = await AuthService.validateCredentials(email, password);
+
+    if (!validation.valid) {
+      return res.status(validation.error.status).json({ success: false, message: validation.error.message });
     }
 
-    // Check if password is correct
-    const isMatch = await user.comparePassword(password);
+    const accessToken = AuthService.generateAccessToken(validation.user);
+    const refreshToken = AuthService.generateRefreshToken(validation.user);
+    await validation.user.save();
 
-    if (!isMatch) {
-      return res.status(401).json({ success: false, message: 'Invalid email or password' });
-    }
-
-    // Check if user is active
-    if (!user.is_active) {
-      return res.status(401).json({ success: false, message: 'Your account has been deactivated' });
-    }
-
-    // Generate tokens
-    const accessToken = generateAccessToken(user);
-
-    // Create & store refresh token (hashed in DB)
-    const refreshToken = generateRefreshToken(user);
-    await user.save();
-
-    // Clear sensitive data
-    const userToReturn = {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      wallet_address: user.wallet_address,
-    };
-
-    // Send response with tokens
     res.status(200).json({
       success: true,
-      user: userToReturn,
+      user: AuthService.sanitizeUserResponse(validation.user),
       accessToken,
       refreshToken
     });
@@ -186,88 +85,88 @@ exports.loginUser = async (req, res) => {
   }
 };
 
+// Helper functions for wallet login - using AuthService
+const validateWalletLoginInput = (walletAddress) => {
+  if (!walletAddress) {
+    return { valid: false, error: { status: 400, message: 'Wallet address is required' } };
+  }
+  return { valid: true };
+};
+
+const validateUserForLogin = (user) => {
+  if (!user) {
+    return { valid: false, error: { status: 404, message: 'User not found' } };
+  }
+  if (!user.is_active) {
+    return { valid: false, error: { status: 401, message: 'Your account has been deactivated' } };
+  }
+  return { valid: true };
+};
+
+const checkStrictModeRequirement = (isStrict, hasProof, walletAddress) => {
+  if (isStrict && !hasProof) {
+    console.warn(`[Auth] Rejected insecure wallet login for ${walletAddress} (Strict Mode ON)`);
+    return {
+      blocked: true,
+      error: {
+        status: 400,
+        message: 'Signature and message required. Insecure login is disabled.'
+      }
+    };
+  }
+  return { blocked: false };
+};
+
 exports.loginWithWallet = async (req, res) => {
   try {
     const { wallet_address, signature, message } = req.body;
 
-    if (!wallet_address) {
-      return res.status(400).json({ success: false, message: 'Wallet address is required' });
+    const inputValidation = validateWalletLoginInput(wallet_address);
+    if (!inputValidation.valid) {
+      return res.status(inputValidation.error.status).json({
+        success: false,
+        message: inputValidation.error.message
+      });
     }
 
-    // Find user by wallet address
     const user = await User.findOne({ wallet_address });
-
-    if (!user) {
-      // User not found - Frontend should redirect to registration
-      return res.status(404).json({ success: false, message: 'User not found' });
-    }
-
-    // Check if user is active
-    if (!user.is_active) {
-      return res.status(401).json({ success: false, message: 'Your account has been deactivated' });
+    const userValidation = validateUserForLogin(user);
+    if (!userValidation.valid) {
+      return res.status(userValidation.error.status).json({
+        success: false,
+        message: userValidation.error.message
+      });
     }
 
     const isStrict = process.env.ENABLE_STRICT_WALLET_LOGIN === 'true';
     const hasProof = signature && message;
 
-    if (isStrict && !hasProof) {
-      console.warn(`[Auth] Rejected insecure wallet login for ${wallet_address} (Strict Mode ON)`);
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Signature and message required. Insecure login is disabled.' 
+    const strictCheck = checkStrictModeRequirement(isStrict, hasProof, wallet_address);
+    if (strictCheck.blocked) {
+      return res.status(strictCheck.error.status).json({
+        success: false,
+        message: strictCheck.error.message
       });
     }
 
     if (hasProof) {
-      // Secure Path: Verify signature if provided (regardless of strict mode)
-      
-      // Verify challenge exists and is valid
-      if (!user.wallet_nonce || !user.wallet_nonce_expiry || user.wallet_nonce_expiry < new Date()) {
-        return res.status(401).json({ success: false, message: 'Login challenge expired or invalid. Please request a new challenge.' });
+      const secureLoginResult = await AuthService.performSecureLogin(user, signature, message, wallet_address);
+      if (!secureLoginResult.valid) {
+        return res.status(secureLoginResult.error.status).json({
+          success: false,
+          message: secureLoginResult.error.message,
+          ...(secureLoginResult.error.error && { error: secureLoginResult.error.error })
+        });
       }
-
-      // Verify message format
-      const expectedMessage = `Sign this message to log in to Money Factory AI\n\nNonce: ${user.wallet_nonce}`;
-      if (message !== expectedMessage) {
-        return res.status(401).json({ success: false, message: 'Invalid message format or nonce mismatch' });
-      }
-
-      // Verify signature
-      try {
-        const signatureUint8 = bs58.decode(signature);
-        const messageUint8 = new TextEncoder().encode(message);
-        const publicKeyUint8 = bs58.decode(wallet_address);
-
-        const verified = nacl.sign.detached.verify(messageUint8, signatureUint8, publicKeyUint8);
-        if (!verified) {
-          return res.status(401).json({ success: false, message: 'Invalid wallet signature' });
-        }
-      } catch (err) {
-        return res.status(400).json({ success: false, message: 'Cryptographic verification failed', error: err.message });
-      }
-
-      // Clear nonce after successful verification
-      user.wallet_nonce = null;
-      user.wallet_nonce_expiry = null;
-      await user.save();
     } else {
-      // Legacy Path: Only reached if !isStrict and !hasProof
       console.warn(`[Security Warning] Insecure wallet login used for ${wallet_address}. Enable ENABLE_STRICT_WALLET_LOGIN=true for production.`);
     }
 
-    // Generate tokens
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
+    const accessToken = AuthService.generateAccessToken(user);
+    const refreshToken = AuthService.generateRefreshToken(user);
     await user.save();
 
-    // Clear sensitive data
-    const userToReturn = {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      wallet_address: user.wallet_address,
-    };
+    const userToReturn = AuthService.sanitizeUserResponse(user);
 
     res.status(200).json({
       success: true,
@@ -472,7 +371,7 @@ exports.subscription = async (req, res) => {
       });
     }
 
-    const user = await User.findById(req.params.id)
+    const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
@@ -503,18 +402,18 @@ exports.subscription = async (req, res) => {
 exports.debugWhoAmI = async (req, res) => {
   // Guard: Dev only or Admin
   if (process.env.NODE_ENV === 'production' && req.user.role !== 'admin') {
-      return res.status(403).json({ success: false, message: 'Debug endpoint not available' });
+    return res.status(403).json({ success: false, message: 'Debug endpoint not available' });
   }
 
   res.status(200).json({
-      success: true,
-      data: {
-          mongoId: req.user._id,
-          email: req.user.email,
-          wallet_address: req.user.wallet_address,
-          role: req.user.role,
-          wallet_nonce_set: !!req.user.wallet_nonce
-      }
+    success: true,
+    data: {
+      mongoId: req.user._id,
+      email: req.user.email,
+      wallet_address: req.user.wallet_address,
+      role: req.user.role,
+      wallet_nonce_set: !!req.user.wallet_nonce
+    }
   });
 };
 
@@ -529,7 +428,7 @@ exports.logoutUser = async (req, res) => {
       });
     }
 
-    const refreshTokenHash = hashRefreshToken(refreshToken);
+    const refreshTokenHash = AuthService.hashRefreshToken(refreshToken);
     // Find user by hashed refresh token (preferred) or legacy raw token (temporary)
     const user = await User.findOne({
       $or: [{ refreshTokenHash }, { refreshToken }],
@@ -565,7 +464,7 @@ exports.refreshToken = async (req, res) => {
       });
     }
 
-    const refreshTokenHash = hashRefreshToken(refreshToken);
+    const refreshTokenHash = AuthService.hashRefreshToken(refreshToken);
     // Find user by hashed refresh token (preferred) or legacy raw token (temporary)
     const user = await User.findOne({
       refreshTokenExpiry: { $gt: new Date() },
@@ -579,9 +478,9 @@ exports.refreshToken = async (req, res) => {
       });
     }
 
-    const accessToken = generateAccessToken(user);
+    const accessToken = AuthService.generateAccessToken(user);
     // Rotate refresh token on every refresh to reduce replay window
-    const nextRefreshToken = generateRefreshToken(user);
+    const nextRefreshToken = AuthService.generateRefreshToken(user);
     await user.save();
 
     res.status(200).json({
@@ -638,25 +537,83 @@ exports.updateTokenBalance = async (req, res) => {
 
 const { verifyTransaction } = require('../utils/solana');
 
+// Helper functions to reduce cognitive complexity
+const normalizeStringField = (value) => {
+  return typeof value === 'string' ? value.trim() : undefined;
+};
+
+const normalizeNumericField = (value, min = 0, max = 100) => {
+  return Number.isFinite(Number(value)) ? Math.max(min, Math.min(max, Number(value))) : undefined;
+};
+
+const normalizePhase = (phase) => {
+  return Number.isFinite(Number(phase)) ? Number(phase) : undefined;
+};
+
+const validateRarity = (rarity, allowedRarities) => {
+  const normalized = normalizeStringField(rarity)?.toLowerCase();
+  if (normalized && !allowedRarities.includes(normalized)) {
+    return { valid: false, error: 'Invalid rarity provided' };
+  }
+  return { valid: true, value: normalized };
+};
+
+const resolveMintAddress = (nftAddress, mintAddress) => {
+  const resolved = nftAddress || mintAddress;
+  return typeof resolved === 'string' ? resolved.trim() : '';
+};
+
+const verifyNFTSecurity = async (resolvedAddress, walletAddress, userId) => {
+  const shouldVerify = process.env.NODE_ENV !== 'test' || process.env.ENABLE_SOLANA_TESTS === 'true';
+  if (!shouldVerify) return { success: true };
+
+  try {
+    await verifyTransaction(resolvedAddress, walletAddress);
+    return { success: true };
+  } catch (verificationError) {
+    const errorMsg = verificationError instanceof Error ? verificationError.message : String(verificationError);
+    if (process.env.NODE_ENV !== 'test') {
+      console.error(`NFT Verification Failed for user ${userId}:`, errorMsg);
+    }
+    return {
+      success: false,
+      error: errorMsg,
+      message: 'NFT Verification Failed: Invalid transaction or wallet mismatch.'
+    };
+  }
+};
+
+const buildCertificatePayload = (data, resolvedAddress) => {
+  const allowedRarities = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'mythic', 'unique'];
+  const rarityValidation = validateRarity(data.rarity, allowedRarities);
+  if (!rarityValidation.valid) {
+    return { error: rarityValidation.error };
+  }
+
+  const resolvedPhase = normalizePhase(data.phase);
+  const numericXp = normalizeNumericField(data.xp_earned, 0, 1000);
+  const numericScore = normalizeNumericField(data.score, 0, 100) || 0;
+
+  return {
+    payload: {
+      ...(resolvedPhase !== undefined && !Number.isNaN(resolvedPhase) && { phase: resolvedPhase }),
+      nft_address: resolvedAddress,
+      mint_address: resolvedAddress,
+      score: numericScore,
+      mint_date: new Date(),
+      ...(normalizeStringField(data.title) && { title: normalizeStringField(data.title) }),
+      ...(normalizeStringField(data.description) && { description: normalizeStringField(data.description) }),
+      ...(normalizeStringField(data.image_url) && { image_url: normalizeStringField(data.image_url) }),
+      ...(rarityValidation.value && { rarity: rarityValidation.value }),
+      ...(numericXp !== undefined && !Number.isNaN(numericXp) && { xp_earned: numericXp })
+    }
+  };
+};
+
 exports.addNFTCertificate = async (req, res) => {
   try {
     const userId = req.user.id;
-    const {
-      phase,
-      nft_address,
-      mint_address,
-      score,
-      title,
-      description,
-      image_url,
-      rarity,
-      xp_earned
-    } = req.body;
-
-    // In the frontend, 'mint_address' is sent as the transaction signature (txSig)
-    // We use this to verify the transaction on-chain.
-    const resolvedAddressRaw = nft_address || mint_address;
-    const resolvedAddress = typeof resolvedAddressRaw === 'string' ? resolvedAddressRaw.trim() : '';
+    const resolvedAddress = resolveMintAddress(req.body.nft_address, req.body.mint_address);
 
     if (!resolvedAddress || resolvedAddress.length < 10) {
       return res.status(400).json({
@@ -665,25 +622,14 @@ exports.addNFTCertificate = async (req, res) => {
       });
     }
 
-    // --- SECURITY CHECK: Verify Transaction on Solana ---
-    // Skip verification in test environment if needed, or mock it.
-    if (process.env.NODE_ENV !== 'test' || process.env.ENABLE_SOLANA_TESTS === 'true') {
-      try {
-        await verifyTransaction(resolvedAddress, req.user.wallet_address);
-      } catch (verificationError) {
-        const errorMsg = verificationError instanceof Error ? verificationError.message : String(verificationError);
-        // Only log in non-test environment to reduce CI noise
-        if (process.env.NODE_ENV !== 'test') {
-          console.error(`NFT Verification Failed for user ${userId}:`, errorMsg);
-        }
-        return res.status(400).json({
-          success: false,
-          message: 'NFT Verification Failed: Invalid transaction or wallet mismatch.',
-          error: errorMsg
-        });
-      }
+    const securityCheck = await verifyNFTSecurity(resolvedAddress, req.user.wallet_address, userId);
+    if (!securityCheck.success) {
+      return res.status(400).json({
+        success: false,
+        message: securityCheck.message,
+        error: securityCheck.error
+      });
     }
-    // ----------------------------------------------------
 
     const duplicateCertificate = await User.findOne({
       'nft_certificates.mint_address': resolvedAddress,
@@ -696,47 +642,19 @@ exports.addNFTCertificate = async (req, res) => {
       });
     }
 
-    const allowedRarities = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'mythic', 'unique'];
-
-    const resolvedPhase = Number.isFinite(Number(phase)) ? Number(phase) : undefined;
-
-    const numericXp = Number.isFinite(Number(xp_earned)) ? Math.max(0, Math.min(1000, Number(xp_earned))) : undefined;
-
-    const normalizedRarity = typeof rarity === 'string' && rarity.trim().length > 0
-      ? rarity.trim().toLowerCase()
-      : undefined;
-
-    if (normalizedRarity && !allowedRarities.includes(normalizedRarity)) {
+    const certificateResult = buildCertificatePayload(req.body, resolvedAddress);
+    if (certificateResult.error) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid rarity provided',
+        message: certificateResult.error,
       });
     }
-
-    const normalizedTitle = typeof title === 'string' ? title.trim() : undefined;
-    const normalizedDescription = typeof description === 'string' ? description.trim() : undefined;
-    const normalizedImageUrl = typeof image_url === 'string' ? image_url.trim() : undefined;
-
-    const numericScore = Number.isFinite(Number(score)) ? Math.max(0, Math.min(100, Number(score))) : 0;
-
-    const certificatePayload = {
-      ...(resolvedPhase !== undefined && !Number.isNaN(resolvedPhase) && { phase: resolvedPhase }),
-      nft_address: resolvedAddress,
-      mint_address: resolvedAddress,
-      score: numericScore,
-      mint_date: new Date(),
-      ...(normalizedTitle && { title: normalizedTitle }),
-      ...(normalizedDescription && { description: normalizedDescription }),
-      ...(normalizedImageUrl && { image_url: normalizedImageUrl }),
-      ...(normalizedRarity && { rarity: normalizedRarity }),
-      ...(numericXp !== undefined && !Number.isNaN(numericXp) && { xp_earned: numericXp })
-    };
 
     const user = await User.findByIdAndUpdate(
       userId,
       {
         $push: {
-          nft_certificates: certificatePayload
+          nft_certificates: certificateResult.payload
         }
       },
       { new: true }

@@ -11,3 +11,11 @@ Mapping cahier → implémentation
 - Observabilité: /api/health(z), /api/metrics, admin logs/state (see tests)
 
 Gaps majeurs: aucun bloquant pour le MVP; CI racine ajoutée; docs centralisés.
+
+## 👥 Contributeurs
+
+**Équipe Money Factory AI** :
+
+- **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
+- **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
+- **Adem Behajaissa** : Backend Stack Developer

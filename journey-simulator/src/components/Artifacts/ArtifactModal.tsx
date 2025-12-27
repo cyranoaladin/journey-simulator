@@ -1,6 +1,6 @@
+import { AnimatePresence, motion } from 'framer-motion';
+import { Check, Download, Share2, X } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
-import { X, Download, Share2, Check } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface ArtifactModalProps {
   isOpen: boolean;
@@ -17,9 +17,9 @@ export const ArtifactModal: React.FC<ArtifactModalProps> = ({ isOpen, onClose, f
       return fileUrl;
     }
 
-    if (typeof window !== 'undefined') {
+    if (globalThis.window !== undefined) {
       try {
-        return new URL(fileUrl, window.location.origin).href;
+        return new URL(fileUrl, globalThis.window.location.origin).href;
       } catch (error) {
         console.error('Failed to resolve artifact URL', error);
         return fileUrl;
@@ -37,13 +37,17 @@ export const ArtifactModal: React.FC<ArtifactModalProps> = ({ isOpen, onClose, f
       anchor.href = resolvedUrl;
       const urlWithoutQuery = resolvedUrl.split('?')[0];
       const extension = urlWithoutQuery.includes('.') ? urlWithoutQuery.split('.').pop() : 'pdf';
+      // Normalize title: lowercase, replace non-alphanumeric with dashes, remove leading/trailing dashes
+      // Group regex parts to make operator precedence explicit: (^-+)|(-+$)
+      // Normalize title: lowercase, replace non-alphanumeric with dashes, remove leading/trailing dashes
+      // Note: Using replace() with regex is appropriate here (not replaceAll) as we need pattern matching
       const normalizedTitle = title
-        ? title.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+        ? title.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-+)|(-+$)/g, '')
         : 'mfai-artifact';
       anchor.download = `${normalizedTitle || 'mfai-artifact'}.${extension}`;
       document.body.appendChild(anchor);
       anchor.click();
-      document.body.removeChild(anchor);
+      anchor.remove();
     } catch (error) {
       console.error('Artifact download failed', error);
     }

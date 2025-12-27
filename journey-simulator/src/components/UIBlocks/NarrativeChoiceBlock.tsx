@@ -64,7 +64,7 @@ export default function NarrativeChoice({ block }: NarrativeChoiceBlockProps) {
 
       // Optionally apply XP delta
       const xpDelta = Number(data?.next_state?.xp_delta || 0);
-      if (typeof updateProgress === 'function' && !isNaN(xpDelta) && xpDelta > 0) {
+      if (typeof updateProgress === 'function' && !Number.isNaN(xpDelta) && xpDelta > 0) {
         await updateProgress(xpDelta);
       }
 

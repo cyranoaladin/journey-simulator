@@ -302,11 +302,16 @@ const JourneyDashboard: FC = () => {
                   <div key={phase.id} className="text-center">
                     <div
                       className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2 ${
-                        isCompleted
-                          ? "bg-gradient-primary text-white"
-                          : isCurrent
-                            ? "bg-gradient-primary text-white animate-pulse"
-                            : "bg-white/10 text-white/50"
+                        (() => {
+                          // Extract nested ternary into explicit variable
+                          if (isCompleted) {
+                            return "bg-gradient-primary text-white";
+                          }
+                          if (isCurrent) {
+                            return "bg-gradient-primary text-white animate-pulse";
+                          }
+                          return "bg-white/10 text-white/50";
+                        })()
                       }`}
                     >
                       {isCompleted ? "✓" : index + 1}
