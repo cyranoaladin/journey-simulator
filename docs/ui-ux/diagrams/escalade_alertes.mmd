@@ -1,0 +1,10 @@
+flowchart TD
+  src[Alertes CRITICAL détectées] --> filt[Filtrage doublons et fenêtre]
+  filt --> ack[Flag ACK en attente]
+  ack --> brd[Broadcast UI : toasts + panneau]
+  ack --> ops[Webhook / Slack / Email ops]
+  brd --> usr[Utilisateur voit CTA Détails]
+  usr --> act{Résolu ?}
+  act -->|Oui| clear[Marquer résolu, retirer de la pile]
+  act -->|Non| escalate[Escalade L2/L3]
+  escalate --> audit[Tracer dans audit/telemetry]

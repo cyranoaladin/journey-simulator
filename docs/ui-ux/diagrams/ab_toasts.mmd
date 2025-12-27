@@ -1,0 +1,11 @@
+flowchart TD
+  start((Déclencheur)) --> split{Variant ?}
+  split -->|A| A1[Toast compact : titre + CTA court]
+  split -->|B| B1[Toast détaillé : titre + message + CTA]
+  A1 --> metrA[Mesure : taux clic CTA, fermeture, temps visible]
+  B1 --> metrB[Mesure : taux clic CTA, fermeture, temps visible]
+  metrA --> compare[Comparaison A/B]
+  metrB --> compare
+  compare --> decide{Garder ?}
+  decide -->|Oui| deploy[Déployer variante gagnante]
+  decide -->|Non| iterate[Itérer sur contenu/durée/placement]

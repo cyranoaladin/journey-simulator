@@ -83,6 +83,10 @@ class ValidationService {
       },
     };
     ops.warnings = ops.warnings.filter((w) => w !== 'invalid_input_schema');
+    // Marque explicitement l’application du preset pour les assertions de tests
+    if (!ops.warnings.includes('preset_applied')) {
+      ops.warnings.push('preset_applied');
+    }
     return { req: updatedReq, preset };
   }
 

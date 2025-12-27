@@ -1,0 +1,8 @@
+flowchart TD
+  L[Layout] --> JL[JourneyLayout]
+  JL --> WS[JourneyWorkspace]
+  WS --> T[JourneyTimeline]
+  WS --> Pbar[JourneyProgressBar]
+  WS --> NA[JourneyNextActionsPanel]
+  WS --> UIR[UIBlocksRenderer]
+  UIR --> |Blocs dynamiques| B[Text/Quiz/Mission/Eval/Resource/...]

@@ -686,9 +686,9 @@ const buildSystemStatus = ({
       artifactsSummary,
     },
     slo: {
-      window: metricsSummaryAll.window,
-      latency: metricsSummaryAll.latency,
-      rates: metricsSummaryAll.rates,
+    window: metricsSummaryAll.window || 1,
+    latency: metricsSummaryAll.latency || {},
+    rates: metricsSummaryAll.rates || {},
       byTenant: metricsByTenant,
     },
     alerts: alertingEngine.recentAlerts(5),
@@ -850,6 +850,8 @@ async function orchestrateVerticalSlice(payload) {
     }
 
     const explicitPhaseForIntents = payload?.constraints?.phase || payload?.context?.journey?.phaseId || null;
+    // Sécurise la récupération des phases issues du contexte (évite undefined)
+    const contextPhases = Array.isArray(req?.context?.journey?.phases) ? req.context.journey.phases : [];
     // Extract nested ternary into explicit variable
     let phasesForIntents = [];
     if (explicitPhaseForIntents) {
@@ -1550,6 +1552,9 @@ async function orchestrateVerticalSlice(payload) {
     alertingEngine.evaluate({ ...currentMetricsSummary, tenantId: 'all' });
     Object.values(currentMetricsByTenant).forEach((ms) => alertingEngine.evaluate(ms));
 
+    // Collect recent alerts for downstream decisions and telemetry
+    const alertsAll = alertingEngine.recentAlerts(20);
+
     aggregated.ops.metricsSummary = { ...currentMetricsSummary, byTenant: currentMetricsByTenant };
     aggregated.ops.costGuards = aggregated.ops.costGuards || [];
     aggregated.systemStatus.alerts = alertingEngine.recentAlerts(5);
@@ -1650,6 +1655,9 @@ async function orchestrateVerticalSlice(payload) {
       agentResults: runsWithScores,
       responseSnapshot: aggregated,
     });
+
+    // Snapshot recent alerts for telemetry payload
+    const recentAlerts = alertingEngine.recentAlerts(5);
 
     telemetryAdapter.emit({
       type: 'orchestration',
@@ -1817,13 +1825,19 @@ async function orchestrateVerticalSlice(payload) {
 
     metricsStore.record(aggregated, tenantId);
     // Reuse metricsSummaryAll and metricsByTenant already computed in buildSystemStatus
-    alertingEngine.evaluate({ ...aggregated.ops.metricsSummary, tenantId: 'all' });
-    Object.values(aggregated.ops.metricsSummary.byTenant || {}).forEach((ms) => alertingEngine.evaluate(ms));
+    const metricsSummarySafe = aggregated?.ops?.metricsSummary || {
+      window: 0,
+      latency: {},
+      rates: {},
+      byTenant: {}
+    };
+    alertingEngine.evaluate({ ...metricsSummarySafe, tenantId: 'all' });
+    Object.values(metricsSummarySafe.byTenant || {}).forEach((ms) => alertingEngine.evaluate(ms));
     aggregated.systemStatus.slo = {
-      window: aggregated.ops.metricsSummary.window,
-      latency: aggregated.ops.metricsSummary.latency,
-      rates: aggregated.ops.metricsSummary.rates,
-      byTenant: aggregated.ops.metricsSummary.byTenant
+      window: metricsSummarySafe.window,
+      latency: metricsSummarySafe.latency,
+      rates: metricsSummarySafe.rates,
+      byTenant: metricsSummarySafe.byTenant
     };
     aggregated.systemStatus.alerts = alertingEngine.recentAlerts(5);
     const memorySummary = memoryStore.summary();

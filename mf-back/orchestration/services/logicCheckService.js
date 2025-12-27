@@ -40,10 +40,16 @@ class LogicCheckService {
    */
   static computeOverallStatus(runsWithScores) {
     const severity = { FAIL: 3, TIMEOUT: 2, WARN: 1, OK: 0 };
-    const hasOk = runsWithScores.some((r) => r.status === 'OK');
     const hasFailOrTimeout = runsWithScores.some((r) => r.status === 'FAIL' || r.status === 'TIMEOUT');
+    const hasWarn = runsWithScores.some((r) => r.status === 'WARN');
+    const hasOk = runsWithScores.some((r) => r.status === 'OK');
 
-    if (hasOk && !hasFailOrTimeout) {
+    // Si aucun FAIL/TIMEOUT mais au moins un WARN, retourner WARN même s'il y a des OK
+    if (!hasFailOrTimeout && hasWarn) {
+      return 'WARN';
+    }
+
+    if (hasOk && !hasFailOrTimeout && !hasWarn) {
       return 'OK';
     }
 

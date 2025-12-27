@@ -1,0 +1,5 @@
+flowchart TD
+  SRC[Sources métriques] --> AGG[Regroupement SLO]
+  AGG --> A1[Alertes CRITICAL/WARN/INFO]
+  A1 --> UI[Affichage UI : toasts + panneaux]
+  UI --> ACT[Actions : Retry / Ouvrir détails / Ignorer]

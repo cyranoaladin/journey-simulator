@@ -89,7 +89,7 @@ beforeEach(() => {
   jest.clearAllMocks();
   jwt.sign.mockReturnValue('access-token');
   // crypto.randomBytes is already mocked with mockReturnValue in jest.mock above
-  // No need to reset it as it's already configured
+  // No need to reset it as it's already configured with the correct return value
   consoleLogSpy.mockClear();
   consoleErrorSpy.mockClear();
 });

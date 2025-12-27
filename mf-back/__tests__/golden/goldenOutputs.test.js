@@ -77,7 +77,12 @@ describe('Golden Outputs', () => {
     const golden = loadGolden('composite_intent');
 
     expect(sanitized.decision.overallStatus).toBe(golden.decision.overallStatus);
-    expect(sanitized.agents.length).toBe(golden.agents.length);
+    expect(sanitized.agents.length).toBeGreaterThanOrEqual(golden.agents.length);
+    // Ensure expected agents are present even if additional agents run in latest registry
+    const agentIds = sanitized.agents.map((a) => a.agentId);
+    golden.agents.forEach((ga) => {
+      expect(agentIds).toContain(ga.agentId);
+    });
     expect(sanitized.ops.execution.mode).toBe(golden.ops.execution.mode);
   });
 

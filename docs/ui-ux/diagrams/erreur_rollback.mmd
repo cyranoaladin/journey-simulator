@@ -1,0 +1,8 @@
+flowchart TD
+  A[Action utilisateur] --> B[Erreur détectée]
+  B --> C[Feedback immédiat : toast + inline]
+  C --> D{Erreur récupérable ?}
+  D -->|Oui| R1[Retry]
+  D -->|Non| R2[Rollback visuel, état stable]
+  R1 --> S[Succès : fermer toast, MAJ UI]
+  R2 --> H[Afficher aide/support, documentation]
