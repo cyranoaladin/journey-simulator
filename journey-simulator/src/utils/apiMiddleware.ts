@@ -65,7 +65,7 @@ export const authMiddleware: Middleware<any> = async (context, _next) => {
 /**
  * Response handler middleware
  */
-export const responseHandlerMiddleware: Middleware<any> = async (context, next) => {
+export const responseHandlerMiddleware: Middleware<any> = async (_context, next) => {
   const ctx = await next();
   if (!ctx.response) {
     return ctx;
@@ -182,9 +182,17 @@ async function handleOfflineFallback<T>(_path: string, _error: any): Promise<T |
 }
 
 /**
+ * Demo handler interface
+ */
+interface DemoHandler {
+  matches: (path: string, options: RequestInit) => boolean;
+  handle: (path: string, options: RequestInit) => Promise<any>;
+}
+
+/**
  * Demo handlers registry
  */
-function getDemoHandlers() {
+function getDemoHandlers(): DemoHandler[] {
   // This would contain all the demo mode handlers
   // For now, return empty array - full implementation would include all handlers
   return [];

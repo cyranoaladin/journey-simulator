@@ -1,9 +1,9 @@
 import createClient from "openapi-fetch";
-import type { paths } from "./mf-back-client"; // Generated types
+import type { Paths } from "./mf-back-client"; // Generated types
 import { API_BASE_URL } from "../utils/api";
 import { tokenStore } from "../utils/tokenStore";
 
-export const client = createClient<paths>({ baseUrl: API_BASE_URL });
+export const client = createClient<Paths>({ baseUrl: API_BASE_URL });
 
 // Add Authorization header if token exists
 client.use({
@@ -34,7 +34,7 @@ export const auth = {
 };
 
 export const journey = {
-  getUserProgress: async () => client.GET("/journey/user-progress"),
+  getUserProgress: async () => client.GET("/journey/user-progress", {}),
 };
 
 export const agents = {

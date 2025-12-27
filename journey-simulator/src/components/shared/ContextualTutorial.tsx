@@ -148,7 +148,7 @@ const ContextualTutorial = ({
 
           <div className="mt-4 flex justify-center">
             <div className="flex gap-1">
-              {steps.map((step, index) => {
+              {steps.map((_step, index) => {
                 const stepKey = `tutorial-step-${index}`;
                 return (
                   <div

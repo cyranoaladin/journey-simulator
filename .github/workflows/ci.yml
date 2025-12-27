@@ -27,6 +27,15 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=10
+      mongo:
+        image: mongo:6
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -95,8 +104,18 @@ jobs:
       - name: Build (simulator + web)
         run: npm run build:all
 
+      - name: Wait for MongoDB to be ready
+        run: |
+          # Install netcat if not available
+          sudo apt-get update && sudo apt-get install -y netcat-openbsd || true
+          # Wait for MongoDB port to be open
+          timeout 30 bash -c 'until nc -z localhost 27017 2>/dev/null; do echo "Waiting for MongoDB..."; sleep 1; done' || true
+          sleep 3  # Give MongoDB a moment to fully initialize
+
       - name: Unit tests (back + simulator + web)
         run: npm run test:all
+        env:
+          MONGO_URI: mongodb://localhost:27017/testdb
 
       - name: Install Playwright browsers (journey-simulator)
         working-directory: journey-simulator
