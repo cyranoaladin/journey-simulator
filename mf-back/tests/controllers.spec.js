@@ -12,7 +12,7 @@ jest.mock('crypto', () => {
   const actual = jest.requireActual('crypto');
   return {
     ...actual,
-    randomBytes: jest.fn(),
+    randomBytes: jest.fn().mockReturnValue({ toString: () => 'refresh-token' }),
   };
 });
 
@@ -88,7 +88,8 @@ afterAll(() => {
 beforeEach(() => {
   jest.clearAllMocks();
   jwt.sign.mockReturnValue('access-token');
-  crypto.randomBytes.mockReturnValue({ toString: () => 'refresh-token' });
+  // crypto.randomBytes is already mocked with mockReturnValue in jest.mock above
+  // No need to reset it as it's already configured
   consoleLogSpy.mockClear();
   consoleErrorSpy.mockClear();
 });

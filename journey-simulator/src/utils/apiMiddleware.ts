@@ -220,4 +220,3 @@ export function composeMiddlewares<T>(...middlewares: Middleware<T>[]): Middlewa
     return dispatch(0);
   };
 }
-

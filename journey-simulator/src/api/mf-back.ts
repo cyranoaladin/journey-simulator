@@ -1,7 +1,7 @@
 import createClient from "openapi-fetch";
-import type { Paths } from "./mf-back-client"; // Generated types
 import { API_BASE_URL } from "../utils/api";
 import { tokenStore } from "../utils/tokenStore";
+import type { Paths } from "./mf-back-client"; // Generated types
 
 export const client = createClient<Paths>({ baseUrl: API_BASE_URL });
 

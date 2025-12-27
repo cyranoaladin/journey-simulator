@@ -1,7 +1,7 @@
 const executionEngine = require('../executionEngine');
 const executionGate = require('../executionGate');
 const actionToolMapper = require('../actionToolMapper');
-const logger = require('../utils/logger').createLogger(__filename);
+const logger = require('../../utils/logger').createLogger(__filename);
 
 /**
  * Service d'exécution pour l'orchestration
@@ -130,7 +130,7 @@ class ExecutionService {
    * Exécution avec gate (privé)
    */
   static _executeWithGate(executionTools, state, shadowMode, req, payload, tenantId, getTraceId, ops) {
-    const logger = require('../utils/logger').createLogger(__filename);
+    const logger = require('../../utils/logger').createLogger(__filename);
     try {
       if (process.env.EXECUTION_ENABLED === 'true' && !shadowMode) {
         logger.info('Real execution enabled, attempting guarded execution', { traceId: getTraceId(req, payload), gateId: state.gateId });
