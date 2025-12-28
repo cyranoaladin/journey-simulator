@@ -850,14 +850,12 @@ async function orchestrateVerticalSlice(payload) {
     }
 
     const explicitPhaseForIntents = payload?.constraints?.phase || payload?.context?.journey?.phaseId || null;
-    // Sécurise la récupération des phases issues du contexte (évite undefined)
-    const contextPhases = Array.isArray(req?.context?.journey?.phases) ? req.context.journey.phases : [];
-    // Extract nested ternary into explicit variable
+    const payloadPhases = Array.isArray(payload?.context?.journey?.phases) ? payload.context.journey.phases : [];
     let phasesForIntents = [];
-    if (explicitPhaseForIntents) {
-      phasesForIntents = contextPhases.length > 0 ? contextPhases : [explicitPhaseForIntents];
-    } else {
-      phasesForIntents = contextPhases.length > 0 ? contextPhases : [];
+    if (payloadPhases.length > 0) {
+      phasesForIntents = payloadPhases;
+    } else if (explicitPhaseForIntents) {
+      phasesForIntents = [explicitPhaseForIntents];
     }
     const workflowIntents = phasesForIntents.flatMap((phaseId) =>
       resolveWorkflowIntents({ ...req.context?.journey, phaseId })

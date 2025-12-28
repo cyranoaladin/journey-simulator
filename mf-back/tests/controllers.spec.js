@@ -504,7 +504,7 @@ describe('User Controller', () => {
       expect.objectContaining({
         success: true,
         accessToken: 'access-token',
-        refreshToken: 'refresh-token',
+        refreshToken: expect.stringMatching(/^[a-f0-9]{80}$/),
       })
     );
   });
@@ -553,7 +553,9 @@ describe('User Controller', () => {
     expect(userDoc.save).toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ refreshToken: 'refresh-token' })
+      expect.objectContaining({
+        refreshToken: expect.stringMatching(/^[a-f0-9]{80}$/),
+      })
     );
   });
 
@@ -596,7 +598,10 @@ describe('User Controller', () => {
     );
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ accessToken: 'access-token', refreshToken: 'refresh-token' })
+      expect.objectContaining({
+        accessToken: 'access-token',
+        refreshToken: expect.stringMatching(/^[a-f0-9]{80}$/),
+      })
     );
   });
 
