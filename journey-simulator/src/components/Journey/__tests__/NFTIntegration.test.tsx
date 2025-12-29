@@ -84,7 +84,7 @@ describe('NFT Integration in JourneyWorkspace', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         // Complete phase requires an auth token (now via tokenStore/sessionStorage)
-        tokenStore.setAccessToken('demo-token')
+        tokenStore.setAccessToken('real-token')
         tokenStore.setRefreshToken('demo-refresh-token')
         layoutMock.toggleFocusMode.mockClear();
         layoutMock.setLeftPanelOpen.mockClear();

@@ -120,7 +120,8 @@ describe('JourneyWorkspace', () => {
         vi.clearAllMocks();
 
         // Complete phase requires an auth token (now via tokenStore/sessionStorage)
-        tokenStore.setAccessToken('demo-token');
+        // Use 'real-token' to ensure JourneySimulationMode is rendered, not DemoMode
+        tokenStore.setAccessToken('real-token');
         tokenStore.setRefreshToken('demo-refresh-token');
 
         layoutMock.toggleFocusMode.mockClear();
