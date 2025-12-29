@@ -24,6 +24,11 @@ jobs:
         cache: 'npm'
         cache-dependency-path: mf-back/package-lock.json
 
+    - name: Start MongoDB
+      uses: supercharge/mongodb-github-action@v1
+      with:
+        mongodb-version: '6.0'
+
     - name: Upgrade npm
       run: npm install -g npm@11
 
@@ -38,6 +43,7 @@ jobs:
       working-directory: ./mf-back
       env:
         CI: true
+        MONGO_URI: mongodb://localhost:27017/testdb
 
     - name: Check RAG Connection (Optional)
       run: node scripts/check-rag-connection.js || echo "RAG connection check skipped or completed"
