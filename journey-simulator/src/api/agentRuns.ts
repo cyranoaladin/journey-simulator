@@ -1,6 +1,6 @@
 import { Components } from './mf-back-client';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+import { API_BASE_URL } from '../utils/api';
+import { tokenStore } from '../utils/tokenStore';
 
 type AgentRun = Components['schemas']['AgentRun'];
 
@@ -19,12 +19,14 @@ export async function getRecentAgentRuns({ journeyId, limit = 3 }: GetAgentRunsO
         // Note: Sort is usually handled by backend default or we might need to add sort param if supported
         // Assuming backend returns sorted or we accept default order for now.
 
+        const token = tokenStore.getAccessToken();
+
         const response = await fetch(url.toString(), {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                // Add auth headers if needed, usually stored in localStorage or cookie
-                ...(localStorage.getItem('token') ? { 'Authorization': `Bearer ${localStorage.getItem('token')}` } : {})
+                // Use session-backed token storage to align with the rest of the app auth flow
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
             }
         });
 

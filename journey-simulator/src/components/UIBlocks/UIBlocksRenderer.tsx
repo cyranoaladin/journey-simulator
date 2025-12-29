@@ -260,6 +260,7 @@ function Quiz({ block }: { block: QuizBlock; }) {
                       setAnswers((prev) => ({ ...prev, [q.id]: idx }))
                     }
                     disabled={mode === "certifying" && showExplain} // Disable changes after submission
+                    aria-pressed={selected}
                     className={(() => {
                       // Simplify nested template literals
                       let baseClass = "w-full text-left px-3 py-2 rounded-md transition border";
@@ -425,6 +426,7 @@ function Mission({ block }: { block: MissionBlock; }) {
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder="https://..."
+            aria-label={`Submission link for ${block.title}`}
             className="w-full px-3 py-2 rounded bg-black/30 border border-white/10"
           />
         ) : (
@@ -436,6 +438,7 @@ function Mission({ block }: { block: MissionBlock; }) {
                 ? "Paste code here..."
                 : "Describe your deliverable..."
             }
+            aria-label={`Submission text for ${block.title}`}
             className="w-full h-28 px-3 py-2 rounded bg-black/30 border border-white/10 font-mono"
           />
         )}
@@ -517,6 +520,7 @@ function Resources({ block }: { block: ResourceBlock; }) {
                     href={r.url}
                     target="_blank"
                     rel="noreferrer"
+                    aria-label={`Open resource: ${r.label}`}
                   >
                     Open
                   </a>
@@ -622,6 +626,38 @@ function processListItem(line: string, out: string[], inList: boolean): { proces
   return { processed: false, newInList: inList };
 }
 
+// Helper to process a single line and return the new list state
+function processLine(
+  line: string,
+  out: string[],
+  inList: boolean
+): boolean {
+  // Strategy pattern for different line types
+  const headerStrategies = [
+    { pattern: /^###\s+/, tag: "h3" },
+    { pattern: /^##\s+/, tag: "h2" },
+    { pattern: /^#\s+/, tag: "h1" }
+  ];
+
+  for (const { pattern, tag } of headerStrategies) {
+    const res = processHeader(line, pattern, tag, out, inList);
+    if (res.processed) return res.newInList;
+  }
+
+  const listRes = processListItem(line, out, inList);
+  if (listRes.processed) return listRes.newInList;
+
+  if (line === "") {
+    closeListIfOpen(out, inList);
+    out.push("<br/>");
+    return false;
+  }
+
+  // Default: paragraph
+  out.push(`<p>${escapeHtml(line)}</p>`);
+  return inList;
+}
+
 function renderBasicMarkdown(md: string) {
   // Escape user-controlled text first to prevent HTML/entity injection, then add a tiny subset of
   // safe markup (headers, lists, paragraphs).
@@ -630,43 +666,7 @@ function renderBasicMarkdown(md: string) {
   let inList = false;
 
   for (const raw of lines) {
-    const line = raw.trim();
-
-    // Process headers (h3, h2, h1)
-    const h3Result = processHeader(line, /^###\s+/, "h3", out, inList);
-    if (h3Result.processed) {
-      inList = h3Result.newInList;
-      continue;
-    }
-
-    const h2Result = processHeader(line, /^##\s+/, "h2", out, inList);
-    if (h2Result.processed) {
-      inList = h2Result.newInList;
-      continue;
-    }
-
-    const h1Result = processHeader(line, /^#\s+/, "h1", out, inList);
-    if (h1Result.processed) {
-      inList = h1Result.newInList;
-      continue;
-    }
-
-    // Process list items
-    const listResult = processListItem(line, out, inList);
-    if (listResult.processed) {
-      inList = listResult.newInList;
-      continue;
-    }
-
-    // Process empty lines
-    if (line === "") {
-      inList = closeListIfOpen(out, inList);
-      out.push("<br/>");
-      continue;
-    }
-
-    // Default: paragraph
-    out.push(`<p>${escapeHtml(line)}</p>`);
+    inList = processLine(raw.trim(), out, inList);
   }
 
   if (inList) out.push("</ul>");

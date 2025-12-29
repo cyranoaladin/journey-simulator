@@ -24,11 +24,12 @@ describe('JourneyTimeline', () => {
         expect(screen.getByText('Phase 3')).toBeInTheDocument()
     })
 
-    it('highlights current phase', () => {
+    it('marks the current phase as active', () => {
         render(<JourneyTimeline phases={mockPhases} currentPhase={1} />)
 
-        const phase2Title = screen.getByText('Phase 2')
-        expect(phase2Title).toHaveClass('text-accent-cyan')
+        const buttons = screen.getAllByRole('button')
+        expect(buttons[1]).toHaveAttribute('aria-current', 'step')
+        expect(buttons[0]).not.toHaveAttribute('aria-current')
     })
 
     it('calls onPhaseChange when a completed or active phase is clicked', () => {
@@ -37,11 +38,11 @@ describe('JourneyTimeline', () => {
 
         // Click Phase 1 (completed) - we need to find the clickable container
         // The text is inside the container.
-        fireEvent.click(screen.getByText('Phase 1'))
+        fireEvent.click(screen.getAllByRole('button')[0])
         expect(onPhaseChange).toHaveBeenCalledWith(0)
 
         // Click Phase 2 (active)
-        fireEvent.click(screen.getByText('Phase 2'))
+        fireEvent.click(screen.getAllByRole('button')[1])
         expect(onPhaseChange).toHaveBeenCalledWith(1)
     })
 
@@ -50,7 +51,7 @@ describe('JourneyTimeline', () => {
         render(<JourneyTimeline phases={mockPhases} currentPhase={0} onPhaseChange={onPhaseChange} />)
 
         // Click Phase 2 (locked)
-        fireEvent.click(screen.getByText('Phase 2'))
+        fireEvent.click(screen.getAllByRole('button')[1])
         expect(onPhaseChange).not.toHaveBeenCalled()
     })
 })

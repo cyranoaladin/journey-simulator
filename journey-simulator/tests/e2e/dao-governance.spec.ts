@@ -150,9 +150,9 @@ test.describe('DAO Governance', () => {
         const adminBtn = page.getByRole('button', { name: /Open Admin Console/i });
         await expect(adminBtn).toBeVisible({ timeout: 30000 });
 
-        const adminPanelHeading = page.getByRole('heading', { name: /Advanced Console/i });
+        const adminPanel = page.getByTestId('dao-admin-panel');
         for (let i = 0; i < 3; i++) {
-            if (await adminPanelHeading.isVisible()) break;
+            if (await adminPanel.isVisible()) break;
             try {
                 await adminBtn.click({ force: true, timeout: 15000 });
             } catch {
@@ -169,7 +169,7 @@ test.describe('DAO Governance', () => {
         }
 
         // Wait for panel to appear (stable heading in the collapsible container)
-        await expect(adminPanelHeading).toBeVisible({ timeout: 30000 });
+        await expect(adminPanel).toBeVisible({ timeout: 30000 });
         await expect(page.getByRole('heading', { name: /Zyno DAO Console/i })).toBeVisible({ timeout: 30000 });
         const apiKeyInput = page.getByLabel(/Admin API Key/i);
         await expect(apiKeyInput).toBeVisible({ timeout: 15000 });
@@ -211,13 +211,13 @@ test.describe('DAO Governance', () => {
         const adminBtn = page.getByRole('button', { name: /Open Admin Console/i });
         await expect(adminBtn).toBeVisible();
 
-        const adminPanelHeading = page.getByRole('heading', { name: /Advanced Console/i });
+        const adminPanel = page.getByTestId('dao-admin-panel');
         for (let i = 0; i < 3; i++) {
-            if (await adminPanelHeading.isVisible()) break;
+            if (await adminPanel.isVisible()) break;
             await page.waitForTimeout(250);
             await adminBtn.click({ force: true });
         }
-        await expect(adminPanelHeading).toBeVisible({ timeout: 30000 });
+        await expect(adminPanel).toBeVisible({ timeout: 30000 });
 
         // Select a voter
         const voterSelect = page.locator('select[name="dao-voter"]');

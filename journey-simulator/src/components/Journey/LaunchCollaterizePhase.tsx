@@ -4,7 +4,11 @@ import { useJourneyStore } from '../../store/journeyStore';
 import { api } from '../../utils/api';
 import { generateStableKey } from '../../utils/generateStableKey';
 
-export const LaunchCollaterizePhase: React.FC = () => {
+export interface LaunchCollaterizePhaseProps {
+  onComplete?: () => void;
+}
+
+export const LaunchCollaterizePhase: React.FC<LaunchCollaterizePhaseProps> = ({ onComplete }) => {
   const apiJourneyId = useJourneyStore((state) => state.apiJourneyId);
   const ensureApiJourneyId = useJourneyStore((state) => state.ensureApiJourneyId);
   const setCollaterizeSimulation = useJourneyStore((state) => state.setCollaterizeSimulation);
@@ -109,8 +113,8 @@ export const LaunchCollaterizePhase: React.FC = () => {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-white">Launch Simulation Results</h2>
         <div className={`px-4 py-1 rounded-full text-sm font-bold ${results.accepted
-            ? 'bg-green-900/50 text-green-400 border border-green-500'
-            : 'bg-red-900/50 text-red-400 border border-red-500'
+          ? 'bg-green-900/50 text-green-400 border border-green-500'
+          : 'bg-red-900/50 text-red-400 border border-red-500'
           }`}>
           {results.accepted ? 'ELIGIBLE' : 'NOT ELIGIBLE'}
         </div>
@@ -128,7 +132,7 @@ export const LaunchCollaterizePhase: React.FC = () => {
             <div
               ref={eligibilityBarRef}
               className={`h-full transition-all duration-500 ${results.eligibilityScore >= 80 ? 'bg-green-500' :
-                  results.eligibilityScore >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                results.eligibilityScore >= 60 ? 'bg-yellow-500' : 'bg-red-500'
                 }`}
             />
           </div>

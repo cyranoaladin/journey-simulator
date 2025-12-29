@@ -19,6 +19,16 @@ test.describe('Login Page', () => {
       });
     });
 
+    await page.goto('about:blank');
+    await page.evaluate(() => {
+      try {
+        window.sessionStorage.clear();
+        window.localStorage.clear();
+      } catch {
+        /* ignore */
+      }
+    });
+
     await page.goto('/login');
 
     const heading = page.getByRole('heading', { name: /welcome back/i });

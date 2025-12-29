@@ -16,7 +16,7 @@ test.describe('Demo Mode Workflow', () => {
         // Clicking the card CTA is flaky in CI due to Framer Motion DOM detaches.
         // Journey selection is already covered by other E2E tests; here we validate the demo autoplay UX.
         await page.goto('/journeys/cognitive-activation-hub');
-        await expect(page).toHaveURL(/\/journeys\/cognitive-activation-hub$/);
+        await expect(page).toHaveURL(/\/journeys\/(demo\/)?cognitive-activation-hub$/);
         // In demo mode, the title appears both in the sticky header (h1) and the hero (h2).
         await expect(page.getByRole('heading', { name: 'The Cognitive Activation Hub', level: 2 })).toBeVisible();
 

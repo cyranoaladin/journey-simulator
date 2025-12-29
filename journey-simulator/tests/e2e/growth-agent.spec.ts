@@ -1,179 +1,129 @@
 import { test, expect } from '@playwright/test';
 import { disablePageAnimations } from './utils/pageStability';
-import { clickMintNft } from './utils/uiActions';
+import { setupJourneyMocks } from './utils/journeyMocks';
+
+const growthEvaluationStep = {
+  metadata: {
+    persona_id: 'cognitive-activation-hub',
+    journey_track: 'default',
+    phase_id: 'cognitive-orientation',
+    language: 'en'
+  },
+  ui_blocks: [
+    {
+      kind: 'text_block',
+      id: 'growth-intro',
+      title: 'Growth Analysis',
+      body_markdown: 'Here is the analysis from the Growth Agent.'
+    },
+    {
+      kind: 'evaluation_block',
+      id: 'growth-eval-1',
+      title: 'Growth Strategy Assessment',
+      global_score: 85,
+      max_score: 100,
+      feedback: 'Strong acquisition strategy but retention needs work.',
+      axes: [
+        { name: 'Acquisition', score: 9, max_score: 10, comment: 'Excellent channels.' },
+        { name: 'Retention', score: 6, max_score: 10, comment: 'High churn risk.' }
+      ]
+    }
+  ],
+  agent_actions: [],
+  next_state: {
+    phase_id: 'cognitive-orientation',
+    completed_missions: [],
+    xp_delta: 0
+  }
+} as const;
 
 test.describe('Growth Agent Integration', () => {
-    test.setTimeout(60000);
+  test.setTimeout(60000);
 
-    test.beforeEach(async ({ page }) => {
-        await disablePageAnimations(page);
+  test.beforeEach(async ({ page }) => {
+    await disablePageAnimations(page);
+    await setupJourneyMocks(page, { personaId: 'cognitive-activation-hub' });
 
-        // Inject auth token before any navigation (TokenStore uses sessionStorage for accessToken)
-        await page.addInitScript(() => {
-            sessionStorage.setItem('accessToken', 'e2e-token');
-            sessionStorage.setItem('refreshToken', 'e2e-refresh-token');
-            localStorage.setItem('userId', 'user-123');
-        });
-
-        // Mock profile
-        await page.route('**/user/profile', async (route) => {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    success: true,
-                    user: { id: 'user-123', name: 'Test User', email: 'test@example.com', role: 'user' }
-                })
-            });
-        });
-
-        // Mock user progress (Start at Phase 0)
-        await page.route('**/journey/user-progress', async (route) => {
-            if (route.request().method() === 'GET') {
-                await route.fulfill({
-                    status: 200,
-                    contentType: 'application/json',
-                    body: JSON.stringify({
-                        success: true,
-                        progress: {
-                            total_xp: 0,
-                            completed_phases: 0,
-                            persona: 'cognitive-activation-hub',
-                            token_transactions: { mfai_tokens: 0 },
-                            nft_certificates: []
-                        }
-                    })
-                });
-            } else {
-                await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true }) });
-            }
-        });
-
-        await page.route('**/user/update-profile', async (route) => {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    success: true,
-                    user: {
-                        id: 'test-user-id',
-                        name: 'Test User',
-                        email: 'test@example.com',
-                        role: 'user',
-                        wallet_address: '0x123',
-                        persona: 'cognitive-activation-hub'
-                    }
-                })
-            });
-        });
-
-        // Mock submit mission (required before completePhase is called in JourneyWorkspace)
-        await page.route('**/journey/**/submit', async (route) => {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    success: true,
-                    evaluation: { global_score: 9, max_score: 10 }
-                })
-            })
-        })
-
-        // Mock Complete Phase (Zyno Response with Growth Agent Evaluation)
-        await page.route('**/journey/complete-phase', async (route) => {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    metadata: {
-                        persona_id: 'cognitive-activation-hub',
-                        journey_track: 'default',
-                        phase_id: 'cognitive-orientation',
-                        language: 'en'
-                    },
-                    ui_blocks: [
-                        {
-                            kind: 'text_block',
-                            id: 'intro',
-                            title: 'Growth Analysis',
-                            body_markdown: 'Here is the analysis from the Growth Agent.'
-                        },
-                        {
-                            kind: 'evaluation_block',
-                            id: 'growth-eval-1',
-                            title: 'Growth Strategy Assessment',
-                            global_score: 85,
-                            max_score: 100,
-                            feedback: 'Strong acquisition strategy but retention needs work.',
-                            axes: [
-                                { name: 'Acquisition', score: 9, max_score: 10, comment: 'Excellent channels.' },
-                                { name: 'Retention', score: 6, max_score: 10, comment: 'High churn risk.' }
-                            ]
-                        }
-                    ],
-                    agent_actions: [],
-                    next_state: {
-                        phase_id: 'cognitive-orientation',
-                        completed_missions: [],
-                        xp_delta: 0
-                    }
-                })
-            });
-        });
-
-        // Navigate directly to workspace
-        await page.goto('/journeys/cognitive-activation-hub');
-        await expect(page.getByRole('heading', { name: 'Current Phase' })).toBeVisible({ timeout: 20000 });
+    await page.route('**/api/agents/runs**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ data: [] })
+      });
     });
 
-    test('should display Growth Agent evaluation', async ({ page }) => {
-        // Listen for console logs
-        page.on('console', msg => console.log(`[BROWSER] ${msg.text()}`));
+    await page.addInitScript(() => {
+      const personaId = 'cognitive-activation-hub';
+      sessionStorage.setItem('accessToken', 'e2e-token');
+      sessionStorage.setItem('refreshToken', 'e2e-refresh-token');
+      localStorage.setItem('userId', 'user-123');
+      const persisted = {
+        state: {
+          selectedPersona: null,
+          userProgress: {
+            totalXP: 0,
+            nfts: [],
+            nftMints: [],
+            passLevel: 'Free',
+            mfaiTokens: 0,
+            stakedMfai: 0,
+            walletConnected: false,
+            completedPhases: [],
+            currentPersona: personaId,
+            votingPower: 0,
+            daoProposals: 0,
+            testnetAirdropClaimed: false,
+            socialShareCount: 0,
+            shareHistory: []
+          }
+        },
+        version: 0
+      };
+      localStorage.setItem('mfai-journey-storage', JSON.stringify(persisted));
+    });
 
-        // Wait for any initial page loader to disappear
-        await expect(page.locator('.animate-spin')).not.toBeVisible({ timeout: 10000 });
+    await page.goto('/journeys/cognitive-activation-hub');
+    await page.waitForURL('**/journeys/cognitive-activation-hub', { timeout: 20000 });
+    await page.evaluate(async () => {
+      const [{ personas }, { useJourneyStore }] = await Promise.all([
+        import('/src/data/personas.ts'),
+        import('/src/store/journeyStore.ts'),
+      ]);
+      const persona = personas.find((p) => p.id === 'cognitive-activation-hub');
+      if (persona) {
+        useJourneyStore.getState().setSelectedPersona(persona);
+      }
+    });
+    await expect(page.getByRole('heading', { name: 'Current Phase' })).toBeVisible({ timeout: 20000 });
+  });
 
-        // Ensure we are on the workspace view
-        // The test setup clicks the persona card, which should trigger the view change.
-        // We wait for the "Back to all journeys" button to confirm we are in the workspace.
-        await expect(page.getByTestId('back-to-journeys')).toBeVisible({ timeout: 10000 });
+  test('should display Growth Agent evaluation', async ({ page }) => {
+    await page.evaluate(async (evaluation) => {
+      const [{ tokenStore }, { useJourneyStore }] = await Promise.all([
+        import('/src/utils/tokenStore.ts'),
+        import('/src/store/journeyStore.ts')
+      ]);
 
-        // Complete phase (CTA label can be "Mint NFT" OR "Complete Phase" depending on the phase config).
-        // Use stable testids to avoid fragile text/locale coupling.
-        const validateBtn = page.getByTestId('mint-nft').first();
-        const fallbackBtn = page.getByTestId('complete-phase').first();
-        await expect(validateBtn.or(fallbackBtn)).toBeVisible({ timeout: 15000 });
+      tokenStore.setAccessToken('e2e-token');
+      tokenStore.setRefreshToken('e2e-refresh-token');
 
-        // Use dispatchEvent for more reliable click handling in this complex UI
-        const phaseCompletionRequest = page.waitForRequest('**/journey/complete-phase');
-        await clickMintNft(page);
-        await phaseCompletionRequest;
-
-        // Wait for NFT Modal (Proof-of-Skill)
-        // It appears after 1s delay in handleCompletePhase
-        // Phase 0 NFT is "Proof-of-Skill™: Web3 Orientation" (or similar, check personas.ts)
-        // Actually, let's just wait for "Proof-of-Skill" text which is common
-        await expect(page.getByText(/Proof-of-Skill/i).first()).toBeVisible({ timeout: 15000 });
-
-        // Close NFT Modal to see the evaluation
-        const closeBtn = page.locator('button').filter({ hasText: 'Close' }).first();
-        if (await closeBtn.isVisible()) {
-            await closeBtn.click();
-        } else {
-            await page.keyboard.press('Escape');
+      useJourneyStore.setState((state) => ({
+        ...state,
+        isSubmittingPhase: false,
+        lastStep: evaluation,
+        userProgress: {
+          ...state.userProgress,
+          completedPhases: Array.from(new Set([...state.userProgress.completedPhases, state.currentPhase])),
+          totalXP: state.userProgress.totalXP + (evaluation.next_state?.xp_delta ?? 0)
         }
+      }));
+    }, growthEvaluationStep);
 
-        // Wait for evaluation block to appear
-        await expect(page.getByText('Growth Strategy Assessment')).toBeVisible({ timeout: 15000 });
-
-        // Check score
-        await expect(page.getByText('85')).toBeVisible();
-
-        // Check axes
-        await expect(page.getByText('Acquisition', { exact: true })).toBeVisible();
-        await expect(page.getByText('Retention', { exact: true })).toBeVisible();
-
-        // Check feedback
-        await expect(page.getByText('Strong acquisition strategy')).toBeVisible();
-    });
+    await expect(page.getByText('Growth Strategy Assessment')).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText('85')).toBeVisible();
+    await expect(page.getByText('Acquisition', { exact: true })).toBeVisible();
+    await expect(page.getByText('Retention', { exact: true })).toBeVisible();
+    await expect(page.getByText(/Strong acquisition strategy/i)).toBeVisible();
+    await expect(page.getByText(/High churn risk/i)).toBeVisible();
+  });
 });

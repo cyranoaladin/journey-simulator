@@ -30,7 +30,7 @@ test.describe('Journey Workspace UX Enhancement', () => {
         await expect(page.getByTestId('journey-next-actions')).toBeVisible();
 
         // Agent intel is inside Next Actions panel
-        await expect(page.getByText('Agent Intel')).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Agent Intel' })).toBeVisible();
     });
 
     test('Should display Key Artifacts and Agent Intel', async ({ page }) => {
@@ -38,7 +38,7 @@ test.describe('Journey Workspace UX Enhancement', () => {
         await expect(page.getByRole('heading', { name: 'Project Artifacts' })).toBeVisible();
 
         // Agent Intel (Right Col or inside Actions)
-        await expect(page.getByText('Agent Intel')).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Agent Intel' })).toBeVisible();
     });
 
 });

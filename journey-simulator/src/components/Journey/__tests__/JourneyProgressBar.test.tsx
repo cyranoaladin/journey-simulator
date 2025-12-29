@@ -22,14 +22,15 @@ describe('JourneyProgressBar', () => {
         expect(screen.getByTestId('journey-progress-bar')).toBeInTheDocument();
     });
 
-    it('highlights the current step', () => {
+    it('highlights the current step with status badge', () => {
         render(<JourneyProgressBar personaId="test-persona" currentStepId="phase-2" />);
-        // Check for 'IN PROGRESS' badge which indicates active state
-        expect(screen.getByText('IN PROGRESS')).toBeInTheDocument();
+
+        expect(screen.getByText(/In progress/i)).toBeInTheDocument();
 
         // Check for active styling or indicator (implementation dependent, but we can check if it exists)
         const step2 = screen.getByTestId('journey-progress-step-phase-2');
         expect(step2).toBeInTheDocument();
+        expect(screen.getByText('Phase 2 of 3')).toBeInTheDocument();
     });
 
     it('renders all phases', () => {

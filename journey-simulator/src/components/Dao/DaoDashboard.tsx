@@ -366,6 +366,7 @@ const DaoDashboard = () => {
               exit={{ opacity: 0, y: -16 }}
               transition={{ duration: 0.3 }}
               className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur"
+              data-testid="dao-admin-panel"
             >
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>

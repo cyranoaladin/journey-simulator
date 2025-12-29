@@ -12,6 +12,7 @@ const authRouter = require('./routes/auth-routes'); // Correction du nom
 const journeyRouter = require('./routes/journey-routes');
 const orchestrationRouter = require('./routes/zyno-routes'); // Routes pour l'IA
 const daoRouter = require('./routes/dao-routes'); // Routes DAO
+const agentRouter = require('./routes/agent-routes');
 const ragRouter = require('./routes/rag-routes');
 const demoRouter = require('./routes/demo-routes'); // Routes Demo
 const userRouter = require('./routes/user-routes'); // Routes User
@@ -73,6 +74,7 @@ app.use('/auth', authRouter);           // C'est ici que ça manquait !
 app.use('/journey', journeyRouter);
 app.use('/orchestration', orchestrationRouter);
 app.use('/dao', daoRouter);
+app.use('/api/agents', agentRouter);
 app.use('/', ragRouter);
 app.use('/demo', demoRouter);           // Routes Demo
 app.use('/user', userRouter);           // Routes User

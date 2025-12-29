@@ -1,4 +1,7 @@
-import { CheckCircle2, Lock, PlayCircle } from 'lucide-react';
+import { type KeyboardEvent } from 'react';
+import { CheckCircle2, Lock, PlayCircle, Sparkles } from 'lucide-react';
+import EmptyState from '../shared/EmptyState';
+import InfoBadge from '../shared/InfoBadge';
 
 interface Phase {
   id: string;
@@ -14,102 +17,136 @@ interface JourneyTimelineProps {
 }
 
 export default function JourneyTimeline({ phases, currentPhase, onPhaseChange }: JourneyTimelineProps) {
+  const totalPhases = phases.length;
+  const activeIndex = totalPhases === 0 ? 0 : Math.min(currentPhase, totalPhases - 1);
+  const completedCount = Math.min(currentPhase, totalPhases);
+  const progressPercent = totalPhases === 0 ? 0 : Math.round((completedCount / totalPhases) * 100);
+  const progressAriaLabel = `Journey progress: ${completedCount} of ${totalPhases} phases completed`;
+
+  if (totalPhases === 0) {
+    return (
+      <div className="rounded-xl border border-dashed border-white/10 bg-white/5 p-6">
+        <EmptyState
+          dense
+          tone="info"
+          title="No phases configured"
+          description="Define the journey phases to unlock navigation and guidance."
+          icon={<Sparkles size={18} className="text-accent-cyan" />}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-3">
-      {phases.map((phase, index) => {
-        const isCompleted = index < currentPhase;
-        const isActive = index === currentPhase;
-        const isLocked = index > currentPhase;
+    <div className="space-y-4" data-testid="journey-timeline">
+      <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-white/50">
+        <InfoBadge
+          label={`Phase ${activeIndex + 1} of ${totalPhases}`}
+          tone="info"
+          icon={<Sparkles size={12} className="text-accent-cyan" />}
+        />
+        <span className="font-semibold text-white/60">{progressPercent}% complete</span>
+      </div>
 
-        const phaseKey = phase.id || `phase-${index}-${phase.name || phase.title || 'unknown'}`;
-        const handleKeyDown = (e: React.KeyboardEvent) => {
-          if (!isLocked && onPhaseChange && (e.key === 'Enter' || e.key === ' ')) {
-            e.preventDefault();
-            onPhaseChange(index);
-          }
-        };
+      <ol className="relative space-y-4 pl-5 before:absolute before:left-[15px] before:top-6 before:h-[calc(100%-1.5rem)] before:w-px before:bg-white/10">
+        {phases.map((phase, index) => {
+          const isCompleted = index < completedCount;
+          const isActive = index === activeIndex;
+          const isLocked = index > completedCount;
+          const phaseKey = phase.id || `phase-${index}-${phase.name || phase.title || 'unknown'}`;
+          const statusLabel = isActive ? 'In progress' : isCompleted ? 'Completed' : 'Locked';
+          const statusTone: 'default' | 'success' | 'info' = isCompleted ? 'success' : isActive ? 'info' : 'default';
 
-        const iconContent = (
-          <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors
-            ${(() => {
-              // Extract nested ternary into explicit variable
-              if (isActive) {
-                return 'bg-accent-cyan/20 text-accent-cyan ring-2 ring-accent-cyan/50';
-              }
-              if (isCompleted) {
-                return 'bg-green-500/20 text-green-400';
-              }
-              return 'bg-white/5 text-white/30';
-            })()}`}
-          >
-            {(() => {
-              // Extract nested ternary into explicit variable
-              if (isActive) {
-                return <PlayCircle size={16} />;
-              }
-              if (isCompleted) {
-                return <CheckCircle2 size={16} />;
-              }
-              return <Lock size={16} />;
-            })()}
-          </div>
-        );
+          const handleSelect = () => {
+            if (onPhaseChange) {
+              onPhaseChange(index);
+            }
+          };
 
-        const textContent = (
-          <div className="ml-3 flex-1 min-w-0 pt-1">
-            <div className="flex items-baseline justify-between">
-              <h4 className={`text-sm font-medium ${(() => {
-                // Extract nested ternary into explicit variable
-                if (isActive) {
-                  return 'text-accent-cyan';
-                }
-                if (isCompleted) {
-                  return 'text-green-400';
-                }
-                return 'text-white/50';
-              })()}`}>
-                {phase.title}
-              </h4>
-            </div>
-            <p className="text-xs text-white/40 mt-1 truncate">{phase.description}</p>
-          </div>
-        );
+          const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+            if (onPhaseChange && (event.key === 'Enter' || event.key === ' ')) {
+              event.preventDefault();
+              onPhaseChange(index);
+            }
+          };
 
-        if (!isLocked && onPhaseChange) {
+          const NodeIcon = isActive ? PlayCircle : isCompleted ? CheckCircle2 : Lock;
+          const nodeClasses = (() => {
+            if (isActive) {
+              return 'border-accent-cyan text-accent-cyan bg-accent-cyan/10 shadow-[0_0_24px_rgba(34,211,238,0.25)]';
+            }
+            if (isCompleted) {
+              return 'border-green-400/80 text-green-300 bg-green-500/10';
+            }
+            return 'border-white/10 text-white/30 bg-white/5';
+          })();
+          const isSelectable = Boolean(onPhaseChange) && !isLocked;
+
           return (
-            <button
-              key={phaseKey}
-              type="button"
-              className="flex items-start w-full text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent-cyan/50"
-              onClick={() => onPhaseChange(index)}
-              onKeyDown={handleKeyDown}
-            >
-              {iconContent}
-              {textContent}
-            </button>
+            <li key={phaseKey} className="relative flex gap-3 pl-3">
+              {index < totalPhases - 1 && (
+                <span className="absolute left-[15px] top-10 h-[calc(100%-2.5rem)] w-px bg-white/10" aria-hidden="true" />
+              )}
+
+              <button
+                type="button"
+                onClick={isSelectable ? handleSelect : undefined}
+                onKeyDown={isSelectable ? handleKeyDown : undefined}
+                disabled={!isSelectable}
+                className={`group flex w-full items-start gap-3 rounded-xl border border-transparent p-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan/40 ${
+                  isSelectable ? 'cursor-pointer hover:border-accent-cyan/30 hover:bg-white/5 active:scale-[0.99]' : 'cursor-default opacity-80'
+                }`}
+                aria-current={isActive ? 'step' : undefined}
+                aria-disabled={isSelectable ? undefined : 'true'}
+              >
+                <div className={`flex h-10 w-10 items-center justify-center rounded-full border text-sm transition ${nodeClasses}`}>
+                  <NodeIcon size={18} aria-hidden="true" />
+                  {isActive && <span className="absolute inset-0 rounded-full border border-accent-cyan/50 opacity-30 blur-[1px]" />}
+                </div>
+
+                <div className="min-w-0 flex-1 space-y-2">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-start justify-between gap-3">
+                      <h4 className={`text-sm font-semibold leading-tight ${isActive ? 'text-white' : isCompleted ? 'text-white/80' : 'text-white/60'}`}>
+                        {phase.title}
+                      </h4>
+                      <InfoBadge label={statusLabel} tone={statusTone} />
+                    </div>
+                    {phase.mission && (
+                      <p className="text-[11px] uppercase tracking-[0.3em] text-white/40">{phase.mission}</p>
+                    )}
+                    <p className={`text-xs leading-relaxed ${isActive ? 'text-white/80' : 'text-white/50'} line-clamp-3`}>
+                      {phase.description || 'No description provided yet.'}
+                    </p>
+                  </div>
+
+                  {phase.outcomes && Array.isArray(phase.outcomes) && phase.outcomes.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {phase.outcomes.slice(0, 2).map((outcome: string) => (
+                        <InfoBadge key={outcome} tone="default" label={outcome} />
+                      ))}
+                      {phase.outcomes.length > 2 && (
+                        <InfoBadge tone="default" label={`+${phase.outcomes.length - 2} more`} />
+                      )}
+                    </div>
+                  )}
+                </div>
+              </button>
+            </li>
           );
-        }
+        })}
+      </ol>
 
-        return (
-          <div
-            key={phaseKey}
-            className="flex items-start cursor-default"
-          >
-            {iconContent}
-            {textContent}
-          </div>
-        );
-      })}
-
-      <div className="mt-4 pt-4 border-t border-white/10">
-        <div className="flex justify-between text-xs text-white/40">
+      <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+        <div className="flex items-center justify-between text-xs text-white/50">
           <span>Progress</span>
-          <span>{Math.min(currentPhase, phases.length)}/{phases.length}</span>
+          <span className="font-semibold text-white/80">{completedCount}/{totalPhases}</span>
         </div>
         <progress
           className="timeline-progress mt-2"
-          value={Math.min(currentPhase, phases.length)}
-          max={phases.length}
+          value={completedCount}
+          max={totalPhases}
+          aria-label={progressAriaLabel}
         />
       </div>
     </div>

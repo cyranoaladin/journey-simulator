@@ -29,8 +29,9 @@ describe('JourneyNextActionsPanel', () => {
         expect(screen.getByText('Use Tool')).toBeInTheDocument();
     });
 
-    it('renders nothing if phase not found', () => {
-        const { container } = render(<JourneyNextActionsPanel personaId="test" currentStepId="unknown" />);
-        expect(container).toBeEmptyDOMElement();
+    it('renders informative empty state if phase not found', () => {
+        render(<JourneyNextActionsPanel personaId="test" currentStepId="unknown" />);
+        expect(screen.getByText('No phase selected')).toBeInTheDocument();
+        expect(screen.getByText('Select a phase on the journey timeline to view the recommended next actions.')).toBeInTheDocument();
     });
 });

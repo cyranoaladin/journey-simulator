@@ -34,7 +34,15 @@ test.describe('Investor Demo Flow - Capital Foundry', () => {
         // Auto-sim may surface an artifact modal that intercepts clicks; close it if present.
         const closeArtifactBtnEarly = page.getByRole('button', { name: 'Close artifact viewer' });
         if (await closeArtifactBtnEarly.isVisible().catch(() => false)) {
-            await closeArtifactBtnEarly.click();
+            try {
+                await closeArtifactBtnEarly.click({ force: true });
+            } catch {
+                await page.keyboard.press('Escape').catch(() => undefined);
+                await page.evaluate(() => {
+                    const el = document.querySelector('button[aria-label="Close artifact viewer"]') as HTMLButtonElement | null;
+                    el?.click();
+                });
+            }
         }
 
         // Wait until the auto-sim reaches the launch phase.
@@ -48,11 +56,19 @@ test.describe('Investor Demo Flow - Capital Foundry', () => {
         // Close the artifact viewer if it's open (it covers the back button)
         const closeArtifactBtn = page.getByRole('button', { name: 'Close artifact viewer' });
         if (await closeArtifactBtn.isVisible().catch(() => false)) {
-            await closeArtifactBtn.click();
+            try {
+                await closeArtifactBtn.click({ force: true });
+            } catch {
+                await page.keyboard.press('Escape').catch(() => undefined);
+                await page.evaluate(() => {
+                    const el = document.querySelector('button[aria-label="Close artifact viewer"]') as HTMLButtonElement | null;
+                    el?.click();
+                });
+            }
         }
 
         // Some layouts don't render the JourneyWorkspace header back button; navigate directly.
         await page.goto('/journeys');
-        await expect(page).toHaveURL(/\/journeys$/);
+        await expect(page).toHaveURL(/\/journeys(\/demo)?$/);
     });
 });

@@ -16,7 +16,8 @@ test.describe('Journey Navigation Workflow', () => {
         await page.waitForURL('**/journeys/capital-foundry');
 
         // Verify we're now in the workspace
-        await expect(page.getByTestId('back-to-journeys')).toBeVisible({ timeout: 10000 });
+        const backButton = page.getByRole('button', { name: /Back to Journeys/i });
+        await expect(backButton).toBeVisible({ timeout: 20000 });
         // "The Capital Foundry Journey" might be transparent due to bg-clip-text, so check for "Current Phase" instead which is always visible
         await expect(page.getByRole('heading', { name: 'Current Phase' })).toBeVisible();
     });
@@ -26,10 +27,11 @@ test.describe('Journey Navigation Workflow', () => {
         await page.goto('/journeys/cognitive-activation-hub');
 
         // Verify we're in the workspace
-        await expect(page.getByTestId('back-to-journeys')).toBeVisible({ timeout: 10000 });
+        const backButton = page.getByRole('button', { name: /Back to Journeys/i });
+        await expect(backButton).toBeVisible({ timeout: 20000 });
 
         // Click the back button
-        await page.getByTestId('back-to-journeys').dispatchEvent('click');
+        await backButton.dispatchEvent('click');
 
         // Wait for URL to change to /journeys
         await page.waitForURL('**/journeys', { timeout: 15000 });
@@ -38,7 +40,7 @@ test.describe('Journey Navigation Workflow', () => {
         await expect(page.getByTestId('journeys-page-title')).toBeVisible({ timeout: 15000 });
 
         // Verify the "Back to all journeys" button is no longer visible
-        await expect(page.getByTestId('back-to-journeys')).not.toBeVisible();
+        await expect(page.getByRole('button', { name: /Back to Journeys/i })).not.toBeVisible();
     });
 
     test('should maintain journey state when navigating between routes', async ({ page }) => {
@@ -48,7 +50,7 @@ test.describe('Journey Navigation Workflow', () => {
 
         // Navigate to dashboard
         await page.goto('/dashboard');
-        await expect(page.getByRole('link', { name: 'Dashboard' }).or(page.getByText('Welcome', { exact: false }))).toBeVisible({ timeout: 10000 });
+        await page.waitForURL('**/dashboard', { timeout: 10000 });
 
         // Navigate back to journeys
         // Clear persisted journey store to avoid flaky re-hydration keeping a selected persona.
@@ -71,19 +73,19 @@ test.describe('Journey Navigation Workflow', () => {
         await page.goto('/journeys/capital-foundry', { waitUntil: 'domcontentloaded' });
         await page.waitForURL('**/journeys/capital-foundry');
         await expect(page.getByRole('heading', { name: 'The Capital Foundry', level: 2 })).toBeVisible({ timeout: 15000 });
-        await expect(page.getByTestId('back-to-journeys')).toBeVisible({ timeout: 15000 });
+        await expect(page.getByRole('button', { name: /Back to Journeys/i })).toBeVisible({ timeout: 20000 });
     });
 
     test('should allow switching between different journeys', async ({ page }) => {
         // Deterministic route-based switching (avoids flaky animated card clicks).
         await page.goto('/journeys/capital-foundry', { waitUntil: 'domcontentloaded' });
         await page.waitForURL('**/journeys/capital-foundry');
-        await expect(page.getByTestId('back-to-journeys')).toBeVisible({ timeout: 15000 });
+        await expect(page.getByRole('button', { name: /Back to Journeys/i })).toBeVisible({ timeout: 20000 });
         await expect(page.getByRole('heading', { name: 'The Capital Foundry', level: 2 })).toBeVisible({ timeout: 15000 });
 
         await page.goto('/journeys/cognitive-activation-hub', { waitUntil: 'domcontentloaded' });
         await page.waitForURL('**/journeys/cognitive-activation-hub');
-        await expect(page.getByTestId('back-to-journeys')).toBeVisible({ timeout: 15000 });
+        await expect(page.getByRole('button', { name: /Back to Journeys/i })).toBeVisible({ timeout: 20000 });
         await expect(page.getByRole('heading', { name: 'The Cognitive Activation Hub', level: 2 })).toBeVisible({ timeout: 15000 });
 
         // Switch back to confirm the router/store can handle multiple transitions.

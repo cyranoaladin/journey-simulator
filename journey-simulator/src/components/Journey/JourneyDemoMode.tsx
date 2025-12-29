@@ -1,0 +1,334 @@
+import { ArrowLeft, Loader2, Sparkles, Target } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { shallow } from 'zustand/shallow';
+import { useJourneyStore } from '../../store/journeyStore';
+import type { JourneyStepResponse, UIBlock, TextBlock } from '../../types/uiBlocks';
+import { tokenStore } from '../../utils/tokenStore';
+import UIBlocksRenderer from '../UIBlocks/UIBlocksRenderer';
+import { JourneyProgressBar } from './JourneyProgressBar';
+import JourneyTimeline from './JourneyTimeline';
+import ZynoSignalSidebar from './ZynoSignalSidebar';
+
+import { DEMO_SCENARIOS } from '../../config/demoScenarios';
+import { useAutoSimulation } from '../../hooks/useAutoSimulation';
+import { usePhaseData } from '../../hooks/usePhaseData';
+
+import JourneyCompletedPage from '../JourneyCompletedPage';
+
+import { toast } from 'sonner';
+import { useWorkspaceLayout } from '../../contexts/WorkspaceLayoutContext';
+import { useArtifacts } from '../../hooks/useArtifacts';
+import { ArtifactModal } from '../Artifacts/ArtifactModal';
+import { NeuralOverlay } from '../Artifacts/NeuralOverlay';
+
+interface JourneyDemoModeProps {
+    onBack?: () => void;
+}
+
+const JourneyDemoMode = ({ onBack }: JourneyDemoModeProps) => {
+    const navigate = useNavigate();
+    const {
+        selectedPersona,
+        userProgress,
+        currentPhaseIndex,
+        lastStep,
+        isStepLoading,
+        runInteractiveStep,
+        setCurrentPhase,
+        completePhase,
+        uiMode,
+        uiTone,
+    } = useJourneyStore(
+        (state) => ({
+            selectedPersona: state.selectedPersona,
+            userProgress: state.userProgress,
+            currentPhaseIndex: state.currentPhase,
+            lastStep: state.lastStep,
+            isStepLoading: state.isStepLoading,
+            runInteractiveStep: state.runInteractiveStep,
+            setCurrentPhase: state.setCurrentPhase,
+            completePhase: state.completePhase,
+            uiMode: state.uiMode,
+            uiTone: state.uiTone,
+        }),
+        shallow
+    );
+
+    const [isThinking, setIsThinking] = useState(false);
+    const [currentTask, setCurrentTask] = useState({ agent: '', task: '' });
+    const [viewingArtifact, setViewingArtifact] = useState<any>(null);
+    const [unlockedArtifacts, setUnlockedArtifacts] = useState<string[]>([]);
+
+    const pendingArtifactIdsRef = useRef<Set<string>>(new Set());
+    const { artifacts } = useArtifacts({
+        fallbackToStatic: true,
+    });
+
+    const activePhaseIndex = currentPhaseIndex ?? userProgress.completedPhases.length;
+    const selectedPersonaId = selectedPersona?.id ?? 'unknown';
+
+    const {
+        activePhase,
+        safeActivePhase,
+        totalPhases,
+    } = usePhaseData({
+        selectedPersona,
+        activePhaseIndex,
+        userProgress
+    });
+
+    const showNeuralOverlay = (task: string) => {
+        const startedAt = Date.now();
+        setIsThinking(true);
+        setCurrentTask({ agent: 'Zyno', task });
+        return startedAt;
+    };
+
+    const hideNeuralOverlay = async (startedAt: number) => {
+        const elapsed = Date.now() - startedAt;
+        if (elapsed < 450) {
+            await new Promise((r) => setTimeout(r, 450 - elapsed));
+        }
+        setIsThinking(false);
+    };
+
+    // Keep useAutoSimulation
+    const {
+        isAutoSimulating,
+        autoSimProgress,
+        startAutoSimulation,
+        stopAutoSimulation
+    } = useAutoSimulation({
+        isDemo: true,
+        selectedPersona: selectedPersona!,
+        activePhaseIndex: currentPhaseIndex ?? userProgress.completedPhases.length,
+        setCurrentPhase,
+        runInteractiveStep,
+        completePhase,
+        onThinkingStart: showNeuralOverlay,
+        onThinkingEnd: hideNeuralOverlay
+    });
+
+    // Auto-Sim Logic: Unlocking artifacts
+    useEffect(() => {
+        if ((lastStep?.ui_blocks?.length ?? 0) > 0) {
+            const personaId = selectedPersona?.id || 'web3_builder';
+            const currentStepIndex = userProgress.completedPhases.length + 1;
+            const artifactId = DEMO_SCENARIOS[personaId]?.[currentStepIndex];
+
+            if (
+                artifactId &&
+                !unlockedArtifacts.includes(artifactId) &&
+                !pendingArtifactIdsRef.current.has(artifactId)
+            ) {
+                setUnlockedArtifacts((prev) => (prev.includes(artifactId) ? prev : [...prev, artifactId]));
+                pendingArtifactIdsRef.current.delete(artifactId);
+                toast.success("New Artifact Generated!");
+                const artifact = artifacts.find(a => a.id === artifactId);
+                if (artifact) setViewingArtifact(artifact);
+            }
+        }
+    }, [artifacts, lastStep, selectedPersona, unlockedArtifacts, userProgress.completedPhases]);
+
+    useEffect(() => {
+        return () => {
+            pendingArtifactIdsRef.current.clear();
+        };
+    }, []);
+
+    const {
+        focusMode,
+        leftPanelOpen,
+        rightPanelOpen,
+    } = useWorkspaceLayout();
+
+    const autoSimPercent = autoSimProgress
+        ? Math.min(100, Math.max(0, (autoSimProgress.current / Math.max(autoSimProgress.total, 1)) * 100))
+        : 0;
+
+    // Demo: Simply trigger auto sim, no "Run Interactive Step" driven by component unless auto sim needs it.
+    // Actually, standard workspace had logic to "start phase" automatically.
+    // In demo mode, we might want to start AutoSim immediately or wait for user to click "Start Demo".
+    // The existing code auto-starts it via handleRunInteractiveStep inside useEffect.
+
+    useEffect(() => {
+        if (isStepLoading || isAutoSimulating) return;
+        if (!selectedPersona || !activePhase) return;
+        if (activePhaseIndex >= totalPhases) return;
+
+        // In Demo, we automate everything.
+        // We can just call startAutoSimulation if not running.
+        // But wait, user might want to read first.
+        // Let's stick to the previous logic: Trigger runInteractiveStep once per phase to get the "blocks".
+        // But for "Auto Simulation", it iterates through steps.
+
+        // Let's just launch auto simulation if we are in demo mode and haven't started?
+        // Or rely on the "Auto Simulation" button in the UI? 
+        // The previous code had a "Run Local Simulation" button.
+    }, []);
+
+    const localInteractionStep = useMemo<JourneyStepResponse>(() => {
+        // We can keep the local mock blocks for fallback
+        const blocks: UIBlock[] = [];
+        // ... (Simplified blocks for demo) ...
+        const introBlock: TextBlock = {
+            kind: 'text_block' as const,
+            id: `${selectedPersonaId}:${safeActivePhase.id}:intro`,
+            title: 'Zyno Demo Brief',
+            body_markdown: `**Phase:** ${safeActivePhase.title}\n\nObserving autonomous agent completion of this phase.`,
+        };
+        blocks.push(introBlock);
+
+        return {
+            metadata: {
+                persona_id: selectedPersonaId,
+                journey_track: selectedPersonaId,
+                phase_id: safeActivePhase.id,
+                language: 'en',
+                mode: uiMode,
+                tone: uiTone,
+                title: `${safeActivePhase.title} — Demo`,
+                summary: 'Demo execution',
+            },
+            ui_blocks: blocks,
+            agent_actions: [],
+            next_state: { phase_id: safeActivePhase.id, completed_missions: [], xp_delta: 0 },
+        };
+    }, [safeActivePhase, selectedPersonaId, uiMode, uiTone]);
+
+    const interactionResponse = useMemo<JourneyStepResponse>(() => {
+        // If we have a step from the store/auto-sim, use it.
+        const candidate = lastStep as unknown as JourneyStepResponse | null;
+        if (candidate?.ui_blocks?.length) return candidate;
+        return localInteractionStep;
+    }, [lastStep, localInteractionStep]);
+
+    if (!selectedPersona) return null;
+    if (activePhaseIndex >= totalPhases) return <JourneyCompletedPage />;
+
+    const handleExitDemo = () => {
+        try {
+            tokenStore.clearTokens();
+        } catch (error) {
+            console.error('Error clearing tokens:', error);
+        }
+        navigate('/');
+    };
+
+    return (
+        <div className="min-h-screen bg-[#0A0A1F] pb-20 font-sans text-white">
+            <NeuralOverlay isVisible={isThinking} agentName={currentTask.agent} taskName={currentTask.task} />
+            <ArtifactModal isOpen={!!viewingArtifact} onClose={() => setViewingArtifact(null)} fileUrl={viewingArtifact?.fileUrl} title={viewingArtifact?.title} />
+
+            {/* HEADER */}
+            <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-white/10 bg-[#0A0A1F]/95 px-6 backdrop-blur">
+                <div className="flex items-center gap-3">
+                    <button onClick={() => onBack ? onBack() : navigate('/journeys')} className="group flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 transition hover:bg-white/10">
+                        <ArrowLeft size={14} className="text-white/60 group-hover:text-white" />
+                        <span className="text-xs font-medium text-white/60 group-hover:text-white">Exit Demo</span>
+                    </button>
+                </div>
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-3">
+                    <h1 className="text-sm font-bold uppercase tracking-wider text-white">{selectedPersona.title}</h1>
+                    <span className="rounded-full bg-accent-cyan/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-accent-cyan border border-accent-cyan/20">Demo Mode</span>
+                </div>
+                <div className="flex items-center gap-3">
+                    <button onClick={handleExitDemo} className="rounded-full bg-white text-black px-4 py-1.5 text-xs font-bold hover:bg-gray-200 transition">Exit Demo</button>
+                </div>
+            </header>
+
+            {/* BODY */}
+            <main className={`relative mx-auto max-w-[1920px] transition-all duration-300 ${focusMode ? 'px-0' : 'px-4 lg:px-8'}`}>
+                {!focusMode && (
+                    <div className="mb-6 mt-6 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+                        {/* SIMULATION CONTROLS */}
+                        <div className="w-full rounded-xl border border-accent-cyan/30 bg-accent-cyan/5 p-4 shine-effect">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-cyan/20 text-accent-cyan">
+                                        {isAutoSimulating ? <Loader2 className="animate-spin" size={20} /> : <Sparkles size={20} />}
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-white">Auto-Simulation Active</h3>
+                                        <p className="text-xs text-white/60">Zyno is navigating the journey autonomously.</p>
+                                    </div>
+                                </div>
+                                {!isAutoSimulating ? (
+                                    <button
+                                        onClick={startAutoSimulation}
+                                        className="flex items-center gap-2 rounded-lg bg-accent-cyan px-4 py-2 text-sm font-bold text-black shadow-[0_0_15px_rgba(34,211,238,0.4)] hover:bg-accent-cyan/90"
+                                    >
+                                        <Sparkles size={16} /> Start Simulation
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={stopAutoSimulation}
+                                        className="flex items-center gap-2 rounded-lg border border-red-500/50 bg-red-500/10 px-4 py-2 text-sm font-bold text-red-400 hover:bg-red-500/20"
+                                    >
+                                        Stop
+                                    </button>
+                                )}
+                            </div>
+                            {isAutoSimulating && (
+                                <div className="mt-4">
+                                    <div className="mb-1 flex justify-between text-xs uppercase tracking-wider text-accent-cyan">
+                                        <span>Simulating {safeActivePhase.title}...</span>
+                                        <span>{Math.round(autoSimPercent)}%</span>
+                                    </div>
+                                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/40">
+                                        <div className="h-full bg-accent-cyan transition-all duration-300" style={{ width: `${autoSimPercent}%` }} />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* TRINITY LAYOUT */}
+                <div className={`grid gap-6 transition-all duration-500 ${focusMode ? 'grid-cols-1' : leftPanelOpen && rightPanelOpen ? 'grid-cols-[280px_1fr_320px]' : leftPanelOpen ? 'grid-cols-[280px_1fr]' : rightPanelOpen ? 'grid-cols-[1fr_320px]' : 'grid-cols-1'}`}>
+
+                    {/* LEFT: TIMELINE (READ ONLY) */}
+                    {leftPanelOpen && !focusMode && (
+                        <aside className="sticky top-24 h-[calc(100vh-8rem)] overflow-y-auto rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl">
+                            <JourneyTimeline phases={selectedPersona?.phases || []} currentPhase={userProgress.completedPhases.length} />
+                        </aside>
+                    )}
+
+                    {/* CENTER: STAGE */}
+                    <section className="min-h-[600px] space-y-6">
+                        {!focusMode && <JourneyProgressBar personaId={selectedPersona.id} currentStepId={activePhase.id} />}
+
+                        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/10 to-white/5 p-1 shadow-2xl backdrop-blur-2xl">
+                            {/* Simplified Header for Blocks */}
+                            <div className="flex items-center justify-between border-b border-white/10 bg-white/5 px-6 py-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-accent-purple to-blue-600 text-white shadow-lg">
+                                        <Target size={16} />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-sm font-bold uppercase tracking-wider text-white">Simulation Stream</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="max-h-[800px] overflow-y-auto bg-black/20 p-6 md:p-8">
+                                <UIBlocksRenderer
+                                    response={interactionResponse as JourneyStepResponse}
+                                />
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* RIGHT: ARTIFACTS */}
+                    {rightPanelOpen && !focusMode && (
+                        <aside className="sticky top-24 h-[calc(100vh-8rem)] space-y-4 overflow-y-auto rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl">
+                            <ZynoSignalSidebar className="w-full" />
+                        </aside>
+                    )}
+                </div>
+            </main>
+        </div>
+    );
+};
+
+export default JourneyDemoMode;

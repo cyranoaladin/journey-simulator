@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion';
-import { Check, Zap } from 'lucide-react';
+import { Check, Sparkles, Zap } from 'lucide-react';
 import React from 'react';
 import { getJourneyPhases } from '../../config/journeyPhases';
+import EmptyState from '../shared/EmptyState';
+import InfoBadge from '../shared/InfoBadge';
 
 interface Props {
   personaId: string;
@@ -12,11 +14,36 @@ export const JourneyProgressBar: React.FC<Props> = ({ personaId, currentStepId }
   const phases = getJourneyPhases(personaId);
   const currentPhaseIndex = phases.findIndex(p => p.id === currentStepId);
   const activeIndex = currentPhaseIndex === -1 ? 0 : currentPhaseIndex;
+  const totalPhases = phases.length;
+  const completedCount = Math.max(0, Math.min(activeIndex, totalPhases));
+  const progressPercent = totalPhases === 0 ? 0 : Math.round((completedCount / totalPhases) * 100);
+
+  if (totalPhases === 0) {
+    return (
+      <div className="w-full rounded-2xl border border-dashed border-white/10 bg-white/5 p-4" data-testid="journey-progress-bar">
+        <EmptyState
+          dense
+          tone="info"
+          title="Journey not configured"
+          description="Assign phases to this persona to surface progress guidance."
+          icon={<Sparkles size={18} className="text-accent-cyan" />}
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full py-2 px-4 mb-2" data-testid="journey-progress-bar">
-      {/* Container ensures spacing for labels below */}
-      <div className="relative flex items-center justify-between min-h-[100px]">
+    <div className="w-full rounded-2xl border border-white/10 bg-white/5 p-4" data-testid="journey-progress-bar">
+      <div className="flex items-center justify-between text-xs text-white/60">
+        <InfoBadge
+          label={`Phase ${Math.min(activeIndex + 1, totalPhases)} of ${totalPhases}`}
+          tone="info"
+          icon={<Sparkles size={12} className="text-accent-cyan" />}
+        />
+        <span>{progressPercent}% complete</span>
+      </div>
+
+      <div className="relative mt-4 flex items-center justify-between min-h-[100px]">
 
         {/* Progress Track (Background) */}
         <div className="absolute left-0 top-[20px] h-1 w-full bg-white/5 rounded-full z-0 overflow-hidden">
@@ -107,15 +134,13 @@ export const JourneyProgressBar: React.FC<Props> = ({ personaId, currentStepId }
                   );
                 })()}
 
-                {index === activeIndex && (
-                  <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="mt-1 text-[9px] text-accent-cyan/60 font-mono bg-accent-cyan/10 px-2 py-0.5 rounded border border-accent-cyan/20"
-                  >
-                    IN PROGRESS
-                  </motion.span>
-                )}
+                {index === activeIndex ? (
+                  <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
+                    <InfoBadge label="In progress" tone="info" className="mt-2" />
+                  </motion.div>
+                ) : isCompleted ? (
+                  <InfoBadge label="Completed" tone="success" className="mt-2" />
+                ) : null}
               </div>
             </div>
           );

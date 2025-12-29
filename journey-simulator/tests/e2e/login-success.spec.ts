@@ -63,10 +63,26 @@ test.describe('Login Flow', () => {
       });
     });
 
+    await page.goto('about:blank');
+    await page.evaluate(() => {
+      try {
+        window.sessionStorage.clear();
+        window.localStorage.clear();
+      } catch {
+        /* ignore */
+      }
+    });
+
     await page.goto('/login');
 
-    await page.locator('input[name="email"]').fill('demo@mfai.com');
-    await page.locator('input[name="password"]').fill('demo123');
+    const emailInput = page.locator('input[name="email"]');
+    const passwordInput = page.locator('input[name="password"]');
+
+    await expect(emailInput).toBeVisible({ timeout: 20000 });
+    await expect(passwordInput).toBeVisible({ timeout: 20000 });
+
+    await emailInput.fill('demo@mfai.com');
+    await passwordInput.fill('demo123');
     await page.getByRole('button', { name: 'Sign In' }).click();
 
     await page.waitForURL('**/journeys', { timeout: 15000 });
