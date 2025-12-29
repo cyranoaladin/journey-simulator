@@ -131,6 +131,7 @@ describe('NFT Integration in JourneyWorkspace', () => {
             uiMode: 'discovery',
             uiTone: 'pedagogical',
             ensureApiJourneyId: vi.fn().mockReturnValue('mock-journey-id'),
+            runInteractiveStep: vi.fn().mockResolvedValue(undefined),
         };
 
         (useJourneyStore as any).mockImplementation((selector: any) => {
