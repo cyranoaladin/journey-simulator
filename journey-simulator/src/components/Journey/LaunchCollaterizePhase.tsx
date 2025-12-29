@@ -38,6 +38,7 @@ export const LaunchCollaterizePhase: React.FC<LaunchCollaterizePhaseProps> = ({ 
         setCollaterizeSimulation(response.simulation);
         setResults(response.simulation);
         toast.success('Launch simulation completed successfully');
+        if (onComplete) onComplete();
       } else {
         throw new Error(response.error || 'Simulation failed');
       }

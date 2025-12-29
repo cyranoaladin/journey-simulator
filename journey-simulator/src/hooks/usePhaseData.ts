@@ -54,7 +54,6 @@ export const usePhaseData = ({
             'Submit your deliverable for evaluation to unlock rewards.',
         ].filter((item): item is string => Boolean(item && item.trim()))
         : [];
-    // @ts-ignore - dynamic type check for fallback
     const objectiveList = (phaseObjectives.length > 0 ? phaseObjectives : objectivesFallback) as string[];
     const objectiveStatuses = objectiveList.map((_, index) => {
         if (isPhaseCompleted) return 'done' as const;
