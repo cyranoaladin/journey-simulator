@@ -74,8 +74,8 @@ describe('JourneyWorkspace', () => {
     let consoleErrorSpy: ReturnType<typeof vi.spyOn> | undefined;
 
     beforeAll(() => {
-        consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => { });
+        consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
     });
 
     afterAll(() => {
@@ -167,17 +167,21 @@ describe('JourneyWorkspace', () => {
         );
 
         expect(screen.getAllByText('Test Persona')[0]).toBeInTheDocument();
-        expect(screen.getAllByText('Phase 1')[0]).toBeInTheDocument();
-        expect(screen.getByText('Run Simulation')).toBeInTheDocument();
+        // Phase title is rendered as "PHASE 1" in CSS/HTML but content might be mixed case.
+        // Use regex for case-insensitive match or check breadcrumb content explicitly.
+        // The breadcrumb contains "PHASE 1" and "Phase 1" (title)
+        expect(screen.getAllByText(/Phase 1/i)[0]).toBeInTheDocument();
+        // Interaction is now auto-triggered, so "Run Simulation" button is not present by default.
+        // Instead, we verify the workspace is rendered.
+        expect(screen.getByText(/Mission Workspace/i)).toBeInTheDocument();
     });
 
-    it('calls runInteractiveStep when Start button is clicked', () => {
-        // This test asserts single-step behavior; disable demo autoplay for it.
+    it('triggers runInteractiveStep automatically on mount', async () => {
+        // This test asserts auto-bootstrap behavior.
         try {
             tokenStore.setAccessToken('real-token');
         } catch (e) {
             // Ignore error in test
-            expect(e).toBeDefined();
         }
 
         render(
@@ -186,13 +190,12 @@ describe('JourneyWorkspace', () => {
             </MemoryRouter>
         );
 
-        const startButton = screen.getByText('Run Simulation');
-        fireEvent.click(startButton);
-
-        expect(mockRunInteractiveStep).toHaveBeenCalledWith({
-            phaseId: 'phase-1',
-            trackId: 'persona-1',
-            userInput: ''
+        await waitFor(() => {
+            expect(mockRunInteractiveStep).toHaveBeenCalledWith({
+                phaseId: 'phase-1',
+                trackId: 'persona-1',
+                userInput: ''
+            });
         });
     });
 
@@ -204,7 +207,9 @@ describe('JourneyWorkspace', () => {
             </MemoryRouter>
         );
 
-        // The button text changes to a loader, so "Start / Continue" should not be there
+        // The "Mission Workspace" title should still be there, but maybe not controls if loading?
+        // Actually, we just check that "Run Simulation" is DEFINITELY not there (as it shouldn't be anyway)
+        // and that perhaps a loader is present if implemented.
         expect(screen.queryByText('Run Simulation')).not.toBeInTheDocument();
     });
 
@@ -242,7 +247,7 @@ describe('JourneyWorkspace', () => {
                 <JourneyWorkspace />
             </MemoryRouter>
         );
-        expect(screen.getByTestId('complete-phase')).toBeInTheDocument();
+        expect(screen.getByTestId('complete-phase-button')).toBeInTheDocument();
     });
 
     it('calls completePhase when Complete Phase button is clicked', async () => {
@@ -263,7 +268,7 @@ describe('JourneyWorkspace', () => {
             </MemoryRouter>
         );
 
-        const completeButton = screen.getByTestId('complete-phase');
+        const completeButton = screen.getByTestId('complete-phase-button');
         fireEvent.click(completeButton);
 
         // handleCompletePhase is async (submitMission -> completePhase), so wait for it.
