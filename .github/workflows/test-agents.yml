@@ -26,31 +26,31 @@ jobs:
           --health-retries=5
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '22.x'
-        cache: 'npm'
-        cache-dependency-path: mf-back/package-lock.json
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+          cache-dependency-path: mf-back/package-lock.json
 
-    - name: Upgrade npm
-      run: npm install -g npm@11
+      - name: Upgrade npm
+        run: npm install -g npm@11
 
-    - name: Install dependencies
-      run: npm ci
-      working-directory: ./mf-back
-      env:
-        CI: true
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./mf-back
+        env:
+          CI: true
 
-    - name: Run Unit Tests
-      run: npm test
-      working-directory: ./mf-back
-      env:
-        CI: true
-        MONGO_URI: mongodb://localhost:27017/testdb
+      - name: Run Unit Tests
+        run: npm test
+        working-directory: ./mf-back
+        env:
+          CI: true
+          MONGO_URI: mongodb://localhost:27017/testdb
 
-    - name: Check RAG Connection (Optional)
-      run: node scripts/check-rag-connection.js || echo "RAG connection check skipped or completed"
-      working-directory: ./mf-back
+      - name: Check RAG Connection (Optional)
+        run: node scripts/check-rag-connection.js || echo "RAG connection check skipped or completed"
+        working-directory: ./mf-back
