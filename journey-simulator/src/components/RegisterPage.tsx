@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight, AlertCircle, CheckCircle, Wallet } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { logger } from '../utils/logger';
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -108,6 +109,7 @@ const RegisterPage: React.FC = () => {
         setError('Registration failed. Please try again.');
       }
     } catch (err) {
+      logger.error('Registration failed', err);
       setError('Registration failed. Please check your connection and try again.');
     } finally {
       setIsSubmitting(false);
@@ -131,7 +133,6 @@ const RegisterPage: React.FC = () => {
   }
 
   return (
-    <>
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 relative">
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-accent-cyan/10 via-accent-purple/10 to-accent-gold/10"></div>
@@ -423,7 +424,6 @@ const RegisterPage: React.FC = () => {
         </motion.div>
       </motion.div>
     </div>
-    </>
   );
 };
 

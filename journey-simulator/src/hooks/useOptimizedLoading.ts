@@ -11,11 +11,33 @@ export const useOptimizedLoading = <T,>(
   const [error, setError] = useState<Error | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const execute = useCallback(async () => {
-    // Cancel previous request if still pending
+  const fromCache = (key: string) => {
+    const cached = sessionStorage.getItem(key);
+    if (!cached) return null;
+    try {
+      const { data: cachedData, timestamp } = JSON.parse(cached);
+      const age = Date.now() - timestamp;
+      return age < 300000 ? cachedData : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const persistCache = (key: string, value: T) => {
+    sessionStorage.setItem(
+      key,
+      JSON.stringify({ data: value, timestamp: Date.now() })
+    );
+  };
+
+  const abortPrevious = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
+  };
+
+  const execute = useCallback(async () => {
+    abortPrevious();
 
     const controller = new AbortController();
     abortControllerRef.current = controller;
@@ -24,39 +46,26 @@ export const useOptimizedLoading = <T,>(
     setError(null);
 
     try {
-      // Check if data is in cache
       if (cacheKey) {
-        const cached = sessionStorage.getItem(cacheKey);
-        if (cached) {
-          const { data: cachedData, timestamp } = JSON.parse(cached);
-          const age = Date.now() - timestamp;
-          // Cache valid for 5 minutes (300,000 ms)
-          if (age < 300000) {
-            setData(cachedData);
-            setIsLoading(false);
-            return cachedData;
-          }
+        const cachedData = fromCache(cacheKey);
+        if (cachedData !== null) {
+          setData(cachedData);
+          setIsLoading(false);
+          return cachedData;
         }
       }
 
       const result = await asyncFunction();
 
-      // Only update if request was not cancelled
       if (!controller.signal.aborted) {
         setData(result);
-
-        // Save to cache if key provided
         if (cacheKey) {
-          sessionStorage.setItem(
-            cacheKey,
-            JSON.stringify({ data: result, timestamp: Date.now() })
-          );
+          persistCache(cacheKey, result);
         }
       }
 
       return result;
     } catch (err: any) {
-      // Only handle error if not due to cancellation
       if (err.name !== 'AbortError' && !controller.signal.aborted) {
         setError(err);
       }
@@ -65,22 +74,15 @@ export const useOptimizedLoading = <T,>(
       if (!controller.signal.aborted) {
         setIsLoading(false);
       }
-      // Clean up controller if it's the same one
       if (abortControllerRef.current === controller) {
         abortControllerRef.current = null;
       }
     }
-  }, deps);
+  }, [...deps, asyncFunction, cacheKey]);
 
   useEffect(() => {
     execute();
-
-    // Cleanup on unmount
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-    };
+    return () => abortPrevious();
   }, [execute]);
 
   const refresh = useCallback(() => {
@@ -88,7 +90,7 @@ export const useOptimizedLoading = <T,>(
       sessionStorage.removeItem(cacheKey);
     }
     execute();
-  }, [execute, cacheKey]);
+  }, [cacheKey, execute]);
 
   return { data, isLoading, error, refresh, execute };
 };
@@ -113,7 +115,7 @@ export const useProgressiveLoading = <T,>(steps: (() => Promise<T>)[]) => {
         setIsComplete(true);
       }
     } catch (error) {
-      console.error(`Error loading step ${currentStep + 1}:`, error);
+      console.error("Error loading step", { step: currentStep + 1, error });
     } finally {
       setIsLoading(false);
     }
@@ -129,7 +131,7 @@ export const useProgressiveLoading = <T,>(steps: (() => Promise<T>)[]) => {
         newResults.push(result);
         setCurrentStep(i + 1);
       } catch (error) {
-        console.error(`Error loading step ${i + 1}:`, error);
+        console.error("Error loading step", { step: i + 1, error });
         break;
       }
     }

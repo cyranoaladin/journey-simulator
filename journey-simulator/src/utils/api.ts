@@ -24,12 +24,12 @@ function resolveApiBaseUrl(): string {
   const configured = import.meta.env.VITE_API_BASE_URL
   const normalizedConfigured = configured ? normalizeApiBaseUrl(configured) : null
 
-  // If UI runs locally, always prefer local mf-back unless the user explicitly configured a local URL.
+  // Si l'UI tourne en local, pointer par défaut sur le backend local (127.0.0.1:3000)
   if (isLocalUiHost()) {
     if (normalizedConfigured && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(normalizedConfigured)) {
       return normalizedConfigured
     }
-    return 'http://127.0.0.1:3002'
+    return 'http://127.0.0.1:3000'
   }
 
   // Non-local UI: use configured URL or hosted default.
@@ -253,7 +253,7 @@ const buildOfflineAgentLogs = (currentPhase: number, totalXP: number) => {
 const handleOfflineFallback = async <T>(path: string, error: unknown): Promise<T | undefined> => {
   const normalizedPath = path.split('?')[0];
   const { currentPhase, totalXP } = getLocalProgressSnapshot();
-  console.warn(`[API] Offline fallback engaged for ${path}`, error);
+  console.warn("[API] Offline fallback engaged", { path, error });
 
   try {
     if (normalizedPath === '/journey/artifacts') {
@@ -303,40 +303,102 @@ const handleOfflineFallback = async <T>(path: string, error: unknown): Promise<T
       } as unknown as T;
     }
   } catch (fallbackError) {
-    console.error(`[API] Offline fallback failed for ${path}`, fallbackError);
+    console.error("[API] Offline fallback failed", { path, error: fallbackError });
   }
 
   return undefined;
 };
 
 // Centralized authenticated request with auto-refresh on 401
-const request = async <T>(
-  path: string,
-  options: RequestInit = {},
-  retryOnUnauthorized: boolean = true
-): Promise<T> => {
-  // Mock response for demo mode
+// Helper to handle demo mode logic
+const executeDemoRequest = async <T>(path: string, options: RequestInit): Promise<T | null> => {
   const token = tokenStore.getAccessToken();
-  logger.debug(`[API] Requesting: ${path} (Base: ${API_BASE_URL})`);
-
-  // CRITICAL: Allow real backend calls for AI agents even in demo mode
   const isAIAgentCall = path.includes('/step') || path.includes('/submit');
 
   if (token === 'demo-token' && !isAIAgentCall) {
     logger.debug(`[Demo Mode] Mocking request to ${path}`);
     const stateManager = new DemoStateManager();
     const demoResponse = await handleDemoRequest<T>(path, options, stateManager);
-    if (demoResponse !== null) {
-      return demoResponse;
-    }
-    // Fallback to default success if handler returns null
-    return { success: true } as unknown as T;
+    return demoResponse !== null ? demoResponse : ({ success: true } as unknown as T);
   }
+  return null;
+};
+
+// Helper to handle token refresh logic
+const executeRefresh = async <T>(path: string, options: RequestInit): Promise<T> => {
+  const storedRefreshToken = tokenStore.getRefreshToken();
+  if (!storedRefreshToken) {
+    throw new Error('Unauthorized and no refresh token available');
+  }
+
+  // Handle demo refresh token specifically
+  if (storedRefreshToken === 'demo-refresh-token') {
+    tokenStore.setAccessToken('demo-token');
+    const demoRes = await executeDemoRequest<T>(path, options);
+    return demoRes || ({ success: true } as unknown as T);
+  }
+
+  if (!refreshInFlight) {
+    refreshInFlight = fetch(`${API_BASE_URL}/user/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken: storedRefreshToken }),
+    }).finally(() => {
+      refreshInFlight = null;
+    });
+  }
+
+  const refreshResp = await refreshInFlight;
+
+  if (refreshResp.ok) {
+    const refreshData = await refreshResp.json();
+    if (refreshData?.accessToken) {
+      tokenStore.setAccessToken(refreshData.accessToken);
+    }
+    if (refreshData?.refreshToken) {
+      tokenStore.setRefreshToken(refreshData.refreshToken);
+    }
+
+    // Retry original request once with updated Authorization header
+    const retryResponse = await fetch(`${API_BASE_URL}${path}`, {
+      ...options,
+      headers: {
+        ...(options.headers || {}),
+        ...getAuthHeaders(),
+      },
+    });
+    return handleResponse<T>(retryResponse);
+  }
+
+  // Refresh failed
+  tokenStore.clearTokens();
+  // Try to parse error message safely
+  let errorMessage = 'Token refresh failed';
+  try {
+    const errorData = await refreshResp.json();
+    if (errorData?.message) errorMessage = errorData.message;
+  } catch (e) {
+    // Ignore JSON parse error on failure
+  }
+  throw new Error(errorMessage);
+};
+
+// Centralized authenticated request with simplified logic
+const request = async <T>(
+  path: string,
+  options: RequestInit = {},
+  retryOnUnauthorized: boolean = true
+): Promise<T> => {
+  logger.debug(`[API] Requesting: ${path} (Base: ${API_BASE_URL})`);
+
+  const demoResult = await executeDemoRequest<T>(path, options);
+  if (demoResult) return demoResult;
 
   let response: Response;
   try {
     response = await fetch(`${API_BASE_URL}${path}`, {
       ...options,
+      credentials: 'include',
       headers: {
         ...(options.headers || {}),
       },
@@ -352,62 +414,7 @@ const request = async <T>(
   logger.debug(`[API] Response for ${path}: ${response.status}`);
 
   if (response.status === 401 && retryOnUnauthorized) {
-    // Attempt token refresh once
-    const storedRefreshToken = tokenStore.getRefreshToken();
-    if (!storedRefreshToken) {
-      const errorData: ApiError = await response.json().catch(() => ({
-        success: false,
-        message: 'Unauthorized and no refresh token available',
-      }));
-      throw new Error(errorData.message || 'Unauthorized');
-    }
-
-    // Refresh token
-    // Handle demo refresh token specifically
-    if (storedRefreshToken === 'demo-refresh-token') {
-      tokenStore.setAccessToken('demo-token');
-      return request<T>(path, options, false);
-    }
-
-    if (!refreshInFlight) {
-      refreshInFlight = fetch(`${API_BASE_URL}/user/refresh`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken: storedRefreshToken }),
-      }).finally(() => {
-        refreshInFlight = null;
-      });
-    }
-
-    const refreshResp = await refreshInFlight;
-
-    if (refreshResp.ok) {
-      const refreshData = await refreshResp.json();
-      if (refreshData?.accessToken) {
-        tokenStore.setAccessToken(refreshData.accessToken);
-      }
-      if (refreshData?.refreshToken) {
-        tokenStore.setRefreshToken(refreshData.refreshToken);
-      }
-
-      // Retry original request once with updated Authorization header
-      const retryResponse = await fetch(`${API_BASE_URL}${path}`, {
-        ...options,
-        headers: {
-          ...(options.headers || {}),
-          ...getAuthHeaders(),
-        },
-      });
-      return handleResponse<T>(retryResponse);
-    }
-
-    // Refresh failed
-    tokenStore.clearTokens();
-    const errorData: ApiError = await refreshResp.json().catch(() => ({
-      success: false,
-      message: 'Token refresh failed',
-    }));
-    throw new Error(errorData.message || 'Token refresh failed');
+    return executeRefresh<T>(path, options);
   }
 
   return handleResponse<T>(response);

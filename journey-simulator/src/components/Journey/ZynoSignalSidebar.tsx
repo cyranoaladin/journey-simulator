@@ -119,13 +119,11 @@ const ZynoSignalSidebar: React.FC<Props> = ({ className = '' }) => {
                     </span>
                     <InfoBadge label={`${displayValue}/100`} tone="default" />
                   </div>
-                  <div
+                  <progress
                     className="mt-3 h-2 w-full rounded-full bg-white/10"
-                    role="progressbar"
                     aria-label={progressLabel}
-                    aria-valuenow={displayValue}
-                    aria-valuemin={0}
-                    aria-valuemax={100}
+                    max={100}
+                    value={displayValue}
                   >
                     <motion.div
                       initial={{ width: 0 }}
@@ -133,7 +131,7 @@ const ZynoSignalSidebar: React.FC<Props> = ({ className = '' }) => {
                       transition={{ duration: 0.6 }}
                       className="h-full rounded-full bg-white/70"
                     />
-                  </div>
+                  </progress>
                 </div>
               )
             })

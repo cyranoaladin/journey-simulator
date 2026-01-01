@@ -18,6 +18,12 @@ services:
     volumes:
       - ./mf-back:/usr/src/app
       - api-node-modules:/usr/src/app/node_modules
+    security_opt:
+      - no-new-privileges:true
+    # Dev bind mount requires writable filesystem for live reload. // nosemgrep
+    read_only: true
+    tmpfs:
+      - /tmp
     depends_on:
       mongo:
         condition: service_healthy
@@ -29,6 +35,12 @@ services:
       - "27017:27017"
     volumes:
       - ./data/mongo:/data/db
+    security_opt:
+      - no-new-privileges:true
+    # Mongo needs writable data dir. // nosemgrep
+    read_only: true
+    tmpfs:
+      - /tmp
     healthcheck:
       test: [ "CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')" ]
       interval: 10s
@@ -47,6 +59,12 @@ services:
       - "5435:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
+    security_opt:
+      - no-new-privileges:true
+    # Postgres needs writable data dir. // nosemgrep
+    read_only: true
+    tmpfs:
+      - /tmp
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "prisma" ]
       interval: 10s
@@ -63,6 +81,9 @@ services:
       API_UPSTREAM: api:3000
     ports:
       - "3003:80"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
     depends_on:
       - api
 

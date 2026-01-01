@@ -111,11 +111,15 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
     return 'Gold';
   };
 
+  type MissionStatus = 'completed' | 'active' | 'locked';
+
   const personaMissions = selectedPersona
     ? selectedPersona.phases.map((phase, index) => {
       const isCompleted = userProgress.completedPhases.includes(index);
       const isCurrent = !isCompleted && index === userProgress.completedPhases.length;
-      const status: 'completed' | 'active' | 'locked' = isCompleted ? 'completed' : isCurrent ? 'active' : 'locked';
+      let status: MissionStatus = 'locked';
+      if (isCompleted) status = 'completed';
+      else if (isCurrent) status = 'active';
 
       return {
         index,
@@ -128,7 +132,7 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
     })
     : [];
 
-  const getMissionStatusStyles = (status: 'completed' | 'active' | 'locked') => {
+  const getMissionStatusStyles = (status: MissionStatus) => {
     switch (status) {
       case 'completed':
         return 'text-green-300 bg-green-500/20 border-green-500/30';
@@ -139,7 +143,13 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
     }
   };
 
-  const renderMissionStatusIcon = (status: 'completed' | 'active' | 'locked') => {
+  const getMissionStatusLabel = (status: MissionStatus) => {
+    if (status === 'completed') return 'Completed';
+    if (status === 'active') return 'In Progress';
+    return 'Locked';
+  };
+
+  const renderMissionStatusIcon = (status: MissionStatus) => {
     if (status === 'completed') {
       return <CheckCircle size={12} className="mr-1" />;
     }
@@ -367,11 +377,7 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
                             className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold ${getMissionStatusStyles(mission.status)}`}
                           >
                             {renderMissionStatusIcon(mission.status)}
-                            {mission.status === 'completed'
-                              ? 'Completed'
-                              : mission.status === 'active'
-                                ? 'In Progress'
-                                : 'Locked'}
+                            {getMissionStatusLabel(mission.status)}
                           </span>
                         </div>
                         <div className="mt-2 text-sm font-semibold text-white">

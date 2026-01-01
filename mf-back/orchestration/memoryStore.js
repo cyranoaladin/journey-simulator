@@ -4,8 +4,12 @@
  * - TTL-based eviction (default 10 minutes)
  * - Simple size cap FIFO (default 50)
  */
+const fs = require('node:fs');
+const path = require('node:path');
+
 const DEFAULT_TTL_MS = 10 * 60 * 1000;
 const DEFAULT_MAX_ENTRIES = 50;
+const PERSIST_PATH = path.resolve(__dirname, '../memory/memoryStore.json');
 
 class MemoryStore {
   constructor(ttlMs = DEFAULT_TTL_MS, maxEntries = DEFAULT_MAX_ENTRIES) {
@@ -13,6 +17,7 @@ class MemoryStore {
     this.maxEntries = maxEntries;
     this.tenants = new Map(); // tenantId -> { store: Map, order: [] }
     this.evictions = 0;
+    this.loadFromDisk();
   }
 
   ensureTenant(tenantId) {
@@ -66,6 +71,7 @@ class MemoryStore {
     if (!store.has(runId)) order.push(runId);
     store.set(runId, { data, ts: Date.now() });
     this.pruneTenant(tenantId);
+    this.persist();
   }
 
   values(tenantId) {
@@ -93,6 +99,38 @@ class MemoryStore {
   clear() {
     this.tenants.clear();
     this.evictions = 0;
+    this.persist();
+  }
+
+  persist() {
+    try {
+      const payload = {};
+      this.tenants.forEach((tenant, id) => {
+        payload[id] = {
+          order: tenant.order,
+          entries: Array.from(tenant.store.entries()).map(([runId, value]) => [runId, value]),
+        };
+      });
+      fs.mkdirSync(path.dirname(PERSIST_PATH), { recursive: true });
+      fs.writeFileSync(PERSIST_PATH, JSON.stringify(payload), 'utf8');
+    } catch (err) {
+      // silent failure; non-blocking
+    }
+  }
+
+  loadFromDisk() {
+    try {
+      if (!fs.existsSync(PERSIST_PATH)) return;
+      const raw = fs.readFileSync(PERSIST_PATH, 'utf8');
+      const parsed = JSON.parse(raw);
+      Object.entries(parsed || {}).forEach(([tenantId, data]) => {
+        const store = new Map(data.entries || []);
+        const order = Array.isArray(data.order) ? data.order : [];
+        this.tenants.set(tenantId, { store, order });
+      });
+    } catch (err) {
+      // ignore load errors
+    }
   }
 }
 

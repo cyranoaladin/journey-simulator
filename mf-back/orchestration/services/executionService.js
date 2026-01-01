@@ -1,6 +1,7 @@
 const executionEngine = require('../executionEngine');
 const executionGate = require('../executionGate');
 const actionToolMapper = require('../actionToolMapper');
+const { timeoutGuard } = require('../timeoutGuard');
 const logger = require('../../utils/logger').createLogger(__filename);
 
 /**
@@ -16,7 +17,7 @@ class ExecutionService {
       const mapped = actionToolMapper.mapActionToTool(step.action);
       const tool = mapped.tool;
       if (!tool || mapped.toolId === 'noop') {
-        if (mapped.reason === 'unknown_action' && step.action && step.action.trim()) {
+        if (mapped.reason === 'unknown_action') {
           if (!ops.warnings.includes('unknown_action_tool')) {
             ops.warnings.push('unknown_action_tool');
           }
@@ -102,9 +103,14 @@ class ExecutionService {
 
   /**
    * Gère l'exécution avec tous les modes (REAL, DRY_RUN, SHADOW)
+   * Reduced signature: options object groups detailed params
    */
-  static handleExecution(executionTools, executionGateInfo, guardDecision, req, payload, tenantId, getTraceId, ops) {
-    const executionGate = require('../executionGate');
+  /**
+   * Gère l'exécution avec tous les modes (REAL, DRY_RUN, SHADOW)
+   * Reduced signature: options object groups detailed params
+   */
+  static handleExecution(executionTools, { req, payload }, options = {}) {
+    const { executionGateInfo, guardDecision, tenantId, getTraceId, ops } = options;
     const shadowMode = process.env.REAL_EXECUTION_MODE === 'shadow';
     ops.execution.shadow = shadowMode;
     let executionResult = null;
@@ -112,15 +118,15 @@ class ExecutionService {
     if (executionGateInfo?.gateId) {
       const state = executionGate.get(executionGateInfo.gateId);
       if (state?.status === 'APPROVED' && guardDecision.realExecutionAllowed) {
-        executionResult = this._executeWithGate(executionTools, state, shadowMode, req, payload, tenantId, getTraceId, ops);
+        executionResult = ExecutionService._executeWithGate(executionTools, { state, shadowMode, req, payload, tenantId, getTraceId, ops });
       } else if (state?.status === 'APPROVED' && !guardDecision.realExecutionAllowed) {
-        executionResult = this.simulateExecution(executionTools, getTraceId(req, payload), req.runId || req.traceId || 'unknown', tenantId, true);
+        executionResult = ExecutionService.simulateExecution(executionTools, getTraceId(req, payload), req.runId || req.traceId || 'unknown', tenantId, true);
         ops.execution.attempted = true;
         ops.execution.mode = 'DRY_RUN';
         ops.execution.blocked = true;
       }
     } else if (executionTools.length > 0) {
-      executionResult = this._executeWithoutGate(executionTools, guardDecision, shadowMode, req, payload, tenantId, getTraceId, ops);
+      executionResult = ExecutionService._executeWithoutGate(executionTools, { guardDecision, shadowMode, req, payload, tenantId, getTraceId, ops });
     }
 
     return executionResult;
@@ -129,19 +135,20 @@ class ExecutionService {
   /**
    * Exécution avec gate (privé)
    */
-  static _executeWithGate(executionTools, state, shadowMode, req, payload, tenantId, getTraceId, ops) {
+  static _executeWithGate(executionTools, options) {
+    const { state, shadowMode, req, payload, tenantId, getTraceId, ops } = options;
     const logger = require('../../utils/logger').createLogger(__filename);
     try {
       if (process.env.EXECUTION_ENABLED === 'true' && !shadowMode) {
         logger.info('Real execution enabled, attempting guarded execution', { traceId: getTraceId(req, payload), gateId: state.gateId });
-        const result = this.executePlan(executionTools, getTraceId(req, payload), req?.runId || payload?.runId || 'unknown', tenantId, true);
+        const result = ExecutionService.executePlan(executionTools, getTraceId(req, payload), req?.runId || payload?.runId || 'unknown', tenantId, true);
         ops.execution.attempted = true;
         ops.execution.mode = 'REAL';
         return result;
       } else if (process.env.EXECUTION_ENABLED === 'true' && shadowMode) {
-        return this._executeShadowMode(executionTools, req, payload, tenantId, getTraceId, ops);
+        return ExecutionService._executeShadowMode(executionTools, req, payload, tenantId, getTraceId, ops);
       } else {
-        const result = this.simulateExecution(executionTools, getTraceId(req, payload), req?.runId || payload?.runId || 'unknown', tenantId, true);
+        const result = ExecutionService.simulateExecution(executionTools, getTraceId(req, payload), req?.runId || payload?.runId || 'unknown', tenantId, true);
         ops.execution.attempted = true;
         ops.execution.mode = 'DRY_RUN';
         if (!ops.fallbacks.includes('real_disabled_flag')) {
@@ -155,7 +162,7 @@ class ExecutionService {
         gateId: state?.gateId,
         error: err.message,
       });
-      const result = this.simulateExecution(executionTools, getTraceId(req, payload), req?.runId || payload?.runId || 'unknown', tenantId, state?.status === 'APPROVED');
+      const result = ExecutionService.simulateExecution(executionTools, getTraceId(req, payload), req?.runId || payload?.runId || 'unknown', tenantId, state?.status === 'APPROVED');
       ops.execution.attempted = true;
       ops.execution.mode = 'DRY_RUN';
       if (!ops.fallbacks.includes('execution_fallback')) {
@@ -168,10 +175,11 @@ class ExecutionService {
   /**
    * Exécution sans gate (privé)
    */
-  static _executeWithoutGate(executionTools, guardDecision, shadowMode, req, payload, tenantId, getTraceId, ops) {
-    const baseSimulation = this.simulateExecution(executionTools, getTraceId(req, payload), req.runId || req.traceId || 'unknown', tenantId, false);
+  static _executeWithoutGate(executionTools, options) {
+    const { guardDecision, shadowMode, req, payload, tenantId, getTraceId, ops } = options;
+    const baseSimulation = ExecutionService.simulateExecution(executionTools, getTraceId(req, payload), req.runId || req.traceId || 'unknown', tenantId, false);
     if (guardDecision.realExecutionAllowed && process.env.EXECUTION_ENABLED === 'true' && shadowMode) {
-      return this._executeShadowMode(executionTools, req, payload, tenantId, getTraceId, ops, baseSimulation);
+      return ExecutionService._executeShadowMode(executionTools, req, payload, tenantId, getTraceId, ops, baseSimulation);
     }
     ops.execution.attempted = true;
     ops.execution.mode = guardDecision.realExecutionAllowed ? ops.execution.mode : 'DRY_RUN';
@@ -183,8 +191,8 @@ class ExecutionService {
    * Mode shadow: compare DRY_RUN et REAL simulé (privé)
    */
   static _executeShadowMode(executionTools, req, payload, tenantId, getTraceId, ops, baseSimulation = null) {
-    const dryRun = baseSimulation || this.simulateExecution(executionTools, getTraceId(req, payload), req.runId || req.traceId || 'unknown', tenantId, false);
-    const realSimulated = this.simulateExecution(executionTools, getTraceId(req, payload), req.runId || req.traceId || 'unknown', tenantId, true);
+    const dryRun = baseSimulation || ExecutionService.simulateExecution(executionTools, getTraceId(req, payload), req.runId || req.traceId || 'unknown', tenantId, false);
+    const realSimulated = ExecutionService.simulateExecution(executionTools, getTraceId(req, payload), req.runId || req.traceId || 'unknown', tenantId, true);
 
     const stepsChanged = [];
     const riskEscalation = [];
@@ -222,6 +230,97 @@ class ExecutionService {
     ops.execution.mode = 'DRY_RUN';
     return ops.execution.shadowComparison;
   }
+
+  /**
+   * Wrapper pour l'exécution d'un agent avec retry
+   */
+  static async executeAgentWithRetry(params) {
+    return executionEngine.executeAgentWithRetry({
+      ...params,
+      timeoutGuard: timeoutGuard
+    });
+  }
+
+  /**
+   * Gère le flux d'exécution complet
+   */
+  static handleExecutionFlow({
+    executionTools,
+    executionGateInfo,
+    guardDecision,
+    req,
+    payload,
+    tenantId,
+    getTraceId,
+    ops,
+    shadowMode,
+    preSimulation,
+  }) {
+    // Call new handleExecution signature
+    const executionResult = ExecutionService.handleExecution(
+      executionTools,
+      { req, payload },
+      { executionGateInfo, guardDecision, tenantId, getTraceId, ops }
+    );
+
+    let executionPlan = null;
+    if (executionResult && executionResult.steps) {
+      executionPlan = {
+        mode: executionResult.mode || (shadowMode ? 'SHADOW' : 'DRY_RUN'),
+        steps: executionResult.steps,
+        summary: executionResult.summary || preSimulation.summary,
+        overallStatus: executionResult.overallStatus || preSimulation.overallStatus,
+      };
+    } else if (executionResult && executionResult.dryRun) {
+      executionPlan = {
+        mode: 'SHADOW',
+        steps: executionResult.dryRun.steps,
+        summary: executionResult.dryRun.summary,
+        overallStatus: executionResult.dryRun.overallStatus,
+      };
+    }
+
+    return { executionResult, executionPlan };
+  }
+
+  /**
+   * Attache les métriques d'exécution
+   */
+  static attachExecutionMetrics(ops, executionPlan) {
+    if (executionPlan && executionPlan.steps && executionPlan.steps.length > 0) {
+      ops.execution.steps = {
+        count: executionPlan.steps.length,
+        blocked: executionPlan.steps.filter((s) => s.status === 'BLOCKED_BY_GATE').length,
+        ok: executionPlan.steps.filter((s) => s.status === 'SIMULATED_OK').length,
+        failed: executionPlan.steps.filter((s) => s.status === 'SIMULATED_FAIL').length,
+        skipped: executionPlan.steps.filter((s) => s.status === 'SKIPPED').length,
+      };
+      const toolsUsed = Array.from(new Set(executionPlan.steps.map((s) => s.toolId).filter(Boolean)));
+      ops.execution.tools = {
+        used: toolsUsed.length,
+        list: toolsUsed,
+      };
+    } else {
+      ops.execution.steps = { count: 0, blocked: 0, ok: 0, failed: 0, skipped: 0 };
+      ops.execution.tools = { used: 0, list: [] };
+    }
+  }
 }
 
-module.exports = ExecutionService;
+// Standalone export for script compatibility
+async function executeAgentWithRetry(params) {
+  return ExecutionService.executeAgentWithRetry(params);
+}
+
+module.exports = {
+  ExecutionService,
+  buildExecutionPlan: ExecutionService.buildExecutionPlan,
+  handleExecutionGate: ExecutionService.handleExecutionGate,
+  simulateExecution: ExecutionService.simulateExecution,
+  executePlan: ExecutionService.executePlan,
+  handleExecution: (...args) => ExecutionService.handleExecution(...args),
+  executeAgentWithRetry, // Renamed for script
+  executeAgentWithRetryWrapper: executeAgentWithRetry, // Alias for backward compatibility if needed
+  handleExecutionFlow: ExecutionService.handleExecutionFlow,
+  attachExecutionMetrics: ExecutionService.attachExecutionMetrics,
+};

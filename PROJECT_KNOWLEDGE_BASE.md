@@ -5,7 +5,7 @@
 Ce document sert de **source de vérité** pour :
 
 - Le Design System (couleurs, typographie, composants, Trinity Layout)
-- L'orchestration agentique (23 agents Zyno, Intent Router, Execution Gate)
+- L'orchestration agentique (37 agents Zyno, Intent Router, Execution Gate)
 - Les workflows métier (AEPO/AECO, SkillChain Mining, Auth SIWS, Pipeline Minting)
 - Les protocoles et conventions (AEPO/AECO, protocoles agents)
 
@@ -98,7 +98,7 @@ Ce document sert de **source de vérité** pour :
 - Cognitive Activation Protocol™ : Learn → Build → Govern → Launch (phases UI à représenter, badges, gating).
 - SkillChain Mining : actions validées ⇒ XP ⇒ conversion $MFAI ⇒ Proof-of-Skill NFT (afficher solde/XP, progression, certificats).
 - Bonding Curve (Collaterize) : affichage du prix courant, supply, impact d’un achat; étapes guidées (input → estimation → confirmation).
-- Zyno Agents (23 implémentés) : spécialités réparties (research, drafting, risk, compliance, tokenomics, UX, growth, legal, ops, comms…). Dans l’UI, surface via “Zyno Pulse” (panneau droit) : messages, recommandations, état courant; chaque agent référencé par un id stable pour instrumentation.
+- Zyno Agents (37 implémentés, RiskFraud désactivé par défaut) : spécialités réparties (research, drafting, risk, compliance, tokenomics, UX, growth, legal, ops, comms…). Dans l’UI, surface via “Zyno Pulse” (panneau droit) : messages, recommandations, état courant; chaque agent référencé par un id stable pour instrumentation.
 
 ## Flux de données & intégration
 
@@ -151,9 +151,9 @@ Ce document sert de **source de vérité** pour :
 - Afficher la progression AEPO/AECO (bars, badges) et l’impact tokenomics (XP → MFAI → NFT).
 - Prévoir hooks d’instrumentation (events) par agent id, phase id, step id.
 
-### Matrice de personnalité des 23 agents Zyno
+### Matrice de personnalité des 37 agents Zyno
 
-- Agents côté backend (`mf-back/orchestration/agentsRegistry.js`) : Guide, Coach, Pitch, Web3Legal, NFT, Token, Tokenomics, Launchpad, Builder, DAO, Audit, Product, Dev, Investor, Onboarding, Growth, Community, Reflection, Education, Design, Governance, Protocol, Security. Total : **23**.
+- Agents côté backend (`mf-back/orchestration/agentsRegistry.js`) : Guide, Coach, Education, Reflection, Builder, Protocol, Dev, Design, NFT, DAO, GovernanceDAO, Tokenomics, ProductSpec, JourneyDesign, Evaluation, Investor, InvestorDemo, Growth, Analytics, Marketplace, Performance, DevOps, Observability, QAPlaywright, Security, SecurityAudit, Compliance, Web3Legal, Audit, SolanaAnchor, Minting, WalletAuth, RAGOps, DataIntegrity, APIContract, Curriculum, UXWriting (RiskFraud désactivé). Total : **37** (36 actifs + 1 désactivé).
 
 #### Table mapping agents ↔ icônes (Lucide) — accents visuels (hex)
 

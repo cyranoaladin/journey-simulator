@@ -28,6 +28,7 @@ import { logger } from '../../utils/logger';
 import { AgentScoreboardProvider } from './AgentScoreboardContext';
 import ResourceUploader from './ResourceUploader';
 import ZynoDecisionPanel from './ZynoDecisionPanel';
+import { useJourneyStore } from '../../store/journeyStore';
 
 const quickIntents = [
   {
@@ -126,6 +127,7 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
   const [missionSummary, setMissionSummary] = useState<MissionSummary | null>(
     sampleMissionSummary as MissionSummary,
   );
+  const runMode = useJourneyStore((state) => state.runMode);
   const [history, setHistory] = useState<PromptHistoryEntry[]>([]);
   const [healthProbes, setHealthProbes] = useState<Record<ProbeKey, ProbeState>>(() => ({
     healthz: createProbeState(),
@@ -133,6 +135,105 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
   }));
   const [healthRefreshState, setHealthRefreshState] = useState<'idle' | 'refreshing'>('idle');
   const shouldReduceMotion = useReducedMotion();
+
+  const addHistoryEntry = (intent: string) => {
+    const entryId = generatePromptId();
+    setHistory((prev) =>
+      [
+        {
+          id: entryId,
+          text: intent,
+          createdAt: new Date().toISOString(),
+          status: 'pending' as PromptStatus,
+        },
+        ...prev,
+      ].slice(0, MAX_PROMPT_HISTORY),
+    );
+    return entryId;
+  };
+
+  const markHistoryStatus = (entryId: string, status: PromptStatus, textOverride?: string) => {
+    setHistory((prev) =>
+      prev.map((entry) =>
+        entry.id === entryId
+          ? { ...entry, status, text: textOverride ?? entry.text }
+          : entry,
+      ),
+    );
+  };
+
+  const createAbortableTimeout = (ms: number) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), ms);
+    return {
+      controller,
+      clear: () => clearTimeout(timeoutId),
+    };
+  };
+
+  const submitSimulation = async (intent: string, signal: AbortSignal) => {
+    let storedUserId: string | null = null;
+    try {
+      storedUserId = sessionStorage.getItem('userId') || localStorage.getItem('userId');
+    } catch {
+      storedUserId = null;
+    }
+
+    if (!storedUserId) {
+      if (process.env.NODE_ENV === 'test') {
+        storedUserId = 'test-user';
+      } else {
+        throw new Error('userId manquant : connectez-vous puis réessayez.');
+      }
+    }
+
+    const response = await fetch(`${API_BASE_URL}/orchestration`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(storedUserId ? { 'x-user-id': storedUserId } : {}),
+      },
+      body: JSON.stringify({ input: intent, userId: storedUserId ?? 'demo_user', mode: runMode }),
+      signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Request failed with status ${response.status}`);
+    }
+
+    return response.json() as Promise<OrchestrationResult>;
+  };
+
+  const handleSimulationSuccess = (
+    entryId: string,
+    payload: OrchestrationResult,
+    shouldClearInput: boolean
+  ) => {
+    const summary = buildSummaryFromResult(payload);
+    setResult(payload);
+    setMissionSummary(summary);
+    setStatus('idle');
+    markHistoryStatus(entryId, 'success');
+    if (shouldClearInput) {
+      setUserInput('');
+    }
+    onMissionUpdate?.(summary);
+  };
+
+  const handleSimulationError = (entryId: string, error: unknown, intentText: string) => {
+    logger.error('Simulation error:', error);
+
+    let errorMessage = 'An unexpected error occurred.';
+    if ((error as { name?: string })?.name === 'AbortError') {
+      errorMessage = 'Request timed out. Please try again.';
+    } else if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+
+    setStatus('error');
+    setMissionSummary(null);
+    markHistoryStatus(entryId, 'error', `${intentText} (Error: ${errorMessage})`);
+  };
 
   const refreshHealthStatus = useCallback(async () => {
     setHealthRefreshState('refreshing');
@@ -197,7 +298,7 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
   const buildSummaryFromResult = (payload: OrchestrationResult): MissionSummary => {
     const timeline = payload.timeline ?? [];
     const agentScores = timeline
-      .map((entry) => entry.feedback?.aepo ?? payload.results[entry.agent]?.feedback?.aepo ?? null)
+      .map((entry) => entry.feedback?.aepo ?? payload.results?.[entry.agent]?.feedback?.aepo ?? null)
       .filter((value): value is number => typeof value === 'number');
 
     const aepoScore = agentScores.length
@@ -210,7 +311,7 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
       : 50;
 
     const generatedTextLines = timeline.map((entry) => {
-      const reasoning = entry.reasoning ?? payload.results[entry.agent]?.feedback?.ae_summary ?? 'Summary unavailable';
+      const reasoning = entry.reasoning ?? payload.results?.[entry.agent]?.feedback?.ae_summary ?? 'Summary unavailable';
       return `• ${entry.agent} → ${reasoning}`;
     });
 
@@ -231,70 +332,19 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
       return;
     }
 
-    const entryId = generatePromptId();
-    setHistory((prev) =>
-      [
-        {
-          id: entryId,
-          text: trimmed,
-          createdAt: new Date().toISOString(),
-          status: 'pending' as PromptStatus,
-        },
-        ...prev,
-      ].slice(0, MAX_PROMPT_HISTORY),
-    );
+    const entryId = addHistoryEntry(trimmed);
 
     setStatus('loading');
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
+    const { controller, clear } = createAbortableTimeout(10000);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/orchestration`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ input: trimmed, userId: 'demo_user' }),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
-      }
-
-      const payload: OrchestrationResult = await response.json();
-      const summary = buildSummaryFromResult(payload);
-      setResult(payload);
-      setMissionSummary(summary);
-      setStatus('idle');
-      setHistory((prev) =>
-        prev.map((entry) =>
-          entry.id === entryId ? { ...entry, status: 'success' } : entry,
-        ),
-      );
-
-      if (!prompt) {
-        setUserInput('');
-      }
-    } catch (error: any) {
-      clearTimeout(timeoutId);
-      logger.error('Simulation error:', error);
-
-      let errorMessage = 'An unexpected error occurred.';
-      if (error.name === 'AbortError') {
-        errorMessage = 'Request timed out. Please try again.';
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-
-      setStatus('error');
-      setMissionSummary(null);
-      setHistory((prev) =>
-        prev.map((entry) =>
-          entry.id === entryId ? { ...entry, status: 'error', text: `${entry.text} (Error: ${errorMessage})` } : entry,
-        ),
-      );
+      const payload = await submitSimulation(trimmed, controller.signal);
+      handleSimulationSuccess(entryId, payload, !prompt);
+    } catch (error) {
+      handleSimulationError(entryId, error, trimmed);
+    } finally {
+      clear();
     }
   };
 
@@ -323,6 +373,188 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
       timestamp: new Date(missionSummary.timestamp).toLocaleString(),
     };
   }, [missionSummary]);
+
+  const getHistoryBadge = (status: PromptStatus) => {
+    if (status === 'success') {
+      return { className: 'bg-success/15 text-success', label: 'Completed' };
+    }
+    if (status === 'error') {
+      return { className: 'bg-danger/15 text-danger', label: 'Error' };
+    }
+    return { className: 'bg-info/15 text-info', label: 'Pending' };
+  };
+
+type MissionHighlights = {
+  aepo: number;
+  agents: number;
+  timestamp: string | null;
+};
+
+const MissionStats = ({
+  missionHighlights,
+  refreshHealthStatus,
+  healthRefreshState,
+  healthProbes,
+  latestHealthCheck,
+  failingProbe,
+}: {
+  readonly missionHighlights: MissionHighlights;
+  readonly refreshHealthStatus: () => Promise<void>;
+  readonly healthRefreshState: 'idle' | 'refreshing';
+  readonly healthProbes: Record<ProbeKey, ProbeState>;
+  readonly latestHealthCheck: string;
+  readonly failingProbe: ProbeState | undefined;
+}) => (
+  <div className="flex flex-wrap items-start justify-between gap-4">
+    <div className="flex items-center gap-3">
+      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-accent text-white shadow-neon-ring">
+        <Bot size={22} />
+      </div>
+      <div>
+        <p className="text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-mfai-text/60">Zyno Mission Control</p>
+        <h2 className="mt-1 text-2xl font-semibold text-slate-900 dark:text-mfai-text md:text-3xl">Interactive Agentic Console</h2>
+      </div>
+    </div>
+    <div className="grid grid-cols-2 gap-3 text-sm text-slate-600 dark:text-mfai-text/80 sm:grid-cols-4">
+      <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
+        <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">AEPO Score</span>
+        <p className="mt-1 text-lg font-semibold text-accent">{missionHighlights.aepo || '—'}</p>
+      </div>
+      <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
+        <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">Agents Activated</span>
+        <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-mfai-text">{missionHighlights.agents}</p>
+      </div>
+      <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
+        <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">Last Sync</span>
+        <p className="mt-1 text-xs text-slate-600 dark:text-mfai-text/70">{missionHighlights.timestamp ?? 'Never'}</p>
+      </div>
+      <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">Stack Health</span>
+          <button
+            type="button"
+            onClick={refreshHealthStatus}
+            disabled={healthRefreshState === 'refreshing'}
+            className="inline-flex items-center rounded-full border border-slate-200/60 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-600 transition hover:border-accent/50 hover:text-accent disabled:opacity-60 dark:border-mfai-border/50 dark:text-mfai-text/70"
+            title="Refresh health probes"
+          >
+            {healthRefreshState === 'refreshing' ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
+          </button>
+        </div>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {probeKeys.map((key) => {
+            const probe = healthProbes[key];
+            const label = probeConfig[key].label;
+            return (
+              <span key={key} className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-semibold ${getProbeBadgeClasses(probe.status)}`}>
+                {label}
+                <span className="text-[10px] opacity-70">{typeof probe.latencyMs === 'number' ? `${probe.latencyMs}ms` : '—'}</span>
+              </span>
+            );
+          })}
+        </div>
+        <p className="mt-2 text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">Last check: {latestHealthCheck}</p>
+        {failingProbe?.error ? <p className="mt-1 text-xs text-rose-400">{failingProbe.error}</p> : null}
+      </div>
+    </div>
+  </div>
+);
+
+const QuickTemplatesSection = ({
+  onSelect,
+  shouldReduceMotion,
+  setUserInput,
+}: {
+  readonly onSelect: (value: string) => void;
+  readonly shouldReduceMotion: boolean;
+  readonly setUserInput: (value: string) => void;
+}) => (
+  <div className="mfai-console-panel space-y-3">
+    <p className="text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-mfai-text/60">Quick Templates</p>
+    <div className="flex flex-wrap gap-2">
+      {quickIntents.map((intent) => (
+        <motion.button
+          type="button"
+          key={intent.label}
+          whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
+          whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
+          onClick={() => {
+            setUserInput(intent.value);
+            onSelect(intent.value);
+          }}
+          className="inline-flex items-center gap-2 rounded-2xl border border-accent/40 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-accent transition-colors hover:bg-accent/10 dark:bg-mfai-surface/60"
+        >
+          <intent.icon size={14} />
+          {intent.label}
+        </motion.button>
+      ))}
+    </div>
+  </div>
+);
+
+const RequestHistory = ({
+  history,
+  shouldReduceMotion,
+  onClear,
+  onReuse,
+  onRelaunch,
+}: {
+  readonly history: PromptHistoryEntry[];
+  readonly shouldReduceMotion: boolean;
+  readonly onClear: () => void;
+  readonly onReuse: (text: string) => void;
+  readonly onRelaunch: (text: string) => void;
+}) => (
+  <div className="mfai-console-panel space-y-4">
+    <header className="flex items-center justify-between text-sm text-slate-600 dark:text-mfai-text/70">
+      <div className="flex items-center gap-2">
+        <History size={16} />
+        Request History
+      </div>
+      <button type="button" className="text-xs text-accent underline-offset-4 hover:underline" onClick={onClear}>
+        Clear
+      </button>
+    </header>
+    {history.length === 0 ? (
+      <p className="text-sm text-slate-600 dark:text-mfai-text/60">No missions recorded yet.</p>
+    ) : (
+      <ul className="flex flex-col gap-3">
+        {history.map((entry) => {
+          const badge = getHistoryBadge(entry.status);
+          return (
+            <li key={entry.id} className="rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm text-slate-700 dark:border-mfai-border/60 dark:bg-mfai-surfaceAlt/40 dark:text-mfai-text/80">
+              <div className="flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-mfai-text/60">
+                <span>{new Date(entry.createdAt).toLocaleTimeString()}</span>
+                <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${badge.className}`}>{badge.label}</span>
+              </div>
+              <p className="mt-2 text-sm font-medium text-slate-800 dark:text-mfai-text">{entry.text}</p>
+              <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                <motion.button
+                  type="button"
+                  whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
+                  whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
+                  className="rounded-full border border-slate-200/70 px-3 py-1 text-xs text-slate-600 hover:border-accent/60 hover:text-accent dark:border-mfai-border/60 dark:text-mfai-text/70"
+                  onClick={() => onReuse(entry.text)}
+                >
+                  Reuse
+                </motion.button>
+                <motion.button
+                  type="button"
+                  whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
+                  whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
+                  className="rounded-full border border-accent/40 px-3 py-1 text-xs text-accent hover:bg-accent/10"
+                  onClick={() => onRelaunch(entry.text)}
+                >
+                  Relaunch
+                </motion.button>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    )}
+  </div>
+);
 
   const latestHealthCheck = useMemo(() => {
     const epochs = probeKeys
@@ -360,92 +592,14 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
         className="space-y-8"
       >
         <header className="mfai-console-panel flex flex-col gap-4">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-accent text-white shadow-neon-ring">
-                <Bot size={22} />
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-mfai-text/60">
-                  Zyno Mission Control
-                </p>
-                <h2 className="mt-1 text-2xl font-semibold text-slate-900 dark:text-mfai-text md:text-3xl">
-                  Interactive Agentic Console
-                </h2>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3 text-sm text-slate-600 dark:text-mfai-text/80 sm:grid-cols-4">
-              <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
-                <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">
-                  AEPO Score
-                </span>
-                <p className="mt-1 text-lg font-semibold text-accent">
-                  {missionHighlights.aepo || '—'}
-                </p>
-              </div>
-              <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
-                <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">
-                  Agents Activated
-                </span>
-                <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-mfai-text">
-                  {missionHighlights.agents}
-                </p>
-              </div>
-              <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
-                <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">
-                  Last Sync
-                </span>
-                <p className="mt-1 text-xs text-slate-600 dark:text-mfai-text/70">
-                  {missionHighlights.timestamp ?? 'Never'}
-                </p>
-              </div>
-              <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">
-                    Stack Health
-                  </span>
-                  <button
-                    type="button"
-                    onClick={refreshHealthStatus}
-                    disabled={healthRefreshState === 'refreshing'}
-                    className="inline-flex items-center rounded-full border border-slate-200/60 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-600 transition hover:border-accent/50 hover:text-accent disabled:opacity-60 dark:border-mfai-border/50 dark:text-mfai-text/70"
-                    title="Refresh health probes"
-                  >
-                    {healthRefreshState === 'refreshing' ? (
-                      <Loader2 size={12} className="animate-spin" />
-                    ) : (
-                      <RefreshCw size={12} />
-                    )}
-                  </button>
-                </div>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {probeKeys.map((key) => {
-                    const probe = healthProbes[key];
-                    const label = probeConfig[key].label;
-                    return (
-                      <span
-                        key={key}
-                        className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-semibold ${getProbeBadgeClasses(probe.status)}`}
-                      >
-                        {label}
-                        <span className="text-[10px] opacity-70">
-                          {typeof probe.latencyMs === 'number' ? `${probe.latencyMs}ms` : '—'}
-                        </span>
-                      </span>
-                    );
-                  })}
-                </div>
-                <p className="mt-2 text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">
-                  Last check: {latestHealthCheck}
-                </p>
-                {failingProbe?.error ? (
-                  <p className="mt-1 text-xs text-rose-400">
-                    {failingProbe.error}
-                  </p>
-                ) : null}
-              </div>
-            </div>
-          </div>
+          <MissionStats
+            missionHighlights={missionHighlights}
+            refreshHealthStatus={refreshHealthStatus}
+            healthRefreshState={healthRefreshState}
+            healthProbes={healthProbes}
+            latestHealthCheck={latestHealthCheck}
+            failingProbe={failingProbe}
+          />
           <p className="max-w-3xl text-sm text-slate-600 dark:text-mfai-text/80 md:text-base">
             Describe your missions, relaunch agents, or trigger DAO exports. The quick templates below
             accelerate interactions and ensure complete guidance for your Web3 journey.
@@ -509,96 +663,15 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
               </div>
             </motion.form>
 
-            <div className="mfai-console-panel space-y-3">
-              <p className="text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-mfai-text/60">
-                Quick Templates
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {quickIntents.map((intent) => (
-                  <motion.button
-                    type="button"
-                    key={intent.label}
-                    whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
-                    whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
-                    onClick={() => {
-                      setUserInput(intent.value);
-                      handleRunSimulation(intent.value);
-                    }}
-                    className="inline-flex items-center gap-2 rounded-2xl border border-accent/40 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-accent transition-colors hover:bg-accent/10 dark:bg-mfai-surface/60"
-                  >
-                    <intent.icon size={14} />
-                    {intent.label}
-                  </motion.button>
-                ))}
-              </div>
-            </div>
+            <QuickTemplatesSection onSelect={handleRunSimulation} shouldReduceMotion={Boolean(shouldReduceMotion)} setUserInput={setUserInput} />
 
-            <div className="mfai-console-panel space-y-4">
-              <header className="flex items-center justify-between text-sm text-slate-600 dark:text-mfai-text/70">
-                <div className="flex items-center gap-2">
-                  <History size={16} />
-                  Request History
-                </div>
-                <button
-                  type="button"
-                  className="text-xs text-accent underline-offset-4 hover:underline"
-                  onClick={() => setHistory([])}
-                >
-                  Clear
-                </button>
-              </header>
-              {history.length === 0 ? (
-                <p className="text-sm text-slate-600 dark:text-mfai-text/60">
-                  No missions recorded yet.
-                </p>
-              ) : (
-                <ul className="flex flex-col gap-3">
-                  {history.map((entry) => (
-                    <li
-                      key={entry.id}
-                      className="rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm text-slate-700 dark:border-mfai-border/60 dark:bg-mfai-surfaceAlt/40 dark:text-mfai-text/80"
-                    >
-                      <div className="flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-mfai-text/60">
-                        <span>{new Date(entry.createdAt).toLocaleTimeString()}</span>
-                        <span
-                          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${entry.status === 'success'
-                            ? 'bg-success/15 text-success'
-                            : entry.status === 'error'
-                              ? 'bg-danger/15 text-danger'
-                              : 'bg-info/15 text-info'
-                            }`}
-                        >
-                          {entry.status === 'success' && 'Completed'}
-                          {entry.status === 'error' && 'Error'}
-                          {entry.status === 'pending' && 'Pending'}
-                        </span>
-                      </div>
-                      <p className="mt-2 text-sm font-medium text-slate-800 dark:text-mfai-text">{entry.text}</p>
-                      <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                        <motion.button
-                          type="button"
-                          whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
-                          whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
-                          className="rounded-full border border-slate-200/70 px-3 py-1 text-xs text-slate-600 hover:border-accent/60 hover:text-accent dark:border-mfai-border/60 dark:text-mfai-text/70"
-                          onClick={() => setUserInput(entry.text)}
-                        >
-                          Reuse
-                        </motion.button>
-                        <motion.button
-                          type="button"
-                          whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
-                          whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
-                          className="rounded-full border border-accent/40 px-3 py-1 text-xs text-accent hover:bg-accent/10"
-                          onClick={() => handleRunSimulation(entry.text)}
-                        >
-                          Relaunch
-                        </motion.button>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+            <RequestHistory
+              history={history}
+              shouldReduceMotion={Boolean(shouldReduceMotion)}
+              onClear={() => setHistory([])}
+              onReuse={setUserInput}
+              onRelaunch={handleRunSimulation}
+            />
           </div>
 
           <div className="flex flex-col gap-5">

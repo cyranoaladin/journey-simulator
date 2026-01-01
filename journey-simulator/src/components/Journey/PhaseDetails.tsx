@@ -53,7 +53,7 @@ const PhaseDetails: FC<PhaseDetailsProps> = ({ phase }) => {
                 {/* Tools & Resources */}
                 <div>
                     <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />{' '}
                         Tools & Resources
                     </h4>
                     <div className="flex flex-wrap gap-2">

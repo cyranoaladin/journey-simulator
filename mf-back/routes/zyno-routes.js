@@ -6,13 +6,67 @@ const gateRouter = require('./orchestration-gate');
 const { listTemplates } = require('../data/parcoursTemplates');
 const agentMemory = require('../memory/agent_memory');
 const { getOrchestrationGlossary } = require('../utils/aepoAeco');
+const {
+  normalizeMode,
+  ensureModeAllowed,
+  registryCoverage,
+} = require('../orchestration/runtimeMode');
 
 const router = express.Router();
 
-router.post('/orchestration', async (req, res) => {
+let clientPreferredMode = null;
+
+const resolveMode = (raw) => {
+  if (raw) return normalizeMode(raw);
+  if (clientPreferredMode) return clientPreferredMode;
+  if (process.env.DEMO_MODE === 'true') return 'demo';
+  if (process.env.EXECUTION_ENABLED === 'true') return 'real';
+  return 'simulation';
+};
+
+router.post('/mode', (req, res) => {
+  const requested = req.body?.mode;
+  const normalized = normalizeMode(requested);
+  clientPreferredMode = normalized;
+  return res.json({ success: true, mode: normalized });
+});
+
+router.get('/', (req, res) => {
+  const mode = resolveMode(req.query?.mode);
+  res.json({ status: 'ok', mode });
+});
+
+const handleOrchestration = async (req, res) => {
   try {
+    const requestedMode = req.body?.mode || req.query?.mode;
+    const mode = resolveMode(requestedMode);
+    const guard = ensureModeAllowed(mode);
+    if (!guard.allowed) {
+      return res.status(400).json({
+        error: 'Mode real bloqué : environnement incomplet',
+        issues: guard.issues,
+        runtime: guard.health,
+        mode,
+      });
+    }
+
+    if (mode === 'real') {
+      const authHeader = req.headers?.authorization || '';
+      if (/demo-token/i.test(authHeader)) {
+        return res.status(400).json({
+          error: 'Mode real interdit avec un token demo',
+          mode,
+        });
+      }
+    }
+
     const userInput = req.body?.input ?? '';
-    const userId = req.body?.userId ?? 'demo_user';
+    const userId = req.body?.userId
+      || req.headers['x-user-id']
+      || req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'User context is required' });
+    }
     const context = {
       user: { id: userId },
       userId,
@@ -20,6 +74,7 @@ router.post('/orchestration', async (req, res) => {
       phase: req.body?.phase ?? 'Learn',
       objective: req.body?.objective ?? userInput,
       input: userInput,
+      mode,
     };
 
     const orchestrationResult = await orchestrateZyno(userInput, context);
@@ -61,6 +116,8 @@ router.post('/orchestration', async (req, res) => {
 
     res.json({
       ...orchestrationResult,
+      mode,
+      runtime: guard.health,
       availableTemplates,
       timestamp: new Date().toISOString(),
       // Non-breaking metadata for developers/investors: unified AEPO/AECO definitions.
@@ -73,36 +130,98 @@ router.post('/orchestration', async (req, res) => {
     console.error('Orchestration error:', errorMsg);
     res.status(500).json({ error: 'Zyno orchestration failed.' });
   }
-});
+};
 
-// Vertical slice orchestrator (SecurityAuditAgent + ProductSpecAgent)
-// Mounted at /orchestration → final path: POST /orchestration/vslice
-router.post('/vslice', async (req, res) => {
+router.post('/', handleOrchestration);
+router.post('/orchestration', handleOrchestration);
+const handleVerticalSlice = async (req, res) => {
   try {
+    const requestedMode = req.body?.mode || req.query?.mode;
+    const mode = resolveMode(requestedMode);
+
+    // Test mode mock est géré dans orchestrateVerticalSlice (mock interne) pour garder la logique métier intacte.
+
+    const guard = ensureModeAllowed(mode);
+    if (!guard.allowed) {
+      return res.status(400).json({
+        error: 'Mode real bloqué : environnement incomplet',
+        issues: guard.issues,
+        runtime: guard.health,
+        mode,
+      });
+    }
+
+    if (mode === 'real') {
+      const authHeader = req.headers?.authorization || '';
+      if (/demo-token/i.test(authHeader)) {
+        return res.status(400).json({
+          error: 'Mode real interdit avec un token demo',
+          mode,
+        });
+      }
+    }
+
     const traceId = req.body?.traceId || req.headers['x-trace-id'] || undefined;
+
     const result = await orchestrateVerticalSlice({
       traceId,
       runId: req.body?.runId,
-      userId: req.body?.userId,
+      userId: req.body?.userId || req.headers['x-user-id'] || req.user?.id || (process.env.NODE_ENV === 'test' ? 'test-user' : null),
       intent: req.body?.intent || 'vslice',
       input: req.body?.input || '',
-      context: req.body?.context || {},
+      context: { ...(req.body?.context || {}), mode },
       constraints: req.body?.constraints || {},
       preset: req.body?.preset,
       web3: req.body?.web3,
       headers: req.headers,
+      mode,
     });
-    res.json(result);
+    res.json({ ...result, mode, runtime: guard.health });
   } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : String(error);
+    const errorMsg = error instanceof Error ? `${error.message}\n${error.stack}` : String(error);
     console.error('Vertical slice orchestration error:', errorMsg);
     res.status(500).json({ error: 'Vertical slice orchestration failed.' });
   }
-});
+};
+
+// Alias vslice under /orchestration/vslice to match frontend expectations
+router.post('/orchestration/vslice', handleVerticalSlice);
+
+// Vertical slice orchestrator (SecurityAuditAgent + ProductSpecAgent)
+// Mounted at /orchestration → final path: POST /orchestration/vslice
+router.post('/vslice', handleVerticalSlice);
 
 router.use('/', gateRouter);
 
-router.get('/orchestration/logs', async (req, res) => {
+router.get('/runtime-health', (req, res) => {
+  const mode = normalizeMode(req.query?.mode);
+  const guard = ensureModeAllowed(mode);
+  res.json({
+    mode,
+    allowed: guard.allowed,
+    issues: guard.issues,
+    runtime: guard.health,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+router.get('/health/llm-rag', (_req, res) => {
+  const health = ensureModeAllowed('real').health;
+  const issues = [];
+  if (!health.llm.hasKey) issues.push('OPENAI_API_KEY manquante');
+  if (!health.rag.remoteConfigured) issues.push('RAG_SEARCH_URL absent (fallback local)');
+  if (health.rag.remoteConfigured && !health.rag.hasKey) issues.push('RAG_API_KEY manquante');
+  if (!health.execution.enabled) issues.push('EXECUTION_ENABLED doit être true pour le mode real');
+  res.json({
+    llm: health.llm,
+    rag: health.rag,
+    issues,
+    ok: issues.length === 0,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+router.get('/logs', async (req, res) => {
   try {
     const { userId, intent, limit = 50 } = req.query;
     const filters = {};
@@ -187,6 +306,14 @@ router.get('/admin/agent-logs', async (req, res) => {
     console.error('Agent logs error:', errorMsg);
     res.status(500).json({ error: 'Unable to retrieve agent logs.' });
   }
+});
+
+router.get('/registry/coverage', (_req, res) => {
+  const coverage = registryCoverage();
+  res.json({
+    coverage,
+    timestamp: new Date().toISOString(),
+  });
 });
 
 router.get('/admin/agent-scoreboard', (req, res) => {

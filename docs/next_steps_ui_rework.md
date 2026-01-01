@@ -60,7 +60,7 @@
 🖋️ **Mise à jour manuelle** à chaque PR ou commit lié à l’UI.  
 ✅ Ne pas oublier de **cocher** une tâche seulement une fois testée localement.  
 📁 Ce fichier peut être inclus dans `docs/` ou à la racine du projet.  
-📌 GitHub Copilot peut le lire pour guider les développements futurs.
+📌 Utilisez ces instructions comme checklist de référence pour les évolutions UI.
 
 ## 👥 Contributeurs
 

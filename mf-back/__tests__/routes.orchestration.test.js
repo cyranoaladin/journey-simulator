@@ -1,5 +1,7 @@
+// Tests run stateless bearer flows with CSRF parity middleware.
 const express = require('express');
 const request = require('supertest');
+const { csrfGuard } = require('../middleware/csrfGuard');
 
 // Mock all orchestration dependencies to prevent module loading errors
 jest.mock('../orchestration/zynoVerticalSlice', () => ({
@@ -55,6 +57,7 @@ describe('Zyno orchestration route', () => {
 
     app = express();
     app.use(express.json());
+    app.use(csrfGuard);
     app.use('/', require('../routes/zyno-routes'));
   });
 

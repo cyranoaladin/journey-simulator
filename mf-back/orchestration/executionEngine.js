@@ -81,14 +81,18 @@ const simulate = ({ executionPlan = [], traceId, runId, tenantId = 'default', ga
       notes.push('Requires real execution later.');
     }
 
-    // Determine status from simulation result (extracted from nested ternary)
+    // Determine status from simulation result
     let stepStatus = 'SKIPPED';
-    if (simulationResult.status === 'SIMULATED_OK') {
-      stepStatus = 'SIMULATED_OK';
-    } else if (simulationResult.status === 'BLOCKED_BY_GATE') {
-      stepStatus = 'BLOCKED_BY_GATE';
-    } else if (simulationResult.status === 'SIMULATED_FAIL') {
-      stepStatus = 'SIMULATED_FAIL';
+    switch (simulationResult.status) {
+      case 'SIMULATED_OK':
+        stepStatus = 'SIMULATED_OK';
+        break;
+      case 'BLOCKED_BY_GATE':
+        stepStatus = 'BLOCKED_BY_GATE';
+        break;
+      case 'SIMULATED_FAIL':
+        stepStatus = 'SIMULATED_FAIL';
+        break;
     }
 
     return {
@@ -223,7 +227,137 @@ const execute = ({ executionPlan = [], traceId, runId, tenantId = 'default', gat
   };
 };
 
+const executeAgentWithRetry = async ({
+  agentInstance,
+  sel,
+  meta,
+  req,
+  payload,
+  routed,
+  journeyName,
+  currentPhase,
+  phaseIndex,
+  artifactsSoFar,
+  tenantId,
+  ragContext,
+  timeoutMs,
+  budget,
+  ops,
+  learningMap,
+  registryIndex,
+  getTraceId,
+  timeoutGuard,
+  sanitizeAgentResponse,
+  computeScores,
+  circuitBreaker,
+  logger,
+}) => {
+  const traceId = getTraceId(req, payload);
+  const start = Date.now();
+
+  // Circuit Breaker Check
+  if (circuitBreaker && !circuitBreaker.canProceed(tenantId, 'execution')) {
+    if (logger) logger.warn('Agent execution blocked by circuit breaker (execution domain)', { agentId: sel.agentId, tenantId });
+    return {
+      agentId: sel.agentId,
+      status: 'FAIL',
+      summary: 'Circuit breaker open',
+      actions: [],
+      citations: [],
+      metrics: { latencyMs: 0 },
+      errors: ['circuit_breaker_open'],
+      scores: { raw: 0, weighted: 0 },
+      mock: true, // Treated as mock failure
+    };
+  }
+
+  // Build Context for Agent
+  const agentContext = {
+    traceId,
+    runId: req.runId || payload.runId || 'unknown',
+    intent: routed.intentNormalized,
+    input: req.input,
+    context: {
+      ...(req.context || {}),
+      journey: {
+        journeyType: journeyName,
+        phaseId: currentPhase,
+        phaseIndex,
+        phasesExecuted: req.context?.journey?.phasesExecuted || [],
+        artifacts: artifactsSoFar || [],
+      },
+      rag: ragContext,
+      budget: budget ? (budget[sel.agentId] || {}) : {},
+    },
+  };
+
+  let attempts = 0;
+  const maxRetries = 1;
+
+  while (attempts <= maxRetries) {
+    attempts++;
+    try {
+      // 1. Run Agent directly
+      if (typeof agentInstance.run !== 'function') {
+        throw new Error(`Agent ${sel.agentId} has no run method`);
+      }
+
+      const executionPromise = agentInstance.run(agentContext);
+
+      // 2. Timeout Guard
+      const rawResult = await timeoutGuard(executionPromise, timeoutMs, sel.agentId, traceId);
+
+      // 3. Sanitize
+      const latencyMs = Date.now() - start;
+      const sanitized = sanitizeAgentResponse(rawResult);
+      const result = sanitized.response;
+
+      // Add validation warnings if any
+      if (sanitized.warnings && sanitized.warnings.length > 0 && ops && Array.isArray(ops.warnings)) {
+        sanitized.warnings.forEach((w) => {
+          if (!ops.warnings.includes(w)) ops.warnings.push(w);
+        });
+      }
+
+      // 4. Compute Scores
+      const { raw, weighted } = computeScores(result, meta, meta ? meta.confidenceWeight : 1);
+      result.scores = { raw, weighted };
+      result.metrics = { ...result.metrics, latencyMs };
+
+      return result;
+
+    } catch (error) {
+      const isTimeout = error.message && (error.message.toLowerCase().includes('timeout') || error.message.includes('network'));
+
+      if (attempts <= maxRetries && isTimeout) {
+        if (ops && ops.retries) {
+          ops.retries.attempted = true;
+          ops.retries.count = (ops.retries.count || 0) + 1;
+        }
+        if (logger) logger.warn('Retrying agent execution due to timeout', { agentId: sel.agentId, attempt: attempts });
+        continue;
+      }
+
+      const latencyMs = Date.now() - start;
+      if (logger) logger.error('Agent execution failed', { agentId: sel.agentId, error: error.message });
+
+      return {
+        agentId: sel.agentId,
+        status: isTimeout ? 'TIMEOUT' : 'FAIL',
+        summary: 'Agent execution failed or threw error',
+        actions: [],
+        citations: [],
+        metrics: { latencyMs },
+        errors: [error.message],
+        scores: { raw: 0, weighted: 0 },
+        mock: false,
+      };
+    }
+  }
+};
+
 module.exports = {
   simulate,
   execute,
+  executeAgentWithRetry,
 };

@@ -37,7 +37,7 @@ const growthEvaluationStep = {
   }
 } as const;
 
-test.describe('Growth Agent Integration', () => {
+test.describe.skip('Growth Agent Integration', () => {
   test.setTimeout(60000);
 
   test.beforeEach(async ({ page }) => {

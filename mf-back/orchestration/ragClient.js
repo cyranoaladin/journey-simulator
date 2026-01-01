@@ -52,10 +52,17 @@ class RAGClient {
     if (!fs.existsSync(LOCAL_RAG_DIR)) return [];
     const files = this.walkDocs(LOCAL_RAG_DIR);
     const normalized = (query || '').toLowerCase();
+    const tokens = normalized.split(/\s+/).filter(Boolean);
     const scored = files.map((file) => {
-      const score = normalized
-        ? (file.text.toLowerCase().match(new RegExp(normalized.split(/\s+/).join('|'), 'g')) || []).length
-        : 1;
+      if (!tokens.length) {
+        return { ...file, score: 1 };
+      }
+      const lower = file.text.toLowerCase();
+      const score = tokens.reduce((acc, token) => {
+        if (!token) return acc;
+        const occurrences = lower.split(token).length - 1;
+        return acc + Math.max(occurrences, 0);
+      }, 0);
       return { ...file, score };
     });
     return scored

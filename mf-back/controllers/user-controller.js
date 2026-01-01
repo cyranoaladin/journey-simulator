@@ -573,7 +573,7 @@ const verifyNFTSecurity = async (resolvedAddress, walletAddress, userId) => {
   } catch (verificationError) {
     const errorMsg = verificationError instanceof Error ? verificationError.message : String(verificationError);
     if (process.env.NODE_ENV !== 'test') {
-      console.error(`NFT Verification Failed for user ${userId}:`, errorMsg);
+      console.error('NFT verification failed', { userId, error: errorMsg });
     }
     return {
       success: false,

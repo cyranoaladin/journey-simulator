@@ -35,7 +35,7 @@ describe('API /api/journeys/[id]/step with actionId', () => {
 
   it('forwards actionId to callZynoStep when ?llm=1', async () => {
     const mod = await import(path)
-    const { POST } = mod as any
+    const { POST } = mod as { POST: (req: any, ctx: any) => Promise<Response> }
     const url = new URL('http://localhost/api/journeys/abc/step?llm=1')
     const req = {
       json: async () => ({
@@ -46,8 +46,8 @@ describe('API /api/journeys/[id]/step with actionId', () => {
         actionId: 'go_next',
       }),
       url: url.toString(),
-    } as any
-    const res = await POST(req, { params: { id: 'abc' } } as any)
+    }
+    const res = await POST(req, { params: { id: 'abc' } })
     expect(res.status).toBe(200)
     expect(callSpy).toHaveBeenCalledTimes(1)
     const arg = callSpy.mock.calls[0][0]

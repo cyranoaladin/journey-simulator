@@ -7,6 +7,38 @@ const { saveMetric } = require('../memory/agent_metrics');
 const agentMemory = require('../memory/agent_memory');
 const { AEPO, AECO } = require('../utils/aepoAeco');
 
+function buildHistorySummary(historyEntries = []) {
+  if (!Array.isArray(historyEntries) || historyEntries.length === 0) {
+    return null;
+  }
+  const last = historyEntries.slice(-3).map((h) => {
+    const safeAgent = h.agentName || h.type || 'interaction';
+    const safeSummary = typeof h.summary === 'string'
+      ? h.summary.slice(0, 180)
+      : h.ae_summary || h.ae_outcome || h.reason || null;
+    return {
+      agent: safeAgent,
+      summary: safeSummary || null,
+      intent: h.intent || null,
+      timestamp: h.timestamp || null,
+    };
+  });
+  const markers = historyEntries.reduce((acc, entry) => {
+    if (entry?.payload?.projectName) {
+      acc.projectName = entry.payload.projectName;
+    }
+    if (entry?.payload?.vision) {
+      acc.vision = entry.payload.vision;
+    }
+    return acc;
+  }, { projectName: null, vision: null });
+  return {
+    markers,
+    recent: last,
+    count: historyEntries.length,
+  };
+}
+
 function normalizeReferences(agentResult = {}) {
   if (Array.isArray(agentResult.sources)) {
     return agentResult.sources;
@@ -169,12 +201,13 @@ async function triggerAgents(agentNames, mode, context, intent) {
       const agentInstance = new agent();
       const agentResult = await agentInstance.run(buildAgentInput(), context);
       const durationMs = Date.now() - startedAt;
-      const errorCount = Array.isArray(agentResult?.errors)
-        ? agentResult.errors.length
-        : agentResult?.error
-          ? 1
-          : 0;
-      const success = agentResult?.success === false ? false : !agentResult?.error;
+      const errorCount = (() => {
+        if (Array.isArray(agentResult?.errors)) {
+          return agentResult.errors.length;
+        }
+        return agentResult?.error ? 1 : 0;
+      })();
+      const success = agentResult?.success !== false && !agentResult?.error;
       const aepoScore = computeAEPO({ duration: durationMs, success, retries: errorCount });
 
       const metricPayload = {
@@ -231,9 +264,13 @@ async function triggerAgents(agentNames, mode, context, intent) {
         prompt: normalized.prompt,
         reasoning: normalized.reasoning,
         action: normalized.action,
-        summary: summarizeOutput(normalized.output ?? normalized.response),
+        summary: summarizeOutput(normalized.output ?? normalized.response ?? normalized.reasoning),
         sources: normalized.sources,
         feedback: normalized.feedback,
+        debug: {
+          reasoning: normalized.reasoning ?? null,
+          raw: normalized.raw ?? null,
+        },
         // Human-readable context for observers (dev/investors). Safe to ignore by clients.
         orchestration: {
           aepo: AEPO,
@@ -317,6 +354,17 @@ async function orchestrateZyno(userInput, context = {}) {
   const agents = mapIntentToAgents(intent);
   const mode = determineExecutionMode(intent);
   const template = loadTemplateForIntent(intent);
+  const userId = context.userId ?? context.user?.id ?? null;
+  const userMemory = userId ? agentMemory.get(userId) : null;
+  const fullHistory = Array.isArray(userMemory?.history) ? userMemory.history : [];
+  const historySummary = buildHistorySummary(fullHistory);
+  const contextWithMemory = {
+    ...context,
+    input: context.input || userInput,
+    objective: context.objective || userInput,
+    history: fullHistory.slice(-10),
+    historySummary
+  };
 
   if (agents.length === 0) {
     return {
@@ -330,17 +378,13 @@ async function orchestrateZyno(userInput, context = {}) {
     };
   }
 
-  const executionResult = await triggerAgents(agents, mode, {
-    ...context,
-    input: context.input || userInput,
-    objective: context.objective || userInput
-  }, intent);
+  const executionResult = await triggerAgents(agents, mode, contextWithMemory, intent);
 
   const { resultMap, timeline } = executionResult;
   const currentStep = timeline.length ? timeline[timeline.length - 1] : null;
 
-  if (currentStep && context.userId) {
-    agentMemory.update(context.userId, {
+  if (currentStep && userId) {
+    agentMemory.update(userId, {
       lastStep: currentStep,
       lastIntent: intent,
       lastTimeline: timeline.slice(-5),
@@ -348,6 +392,7 @@ async function orchestrateZyno(userInput, context = {}) {
   }
 
   return {
+    runtimeMode: context.mode || 'simulation',
     executedAgents: agents,
     intent,
     mode,

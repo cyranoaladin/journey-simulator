@@ -1,52 +1,105 @@
-const { mkFinding, mkAction, estimateConfidence, safeRun } = require('./agentUtils');
+const { LLMClient } = require('../orchestration/llmClient');
 
 class MintingAgent {
-  async run(request = {}) {
-    const { traceId, input = '', context = {} } = request;
-    const inputPresent = Boolean(input && input.trim());
+  constructor() {
+    this.id = 'MintingAgent';
+    this.llm = new LLMClient({});
+  }
 
-    return safeRun('MintingAgent', () => {
-      const findings = [
-        mkFinding('preconditions', 'ok', 'medium', 'Proof/anchor status required before mint'),
-        mkFinding('idempotency', 'ok', 'medium', 'Idempotency key per mint request'),
-        mkFinding('supply', 'warn', 'medium', 'Supply cap and policy not specified'),
-        mkFinding('audit', 'ok', 'low', 'Audit trail and replay guard needed'),
-      ];
+  buildPrompt({ input, ragChunks, journey, orchestrationMode }) {
+    const citations = (ragChunks || [])
+      .map((c, i) => `- [${i + 1}] ${c.title}: ${c.text.slice(0, 180)}...`)
+      .join('\n');
 
-      const actions = [
-        mkAction('Add mint request schema with proofId + nonce'),
-        mkAction('Implement double-mint guard using idempotency key'),
-        mkAction('Record audit trail entries for mint attempts'),
-        mkAction('Provide dry-run / preview endpoint before real mint'),
-      ];
+    const phase = journey?.phaseId || 'unknown';
+    const isCollaborative = orchestrationMode === 'AECO';
 
-      const confidence = estimateConfidence({
-        inputPresent,
-        ragHits: 0,
-        hasFindings: findings.length > 0,
-      });
+    const tone = isCollaborative
+      ? 'Technical, referencing SecurityAgent for access control and NFTAgent for metadata.'
+      : 'Precise, function-oriented, "Minion".';
 
-      const status = inputPresent ? 'OK' : 'WARN';
-      const summary = inputPresent ? 'Mint pipeline simulated and guarded' : 'Mint plan drafted with defaults';
-      const assumptions = inputPresent ? [] : ['Proof/anchor details manquants, testnet only'];
-      const limits = ['Simulation only, aucun mint on-chain', 'Depends on web3Guards + kill switch'];
+    return {
+      system: [
+        '**IDENTITY**: Mint Pipeline Specialist.',
+        '**EXPERTISE**: Candy Machine Configuration, Whitelist Management (Merkle Trees), Token Gating, Anti-Bot measures.',
+        '**WORKFLOW**:',
+        '1. Configure the Minting Contract (Candy Machine / Umi).',
+        '2. Generate the Whitelist/Allowlist merkle root.',
+        '3. Simulate the Minting Process (Gas estimation, failure scenarios).',
+        '',
+        `**TONE**: ${tone}`,
+        '**OUTPUT FORMAT**: STRICT JSON: {',
+        '  "status": "OK",',
+        '  "summary": "...",',
+        '  "mint_specs": { "guards": ["..."], "phases": ["..."] },',
+        '  "resources": {',
+        '     "diagram": "Mermaid diagram string (graph TD... for mint process)",',
+        '     "data": { "start_date": "...", "price": "..." },',
+        '     "documentation": "Markdown minting setup guide"',
+        '  },',
+        '  "actions": ["..."]',
+        '}',
+        '**RESOURCES**: Must output valid Mermaid.js diagrams for minting workflow.'
+      ].join('\n'),
+      user: [
+        `User Input: ${input}`,
+        `Current Phase: ${phase}`,
+        `Mode: ${orchestrationMode}`,
+        'RAG Context:',
+        citations || '- (no specific minting docs found)',
+        '',
+        'Configure the minting pipeline.'
+      ].join('\n'),
+    };
+  }
 
-      return {
-        status,
-        summary,
-        findings,
-        actions,
-        confidence,
-        assumptions,
-        limits,
-        citations: [],
-        metrics: { ragHits: 0 },
-        traceId,
-        details: {
-          journeyType: context?.journey?.journeyType || 'mint',
-        },
-      };
+  async run(request) {
+    const { traceId, input, context = {}, rag = {}, constraints = {} } = request;
+    const ragChunks = rag.chunks || (context.rag && context.rag.chunks) || [];
+
+    const prompt = this.buildPrompt({
+      input,
+      ragChunks,
+      journey: context.journey,
+      orchestrationMode: context.orchestrationMode || 'AEPO'
     });
+
+    const llmRes = await this.llm.generate({
+      prompt,
+      traceId,
+      agentId: this.id,
+      maxTokens: constraints.maxTokens || 1200,
+      temperature: 0.1 // Precision required
+    });
+
+    let parsed = { mint_specs: {}, resources: {}, actions: ['Upload assets to Arweave'], summary: "Minting analysis failed to parse" };
+    try {
+      const jsonMatch = llmRes.text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        parsed = JSON.parse(jsonMatch[0]);
+      } else {
+        parsed = JSON.parse(llmRes.text);
+      }
+    } catch (e) {
+      parsed.details = llmRes.text;
+      parsed.resources = { documentation: '### Error\nCould not parse Minting JSON.' };
+    }
+
+    return {
+      traceId,
+      agentId: this.id,
+      status: 'OK',
+      summary: parsed.summary || 'Mint pipeline configured',
+      details: parsed.mint_specs || {},
+      resources: parsed.resources || {},
+      confidence: 0.95,
+      assumptions: [`RAG hits: ${ragChunks.length}`],
+      citations: ragChunks.map((c) => ({ id: c.id, title: c.title, source: c.source })),
+      actions: parsed.actions || ['Upload assets to Arweave'],
+      metrics: { latencyMs: llmRes.latencyMs, tokens: llmRes.tokensUsed, ragHits: ragChunks.length },
+      errors: [],
+      mock: llmRes.mock || false,
+    };
   }
 }
 

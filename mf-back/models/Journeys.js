@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 
 
 const journeySchema = new mongoose.Schema({
+    journeyId: {
+        type: String,
+        index: true,
+    },
     user_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

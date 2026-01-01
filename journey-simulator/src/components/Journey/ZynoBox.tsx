@@ -12,6 +12,12 @@ interface ZynoBoxProps {
   onPrompt?: (msg: string) => void;
 }
 
+const pickRandomTip = (list: string[]) => {
+  if (!list || list.length === 0) return null;
+  const randomIndex = Math.floor(Math.random() * list.length);
+  return list[randomIndex] ?? null;
+};
+
 const ZynoBox: React.FC<ZynoBoxProps> = ({
   context: _context = '',
   tips = EMPTY_TIPS,
@@ -108,14 +114,6 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
     defaultTips
   ]);
 
-  // Safety: avoid any automatic setState loops in production.
-  // We only pick a tip when the user opens the box, or clicks "New tip".
-  function pickRandomTip(list: string[]) {
-    if (!list || list.length === 0) return null;
-    const randomIndex = Math.floor(Math.random() * list.length);
-    return list[randomIndex] ?? null;
-  }
-
   // Get a contextual greeting based on user progress
   const getGreeting = () => {
     if (!selectedPersona) return "Hi! I'm Zyno, your AI Co-Founder™. Ready to start your cognitive activation journey?";
@@ -164,7 +162,7 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
         onClick={() => {
           setIsOpen(true);
           setFeedbackGiven(false);
-          setCurrentTip((prev) => (prev ? prev : pickRandomTip(activeTips)));
+          setCurrentTip((prev) => prev ?? pickRandomTip(activeTips));
         }}
         className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-gradient-primary rounded-full flex items-center justify-center shadow-lg"
       >
@@ -240,7 +238,21 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
                     <p className="text-sm">{currentTip}</p>
 
                     {/* Feedback buttons */}
-                    {!feedbackGiven ? (
+                    {feedbackGiven ? (
+                      <div className="flex justify-between items-center mt-3">
+                        <div className="text-xs text-primary-400">
+                          Thanks for your feedback!
+                        </div>
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={getNewTip}
+                          className="text-xs text-primary-400 hover:text-primary-300"
+                        >
+                          New tip
+                        </motion.button>
+                      </div>
+                    ) : (
                       <div className="flex justify-between mt-3">
                         <div className="flex space-x-2">
                           <motion.button
@@ -259,20 +271,6 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
                           >
                             <ThumbsDown size={14} />
                           </motion.button>
-                        </div>
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={getNewTip}
-                          className="text-xs text-primary-400 hover:text-primary-300"
-                        >
-                          New tip
-                        </motion.button>
-                      </div>
-                    ) : (
-                      <div className="flex justify-between items-center mt-3">
-                        <div className="text-xs text-primary-400">
-                          Thanks for your feedback!
                         </div>
                         <motion.button
                           whileHover={{ scale: 1.05 }}
@@ -320,14 +318,12 @@ const ZynoBox: React.FC<ZynoBoxProps> = ({
                       type="text"
                       placeholder="Ask Zyno a question..."
                       className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-white/60 focus:outline-none focus:border-primary-400"
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          const input = e.currentTarget as HTMLInputElement;
-                          if (input.value.trim()) {
-                            onPrompt(input.value);
-                            input.value = '';
-                          }
-                        }
+                      onKeyDown={(e) => {
+                        if (e.key !== 'Enter') return;
+                        const input = e.currentTarget as HTMLInputElement;
+                        if (!input.value.trim()) return;
+                        onPrompt(input.value);
+                        input.value = '';
                       }}
                     />
                     <motion.button

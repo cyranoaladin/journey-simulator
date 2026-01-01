@@ -1,38 +1,90 @@
-const BaseAgent = require('./BaseAgent');
+const { LLMClient } = require('../orchestration/llmClient');
 
-class AuditAgent extends BaseAgent {
+class AuditAgent {
   constructor() {
-    super("AuditAgent");
+    this.id = 'AuditAgent';
+    this.llm = new LLMClient({});
   }
 
-  buildSystemPrompt(ctx) {
-    return `You are the **AuditAgent**, a Security Auditor.
-Your goal is to find vulnerabilities and suggest security hardening.
+  buildPrompt({ input, ragChunks, journey }) {
+    const citations = (ragChunks || [])
+      .map((c, i) => `- [${i + 1}] ${c.title}: ${c.text.slice(0, 180)}...`)
+      .join('\n');
 
-Your responsibilities:
-1. Analyze logic for potential exploits (re-entrancy, ownership checks).
-2. Recommend security patterns.
-3. Verify access controls.
+    const phase = journey?.phaseId || 'unknown';
 
-**OUTPUT FORMAT (CRITICAL):**
-You must strictly output a valid JSON object. Do not include markdown formatting like \`\`\`json.
-Structure:
-{
-  "analysis": "High-level summary of the security posture",
-  "vulnerabilities": ["List of potential specific exploits or weaknesses"],
-  "recommendations": ["List of specific hardening steps"],
-  "riskLevel": "Low" | "Medium" | "High" | "Critical"
-}
-
-**IMPORTANT:** Always respond in **English**.
-
-Tone: Cautious, analytical, severe.`;
+    return {
+      system: [
+        'You are AuditAgent, a comprehensive technical auditor for Web3 systems.',
+        'Unlike SecurityAgent (who focuses on exploits), you focus on Code Quality, Architecture, and Best Practices.',
+        '',
+        'Audit Dimensions:',
+        '- Architecture: Modularity, upgradeability, state management.',
+        '- Gas Optimization: Compute unit usage, account rent hygiene.',
+        '- Code Quality: Readability, documentation, test coverage (Unit/Integration/E2E).',
+        '- Dependency integrity: Version pinning, known vulnerabilities in dependencies.',
+        '',
+        'Output Format: STRICT JSON: { "status": "OK", "quality_score": 0-100, "summary": "...", "issues": [{ "category": "...", "severity": "...", "description": "...", "recommendation": "..." }], "actions": ["..."] }.',
+        'Be constructive but rigorous.'
+      ].join('\n'),
+      user: [
+        `User Input: ${input}`,
+        `Current Phase: ${phase}`,
+        'RAG Context:',
+        citations || '- (no specific audit docs found)',
+        '',
+        'Conduct a technical quality audit.'
+      ].join('\n'),
+    };
   }
 
-  buildUserPrompt(ctx) {
-    return `User Input: "${ctx.submission || ctx.lastInput || ctx.input || ctx.objective}"
+  async run(request) {
+    const { traceId, input, context = {}, rag = {}, constraints = {} } = request;
+    const ragChunks = rag.chunks || (context.rag && context.rag.chunks) || [];
 
-Analyze the security implications of this logic and output JSON.`;
+    const prompt = this.buildPrompt({
+      input,
+      ragChunks,
+      journey: context.journey
+    });
+
+    const llmRes = await this.llm.generate({
+      prompt,
+      traceId,
+      agentId: this.id,
+      maxTokens: constraints.maxTokens || 1200,
+      temperature: 0.2
+    });
+
+    let parsed = { issues: [], actions: [], summary: "Audit analysis failed to parse" };
+    try {
+      const jsonMatch = llmRes.text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        parsed = JSON.parse(jsonMatch[0]);
+      } else {
+        parsed = JSON.parse(llmRes.text);
+      }
+    } catch (e) {
+      parsed.details = llmRes.text;
+      parsed.issues = [{ category: 'Parsing', severity: 'Low', description: 'Could not parse JSON report', recommendation: 'Review raw text' }];
+    }
+
+    return {
+      traceId,
+      agentId: this.id,
+      status: 'OK',
+      summary: parsed.summary || 'Audit complete',
+      details: parsed.details || llmRes.text,
+      issues: parsed.issues || [],
+      qualityScore: parsed.quality_score || 0,
+      confidence: 0.9,
+      assumptions: [`RAG hits: ${ragChunks.length}`],
+      citations: ragChunks.map((c) => ({ id: c.id, title: c.title, source: c.source })),
+      actions: parsed.actions || ['Refactor identified hot-spots'],
+      metrics: { latencyMs: llmRes.latencyMs, tokens: llmRes.tokensUsed, ragHits: ragChunks.length },
+      errors: [],
+      mock: llmRes.mock || false,
+    };
   }
 }
 

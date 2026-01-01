@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { API_BASE_URL } from '../utils/api';
 import UIBlocksRenderer from './UIBlocks/UIBlocksRenderer';
+import { useJourneyStore } from '../store/journeyStore';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -9,6 +10,7 @@ interface Message {
 }
 
 const PlaygroundPage = () => {
+  const runMode = useJourneyStore((state) => state.runMode);
   const [input, setInput] = useState('');
   const [history, setHistory] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -30,6 +32,25 @@ const PlaygroundPage = () => {
     const trimmedInput = input.trim();
     if (!trimmedInput) return;
 
+    let storedUserId: string | null = null;
+    try {
+      storedUserId = sessionStorage.getItem('userId') || localStorage.getItem('userId');
+    } catch {
+      storedUserId = null;
+    }
+
+    if (!storedUserId) {
+      setHistory((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: { results: { error: { output: 'Erreur: userId manquant. Connectez-vous puis réessayez.' } } },
+          timestamp: Date.now(),
+        },
+      ]);
+      return;
+    }
+
     const userMsg: Message = { role: 'user', content: trimmedInput, timestamp: Date.now() };
     setHistory(prev => [...prev, userMsg]);
     setInput('');
@@ -38,10 +59,14 @@ const PlaygroundPage = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/orchestration`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(storedUserId ? { 'x-user-id': storedUserId } : {}),
+        },
         body: JSON.stringify({
           input: trimmedInput,
-          userId: 'playground_session_v1'
+          userId: storedUserId ?? 'playground_session_v1',
+          mode: runMode,
         })
       });
 

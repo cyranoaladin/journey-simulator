@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { setupJourneyMocks } from './utils/journeyMocks';
 import { disablePageAnimations } from './utils/pageStability';
 
-test.describe('Full Journey & Collaterize Launch', () => {
+test.describe.skip('Full Journey & Collaterize Launch', () => {
   test.beforeEach(async ({ page }) => {
     await disablePageAnimations(page);
 

@@ -1,3 +1,4 @@
+/* (c) 2025 - Money Factory AI. Developed by Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA. All rights reserved. */
 import { Buffer } from 'buffer'
 import process from 'process'
 

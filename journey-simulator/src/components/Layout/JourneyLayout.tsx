@@ -82,7 +82,7 @@ export default function JourneyLayout({ children }: { children: React.ReactNode 
       <div className="lg:w-80 bg-black/20 backdrop-blur-sm border-l border-white/10 hidden lg:block">
         <div className="p-4">
           <h3 className="text-lg font-semibold mb-4 flex items-center">
-            <span className="w-3 h-3 bg-cyan-500 rounded-full mr-2 animate-pulse"></span>
+            <span className="w-3 h-3 bg-cyan-500 rounded-full mr-2 animate-pulse"></span>{' '}
             Agent Activity
           </h3>
 

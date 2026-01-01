@@ -1,65 +1,105 @@
-const BaseAgent = require('./BaseAgent');
+const { LLMClient } = require('../orchestration/llmClient');
 
-class DAOAgent extends BaseAgent {
+class DAOAgent {
   constructor() {
-    super("DAOAgent");
+    this.id = 'DAOAgent';
+    this.llm = new LLMClient({});
   }
 
-  buildSystemPrompt(ctx) {
-    return `You are the **DAOAgent**, a governance architect for decentralized organizations.
-Your goal is to help the user design and manage their DAO.
+  buildPrompt({ input, ragChunks, journey, orchestrationMode }) {
+    const citations = (ragChunks || [])
+      .map((c, i) => `- [${i + 1}] ${c.title}: ${c.text.slice(0, 180)}...`)
+      .join('\n');
 
-Your responsibilities:
-1. Advise on governance models (token-based, multisig, council).
-2. Help with tooling selection (Realms, Squads).
-3. Review proposal structures and voting parameters.
-4. Discuss decentralization roadmaps.
+    const phase = journey?.phaseId || 'unknown';
+    const isCollaborative = orchestrationMode === 'AECO';
 
-Tone: Diplomatic, structural, thoughtful.`;
-  }
+    const tone = isCollaborative
+      ? 'Diplomatic, linking with GovernanceDAOAgent for rules and CommunityAgent for sentiment.'
+      : 'Strategic, community-focused, "DAO Tooling Expert".';
 
-  buildUserPrompt(ctx) {
-    return `User Input: "${ctx.submission || ctx.lastInput}"
-
-Review the governance structure or proposal.`;
-  }
-
-  async run(ctx) {
-    const EVALUATION_SCHEMA = {
-      type: "json_schema",
-      json_schema: {
-        name: "DAOResponse",
-        strict: true,
-        schema: {
-          type: "object",
-          required: ["global_score", "feedback", "axes"],
-          properties: {
-            global_score: { type: "number" },
-            feedback: { type: "string" },
-            axes: {
-              type: "array",
-              items: {
-                type: "object",
-                required: ["name", "score", "max_score", "comment"],
-                properties: {
-                  name: { type: "string" },
-                  score: { type: "number" },
-                  max_score: { type: "number" },
-                  comment: { type: "string" },
-                },
-                additionalProperties: false,
-              },
-            },
-          },
-          additionalProperties: false,
-        },
-      },
+    return {
+      system: [
+        '**IDENTITY**: DAO Tooling & Community Architect.',
+        '**EXPERTISE**: DAO Tooling (Realms, Squads, Snapshot, Tally), Onboarding Flows, Contributor Compensation models (Coords, Utopia).',
+        '**WORKFLOW**:',
+        '1. Select the Governance Stack (Realms vs Snapshot).',
+        '2. Design the Onboarding & Access Control (Token gating, Discord roles).',
+        '3. Structure Working Groups/SubDAOs.',
+        '',
+        `**TONE**: ${tone}`,
+        '**OUTPUT FORMAT**: STRICT JSON: {',
+        '  "status": "OK",',
+        '  "summary": "...",',
+        '  "dao_structure": { "stack": ["..."], "roles": ["..."] },',
+        '  "resources": {',
+        '     "diagram": "Mermaid diagram string (graph TD... for org structure)",',
+        '     "data": { "tool_costs": { "realms": "free", "snapshot": "free" }, "readiness": 0-100 },',
+        '     "documentation": "Markdown tooling setup guide"',
+        '  },',
+        '  "actions": ["..."]',
+        '}',
+        '**RESOURCES**: Must output valid Mermaid.js diagrams for DAO structure.'
+      ].join('\n'),
+      user: [
+        `User Input: ${input}`,
+        `Current Phase: ${phase}`,
+        `Mode: ${orchestrationMode}`,
+        'RAG Context:',
+        citations || '- (no specific DAO docs found)',
+        '',
+        'Architect the DAO tooling and structure.'
+      ].join('\n'),
     };
+  }
 
-    return super.run(ctx, {
-      response_format: EVALUATION_SCHEMA,
-      temperature: 0.3,
+  async run(request) {
+    const { traceId, input, context = {}, rag = {}, constraints = {} } = request;
+    const ragChunks = rag.chunks || (context.rag && context.rag.chunks) || [];
+
+    const prompt = this.buildPrompt({
+      input,
+      ragChunks,
+      journey: context.journey,
+      orchestrationMode: context.orchestrationMode || 'AEPO'
     });
+
+    const llmRes = await this.llm.generate({
+      prompt,
+      traceId,
+      agentId: this.id,
+      maxTokens: constraints.maxTokens || 1200,
+      temperature: 0.3
+    });
+
+    let parsed = { dao_structure: {}, resources: {}, actions: [], summary: "DAO analysis failed to parse" };
+    try {
+      const jsonMatch = llmRes.text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        parsed = JSON.parse(jsonMatch[0]);
+      } else {
+        parsed = JSON.parse(llmRes.text);
+      }
+    } catch (e) {
+      parsed.details = llmRes.text;
+      parsed.resources = { documentation: '### Error\nCould not parse DAO JSON.' };
+    }
+
+    return {
+      traceId,
+      agentId: this.id,
+      status: 'OK',
+      summary: parsed.summary || 'DAO structure designed',
+      details: parsed.dao_structure || {},
+      resources: parsed.resources || {},
+      confidence: 0.9,
+      assumptions: [`RAG hits: ${ragChunks.length}`],
+      citations: ragChunks.map((c) => ({ id: c.id, title: c.title, source: c.source })),
+      actions: parsed.actions || ['Setup Realms instance'],
+      metrics: { latencyMs: llmRes.latencyMs, tokens: llmRes.tokensUsed, ragHits: ragChunks.length },
+      errors: [],
+      mock: llmRes.mock || false,
+    };
   }
 }
 

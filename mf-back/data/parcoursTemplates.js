@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const templatesDir = process.env.PARCOURS_TEMPLATE_PATH || path.resolve(__dirname, 'parcours_templates');
 
@@ -29,7 +29,7 @@ function readTemplateFile(fileName) {
   try {
     return JSON.parse(raw);
   } catch (error) {
-    console.warn(`Unable to parse parcours template ${fileName}:`, error.message);
+    console.warn('Unable to parse parcours template', { fileName, error: error.message });
     return null;
   }
 }

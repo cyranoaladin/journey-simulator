@@ -1,6 +1,8 @@
 import '@testing-library/jest-dom';
-import { TextDecoder, TextEncoder } from 'util';
+import { TextDecoder, TextEncoder } from 'node:util';
 import { WritableStream } from 'web-streams-ponyfill';
+import { Buffer } from 'node:buffer';
+import crypto from 'node:crypto';
 
 if (typeof globalThis.WritableStream === 'undefined') {
   ;(globalThis as any).WritableStream = WritableStream
@@ -9,6 +11,17 @@ if (typeof globalThis.WritableStream === 'undefined') {
 // Polyfill for libs requiring TextEncoder/TextDecoder (e.g., noble)
 ;(globalThis as any).TextEncoder = TextEncoder
 ;(globalThis as any).TextDecoder = TextDecoder as unknown as typeof globalThis.TextDecoder
+
+;(globalThis as any).Buffer = Buffer
+
+Object.defineProperty(globalThis, 'crypto', {
+  value: {
+    getRandomValues: (arr: Uint8Array) => crypto.randomFillSync(arr),
+    randomUUID: () => crypto.randomUUID(),
+    subtle: crypto.webcrypto.subtle,
+  },
+  configurable: true,
+});
 
 // Polyfill for Request/Response in Jest environment
 if (typeof Request === 'undefined') {
@@ -22,7 +35,7 @@ if (typeof Request === 'undefined') {
   } as any
 }
 if (typeof Response === 'undefined') {
-  global.Response = class Response {
+  globalThis.Response = class Response {
     constructor(body?: any, init?: any) {
       this.status = init?.status || 200
       this._body = body

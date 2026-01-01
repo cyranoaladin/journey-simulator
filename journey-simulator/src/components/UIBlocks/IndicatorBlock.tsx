@@ -15,7 +15,7 @@ export interface IndicatorBlock {
 }
 
 interface IndicatorBlockProps {
-  block: IndicatorBlock;
+  readonly block: IndicatorBlock;
 }
 
 export default function IndicatorBlock({ block }: IndicatorBlockProps) {

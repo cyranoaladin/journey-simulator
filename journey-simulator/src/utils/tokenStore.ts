@@ -7,24 +7,24 @@ let inMemoryRefreshToken: NullableString = null;
 const safeSessionStorage = {
   getItem(key: string): NullableString {
     try {
-      if (typeof window === 'undefined' || !window.sessionStorage) return null;
-      return window.sessionStorage.getItem(key);
+      if (typeof globalThis === 'undefined' || !globalThis.sessionStorage) return null;
+      return globalThis.sessionStorage.getItem(key);
     } catch {
       return null;
     }
   },
   setItem(key: string, value: string) {
     try {
-      if (typeof window === 'undefined' || !window.sessionStorage) return;
-      window.sessionStorage.setItem(key, value);
+      if (typeof globalThis === 'undefined' || !globalThis.sessionStorage) return;
+      globalThis.sessionStorage.setItem(key, value);
     } catch {
       // ignore
     }
   },
   removeItem(key: string) {
     try {
-      if (typeof window === 'undefined' || !window.sessionStorage) return;
-      window.sessionStorage.removeItem(key);
+      if (typeof globalThis === 'undefined' || !globalThis.sessionStorage) return;
+      globalThis.sessionStorage.removeItem(key);
     } catch {
       // ignore
     }
@@ -34,24 +34,24 @@ const safeSessionStorage = {
 const safeLocalStorage = {
   getItem(key: string): NullableString {
     try {
-      if (typeof window === 'undefined' || !window.localStorage) return null;
-      return window.localStorage.getItem(key);
+      if (typeof globalThis === 'undefined' || !globalThis.localStorage) return null;
+      return globalThis.localStorage.getItem(key);
     } catch {
       return null;
     }
   },
   setItem(key: string, value: string) {
     try {
-      if (typeof window === 'undefined' || !window.localStorage) return;
-      window.localStorage.setItem(key, value);
+      if (typeof globalThis === 'undefined' || !globalThis.localStorage) return;
+      globalThis.localStorage.setItem(key, value);
     } catch {
       // ignore
     }
   },
   removeItem(key: string) {
     try {
-      if (typeof window === 'undefined' || !window.localStorage) return;
-      window.localStorage.removeItem(key);
+      if (typeof globalThis === 'undefined' || !globalThis.localStorage) return;
+      globalThis.localStorage.removeItem(key);
     } catch {
       // ignore
     }

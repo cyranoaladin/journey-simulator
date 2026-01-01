@@ -22,7 +22,7 @@ const llmCache = new LRUCache({
   ttl: 1000 * 60 * 60 * 24,
 });
 
-const DEFAULT_LLM_MODEL = process.env.LLM_MODEL_NAME || "gpt-4o";
+const DEFAULT_LLM_MODEL = 'gpt-4.1-mini-2025-04-14';
 const GPT_MINI_MODEL = "gpt-4o-mini"; // Cost-effective model for simpler tasks
 const DEFAULT_LLM_TEMPERATURE = Number(process.env.LLM_TEMPERATURE ?? 0.4) || 0.4;
 const DEFAULT_LLM_MAX_OUTPUT_TOKENS = Number(process.env.LLM_MAX_OUTPUT_TOKENS ?? 1500) || 1500;
@@ -129,7 +129,40 @@ async function callGpt5({
       console.log(`[callGpt5] Reasoning effort: ${reasoning_effort} (not supported by OpenAI API)`);
     }
 
-    const completion = await openai.chat.completions.create(payload);
+    const promptSizeChars = JSON.stringify(payload?.messages || []).length;
+    if (process.env.NODE_ENV !== 'test') {
+      console.log(`[LLM_DEBUG]: Prompt Sent Size: ${promptSizeChars} chars`);
+    }
+
+    const maxRetries = 2;
+    let lastError = null;
+    let completion = null;
+    for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
+      try {
+        completion = await openai.chat.completions.create(payload);
+        break;
+      } catch (err) {
+        lastError = err;
+        const status = err?.status || err?.response?.status;
+        const retriable = status === 429 || status >= 500;
+        if (!retriable || attempt === maxRetries) {
+          throw err;
+        }
+        const backoffMs = 500 * (attempt + 1);
+        if (process.env.NODE_ENV !== 'test') {
+          console.warn(`[LLM_DEBUG]: Retry ${attempt + 1} after ${backoffMs}ms (status ${status})`);
+        }
+        await new Promise((resolve) => setTimeout(resolve, backoffMs));
+      }
+    }
+
+    if (!completion) {
+      throw lastError || new Error('OpenAI completion failed');
+    }
+
+    if (process.env.NODE_ENV !== 'test') {
+      console.log('[LLM_DEBUG]: Raw Response Received');
+    }
     const choice = completion.choices[0];
 
     const result = {

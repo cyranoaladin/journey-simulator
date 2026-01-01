@@ -11,7 +11,7 @@ export const NeuralOverlay: React.FC<Props> = ({ isVisible, agentName, taskName 
 
   return (
     <div
-      className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm rounded-3xl overflow-hidden"
+      className="absolute inset-0 z-50 flex flex-col items-center justify-center overflow-hidden rounded-3xl bg-black/80 backdrop-blur-sm"
       data-testid="neural-overlay"
     >
       {/* Iframe vers le Canvas HTML */}
@@ -33,7 +33,7 @@ export const NeuralOverlay: React.FC<Props> = ({ isVisible, agentName, taskName 
           {agentName} is working...
         </h3>
         <p className="text-gray-400 font-mono text-sm animate-pulse" data-testid="neural-overlay-task">
-          {'> '}{taskName}
+          {`> ${taskName}`}
         </p>
       </div>
     </div>

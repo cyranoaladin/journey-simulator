@@ -1,80 +1,105 @@
-const BaseAgent = require('./BaseAgent');
+const { LLMClient } = require('../orchestration/llmClient');
 
-class ProtocolAgent extends BaseAgent {
+class ProtocolAgent {
     constructor() {
-        super("ProtocolAgent");
+        this.id = 'ProtocolAgent';
+        this.llm = new LLMClient({});
     }
 
-    buildSystemPrompt(ctx) {
-        return `You are the **ProtocolAgent**, a senior systems architect for Solana.
-Your goal is to help the user build scalable, high-throughput infrastructure.
-You care about "TPS", "Latency", "State Compression", and "Compute Units".
+    buildPrompt({ input, ragChunks, journey, orchestrationMode }) {
+        const citations = (ragChunks || [])
+            .map((c, i) => `- [${i + 1}] ${c.title}: ${c.text.slice(0, 180)}...`)
+            .join('\n');
 
-Your responsibilities:
-1. Review Architecture: Analyze diagrams and tech stacks for scalability bottlenecks.
-2. Optimize Performance: Suggest specific Solana optimizations (e.g., "Use lookup tables", "Pack account data").
-3. Design DePIN Networks: Advise on hardware-software integration and token incentives for physical infra.
-4. Validate Feasibility: Check if a proposed idea is technically possible on Solana mainnet.
+        const phase = journey?.phaseId || 'unknown';
+        const isCollaborative = orchestrationMode === 'AECO';
 
-Tone: Technical, precise, engineering-focused. Use terms like "Merkle Tree", "Zero Copy", "Sealevel Runtime".`;
-    }
+        const tone = isCollaborative
+            ? 'Constructive, referencing TokenomicsAgent for incentive compatibility.'
+            : 'Technical, precise, engineering-focused.';
 
-    buildUserPrompt(ctx) {
-        return `Here is the protocol architecture or technical question from the user:
-"${ctx.submission}"
-
-**Your task:**
-1. Analyze this technical proposal from an engineering perspective
-2. Evaluate the quality, feasibility, and technical depth of the response
-3. Provide a **global_score** from 0 to 10 where:
-   - 0-3: Poor understanding, major technical flaws
-   - 4-6: Basic understanding, some good points but lacks depth
-   - 7-8: Good technical analysis with solid reasoning
-   - 9-10: Excellent, production-ready architecture with deep insights
-
-4. Provide detailed **feedback** explaining your score
-5. Break down your evaluation into **axes** (e.g., "Technical Feasibility", "Scalability", "Solana Best Practices") with individual scores
-
-Be fair but rigorous in your evaluation. Reward well-thought-out answers even if brief.`;
-    }
-
-    async run(ctx) {
-        // Use standard evaluation schema
-        const EVALUATION_SCHEMA = {
-            type: "json_schema",
-            json_schema: {
-                name: "EvaluationResponse",
-                strict: true,
-                schema: {
-                    type: "object",
-                    required: ["global_score", "feedback", "axes"],
-                    properties: {
-                        global_score: { type: "number" },
-                        feedback: { type: "string" },
-                        axes: {
-                            type: "array",
-                            items: {
-                                type: "object",
-                                required: ["name", "score", "max_score", "comment"],
-                                properties: {
-                                    name: { type: "string" },
-                                    score: { type: "number" },
-                                    max_score: { type: "number" },
-                                    comment: { type: "string" },
-                                },
-                                additionalProperties: false,
-                            },
-                        },
-                    },
-                    additionalProperties: false,
-                },
-            },
+        return {
+            system: [
+                '**IDENTITY**: Senior Systems Architect & Protocol Standardizer.',
+                '**EXPERTISE**: Token Extensions (Token-2022), Interoperability Standards (Meteora, Raydium, Wormhole), State Compression, DePIN architectures.',
+                '**WORKFLOW**:',
+                '1. Ensure compliance with SPL Standards (e.g. Transfer Hook, Metadata Pointer).',
+                '2. Analyze scalability bottlenecks (Merkle Trees vs Account packing).',
+                '3. Design the protocol interaction flow.',
+                '',
+                `**TONE**: ${tone}`,
+                '**OUTPUT FORMAT**: STRICT JSON: {',
+                '  "status": "OK",',
+                '  "summary": "...",',
+                '  "protocol_specs": { "standards": ["..."], "optimizations": ["..."] },',
+                '  "resources": {',
+                '     "diagram": "Mermaid diagram string (sequenceDiagram...)",',
+                '     "data": { "tps_estimate": 0, "compute_units": 0 },',
+                '     "documentation": "Markdown protocol spec"',
+                '  },',
+                '  "actions": ["..."]',
+                '}',
+                '**RESOURCES**: Must output valid Mermaid.js diagrams for protocol flow.'
+            ].join('\n'),
+            user: [
+                `User Input: ${input}`,
+                `Current Phase: ${phase}`,
+                `Mode: ${orchestrationMode}`,
+                'RAG Context:',
+                citations || '- (no specific protocol docs found)',
+                '',
+                'Standardize and optimize the protocol architecture.'
+            ].join('\n'),
         };
+    }
 
-        return super.run(ctx, {
-            response_format: EVALUATION_SCHEMA,
-            temperature: 0.3,
+    async run(request) {
+        const { traceId, input, context = {}, rag = {}, constraints = {} } = request;
+        const ragChunks = rag.chunks || (context.rag && context.rag.chunks) || [];
+
+        const prompt = this.buildPrompt({
+            input,
+            ragChunks,
+            journey: context.journey,
+            orchestrationMode: context.orchestrationMode || 'AEPO'
         });
+
+        const llmRes = await this.llm.generate({
+            prompt,
+            traceId,
+            agentId: this.id,
+            maxTokens: constraints.maxTokens || 1500,
+            temperature: 0.2
+        });
+
+        let parsed = { protocol_specs: {}, resources: {}, actions: [], summary: "Protocol analysis failed to parse" };
+        try {
+            const jsonMatch = llmRes.text.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                parsed = JSON.parse(jsonMatch[0]);
+            } else {
+                parsed = JSON.parse(llmRes.text);
+            }
+        } catch (e) {
+            parsed.details = llmRes.text;
+            parsed.resources = { documentation: '### Error\nCould not parse Protocol JSON.' };
+        }
+
+        return {
+            traceId,
+            agentId: this.id,
+            status: 'OK',
+            summary: parsed.summary || 'Protocol standardization complete',
+            details: parsed.protocol_specs || {},
+            resources: parsed.resources || {},
+            confidence: 0.9,
+            assumptions: [`RAG hits: ${ragChunks.length}`],
+            citations: ragChunks.map((c) => ({ id: c.id, title: c.title, source: c.source })),
+            actions: parsed.actions || ['Implement Token-2022 extensions'],
+            metrics: { latencyMs: llmRes.latencyMs, tokens: llmRes.tokensUsed, ragHits: ragChunks.length },
+            errors: [],
+            mock: llmRes.mock || false,
+        };
     }
 }
 

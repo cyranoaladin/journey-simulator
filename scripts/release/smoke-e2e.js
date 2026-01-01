@@ -1,15 +1,18 @@
 #!/usr/bin/env node
 /* Smoke E2E API/UI (headless) */
+// CSRF parity applied to mirror app behavior.
 const express = require('express');
 const request = require('supertest');
 const fs = require('fs');
 const path = require('path');
+const { csrfGuard } = require('../../mf-back/middleware/csrfGuard');
 
 const orchestrationRouter = require('../../mf-back/routes/zyno-routes');
 
 const buildApp = () => {
   const app = express();
   app.use(express.json());
+  app.use(csrfGuard);
   app.use('/orchestration', orchestrationRouter);
   return app;
 };

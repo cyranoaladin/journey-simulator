@@ -52,7 +52,7 @@ Ce document liste toutes les variables d'environnement nécessaires pour le fonc
 ### Obligatoires pour LLM Réel
 
 - **`OPENAI_API_KEY`** : Clé API OpenAI
-  - Format : `sk-...`
+  - Format : clé privée OpenAI (ne pas commit)
   - Utilisé dans : `mf-back/utils/openaiClient.js`, `mf-back/orchestration/zynoVerticalSlice.js`
   - **⚠️ CRITIQUE** : Sans cette clé, le système utilise le mode mock
   - Fallback : mode mock activé automatiquement
@@ -156,7 +156,7 @@ Ce document liste toutes les variables d'environnement nécessaires pour le fonc
 
 ### Pour LLM Réel
 
-- [ ] `OPENAI_API_KEY` est défini et valide (commence par `sk-`)
+- [ ] `OPENAI_API_KEY` est défini et valide (clé OpenAI privée)
 - [ ] `LLM_MODEL_NAME` est défini si différent de `gpt-4o`
 - [ ] Test de connexion : vérifier que `ops.llm.mode === 'openai'` dans les réponses
 

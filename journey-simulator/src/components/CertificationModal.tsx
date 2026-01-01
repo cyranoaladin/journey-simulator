@@ -29,29 +29,17 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Extract phase number from persona phases and certification metadata
-  const getPhaseNumber = () => {
+  const phaseNumber = (() => {
     if (!selectedPersona) return 1;
-
     if (certification.phaseId) {
       const index = selectedPersona.phases.findIndex((phase) => phase.id === certification.phaseId);
-      if (index !== -1) {
-        return index + 1;
-      }
+      if (index !== -1) return index + 1;
     }
-
-    // Fallback to legacy ID parsing when phaseId is unavailable
-    const matches = certification.id?.match(/phase-(\d+)/);
-    if (matches?.[1]) {
-      return parseInt(matches[1], 10);
-    }
-
+    const matches = /phase-(\d+)/.exec(certification.id ?? '');
+    if (matches?.[1]) return Number.parseInt(matches[1], 10);
     return 1;
-  };
+  })();
 
-  const phaseNumber = getPhaseNumber();
-
-  // Handle certification download with backend tracking
   const handleDownload = async () => {
     try {
       setIsLoading(true);
@@ -81,7 +69,6 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
     }
   };
 
-  // Handle certification sharing with backend tracking
   const handleShare = async (platform: string) => {
     try {
       setIsLoading(true);
@@ -99,11 +86,13 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
       // Simulate sharing
       const shareUrl = `https://mfai.app/certification/${certification.id}`;
       const shareText = `I just earned my ${certification.name} certification! 🎉 #MFAI #ProofOfSkill`;
-
-      if (platform === 'twitter') {
-        globalThis.window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
-      } else if (platform === 'linkedin') {
-        globalThis.window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank');
+      const targets: Record<string, string> = {
+        twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
+        linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+      };
+      const targetUrl = targets[platform];
+      if (targetUrl && globalThis.window) {
+        globalThis.window.open(targetUrl, '_blank');
       }
 
     } catch (err) {
@@ -114,7 +103,6 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
     }
   };
 
-  // Handle NFT minting completion
   const handleMintedNFT = async (mintAddress: string) => {
     try {
       setMintedAddress(mintAddress);
@@ -128,28 +116,81 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
     }
   };
 
-  // Get proof type based on persona and certification
-  const getProofTypeForCert = () => {
-    if (!selectedPersona) return 'Skill';
-    return getProofType(selectedPersona.id, certification.phaseId || certification.id);
-  };
-
-  const proofType = getProofTypeForCert();
-
-  // Use shared persona style utility
+  const proofType = selectedPersona ? getProofType(selectedPersona.id, certification.phaseId || certification.id) : 'Skill';
   const personaStyle = getPersonaStyle(selectedPersona?.id);
 
-  // Extract XP value from attributes
   const getXpValue = () => {
     const xpAttribute = certification.attributes.find(attr => attr.trait_type === 'XP Earned');
     return xpAttribute ? Number(xpAttribute.value) : 0;
   };
 
-  // Extract phase from attributes
   const getPhaseValue = () => {
     const phaseAttribute = certification.attributes.find(attr => attr.trait_type === 'Phase');
     return phaseAttribute ? String(phaseAttribute.value) : '';
   };
+
+  const renderActionButton = ({
+    label,
+    icon,
+    onClick,
+    disabled,
+    loadingLabel,
+    primary,
+  }: {
+    label: string;
+    icon: React.ReactNode;
+    onClick: () => void;
+    disabled?: boolean;
+    loadingLabel?: string;
+    primary?: boolean;
+  }) => (
+    <motion.button
+      whileHover={{ scale: disabled ? 1 : 1.02 }}
+      whileTap={{ scale: disabled ? 1 : 0.98 }}
+      onClick={onClick}
+      disabled={disabled}
+      className={`flex flex-col items-center space-y-1 p-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+        primary ? 'bg-accent-cyan/20 hover:bg-accent-cyan/30 text-accent-cyan' : 'bg-white/10 hover:bg-white/20'
+      }`}
+    >
+      {icon}
+      <span className="text-xs">{disabled && loadingLabel ? loadingLabel : label}</span>
+    </motion.button>
+  );
+
+  const renderActions = () => (
+    <div className="grid grid-cols-3 gap-3 mb-4">
+      {renderActionButton({
+        label: isLoading ? 'Downloading...' : 'Download',
+        loadingLabel: 'Downloading...',
+        icon: <Download size={20} />,
+        onClick: () => {
+          void handleDownload();
+        },
+        disabled: isLoading,
+      })}
+      {renderActionButton({
+        label: isLoading ? 'Sharing...' : 'Share',
+        loadingLabel: 'Sharing...',
+        icon: <Share2 size={20} />,
+        onClick: () => {
+          void handleShare('twitter');
+        },
+        disabled: isLoading,
+      })}
+      {renderActionButton({
+        label: mintedAddress ? 'Explorer' : 'Mint first',
+        icon: <ExternalLink size={20} />,
+        onClick: () => {
+          if (mintedAddress) {
+            globalThis.window.open(`https://explorer.solana.com/address/${mintedAddress}?cluster=devnet`, '_blank');
+          }
+        },
+        disabled: !mintedAddress,
+        primary: Boolean(mintedAddress),
+      })}
+    </div>
+  );
 
   return (
     <>
@@ -265,45 +306,7 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
                 </div>
               )}
 
-              {/* Actions */}
-              <div className="grid grid-cols-3 gap-3 mb-4">
-                <motion.button
-                  whileHover={{ scale: isLoading ? 1 : 1.02 }}
-                  whileTap={{ scale: isLoading ? 1 : 0.98 }}
-                  onClick={handleDownload}
-                  disabled={isLoading}
-                  className="flex flex-col items-center space-y-1 p-3 rounded-lg bg-white/10 hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Download size={20} />
-                  <span className="text-xs">{isLoading ? 'Downloading...' : 'Download'}</span>
-                </motion.button>
-
-                <motion.button
-                  whileHover={{ scale: isLoading ? 1 : 1.02 }}
-                  whileTap={{ scale: isLoading ? 1 : 0.98 }}
-                  onClick={() => handleShare('twitter')}
-                  disabled={isLoading}
-                  className="flex flex-col items-center space-y-1 p-3 rounded-lg bg-white/10 hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Share2 size={20} />
-                  <span className="text-xs">{isLoading ? 'Sharing...' : 'Share'}</span>
-                </motion.button>
-
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => {
-                    if (mintedAddress) {
-                      globalThis.window.open(`https://explorer.solana.com/address/${mintedAddress}?cluster=devnet`, '_blank');
-                    }
-                  }}
-                  disabled={!mintedAddress}
-                  className="flex flex-col items-center space-y-1 p-3 rounded-lg bg-white/10 hover:bg-white/20 transition-colors disabled:opacity-50"
-                >
-                  <ExternalLink size={20} />
-                  <span className="text-xs">Explorer</span>
-                </motion.button>
-              </div>
+              {renderActions()}
 
               {/* Mint Button */}
               {!mintedAddress && (

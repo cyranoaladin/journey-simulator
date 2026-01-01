@@ -10,7 +10,7 @@ import { normalizeCompletedPhases } from '../utils/progress';
 import { logger } from '../utils/logger';
 import { tokenStore } from '../utils/tokenStore';
 
-import type { JourneyStepResponse, Mode, Tone } from '../types/uiBlocks';
+import type { JourneyStepResponse, Mode, Tone, RunMode } from '../types/uiBlocks';
 
 
 export type CollaterizeSimulation = {
@@ -35,6 +35,7 @@ interface JourneyState {
   modalContent: any;
   apiJourneyId: string | null;
   lastStep: JourneyStepResponse | null;
+  runMode: RunMode;
   uiMode: Mode;
   uiTone: Tone;
   isStepLoading: boolean;
@@ -42,6 +43,7 @@ interface JourneyState {
   setSelectedPersona: (persona: Persona | null) => void;
   setCurrentPhase: (phase: number) => void;
   setUiMode: (mode: Mode) => void;
+  setRunMode: (mode: RunMode) => void;
   setUiTone: (tone: Tone) => void;
   ensureApiJourneyId: () => string;
   runInteractiveStep: (args: { phaseId: string; trackId: string; userInput?: string; }) => Promise<JourneyStepResponse>;
@@ -126,6 +128,26 @@ type DemoDatabase = {
 const DEMO_DB_KEY = 'demo_mock_db';
 const DEMO_DB_VERSION = 2;
 const DEMO_ACTIVE_PERSONA_KEY = 'demo_active_persona';
+
+const PROGRESS_THROTTLE_MS = 4000;
+let progressFetchInFlight: Promise<void> | null = null;
+let lastProgressFetchTs = 0;
+
+const getStoredUserId = (): string | null => {
+  try {
+    if (typeof sessionStorage !== 'undefined') {
+      const stored = sessionStorage.getItem('userId');
+      if (stored) return stored;
+    }
+    if (typeof localStorage !== 'undefined') {
+      const stored = localStorage.getItem('userId');
+      if (stored) return stored;
+    }
+  } catch {
+    // ignore storage access issues
+  }
+  return null;
+};
 
 const createEmptyDemoPersona = (): DemoPersonaSnapshot => ({
   xp: 0,
@@ -233,6 +255,141 @@ const derivePassLevel = (
   return 'Free';
 };
 
+type PhaseResolution = {
+  phaseNumber: number;
+  xpReward: number;
+  mfaiReward: number;
+  nftReward?: string;
+  resolvedNftName?: string;
+  proofData: any;
+  phases: Persona['phases'];
+};
+
+const resolvePhaseRewards = (
+  state: JourneyState,
+  phaseIndex: number,
+  options: {
+    score?: number;
+    nftAddress?: string;
+    phaseNumber?: number;
+    xpReward?: number;
+    mfaiReward?: number;
+    nftReward?: string;
+  }
+): PhaseResolution => {
+  const phaseNumber = options.phaseNumber ?? phaseIndex + 1;
+  const currentPersona = state.selectedPersona;
+  const personaData = currentPersona ? personas.find((p) => p.id === currentPersona.id) : null;
+  const phases = personaData ? personaData.phases : [];
+  const currentPhaseData = phases[phaseNumber - 1];
+
+  const xpReward = options.xpReward ?? currentPhaseData?.xpReward ?? 0;
+  const mfaiReward = options.mfaiReward ?? currentPhaseData?.mfaiReward ?? 0;
+  const nftReward = options.nftReward ?? currentPhaseData?.nftReward;
+
+  let resolvedNftName = nftReward;
+  let proofData: any = null;
+
+  const resolvedPersonaId = currentPersona?.id ?? state.userProgress.currentPersona;
+  const resolvedPhaseId = currentPhaseData?.id;
+  const resolvedPhaseTitle = currentPhaseData?.title ?? `Phase ${phaseNumber}`;
+
+  if (resolvedPersonaId && resolvedPhaseId) {
+    try {
+      const proofType = getProofType(resolvedPersonaId, resolvedPhaseId);
+      proofData = getPersonaProofData(resolvedPersonaId, resolvedPhaseId, proofType, xpReward, resolvedPhaseTitle, phaseNumber);
+      if (proofData?.name) {
+        resolvedNftName = proofData.name;
+      }
+    } catch (metadataError) {
+      console.warn('Failed to derive proof metadata for NFT reward:', metadataError);
+    }
+  }
+
+  return { phaseNumber, xpReward, mfaiReward, nftReward, resolvedNftName, proofData, phases };
+};
+
+const buildProgressUpdate = (
+  state: JourneyState,
+  phaseIndex: number,
+  rewards: PhaseResolution
+) => {
+  const updatedPhases = Array.from(new Set([...state.userProgress.completedPhases, phaseIndex])).sort((a, b) => a - b);
+  const nextPhaseIndex = Math.min(updatedPhases.length, Math.max(rewards.phases.length - 1, 0));
+
+  const newTotalXP = state.userProgress.totalXP + rewards.xpReward;
+  let updatedNFTs = state.userProgress.nfts;
+
+  if (rewards.resolvedNftName && !updatedNFTs.includes(rewards.resolvedNftName)) {
+    updatedNFTs = [...updatedNFTs, rewards.resolvedNftName];
+  }
+
+  const updatedPassLevel = derivePassLevel(undefined, newTotalXP, updatedNFTs.length);
+
+  const updatedProgress: UserProgress = {
+    ...state.userProgress,
+    completedPhases: updatedPhases,
+    totalXP: newTotalXP,
+    mfaiTokens: state.userProgress.mfaiTokens + rewards.mfaiReward,
+    votingPower: state.userProgress.votingPower + Math.floor(rewards.xpReward / 10),
+    nfts: updatedNFTs,
+    passLevel: updatedPassLevel,
+  };
+
+  return { updatedProgress, nextPhaseIndex };
+};
+
+const mapBackendProgress = (progress: any, currentState: JourneyState) => {
+  const totalXP: number = progress.total_xp ?? 0;
+  const normalizedBackend = normalizeCompletedPhases(progress);
+  let backendCompletedPhases = normalizedBackend.completedPhases;
+
+  if (backendCompletedPhases.length === 0 && normalizedBackend.completedCount > 0) {
+    backendCompletedPhases = Array.from({ length: normalizedBackend.completedCount }, (_, index) => index);
+  }
+
+  const backendPersonaId: string | undefined = progress.persona || currentState.userProgress.currentPersona || undefined;
+  const matchedPersona = backendPersonaId ? personas.find((persona) => persona.id === backendPersonaId) : null;
+  const progressPersona = currentState.selectedPersona ?? matchedPersona ?? null;
+  const mergedPhaseIndexes = Array.from(new Set([...backendCompletedPhases, ...currentState.userProgress.completedPhases])).sort((a, b) => a - b);
+  const personaPhaseCount = progressPersona?.phases?.length ?? Math.max(mergedPhaseIndexes.length, normalizedBackend.completedCount);
+  const completedPhases = mergedPhaseIndexes.filter((index) => index < personaPhaseCount);
+  const rawCertificates: any[] = Array.isArray(progress.nft_certificates) ? progress.nft_certificates : [];
+
+  const mappedNfts = rawCertificates.map((certificate) => {
+    if (certificate?.title) return certificate.title as string;
+    if (certificate?.phase) return `Phase ${certificate.phase} NFT`;
+    if (certificate?.mint_address) return certificate.mint_address as string;
+    if (certificate?.nft_address) return certificate.nft_address as string;
+    return 'NFT Certificate';
+  });
+
+  const dedupedNfts = Array.from(new Set([...currentState.userProgress.nfts, ...mappedNfts]));
+  const passLevel = derivePassLevel(progress.subscription, totalXP, dedupedNfts.length);
+
+  const mappedProgress: UserProgress = {
+    ...initialUserProgress,
+    ...currentState.userProgress,
+    totalXP,
+    nfts: dedupedNfts,
+    passLevel,
+    mfaiTokens: progress.token_transactions?.mfai_tokens ?? currentState.userProgress.mfaiTokens,
+    stakedMfai: currentState.userProgress.stakedMfai,
+    walletConnected: currentState.userProgress.walletConnected,
+    walletAddress: currentState.userProgress.walletAddress,
+    completedPhases,
+    currentPersona: backendPersonaId ?? currentState.userProgress.currentPersona,
+    votingPower: Math.floor(totalXP / 10),
+    daoProposals: currentState.userProgress.daoProposals,
+    testnetAirdropClaimed: currentState.userProgress.testnetAirdropClaimed,
+    socialShareCount: currentState.userProgress.socialShareCount,
+    nftMints: currentState.userProgress.nftMints,
+    demoModeEnabled: Boolean(progress.demo_mode?.enabled),
+  };
+
+  return { mappedProgress, completedCount: completedPhases.length };
+};
+
 export const useJourneyStore = createWithEqualityFn<JourneyState>()(
   persist(
     (set, get) => ({
@@ -244,6 +401,7 @@ export const useJourneyStore = createWithEqualityFn<JourneyState>()(
       modalContent: null,
       apiJourneyId: null,
       lastStep: null,
+      runMode: 'simulation',
       uiMode: 'discovery',
       uiTone: 'pedagogical',
       isStepLoading: false,
@@ -271,6 +429,21 @@ export const useJourneyStore = createWithEqualityFn<JourneyState>()(
 
       setCurrentPhase: (phase) => set({ currentPhase: phase }),
 
+      setRunMode: (mode) => {
+        set({ runMode: mode });
+        const userId = getStoredUserId();
+        // Notify backend of mode intent; fire-and-forget to avoid blocking UI.
+        window.fetch(`${API_BASE_URL}/orchestration/mode`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(userId ? { 'x-user-id': userId } : {}),
+          },
+          body: JSON.stringify({ mode }),
+        }).catch((err) => {
+          logger.warn('Failed to notify backend of run mode change', err);
+        });
+      },
       setUiMode: (mode) => set({ uiMode: mode }),
       setUiTone: (tone) => set({ uiTone: tone }),
       setIsStepLoading: (loading) => set({ isStepLoading: loading }),
@@ -297,9 +470,15 @@ export const useJourneyStore = createWithEqualityFn<JourneyState>()(
         };
         try {
           set({ isStepLoading: true });
+          const token = tokenStore.getAccessToken();
+          const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+          }
+
           const resp = await window.fetch(`${API_BASE_URL}/journey/${id}/step`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers,
             body: JSON.stringify(body),
           });
           if (!resp.ok) throw new Error(`step failed: ${resp.status}`);
@@ -369,71 +548,12 @@ export const useJourneyStore = createWithEqualityFn<JourneyState>()(
           return;
         }
 
-        const phaseNumber = options.phaseNumber ?? phaseIndex + 1;
-        const currentPersona = state.selectedPersona;
-        const personaData = currentPersona ? personas.find(p => p.id === currentPersona.id) : null;
-        const phases = personaData ? personaData.phases : [];
-
-        if (phaseIndex >= phases.length) {
+        const rewards = resolvePhaseRewards(state, phaseIndex, options);
+        if (phaseIndex >= rewards.phases.length) {
           return;
         }
 
-        const currentPhaseData = phases[phaseNumber - 1];
-        const xpReward = options.xpReward ?? currentPhaseData?.xpReward ?? 0;
-        const mfaiReward = options.mfaiReward ?? currentPhaseData?.mfaiReward ?? 0;
-        const nftReward = options.nftReward ?? currentPhaseData?.nftReward;
-
-        const resolvedPersonaId = currentPersona?.id ?? state.userProgress.currentPersona;
-        const resolvedPhaseId = currentPhaseData?.id;
-        const resolvedPhaseTitle = currentPhaseData?.title ?? `Phase ${phaseNumber}`;
-        let resolvedNftName = nftReward;
-
-        let proofData: any = null;
-
-        if (resolvedPersonaId && resolvedPhaseId) {
-          try {
-            const proofType = getProofType(resolvedPersonaId, resolvedPhaseId);
-            proofData = getPersonaProofData(
-              resolvedPersonaId,
-              resolvedPhaseId,
-              proofType,
-              xpReward,
-              resolvedPhaseTitle,
-              phaseNumber
-            );
-
-            if (proofData?.name) {
-              resolvedNftName = proofData.name;
-            }
-          } catch (metadataError) {
-            console.warn('Failed to derive proof metadata for NFT reward:', metadataError);
-          }
-        }
-
-        const updatedPhases = Array.from(
-          new Set([...state.userProgress.completedPhases, phaseIndex])
-        ).sort((a, b) => a - b);
-
-        const nextPhaseIndex = Math.min(updatedPhases.length, Math.max(phases.length - 1, 0));
-
-        const newTotalXP = state.userProgress.totalXP + xpReward;
-        let updatedNFTs = state.userProgress.nfts;
-
-        if (resolvedNftName && !updatedNFTs.includes(resolvedNftName)) {
-          updatedNFTs = [...updatedNFTs, resolvedNftName];
-        }
-
-        const updatedPassLevel = derivePassLevel(undefined, newTotalXP, updatedNFTs.length);
-
-        const updatedProgress: UserProgress = {
-          ...state.userProgress,
-          completedPhases: updatedPhases,
-          totalXP: newTotalXP,
-          mfaiTokens: state.userProgress.mfaiTokens + mfaiReward,
-          votingPower: state.userProgress.votingPower + Math.floor(xpReward / 10),
-          nfts: updatedNFTs,
-          passLevel: updatedPassLevel,
-        };
+        const { updatedProgress, nextPhaseIndex } = buildProgressUpdate(state, phaseIndex, rewards);
 
         set({
           userProgress: updatedProgress,
@@ -447,16 +567,16 @@ export const useJourneyStore = createWithEqualityFn<JourneyState>()(
 
         try {
           const response = await api.completePhase({
-            phase_number: phaseNumber,
+            phase_number: rewards.phaseNumber,
             score: options.score ?? 100,
             nft_address: options.nftAddress || '0x' + Math.random().toString(16).slice(2, 42),
-            xp_reward: xpReward,
-            mfai_reward: mfaiReward,
-            nft_reward: resolvedNftName,
-            title: proofData?.name,
-            description: proofData?.description,
-            image_url: proofData?.imageUrl,
-            rarity: proofData?.rarity,
+            xp_reward: rewards.xpReward,
+            mfai_reward: rewards.mfaiReward,
+            nft_reward: rewards.resolvedNftName,
+            title: rewards.proofData?.name,
+            description: rewards.proofData?.description,
+            image_url: rewards.proofData?.imageUrl,
+            rarity: rewards.proofData?.rarity,
           });
 
           if (response && response.ui_blocks) {
@@ -711,109 +831,41 @@ export const useJourneyStore = createWithEqualityFn<JourneyState>()(
       }),
 
       loadUserProgress: async () => {
+        const now = Date.now();
+        if (progressFetchInFlight) {
+          return progressFetchInFlight;
+        }
+        if (now - lastProgressFetchTs < PROGRESS_THROTTLE_MS) {
+          return Promise.resolve();
+        }
+
         const currentState = get();
 
-        try {
-          const response = await api.getUserProgress();
+        progressFetchInFlight = (async () => {
+          try {
+            const response = await api.getUserProgress();
 
-          if (!response?.success) {
-            return;
+            if (!response?.success) {
+              return;
+            }
+
+            const progress = response.progress || {};
+            const { mappedProgress, completedCount } = mapBackendProgress(progress, currentState);
+
+            set({
+              selectedPersona: currentState.selectedPersona,
+              currentPhase: completedCount,
+              userProgress: mappedProgress,
+            });
+          } catch (error) {
+            console.error('Failed to load user progress from backend:', error);
+          } finally {
+            progressFetchInFlight = null;
+            lastProgressFetchTs = Date.now();
           }
+        })();
 
-          const progress = response.progress || {};
-          const totalXP: number = progress.total_xp ?? 0;
-          const normalizedBackend = normalizeCompletedPhases(progress);
-          let backendCompletedPhases = normalizedBackend.completedPhases;
-
-          if (backendCompletedPhases.length === 0 && normalizedBackend.completedCount > 0) {
-            backendCompletedPhases = Array.from({ length: normalizedBackend.completedCount }, (_, index) => index);
-          }
-
-          const backendPersonaId: string | undefined = progress.persona || currentState.userProgress.currentPersona || undefined;
-          const matchedPersona = backendPersonaId
-            ? personas.find((persona) => persona.id === backendPersonaId)
-            : null;
-
-          // Persona used to normalize phase counts/progress math.
-          // We intentionally do NOT auto-select a persona here, otherwise the UI can
-          // oscillate between /journeys list and an auto-selected workspace.
-          const progressPersona = currentState.selectedPersona ?? matchedPersona ?? null;
-          const mergedPhaseIndexes = Array.from(new Set([
-            ...backendCompletedPhases,
-            ...currentState.userProgress.completedPhases
-          ])).sort((a, b) => a - b);
-
-          const personaPhaseCount = progressPersona?.phases?.length
-            ?? Math.max(mergedPhaseIndexes.length, normalizedBackend.completedCount);
-
-          const completedPhases = mergedPhaseIndexes.filter((index) => index < personaPhaseCount);
-
-          const safeCompletedCount = completedPhases.length;
-
-          const rawCertificates: any[] = Array.isArray(progress.nft_certificates)
-            ? progress.nft_certificates
-            : [];
-
-          const mappedNfts = rawCertificates.map((certificate) => {
-            if (certificate?.title) {
-              return certificate.title as string;
-            }
-
-            if (certificate?.phase) {
-              return `Phase ${certificate.phase} NFT`;
-            }
-
-            if (certificate?.mint_address) {
-              return certificate.mint_address as string;
-            }
-
-            if (certificate?.nft_address) {
-              return certificate.nft_address as string;
-            }
-
-            return 'NFT Certificate';
-          });
-
-          const dedupedNfts = Array.from(new Set([
-            ...currentState.userProgress.nfts,
-            ...mappedNfts,
-          ]));
-
-          const passLevel = derivePassLevel(
-            progress.subscription,
-            totalXP,
-            dedupedNfts.length
-          );
-
-          const mappedProgress: UserProgress = {
-            ...initialUserProgress,
-            ...currentState.userProgress,
-            totalXP,
-            nfts: dedupedNfts,
-            passLevel,
-            mfaiTokens: progress.token_transactions?.mfai_tokens ?? currentState.userProgress.mfaiTokens,
-            stakedMfai: currentState.userProgress.stakedMfai,
-            walletConnected: currentState.userProgress.walletConnected,
-            walletAddress: currentState.userProgress.walletAddress,
-            completedPhases,
-            currentPersona: backendPersonaId ?? currentState.userProgress.currentPersona,
-            votingPower: Math.floor(totalXP / 10),
-            daoProposals: currentState.userProgress.daoProposals,
-            testnetAirdropClaimed: currentState.userProgress.testnetAirdropClaimed,
-            socialShareCount: currentState.userProgress.socialShareCount,
-            nftMints: currentState.userProgress.nftMints,
-            demoModeEnabled: Boolean(progress.demo_mode?.enabled)
-          };
-
-          set({
-            // Keep current selection; do not auto-select from backend progress.
-            selectedPersona: currentState.selectedPersona,
-            currentPhase: safeCompletedCount,
-            userProgress: mappedProgress,
-          });
-        } catch (error) {
-          console.error('Failed to load user progress from backend:', error);
-        }
+        return progressFetchInFlight;
       },
 
       setUserProgress: (progress) => set({ userProgress: progress }),
@@ -862,6 +914,7 @@ export const useJourneyStore = createWithEqualityFn<JourneyState>()(
           walletAddress: undefined,
         },
         selectedPersona: state.selectedPersona,
+        runMode: state.runMode,
       }),
     }
   )

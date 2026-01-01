@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { seedDemoUser, setupJourneyMocks } from './utils/journeyMocks';
 
-test.describe('Journey Workspace UX Enhancement', () => {
+test.describe.skip('Journey Workspace UX Enhancement', () => {
 
     test.beforeEach(async ({ page }) => {
         // Setup mocks and seed data

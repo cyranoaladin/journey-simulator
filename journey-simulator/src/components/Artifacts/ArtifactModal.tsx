@@ -40,9 +40,12 @@ export const ArtifactModal: React.FC<ArtifactModalProps> = ({ isOpen, onClose, f
       // Normalize title: lowercase, replace non-alphanumeric with dashes, remove leading/trailing dashes
       // Group regex parts to make operator precedence explicit: (^-+)|(-+$)
       // Normalize title: lowercase, replace non-alphanumeric with dashes, remove leading/trailing dashes
-      // Note: Using replace() with regex is appropriate here (not replaceAll) as we need pattern matching
       const normalizedTitle = title
-        ? title.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-+)|(-+$)/g, '')
+        ? title
+            .trim()
+            .toLowerCase()
+            .replaceAll(/[^a-z0-9]+/g, '-')
+            .replaceAll(/(^-+)|(-+$)/g, '')
         : 'mfai-artifact';
       anchor.download = `${normalizedTitle || 'mfai-artifact'}.${extension}`;
       document.body.appendChild(anchor);

@@ -203,7 +203,7 @@ export const JourneyNextActionsPanel: React.FC<Props> = ({
                     <Bot size={14} /> Agent Intel
                 </h4>
 
-                {isLoadingRuns ? (
+                {isLoadingRuns && (
                     <EmptyState
                         dense
                         tone="info"
@@ -211,7 +211,8 @@ export const JourneyNextActionsPanel: React.FC<Props> = ({
                         description="Zyno agents are compiling the latest observations for this journey."
                         icon={<Loader2 size={18} className="animate-spin" />}
                     />
-                ) : recentRuns.length > 0 ? (
+                )}
+                {!isLoadingRuns && recentRuns.length > 0 && (
                     <div className="space-y-3">
                         {recentRuns.map((run) => (
                             <div key={run._id} className="rounded-xl bg-black/20 p-3 text-xs" data-testid="journey-recent-output-item">
@@ -229,7 +230,8 @@ export const JourneyNextActionsPanel: React.FC<Props> = ({
                             </div>
                         ))}
                     </div>
-                ) : (
+                )}
+                {!isLoadingRuns && recentRuns.length === 0 && (
                     <EmptyState
                         dense
                         title="No agent intel yet"

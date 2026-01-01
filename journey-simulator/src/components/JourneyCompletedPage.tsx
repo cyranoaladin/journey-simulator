@@ -38,7 +38,7 @@ const useWindowSize = () => {
   const [size, setSize] = useState({ width: 0, height: 0 })
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
+    if (!globalThis.window) {
       return
     }
 
@@ -182,7 +182,7 @@ const JourneyCompletedPage = () => {
   }, [routeSummary, personaForUi, userProgress.completedPhases.length, userProgress.totalXP, userProgress.mfaiTokens, userProgress.votingPower, userProgress.nfts])
 
   useEffect(() => {
-    if (typeof globalThis.window === 'undefined') {
+    if (!globalThis.window) {
       return undefined
     }
     const timeout = globalThis.window.setTimeout(() => setShowConfetti(false), 6000)
@@ -208,7 +208,7 @@ const JourneyCompletedPage = () => {
     setIsGeneratingPdf(true)
     try {
       // Note: Using replace() with regex is appropriate here (not replaceAll) as we need pattern matching
-      await exportToPDF('journey-summary', `${summary.personaTitle.replace(/\s+/g, '-')}-completion.pdf`)
+      await exportToPDF('journey-summary', `${summary.personaTitle.replaceAll(/\s+/g, '-')}-completion.pdf`)
     } catch (error) {
       console.error('PDF export failed:', error)
       setExportError(error instanceof Error ? error.message : 'PDF export impossible.')

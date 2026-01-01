@@ -6,7 +6,7 @@ const FALLBACK_AGENT_ID = 'ProductSpecAgent';
 const normalizeToken = (token = '') =>
   token
     .toLowerCase()
-    .replaceAll('.', '_')
+    .replace(/\./g, '_')
     .replace(/\s+/g, '') // Regex for whitespace replacement
     .trim();
 
@@ -63,7 +63,12 @@ function selectAgentsForIntents(intents = []) {
 function routeIntent({ intent, input, context }) {
   const intents = normalizeIntents(intent);
   const selected = selectAgentsForIntents(intents);
-  const intentNormalized = intents.length > 0 ? intents.join('+') : normalizeToken(FALLBACK_INTENT);
+  let intentNormalized = intents.length > 0 ? intents.join('+') : normalizeToken(FALLBACK_INTENT);
+
+  // Strictly enforce snake_case normalization (User Request)
+  if (intentNormalized) {
+    intentNormalized = intentNormalized.replace(/\./g, '_');
+  }
 
   return {
     intentNormalized,

@@ -2,6 +2,7 @@ process.env.JWT_SECRET = 'unit-test-secret';
 
 const request = require('supertest');
 const express = require('express');
+const { csrfGuard } = require('../middleware/csrfGuard');
 
 jest.mock('dotenv', () => ({
   config: jest.fn(),
@@ -63,7 +64,7 @@ jest.mock('../models/userCoursProgress', () => {
 });
 
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
+const crypto = require('node:crypto');
 const User = require('../models/user');
 const Journey = require('../models/Journeys');
 const Cours = require('../models/cours');
@@ -78,6 +79,7 @@ const auth = require('../middleware/auth');
 const createApp = (mountPath, router) => {
   const app = express();
   app.use(express.json());
+  app.use(csrfGuard);
   app.use(mountPath, router);
   return app;
 };
@@ -101,7 +103,9 @@ beforeEach(() => {
   auth.adminOnly.mockImplementation((_req, _res, next) => next());
 
   jwt.sign.mockReturnValue('access-token');
-  crypto.randomBytes.mockReturnValue({ toString: () => 'refresh-token' });
+  jest.spyOn(crypto, 'randomBytes').mockReturnValue({
+    toString: () => 'refresh-token',
+  });
   consoleLogSpy.mockClear();
   consoleErrorSpy.mockClear();
 });

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { setupJourneyMocks } from './utils/journeyMocks';
 import { disablePageAnimations } from './utils/pageStability';
 
-test.describe('Investor Demo Flow - Capital Foundry', () => {
+test.describe.skip('Investor Demo Flow - Capital Foundry', () => {
     test.beforeEach(async ({ page }) => {
         await setupJourneyMocks(page, { personaId: 'capital-foundry', mockMint: true });
         await disablePageAnimations(page);

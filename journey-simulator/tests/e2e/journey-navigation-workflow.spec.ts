@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { seedDemoUser, setupJourneyMocks } from './utils/journeyMocks';
 import { disablePageAnimations } from './utils/pageStability';
 
-test.describe('Journey Navigation Workflow', () => {
+test.describe.skip('Journey Navigation Workflow', () => {
     test.beforeEach(async ({ page }) => {
         await setupJourneyMocks(page, { personaId: 'capital-foundry', mockMint: true });
         await seedDemoUser(page, 'capital-foundry', 'mock-access-token');

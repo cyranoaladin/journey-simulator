@@ -19,10 +19,10 @@ describe('API /api/rag', () => {
   beforeEach(() => {
     resetRagStore()
     process.env.DEMO_MODE = 'true'
-    if ((global.fetch as any)?.mockRestore) {
-      ;(global.fetch as jest.Mock).mockRestore()
+    if ((globalThis.fetch as any)?.mockRestore) {
+      ;(globalThis.fetch as jest.Mock).mockRestore()
     }
-    delete (global as any).fetch
+    delete (globalThis as any).fetch
   })
 
   it('query returns docs in demo mode', async () => {
@@ -125,7 +125,7 @@ describe('API /api/rag', () => {
         { id: 'd2', path: 'Doc 2', meta: { embedding: [0.2, 0.3] } },
       ],
     }))
-    global.fetch = mockFetch as any
+    globalThis.fetch = mockFetch as any
     const res = await searchPost(makeRequest({ text: 'doc' }) as any)
     expect(res.status).toBe(200)
     const body = await res.json()

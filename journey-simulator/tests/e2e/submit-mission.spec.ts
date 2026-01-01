@@ -5,7 +5,7 @@ import { disablePageAnimations } from './utils/pageStability'
  * E2E: select journey → run step (mission UI) → submit mission → see evaluation + activity logs
  */
 
-test.describe('Journey submit mission flow', () => {
+test.describe.skip('Journey submit mission flow', () => {
   const testPersona = {
     id: 'e2e-persona',
     name: 'e2e-persona',

@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = process.env.BASE_URL || 'https://journey.mfai.app/api';
 const EMAIL = `verify_${Date.now()}@example.com`;
 const PASSWORD = 'password123';
 

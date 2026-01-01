@@ -29,10 +29,10 @@ const initialState: AgentScoreboardState = {
 }
 
 const readStoredKey = () => {
-  if (typeof window === 'undefined') {
+  if (typeof globalThis === 'undefined') {
     return ''
   }
-  return window.localStorage.getItem(ADMIN_API_STORAGE_KEY) ?? ''
+  return globalThis.localStorage?.getItem(ADMIN_API_STORAGE_KEY) ?? ''
 }
 
 type AgentScoreboardProviderProps = {
@@ -45,11 +45,11 @@ export function AgentScoreboardProvider({ children }: AgentScoreboardProviderPro
 
   const storeKey = useCallback((value: string) => {
     setApiKey(value)
-    if (typeof window !== 'undefined') {
+    if (typeof globalThis !== 'undefined' && globalThis.localStorage) {
       if (value) {
-        window.localStorage.setItem(ADMIN_API_STORAGE_KEY, value)
+        globalThis.localStorage.setItem(ADMIN_API_STORAGE_KEY, value)
       } else {
-        window.localStorage.removeItem(ADMIN_API_STORAGE_KEY)
+        globalThis.localStorage.removeItem(ADMIN_API_STORAGE_KEY)
       }
     }
   }, [])

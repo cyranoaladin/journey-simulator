@@ -17,11 +17,21 @@ const Skeleton = ({
 }: SkeletonProps) => {
   const baseClasses = "bg-gray-700/50 animate-pulse rounded-md";
 
+  const dimensionValue = (value?: number | string) => {
+    if (typeof value === 'number') {
+      return `${value}px`;
+    }
+    return value;
+  };
+
   const getVariantStyles = () => {
-    if (width || height) {
+    const widthValue = dimensionValue(width);
+    const heightValue = dimensionValue(height);
+
+    if (widthValue || heightValue) {
       return {
-        width: width ? (typeof width === 'number' ? `${width}px` : width) : undefined,
-        height: height ? (typeof height === 'number' ? `${height}px` : height) : undefined,
+        width: widthValue,
+        height: heightValue,
       };
     }
 

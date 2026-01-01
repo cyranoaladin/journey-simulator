@@ -31,7 +31,7 @@ describe('WalletContext helpers', () => {
 
 describe('WalletContextProvider integration', () => {
   afterEach(() => {
-    const globals = window as Window & {
+    const globals = globalThis as typeof globalThis & {
       __MFAI_WALLET_ADAPTERS__?: string[]
       __MFAI_SOLANA_NETWORK__?: WalletAdapterNetwork
       __MFAI_SOLANA_ENDPOINT__?: string
@@ -43,7 +43,7 @@ describe('WalletContextProvider integration', () => {
 
   it('announces available adapters after initialization', async () => {
     const adaptersPromise = new Promise<string[]>((resolve, reject) => {
-      const globals = window as Window & {
+      const globals = globalThis as typeof globalThis & {
         __MFAI_WALLET_ADAPTERS__?: string[]
         __MFAI_SOLANA_NETWORK__?: WalletAdapterNetwork
         __MFAI_SOLANA_ENDPOINT__?: string
@@ -66,12 +66,12 @@ describe('WalletContextProvider integration', () => {
       }
 
       const cleanup = () => {
-        window.removeEventListener('walletAdaptersReady', handleReady)
-        window.removeEventListener('walletError', handleError)
+        globalThis.removeEventListener?.('walletAdaptersReady', handleReady)
+        globalThis.removeEventListener?.('walletError', handleError)
       }
 
-      window.addEventListener('walletAdaptersReady', handleReady)
-      window.addEventListener('walletError', handleError)
+      globalThis.addEventListener?.('walletAdaptersReady', handleReady)
+      globalThis.addEventListener?.('walletError', handleError)
     })
 
     await act(async () => {
@@ -92,7 +92,7 @@ describe('WalletContextProvider integration', () => {
       expect.arrayContaining(['Solflare', 'Torus'])
     )
 
-    const globals = window as Window & {
+    const globals = globalThis as typeof globalThis & {
       __MFAI_SOLANA_NETWORK__?: WalletAdapterNetwork
       __MFAI_SOLANA_ENDPOINT__?: string
     }

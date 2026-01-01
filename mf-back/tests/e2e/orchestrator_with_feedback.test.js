@@ -1,6 +1,6 @@
 const { exec } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const LOG_PATH = path.join(__dirname, '..', '..', 'logs', 'agent_feedback.json');
 const PROJECT_ROOT = path.join(__dirname, '..', '..');

@@ -35,12 +35,15 @@ export async function POST(req: Request) {
     )
   }
 
-  type DocRow = { id: string; path: string; meta: { embedding: number[] | unknown } } // Updated type based on FastAPI Document schema
+  type DocRow = { id: string; path: string; meta: { embedding?: number[] | unknown } }
   const ranked = (docs as DocRow[])
-    .map((d) => ({
-      d,
-      score: Array.isArray(d.meta?.embedding) ? cosine(qvec, d.meta.embedding as number[]) : 0,
-    }))
+    .map((d) => {
+      const embedding = Array.isArray(d.meta?.embedding) ? (d.meta.embedding as number[]) : null
+      return {
+        d,
+        score: embedding ? cosine(qvec, embedding) : 0,
+      }
+    })
     .sort((a, b) => b.score - a.score)
     .slice(0, 10)
   return NextResponse.json({

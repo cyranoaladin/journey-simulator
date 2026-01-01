@@ -9,22 +9,20 @@ export interface PersonaStyle {
   textColor: string;
 }
 
+const cognitiveStyle: PersonaStyle = {
+  bgGradient: 'from-sky-500 to-cyan-400',
+  iconBg: 'bg-sky-500',
+  textColor: 'text-cyan-300'
+};
+
 export function getPersonaStyle(personaId?: string | null): PersonaStyle {
   if (!personaId) {
-    return {
-      bgGradient: 'from-sky-500 to-cyan-400',
-      iconBg: 'bg-sky-500',
-      textColor: 'text-cyan-300'
-    };
+    return cognitiveStyle;
   }
 
   switch (personaId) {
     case 'cognitive-activation-hub':
-      return {
-        bgGradient: 'from-sky-500 to-cyan-400',
-        iconBg: 'bg-sky-500',
-        textColor: 'text-cyan-300'
-      };
+      return cognitiveStyle;
     case 'capital-foundry':
       return {
         bgGradient: 'from-emerald-500 to-teal-500',
@@ -56,11 +54,6 @@ export function getPersonaStyle(personaId?: string | null): PersonaStyle {
         textColor: 'text-cyan-300'
       };
     default:
-      // Reuse same block as 'cognitive-activation-hub' case to avoid duplication
-      return {
-        bgGradient: 'from-sky-500 to-cyan-400',
-        iconBg: 'bg-sky-500',
-        textColor: 'text-cyan-300'
-      };
+      return cognitiveStyle;
   }
 }

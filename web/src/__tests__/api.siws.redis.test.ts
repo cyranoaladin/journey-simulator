@@ -9,7 +9,7 @@ jest.mock('../server/redis', () => ({
   },
 }))
 
-const mockRedis = redis as unknown as {
+const mockRedis: { set: jest.Mock; get: jest.Mock; del: jest.Mock } = redis as unknown as {
   set: jest.Mock
   get: jest.Mock
   del: jest.Mock

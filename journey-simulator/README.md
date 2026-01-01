@@ -2,6 +2,8 @@
 
 # Money Factory AI - Journey Simulator
 
+**Auteurs** : Alaeddine BEN RHOUMA · Kamel BEN RHOUMA · Adem BELHAJAISSA
+
 **A Web3-native platform implementing the Cognitive Activation Protocol™**
 
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
@@ -735,7 +737,7 @@ App
                      v
    +-------------------------+     +----------------------+
    |       RAG Client        |     |     LLM Helper        |
-   |  - Ingestion/Search     |     |  - Appel OpenAI/Gemini|
+   |  - Ingestion/Search     |     |  - Appel LLM (OpenAI) |
    +-----------+-------------+     +----------+------------+
                |                             |
                v                             v
@@ -766,7 +768,7 @@ Les agents utilisent :
 
 des documents enrichis (RAG).
 
-des modèles LLM externes (OpenAI, Gemini).
+des modèles LLM externes (OpenAI).
 
 la mémoire des interactions précédentes.
 
@@ -1648,54 +1650,9 @@ Commande: `node journey-simulator/scripts/generate-file-index.mjs`
 <summary><strong>Autres fichiers (root / infra / configs)</strong> (412)</summary>
 
 - `.agent/workflows/verify_demo_mode.md` — Fichier du monorepo (voir chemin).
-- `.cursor/mcp.json` — Fichier du monorepo (voir chemin).
 - `.deploy.env` — Fichier du monorepo (voir chemin).
 - `.deploy.env.example` — Fichier du monorepo (voir chemin).
 - `.eslintignore` — Fichier du monorepo (voir chemin).
-- `.gemini/AUDIT_COMPLET.md` — Fichier du monorepo (voir chemin).
-- `.gemini/AUDIT_SUMMARY.md` — Fichier du monorepo (voir chemin).
-- `.gemini/BACKEND_VERIFICATION_REPORT.md` — Fichier du monorepo (voir chemin).
-- `.gemini/COMPLETE_SYSTEM_VERIFICATION.md` — Fichier du monorepo (voir chemin).
-- `.gemini/CURRENT_TEST_SETUP.md` — Fichier du monorepo (voir chemin).
-- `.gemini/E2E_TESTS_FIX_SUMMARY.md` — Fichier du monorepo (voir chemin).
-- `.gemini/FINAL_TEST_REPORT.md` — Fichier du monorepo (voir chemin).
-- `.gemini/FIX_COMPLETE_PHASE_BUTTON.md` — Fichier du monorepo (voir chemin).
-- `.gemini/FIX_DEVTOOLS_AUTO_OPEN.md` — Fichier du monorepo (voir chemin).
-- `.gemini/FIX_LLM_MODEL_DEFAULT.md` — Fichier du monorepo (voir chemin).
-- `.gemini/FIX_OPENAI_MOCK.md` — Fichier du monorepo (voir chemin).
-- `.gemini/FIX_OPENAI_VERSION.md` — Fichier du monorepo (voir chemin).
-- `.gemini/FIX_UI_SELECTS.md` — Fichier du monorepo (voir chemin).
-- `.gemini/FIXES_APPLIED.md` — Fichier du monorepo (voir chemin).
-- `.gemini/IMPLEMENTATION_PLAN.md` — Fichier du monorepo (voir chemin).
-- `.gemini/IMPLEMENTATION_PROGRESS.md` — Fichier du monorepo (voir chemin).
-- `.gemini/MANUAL_TESTING_GUIDE.md` — Fichier du monorepo (voir chemin).
-- `.gemini/MIGRATION_GPT_5_1.md` — Fichier du monorepo (voir chemin).
-- `.gemini/MISSION_ACCOMPLISHED.md` — Fichier du monorepo (voir chemin).
-- `.gemini/MVP_COMPLETION_CHECKLIST.md` — Fichier du monorepo (voir chemin).
-- `.gemini/OPENAI_API_DIAGNOSTIC.md` — Fichier du monorepo (voir chemin).
-- `.gemini/PLAN_ACTION_URGENT.md` — Fichier du monorepo (voir chemin).
-- `.gemini/PRIORITY_4_COMPLETE.md` — Fichier du monorepo (voir chemin).
-- `.gemini/PRIORITY_5_COMPLETE.md` — Fichier du monorepo (voir chemin).
-- `.gemini/PROJECT_AUDIT_REPORT.md` — Fichier du monorepo (voir chemin).
-- `.gemini/README.md` — Fichier du monorepo (voir chemin).
-- `.gemini/READY_FOR_TESTING.md` — Fichier du monorepo (voir chemin).
-- `.gemini/RESOURCE_IMPROVEMENTS.md` — Fichier du monorepo (voir chemin).
-- `.gemini/RESUME_FINAL_TESTS.md` — Fichier du monorepo (voir chemin).
-- `.gemini/ROLLBACK_GPT_4O.md` — Fichier du monorepo (voir chemin).
-- `.gemini/SESSION_COMPLETE.md` — Fichier du monorepo (voir chemin).
-- `.gemini/SW_DISABLE_INSTRUCTIONS.md` — Fichier du monorepo (voir chemin).
-- `.gemini/SYNTHESE_AUDIT.md` — Fichier du monorepo (voir chemin).
-- `.gemini/TEST_CREDENTIALS.md` — Fichier du monorepo (voir chemin).
-- `.gemini/TEST_RESULTS_E2E.md` — Fichier du monorepo (voir chemin).
-- `.gemini/TEST_RESULTS_FINAL.md` — Fichier du monorepo (voir chemin).
-- `.gemini/TEST_RESULTS_PARTIAL.md` — Fichier du monorepo (voir chemin).
-- `.gemini/TESTING_GUIDE_PRIORITY_4.md` — Fichier du monorepo (voir chemin).
-- `.gemini/TESTING_PLAN.md` — Fichier du monorepo (voir chemin).
-- `.gemini/TESTING_RESOURCES_SUMMARY.md` — Fichier du monorepo (voir chemin).
-- `.gemini/TESTS_DEEP_LINKING_RESOURCES.md` — Fichier du monorepo (voir chemin).
-- `.gemini/UI_HEADER_IMPROVEMENTS.md` — Fichier du monorepo (voir chemin).
-- `.gemini/UI_IMPROVEMENTS.md` — Fichier du monorepo (voir chemin).
-- `.github/copilot-instructions.md` — Fichier du monorepo (voir chemin).
 - `.github/dependabot.yml` — Fichier du monorepo (voir chemin).
 - `.github/ISSUE_TEMPLATE.md` — Fichier du monorepo (voir chemin).
 - `.github/pull_request_template.md` — Fichier du monorepo (voir chemin).
@@ -1716,10 +1673,7 @@ Commande: `node journey-simulator/scripts/generate-file-index.mjs`
 - `audit_compliance.sh` — Fichier du monorepo (voir chemin).
 - `audit.md` — Fichier du monorepo (voir chemin).
 - `cahier_charges_agents.md` — Fichier du monorepo (voir chemin).
-- `cahier_charges_ameliorations_UI_UX.md` — Fichier du monorepo (voir chemin).
 - `cahier_charges_demo_artefacts.md` — Fichier du monorepo (voir chemin).
-- `cahier_charges_gpt5_1_zyno.md` — Fichier du monorepo (voir chemin).
-- `cahier_charges_gpt5_1.md` — Fichier du monorepo (voir chemin).
 - `cahier_charges_high_fidelity_simulation.md` — Fichier du monorepo (voir chemin).
 - `cahier_charges_ressources_html.md` — Fichier du monorepo (voir chemin).
 - `CHANGELOG.md` — Fichier du monorepo (voir chemin).
@@ -1797,7 +1751,6 @@ Commande: `node journey-simulator/scripts/generate-file-index.mjs`
 - `journey-simulator/.storybook/preview.ts` — Fichier du monorepo (voir chemin).
 - `journey-simulator/.vscode/settings.json` — Fichier du monorepo (voir chemin).
 - `journey-simulator/cahier_charges_amelioration_front.md` — Fichier du monorepo (voir chemin).
-- `journey-simulator/copilot_prompt.md` — Fichier du monorepo (voir chemin).
 - `journey-simulator/cypress.config.js` — Fichier du monorepo (voir chemin).
 - `journey-simulator/cypress/e2e/navigation.cy.js` — Tests Cypress (optionnel/legacy).
 - `journey-simulator/cypress/support/commands.js` — Tests Cypress (optionnel/legacy).

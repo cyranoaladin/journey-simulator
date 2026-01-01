@@ -6,10 +6,16 @@ class ProductSpecAgent {
     this.llm = new LLMClient({});
   }
 
-  buildPrompt({ input, ragChunks }) {
+  buildPrompt({ input, ragChunks, context }) {
     const citations = (ragChunks || [])
       .map((c, i) => `- [${i + 1}] ${c.title}: ${c.text.slice(0, 180)}...`)
       .join('\n');
+    const historySummary = context?.historySummary
+      ? JSON.stringify(context.historySummary).slice(0, 600)
+      : '- (aucun résumé disponible)';
+    const recentHistory = Array.isArray(context?.history)
+      ? context.history.slice(-3).map((h) => h.note || h.summary || h.input).filter(Boolean).slice(0, 3)
+      : [];
     return {
       system: [
         'Tu es ProductSpecAgent, responsable des specs produit/UX.',
@@ -18,6 +24,9 @@ class ProductSpecAgent {
       ].join('\n'),
       user: [
         `Demande produit: ${input}`,
+        'Contexte sessions précédentes (à réutiliser sans redemander):',
+        historySummary,
+        recentHistory.length ? `Derniers points: ${recentHistory.join(' | ')}` : 'Derniers points: -',
         'Contexte RAG:',
         citations || '- (aucune source)',
         'Inclure une section flows (3-5 étapes max) et 3 critères d’acceptance minimum.',
@@ -26,11 +35,11 @@ class ProductSpecAgent {
   }
 
   async run(request) {
-    const { traceId, input, rag = {}, constraints = {} } = request;
+    const { traceId, input, rag = {}, context = {}, constraints = {} } = request;
     const ragHits = rag.chunks?.length || 0;
     const hasInput = Boolean(input && input.trim());
     const confidence = Math.min(0.55 + (hasInput ? 0.2 : 0.05) + Math.min(ragHits, 3) * 0.05, 0.9);
-    const prompt = this.buildPrompt({ input, ragChunks: rag.chunks });
+    const prompt = this.buildPrompt({ input, ragChunks: rag.chunks, context });
     const llmRes = await this.llm.generate({
       prompt,
       traceId,

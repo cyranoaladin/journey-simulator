@@ -41,7 +41,8 @@ const LoginPage: React.FC = () => {
       try {
         const ok = await loginAsDemo();
         if (!ok) setError('Demo login failed. Please try again.');
-      } catch {
+      } catch (err) {
+        logger.error('Demo login failed', err);
         setError('Demo login failed. Please try again.');
       } finally {
         setIsSubmitting(false);
@@ -60,6 +61,7 @@ const LoginPage: React.FC = () => {
         setError('Invalid email or password. Please try again.');
       }
     } catch (err) {
+      logger.error('Login failed', err);
       setError('Login failed. Please check your connection and try again.');
     } finally {
       setIsSubmitting(false);
@@ -76,6 +78,7 @@ const LoginPage: React.FC = () => {
         setError('Demo login failed. Please try again.');
       }
     } catch (err) {
+      logger.error('Demo login failed', err);
       setError('Demo login failed. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -99,12 +102,11 @@ const LoginPage: React.FC = () => {
   }
 
   return (
-    <>
-      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 relative">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-accent-cyan/10 via-accent-purple/10 to-accent-gold/10"></div>
-          <div className="pointer-events-none absolute inset-0 opacity-20 auth-background-pattern"></div>
-        </div>
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 relative">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-accent-cyan/10 via-accent-purple/10 to-accent-gold/10"></div>
+        <div className="pointer-events-none absolute inset-0 opacity-20 auth-background-pattern"></div>
+      </div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -299,8 +301,7 @@ const LoginPage: React.FC = () => {
             </p>
           </motion.div>
         </motion.div>
-      </div>
-    </>
+    </div>
   );
 };
 

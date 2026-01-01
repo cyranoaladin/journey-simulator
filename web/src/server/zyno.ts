@@ -78,6 +78,76 @@ async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   }
 }
 
+type ZynoPayload = {
+  model: string
+  input: { role: 'system' | 'user'; content: string }[]
+  response_format: { type: 'json_schema'; json_schema: typeof JOURNEY_STEP_SCHEMA }
+  max_output_tokens: number
+  temperature: number
+  reasoning: { effort: 'medium' | 'low' }
+}
+
+type ZynoConfig = {
+  url: string
+  apiKey: string
+  payload: ZynoPayload
+  maxAttempts?: number
+  timeoutMs?: number
+  logLabel: string
+}
+
+async function executeZynoCall({
+  url,
+  apiKey,
+  payload,
+  maxAttempts = 3,
+  timeoutMs = 30000,
+  logLabel,
+}: ZynoConfig) {
+  const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` }
+  let attempt = 0
+  const started = Date.now()
+
+  while (attempt < maxAttempts) {
+    try {
+      const res = await withTimeout(
+        fetch(url, { method: 'POST', headers, body: JSON.stringify(payload) }),
+        timeoutMs
+      )
+      if (!res.ok) {
+        if (res.status === 429 || res.status >= 500) {
+          attempt++
+          await new Promise((r) => setTimeout(r, 500 * attempt))
+          continue
+        }
+        const text = await res.text().catch(() => `HTTP ${res.status}`)
+        throw new Error(text)
+      }
+
+      const json = await res.json()
+      const content = json?.output?.[0]?.content?.[0]?.text ?? json?.output_text ?? json
+      const out = typeof content === 'string' ? JSON.parse(content) : content
+      const meta = {
+        model: payload.model,
+        duration_ms: Date.now() - started,
+        usage: json?.usage || json?.output?.[0]?.usage || undefined,
+      }
+      try {
+        console.log(logLabel, meta)
+      } catch (logError) {
+        console.warn('Failed to log zyno metrics', { logLabel, error: logError })
+      }
+      return { out, meta }
+    } catch (e: any) {
+      attempt++
+      if (attempt >= maxAttempts) throw e
+      await new Promise((r) => setTimeout(r, 600 * attempt))
+    }
+  }
+
+  throw new Error(`${logLabel} exhausted`)
+}
+
 export async function callZynoStep(input: JourneyStepInput) {
   const { apiKey, url, model, maxTokens, temperature } = (
     await import('@/infra/openaiConfig')
@@ -85,7 +155,7 @@ export async function callZynoStep(input: JourneyStepInput) {
   // Guard: Missing API key
   if (!apiKey) throw new Error('OPENAI_API_KEY missing')
 
-  const payload = {
+  const payload: ZynoPayload = {
     model,
     input: [
       { role: 'system', content: buildSystemPrompt() },
@@ -97,49 +167,7 @@ export async function callZynoStep(input: JourneyStepInput) {
     reasoning: { effort: 'medium' },
   }
 
-  const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` }
-
-  let attempt = 0
-  const maxAttempts = 3
-  const started = Date.now()
-  while (attempt < maxAttempts) {
-    try {
-      const res = await withTimeout(
-        fetch(url, { method: 'POST', headers, body: JSON.stringify(payload) }),
-        30000
-      )
-      // Guard: Retry on rate limit or server error
-      if (!res.ok) {
-        if (res.status === 429 || res.status >= 500) {
-          attempt++
-          await new Promise((r) => setTimeout(r, 500 * attempt))
-          continue
-        }
-        const text = await res.text().catch(() => `HTTP ${res.status}`)
-        throw new Error(text)
-      }
-      const json = await res.json()
-      const content = json?.output?.[0]?.content?.[0]?.text ?? json?.output_text ?? json
-      const out = typeof content === 'string' ? JSON.parse(content) : content
-      const meta = {
-        model,
-        duration_ms: Date.now() - started,
-        usage: json?.usage || json?.output?.[0]?.usage || undefined,
-      }
-      try {
-        console.log('[ZynoStep]', meta)
-      } catch (logError) {
-        console.warn('Failed to log Zyno step metrics', logError)
-      }
-      return { out, meta }
-    } catch (e: any) {
-      attempt++
-      // Guard: Max attempts reached
-      if (attempt >= maxAttempts) throw e
-      await new Promise((r) => setTimeout(r, 600 * attempt))
-    }
-  }
-  throw new Error('Zyno call exhausted')
+  return executeZynoCall({ url, apiKey, payload, logLabel: 'ZynoStep' })
 }
 
 // ---- Mission submission / evaluation ----
@@ -188,7 +216,7 @@ export async function callZynoEvaluate(input: EvaluateInput) {
   // Guard: Missing API key
   if (!apiKey) throw new Error('OPENAI_API_KEY missing')
 
-  const payload = {
+  const payload: ZynoPayload = {
     model,
     input: [
       { role: 'system', content: buildEvalSystemPrompt() },
@@ -200,47 +228,5 @@ export async function callZynoEvaluate(input: EvaluateInput) {
     reasoning: { effort: 'low' },
   }
 
-  const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` }
-
-  let attempt = 0
-  const maxAttempts = 3
-  const started = Date.now()
-  while (attempt < maxAttempts) {
-    try {
-      const res = await withTimeout(
-        fetch(url, { method: 'POST', headers, body: JSON.stringify(payload) }),
-        30000
-      )
-      // Guard: Retry on rate limit or server error
-      if (!res.ok) {
-        if (res.status === 429 || res.status >= 500) {
-          attempt++
-          await new Promise((r) => setTimeout(r, 500 * attempt))
-          continue
-        }
-        const text = await res.text().catch(() => `HTTP ${res.status}`)
-        throw new Error(text)
-      }
-      const json = await res.json()
-      const content = json?.output?.[0]?.content?.[0]?.text ?? json?.output_text ?? json
-      const out = typeof content === 'string' ? JSON.parse(content) : content
-      const meta = {
-        model,
-        duration_ms: Date.now() - started,
-        usage: json?.usage || json?.output?.[0]?.usage || undefined,
-      }
-      try {
-        console.log('[ZynoEval]', meta)
-      } catch (logError) {
-        console.warn('Failed to log Zyno eval metrics', logError)
-      }
-      return { out, meta }
-    } catch (e: any) {
-      attempt++
-      // Guard: Max attempts reached
-      if (attempt >= maxAttempts) throw e
-      await new Promise((r) => setTimeout(r, 600 * attempt))
-    }
-  }
-  throw new Error('Zyno evaluation exhausted')
+  return executeZynoCall({ url, apiKey, payload, logLabel: 'ZynoEval' })
 }

@@ -1,12 +1,18 @@
+// Tests run stateless bearer flows with CSRF parity middleware.
 const express = require('express');
 const request = require('supertest');
 const path = require('node:path');
+const { csrfGuard } = require('../../middleware/csrfGuard');
 
 const orchestrationRouter = require('../../routes/zyno-routes');
+
+process.env.VSLICE_TEST_STUB = 'true';
 
 const buildApp = () => {
   const app = express();
   app.use(express.json());
+  // CSRF désactivé pour isolation test
+  // app.use(csrfGuard);
   app.use('/orchestration', orchestrationRouter);
   return app;
 };
@@ -16,6 +22,7 @@ describe('E2E /orchestration/vslice', () => {
   let server;
 
   beforeAll((done) => {
+    console.log('[TEST_ENV]', process.env.NODE_ENV);
     server = app.listen(0, done);
   });
 
@@ -25,6 +32,7 @@ describe('E2E /orchestration/vslice', () => {
     delete process.env.RUNTIME_ENV;
     delete process.env.REAL_EXECUTION_MODE;
     delete process.env.EXECUTION_ENABLED;
+    delete process.env.VSLICE_TEST_STUB;
   });
 
   afterAll((done) => {
@@ -206,6 +214,9 @@ describe('E2E /orchestration/vslice', () => {
   });
 
   it('exposes executionPlan with steps and shadowComparison delta', async () => {
+    process.env.OPENAI_API_KEY = process.env.OPENAI_API_KEY || 'test-openai-key';
+    process.env.RAG_SEARCH_URL = process.env.RAG_SEARCH_URL || 'http://localhost:9999';
+    process.env.RAG_API_KEY = process.env.RAG_API_KEY || 'test-rag-key';
     process.env.EXECUTION_ENABLED = 'true';
     process.env.REAL_EXECUTION_MODE = 'shadow';
 
@@ -216,6 +227,7 @@ describe('E2E /orchestration/vslice', () => {
         runId: 'e2e-exec-plan',
         intent: 'security.audit',
         input: 'test execution plan',
+        mode: 'real',
       })
       .expect(200);
 
@@ -232,6 +244,7 @@ describe('E2E /orchestration/vslice', () => {
         runId: 'e2e-exec-plan',
         intent: 'security.audit',
         input: 'test execution plan',
+        mode: 'real',
       })
       .expect(200);
 

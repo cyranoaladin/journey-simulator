@@ -48,7 +48,7 @@ export const personas: Persona[] = [
         xpReward: 90,
         mfaiReward: 9,
         nftReward: 'Tokenomics Architect Badge',
-        tools: ['Incentive simulation board', 'Governance scenario engine', 'Zyno economics copilot'],
+        tools: ['Incentive simulation board', 'Governance scenario engine', 'Zyno economics advisor'],
         outcomes: ['Draft incentive flywheel', 'Governance escalation plan', 'Community metrics baseline'],
         zynoTip: 'Token design is economic storytelling. Craft incentives that make everyone a protagonist in value creation.',
         daoVoteRequired: true,
@@ -552,5 +552,31 @@ export const personas: Persona[] = [
         zynoTip: 'Real-world validation is the ultimate test. Use this simulation to refine your metrics before the mainnet launch.',
       },
     ],
+  },
+  {
+    id: 'e2e-persona',
+    name: 'e2e-persona',
+    title: 'E2E Persona',
+    description: 'Synthetic persona used for automated journeys tests.',
+    icon: '🧪',
+    color: 'from-indigo-500 to-purple-500',
+    targetProfile: 'QA automation',
+    motivation: 'Validate guided mission flows end-to-end.',
+    passType: 'Test Pass',
+    phases: [
+      {
+        id: 'e2e-phase',
+        title: 'E2E Phase',
+        description: 'Instrumentation phase for automation.',
+        mission: 'Trigger the Zyno pipeline in a controlled environment.',
+        duration: '1 day',
+        xpReward: 10,
+        mfaiReward: 1,
+        nftReward: 'E2E Proof',
+        tools: ['Automation harness'],
+        outcomes: ['Validated UI flow'],
+        zynoTip: 'Leverage deterministic inputs for consistent outputs.'
+      }
+    ]
   },
 ]

@@ -10,7 +10,7 @@ GREEN ='\033[0;32m';
 RED ='\033[0;31m';
 NC ='\033[0m';
 
-BACKEND_URL = "http://127.0.0.1:3002";
+BACKEND_URL = "http://127.0.0.1:3000";
 WEB_URL = "http://127.0.0.1:3000" # URL par défaut Next.js(souvent proxifiée);
 DEMO_TOKEN = "demo-token";
 

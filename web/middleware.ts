@@ -5,9 +5,16 @@ const WINDOW = 60_000;
 const LIMIT = Number(process.env.RATE_LIMIT_PER_MINUTE || 60);
 
 // Simple in-memory store (per process)
-const globalAny = globalThis as any;
-const store: Map<string, { count: number; start: number; }> = globalAny.__rate || new Map();
-globalAny.__rate = store;
+type RateEntry = { count: number; start: number };
+type RateStore = Map<string, RateEntry>;
+
+declare global {
+  // eslint-disable-next-line no-var
+  var __rate: RateStore | undefined;
+}
+
+const store: RateStore = globalThis.__rate || new Map();
+globalThis.__rate = store;
 
 function isAllowedOrigin(origin: string | null): boolean {
   if (!origin) return false;
@@ -68,7 +75,7 @@ function handleRateLimit(req: Request, url: URL): NextResponse | null {
 
 export function middleware(req: Request) {
   const url = new URL(req.url);
-  const origin = (req.headers as any).get ? (req as any).headers.get('origin') : null;
+  const origin = req.headers.get('origin');
   const isPreflight = req.method === 'OPTIONS';
   const isApiPath = url.pathname.startsWith('/api/');
   const isUserPath = url.pathname.startsWith('/user/');

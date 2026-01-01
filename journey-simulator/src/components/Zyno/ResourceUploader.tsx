@@ -97,6 +97,51 @@ const ResourceUploader = () => {
     }
   };
 
+  const renderDocuments = () => {
+    if (fetchState.loading) {
+      return (
+        <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-500 dark:bg-slate-800 dark:text-slate-300">
+          <Loader2 size={16} className="animate-spin" />
+          Syncing…
+        </div>
+      );
+    }
+    if (fetchState.error) {
+      return (
+        <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">
+          {fetchState.error}
+        </p>
+      );
+    }
+    if (documents.length === 0) {
+      return (
+        <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500 dark:border-slate-700/60 dark:bg-slate-800 dark:text-slate-300">
+          No documents indexed yet.
+        </p>
+      );
+    }
+    return (
+      <ul className="space-y-2">
+        {documents.map((document) => (
+          <li
+            key={document.path}
+            className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600 dark:border-slate-700/60 dark:bg-slate-800 dark:text-slate-200"
+          >
+            <span className="flex items-center gap-2 truncate">
+              <FileText size={16} className="text-indigo-500" />
+              <span className="truncate" title={document.name}>
+                {document.name}
+              </span>
+            </span>
+            <span className="text-[11px] uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              Stored Locally
+            </span>
+          </li>
+        ))}
+      </ul>
+    );
+  };
+
   return (
     <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900">
       <header className="flex items-center justify-between gap-3">
@@ -146,7 +191,7 @@ const ResourceUploader = () => {
             {selectedFile ? selectedFile.name : 'Drag your file here or click to select'}
           </span>
           <span className="text-xs text-slate-400 dark:text-slate-500">
-            Recommended formats: markdown, text, JSON. Max size 2&nbsp;MB.
+            Recommended formats: markdown, text, JSON. Max size 2 MB.
           </span>
           <input
             type="file"
@@ -185,39 +230,7 @@ const ResourceUploader = () => {
         <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
           Indexed Documents ({documents.length})
         </h4>
-        {fetchState.loading ? (
-          <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-500 dark:bg-slate-800 dark:text-slate-300">
-            <Loader2 size={16} className="animate-spin" />
-            Syncing…
-          </div>
-        ) : fetchState.error ? (
-          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">
-            {fetchState.error}
-          </p>
-        ) : documents.length === 0 ? (
-          <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500 dark:border-slate-700/60 dark:bg-slate-800 dark:text-slate-300">
-            No documents indexed yet.
-          </p>
-        ) : (
-          <ul className="space-y-2">
-            {documents.map((document) => (
-              <li
-                key={document.path}
-                className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600 dark:border-slate-700/60 dark:bg-slate-800 dark:text-slate-200"
-              >
-                <span className="flex items-center gap-2 truncate">
-                  <FileText size={16} className="text-indigo-500" />
-                  <span className="truncate" title={document.name}>
-                    {document.name}
-                  </span>
-                </span>
-                <span className="text-[11px] uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                  Stored Locally
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
+        {renderDocuments()}
       </div>
     </section>
   );

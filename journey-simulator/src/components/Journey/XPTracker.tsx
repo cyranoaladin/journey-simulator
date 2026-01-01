@@ -57,12 +57,15 @@ const XPTracker: React.FC<XPTrackerProps> = ({
   const prevLevelXP = (level - 1) * 200;
   const progressToNextLevel = ((currentXP - prevLevelXP) / (nextLevelXP - prevLevelXP)) * 100;
   
-  // Determine if user has a pass boost
+  const computeBoostMultiplier = (passLevel: string) => {
+    if (passLevel === 'Diamond') return 1.5;
+    if (passLevel === 'Platinum') return 1.3;
+    if (passLevel === 'Gold') return 1.2;
+    return 1;
+  };
+
   const hasPassBoost = userProgress.passLevel !== 'Free';
-  const boostMultiplier = 
-    userProgress.passLevel === 'Diamond' ? 1.5 :
-    userProgress.passLevel === 'Platinum' ? 1.3 :
-    userProgress.passLevel === 'Gold' ? 1.2 : 1;
+  const boostMultiplier = computeBoostMultiplier(userProgress.passLevel);
 
   const rewardProgress = nextRewardAt > 0
     ? Math.min((currentXP / nextRewardAt) * 100, 100)

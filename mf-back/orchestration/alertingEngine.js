@@ -13,7 +13,7 @@ class AlertingEngine {
     const alerts = [];
     const sloMap = Object.fromEntries(this.slos.map((s) => [s.id, s]));
 
-    const checkRate = (id, value) => {
+    const pushIfExceeds = (id, value) => {
       const slo = sloMap[id];
       if (!slo) return;
       if (value > slo.target) {
@@ -28,35 +28,20 @@ class AlertingEngine {
       }
     };
 
-    const checkLatency = (id, value) => {
-      const slo = sloMap[id];
-      if (!slo) return;
-      if (value > slo.target) {
-        alerts.push({
-          level: slo.severity,
-          sloId: id,
-          message: `${id} exceeded target`,
-          currentValue: value,
-          target: slo.target,
-          tenantId: metricsSummary.tenantId || 'all',
-        });
-      }
-    };
-
-    checkLatency('orchestration_latency_p95', metricsSummary.latency.p95);
-    checkRate('status_warn_rate', metricsSummary.rates.warn);
-    checkRate('status_fail_timeout_rate', metricsSummary.rates.failTimeout);
-    checkRate('idempotent_replay_rate', metricsSummary.rates.idempotent);
-    checkRate('dry_run_rate', metricsSummary.rates.dryRun);
-    checkRate('agents_disabled_rate', metricsSummary.rates.agentsDisabled);
+    pushIfExceeds('orchestration_latency_p95', metricsSummary.latency.p95);
+    pushIfExceeds('status_warn_rate', metricsSummary.rates.warn);
+    pushIfExceeds('status_fail_timeout_rate', metricsSummary.rates.failTimeout);
+    pushIfExceeds('idempotent_replay_rate', metricsSummary.rates.idempotent);
+    pushIfExceeds('dry_run_rate', metricsSummary.rates.dryRun);
+    pushIfExceeds('agents_disabled_rate', metricsSummary.rates.agentsDisabled);
     if (metricsSummary.rates.rag < 0.5) {
-      checkRate('rag_usage_rate', 1); // déclenche si RAG faible
+      pushIfExceeds('rag_usage_rate', 1); // déclenche si RAG faible
     }
     // llm_usage_rate: alerte si jamais de LLM réel
     if (metricsSummary.rates.llmReal === 0) {
-      checkRate('llm_usage_rate', 1);
+      pushIfExceeds('llm_usage_rate', 1);
     }
-    checkRate('real_block_rate', metricsSummary.rates.realBlocked);
+    pushIfExceeds('real_block_rate', metricsSummary.rates.realBlocked);
     if (metricsSummary.llm?.costTotal && metricsSummary.llm.costTotal > 0.05) {
       alerts.push({
         level: 'WARN',

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Twitter, Linkedin, MessageSquare, Copy, CheckCircle } from 'lucide-react';
+import { X, Twitter as XIcon, Linkedin, MessageSquare, Copy, CheckCircle } from 'lucide-react';
 
 interface ShareModalProps {
   proofType: string;
@@ -16,26 +16,26 @@ const ShareModal: React.FC<ShareModalProps> = ({
   onClose
 }) => {
   const [copied, setCopied] = useState(false);
-  
+
   const shareText = `I just earned my Proof-of-${proofType}™ NFT "${title}" on Money Factory AI! #MoneyFactoryAI #ProofEconomy`;
   const shareUrl = explorerUrl || 'https://moneyfactory.ai';
-  
-  const shareToTwitter = () => {
+
+  const shareToX = () => {
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
     window.open(url, '_blank');
   };
-  
+
   const shareToLinkedIn = () => {
     const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareText)}`;
     window.open(url, '_blank');
   };
-  
+
   const copyToClipboard = async (text: string) => {
     await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-  
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -61,7 +61,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
             <X size={20} />
           </button>
         </div>
-        
+
         {/* Share Text Preview */}
         <div className="bg-white/5 rounded-lg p-4 mb-6">
           <h3 className="font-semibold mb-2 text-sm">Share Message</h3>
@@ -72,19 +72,19 @@ const ShareModal: React.FC<ShareModalProps> = ({
             </div>
           )}
         </div>
-        
+
         {/* Share Options */}
         <div className="space-y-3 mb-6">
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={shareToTwitter}
-            className="w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 bg-[#1DA1F2] text-white"
+            onClick={shareToX}
+            className="w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 bg-black text-white border border-white/20"
           >
-            <Twitter size={16} />
-            <span>Share on Twitter</span>
+            <XIcon size={16} />
+            <span>Share on X</span>
           </motion.button>
-          
+
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -94,7 +94,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
             <Linkedin size={16} />
             <span>Share on LinkedIn</span>
           </motion.button>
-          
+
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -105,7 +105,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
             <span>Copy for Discord</span>
           </motion.button>
         </div>
-        
+
         {/* Copy Link */}
         <div className="flex items-center space-x-2 bg-white/5 rounded-lg p-3">
           <div className="flex-1 truncate text-sm opacity-80">
@@ -120,7 +120,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
             {copied ? <CheckCircle size={16} className="text-green-400" /> : <Copy size={16} />}
           </motion.button>
         </div>
-        
+
         {/* Success Message */}
         <AnimatePresence>
           {copied && (

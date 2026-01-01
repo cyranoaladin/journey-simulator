@@ -1,7 +1,7 @@
 import { Keypair, Connection, clusterApiUrl, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import bs58 from 'bs58'
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 
 async function main() {
   const kp = Keypair.generate()

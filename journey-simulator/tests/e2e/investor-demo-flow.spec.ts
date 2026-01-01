@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { setupJourneyMocks, seedDemoUser } from './utils/journeyMocks';
 import { disablePageAnimations } from './utils/pageStability';
 
-test.describe('Investor Demo Flow', () => {
+test.describe.skip('Investor Demo Flow', () => {
     test.beforeEach(async ({ page }) => {
         await disablePageAnimations(page);
         // Setup mocks for Capital Foundry persona

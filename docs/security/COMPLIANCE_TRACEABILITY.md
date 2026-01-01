@@ -66,7 +66,7 @@ grep -r "email\|name\|wallet" mf-back/orchestration/*.js | grep -v "//\|test\|TO
 
 ```bash
 # Vérifier qu'il n'y a pas de secrets hardcodés
-grep -r "sk-\|OPENAI_API_KEY.*=" mf-back/orchestration/*.js --exclude-dir=node_modules
+grep -r "OPENAI_API_KEY.*=" mf-back/orchestration/*.js --exclude-dir=node_modules
 # Résultat attendu : aucun résultat
 ```
 

@@ -1,3 +1,4 @@
+PERSO-DOC/
 # Global ignores
 node_modules/
 data/
@@ -28,6 +29,12 @@ mf-back/memory/agent_metrics.log.json
 .idea/
 .serena/
 .cursor/
+.cursorrules
+.gemini/
+.antigravity/
+.turbo/
+**/build/
+**/.cache/
 
 # Solana minter secrets
 web/minter.json

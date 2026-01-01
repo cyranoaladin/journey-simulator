@@ -17,7 +17,7 @@ export type MissionSummary = {
 };
 
 type Props = {
-  summary?: MissionSummary | null;
+  readonly summary?: MissionSummary | null;
 };
 
 export default function MissionFeedbackSummary({ summary }: Props) {
@@ -168,7 +168,7 @@ export default function MissionFeedbackSummary({ summary }: Props) {
       </div>
 
       <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-        Admin API Key
+        <span>Admin API Key</span>
         <input
           type="password"
           value={apiKey}

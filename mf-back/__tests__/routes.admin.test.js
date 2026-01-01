@@ -1,8 +1,11 @@
+// Tests run stateless bearer flows with CSRF parity middleware.
 const express = require('express');
 const request = require('supertest');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { csrfGuard } = require('../middleware/csrfGuard');
+const ORIGINAL_READDIR_SYNC = fs.readdirSync;
 
 jest.mock('../models/agentFeedbackLog', () => ({
   find: jest.fn().mockReturnValue({ sort: jest.fn().mockReturnThis(), limit: jest.fn().mockResolvedValue([]) }),
@@ -88,6 +91,8 @@ describe('admin routes', () => {
 
     app = express();
     app.use(express.json());
+    // Stateless API: skip csurf in tests; csrfGuard is already a no-op without cookies
+    app.use(csrfGuard);
     // Load routes after mocks are set up
     try {
       app.use('/', require('../routes/zyno-routes'));
@@ -106,6 +111,7 @@ describe('admin routes', () => {
     errorSpy.mockRestore();
     delete process.env.ADMIN_API_KEY;
     delete process.env.RAG_DATA_PATH;
+    fs.readdirSync = ORIGINAL_READDIR_SYNC;
     if (tempDocsDir) {
       fs.rmSync(tempDocsDir, { recursive: true, force: true });
     }
@@ -201,19 +207,21 @@ describe('admin routes', () => {
 
   it('handles filesystem errors when listing RAG documents', async () => {
     process.env.ADMIN_API_KEY = 'secret';
-    const originalReaddirSync = fs.readdirSync;
     fs.readdirSync = () => {
       throw new Error('fs down');
     };
 
-    const res = await request(app)
-      .get('/admin/rag/documents')
-      .set('x-api-key', 'secret')
-      .expect(500);
+    try {
+      const res = await request(app)
+        .get('/admin/rag/documents')
+        .set('x-api-key', 'secret')
+        .expect(500);
 
-    expect(res.body).toEqual({ error: 'Unable to list documents' });
-    expect(errorSpy).toHaveBeenCalled();
-    fs.readdirSync = originalReaddirSync;
+      expect(res.body).toEqual({ error: 'Unable to list documents' });
+      expect(errorSpy).toHaveBeenCalled();
+    } finally {
+      fs.readdirSync = ORIGINAL_READDIR_SYNC;
+    }
   });
 
   it('denies agent scoreboard access when api key mismatches', async () => {

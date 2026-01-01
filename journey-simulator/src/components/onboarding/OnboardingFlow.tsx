@@ -51,15 +51,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
     }
   }, []);
 
-  const handleTutorialComplete = () => {
-    setShowTutorial(false);
-    localStorage.setItem('onboarding-completed', 'true');
-    if (onComplete) {
-      onComplete();
-    }
-  };
-
-  const handleTutorialSkip = () => {
+  const finalizeTutorial = () => {
     setShowTutorial(false);
     localStorage.setItem('onboarding-completed', 'true');
     if (onComplete) {
@@ -71,8 +63,8 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
     return (
       <ContextualTutorial
         steps={onboardingSteps}
-        onComplete={handleTutorialComplete}
-        onSkip={handleTutorialSkip}
+        onComplete={finalizeTutorial}
+        onSkip={finalizeTutorial}
         autoStart={true}
       />
     );

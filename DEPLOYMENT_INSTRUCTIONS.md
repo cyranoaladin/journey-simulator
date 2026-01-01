@@ -27,7 +27,7 @@ sudo bash /tmp/deploy.sh
 
 Le script vous demandera :
 1. **GitHub Personal Access Token (PAT)** - Pour cloner le repository privé
-2. **OpenAI API Key** - Votre clé commençant par `sk-proj-...`
+2. **OpenAI API Key** - Votre clé OpenAI privée (ne pas la commiter)
 3. **Admin API Key** - Appuyez sur Entrée pour en générer une automatiquement
 
 ## Ce que fait le script automatiquement

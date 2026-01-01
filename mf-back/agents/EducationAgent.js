@@ -1,70 +1,106 @@
-const BaseAgent = require('./BaseAgent');
+const { LLMClient } = require('../orchestration/llmClient');
 
-class EducationAgent extends BaseAgent {
+class EducationAgent {
     constructor() {
-        super("EducationAgent");
+        this.id = 'EducationAgent';
+        this.llm = new LLMClient({});
     }
 
-    buildSystemPrompt(ctx) {
-        return `You are the **EducationAgent**, a patient and insightful mentor.
-Your goal is to make the complex world of Web3 and Solana accessible and intuitive.
-You believe that "Understanding is the first step to building."
+    buildPrompt({ input, ragChunks, journey, orchestrationMode }) {
+        const citations = (ragChunks || [])
+            .map((c, i) => `- [${i + 1}] ${c.title}: ${c.text.slice(0, 180)}...`)
+            .join('\n');
 
-Your responsibilities:
-1. Explain Concepts: Break down technical terms (e.g., "Proof of History", "Rent") into simple analogies.
-2. Create Learning Resources: Generate flashcards, quizzes, and summaries.
-3. Guide Onboarding: Help the user navigate the "Cognitive Activation" phase.
-4. Check Understanding: Ask Socratic questions to ensure the user truly grasps the material.
+        const phase = journey?.phaseId || 'unknown';
+        const isCollaborative = orchestrationMode === 'AECO';
 
-Tone: Encouraging, clear, patient. Use analogies (e.g., "Solana is like a global clock...").`;
-    }
+        const tone = isCollaborative
+            ? 'Pedagogical, bridging gaps between technical agents and user.'
+            : 'Socratic, patient, "Professor".';
 
-    buildUserPrompt(ctx) {
-        return `Here is the user's question or current learning context:
-"${ctx.submission}"
-
-Explain the relevant concepts, potentially using a flashcard or analogy.`;
-    }
-
-    async run(ctx) {
-        // Use standard evaluation schema or a simplified one for education
-        // For now, we use the standard one to allow for "quizzes" or "flashcards" via the axes/feedback mechanism
-        // or we could just return text. Let's stick to the standard schema for consistency.
-        const EVALUATION_SCHEMA = {
-            type: "json_schema",
-            json_schema: {
-                name: "EvaluationResponse",
-                strict: true,
-                schema: {
-                    type: "object",
-                    required: ["global_score", "feedback", "axes"],
-                    properties: {
-                        global_score: { type: "number" },
-                        feedback: { type: "string" },
-                        axes: {
-                            type: "array",
-                            items: {
-                                type: "object",
-                                required: ["name", "score", "max_score", "comment"],
-                                properties: {
-                                    name: { type: "string" },
-                                    score: { type: "number" },
-                                    max_score: { type: "number" },
-                                    comment: { type: "string" },
-                                },
-                                additionalProperties: false,
-                            },
-                        },
-                    },
-                    additionalProperties: false,
-                },
-            },
+        return {
+            system: [
+                '**IDENTITY**: Web3 Educator & Concept Simplifier.',
+                '**EXPERTISE**: Active Pedagogy, Socratic Method, Technical Analogy (e.g. "Rent is parking fees"), Curriculum Design.',
+                '**WORKFLOW**:',
+                '1. Assess user understanding level.',
+                '2. Explain concepts using analogies.',
+                '3. Propose a mini-quiz or active recall exercise.',
+                '4. Link to deeper resources.',
+                '',
+                `**TONE**: ${tone}`,
+                '**OUTPUT FORMAT**: STRICT JSON: {',
+                '  "status": "OK",',
+                '  "summary": "...",',
+                '  "educational_content": { "concept": "...", "analogy": "...", "quiz": ["..."] },',
+                '  "resources": {',
+                '     "diagram": "Mermaid diagram string (graph TD... for concept map)",',
+                '     "data": { "difficulty": "Easy|Medium|Hard", "tags": ["..."] },',
+                '     "documentation": "Markdown detailed lesson"',
+                '  },',
+                '  "actions": ["..."]',
+                '}',
+                '**RESOURCES**: Must output valid simple diagrams for concepts.'
+            ].join('\n'),
+            user: [
+                `User Input: ${input}`,
+                `Current Phase: ${phase}`,
+                `Mode: ${orchestrationMode}`,
+                'RAG Context:',
+                citations || '- (no specific education docs found)',
+                '',
+                'Explain and educate.'
+            ].join('\n'),
         };
+    }
 
-        return super.run(ctx, {
-            response_format: EVALUATION_SCHEMA,
-            temperature: 0.5,
+    async run(request) {
+        const { traceId, input, context = {}, rag = {}, constraints = {} } = request;
+        const ragChunks = rag.chunks || (context.rag && context.rag.chunks) || [];
+
+        const prompt = this.buildPrompt({
+            input,
+            ragChunks,
+            journey: context.journey,
+            orchestrationMode: context.orchestrationMode || 'AEPO'
         });
+
+        const llmRes = await this.llm.generate({
+            prompt,
+            traceId,
+            agentId: this.id,
+            maxTokens: constraints.maxTokens || 1200,
+            temperature: 0.5
+        });
+
+        let parsed = { educational_content: {}, resources: {}, actions: [], summary: "Education analysis failed to parse" };
+        try {
+            const jsonMatch = llmRes.text.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                parsed = JSON.parse(jsonMatch[0]);
+            } else {
+                parsed = JSON.parse(llmRes.text);
+            }
+        } catch (e) {
+            parsed.details = llmRes.text;
+            parsed.resources = { documentation: '### Error\nCould not parse Education JSON.' };
+        }
+
+        return {
+            traceId,
+            agentId: this.id,
+            status: 'OK',
+            summary: parsed.summary || 'Educational content generated',
+            details: parsed.educational_content || {},
+            resources: parsed.resources || {},
+            confidence: 0.95,
+            assumptions: [`RAG hits: ${ragChunks.length}`],
+            citations: ragChunks.map((c) => ({ id: c.id, title: c.title, source: c.source })),
+            actions: parsed.actions || ['Take the quiz'],
+            metrics: { latencyMs: llmRes.latencyMs, tokens: llmRes.tokensUsed, ragHits: ragChunks.length },
+            errors: [],
+            mock: llmRes.mock || false,
+        };
     }
 }
 

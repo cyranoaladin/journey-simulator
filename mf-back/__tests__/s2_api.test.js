@@ -1,8 +1,10 @@
 const request = require('supertest');
+// Tests run stateless bearer flows with CSRF parity middleware.
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const journeyEngineRoutes = require('../routes/journey-engine-routes');
+const { csrfGuard } = require('../middleware/csrfGuard');
 
 // Mock RAG to avoid network errors in tests
 jest.mock('../rag/ragClient', () => ({
@@ -25,6 +27,8 @@ process.env.RAG_SEARCH_URL = ''; // Force local fallback
 
 const app = express();
 app.use(bodyParser.json());
+// Stateless API: skip csurf in tests; csrfGuard is already a no-op without cookies
+app.use(csrfGuard);
 app.use('/api/engine', journeyEngineRoutes);
 
 // DB Setup (Same as s2_logic)

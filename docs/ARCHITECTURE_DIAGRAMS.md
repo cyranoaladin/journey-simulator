@@ -46,7 +46,7 @@ graph TB
     C -->|Stores Users| G
     C -->|Queue Jobs| H
 
-    B -->|Orchestrates| I[Zyno Orchestrator<br/>23 Specialized Agents]
+    B -->|Orchestrates| I[Zyno Orchestrator<br/>37 Specialized Agents]
     I -->|Queries| E
     I -->|Retrieves Context| J[RAG System]
 

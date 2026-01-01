@@ -179,8 +179,7 @@ const ResourceHub = () => {
                   Ready-to-use{' '}
                   <span title={AEPO.tooltip} className="cursor-help border-b border-dashed border-white/20">
                     AEPO
-                  </span>
-                  /
+                  </span>{' / '}
                   <span title={AECO.tooltip} className="cursor-help border-b border-dashed border-white/20">
                     AECO
                   </span>{' '}

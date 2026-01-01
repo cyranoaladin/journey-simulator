@@ -24,7 +24,6 @@ import { useState } from 'react';
 import { getProofType } from '../../data/proofsData';
 import { useJourneyStore } from '../../store/journeyStore';
 import { JourneyPhase } from '../../types/journey';
-import type { JourneyStepResponse } from '../../types/uiBlocks';
 import { generateStableKey } from '../../utils/generateStableKey';
 import { renderHighlightedText } from '../../utils/renderHighlightedText';
 import MintCelebrationBanner from '../MintCelebrationBanner';
@@ -326,9 +325,9 @@ const PhaseSection: FC<PhaseSectionProps> = ({
                   <div className="h-4 bg-white/10 rounded w-1/2" />
                 </div>
               </div>
-            ) : (
-              <UIBlocksRenderer response={lastStep as JourneyStepResponse} />
-            )}
+            ) : lastStep ? (
+              <UIBlocksRenderer response={lastStep} />
+            ) : null}
           </>
         )}
       </div>

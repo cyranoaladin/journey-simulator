@@ -109,16 +109,37 @@ export const LaunchCollaterizePhase: React.FC<LaunchCollaterizePhaseProps> = ({ 
     );
   }
 
+  const getEligibilityBadge = (accepted: boolean) => {
+    if (accepted) {
+      return {
+        className: 'bg-green-900/50 text-green-400 border border-green-500',
+        label: 'ELIGIBLE',
+      };
+    }
+    return {
+      className: 'bg-red-900/50 text-red-400 border border-red-500',
+      label: 'NOT ELIGIBLE',
+    };
+  };
+
+  const getEligibilityBarColor = (score: number) => {
+    if (score >= 80) return 'bg-green-500';
+    if (score >= 60) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
+
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-white">Launch Simulation Results</h2>
-        <div className={`px-4 py-1 rounded-full text-sm font-bold ${results.accepted
-          ? 'bg-green-900/50 text-green-400 border border-green-500'
-          : 'bg-red-900/50 text-red-400 border border-red-500'
-          }`}>
-          {results.accepted ? 'ELIGIBLE' : 'NOT ELIGIBLE'}
-        </div>
+        {(() => {
+          const badge = getEligibilityBadge(results.accepted);
+          return (
+            <div className={`px-4 py-1 rounded-full text-sm font-bold ${badge.className}`}>
+              {badge.label}
+            </div>
+          );
+        })()}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -132,9 +153,7 @@ export const LaunchCollaterizePhase: React.FC<LaunchCollaterizePhaseProps> = ({ 
           <div className="w-full bg-gray-700 h-3 rounded-full overflow-hidden">
             <div
               ref={eligibilityBarRef}
-              className={`h-full transition-all duration-500 ${results.eligibilityScore >= 80 ? 'bg-green-500' :
-                results.eligibilityScore >= 60 ? 'bg-yellow-500' : 'bg-red-500'
-                }`}
+              className={`h-full transition-all duration-500 ${getEligibilityBarColor(results.eligibilityScore)}`}
             />
           </div>
           <p className="mt-2 text-sm text-gray-400">

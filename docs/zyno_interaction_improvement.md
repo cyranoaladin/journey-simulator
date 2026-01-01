@@ -5,7 +5,7 @@
 
 Renforcer la **visibilité** et l’**interactivité** de l’agent Zyno à chaque étape des parcours utilisateur dans le simulateur.
 
-Zyno n’est pas un moteur invisible : c’est un **copilote intelligent** qui doit **expliquer ses actions, afficher ses décisions, proposer des pistes et s’adapter aux retours utilisateurs.**
+Zyno n’est pas un moteur invisible : c’est un **guide stratégique** qui doit **expliquer ses actions, afficher ses décisions, proposer des pistes et s’adapter aux retours utilisateurs.**
 
 ---
 
@@ -131,7 +131,7 @@ Chaque `phase` définie dans les fichiers de templates (journey-tasks.json, temp
 
 ---
 
-## 🏁 Étapes de mise en œuvre pour Copilot
+## 🏁 Étapes de mise en œuvre côté Zyno
 
 1. Ajouter un modèle de réponse standardisée dans tous les agents (output enrichi)
 2. Modifier `zynoOrchestrator.js` pour structurer chaque action de Zyno

@@ -11,6 +11,36 @@ interface ProofCertificationsProps {
   className?: string;
 }
 
+const getRarityColor = (rarity: string) => {
+  switch (rarity) {
+    case 'legendary': return 'text-yellow-400 bg-yellow-400/20';
+    case 'epic': return 'text-purple-400 bg-purple-400/20';
+    case 'rare': return 'text-blue-400 bg-blue-400/20';
+    default: return 'text-gray-400 bg-gray-400/20';
+  }
+};
+
+const getStatusMeta = (isLocked: boolean, isClaimed: boolean) => {
+  if (isLocked) {
+    return { label: 'Locked', className: 'text-yellow-400', icon: <Lock size={10} className="mr-1" /> };
+  }
+  if (isClaimed) {
+    return { label: 'Claimed', className: 'text-green-400', icon: <CheckCircle size={10} className="mr-1" /> };
+  }
+  return { label: 'Available', className: 'text-accent-gold', icon: <Sparkles size={10} className="mr-1" /> };
+};
+
+const getBorderClass = (isLocked: boolean, isClaimed: boolean) => {
+  if (isLocked) return 'border-white/10';
+  if (isClaimed) return 'border-green-500/30';
+  return 'border-white/20';
+};
+
+const getIconContainerClass = (isLocked: boolean, gradient: string) => {
+  if (isLocked) return 'bg-white/10';
+  return `bg-gradient-to-br ${gradient}`;
+};
+
 const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ className = '' }) => {
   const { userProgress, selectedPersona } = useJourneyStore();
   const [selectedCertification, setSelectedCertification] = useState<Certification | null>(null);
@@ -86,16 +116,6 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
   // Use shared persona style utility
   const personaStyle = getPersonaStyle(selectedPersona?.id);
 
-  // Get rarity color
-  const getRarityColor = (rarity: string) => {
-    switch (rarity) {
-      case 'legendary': return 'text-yellow-400 bg-yellow-400/20';
-      case 'epic': return 'text-purple-400 bg-purple-400/20';
-      case 'rare': return 'text-blue-400 bg-blue-400/20';
-      default: return 'text-gray-400 bg-gray-400/20';
-    }
-  };
-
   return (
     <div className={`${className}`}>
       <div className="flex items-center justify-between mb-4">
@@ -119,6 +139,37 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
             const isClaimed = userProgress.nfts.includes(certification.name);
             const proofType = getProofType(selectedPersona?.id || '', certification.phaseId || certification.id);
             const isHovered = hoveredCertId === certification.id;
+            const borderClass = getBorderClass(isLocked, isClaimed);
+            const statusMeta = getStatusMeta(isLocked, isClaimed);
+
+            const renderVisual = () => {
+              if (isLocked) {
+                return (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Lock size={20} className="text-white/50" />
+                  </div>
+                );
+              }
+              if (certification.imageUrl) {
+                return (
+                  <img
+                    src={certification.imageUrl}
+                    alt={certification.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.onerror = null;
+                      target.src = '/images/logo_mfai.png';
+                    }}
+                  />
+                );
+              }
+              return (
+                <div className="w-full h-full flex items-center justify-center">
+                  <Award size={20} className="text-white" />
+                </div>
+              );
+            };
             
             return (
               <motion.div
@@ -131,31 +182,12 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
                 onClick={() => !isLocked && handleCertificationClick(certification)}
                 onHoverStart={() => setHoveredCertId(certification.id)}
                 onHoverEnd={() => setHoveredCertId(null)}
-                className={`relative overflow-hidden rounded-lg border ${isLocked ? 'border-white/10' : isClaimed ? 'border-green-500/30' : 'border-white/20'} bg-white/5 p-3 cursor-pointer transition-all`}
+                className={`relative overflow-hidden rounded-lg border ${borderClass} bg-white/5 p-3 cursor-pointer transition-all`}
               >
                 <div className="flex items-center space-x-3">
                   {/* NFT Icon */}
-                  <div className={`w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 ${isLocked ? 'bg-white/10' : `bg-gradient-to-br ${personaStyle.bgGradient}`}`}>
-                    {isLocked ? (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Lock size={20} className="text-white/50" />
-                      </div>
-                    ) : certification.imageUrl ? (
-                      <img 
-                        src={certification.imageUrl} 
-                        alt={certification.name} 
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.onerror = null;
-                          target.src = '/images/logo_mfai.png';
-                        }}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Award size={20} className="text-white" />
-                      </div>
-                    )}
+                  <div className={`w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 ${getIconContainerClass(isLocked, personaStyle.bgGradient)}`}>
+                    {renderVisual()}
                   </div>
                   
                   {/* NFT Info */}
@@ -173,23 +205,10 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
                       <span className={`text-xs ${isLocked ? 'opacity-50' : 'opacity-80'}`}>
                         Proof-of-{proofType}™
                       </span>
-                      
-                      {isLocked ? (
-                        <span className="text-xs flex items-center text-yellow-400">
-                          <Lock size={10} className="mr-1" />
-                          Locked
-                        </span>
-                      ) : isClaimed ? (
-                        <span className="text-xs flex items-center text-green-400">
-                          <CheckCircle size={10} className="mr-1" />
-                          Claimed
-                        </span>
-                      ) : (
-                        <span className="text-xs flex items-center text-accent-gold">
-                          <Sparkles size={10} className="mr-1" />
-                          Available
-                        </span>
-                      )}
+                      <span className={`text-xs flex items-center ${statusMeta.className}`}>
+                        {statusMeta.icon}
+                        {statusMeta.label}
+                      </span>
                     </div>
                   </div>
                 </div>

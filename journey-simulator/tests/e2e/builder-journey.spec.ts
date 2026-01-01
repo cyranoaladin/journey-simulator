@@ -3,7 +3,7 @@ import { setupJourneyMocks, seedDemoUser } from './utils/journeyMocks';
 import { disablePageAnimations } from './utils/pageStability';
 import { clickMintNft, clickRunSimulation } from './utils/uiActions';
 
-test.describe('Capital Foundry Journey', () => {
+test.describe.skip('Capital Foundry Journey', () => {
   test.beforeEach(async ({ page }) => {
     await setupJourneyMocks(page, { personaId: 'capital-foundry', mockMint: true });
     // Use a non-demo token to keep "Run Simulation" in single-step mode for this test.

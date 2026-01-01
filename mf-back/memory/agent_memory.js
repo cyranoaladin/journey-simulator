@@ -2,7 +2,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const MEMORY_FILE = path.join(__dirname, 'agent_memory.json');
+const MEMORY_DIR = __dirname;
+const MEMORY_FILE = path.join(MEMORY_DIR, 'agent_memory.json');
 
 function createDefaultUserMemory() {
   return {
@@ -18,7 +19,18 @@ function createDefaultUserMemory() {
   };
 }
 
+function ensureMemoryDir() {
+  try {
+    if (!fs.existsSync(MEMORY_DIR)) {
+      fs.mkdirSync(MEMORY_DIR, { recursive: true });
+    }
+  } catch (err) {
+    console.error('Failed to create memory directory:', err);
+  }
+}
+
 function loadFromDisk() {
+  ensureMemoryDir();
   if (!fs.existsSync(MEMORY_FILE)) {
     return {};
   }
@@ -36,6 +48,7 @@ function loadFromDisk() {
 
 function persistToDisk(currentMemory) {
   try {
+    ensureMemoryDir();
     fs.writeFileSync(MEMORY_FILE, JSON.stringify(currentMemory, null, 2));
   } catch (error) {
     console.error('Failed to persist agent memory:', error);
@@ -82,10 +95,18 @@ let memory = loadFromDisk();
 
 module.exports = {
   get(userId) {
+    if (!userId) {
+      console.error('agent_memory.get called without userId');
+      return createDefaultUserMemory();
+    }
     return ensureUser(memory, userId);
   },
 
   update(userId, data) {
+    if (!userId) {
+      console.error('agent_memory.update called without userId');
+      return null;
+    }
     const userRecord = ensureUser(memory, userId);
     memory[userId] = {
       ...userRecord,
@@ -97,6 +118,10 @@ module.exports = {
   },
 
   pushHistory(userId, entry) {
+    if (!userId) {
+      console.error('agent_memory.pushHistory called without userId');
+      return null;
+    }
     const userRecord = ensureUser(memory, userId);
     const historyEntry = {
       timestamp: new Date().toISOString(),
@@ -110,6 +135,10 @@ module.exports = {
   },
 
   saveInteraction(agentName, userId, data = {}) {
+    if (!userId) {
+      console.error('agent_memory.saveInteraction called without userId');
+      return null;
+    }
     const userRecord = ensureUser(memory, userId);
     const entry = {
       timestamp: new Date().toISOString(),

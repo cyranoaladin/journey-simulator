@@ -18,4 +18,6 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/public ./public
 EXPOSE 3000
+RUN addgroup -g 101 app && adduser -S -G app -u 101 app
+USER 101
 CMD ["npm","start"]

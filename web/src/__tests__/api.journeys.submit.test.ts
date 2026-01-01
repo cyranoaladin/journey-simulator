@@ -45,15 +45,15 @@ describe('API /api/journeys/[id]/submit', () => {
 
   it('rejects bad request', async () => {
     const mod = await import(path)
-    const { POST } = mod as any
-    const res = await POST({ json: async () => ({}) } as any, { params: { id: 'abc' } } as any)
+    const { POST } = mod as { POST: (req: any, ctx: any) => Promise<Response> }
+    const res = await POST({ json: async () => ({}) }, { params: { id: 'abc' } })
     expect(res.status).toBe(400)
   })
 
   it('returns demo evaluation when DEMO_MODE=true', async () => {
     process.env.DEMO_MODE = 'true'
     const mod = await import(path)
-    const { POST } = mod as any
+    const { POST } = mod as { POST: (req: any, ctx: any) => Promise<Response> }
     const url = new URL('http://localhost/api/journeys/abc/submit')
     const req = {
       json: async () => ({
@@ -64,7 +64,7 @@ describe('API /api/journeys/[id]/submit', () => {
       }),
       url: url.toString(),
     } as any
-    const res = await POST(req, { params: { id: 'abc' } } as any)
+    const res = await POST(req, { params: { id: 'abc' } })
     expect(res.status).toBe(200)
     const json = await (res as NextResponse).json()
     expect(Array.isArray(json.ui_blocks)).toBe(true)
@@ -76,7 +76,7 @@ describe('API /api/journeys/[id]/submit', () => {
 
   it('forces LLM path with ?llm=1 and uses evaluator mock', async () => {
     const mod = await import(path)
-    const { POST } = mod as any
+    const { POST } = mod as { POST: (req: any, ctx: any) => Promise<Response> }
     const url = new URL('http://localhost/api/journeys/abc/submit?llm=1')
     const req = {
       json: async () => ({
@@ -87,7 +87,7 @@ describe('API /api/journeys/[id]/submit', () => {
       }),
       url: url.toString(),
     } as any
-    const res = await POST(req, { params: { id: 'abc' } } as any)
+    const res = await POST(req, { params: { id: 'abc' } })
     expect(res.status).toBe(200)
     const json = await (res as NextResponse).json()
     expect(json.next_state?.xp_delta).toBe(20)

@@ -58,12 +58,16 @@ const runScript = (scriptName) => {
 };
 
 const replaceBlock = (readme, marker, replacementBlock) => {
-  const re = new RegExp(`<!-- BEGIN AUTO-GENERATED: ${marker} -->[\\s\\S]*?<!-- END AUTO-GENERATED: ${marker} -->`, 'm');
-  if (!re.test(readme)) {
+  const startMarker = `<!-- BEGIN AUTO-GENERATED: ${marker} -->`;
+  const endMarker = `<!-- END AUTO-GENERATED: ${marker} -->`;
+  const startIdx = readme.indexOf(startMarker);
+  const endIdx = readme.indexOf(endMarker);
+  if (startIdx === -1 || endIdx === -1 || endIdx < startIdx) {
     throw new Error(`Marker block not found in README: ${marker}`);
   }
-  // replacementBlock already includes BEGIN/END lines
-  return readme.replace(re, replacementBlock);
+  const before = readme.slice(0, startIdx);
+  const after = readme.slice(endIdx + endMarker.length);
+  return `${before}${replacementBlock}${after}`;
 };
 
 const main = () => {

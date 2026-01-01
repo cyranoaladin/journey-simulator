@@ -18,6 +18,9 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 ENV NODE_ENV=production \
     PORT=3000
 
+RUN groupadd -g 101 nodeapp && useradd -u 101 -g nodeapp -m nodeapp
+USER nodeapp
+
 EXPOSE 3000
 
 ENTRYPOINT ["entrypoint.sh"]

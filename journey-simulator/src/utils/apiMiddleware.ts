@@ -23,7 +23,7 @@ export type Middleware<T> = (
 /**
  * Demo mode middleware - handles all demo mode logic
  */
-export const demoModeMiddleware: Middleware<any> = async (context, next) => {
+export const demoModeMiddleware: Middleware<unknown> = async (context, next) => {
   const { path, options, token } = context;
   const isAIAgentCall = path.includes('/step') || path.includes('/submit');
 
@@ -38,7 +38,7 @@ export const demoModeMiddleware: Middleware<any> = async (context, next) => {
 /**
  * Auth middleware - handles token refresh on 401
  */
-export const authMiddleware: Middleware<any> = async (context, _next) => {
+export const authMiddleware: Middleware<unknown> = async (context, _next) => {
   const { path, options, retryOnUnauthorized } = context;
   let response: Response;
 
@@ -65,7 +65,7 @@ export const authMiddleware: Middleware<any> = async (context, _next) => {
 /**
  * Response handler middleware
  */
-export const responseHandlerMiddleware: Middleware<any> = async (_context, next) => {
+export const responseHandlerMiddleware: Middleware<unknown> = async (_context, next) => {
   const ctx = await next();
   if (!ctx.response) {
     return ctx;
@@ -176,8 +176,8 @@ async function handleResponse<T>(response: Response): Promise<T> {
 /**
  * Helper: Handle offline fallback
  */
-async function handleOfflineFallback<T>(_path: string, _error: any): Promise<T | undefined> {
-  // Offline fallback logic
+async function handleOfflineFallback<T>(_path: string, _error: unknown): Promise<T | undefined> {
+  // Offline fallback logic placeholder
   return undefined;
 }
 
@@ -186,7 +186,7 @@ async function handleOfflineFallback<T>(_path: string, _error: any): Promise<T |
  */
 interface DemoHandler {
   matches: (path: string, options: RequestInit) => boolean;
-  handle: (path: string, options: RequestInit) => Promise<any>;
+  handle: (path: string, options: RequestInit) => Promise<unknown>;
 }
 
 /**

@@ -119,7 +119,7 @@ fi
 
 # Prompt for OpenAI API Key if not set
 if [ -z "$OPENAI_API_KEY" ]; then
-    echo -e "${BLUE}Enter your OpenAI API Key (sk-proj-...):${NC}"
+    echo -e "${BLUE}Enter your OpenAI API Key:${NC}"
     read -s OPENAI_API_KEY
     echo ""
 fi

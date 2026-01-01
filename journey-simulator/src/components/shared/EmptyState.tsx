@@ -41,9 +41,8 @@ export const EmptyState = ({
   const appliedIconTone = iconTone[tone];
 
   return (
-    <div
+    <output
       className={`flex flex-col items-center text-center rounded-2xl border ${appliedTone} ${spacing} ${gap} ${className}`.trim()}
-      role="status"
       aria-live="polite"
     >
       {icon ? (
@@ -64,7 +63,7 @@ export const EmptyState = ({
           {actionLabel}
         </button>
       ) : null}
-    </div>
+    </output>
   );
 };
 

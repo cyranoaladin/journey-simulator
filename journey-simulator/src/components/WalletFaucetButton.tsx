@@ -31,35 +31,47 @@ const WalletFaucetButton: React.FC<WalletFaucetButtonProps> = ({ className = '' 
 
   if (!connected) return null;
 
+  const buildButtonClass = () => {
+    const base = 'flex items-center space-x-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all disabled:opacity-50';
+    if (isSuccess) return `${base} bg-green-500 text-white ${className}`;
+    return `${base} bg-blue-600 hover:bg-blue-500 text-white ${className}`;
+  };
+
+  const renderContent = () => {
+    if (isRequesting) {
+      return (
+        <>
+          <Loader size={14} className="animate-spin" />
+          <span>Requesting...</span>
+        </>
+      );
+    }
+    if (isSuccess) {
+      return (
+        <>
+          <CheckCircle size={14} />
+          <span>Received SOL!</span>
+        </>
+      );
+    }
+    return (
+      <>
+        <Droplets size={14} />
+        <img src="/images/solana.svg" alt="Solana" className="w-4 h-4 ml-1" />
+        <span>Get Devnet SOL</span>
+      </>
+    );
+  };
+
   return (
     <motion.button
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={requestTestnetTokens}
       disabled={isRequesting || isSuccess}
-      className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-        isSuccess
-          ? 'bg-green-500 text-white'
-          : 'bg-blue-600 hover:bg-blue-500 text-white'
-      } disabled:opacity-50 ${className}`}
+      className={buildButtonClass()}
     >
-      {isRequesting ? (
-        <>
-          <Loader size={14} className="animate-spin" />
-          <span>Requesting...</span>
-        </>
-      ) : isSuccess ? (
-        <>
-          <CheckCircle size={14} />
-          <span>Received SOL!</span>
-        </>
-      ) : (
-        <>
-          <Droplets size={14} />
-          <img src="/images/solana.svg" alt="Solana" className="w-4 h-4 ml-1" />
-          <span>Get Devnet SOL</span>
-        </>
-      )}
+      {renderContent()}
     </motion.button>
   );
 };

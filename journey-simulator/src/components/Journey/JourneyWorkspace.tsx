@@ -9,7 +9,7 @@ interface JourneyWorkspaceProps {
 const JourneyWorkspace = ({ onBack }: JourneyWorkspaceProps) => {
   const isDemo = tokenStore.getAccessToken() === 'demo-token';
 
-  if (isDemo) {
+      if (isDemo) {
     return <JourneyDemoMode onBack={onBack} />;
   }
 

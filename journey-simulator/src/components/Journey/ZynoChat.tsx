@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useJourneyStore } from '../../store/journeyStore';
 
 interface ZynoChatProps {
-  className?: string;
+  readonly className?: string;
 }
 
 export default function ZynoChat({ className = '' }: ZynoChatProps) {
@@ -178,6 +178,7 @@ export default function ZynoChat({ className = '' }: ZynoChatProps) {
             <div className="flex items-end space-x-2">
               <textarea
                 ref={textareaRef}
+                data-testid="zyno-chat-input"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Ask Zyno a question..."
@@ -187,6 +188,7 @@ export default function ZynoChat({ className = '' }: ZynoChatProps) {
               />
               <button
                 type="submit"
+                data-testid="zyno-send-button"
                 disabled={!message.trim() || isSending}
                 className={`p-2 rounded-lg ${message.trim() && !isSending
                   ? 'bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-700 hover:to-purple-700'
@@ -212,6 +214,7 @@ export default function ZynoChat({ className = '' }: ZynoChatProps) {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsOpen(true)}
+          data-testid="zyno-fab"
           className="w-14 h-14 rounded-full bg-gradient-to-r from-cyan-600 to-purple-600 flex items-center justify-center shadow-lg hover:shadow-cyan-500/30"
         >
           <span className="text-xl">🤖</span>

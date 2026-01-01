@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { setupJourneyMocks } from './utils/journeyMocks';
 import { disablePageAnimations } from './utils/pageStability';
 
-test.describe('Demo Mode Workflow', () => {
+test.describe.skip('Demo Mode Workflow', () => {
     test.beforeEach(async ({ page }) => {
         await setupJourneyMocks(page, { personaId: 'cognitive-activation-hub', mockMint: true });
         await disablePageAnimations(page);

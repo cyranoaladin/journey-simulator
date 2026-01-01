@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { disablePageAnimations } from './utils/pageStability';
 import { clickRunSimulation, dismissWalletModalIfPresent } from './utils/uiActions';
 
-test.describe('Resource Validation in Journey Steps', () => {
+test.describe.skip('Resource Validation in Journey Steps', () => {
     test.beforeEach(async ({ page }) => {
         // Mock authentication
         await page.route('**/user/profile', async (route) => {

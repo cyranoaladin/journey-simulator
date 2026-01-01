@@ -61,14 +61,14 @@ describe('AgentFeedbackModal', () => {
     const user = userEvent.setup();
     closeModalSpy.mockClear();
     const timeoutSpy = vi
-      .spyOn(window, 'setTimeout')
+      .spyOn(globalThis, 'setTimeout')
       .mockImplementation(((callback: TimerHandler, _delay?: number, ...args: any[]) => {
         if (typeof callback === 'function') {
           callback(...args);
         }
 
         return 1 as unknown as number;
-      }) as typeof window.setTimeout);
+      }) as typeof globalThis.setTimeout);
 
     const formModule = await import('../AgentFeedbackForm');
     expect(typeof formModule.default).toBe('function');

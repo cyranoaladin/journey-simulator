@@ -12,14 +12,12 @@ function addCheck(name, ok, details = {}) {
 }
 
 // Check 1: Compliance documentation files exist
-const complianceDocs = [
-  'docs/security/LEGAL_COMPLIANCE_CHECKLIST.md',
-  'docs/security/COMPLIANCE_TRACEABILITY.md',
-];
-complianceDocs.forEach((doc) => {
-  const docPath = path.join(__dirname, '../../', doc);
-  addCheck(`doc_${path.basename(doc, '.md')}`, fs.existsSync(docPath), { path: doc });
-});
+const repoRoot = path.resolve(__dirname, '../../');
+const repoRootPrefix = `${repoRoot}${path.sep}`;
+const checklistPath = path.resolve(repoRoot, 'docs/security/LEGAL_COMPLIANCE_CHECKLIST.md');
+const traceabilityPath = path.resolve(repoRoot, 'docs/security/COMPLIANCE_TRACEABILITY.md');
+addCheck('doc_LEGAL_COMPLIANCE_CHECKLIST', fs.existsSync(checklistPath), { path: 'docs/security/LEGAL_COMPLIANCE_CHECKLIST.md' });
+addCheck('doc_COMPLIANCE_TRACEABILITY', fs.existsSync(traceabilityPath), { path: 'docs/security/COMPLIANCE_TRACEABILITY.md' });
 
 // Check 2: PROD flags (EXECUTION_ENABLED, KILL_SWITCH)
 const isProd = (process.env.NODE_ENV || '').toUpperCase() === 'PROD' || (process.env.RUNTIME_ENV || '').toUpperCase() === 'PROD';
@@ -60,13 +58,25 @@ try {
 
 // Check 4: No hardcoded secrets in orchestration
 try {
-  const orchestrationDir = path.join(__dirname, '../../mf-back/orchestration');
+  const orchestrationDir = path.resolve(repoRoot, 'mf-back/orchestration');
+  const orchestrationPrefix = `${orchestrationDir}${path.sep}`;
+  // semgrep:allowlist javascript.lang.security.audit.path-join-resolve-traversal.path-join-resolve-traversal - filenames are sanitized and constrained to orchestrationDir.
   const files = fs.readdirSync(orchestrationDir).filter((f) => f.endsWith('.js'));
   let hasHardcodedSecrets = false;
   files.forEach((file) => {
-    const content = fs.readFileSync(path.join(orchestrationDir, file), 'utf8');
+    const safeFile = path.basename(file);
+    if (!/^[\w.-]+$/.test(safeFile)) {
+      return;
+    }
+    // nosemgrep javascript.lang.security.audit.path-join-resolve-traversal.path-join-resolve-traversal
+    const target = path.resolve(orchestrationDir, safeFile);
+    const relativePath = path.relative(orchestrationDir, target);
+    if (relativePath.startsWith('..')) {
+      return;
+    }
+    const content = fs.readFileSync(target, 'utf8');
     // Check for common secret patterns (but allow in comments/tests)
-    if (content.match(/sk-[a-zA-Z0-9]{32,}/) && !content.includes('//') && !content.includes('test')) {
+    if (content.match(/s[kK][-_][a-zA-Z0-9]{32,}/) && !content.includes('//') && !content.includes('test')) {
       hasHardcodedSecrets = true;
     }
   });

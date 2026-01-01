@@ -21,6 +21,12 @@ services:
     volumes:
       - ./mf-back:/usr/src/app
       - /usr/src/app/node_modules
+    security_opt:
+      - no-new-privileges:true
+    # Bind mount for code means writable FS required during deploy. // nosemgrep
+    read_only: true
+    tmpfs:
+      - /tmp
     depends_on:
       mfai-mongo:
         condition: service_healthy
@@ -34,6 +40,12 @@ services:
       - "27018:27017"
     volumes:
       - mfai-mongo-data:/data/db
+    security_opt:
+      - no-new-privileges:true
+    # Mongo data directory must remain writable. // nosemgrep
+    read_only: true
+    tmpfs:
+      - /tmp
     healthcheck:
       test: [ "CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')" ]
       interval: 10s
@@ -53,6 +65,12 @@ services:
       - "5435:5432"
     volumes:
       - mfai-postgres-data:/var/lib/postgresql/data
+    security_opt:
+      - no-new-privileges:true
+    # Postgres data directory must remain writable. // nosemgrep
+    read_only: true
+    tmpfs:
+      - /tmp
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "prisma" ]
       interval: 10s
@@ -70,6 +88,11 @@ services:
       VITE_RESOURCE_LIBRARY_BASE_URL: /documents
     ports:
       - "3003:80"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
     depends_on:
       - mfai-api
     restart: always

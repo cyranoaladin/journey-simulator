@@ -65,9 +65,11 @@ const PhaseInteractionBlock = ({ phaseId, currentStep, onFeedback }: PhaseIntera
             <p className="mb-1 font-semibold text-slate-100">Sources</p>
             <ul className="space-y-1">
               {currentStep.sources.slice(0, 3).map((source) => {
-                const sourceKey = source?.id || source?.title || source?.url || `source-${source?.title || 'unknown'}`;
+                const sourceKey = String(
+                  source?.id ?? source?.title ?? source?.url ?? `source-${source?.title ?? 'unknown'}`
+                );
                 return (
-                  <li key={String(sourceKey)} className="flex items-center gap-2 text-slate-300">
+                  <li key={sourceKey} className="flex items-center gap-2 text-slate-300">
                     <Sparkles size={12} className="text-accent-cyan" />
                     <span>{source?.title ?? source?.url ?? 'Anonymous source'}</span>
                   </li>

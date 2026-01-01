@@ -39,7 +39,7 @@ const createMotionComponent = (tag: keyof JSX.IntrinsicElements | string = 'div'
     const ElementTag = (typeof tag === 'string' ? tag : 'div') as keyof JSX.IntrinsicElements;
     const MockMotionComponent = ({ children, ...props }: any) => {
         const sanitizedProps = stripMotionProps(props);
-        const Component = ElementTag as keyof JSX.IntrinsicElements;
+        const Component: keyof JSX.IntrinsicElements = ElementTag;
         return <Component {...sanitizedProps}>{children}</Component>;
     };
 

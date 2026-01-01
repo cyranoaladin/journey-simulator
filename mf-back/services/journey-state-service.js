@@ -55,7 +55,18 @@ exports.advanceJourneyStep = async ({ journeyId, fromStepId, toStepId, trigger, 
         journey.current_phase = Number.parseInt(phaseMatch[1], 10);
     }
 
-    // TODO: We could log transition metadata (trigger, agentRunId) to a separate collection here
+    if (trigger || agentRunId) {
+        const entry = {
+            from: fromStepId,
+            to: toStepId,
+            trigger: trigger || 'unknown',
+            agentRunId: agentRunId || null,
+            at: new Date().toISOString()
+        };
+        journey.transitionHistory = Array.isArray(journey.transitionHistory)
+            ? [...journey.transitionHistory, entry]
+            : [entry];
+    }
 
     await journey.save();
     return journey;

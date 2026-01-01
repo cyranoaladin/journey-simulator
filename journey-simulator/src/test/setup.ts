@@ -1,5 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import { vi } from 'vitest';
+import { Buffer } from 'node:buffer';
+import crypto from 'node:crypto';
 
 if (typeof globalThis.IntersectionObserver === 'undefined') {
 	class MockIntersectionObserver implements IntersectionObserver {
@@ -43,6 +45,16 @@ if (typeof globalThis.IntersectionObserver === 'undefined') {
 
 	(globalThis as any).IntersectionObserver = MockIntersectionObserver;
 }
+
+(globalThis as any).Buffer = Buffer;
+Object.defineProperty(globalThis, 'crypto', {
+	value: {
+		getRandomValues: (arr: Uint8Array) => crypto.randomFillSync(arr),
+		randomUUID: () => crypto.randomUUID(),
+		subtle: crypto.webcrypto.subtle,
+	},
+	configurable: true,
+});
 
 vi.mock('../hooks/useArtifacts', () => ({
 	useArtifacts: () => ({ artifacts: [], loading: false, error: null }),

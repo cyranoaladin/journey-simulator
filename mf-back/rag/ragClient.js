@@ -4,8 +4,9 @@ const axios = require('axios');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const RAG_SEARCH_URL = process.env.RAG_SEARCH_URL || 'http://localhost:8000/kb/search';
-const RAG_INGEST_URL = process.env.RAG_INGEST_URL || 'http://localhost:8000/kb/ingest';
+const RAG_BASE_URL = process.env.RAG_BASE_URL || 'http://localhost:8000';
+const RAG_SEARCH_URL = process.env.RAG_SEARCH_URL || `${RAG_BASE_URL}/kb/search`;
+const RAG_INGEST_URL = process.env.RAG_INGEST_URL || `${RAG_BASE_URL}/kb/ingest`;
 const RAG_API_KEY = process.env.RAG_API_KEY || '';
 const RAG_COLLECTION = process.env.RAG_COLLECTION || 'mfai-knowledge';
 const RAG_DATA_PATH = process.env.RAG_DATA_PATH || path.resolve(__dirname, '../data/rag-documents');
@@ -62,11 +63,12 @@ module.exports.getRagSnippets = async (options = {}) => {
   } catch (e) {
     const errorMsg = e instanceof Error ? e.message : String(e);
     if (process.env.NODE_ENV !== 'test') {
-      console.warn('RAG search failed:', errorMsg);
+      console.warn('[RAG_NOTICE]: Remote RAG unreachable, using local knowledge base', errorMsg);
     }
-    // Return local fallback, ensuring it's always an array
+    // Circuit breaker: immediate local fallback
     const fallback = readLocalFallback(normalizedQuery);
-    return Array.isArray(fallback) ? fallback : [];
+    if (!Array.isArray(fallback)) return [];
+    return fallback.map((doc) => ({ ...doc, tag: 'UNVERIFIED_LOCAL' }));
   }
 };
 

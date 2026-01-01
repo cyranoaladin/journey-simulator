@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { FileText, Github, Send, Twitter, Users } from 'lucide-react';
+import { FileText, Github, Send, Twitter as XIcon, Users } from 'lucide-react';
 
 const Footer = () => {
   const footerLinks = {
@@ -10,7 +10,7 @@ const Footer = () => {
     ],
     community: [
       // Note: Discord URL is intentionally omitted here until a canonical invite is published.
-      { label: 'X (Twitter)', href: 'https://x.com/Moneyfactoryai', icon: Twitter },
+      { label: 'X', href: 'https://x.com/Moneyfactoryai', icon: XIcon },
       { label: 'Telegram', href: 'https://t.me/MoneyFacoryAI_Portal', icon: Send },
       { label: 'GitHub', href: 'https://github.com/cyranoaladin/Money_Factory', icon: Github },
       { label: 'Support', href: '/support', icon: Users },
@@ -108,7 +108,7 @@ const Footer = () => {
           <p>© 2024 Money Factory AI. All rights reserved.</p>
           <div className="mt-4 flex items-center space-x-4 md:mt-0">
             {[
-              { Icon: Twitter, href: 'https://x.com/Moneyfactoryai' },
+              { Icon: XIcon, href: 'https://x.com/Moneyfactoryai' },
               { Icon: Send, href: 'https://t.me/MoneyFacoryAI_Portal' },
               { Icon: Github, href: 'https://github.com/cyranoaladin/Money_Factory' },
             ].map(({ Icon, href }, index) => (

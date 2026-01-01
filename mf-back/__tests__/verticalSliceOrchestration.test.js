@@ -31,6 +31,21 @@ jest.mock('../agents/ProductSpecAgent', () => {
   }));
 });
 
+jest.mock('../orchestration/services/executionService', () => {
+  const actual = jest.requireActual('../orchestration/services/executionService');
+  return {
+    ...actual,
+    ExecutionService: actual.ExecutionService,
+    handleExecution: (...args) => actual.ExecutionService.handleExecution(...args),
+    executeAgentWithRetry: (...args) => actual.ExecutionService.executeAgentWithRetry(...args),
+  };
+});
+
+jest.mock('../orchestration/services/validationService', () => {
+  const actual = jest.requireActual('../orchestration/services/validationService');
+  return actual;
+});
+
 const { __mockSearch: ragSearchMock } = require('../orchestration/ragClient');
 const { orchestrateVerticalSlice } = require('../orchestration/zynoVerticalSlice');
 const metricsStore = require('../orchestration/metricsStore');
@@ -144,7 +159,7 @@ describe('Vertical Slice Orchestration', () => {
   });
 
   it('marks TIMEOUT when agent exceeds timeout', async () => {
-    mockSecurityRun.mockImplementationOnce(() => new Promise(() => {})); // never resolves
+    mockSecurityRun.mockImplementation(() => new Promise(() => { })); // never resolves (persists for retry)
     const res = await orchestrateVerticalSlice({
       traceId: 'trace-timeout',
       runId: 'run-timeout',
@@ -1425,7 +1440,7 @@ describe('Vertical Slice Orchestration', () => {
       queued: 10,
       running: 5,
       max: 5,
-      release: () => {},
+      release: () => { },
     });
     const res = await orchestrateVerticalSlice({
       traceId: 'trace-shed',

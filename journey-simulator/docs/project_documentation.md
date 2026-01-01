@@ -383,7 +383,7 @@ Each pathway is composed of five mission-rich phases that progressively unlock d
 - **Mission**: Model a token incentive map, stress-test governance edge cases, and publish a protocol impact canvas.
 - **Duration**: 2 weeks
 - **Rewards**: 90 XP, 9 $MFAI, Tokenomics Architect Badge
-- **Tools**: Incentive simulation board, Governance scenario engine, Zyno economics copilot
+- **Tools**: Incentive simulation board, Governance scenario engine, Zyno economics advisor
 - **Outcomes**: Draft incentive flywheel, Governance escalation plan, Community metrics baseline
 - **Zyno Tip**: "Token design is economic storytelling. Craft incentives that make everyone a protagonist in value creation."
 

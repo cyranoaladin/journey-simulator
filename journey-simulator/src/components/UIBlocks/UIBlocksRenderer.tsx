@@ -1,10 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
+import { Brain, ChevronDown, ShieldCheck, Database, AlertTriangle } from "lucide-react";
+import katex from "katex";
+import "katex/dist/katex.min.css";
 import { useEffect, useMemo, useState } from "react";
 import { useJourneyStore } from "../../store/journeyStore";
 import { api } from '../../utils/api';
 import { generateStableKey } from '../../utils/generateStableKey';
 import { logger } from '../../utils/logger';
-// TEMPORARILY DISABLED - import { useFavoritesStore } from "../../store/favoritesStore";
 import type {
   ActionSuggestionsBlock,
   ChecklistBlock,
@@ -13,7 +15,6 @@ import type {
   EvaluationBlock,
   JourneyStepResponse,
   MissionBlock,
-  NarrativeChoiceBlock,
   ProjectSelectionBlock,
   QuizBlock,
   ResourceBlock,
@@ -23,15 +24,15 @@ import type {
   XpBlock,
 } from "../../types/uiBlocks";
 import GovernanceDashboard from "../Governance/GovernanceDashboard";
-import IndicatorBlockComponent, { IndicatorBlock as IndicatorBlockType } from "./IndicatorBlock";
-import InteractiveTemplateComponent, { InteractiveTemplateBlock as InteractiveTemplateBlockType } from "./InteractiveTemplateBlock";
+import IndicatorBlockComponent from "./IndicatorBlock";
+import InteractiveTemplateComponent from "./InteractiveTemplateBlock";
 import NarrativeChoice from "./NarrativeChoiceBlock";
-// TEMPORARILY DISABLED - import { Star } from "lucide-react";
 
 type MermaidModule = typeof import('mermaid');
 type MermaidAPI = MermaidModule & {
   initialize: (config: Record<string, unknown>) => void;
   render: (id: string, definition: string) => Promise<{ svg: string; }>;
+  parse?: (definition: string) => unknown;
 };
 
 let mermaidModule: MermaidAPI | null = null;
@@ -53,6 +54,100 @@ const loadMermaid = async (): Promise<MermaidAPI> => {
 
   return mermaidLoader;
 };
+
+const validateMermaidSyntax = async (definition: string): Promise<void> => {
+  const mermaid = await loadMermaid();
+  if (typeof mermaid.parse === "function") {
+    mermaid.parse(definition);
+    return;
+  }
+  // Fallback: rely on render throwing if invalid; no-op here.
+};
+
+type SourceItem =
+  | string
+  | {
+    id?: string;
+    title?: string;
+    source?: string;
+    file_path?: string;
+    score?: number;
+  };
+
+function ThoughtProcess({ reasoning }: { reasoning?: string | null; }) {
+  const [open, setOpen] = useState(false);
+  if (!reasoning) return null;
+  return (
+    <div className="mt-3 rounded-lg border border-white/10 bg-white/5">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-wide text-white/80 hover:text-white transition-colors"
+      >
+        <span className="flex items-center gap-2">
+          <Brain size={14} className="text-accent-cyan" />
+          Voir le raisonnement de l'IA
+        </span>
+        <ChevronDown
+          size={14}
+          className={`transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, delay: 0.05 }}
+            className="px-3 pb-3 text-xs text-white/80 leading-relaxed whitespace-pre-wrap"
+          >
+            <StreamingText text={reasoning} speed={8} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function SourceBadges({ sources }: { sources?: SourceItem[]; }) {
+  if (!Array.isArray(sources) || sources.length === 0) return null;
+  const filtered = sources
+    .map((s) => {
+      if (typeof s === "string") return { label: s, score: 1, source: s };
+      const score = typeof s.score === "number" ? s.score : undefined;
+      const label = s.title || s.file_path || s.source || s.id || "Source";
+      return { label, score, source: s.source || s.file_path || s.id };
+    })
+    .filter((s) => s.score === undefined || s.score >= 0.6);
+
+  if (!filtered.length) return null;
+
+  return (
+    <div className="mt-3 flex flex-wrap gap-2" data-testid="source-badges">
+      {filtered.map((s) => {
+        const isUnverified = (s.label || '').toUpperCase().includes('UNVERIFIED_LOCAL') || (s.source || '').toUpperCase().includes('UNVERIFIED_LOCAL');
+        const score = s.score;
+        const iconColor = isUnverified ? 'text-amber-300' : score && score >= 0.8 ? 'text-emerald-300' : 'text-accent-cyan';
+        const badgeBg = isUnverified ? 'bg-amber-500/15 border-amber-300/40' : 'bg-accent-cyan/10 border-accent-cyan/40';
+        const key = generateStableKey(s, 'source-badge', ['label', 'score', 'source']);
+        const Icon = isUnverified ? AlertTriangle : score && score >= 0.8 ? ShieldCheck : Database;
+        return (
+          <span
+            key={key}
+            className={`inline-flex items-center gap-1 rounded-full border ${badgeBg} px-2 py-1 text-[11px] text-white/80`}
+          >
+            <Icon size={12} className={iconColor} />
+            {s.label}
+            {typeof score === "number" && (
+              <span className="text-[10px] opacity-80">({score.toFixed(2)})</span>
+            )}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
 
 function StreamingText({ text, speed = 10 }: { text: string; speed?: number; }) {
   const [displayed, setDisplayed] = useState("");
@@ -90,37 +185,144 @@ function Text({ block }: { block: TextBlock; }) {
   );
 }
 
+interface ChecklistItemProps {
+  readonly blockId?: string;
+  readonly item: ChecklistBlock['items'][number];
+  readonly onToggle: () => void;
+}
+
+function ChecklistItem({ blockId, item, onToggle }: ChecklistItemProps) {
+  const itemKey = generateStableKey(item, 'checklist-item', ['label', 'id']);
+  const inputId = `${blockId || 'block'}-${itemKey}`;
+  return (
+    <li key={itemKey}>
+      <label htmlFor={inputId} className="flex items-center gap-2 cursor-pointer">
+        <input id={inputId} type="checkbox" checked={!!item.checked} onChange={onToggle} />
+        <span>{item.label}</span>
+      </label>
+    </li>
+  );
+}
+
 function Checklist({ block }: { block: ChecklistBlock; }) {
   const [items, setItems] = useState(block.items);
+
+  const handleToggle = (index: number) => {
+    const toggleItem = (prev: typeof items) =>
+      prev.map((p, idx) => (idx === index ? { ...p, checked: !p.checked } : p));
+    setItems(toggleItem);
+  };
+
   return (
     <div className="bg-white/5 rounded-xl p-4">
       <h4 className="font-semibold mb-2">{block.title}</h4>
       <ul className="space-y-2">
-        {items.map((it, i) => {
-          const itemKey = generateStableKey(it, 'checklist-item', ['label', 'id']);
+        {items.map((it, i) => (
+          <ChecklistItem
+            key={generateStableKey(it, 'checklist-item', ['label', 'id'])}
+            blockId={block.id}
+            item={it}
+            onToggle={() => handleToggle(i)}
+          />
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+interface QuizOptionProps {
+  readonly optionKey: string;
+  readonly text: string;
+  readonly selected: boolean;
+  readonly isCorrect: boolean;
+  readonly isWrong: boolean;
+  readonly showColors: boolean;
+  readonly disabled: boolean;
+  readonly onSelect: () => void;
+}
+
+function QuizOptionButton({
+  optionKey,
+  text,
+  selected,
+  isCorrect,
+  isWrong,
+  showColors,
+  disabled,
+  onSelect
+}: QuizOptionProps) {
+  let baseClass = "w-full text-left px-3 py-2 rounded-md transition border";
+  baseClass += selected ? " border-accent-cyan/60 bg-accent-cyan/10" : " border-white/10 hover:border-white/20";
+  if (showColors && isCorrect) {
+    baseClass += " bg-green-600/20 border-green-500/50";
+  }
+  if (showColors && isWrong) {
+    baseClass += " bg-red-600/20 border-red-500/50";
+  }
+
+  return (
+    <button
+      key={optionKey}
+      onClick={onSelect}
+      disabled={disabled}
+      aria-pressed={selected}
+      className={baseClass}
+    >
+      {text}
+    </button>
+  );
+}
+
+interface QuizQuestionProps {
+  readonly question: QuizBlock['questions'][number];
+  readonly answers: Record<string, number | null>;
+  readonly showExplain: boolean;
+  readonly mode: "training" | "certifying";
+  readonly onSelect: (questionId: string, optionIndex: number) => void;
+}
+
+function QuizQuestion({
+  question,
+  answers,
+  showExplain,
+  mode,
+  onSelect
+}: QuizQuestionProps) {
+  const options = Array.isArray(question.options) ? question.options : [];
+  return (
+    <div className="border border-white/10 rounded-lg p-3">
+      <div className="font-medium mb-2">{question.question}</div>
+      <div className="space-y-1">
+        {options.map((opt, idx) => {
+          const selected = answers[question.id] === idx;
+          const isCorrect = showExplain && idx === question.correct_option_index;
+          const isWrong = showExplain && selected && !isCorrect;
+          const optionKey = generateStableKey(
+            { text: opt, questionId: question.id, index: idx },
+            'quiz-option',
+            ['text', 'questionId']
+          );
+
           return (
-            <li key={itemKey}>
-              <label
-                htmlFor={`${block.id || 'block'}-${itemKey}`}
-                className="flex items-center gap-2 cursor-pointer"
-              >
-                <input
-                  id={`${block.id}-${itemKey}`}
-                  type="checkbox"
-                  checked={!!it.checked}
-                  onChange={() => {
-                    // Extract nested function to reduce nesting depth
-                    const toggleItem = (prev: typeof items) =>
-                      prev.map((p, idx) => (idx === i ? { ...p, checked: !p.checked } : p));
-                    setItems(toggleItem);
-                  }}
-                />
-                <span>{it.label}              </span>
-              </label>
-            </li>
+            <QuizOptionButton
+              key={optionKey}
+              optionKey={optionKey}
+              text={opt}
+              selected={selected}
+              isCorrect={isCorrect}
+              isWrong={isWrong}
+              showColors={showExplain}
+              disabled={mode === "certifying" && showExplain}
+              onSelect={() => onSelect(question.id, idx)}
+            />
           );
         })}
-      </ul>
+      </div>
+      {showExplain && (
+        <div className="text-xs mt-2 opacity-80">
+          Explanation: {question.explanation}
+        </div>
+      )}
     </div>
   );
 }
@@ -241,54 +443,16 @@ function Quiz({ block }: { block: QuizBlock; }) {
 
       <div className="space-y-4">
         {questions.map((q) => (
-          <div key={q.id} className="border border-white/10 rounded-lg p-3">
-            <div className="font-medium mb-2">{q.question}</div>
-            <div className="space-y-1">
-              {(Array.isArray(q.options) ? q.options : []).map((opt, idx) => {
-                const selected = answers[q.id] === idx;
-                const isCorrect = showExplain && idx === q.correct_option_index;
-                const isWrong = showExplain && selected && !isCorrect;
-
-                // In certifying mode, don't show colors until submitted (showExplain is true)
-                const showColors = showExplain;
-                const optionKey = generateStableKey({ text: opt, questionId: q.id, index: idx }, 'quiz-option', ['text', 'questionId']);
-
-                return (
-                  <button
-                    key={optionKey}
-                    onClick={() =>
-                      setAnswers((prev) => ({ ...prev, [q.id]: idx }))
-                    }
-                    disabled={mode === "certifying" && showExplain} // Disable changes after submission
-                    aria-pressed={selected}
-                    className={(() => {
-                      // Simplify nested template literals
-                      let baseClass = "w-full text-left px-3 py-2 rounded-md transition border";
-                      if (selected) {
-                        baseClass += " border-accent-cyan/60 bg-accent-cyan/10";
-                      } else {
-                        baseClass += " border-white/10 hover:border-white/20";
-                      }
-                      if (showColors && isCorrect) {
-                        baseClass += " bg-green-600/20 border-green-500/50";
-                      }
-                      if (showColors && isWrong) {
-                        baseClass += " bg-red-600/20 border-red-500/50";
-                      }
-                      return baseClass;
-                    })()}
-                  >
-                    {opt}
-                  </button>
-                );
-              })}
-            </div>
-            {showExplain && (
-              <div className="text-xs mt-2 opacity-80">
-                Explanation: {q.explanation}
-              </div>
-            )}
-          </div>
+          <QuizQuestion
+            key={q.id}
+            question={q}
+            answers={answers}
+            showExplain={showExplain}
+            mode={mode}
+            onSelect={(questionId, optionIndex) =>
+              setAnswers((prev) => ({ ...prev, [questionId]: optionIndex }))
+            }
+          />
         ))}
       </div>
 
@@ -467,37 +631,13 @@ function Resources({ block }: { block: ResourceBlock; }) {
   };
   const resources = Array.isArray(block.resources) ? block.resources : [];
 
-  // TEMPORARILY DISABLED - Favorites functionality
-  // const { addFavorite, removeFavoriteByResourceId, isFavorite } = useFavoritesStore();
-  // const ensureApiJourneyId = useJourneyStore((s) => s.ensureApiJourneyId);
-
-  // const toggleFavorite = async (r: ResourceItem) => {
-  //   const journeyId = ensureApiJourneyId();
-  //
-  //   if (isFavorite(r.id)) {
-  //     await removeFavoriteByResourceId(r.id);
-  //   } else {
-  //     await addFavorite({
-  //       userId: 'anonymous',
-  //       journeyId,
-  //       resource: {
-  //         id: r.id,
-  //         label: r.label,
-  //         description: r.description,
-  //         url: r.url,
-  //         resource_type: r.resource_type,
-  //         agent_owner: r.agent_owner,
-  //       },
-  //     });
-  //   }
-  // };
-
   return (
     <div className="bg-white/5 rounded-xl p-4" data-testid="resources-section">
       <h4 className="font-semibold mb-2" data-testid="resources-section-title">{block.title}</h4>
-      <div className="grid gap-2" data-testid="resources-list">
+      <ThoughtProcess reasoning={(block as any).reasoning ?? (block as any).feedback?.reasoning} />
+      <SourceBadges sources={(block as any).sources} />
+      <div className="grid gap-2 mt-2" data-testid="resources-list">
         {resources.map((r) => {
-          // const favorited = isFavorite(r.id);
           return (
             <div
               key={r.id}
@@ -542,22 +682,6 @@ function Resources({ block }: { block: ResourceBlock; }) {
                     Flashcards
                   </button>
                 )}
-                {/* TEMPORARILY DISABLED - Favorite button
-                <button
-                  className={`px-3 py-1.5 rounded-md text-xs transition-colors ${
-                    favorited
-                      ? "bg-accent-gold/20 border border-accent-gold/50 hover:bg-accent-gold/30"
-                      : "border border-white/10 hover:bg-white/5"
-                  }`}
-                  onClick={() => toggleFavorite(r)}
-                  title={favorited ? "Retirer des favoris" : "Ajouter aux favoris"}
-                >
-                  <Star
-                    size={14}
-                    className={favorited ? "fill-accent-gold text-accent-gold" : ""}
-                  />
-                </button>
-                */}
                 <button
                   className="px-3 py-1.5 rounded-md border border-white/10 text-xs hover:bg-white/5 transition-colors"
                   onClick={() => {
@@ -583,14 +707,16 @@ function Resources({ block }: { block: ResourceBlock; }) {
   );
 }
 
-// Helper to escape HTML entities
+// Helper to escape HTML entities using a single pass to avoid missed cases
 function escapeHtml(s: string): string {
-  return s
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
+  const escapeMap: Record<string, string> = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  return s.replace(/[&<>"']/g, match => escapeMap[match] ?? match);
 }
 
 // Helper to close list if open
@@ -653,9 +779,24 @@ function processLine(
     return false;
   }
 
-  // Default: paragraph
+  // Default: paragraph or math
+  const mathLine = line.match(/^\$\$(.*)\$\$$/);
+  if (mathLine) {
+    closeListIfOpen(out, inList);
+    const rendered = renderMath(mathLine[1].trim());
+    out.push(`<div class="math-block font-mono text-accent-cyan/90 text-sm">${rendered}</div>`);
+    return false;
+  }
   out.push(`<p>${escapeHtml(line)}</p>`);
   return inList;
+}
+
+function renderMath(formula: string): string {
+  try {
+    return katex.renderToString(formula, { throwOnError: false, output: "html" });
+  } catch {
+    return escapeHtml(formula);
+  }
 }
 
 function renderBasicMarkdown(md: string) {
@@ -680,6 +821,8 @@ function Document({ block }: { block: DocumentBlock; }) {
         {block.title}{" "}
         <span className="text-xs opacity-70">({block.doc_type})</span>
       </h4>
+      <ThoughtProcess reasoning={(block as any).reasoning ?? (block as any).feedback?.reasoning} />
+      <SourceBadges sources={(block as any).sources} />
       <div
         className="prose prose-invert text-xs"
         dangerouslySetInnerHTML={{
@@ -908,6 +1051,13 @@ function Diagram({ block }: { block: DiagramBlock; }) {
       try {
         setIsLoading(true);
         const mermaid = await loadMermaid();
+        try {
+          await validateMermaidSyntax(block.content);
+        } catch (validationError) {
+          setSvg('<div class="text-xs text-red-300">Diagramme Mermaid invalide</div>');
+          logger.warn("Mermaid syntax validation failed", validationError);
+          return;
+        }
 
         if (!mermaidInitialized) {
           // Strict mode avoids allowing raw HTML/links injection in the generated SVG.
@@ -1043,7 +1193,7 @@ function ProjectSelection({ block }: { block: ProjectSelectionBlock; }) {
 }
 
 export default function UIBlocksRenderer({ response }: { response: JourneyStepResponse; }) {
-  if (!response || !response.ui_blocks) return null;
+  if (!response?.ui_blocks) return null;
 
   const render = (b: UIBlock) => {
     try {
@@ -1082,11 +1232,11 @@ export default function UIBlocksRenderer({ response }: { response: JourneyStepRe
         case "project_selection_block":
           return <ProjectSelection key={b.id} block={b} />;
         case "narrative_choice_block":
-          return <NarrativeChoice key={b.id} block={b as NarrativeChoiceBlock} />;
+          return <NarrativeChoice key={b.id} block={b} />;
         case "indicator_block":
-          return <IndicatorBlockComponent key={b.id} block={b as IndicatorBlockType} />;
+          return <IndicatorBlockComponent key={b.id} block={b} />;
         case "interactive_template_block":
-          return <InteractiveTemplateComponent key={b.id} block={b as InteractiveTemplateBlockType} />;
+          return <InteractiveTemplateComponent key={b.id} block={b} />;
         default:
           return null;
       }

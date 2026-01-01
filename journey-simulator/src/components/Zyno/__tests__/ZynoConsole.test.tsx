@@ -101,7 +101,7 @@ describe('ZynoConsole', () => {
         parcoursTemplate: { templateId: 'template-1' },
       }),
     } as Response);
-    global.fetch = mockFetch as unknown as typeof fetch;
+    globalThis.fetch = mockFetch as unknown as typeof fetch;
   });
 
   afterEach(() => {
@@ -142,7 +142,7 @@ describe('ZynoConsole', () => {
 
   it('should display a timeout error immediately if fetch rejects with AbortError', async () => {
     // Mock global.fetch ONLY for this test to immediately reject with AbortError
-    global.fetch = vi.fn(() => Promise.reject(new DOMException('Aborted', 'AbortError'))) as unknown as typeof fetch;
+    globalThis.fetch = vi.fn(() => Promise.reject(new DOMException('Aborted', 'AbortError'))) as unknown as typeof fetch;
 
     const { ZynoConsole } = await import('../ZynoConsole');
     render(<ZynoConsole />);

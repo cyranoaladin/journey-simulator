@@ -1,17 +1,17 @@
-// Deterministic tiny embedding to avoid external dependencies (for MVP & tests)
+// Deterministic embedding tuned to match the 384-dim remote RAG collection
 export type Vector = number[]
 
 export function embedText(text: string): Vector {
+  const EMBEDDING_DIM = 384
   const tokens = text
     .toLowerCase()
     .split(/[^a-z0-9]+/)
     .filter(Boolean)
-  const dim = 64
-  const vec = new Array(dim).fill(0)
+  const vec = new Array(EMBEDDING_DIM).fill(0)
   for (const t of tokens) {
     let h = 2166136261
     for (let i = 0; i < t.length; i++) h = (h ^ t.charCodeAt(i)) * 16777619
-    const idx = Math.abs(h) % dim
+    const idx = Math.abs(h) % EMBEDDING_DIM
     vec[idx] += 1
   }
   // L2 normalize

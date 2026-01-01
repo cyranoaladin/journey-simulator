@@ -145,7 +145,10 @@ const ZynoAssistant = () => {
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  onKeyDown={(e) => {
+                    if (e.key !== 'Enter') return
+                    handleSendMessage()
+                  }}
                   placeholder="Ask Zyno a question..."
                   className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-white/60 focus:outline-none focus:border-primary-400"
                 />

@@ -14,16 +14,16 @@ OUTPUT_FILE = "FINAL_COMPLETE_AUDIT.md"
 def run_scanner():
     """Lance le scan SonarQube via Docker"""
     print("🚀 1. Lancement du SonarScanner via Docker...")
+    repo_root = subprocess.check_output(["pwd"], text=True).strip()
     cmd = [
         "docker", "run", "--rm",
         f"--network={NETWORK}",
-        "-e", f"SONAR_HOST_URL=http://sonarqube-server:9000",
+        "-e", "SONAR_HOST_URL=http://sonarqube-server:9000",
         "-e", f"SONAR_TOKEN={TOKEN}",
-        "-v", f"$(pwd):/usr/src",
+        "-v", f"{repo_root}:/usr/src",
         "sonarsource/sonar-scanner-cli"
     ]
-    # Utilisation de shell=True pour résoudre $(pwd) sur Linux
-    result = subprocess.run(" ".join(cmd), shell=True)
+    result = subprocess.run(cmd, check=False)
     if result.returncode != 0:
         print("❌ Erreur lors du scan. Vérifiez vos conteneurs.")
         sys.exit(1)
@@ -32,7 +32,7 @@ def run_scanner():
 def wait_for_processing():
     """Attend que le serveur SonarQube termine l'analyse du rapport"""
     print("⏳ 2. Attente du traitement du rapport par le serveur (30s)...")
-    time.sleep(30) 
+    time.sleep(30)
 
 def fetch_sonar_api(endpoint, params=None):
     """Utilitaire pour interroger l'API SonarQube"""
@@ -47,11 +47,11 @@ def fetch_sonar_api(endpoint, params=None):
 def generate_markdown_report():
     """Extrait toutes les données et génère le fichier .md"""
     print(f"📄 3. Extraction de l'audit complet pour {PROJECT_KEY}...")
-    
+
     # A. Métriques globales
     metrics_list = "bugs,vulnerabilities,security_hotspots,code_smells,sqale_index,reliability_rating,security_rating,sqale_rating,ncloc"
     measures = fetch_sonar_api("measures/component", {"component": PROJECT_KEY, "metricKeys": metrics_list})
-    
+
     # B. Toutes les Issues (Pagination 500)
     all_issues = []
     page = 1
@@ -91,7 +91,7 @@ def generate_markdown_report():
         for iss in all_issues:
             path = iss['component'].split(':')[-1]
             issues_by_file.setdefault(path, []).append(iss)
-        
+
         for file, file_issues in sorted(issues_by_file.items()):
             f.write(f"### 📄 `{file}`\n")
             f.write("| Sévérité | Type | Message | Ligne |\n| :--- | :--- | :--- | :--- |\n")

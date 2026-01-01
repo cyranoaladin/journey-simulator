@@ -7,18 +7,24 @@
     "dev:back": "npm run dev --prefix mf-back",
     "dev:simulator": "npm run dev --prefix journey-simulator",
     "dev:web": "npm run dev --prefix web",
+    "build": "npm run build:all",
+    "build:types": "npm run typecheck --prefix journey-simulator",
     "mcp:selftest": "node scripts/mcp-selftest.mjs",
     "ci:verify": "bash scripts/ci-verify.sh",
     "test:back": "npm test --prefix mf-back",
     "test:simulator": "npm test --prefix journey-simulator",
     "test:web": "npm run test:unit --prefix web",
+    "test:fast": "npm test --prefix mf-back -- --runTestsByPath tests/unit/BaseAgent.test.js",
     "test:e2e:simulator": "npm run test:e2e --prefix journey-simulator",
     "lint:simulator": "npm run lint --prefix journey-simulator",
     "lint:web": "npm run lint --prefix web",
+    "lint": "npm run lint:all",
     "test:all": "npm run test:back && npm run test:simulator && npm run test:web",
     "lint:all": "npm run lint:simulator && npm run lint:web",
     "build:all": "npm run build --prefix journey-simulator && npm run build --prefix web",
     "install:all": "npm install --prefix mf-back && npm install --prefix journey-simulator && npm install --prefix web",
+    "preflight": "node tools/system-health.js",
+    "dev": "npm run preflight && concurrently \"npm run dev:back\" \"npm run dev:simulator\" \"npm run dev:web\"",
     "release:preflight": "node scripts/release/preflight.js",
     "release:smoke": "node scripts/release/smoke.js",
     "release:rollback": "node scripts/release/rollback.js",
@@ -29,7 +35,24 @@
     "test:chaos:sim": "node scripts/testing/simulate-chaos.js"
   },
   "devDependencies": {
-    "concurrently": "^8.0.0"
+    "baseline-browser-mapping": "^2.9.11",
+    "concurrently": "^8.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "mf-back/**/*.js": [
+      "node --check"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged && npm run test:fast"
+    }
   },
   "engines": {
     "node": ">=18.0.0"

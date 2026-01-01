@@ -14,10 +14,38 @@ class LogicCheckService {
    */
   static computeScoresForRuns(runs, registryIndex, computeScoresFn) {
     return runs.map((r) => {
+      if (!r) {
+        return {
+          agentId: 'unknown',
+          status: 'FAIL',
+          summary: 'Execution returned no result (null/undefined)',
+          actions: [],
+          scores: { raw: 0, weighted: 0 },
+        };
+      }
       if (r.scores) return r;
       const meta = registryIndex[r.agentId] || {};
       return { ...r, scores: computeScoresFn(r, meta) };
     });
+  }
+
+  /**
+   * Calcule le score d'un run individuel (Restored)
+   */
+  static computeScore(run, learningData = {}, meta = {}) {
+    let score = 0;
+    if (run.status === 'OK') score = 100;
+    else if (run.status === 'WARN') score = 50;
+    else if (run.status === 'FAIL') score = 0;
+
+    const learningAdjustment = learningData?.score || 0;
+    const confidence = meta.confidenceWeight || 1.0;
+    const weighted = score * confidence + learningAdjustment;
+
+    return {
+      raw: score,
+      weighted: Math.max(0, Math.min(100, weighted)),
+    };
   }
 
   /**
@@ -119,7 +147,70 @@ class LogicCheckService {
       .filter(Boolean)
       .join(' | ');
   }
+
+  /**
+   * Creates the definitive action plan by merging current and previous actions,
+   * handling deduplication, scoring, and conflict marking.
+   */
+  static createActionPlan(recommendedActions, previousRecommendedActions = [], contradictions = []) {
+    const currentActionEntries = recommendedActions.map((r) => ({
+      action: r.action,
+      agentId: r.agentId,
+      score: r.score,
+      conflict: contradictions.some((c) => c.agents.includes(r.agentId))
+    }));
+
+    const previousActionEntries = previousRecommendedActions.map((r) => ({
+      action: r.action,
+      agentId: r.agentId,
+      score: r.score || 0,
+      conflict: contradictions.some((c) => c.agents.includes(r.agentId)),
+      fromMemory: true
+    }));
+
+    const mergedActions = [...currentActionEntries, ...previousActionEntries];
+    const dedup = new Map();
+
+    for (const item of mergedActions) {
+      const key = String(item.action || '').toLowerCase().trim();
+      if (!key) continue;
+      if (!dedup.has(key) || (dedup.get(key)?.score || 0) < (item.score || 0)) {
+        dedup.set(key, item);
+      }
+    }
+
+    const stepsOrdered = Array.from(dedup.values()).sort((a, b) => {
+      // Prioritize non-conflicting actions
+      if (a.conflict !== b.conflict) return a.conflict ? 1 : -1;
+      // Then score
+      return (b.score || 0) - (a.score || 0);
+    });
+
+    return stepsOrdered.map((s, idx) => ({
+      action: s.action,
+      sourceAgent: s.agentId,
+      score: s.score,
+      priority: idx + 1,
+      conflict: Boolean(s.conflict),
+      fromMemory: Boolean(s.fromMemory)
+    }));
+  }
+
+  /**
+   * Creates the human-readable plan.
+   */
+  static createHumanPlan(actionPlanSteps, contradictions = []) {
+    return {
+      objective: 'Execute the prioritized improvements',
+      steps: actionPlanSteps.slice(0, 10).map((s, idx) => ({
+        step: idx + 1,
+        action: s.action,
+        owner: s.sourceAgent || 'unassigned',
+        priority: idx < 3 ? 'HIGH' : idx < 6 ? 'MEDIUM' : 'LOW'
+      })),
+      warnings: contradictions.length > 0 ? ['Conflicting agent recommendations present'] : [],
+    };
+  }
 }
 
 module.exports = LogicCheckService;
-

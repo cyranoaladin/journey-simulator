@@ -6,6 +6,7 @@
 const request = require('supertest');
 const express = require('express');
 const bodyParser = require('body-parser');
+const { csrfGuard } = require('../middleware/csrfGuard');
 
 // Mock of modules used by the route
 jest.mock('../memory/agent_metrics', () => ({
@@ -25,6 +26,7 @@ describe('POST /api/feedback – AECO Registration', () => {
   beforeAll(() => {
     app = express();
     app.use(bodyParser.json());
+    app.use(csrfGuard);
     app.use('/api/feedback', feedbackRouter);
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
   });

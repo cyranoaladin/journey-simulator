@@ -1,7 +1,9 @@
 const axios = require('axios');
 
+const BASE_URL = process.env.BASE_URL || 'https://journey.mfai.app/api';
+
 async function reproduceError() {
-    const url = 'http://127.0.0.1:3000/api/journeys/e423ee4a-6ebe-41d6-b7e9-cb2ab90bf4eb/submit';
+    const url = `${BASE_URL}/journeys/e423ee4a-6ebe-41d6-b7e9-cb2ab90bf4eb/submit`;
 
     // Mock payload mimicking the frontend quiz submission
     const payload = {

@@ -3,22 +3,24 @@ import { motion, AnimatePresence } from 'framer-motion'
 import LazyConfetti from './shared/LazyConfetti'
 
 interface Props {
-  score: number
-  maxScore: number
-  phaseId: string
-  onMint: () => void
+  readonly score: number
+  readonly maxScore: number
+  readonly phaseId: string
+  readonly onMint: () => void
 }
 
-export default function MintCelebrationBanner({ score, maxScore, phaseId, onMint }: Props){
+export default function MintCelebrationBanner({ score, maxScore, phaseId, onMint }: Props) {
   const [show, setShow] = useState(true)
   const [confetti, setConfetti] = useState(true)
 
-  useEffect(()=>{
-    const t = setTimeout(()=>setConfetti(false), 2500)
-    return ()=>clearTimeout(t)
+  useEffect(() => {
+    const t = setTimeout(() => setConfetti(false), 2500)
+    return () => clearTimeout(t)
   }, [])
 
-  if(!show) return null
+  if (!show) {
+    return null
+  }
 
   return (
     <AnimatePresence>
@@ -30,7 +32,12 @@ export default function MintCelebrationBanner({ score, maxScore, phaseId, onMint
       >
         {confetti && (
           <div className="absolute -inset-x-4 -top-2 pointer-events-none">
-            <LazyConfetti numberOfPieces={180} recycle={false} width={typeof window!=='undefined'? window.innerWidth: 800} height={160} />
+            <LazyConfetti
+              numberOfPieces={180}
+              recycle={false}
+              width={globalThis.window ? globalThis.window.innerWidth : 800}
+              height={160}
+            />
           </div>
         )}
         <div className="relative flex items-center justify-between gap-3">

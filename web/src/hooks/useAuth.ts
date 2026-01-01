@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3004/api'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000'
 
 export const useAuth = () => {
   const { publicKey, connected } = useWallet()
@@ -22,6 +22,7 @@ export const useAuth = () => {
       try {
         const res = await fetch(`${API_BASE_URL}/auth/me`, {
           headers: { Authorization: `Bearer ${authToken}` },
+          credentials: 'include',
         })
 
         if (res.ok) {
@@ -47,6 +48,7 @@ export const useAuth = () => {
       const res = await fetch(`${API_BASE_URL}/auth/connect-wallet`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           walletAddress: publicKey.toString(),
           chain: 'solana',

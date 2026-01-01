@@ -1,79 +1,170 @@
+const { LLMClient } = require('../orchestration/llmClient');
+const { normalizeProjectSpecs } = require('../constants/project_schemas');
+
 class TokenomicsAgent {
   constructor() {
     this.id = 'TokenomicsAgent';
+    this.llm = new LLMClient({});
   }
 
-  async run(request = {}) {
-    const started = Date.now();
-    try {
-      const { traceId, intentNormalized, input = '', journey = {}, ragContext } = request;
-      const journeyType = journey?.journeyType || 'generic';
-      const phaseId = journey?.phaseId || journey?.phases?.[0] || 'unspecified';
-      const objectives = journey?.objectives || [];
-      const artifacts = journey?.artifacts || [];
-      const hasInput = Boolean(input && input.trim());
-      const citations = Array.isArray(ragContext?.chunks)
-        ? ragContext.chunks.slice(0, 3).map((c) => ({ id: c.id, title: c.title, source: c.source }))
-        : [];
+  buildPrompt({ input, ragChunks, journey, orchestrationMode, history }) {
+    const citations = (ragChunks || [])
+      .map((c, i) => `- [${i + 1}] ${c.title}: ${c.text.slice(0, 180)}...`)
+      .join('\n');
 
-      const summary = hasInput ? 'Tokenomics outline produced' : 'Tokenomics outline drafted with limited input';
-      const confidence = hasInput ? 0.7 : 0.56;
-      const findings = [
-        { item: 'supply', status: 'ok', detail: 'Supply/vesting outlined' },
-        { item: 'allocations', status: 'ok', detail: 'Stakeholder allocations set' },
-        { item: 'scenarios', status: 'warn', detail: 'Run circulation scenarios' },
-      ];
+    const phase = journey?.phaseId || 'unknown';
+    const isCollaborative = orchestrationMode === 'AECO';
 
-      const details = {
-        intent: intentNormalized || 'tokenomics',
-        journeyType,
-        phaseId,
-        objectives,
-        artifacts,
-        model: {
-          supply: 'capped',
-          emissions: 'linear with halving',
-          allocations: [
-            { bucket: 'community', percent: 40 },
-            { bucket: 'team', percent: 20, vesting: '36m' },
-            { bucket: 'investors', percent: 20, vesting: '24m' },
-            { bucket: 'treasury', percent: 20 },
-          ],
-        },
-      };
+    const tone = isCollaborative
+      ? 'Holistic, balancing incentives with GovernanceAgent, aligning with ComplianceAgent.'
+      : 'Mathematically rigorous, ruthless optimizer, "Token Engineer".';
 
-      const actions = [
-        'Draft token supply & vesting schedule',
-        'Validate incentive alignment per stakeholder',
-        'Simulate 12/24/36m circulation scenarios',
-      ];
+    return {
+      system: [
+        '**IDENTITY**: Chief Token Architect & Economist (Thought Partner).',
+        '**EXPERTISE**: Bonding Curves (Linear/Exponential/Sigmoid), Vesting Mathematics, Supply Schedules, Game Theory Equilibrium.',
+        '',
+        '**MEMORY FIRST**: Use the provided conversation history as the primary ground truth about the project. If history contains the project name or constraints, you MUST restate and honor them. Do NOT say "unknown" when history provides the answer.',
+        '**LEGAL & MATH REQUIREMENTS (MUST INCLUDE)**:',
+        '1. **Bonding Curve Formulas** (toujours en LaTeX entre $$ $$):',
+        '   - Linear: $$P = m \\cdot S + b$$',
+        '   - Exponential: $$P = a \\cdot e^{k \\cdot S}$$',
+        '   - Sigmoid: $$P = \\frac{K}{1 + e^{-k \\cdot (S - S_0)}}$$',
+        '2. **Vesting Logic**: Define Cliff (months), Linear Vesting duration (months), and TGE Unlock %.',
+        '   - Formula: Unlock(t) = (t < Cliff) ? 0 : (Allocation * (t - Cliff) / VestingDuration)',
+        '3. **Valuation Metrics**: Calculate Initial Market Cap (IMC) vs Fully Diluted Valuation (FDV).',
+        '4. **Sell Pressure Analysis**: Estimate the "Sell Pressure" (USD value) unlocking at TGE + Cliff.',
+        '5. **CRITICAL VALIDATION**: SUM(Allocations) MUST equal 100%. If the input or your design implies >100% or <100%, you MUST return "status": "ERROR" and "summary": "ERROR: TOTAL_ALLOCATION_MISMATCH".',
+        '',
+        '**WORKFLOW**:',
+        '1. Définir la dynamique de supply (inflation/déflation/hard cap).',
+        '2. Allouer les tokens (Team, Treasury, Community, Investors) et vérifier que la somme = 100%.',
+        '3. Cartographier l’utilité (staking, burn) en expliquant avec une analogie de graphe de flux.',
+        '4. Simuler la pression de vente vs achat avec une petite démonstration (penser série/graphes de flux).',
+        '5. **Double Check Sum**: vérifier la somme avant de sortir la réponse; si !=100% => status ERROR.',
+        '',
+        `**TONE**: ${tone}`,
+        '**OUTPUT FORMAT**: STRICT JSON: {',
+        '  "status": "OK" | "ERROR",',
+        '  "summary": "...",',
+        '  "token_model": { "supply_cap": "...", "valuations": { "fdv": "...", "imc": "..." }, "sell_pressure_at_cliff": "..." },',
+        '  "resources": {',
+        '     "diagram": "Mermaid diagram string (graph TD... for token flow OR pie chart for allocation)",',
+        '     "data": { "allocations": [{ "category": "Team", "percentage": 15, "vesting": "..." }, ...], "inflation_schedule": [...] },',
+        '     "documentation": "Markdown tokenomics paper, incluant toutes les formules en LaTeX $$...$$"',
+        '  },',
+        '  "actions": ["..."]',
+        '}',
+        '**RESOURCES**: Must output valid Mermaid.js diagrams for token distribution.'
+      ].join('\n'),
+      user: [
+        `User Input: ${input}`,
+        `Current Phase: ${phase}`,
+        `Mode: ${orchestrationMode}`,
+        'Conversation History:',
+        (history ? JSON.stringify(history.slice(-3), null, 2) : '- (no history)'),
+        '',
+        'RAG Context:',
+        citations || '- (no specific tokenomics docs found)',
+        '',
+        'Design the token economy.'
+      ].join('\n'),
+    };
+  }
 
+  async run(request) {
+    const { traceId, input, context = {}, rag = {}, constraints = {} } = request;
+    const ragChunks = rag.chunks || (context.rag && context.rag.chunks) || [];
+    const normalizedSpecs = normalizeProjectSpecs({
+      ...context.projectSpecs,
+      ...context.nft,
+    });
+
+    const extractNumber = (raw) => {
+      if (!raw) return null;
+      const normalized = String(raw).replace(/[^0-9.,-\s]/g, '').replace(/[\s,]+/g, '');
+      const parsed = Number(normalized);
+      return Number.isFinite(parsed) ? parsed : null;
+    };
+
+    const lowerInput = (input || '').toLowerCase();
+    const capMatch = lowerInput.match(/market\s*cap\s*(?:initial)?\s*\$?\s*([\d.,\s]+)/) || lowerInput.match(/cap\s*initiale?\s*\$?\s*([\d.,\s]+)/);
+    const supplyMatch = lowerInput.match(/supply\s*(?:de|of)?\s*([\d.,\s]+)/) || lowerInput.match(/offre\s*(?:totale)?\s*([\d.,\s]+)/);
+    const detectedCap = extractNumber(capMatch?.[1]) ?? normalizedSpecs.marketCap;
+    const detectedSupply = extractNumber(supplyMatch?.[1]) ?? normalizedSpecs.supply;
+    const impliedPrice = detectedCap && detectedSupply ? detectedCap / detectedSupply : null;
+    const aberrationDetected = Boolean(
+      detectedCap && detectedSupply && (impliedPrice <= 0 || impliedPrice < 1e-6)
+    );
+
+    if (aberrationDetected) {
       return {
-        agentId: this.id,
-        status: hasInput ? 'OK' : 'WARN',
-        summary,
-        details,
-        findings,
-        confidence,
-        assumptions: hasInput ? [] : ['Modèle préliminaire, à recalibrer'],
-        actions,
-        citations,
-        metrics: { latencyMs: Date.now() - started, ragHits: citations.length },
-        errors: hasInput ? [] : ['missing_input'],
         traceId,
-      };
-    } catch (error) {
-      return {
         agentId: this.id,
-        status: 'FAIL',
-        summary: 'Tokenomics agent failed',
-        actions: [],
+        status: 'ERROR',
+        summary: 'ERROR: MARKET_CAP_INCONSISTENT',
+        details: {
+          reason: 'Initial market cap is incohérent vs supply',
+          detectedCap,
+          detectedSupply,
+          impliedPrice,
+        },
+        findings: [{ item: 'market_cap', status: 'error', detail: 'Market cap trop bas par rapport à la supply' }],
+        confidence: 0.91,
+        assumptions: [`History size: ${(context.history || []).length}`],
         citations: [],
-        metrics: { latencyMs: Date.now() - started },
-        errors: [error.message],
-        traceId: request?.traceId,
+        actions: ['Recalculer le price per token avec des contraintes réalistes'],
+        metrics: { latencyMs: 0, tokens: 0, ragHits: ragChunks.length },
+        errors: ['market_cap_aberration'],
+        mock: true,
       };
     }
+
+    const prompt = this.buildPrompt({
+      input,
+      ragChunks,
+      journey: context.journey,
+      orchestrationMode: context.orchestrationMode || 'AEPO',
+      history: context.history || []
+    });
+
+    const llmRes = await this.llm.generate({
+      prompt,
+      traceId,
+      agentId: this.id,
+      maxTokens: constraints.maxTokens || 1200,
+      temperature: 0.3
+    });
+
+    let parsed = { model: {}, findings: [], actions: [], summary: "Tokenomics analysis failed to parse" };
+    try {
+      const jsonMatch = llmRes.text.match(/\{[\s\S]*\}/);
+      console.log('[DEBUGAGENT] LLM JSON Match:', jsonMatch ? jsonMatch[0] : 'No match');
+      if (jsonMatch) {
+        parsed = JSON.parse(jsonMatch[0]);
+      } else {
+        parsed = JSON.parse(llmRes.text);
+      }
+    } catch (e) {
+      parsed.details = llmRes.text;
+      parsed.findings = [{ item: 'Parse Error', status: 'warn', detail: 'Review tokenomics text output manually.' }];
+    }
+
+    return {
+      traceId,
+      agentId: this.id,
+      status: parsed.status || 'OK',
+      summary: parsed.summary || 'Tokenomics draft generated',
+      details: parsed.token_model || parsed.model || parsed.details || llmRes.text,
+      findings: parsed.findings || [],
+      confidence: 0.8,
+      assumptions: [`RAG hits: ${ragChunks.length}`],
+      citations: ragChunks.map((c) => ({ id: c.id, title: c.title, source: c.source })),
+      actions: parsed.actions || ['Simulate circulation schedule'],
+      metrics: { latencyMs: llmRes.latencyMs, tokens: llmRes.tokensUsed, ragHits: ragChunks.length },
+      errors: [],
+      mock: llmRes.mock || false,
+    };
   }
 }
 

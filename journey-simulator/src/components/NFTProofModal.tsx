@@ -8,13 +8,11 @@ import {
   Copy,
   Download,
   ExternalLink,
-  Linkedin,
   Loader,
   MessageSquare,
   Share2,
   Shield,
   Trophy,
-  Twitter,
   Wallet,
   X,
   Zap
@@ -33,40 +31,36 @@ type SaveAsFn = (data: Blob | string, filename?: string) => void;
 
 let htmlToImageLoader: Promise<HtmlToImageModule> | null = null;
 const loadHtmlToImage = async (): Promise<HtmlToImageModule> => {
-  if (!htmlToImageLoader) {
-    htmlToImageLoader = import('html-to-image');
-  }
+  htmlToImageLoader ??= import('html-to-image');
   return htmlToImageLoader;
 };
 
 let saveAsLoader: Promise<SaveAsFn> | null = null;
 const loadSaveAs = async (): Promise<SaveAsFn> => {
-  if (!saveAsLoader) {
-    saveAsLoader = import('file-saver').then((mod: any) => {
-      const candidate: any = mod?.saveAs ?? mod?.default?.saveAs ?? mod?.default;
-      if (typeof candidate !== 'function') {
-        throw new Error('Unable to load file-saver saveAs()');
-      }
-      return candidate as SaveAsFn;
-    });
-  }
+  saveAsLoader ??= import('file-saver').then((mod: any) => {
+    const candidate: any = mod?.saveAs ?? mod?.default?.saveAs ?? mod?.default;
+    if (typeof candidate !== 'function') {
+      throw new TypeError('Unable to load file-saver saveAs()');
+    }
+    return candidate as SaveAsFn;
+  });
   return saveAsLoader;
 };
 
 interface NFTProofModalProps {
-  personaId?: string;
-  phaseId?: string;
-  proofType: 'Skill' | 'Vision' | 'Yield' | 'Build' | 'Creation' | 'Orchestration' | 'Design' | 'Invest' | 'Security';
-  title: string;
-  description: string;
-  imageUrl?: string;
-  xpEarned: number;
-  phase: string;
-  phaseNumber: number;
-  completionDate?: string;
-  rarity?: 'common' | 'rare' | 'epic' | 'legendary';
-  onClose: () => void;
-  onViewSkillchain?: () => void;
+  readonly personaId?: string;
+  readonly phaseId?: string;
+  readonly proofType: 'Skill' | 'Vision' | 'Yield' | 'Build' | 'Creation' | 'Orchestration' | 'Design' | 'Invest' | 'Security';
+  readonly title: string;
+  readonly description: string;
+  readonly imageUrl?: string;
+  readonly xpEarned: number;
+  readonly phase: string;
+  readonly phaseNumber: number;
+  readonly completionDate?: string;
+  readonly rarity?: 'common' | 'rare' | 'epic' | 'legendary';
+  readonly onClose: () => void;
+  readonly onViewSkillchain?: () => void;
 }
 
 const NFTProofModal: React.FC<NFTProofModalProps> = ({
@@ -107,7 +101,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
     const phaseIndex = Math.max(0, phaseNumber - 1);
     const personaPhase = selectedPersona?.phases?.[phaseIndex];
     const derivedPhaseId = phase
-      ? phase.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
+      ? phase.toLowerCase().replaceAll(/[^a-z0-9]+/g, '-').replaceAll(/(^-|-$)+/g, '')
       : undefined;
     const fallbackPhaseId = phaseIdProp || personaPhase?.id || derivedPhaseId;
     const fallbackPhaseTitle = personaPhase?.title || phase;
@@ -213,62 +207,19 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
     fetchBalance();
   }, [connected, publicKey, connection]);
 
-  // Get persona-specific styling
-  const getPersonaStyle = () => {
-    if (!selectedPersona) return {};
+  const personaStyleMap: Record<string, { bgGradient: string; iconBg: string; textColor: string; borderColor: string }> = {
+    'cognitive-activation-hub': { bgGradient: 'from-sky-500 to-cyan-400', iconBg: 'bg-sky-500', textColor: 'text-cyan-300', borderColor: 'border-cyan-300' },
+    'capital-foundry': { bgGradient: 'from-emerald-500 to-teal-500', iconBg: 'bg-emerald-500', textColor: 'text-emerald-300', borderColor: 'border-emerald-300' },
+    'system-architect': { bgGradient: 'from-purple-500 to-indigo-500', iconBg: 'bg-purple-600', textColor: 'text-indigo-300', borderColor: 'border-indigo-300' },
+    'experience-studio': { bgGradient: 'from-rose-500 to-fuchsia-500', iconBg: 'bg-rose-500', textColor: 'text-fuchsia-300', borderColor: 'border-fuchsia-300' },
+    'impact-engine': { bgGradient: 'from-amber-500 to-lime-500', iconBg: 'bg-amber-500', textColor: 'text-lime-300', borderColor: 'border-lime-300' },
+    'resilience-master': { bgGradient: 'from-slate-500 to-cyan-600', iconBg: 'bg-slate-600', textColor: 'text-cyan-300', borderColor: 'border-cyan-300' },
+  };
 
-    switch (selectedPersona.id) {
-      case 'cognitive-activation-hub':
-        return {
-          bgGradient: 'from-sky-500 to-cyan-400',
-          iconBg: 'bg-sky-500',
-          textColor: 'text-cyan-300',
-          borderColor: 'border-cyan-300'
-        };
-      case 'capital-foundry':
-        return {
-          bgGradient: 'from-emerald-500 to-teal-500',
-          iconBg: 'bg-emerald-500',
-          textColor: 'text-emerald-300',
-          borderColor: 'border-emerald-300'
-        };
-      case 'system-architect':
-        return {
-          bgGradient: 'from-purple-500 to-indigo-500',
-          iconBg: 'bg-purple-600',
-          textColor: 'text-indigo-300',
-          borderColor: 'border-indigo-300'
-        };
-      case 'experience-studio':
-        return {
-          bgGradient: 'from-rose-500 to-fuchsia-500',
-          iconBg: 'bg-rose-500',
-          textColor: 'text-fuchsia-300',
-          borderColor: 'border-fuchsia-300'
-        };
-      case 'impact-engine':
-        return {
-          bgGradient: 'from-amber-500 to-lime-500',
-          iconBg: 'bg-amber-500',
-          textColor: 'text-lime-300',
-          borderColor: 'border-lime-300'
-        };
-      case 'resilience-master':
-        return {
-          bgGradient: 'from-slate-500 to-cyan-600',
-          iconBg: 'bg-slate-600',
-          textColor: 'text-cyan-300',
-          borderColor: 'border-cyan-300'
-        };
-      default:
-        // Reuse same block as 'cognitive-activation-hub' case to avoid duplication
-        return {
-          bgGradient: 'from-sky-500 to-cyan-400',
-          iconBg: 'bg-sky-500',
-          textColor: 'text-cyan-300',
-          borderColor: 'border-cyan-300'
-        };
-    }
+  const getPersonaStyle = () => {
+    const fallback = personaStyleMap['cognitive-activation-hub'];
+    if (!selectedPersona) return fallback;
+    return personaStyleMap[selectedPersona.id] || fallback;
   };
 
   const personaStyle = getPersonaStyle();
@@ -895,14 +846,14 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
                       onClick={() => shareNFT('twitter')}
                       className="w-full text-left px-2 py-1 text-sm hover:bg-white/10 rounded transition-colors flex items-center space-x-2"
                     >
-                      <Twitter size={14} />
-                      <span>Twitter</span>
+                      <X size={14} />
+                      <span>X</span>
                     </button>
                     <button
                       onClick={() => shareNFT('linkedin')}
                       className="w-full text-left px-2 py-1 text-sm hover:bg-white/10 rounded transition-colors flex items-center space-x-2"
                     >
-                      <Linkedin size={14} />
+                      <Share2 size={14} />
                       <span>LinkedIn</span>
                     </button>
                     <button

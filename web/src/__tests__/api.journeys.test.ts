@@ -13,7 +13,7 @@ jest.mock('../server/db', () => ({
 
 describe('API /api/journeys', () => {
   beforeEach(() => {
-    jest.spyOn(global, 'fetch').mockResolvedValue({
+    jest.spyOn(globalThis, 'fetch').mockResolvedValue({
       ok: true,
       json: jest.fn().mockResolvedValue({}),
     } as any)

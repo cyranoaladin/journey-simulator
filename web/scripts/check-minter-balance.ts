@@ -1,5 +1,5 @@
 import { Connection, clusterApiUrl, Keypair } from '@solana/web3.js'
-import fs from 'fs'
+import fs from 'node:fs'
 const secret = JSON.parse(fs.readFileSync('minter.json', 'utf8')) as number[]
 const kp = Keypair.fromSecretKey(Uint8Array.from(secret))
 ;(async () => {

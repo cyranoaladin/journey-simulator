@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🛡️ [MFAI SECURITY GATE] Vérification de la qualité du code..."
+
+npx lint-staged || { echo "❌ Échec du Linting. Corrigez les erreurs avant de committer."; exit 1; }
+
+echo "🔍 Vérification des types..."
+npm run build:types || { echo "❌ Erreur de typage TypeScript détectée."; exit 1; }
+
+echo "🧪 Exécution des tests unitaires rapides..."
+npm run test:fast || { echo "❌ Les tests ont échoué. Intégrité logique compromise."; exit 1; }
+
+echo "✅ Barrière franchie avec succès. Commit autorisé."

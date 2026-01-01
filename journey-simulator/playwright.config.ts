@@ -23,12 +23,20 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
     {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      name: 'ViewPort 1920x1080',
+      use: { viewport: { width: 1920, height: 1080 } },
+    },
+    {
+      name: 'ViewPort 1366x768',
+      use: { viewport: { width: 1366, height: 768 } },
+    },
+    {
+      name: 'ViewPort 375x667',
+      use: { viewport: { width: 375, height: 667 }, isMobile: true, hasTouch: true },
     },
   ],
   webServer: {
-    command: 'npm run dev -- --port 5173',
+    command: 'npm run preview -- --port 5173',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
     stdout: 'pipe',

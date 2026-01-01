@@ -18,6 +18,44 @@ export const JourneyProgressBar: React.FC<Props> = ({ personaId, currentStepId }
   const completedCount = Math.max(0, Math.min(activeIndex, totalPhases));
   const progressPercent = totalPhases === 0 ? 0 : Math.round((completedCount / totalPhases) * 100);
 
+  const getNodeClasses = (isCompleted: boolean, isCurrent: boolean) => {
+    if (isCompleted) {
+      return 'border-accent-cyan bg-accent-cyan text-black shadow-[0_0_20px_rgba(34,211,238,0.4)]';
+    }
+    if (isCurrent) {
+      return 'border-accent-cyan bg-[#0A0A1F] text-accent-cyan shadow-[0_0_30px_rgba(34,211,238,0.6)] ring-2 ring-accent-cyan/20 ring-offset-2 ring-offset-black';
+    }
+    return 'border-white/10 bg-[#0A0A1F] text-white/20';
+  };
+
+  const getLabelOpacityClass = (isCompleted: boolean, isCurrent: boolean) => {
+    if (isCurrent) return 'opacity-100 translate-y-0';
+    if (isCompleted) return 'opacity-60 hover:opacity-100';
+    return 'opacity-30 hover:opacity-80';
+  };
+
+  const getLabelColorClass = (isCompleted: boolean, isCurrent: boolean) => {
+    if (isCurrent) return 'text-accent-cyan drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]';
+    if (isCompleted) return 'text-accent-cyan/80';
+    return 'text-white/40';
+  };
+
+  const renderNodeContent = (isCompleted: boolean, isCurrent: boolean, index: number) => {
+    if (isCompleted) return <Check size={18} strokeWidth={3} />;
+    if (isCurrent) return <Zap size={18} className="fill-current" />;
+    return <span className="text-xs font-mono">{index + 1}</span>;
+  };
+
+  const renderStatusBadge = (isCompleted: boolean, isCurrent: boolean) => {
+    if (isCurrent) {
+      return <InfoBadge label="In progress" tone="info" className="mt-2" />;
+    }
+    if (isCompleted) {
+      return <InfoBadge label="Completed" tone="success" className="mt-2" />;
+    }
+    return null;
+  };
+
   if (totalPhases === 0) {
     return (
       <div className="w-full rounded-2xl border border-dashed border-white/10 bg-white/5 p-4" data-testid="journey-progress-bar">
@@ -61,86 +99,35 @@ export const JourneyProgressBar: React.FC<Props> = ({ personaId, currentStepId }
         {phases.map((phase, index) => {
           const isCompleted = index < activeIndex;
           const isCurrent = index === activeIndex;
+          const nodeClasses = getNodeClasses(isCompleted, isCurrent);
+          const labelOpacityClass = getLabelOpacityClass(isCompleted, isCurrent);
+          const labelColorClass = getLabelColorClass(isCompleted, isCurrent);
 
           return (
             <div
               key={phase.id}
-              className="relative z-10 flex flex-col items-center group w-24" // Fixed width container to center label
+              className="relative z-10 flex flex-col items-center group w-24"
               data-testid={`journey-progress-step-${phase.id}`}
             >
-              {/* Node Circle */}
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: isCurrent ? 1.1 : 1, opacity: 1 }}
                 transition={{ delay: index * 0.1 }}
-                className={`
-                  relative flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-500
-                  ${(() => {
-                    // Extract nested ternary into explicit variable
-                    if (isCompleted) {
-                      return 'border-accent-cyan bg-accent-cyan text-black shadow-[0_0_20px_rgba(34,211,238,0.4)]';
-                    }
-                    if (isCurrent) {
-                      return 'border-accent-cyan bg-[#0A0A1F] text-accent-cyan shadow-[0_0_30px_rgba(34,211,238,0.6)] ring-2 ring-accent-cyan/20 ring-offset-2 ring-offset-black';
-                    }
-                    return 'border-white/10 bg-[#0A0A1F] text-white/20';
-                  })()}
-                `}
+                className={`relative flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-500 ${nodeClasses}`}
               >
-                {(() => {
-                  if (isCompleted) {
-                    return <Check size={18} strokeWidth={3} />;
-                  }
-                  if (isCurrent) {
-                    return <Zap size={18} className="fill-current" />;
-                  }
-                  return <span className="text-xs font-mono">{index + 1}</span>;
-                })()}
-
-                {/* Pulse Effect for Current */}
+                {renderNodeContent(isCompleted, isCurrent, index)}
                 {isCurrent && (
                   <div className="absolute inset-0 rounded-full border border-accent-cyan animate-ping opacity-20" />
                 )}
               </motion.div>
 
-              {/* Label */}
               <div
-                className={`
-                  absolute top-14 w-32 flex flex-col items-center text-center transition-all duration-500
-                  ${(() => {
-                    // Extract nested ternary into explicit variable
-                    if (isCurrent) {
-                      return 'opacity-100 translate-y-0';
-                    }
-                    if (isCompleted) {
-                      return 'opacity-60 hover:opacity-100';
-                    }
-                    return 'opacity-30 hover:opacity-80';
-                  })()}
-                `}
+                className={`absolute top-14 w-32 flex flex-col items-center text-center transition-all duration-500 ${labelOpacityClass}`}
               >
-                {(() => {
-                  // Determine label color based on phase state (extracted to avoid conditional returning same value)
-                  let labelColorClass = 'text-white/40'; // Default: future phase
-                  if (isCurrent) {
-                    labelColorClass = 'text-accent-cyan drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]';
-                  } else if (isCompleted) {
-                    labelColorClass = 'text-accent-cyan/80';
-                  }
-                  return (
-                    <span className={`text-[10px] uppercase tracking-widest font-bold leading-tight ${labelColorClass}`}>
-                      {phase.label}
-                    </span>
-                  );
-                })()}
-
-                {index === activeIndex ? (
-                  <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
-                    <InfoBadge label="In progress" tone="info" className="mt-2" />
-                  </motion.div>
-                ) : isCompleted ? (
-                  <InfoBadge label="Completed" tone="success" className="mt-2" />
-                ) : null}
+                <span className={`text-[10px] uppercase tracking-widest font-bold leading-tight ${labelColorClass}`}>
+                  {phase.label}
+                </span>
+                {renderStatusBadge(isCompleted, isCurrent)}
               </div>
             </div>
           );

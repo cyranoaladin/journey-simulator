@@ -8,7 +8,7 @@ async function getGlobalMetrics(req, res) {
             data: metrics
         });
     } catch (error) {
-        console.error('Error fetching global metrics:', error);
+        console.error('Error fetching global metrics', { error });
         res.status(500).json({ success: false, error: 'Failed to fetch global metrics' });
     }
 }
@@ -27,7 +27,7 @@ async function getJourneyMetrics(req, res) {
             data: metrics
         });
     } catch (error) {
-        console.error(`Error fetching metrics for journey ${req.params.id}:`, error);
+        console.error('Error fetching metrics for journey', { journeyId: req.params.id, error });
         res.status(500).json({ success: false, error: 'Failed to fetch journey metrics' });
     }
 }

@@ -23,7 +23,8 @@ vi.mock('../../../utils/api', async (importOriginal) => {
 // Mock child components to simplify testing
 vi.mock('../JourneyTimeline', () => ({
     default: ({ onPhaseChange }: any) => (
-        <div
+        <button
+            type="button"
             data-testid="journey-timeline"
             onClick={() => onPhaseChange(1)}
             onKeyDown={(e: React.KeyboardEvent) => {
@@ -32,11 +33,9 @@ vi.mock('../JourneyTimeline', () => ({
                     onPhaseChange(1);
                 }
             }}
-            role="button"
-            tabIndex={0}
         >
             Timeline
-        </div>
+        </button>
     )
 }));
 vi.mock('../../AgentActivityFeed', () => ({

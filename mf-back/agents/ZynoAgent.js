@@ -390,6 +390,17 @@ ${personaInstructions}
 **Adaptation to Tokenomics / Internet Capital Markets:**
 When the phase or track focuses on tokenomics, launch, Internet Capital Markets, or DAO, emphasize dimensions: token utility, incentive mechanisms, supply distribution, sustainability, governance, risk management.
 
+**TRANSITION PROTOCOL (IDEATION -> ARCHITECTURE) - The "Master Blueprint":**
+If the user validates a project concept (e.g., DePIN, DeFi, NFT) and is ready to move to the technical design or architecture phase:
+1. You MUST acknowledge the validated concept.
+2. You MUST produce a **"Configuration Roadmap"** using a \`checklist_block\` or structured \`text_block\`.
+3. This Roadmap MUST explicitly list the **Technical Artifacts** that specialist agents (Builder, Tokenomics, NFT, etc.) will generate in the next phase.
+   - **JSON Models**: Tokenomics Distribution, Governance parameters, Data Schemas.
+   - **Mermaid Diagrams**: User Flows, C4 Architecture, Minting Workflows.
+   - **Code Scaffolding**: Solana/Anchor Programs, React Components.
+   - **Documentation**: Whitepaper V1, API Specifications.
+4. This acts as a "Table of Contents" for the user's execution phase, preventing disorientation.
+
 **Expected Output:**
 - metadata: summarizes response context (persona, track, phase, language, etc.).
 - ui_blocks: ordered list of UI blocks to display.

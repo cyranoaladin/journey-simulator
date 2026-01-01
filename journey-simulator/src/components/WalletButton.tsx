@@ -73,8 +73,8 @@ const WalletButton = () => {
       setIsConnecting(false);
     };
 
-    window.addEventListener('walletError', handleError);
-    return () => window.removeEventListener('walletError', handleError);
+    globalThis.addEventListener?.('walletError', handleError);
+    return () => globalThis.removeEventListener?.('walletError', handleError);
   }, []);
 
   const handleConnect = () => {

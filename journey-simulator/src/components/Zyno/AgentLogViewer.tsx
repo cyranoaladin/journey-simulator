@@ -71,7 +71,7 @@ export default function AgentLogViewer() {
           renderItem={(log, index) => {
             const payload = log.payload as unknown;
             const payloadKeyCount =
-              payload && typeof payload === 'object' ? Object.keys(payload as Record<string, unknown>).length : 0;
+              payload && typeof payload === 'object' ? Object.keys(payload).length : 0;
 
             return (
               <article

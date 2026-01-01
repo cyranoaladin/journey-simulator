@@ -189,6 +189,7 @@ const JourneyModal = () => {
 
   const renderHolderModal = () => {
     const { holder } = modalContent as { holder: AccessPassHolder; };
+    const passIcon = ({ Gold: '🥇', Platinum: '🥈' } as Record<string, string>)[holder.passLevel] ?? '💎';
     return (
       <div className="max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="glass-effect rounded-2xl p-8">
@@ -201,13 +202,7 @@ const JourneyModal = () => {
                 <h2 className="text-3xl font-space font-bold">{holder.name}</h2>
                 <p className="text-xl opacity-80">{holder.title}</p>
                 <div className="flex items-center space-x-2 mt-2">
-                  <span className="text-3xl">
-                    {holder.passLevel === 'Gold'
-                      ? '🥇'
-                      : holder.passLevel === 'Platinum'
-                        ? '🥈'
-                        : '💎'}
-                  </span>
+                  <span className="text-3xl">{passIcon}</span>
                   <span className="text-lg font-semibold">
                     {holder.passLevel} Skillchain Card™
                   </span>

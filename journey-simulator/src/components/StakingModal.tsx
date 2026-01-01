@@ -21,7 +21,7 @@ const StakingModal: React.FC<StakingModalProps> = ({
   const { updateStaking } = useJourneyStore();
 
   const handleStake = async () => {
-    const amount = parseFloat(stakeAmount);
+    const amount = Number.parseFloat(stakeAmount);
     if (amount <= 0 || amount > availableAmount) return;
 
     setIsStaking(true);
@@ -48,7 +48,7 @@ const StakingModal: React.FC<StakingModalProps> = ({
     return { dailyReward, monthlyReward, yearlyReward };
   };
 
-  const rewards = calculateRewards(parseFloat(stakeAmount) || 0);
+  const rewards = calculateRewards(Number.parseFloat(stakeAmount) || 0);
 
   return (
     <motion.div
@@ -129,7 +129,7 @@ const StakingModal: React.FC<StakingModalProps> = ({
         </div>
 
         {/* Rewards Preview */}
-        {parseFloat(stakeAmount) > 0 && (
+        {Number.parseFloat(stakeAmount) > 0 && (
           <div className="bg-gradient-primary/20 border border-primary-500/30 rounded-lg p-4 mb-6">
             <h3 className="font-semibold mb-3 flex items-center">
               <TrendingUp size={16} className="mr-2" />
@@ -180,7 +180,12 @@ const StakingModal: React.FC<StakingModalProps> = ({
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={handleStake}
-          disabled={isStaking || !stakeAmount || parseFloat(stakeAmount) <= 0 || parseFloat(stakeAmount) > availableAmount}
+          disabled={
+            isStaking
+            || !stakeAmount
+            || Number.parseFloat(stakeAmount) <= 0
+            || Number.parseFloat(stakeAmount) > availableAmount
+          }
           className="w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 bg-gradient-primary text-white disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isStaking ? (

@@ -16,7 +16,8 @@ function runStep(name, command, cwd = null) {
   try {
     const options = { stdio: 'pipe', encoding: 'utf8' };
     if (cwd) options.cwd = cwd;
-    const output = execSync(command, options).toString();
+    const [cmd, ...args] = command.split(' ');
+    const output = execFileSync(cmd, args, options).toString();
     return { name, status: 'OK', output: safeJson(output) };
   } catch (err) {
     return { name, status: 'FAIL', error: err.message, output: safeJson(err.stdout?.toString() || '') };

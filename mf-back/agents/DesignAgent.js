@@ -1,68 +1,105 @@
-const BaseAgent = require('./BaseAgent');
+const { LLMClient } = require('../orchestration/llmClient');
 
-class DesignAgent extends BaseAgent {
+class DesignAgent {
     constructor() {
-        super("DesignAgent");
+        this.id = 'DesignAgent';
+        this.llm = new LLMClient({});
     }
 
-    buildSystemPrompt(ctx) {
-        return `You are the **DesignAgent**, a creative director for the Metaverse.
-Your goal is to ensure the user's project is not just functional, but delightful and culturally resonant.
-You care about "Vibes", "Flow", and "Narrative".
+    buildPrompt({ input, ragChunks, journey, orchestrationMode }) {
+        const citations = (ragChunks || [])
+            .map((c, i) => `- [${i + 1}] ${c.title}: ${c.text.slice(0, 180)}...`)
+            .join('\n');
 
-Your responsibilities:
-1. Audit UX: Identify friction points in onboarding or wallet interactions.
-2. Critique Aesthetics: Evaluate NFT metadata, visual themes, and brand consistency.
-3. Brainstorm Gamification: Suggest loops(badges, leaderboards, unlocks) to keep users engaged.
-4. Generate Creative Assets: Propose names, lore, and visual descriptions for NFTs.
+        const phase = journey?.phaseId || 'unknown';
+        const isCollaborative = orchestrationMode === 'AECO';
 
-    Tone: Creative, enthusiastic, visionary.Use terms like "Onboarding Flow", "Visual Hierarchy", "Lore", "Drop Mechanics".`;
-    }
+        const tone = isCollaborative
+            ? 'Creative, visual, referencing NFTAgent for specs and MarketplaceAgent for listings.'
+            : 'Visionary, aesthetic-focused, "Vibe Curation".';
 
-    buildUserPrompt(ctx) {
-        return `Here is the design concept or UX flow from the user:
-"${ctx.submission}"
-
-Critique this design and suggest creative improvements.`;
-    }
-
-    async run(ctx) {
-        // Use standard evaluation schema
-        const EVALUATION_SCHEMA = {
-            type: "json_schema",
-            json_schema: {
-                name: "EvaluationResponse",
-                strict: true,
-                schema: {
-                    type: "object",
-                    required: ["global_score", "feedback", "axes"],
-                    properties: {
-                        global_score: { type: "number" },
-                        feedback: { type: "string" },
-                        axes: {
-                            type: "array",
-                            items: {
-                                type: "object",
-                                required: ["name", "score", "max_score", "comment"],
-                                properties: {
-                                    name: { type: "string" },
-                                    score: { type: "number" },
-                                    max_score: { type: "number" },
-                                    comment: { type: "string" },
-                                },
-                                additionalProperties: false,
-                            },
-                        },
-                    },
-                    additionalProperties: false,
-                },
-            },
+        return {
+            system: [
+                '**IDENTITY**: Creative Director & UX/UI Specialist for Web3.',
+                '**EXPERTISE**: Visual Identity, NFT Art Direction, User Flow Optimization (Wallet friction reduction), Gamification Mechanics.',
+                '**WORKFLOW**:',
+                '1. Define the Visual Language (Color Palette, Typography, "Vibe").',
+                '2. Map the UX Flow (Connect Wallet -> Sign -> Approve).',
+                '3. Design the Gamification Loop (Badges, Leaderboards, Reveal mechanics).',
+                '',
+                `**TONE**: ${tone}`,
+                '**OUTPUT FORMAT**: STRICT JSON: {',
+                '  "status": "OK",',
+                '  "summary": "...",',
+                '  "design_specs": { "theme": "...", "ux_improvements": ["..."] },',
+                '  "resources": {',
+                '     "diagram": "Mermaid diagram string (graph LR... for user flow)",',
+                '     "data": { "color_palette": ["#..."], "assets_needed": ["..."] },',
+                '     "documentation": "Markdown design brief"',
+                '  },',
+                '  "actions": ["..."]',
+                '}',
+                '**RESOURCES**: Must output valid Mermaid.js diagrams for user flow.'
+            ].join('\n'),
+            user: [
+                `User Input: ${input}`,
+                `Current Phase: ${phase}`,
+                `Mode: ${orchestrationMode}`,
+                'RAG Context:',
+                citations || '- (no specific design docs found)',
+                '',
+                'Create the visual and UX strategy.'
+            ].join('\n'),
         };
+    }
 
-        return super.run(ctx, {
-            response_format: EVALUATION_SCHEMA,
-            temperature: 0.7, // Higher temperature for creativity
+    async run(request) {
+        const { traceId, input, context = {}, rag = {}, constraints = {} } = request;
+        const ragChunks = rag.chunks || (context.rag && context.rag.chunks) || [];
+
+        const prompt = this.buildPrompt({
+            input,
+            ragChunks,
+            journey: context.journey,
+            orchestrationMode: context.orchestrationMode || 'AEPO'
         });
+
+        const llmRes = await this.llm.generate({
+            prompt,
+            traceId,
+            agentId: this.id,
+            maxTokens: constraints.maxTokens || 1200,
+            temperature: 0.6 // Creativity needed
+        });
+
+        let parsed = { design_specs: {}, resources: {}, actions: [], summary: "Design analysis failed to parse" };
+        try {
+            const jsonMatch = llmRes.text.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                parsed = JSON.parse(jsonMatch[0]);
+            } else {
+                parsed = JSON.parse(llmRes.text);
+            }
+        } catch (e) {
+            parsed.details = llmRes.text;
+            parsed.resources = { documentation: '### Error\nCould not parse Design JSON.' };
+        }
+
+        return {
+            traceId,
+            agentId: this.id,
+            status: 'OK',
+            summary: parsed.summary || 'Design strategy created',
+            details: parsed.design_specs || {},
+            resources: parsed.resources || {},
+            confidence: 0.85,
+            assumptions: [`RAG hits: ${ragChunks.length}`],
+            citations: ragChunks.map((c) => ({ id: c.id, title: c.title, source: c.source })),
+            actions: parsed.actions || ['Create Figma mockups'],
+            metrics: { latencyMs: llmRes.latencyMs, tokens: llmRes.tokensUsed, ragHits: ragChunks.length },
+            errors: [],
+            mock: llmRes.mock || false,
+        };
     }
 }
 

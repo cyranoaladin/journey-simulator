@@ -3,13 +3,23 @@ const fs = require('node:fs');
 const path = require('node:path');
 const agentMemory = require('./agent_memory');
 
+const os = require('os');
 const METRIC_LOG_PATH = path.join(__dirname, 'agent_metrics.log.json');
 const FEEDBACK_LOG_DIR = path.join(__dirname, '..', 'logs');
 const FEEDBACK_LOG_PATH = path.join(FEEDBACK_LOG_DIR, 'agent_feedback.json');
 
+// Fallback paths in /tmp
+const TMP_METRIC_PATH = path.join(os.tmpdir(), 'mfai_agent_metrics.log.json');
+const TMP_FEEDBACK_PATH = path.join(os.tmpdir(), 'mfai_agent_feedback.json');
+
 function ensureDir(dirPath) {
-  if (!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true });
+  try {
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true });
+    }
+  } catch (err) {
+    // If we can't create dir here (read-only), ignore. We'll fallback later or fail gracefully.
+    console.warn(`[agent_metrics] Failed to ensure dir ${dirPath}: ${err.message}`);
   }
 }
 
@@ -28,8 +38,23 @@ function readJsonArray(filePath) {
 }
 
 function writeJsonArray(filePath, data) {
-  ensureDir(path.dirname(filePath));
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+  try {
+    ensureDir(path.dirname(filePath));
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+  } catch (error) {
+    // If EROFS, try fallback to /tmp
+    if (error.code === 'EROFS' || error.code === 'EACCES') {
+      const fallbackPath = filePath.includes('feedback') ? TMP_FEEDBACK_PATH : TMP_METRIC_PATH;
+      try {
+        fs.writeFileSync(fallbackPath, JSON.stringify(data, null, 2));
+        console.warn(`[agent_metrics] Primary path RO, wrote to fallback: ${fallbackPath}`);
+      } catch (fallbackErr) {
+        console.error(`[agent_metrics] Failed to write to fallback ${fallbackPath}: ${fallbackErr.message}`);
+      }
+    } else {
+      console.error(`[agent_metrics] Write failed: ${error.message}`);
+    }
+  }
 }
 
 function saveMetric(agentName, userId, metricType, value, missionId) {
@@ -46,16 +71,10 @@ function saveMetric(agentName, userId, metricType, value, missionId) {
   };
 
   let existing = [];
-  if (fs.existsSync(METRIC_LOG_PATH)) {
-    try {
-      existing = JSON.parse(fs.readFileSync(METRIC_LOG_PATH, 'utf-8'));
-      if (!Array.isArray(existing)) {
-        existing = [];
-      }
-    } catch (error) {
-      existing = [];
-    }
-  }
+  // Try reading from primary, then fallback if empty/fail
+  try {
+    if (fs.existsSync(METRIC_LOG_PATH)) existing = readJsonArray(METRIC_LOG_PATH);
+  } catch (e) { /* ignore */ }
 
   existing.push(entry);
   writeJsonArray(METRIC_LOG_PATH, existing);

@@ -9,7 +9,7 @@ interface AgentLogItem {
   userId?: string;
   agent: string;
   action: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 const buildDemoLogs = (): AgentLogItem[] => {
@@ -135,12 +135,12 @@ export default function AgentActivityFeed() {
 
     try {
       await fetchLogsFromApi(journeyId);
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (!isMountedRef.current) {
         return;
       }
       // Guard: Ignore abort errors
-      if (error?.name === 'AbortError') {
+      if (error instanceof DOMException && error.name === 'AbortError') {
         return;
       }
       updateStateIfMounted(() => {

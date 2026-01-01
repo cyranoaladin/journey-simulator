@@ -16,6 +16,41 @@ interface JourneyTimelineProps {
   readonly onPhaseChange?: (index: number) => void;
 }
 
+const getStatusLabel = (isActive: boolean, isCompleted: boolean) => {
+  if (isActive) return 'In progress';
+  if (isCompleted) return 'Completed';
+  return 'Locked';
+};
+
+const getStatusTone = (isActive: boolean, isCompleted: boolean): 'default' | 'success' | 'info' => {
+  if (isCompleted) return 'success';
+  if (isActive) return 'info';
+  return 'default';
+};
+
+const getNodeClasses = (isActive: boolean, isCompleted: boolean) => {
+  if (isActive) {
+    return 'border-accent-cyan text-accent-cyan bg-accent-cyan/10 shadow-[0_0_24px_rgba(34,211,238,0.25)]';
+  }
+  if (isCompleted) {
+    return 'border-green-400/80 text-green-300 bg-green-500/10';
+  }
+  return 'border-white/10 text-white/30 bg-white/5';
+};
+
+const getButtonClasses = (isSelectable: boolean) =>
+  `group flex w-full items-start gap-3 rounded-xl border border-transparent p-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan/40 ${
+    isSelectable ? 'cursor-pointer hover:border-accent-cyan/30 hover:bg-white/5 active:scale-[0.99]' : 'cursor-default opacity-80'
+  }`;
+
+const getTitleClass = (isActive: boolean, isCompleted: boolean) => {
+  if (isActive) return 'text-white';
+  if (isCompleted) return 'text-white/80';
+  return 'text-white/60';
+};
+
+const getDescriptionClass = (isActive: boolean) => (isActive ? 'text-white/80' : 'text-white/50');
+
 export default function JourneyTimeline({ phases, currentPhase, onPhaseChange }: JourneyTimelineProps) {
   const totalPhases = phases.length;
   const activeIndex = totalPhases === 0 ? 0 : Math.min(currentPhase, totalPhases - 1);
@@ -54,8 +89,8 @@ export default function JourneyTimeline({ phases, currentPhase, onPhaseChange }:
           const isActive = index === activeIndex;
           const isLocked = index > completedCount;
           const phaseKey = phase.id || `phase-${index}-${phase.name || phase.title || 'unknown'}`;
-          const statusLabel = isActive ? 'In progress' : isCompleted ? 'Completed' : 'Locked';
-          const statusTone: 'default' | 'success' | 'info' = isCompleted ? 'success' : isActive ? 'info' : 'default';
+          const statusLabel = getStatusLabel(isActive, isCompleted);
+          const statusTone = getStatusTone(isActive, isCompleted);
 
           const handleSelect = () => {
             if (onPhaseChange) {
@@ -70,16 +105,12 @@ export default function JourneyTimeline({ phases, currentPhase, onPhaseChange }:
             }
           };
 
-          const NodeIcon = isActive ? PlayCircle : isCompleted ? CheckCircle2 : Lock;
-          const nodeClasses = (() => {
-            if (isActive) {
-              return 'border-accent-cyan text-accent-cyan bg-accent-cyan/10 shadow-[0_0_24px_rgba(34,211,238,0.25)]';
-            }
-            if (isCompleted) {
-              return 'border-green-400/80 text-green-300 bg-green-500/10';
-            }
-            return 'border-white/10 text-white/30 bg-white/5';
+          const NodeIcon = (() => {
+            if (isActive) return PlayCircle;
+            if (isCompleted) return CheckCircle2;
+            return Lock;
           })();
+          const nodeClasses = getNodeClasses(isActive, isCompleted);
           const isSelectable = Boolean(onPhaseChange) && !isLocked;
 
           return (
@@ -93,9 +124,7 @@ export default function JourneyTimeline({ phases, currentPhase, onPhaseChange }:
                 onClick={isSelectable ? handleSelect : undefined}
                 onKeyDown={isSelectable ? handleKeyDown : undefined}
                 disabled={!isSelectable}
-                className={`group flex w-full items-start gap-3 rounded-xl border border-transparent p-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan/40 ${
-                  isSelectable ? 'cursor-pointer hover:border-accent-cyan/30 hover:bg-white/5 active:scale-[0.99]' : 'cursor-default opacity-80'
-                }`}
+                className={getButtonClasses(isSelectable)}
                 aria-current={isActive ? 'step' : undefined}
                 aria-disabled={isSelectable ? undefined : 'true'}
               >
@@ -107,7 +136,7 @@ export default function JourneyTimeline({ phases, currentPhase, onPhaseChange }:
                 <div className="min-w-0 flex-1 space-y-2">
                   <div className="flex flex-col gap-1">
                     <div className="flex items-start justify-between gap-3">
-                      <h4 className={`text-sm font-semibold leading-tight ${isActive ? 'text-white' : isCompleted ? 'text-white/80' : 'text-white/60'}`}>
+                      <h4 className={`text-sm font-semibold leading-tight ${getTitleClass(isActive, isCompleted)}`}>
                         {phase.title}
                       </h4>
                       <InfoBadge label={statusLabel} tone={statusTone} />
@@ -115,7 +144,7 @@ export default function JourneyTimeline({ phases, currentPhase, onPhaseChange }:
                     {phase.mission && (
                       <p className="text-[11px] uppercase tracking-[0.3em] text-white/40">{phase.mission}</p>
                     )}
-                    <p className={`text-xs leading-relaxed ${isActive ? 'text-white/80' : 'text-white/50'} line-clamp-3`}>
+                    <p className={`text-xs leading-relaxed ${getDescriptionClass(isActive)} line-clamp-3`}>
                       {phase.description || 'No description provided yet.'}
                     </p>
                   </div>

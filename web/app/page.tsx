@@ -1,3 +1,4 @@
+/* (c) 2025 - Money Factory AI. Developed by Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA. All rights reserved. */
 import { redirect } from 'next/navigation'
 
 export default function HomePage() {

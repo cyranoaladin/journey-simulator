@@ -13,6 +13,7 @@ describe('Agent registry', () => {
     'GovernanceDAOAgent',
     'GrowthAgent',
     'InvestorDemoAgent',
+    'InvestorAgent',
     'UXWritingAgent',
     'QAPlaywrightAgent',
     'DevOpsAgent',

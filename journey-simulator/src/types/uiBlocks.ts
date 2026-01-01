@@ -1,5 +1,6 @@
 export type Language = 'fr' | 'en'
 export type Mode = 'discovery' | 'builder' | 'expert' | 'investor_demo'
+export type RunMode = 'demo' | 'simulation' | 'real'
 export type Tone = 'pedagogical' | 'investor_pitch' | 'critical'
 
 export interface Metadata {

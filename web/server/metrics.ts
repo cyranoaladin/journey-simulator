@@ -24,7 +24,7 @@ class MetricsCollector {
     this.metrics.push(event)
 
     // In a real app, we would flush this to Datadog, Prometheus, or a DB
-    console.log(`[METRICS] ${type}: ${value}`, tags)
+    console.log('[METRICS]', { type, value, tags })
   }
 
   getMetrics() {

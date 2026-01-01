@@ -1,5 +1,8 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import { callZynoStep } from '@/server/zyno'
+import { getDemoStep } from '@/server/demoArtifacts'
+import { setJourneyState, pushAgentLog } from '@/server/state'
 
 const Body = z.object({
   phaseId: z.string(),
@@ -11,11 +14,6 @@ const Body = z.object({
   tone: z.enum(['pedagogical', 'investor_pitch', 'critical']).optional(),
   journeyState: z.record(z.any()),
 })
-
-import { NextRequest } from 'next/server'
-import { callZynoStep } from '@/server/zyno'
-import { getDemoStep } from '@/server/demoArtifacts'
-import { setJourneyState, pushAgentLog } from '@/server/state'
 
 export async function POST(req: NextRequest, ctx: { params: { id: string } }) {
   const id = ctx.params.id
@@ -39,7 +37,7 @@ export async function POST(req: NextRequest, ctx: { params: { id: string } }) {
     userInput,
     actionId,
     journeyState,
-  } = parsed.data as any
+  } = parsed.data
 
   // DEMO_MODE / Replay
   if (process.env.DEMO_MODE === 'true' && !forceLlm) {

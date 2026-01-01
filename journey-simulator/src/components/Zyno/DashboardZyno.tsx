@@ -95,6 +95,30 @@ const DashboardZyno = ({ missionSummary }: DashboardZynoProps) => {
   const containerWhileInView = shouldReduceMotion ? undefined : 'visible';
   const containerViewport = shouldReduceMotion ? undefined : { once: true, margin: '-80px' };
 
+  const getStatDescription = (label: string) => {
+    if (label === 'AEPO Score') {
+      return 'AEPO measures how well your personalized roadmap is orchestrated (signals from missions, progress, and agent outputs).';
+    }
+    if (label === 'Active Agents') {
+      return 'Number of agents solicited during the last mission.';
+    }
+    if (label === 'Total XP') {
+      return 'Cumulative XP via missions, staking, and DAO votes.';
+    }
+    return 'Current $MFAI balance, excluding staking.';
+  };
+
+  const getPhaseCardClass = (isComplete: boolean, isCurrent: boolean) => {
+    const base = 'relative flex h-full flex-col gap-3 rounded-2xl border px-5 py-4 text-sm transition-colors duration-300 ';
+    if (isComplete) {
+      return `${base}border-success/40 bg-success/10 text-success`;
+    }
+    if (isCurrent) {
+      return `${base}border-accent/50 bg-accent/10 text-accent`;
+    }
+    return `${base}border-slate-200/70 bg-white/80 text-slate-600 dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40 dark:text-mfai-text/75`;
+  };
+
   return (
     <section className="space-y-8">
       <motion.div initial={containerInitial} whileInView={containerWhileInView} viewport={containerViewport} className="mfai-card-grid">
@@ -118,13 +142,7 @@ const DashboardZyno = ({ missionSummary }: DashboardZynoProps) => {
               </div>
               <div className="mfai-divider mt-4" />
               <p className="mt-3 text-xs text-slate-600 dark:text-mfai-text/70">
-                {stat.label === 'AEPO Score'
-                  ? 'AEPO measures how well your personalized roadmap is orchestrated (signals from missions, progress, and agent outputs).'
-                  : stat.label === 'Active Agents'
-                    ? 'Number of agents solicited during the last mission.'
-                    : stat.label === 'Total XP'
-                      ? 'Cumulative XP via missions, staking, and DAO votes.'
-                      : 'Current $MFAI balance, excluding staking.'}
+                {getStatDescription(stat.label)}
               </p>
             </motion.div>
           );
@@ -185,12 +203,7 @@ const DashboardZyno = ({ missionSummary }: DashboardZynoProps) => {
                 key={phase.id}
                 custom={shouldReduceMotion ? undefined : index}
                 variants={shouldReduceMotion ? undefined : cardVariants}
-                className={`relative flex h-full flex-col gap-3 rounded-2xl border px-5 py-4 text-sm transition-colors duration-300 ${isComplete
-                    ? 'border-success/40 bg-success/10 text-success'
-                    : isCurrent
-                      ? 'border-accent/50 bg-accent/10 text-accent'
-                      : 'border-slate-200/70 bg-white/80 text-slate-600 dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40 dark:text-mfai-text/75'
-                  }`}
+                className={getPhaseCardClass(isComplete, isCurrent)}
               >
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">

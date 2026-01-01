@@ -87,7 +87,7 @@ export async function POST(req: NextRequest, ctx: { params: { id: string } }) {
           kind: 'xp_block',
           id: 'xp_' + missionId,
           title: 'Progression',
-          current_xp: (journeyState as any)?.xp ?? 0,
+          current_xp: journeyState?.xp ?? 0,
           gained_xp: gained,
           next_level_xp: 100,
         },

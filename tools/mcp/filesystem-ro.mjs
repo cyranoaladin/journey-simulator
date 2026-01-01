@@ -156,7 +156,7 @@ async function handle(req) {
 
       if (toolName === 'search_files') {
         const base = await resolveSafe(args.path);
-        const re = new RegExp(args.pattern, 'i');
+        const normalizedPattern = String(args.pattern || '').toLowerCase();
         const max = Math.max(1, Math.min(Number(args.maxResults || 50), 200));
         const results = [];
 
@@ -164,7 +164,7 @@ async function handle(req) {
         if (baseStat.isFile()) {
           try {
             const txt = await fs.readFile(base, 'utf8');
-            if (re.test(txt)) results.push(base);
+            if (txt.toLowerCase().includes(normalizedPattern)) results.push(base);
           } catch {
             // ignore binary/unreadable
           }
@@ -182,7 +182,7 @@ async function handle(req) {
             } else if (!isEnvLike(p)) {
               try {
                 const txt = await fs.readFile(p, 'utf8');
-                if (re.test(txt)) results.push(p);
+                if (txt.toLowerCase().includes(normalizedPattern)) results.push(p);
               } catch {
                 // ignore binary/unreadable
               }

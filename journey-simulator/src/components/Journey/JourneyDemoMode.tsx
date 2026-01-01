@@ -1,4 +1,4 @@
-import { ArrowLeft, Loader2, Sparkles, Target } from 'lucide-react';
+import { ArrowLeft, LayoutGrid, Loader2, Maximize2, Minimize2, PanelLeft, PanelRight, Sparkles, Target } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { shallow } from 'zustand/shallow';
@@ -9,6 +9,7 @@ import UIBlocksRenderer from '../UIBlocks/UIBlocksRenderer';
 import { JourneyProgressBar } from './JourneyProgressBar';
 import JourneyTimeline from './JourneyTimeline';
 import ZynoSignalSidebar from './ZynoSignalSidebar';
+import ZynoChat from './ZynoChat';
 
 import { DEMO_SCENARIOS } from '../../config/demoScenarios';
 import { useAutoSimulation } from '../../hooks/useAutoSimulation';
@@ -22,6 +23,14 @@ import { useArtifacts } from '../../hooks/useArtifacts';
 import { ArtifactModal } from '../Artifacts/ArtifactModal';
 import { NeuralOverlay } from '../Artifacts/NeuralOverlay';
 
+const computeGridTemplate = (focusMode: boolean, leftPanelOpen: boolean, rightPanelOpen: boolean) => {
+    if (focusMode) return 'grid-cols-1';
+    if (leftPanelOpen && rightPanelOpen) return 'grid-cols-[280px_1fr_320px]';
+    if (leftPanelOpen) return 'grid-cols-[280px_1fr]';
+    if (rightPanelOpen) return 'grid-cols-[1fr_320px]';
+    return 'grid-cols-1';
+};
+
 interface JourneyDemoModeProps {
     onBack?: () => void;
 }
@@ -33,7 +42,7 @@ const JourneyDemoMode = ({ onBack }: JourneyDemoModeProps) => {
         userProgress,
         currentPhaseIndex,
         lastStep,
-        isStepLoading,
+        isStepLoading: _isStepLoading,
         runInteractiveStep,
         setCurrentPhase,
         completePhase,
@@ -141,32 +150,15 @@ const JourneyDemoMode = ({ onBack }: JourneyDemoModeProps) => {
         focusMode,
         leftPanelOpen,
         rightPanelOpen,
+        toggleFocusMode,
+        setLeftPanelOpen,
+        setRightPanelOpen,
+        cycleDensity
     } = useWorkspaceLayout();
 
     const autoSimPercent = autoSimProgress
         ? Math.min(100, Math.max(0, (autoSimProgress.current / Math.max(autoSimProgress.total, 1)) * 100))
         : 0;
-
-    // Demo: Simply trigger auto sim, no "Run Interactive Step" driven by component unless auto sim needs it.
-    // Actually, standard workspace had logic to "start phase" automatically.
-    // In demo mode, we might want to start AutoSim immediately or wait for user to click "Start Demo".
-    // The existing code auto-starts it via handleRunInteractiveStep inside useEffect.
-
-    useEffect(() => {
-        if (isStepLoading || isAutoSimulating) return;
-        if (!selectedPersona || !activePhase) return;
-        if (activePhaseIndex >= totalPhases) return;
-
-        // In Demo, we automate everything.
-        // We can just call startAutoSimulation if not running.
-        // But wait, user might want to read first.
-        // Let's stick to the previous logic: Trigger runInteractiveStep once per phase to get the "blocks".
-        // But for "Auto Simulation", it iterates through steps.
-
-        // Let's just launch auto simulation if we are in demo mode and haven't started?
-        // Or rely on the "Auto Simulation" button in the UI? 
-        // The previous code had a "Run Local Simulation" button.
-    }, []);
 
     const localInteractionStep = useMemo<JourneyStepResponse>(() => {
         // We can keep the local mock blocks for fallback
@@ -216,6 +208,36 @@ const JourneyDemoMode = ({ onBack }: JourneyDemoModeProps) => {
         navigate('/');
     };
 
+    const handleBack = () => {
+        if (onBack) {
+            onBack();
+            return;
+        }
+        navigate('/journeys');
+    };
+
+    const handleNavigationToggle = () => {
+        if (leftPanelOpen) {
+            setLeftPanelOpen(false);
+            return;
+        }
+        if (focusMode) toggleFocusMode();
+        setLeftPanelOpen(true);
+    };
+
+    const handleInsightsToggle = () => {
+        if (rightPanelOpen) {
+            setRightPanelOpen(false);
+            return;
+        }
+        if (focusMode) toggleFocusMode();
+        setRightPanelOpen(true);
+    };
+
+    const gridTemplate = computeGridTemplate(focusMode, leftPanelOpen, rightPanelOpen);
+    const showLeftPanel = leftPanelOpen && !focusMode;
+    const showRightPanel = rightPanelOpen && !focusMode;
+
     return (
         <div className="min-h-screen bg-[#0A0A1F] pb-20 font-sans text-white">
             <NeuralOverlay isVisible={isThinking} agentName={currentTask.agent} taskName={currentTask.task} />
@@ -224,7 +246,7 @@ const JourneyDemoMode = ({ onBack }: JourneyDemoModeProps) => {
             {/* HEADER */}
             <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-white/10 bg-[#0A0A1F]/95 px-6 backdrop-blur">
                 <div className="flex items-center gap-3">
-                    <button onClick={() => onBack ? onBack() : navigate('/journeys')} className="group flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 transition hover:bg-white/10">
+                    <button onClick={handleBack} className="group flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 transition hover:bg-white/10">
                         <ArrowLeft size={14} className="text-white/60 group-hover:text-white" />
                         <span className="text-xs font-medium text-white/60 group-hover:text-white">Exit Demo</span>
                     </button>
@@ -234,7 +256,38 @@ const JourneyDemoMode = ({ onBack }: JourneyDemoModeProps) => {
                     <span className="rounded-full bg-accent-cyan/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-accent-cyan border border-accent-cyan/20">Demo Mode</span>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button onClick={handleExitDemo} className="rounded-full bg-white text-black px-4 py-1.5 text-xs font-bold hover:bg-gray-200 transition">Exit Demo</button>
+                    <button
+                        onClick={handleNavigationToggle}
+                        className={`rounded-full p-2 transition-colors ${leftPanelOpen ? 'text-white bg-white/10' : 'text-white/40 hover:bg-white/10 hover:text-white'}`}
+                        title={leftPanelOpen ? 'Hide Timeline' : 'Show Timeline'}
+                    >
+                        <PanelLeft size={18} />
+                    </button>
+                    <button
+                        onClick={toggleFocusMode}
+                        className={`rounded-full p-2 transition-colors ${focusMode ? 'text-accent-cyan bg-accent-cyan/10' : 'text-white/40 hover:bg-white/10 hover:text-white'}`}
+                        title={focusMode ? 'Exit Focus Mode' : 'Enter Focus Mode'}
+                    >
+                        {focusMode ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+                    </button>
+                    <button
+                        onClick={cycleDensity}
+                        className="rounded-full p-2 text-white/40 hover:bg-white/10 hover:text-white transition-colors"
+                        title="Change View Density"
+                    >
+                        <LayoutGrid size={18} />
+                    </button>
+                    <button
+                        onClick={handleInsightsToggle}
+                        className={`rounded-full p-2 transition-colors ${rightPanelOpen ? 'text-white bg-white/10' : 'text-white/40 hover:bg-white/10 hover:text-white'}`}
+                        title={rightPanelOpen ? 'Hide Insights & Actions' : 'Show Insights & Actions'}
+                    >
+                        <PanelRight size={18} />
+                    </button>
+
+                    <div className="h-4 w-px bg-white/10 mx-1" />
+
+                    <button onClick={handleExitDemo} className="rounded-full bg-white text-black px-4 py-1.5 text-xs font-bold hover:bg-gray-200 transition">Exit</button>
                 </div>
             </header>
 
@@ -254,19 +307,19 @@ const JourneyDemoMode = ({ onBack }: JourneyDemoModeProps) => {
                                         <p className="text-xs text-white/60">Zyno is navigating the journey autonomously.</p>
                                     </div>
                                 </div>
-                                {!isAutoSimulating ? (
-                                    <button
-                                        onClick={startAutoSimulation}
-                                        className="flex items-center gap-2 rounded-lg bg-accent-cyan px-4 py-2 text-sm font-bold text-black shadow-[0_0_15px_rgba(34,211,238,0.4)] hover:bg-accent-cyan/90"
-                                    >
-                                        <Sparkles size={16} /> Start Simulation
-                                    </button>
-                                ) : (
+                                {isAutoSimulating ? (
                                     <button
                                         onClick={stopAutoSimulation}
                                         className="flex items-center gap-2 rounded-lg border border-red-500/50 bg-red-500/10 px-4 py-2 text-sm font-bold text-red-400 hover:bg-red-500/20"
                                     >
                                         Stop
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={startAutoSimulation}
+                                        className="flex items-center gap-2 rounded-lg bg-accent-cyan px-4 py-2 text-sm font-bold text-black shadow-[0_0_15px_rgba(34,211,238,0.4)] hover:bg-accent-cyan/90"
+                                    >
+                                        <Sparkles size={16} /> Start Simulation
                                     </button>
                                 )}
                             </div>
@@ -286,10 +339,10 @@ const JourneyDemoMode = ({ onBack }: JourneyDemoModeProps) => {
                 )}
 
                 {/* TRINITY LAYOUT */}
-                <div className={`grid gap-6 transition-all duration-500 ${focusMode ? 'grid-cols-1' : leftPanelOpen && rightPanelOpen ? 'grid-cols-[280px_1fr_320px]' : leftPanelOpen ? 'grid-cols-[280px_1fr]' : rightPanelOpen ? 'grid-cols-[1fr_320px]' : 'grid-cols-1'}`}>
+                <div className={`grid gap-6 transition-all duration-500 ${gridTemplate}`}>
 
                     {/* LEFT: TIMELINE (READ ONLY) */}
-                    {leftPanelOpen && !focusMode && (
+                    {showLeftPanel && (
                         <aside className="sticky top-24 h-[calc(100vh-8rem)] overflow-y-auto rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl">
                             <JourneyTimeline phases={selectedPersona?.phases || []} currentPhase={userProgress.completedPhases.length} />
                         </aside>
@@ -312,21 +365,20 @@ const JourneyDemoMode = ({ onBack }: JourneyDemoModeProps) => {
                                 </div>
                             </div>
                             <div className="max-h-[800px] overflow-y-auto bg-black/20 p-6 md:p-8">
-                                <UIBlocksRenderer
-                                    response={interactionResponse as JourneyStepResponse}
-                                />
+                                <UIBlocksRenderer response={interactionResponse} />
                             </div>
                         </div>
                     </section>
 
                     {/* RIGHT: ARTIFACTS */}
-                    {rightPanelOpen && !focusMode && (
+                    {showRightPanel && (
                         <aside className="sticky top-24 h-[calc(100vh-8rem)] space-y-4 overflow-y-auto rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl">
                             <ZynoSignalSidebar className="w-full" />
                         </aside>
                     )}
                 </div>
             </main>
+            <ZynoChat />
         </div>
     );
 };

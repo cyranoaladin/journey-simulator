@@ -29,15 +29,15 @@ describe('Journey Store - Phase Completion', () => {
     vi.clearAllMocks();
 
     tokenStore.setAccessToken('test-token');
-    if (typeof window !== 'undefined' && window.localStorage) {
-      window.localStorage.setItem('userId', 'test-user');
+    if (typeof globalThis !== 'undefined' && globalThis.localStorage) {
+      globalThis.localStorage.setItem('userId', 'test-user');
     }
   });
 
   afterEach(() => {
     tokenStore.clearTokens();
-    if (typeof window !== 'undefined' && window.localStorage) {
-      window.localStorage.clear();
+    if (typeof globalThis !== 'undefined' && globalThis.localStorage) {
+      globalThis.localStorage.clear();
     }
   });
 
