@@ -116,10 +116,10 @@ test.describe('Supreme Data Forensics: State Machine Integrity', () => {
         expect(phase1Cert).toBeDefined();
         console.log('Forensic NFT Timestamp:', phase1Cert.mint_date);
 
-        // Assert Timestamp Causality
+        // Verify timestamp causality: mint_date > phase start
         const transitionTime = new Date(phase1Cert.mint_date).getTime();
-        // expect(transitionTime).toBeLessThanOrEqual(now);
-        // expect(transitionTime).toBeGreaterThan(phase1Start.getTime());
+        expect(transitionTime).toBeGreaterThan(phase1Start.getTime());
+        expect(transitionTime).toBeLessThanOrEqual(Date.now());
 
         console.log('✅ Deep Reality Matrix: DB Truth Confirmed (Counter incremented, NFT minted, Timestamp consistent)');
 
