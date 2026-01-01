@@ -8,27 +8,84 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand({ping: 1})'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
     strategy:
       fail-fast: false
       matrix:
         shard: [1, 2, 3, 4]
+    
     steps:
       - uses: actions/checkout@v4
+      
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: package-lock.json
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run build
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Lint
+        run: npm run lint
+      
+      - name: Build
+        run: npm run build
+      
       - name: Audit prod dependencies
         run: npm audit --omit=dev --audit-level=high || true
-      - run: npm run test:unit
+      
+      - name: Run unit tests
+        run: npm run test:unit
+      
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
+      
+      - name: Install wait-on
+        run: npm install -g wait-on
+      
+      - name: Start Backend (mf-back)
+        run: |
+          cd mf-back
+          PORT=3002 MONGO_URI=mongodb://localhost:27017/mfai_test node ./bin/www &
+          echo $! > backend.pid
+        env:
+          NODE_ENV: test
+          EXECUTION_ENABLED: false
+          DEMO_MODE: true
+      
+      - name: Start Frontend (journey-simulator preview)
+        run: |
+          cd journey-simulator
+          npm run preview -- --port 4173 &
+          echo $! > frontend.pid
+      
+      - name: Wait for services to be ready
+        run: |
+          wait-on http://localhost:3002/health -t 30000
+          wait-on http://localhost:4173 -t 30000
+      
       - name: Run E2E tests (Sharded)
         run: npx playwright test --shard=${{ matrix.shard }}/4
+        env:
+          CI: true
+      
+      - name: Stop services
+        if: always()
+        run: |
+          if [ -f mf-back/backend.pid ]; then kill $(cat mf-back/backend.pid) || true; fi
+          if [ -f journey-simulator/frontend.pid ]; then kill $(cat journey-simulator/frontend.pid) || true; fi
       
       - name: Upload Playwright test-results (always)
         if: always()
