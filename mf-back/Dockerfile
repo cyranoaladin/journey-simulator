@@ -7,8 +7,8 @@ COPY package.json package-lock.json ./
 
 ARG INSTALL_DEV=false
 RUN npm set fund false \
- && npm set audit false \
- && if [ "$INSTALL_DEV" = "true" ]; then npm ci; else npm ci --omit=dev; fi
+    && npm set audit false \
+    && if [ "$INSTALL_DEV" = "true" ]; then npm ci; else npm ci --omit=dev; fi
 
 COPY . .
 
@@ -19,6 +19,7 @@ ENV NODE_ENV=production \
     PORT=3000
 
 RUN groupadd -g 101 nodeapp && useradd -u 101 -g nodeapp -m nodeapp
+RUN chown -R nodeapp:nodeapp /usr/src/app
 USER nodeapp
 
 EXPOSE 3000

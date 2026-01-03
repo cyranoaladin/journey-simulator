@@ -1,3 +1,9 @@
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
 # Checklist des Variables d'Environnement
 
 ## Vue d'ensemble
@@ -219,3 +225,7 @@ required.forEach(v => {
 - **Kamel BEN RHOUMA** : Cofondateur et Full Stack Developer
 - **Alaeddine BEN RHOUMA** : Cofondateur et Chief Operating & Blockchain Officer
 - **Adem Behajaissa** : Backend Stack Developer
+
+## Hardening / Production
+- **SKIP_NPM_INSTALL**: Set to "true" to prevent runtime npm install in production containers (used in .deploy.env).
+- **RAG_MAX_TOPK**: Maximum number of RAG snippets to retrieve.

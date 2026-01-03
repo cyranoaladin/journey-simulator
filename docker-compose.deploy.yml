@@ -14,13 +14,14 @@ services:
       PORT: 3002
       MONGO_URI: mongodb://mfai-mongo:27017/journey
       API_BASE_URL: https://journey.mfai.app/api
+      SKIP_NPM_INSTALL: "true"
     env_file:
       - .deploy.env
     ports:
       - "3002:3002"
-    volumes:
-      - ./mf-back:/usr/src/app
-      - /usr/src/app/node_modules
+    # volumes:
+    #   - ./mf-back:/usr/src/app
+    #   - /usr/src/app/node_modules
     security_opt:
       - no-new-privileges:true
     # Bind mount for code means writable FS required during deploy. // nosemgrep
