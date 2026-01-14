@@ -38,7 +38,7 @@
     "@solana/wallet-adapter-react-ui": "^0.9.39",
     "@solana/web3.js": "^1.95.3",
     "bs58": "^6.0.0",
-    "bullmq": "^5.65.0",
+    "bullmq": "^5.66.5",
     "canvas-confetti": "^1.9.4",
     "ioredis": "^5.8.2",
     "lucide-react": "^0.556.0",
