@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 import { CheckCircle2, Lock, Plus, RefreshCw, ShieldCheck, ThumbsDown, ThumbsUp } from 'lucide-react';
 import {
@@ -64,7 +70,7 @@ export default function ZynoDAOAdminPanel() {
     if (!config) {
       return '';
     }
-    return `${config.quorumPercent}% quorum • Total Power ${config.totalVotingPower}`;
+    return `${config.quorumPercent}% quorum  Total Power ${config.totalVotingPower}`;
   }, [config]);
 
   const handleCreateProposal = async (event: React.FormEvent) => {
@@ -146,7 +152,7 @@ export default function ZynoDAOAdminPanel() {
   };
 
   const renderVoterOption = (voter: DaoVoter) => {
-    const label = voter.name ? `${voter.name} • ${voter.weight}` : `${voter.id} • ${voter.weight}`;
+    const label = voter.name ? `${voter.name}  ${voter.weight}` : `${voter.id}  ${voter.weight}`;
     return (
       <option key={voter.id} value={voter.id}>
         {label}
@@ -258,7 +264,7 @@ export default function ZynoDAOAdminPanel() {
           disabled={creating}
           className="inline-flex items-center gap-2 rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-slate-400/60"
         >
-          {creating ? 'Creating…' : 'Create Proposal'}
+          {creating ? 'Creating' : 'Create Proposal'}
         </button>
       </form>
 
@@ -280,6 +286,7 @@ export default function ZynoDAOAdminPanel() {
             <article
               key={proposal.id}
               className="space-y-3 rounded-xl border border-slate-200 p-4 dark:border-slate-700/60"
+              data-testid={`admin-proposal-${proposal.id}`}
             >
               <header className="flex flex-wrap items-center justify-between gap-2">
                 <div>
@@ -300,11 +307,11 @@ export default function ZynoDAOAdminPanel() {
               <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
                 <div className="rounded-lg bg-slate-100 p-3 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
                   <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">Votes Yes</p>
-                  <p className="text-lg font-semibold text-emerald-600 dark:text-emerald-300">{proposal.votes.yes}</p>
+                  <p className="text-lg font-semibold text-emerald-600 dark:text-emerald-300" data-testid={`vote-yes-count-${proposal.id}`}>{proposal.votes.yes}</p>
                 </div>
                 <div className="rounded-lg bg-slate-100 p-3 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
                   <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">Votes No</p>
-                  <p className="text-lg font-semibold text-red-500 dark:text-red-300">{proposal.votes.no}</p>
+                  <p className="text-lg font-semibold text-red-500 dark:text-red-300" data-testid={`vote-no-count-${proposal.id}`}>{proposal.votes.no}</p>
                 </div>
                 <div className="rounded-lg bg-slate-100 p-3 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
                   <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">Quorum</p>
@@ -326,6 +333,7 @@ export default function ZynoDAOAdminPanel() {
                   onClick={() => submitVote(proposal.id, 'yes')}
                   disabled={proposal.status !== 'active' || voting}
                   className="inline-flex items-center gap-2 rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-slate-400/60"
+                  data-testid={`vote-yes-btn-${proposal.id}`}
                 >
                   <ThumbsUp size={16} />
                   Yes ({selectedVoter || '---'})
@@ -335,6 +343,7 @@ export default function ZynoDAOAdminPanel() {
                   onClick={() => submitVote(proposal.id, 'no')}
                   disabled={proposal.status !== 'active' || voting}
                   className="inline-flex items-center gap-2 rounded-md bg-red-500 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-red-400 disabled:cursor-not-allowed disabled:bg-slate-400/60"
+                  data-testid={`vote-no-btn-${proposal.id}`}
                 >
                   <ThumbsDown size={16} />
                   No
@@ -353,14 +362,14 @@ export default function ZynoDAOAdminPanel() {
               {proposal.status === 'closed' && proposal.outcome === 'accepted' && (
                 <p className="flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
                   <CheckCircle2 size={16} />
-                  Decision accepted — implementation recommended.
+                  Decision accepted  implementation recommended.
                 </p>
               )}
 
               {proposal.status === 'closed' && proposal.outcome === 'rejected' && (
                 <p className="flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-500/10 dark:text-red-300">
                   <ThumbsDown size={16} />
-                  Proposal rejected — revise strategy.
+                  Proposal rejected  revise strategy.
                 </p>
               )}
             </article>

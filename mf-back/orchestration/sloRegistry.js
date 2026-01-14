@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const SLOS = [
   {
     id: 'orchestration_latency_p95',
@@ -30,13 +36,13 @@ const SLOS = [
   {
     id: 'dry_run_rate',
     description: 'Taux de runs en DRY_RUN',
-    target: 0.95, // attendu élevé par défaut
+    target: 0.95, // expected high by default
     window: 100,
     severity: 'INFO',
   },
   {
     id: 'agents_disabled_rate',
-    description: 'Part des agents désactivés sur la sélection',
+    description: 'Share of agents disabled on selection',
     target: 0.2,
     window: 100,
     severity: 'WARN',
@@ -50,21 +56,21 @@ const SLOS = [
   },
   {
     id: 'llm_usage_rate',
-    description: 'Taux de runs avec LLM réel (non mock)',
+    description: 'Rate of runs with real LLM (non mock)',
     target: 0.5,
     window: 100,
     severity: 'INFO',
   },
   {
     id: 'real_block_rate',
-    description: 'Taux de tentatives REAL bloquées par guards',
+    description: 'Rate of REAL attempts blocked by guards',
     target: 0.1,
     window: 100,
     severity: 'WARN',
   },
   {
     id: 'llm_cost_per_run',
-    description: 'Coût LLM estimé par run',
+    description: 'Estimated LLM cost per run',
     target: 0.05, // USD
     window: 100,
     severity: 'WARN',

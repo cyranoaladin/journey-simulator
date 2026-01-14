@@ -1,7 +1,13 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { API_BASE_URL } from '../utils/api';
 import UIBlocksRenderer from './UIBlocks/UIBlocksRenderer';
-import { useJourneyStore } from '../store/journeyStore';
+import { useRunModeStore } from '../store/runModeStore';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -10,7 +16,7 @@ interface Message {
 }
 
 const PlaygroundPage = () => {
-  const runMode = useJourneyStore((state) => state.runMode);
+  const runMode = useRunModeStore((state) => state.runMode);
   const [input, setInput] = useState('');
   const [history, setHistory] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -44,7 +50,7 @@ const PlaygroundPage = () => {
         ...prev,
         {
           role: 'assistant',
-          content: { results: { error: { output: 'Erreur: userId manquant. Connectez-vous puis réessayez.' } } },
+          content: { results: { error: { output: 'Error: Missing userId. Please login and try again.' } } },
           timestamp: Date.now(),
         },
       ]);
@@ -90,11 +96,11 @@ const PlaygroundPage = () => {
   return (
     <section className="max-w-5xl mx-auto px-4 py-4 flex flex-col h-full">
       <header className="mb-4 flex-none">
-        <h1 className="text-2xl font-bold gradient-text">🎮 Zyno Chat Playground</h1>
+        <h1 className="text-2xl font-bold gradient-text"> Zyno Chat Playground</h1>
         <p className="text-xs text-slate-500">Continuous conversation mode.</p>
       </header>
 
-      {/* --- FENÊTRE DE CHAT (Bordure ajoutée + Hauteur réduite) --- */}
+      {/* --- CHAT WINDOW (Added border + Reduced height) --- */}
       <div className="flex-1 flex flex-col bg-slate-900/30 border border-white/10 rounded-2xl overflow-hidden h-[calc(100vh-220px)] shadow-xl relative">
 
         {/* Zone des messages */}
@@ -153,7 +159,7 @@ const PlaygroundPage = () => {
           <div ref={scrollRef} />
         </div>
 
-        {/* --- ZONE DE SAISIE (Intégrée en bas de la fenêtre) --- */}
+        {/* --- INPUT AREA (Integrated at bottom of window) --- */}
         <div className="p-4 bg-slate-900/80 border-t border-white/10 backdrop-blur-md">
           <form onSubmit={handleSubmit} className="flex gap-3 relative">
             <textarea
@@ -174,7 +180,7 @@ const PlaygroundPage = () => {
               className="px-5 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 text-white font-semibold text-sm hover:opacity-90 transition-all shadow-lg shadow-primary-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               <span>Send</span>
-              <span className="text-xs">🚀</span>
+              <span className="text-xs"></span>
             </button>
           </form>
         </div>

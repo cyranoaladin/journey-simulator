@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { AECO, AEPO } from '@/content/aepoAeco';
 import { motion } from 'framer-motion';
 import {
@@ -49,7 +55,7 @@ const resourceLibrary: Resource[] = [
   },
   {
     id: 'web3-transformation',
-    title: 'Web2 ➝ Web3 Activation Guide',
+    title: 'Web2  Web3 Activation Guide',
     summary: 'Detailed pathway to transform a Web2 team into autonomous Web3 builders.',
     tags: ['Onboarding', 'Execution', 'Playbook'],
     format: 'Guide',
@@ -188,7 +194,7 @@ const ResourceHub = () => {
               </div>
               <div className="flex items-center gap-3">
                 <Layers size={18} />
-                <span>Seamless Product ⇄ Governance handoff</span>
+                <span>Seamless Product  Governance handoff</span>
               </div>
               <div className="flex items-center gap-3">
                 <Globe size={18} />
@@ -269,6 +275,7 @@ const ResourceHub = () => {
             {filteredResources.map((resource, index) => (
               <motion.article
                 key={resource.id}
+                data-testid="resource-card"
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05, duration: 0.3 }}
@@ -286,7 +293,7 @@ const ResourceHub = () => {
                 ) : null}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-white/60">
-                    <span>{resource.format}</span>
+                    <span data-testid="resource-status">{resource.format}</span>
                     <span>{resource.minutes} min</span>
                   </div>
                   <h3 className="text-lg font-semibold text-white group-hover:text-accent-neon transition">
@@ -306,6 +313,7 @@ const ResourceHub = () => {
                 </div>
                 <a
                   href={`${KNOWLEDGE_BASE_URL}/${resource.slug}`}
+                  data-testid="resource-open"
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white/80 transition hover:bg-white/20"

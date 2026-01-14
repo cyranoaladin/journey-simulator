@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { Eye, Lock } from 'lucide-react';
 import React from 'react';
 
@@ -47,7 +53,7 @@ export const ArtifactCard: React.FC<Props> = ({ artifact, onClick }) => {
       {/* Title & Agent */}
       <h4 className="text-white font-bold mb-1 truncate">{artifact.title}</h4>
       <div className="flex items-center gap-2 text-xs text-gray-400 mb-4">
-        <span className={artifact.agent.color}>●</span>
+        <span className={artifact.agent.color}></span>
         <span>{artifact.agent.name}</span>
       </div>
 

@@ -1,9 +1,16 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 // Persistent Agent Memory System with basic file persistence
 const fs = require('node:fs');
 const path = require('node:path');
 
 const MEMORY_DIR = __dirname;
 const MEMORY_FILE = path.join(MEMORY_DIR, 'agent_memory.json');
+const FALLBACK_FILE = '/tmp/mfai_agent_memory.json';
 
 function createDefaultUserMemory() {
   return {
@@ -22,36 +29,57 @@ function createDefaultUserMemory() {
 function ensureMemoryDir() {
   try {
     if (!fs.existsSync(MEMORY_DIR)) {
+      // In read-only system, this might fail, but directory usually exists in image
       fs.mkdirSync(MEMORY_DIR, { recursive: true });
     }
   } catch (err) {
-    console.error('Failed to create memory directory:', err);
+    console.warn('Warning: Failed to ensure memory directory:', err.message);
   }
 }
 
 function loadFromDisk() {
   ensureMemoryDir();
+
+  let fileToLoad = MEMORY_FILE;
   if (!fs.existsSync(MEMORY_FILE)) {
-    return {};
+    if (fs.existsSync(FALLBACK_FILE)) {
+      fileToLoad = FALLBACK_FILE;
+      console.log(`[agent_memory] Loading from fallback: ${FALLBACK_FILE}`);
+    } else {
+      return {};
+    }
   }
 
   try {
-    const parsed = JSON.parse(fs.readFileSync(MEMORY_FILE, 'utf-8'));
+    const parsed = JSON.parse(fs.readFileSync(fileToLoad, 'utf-8'));
     if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
       return parsed;
     }
   } catch (error) {
-    console.error('Failed to load agent memory from disk, starting fresh:', error);
+    console.error('Failed to load agent memory, starting fresh', { file: fileToLoad, error: error?.message || error });
   }
   return {};
 }
 
 function persistToDisk(currentMemory) {
+  const content = JSON.stringify(currentMemory, null, 2);
+
+  // Try primary location
   try {
     ensureMemoryDir();
-    fs.writeFileSync(MEMORY_FILE, JSON.stringify(currentMemory, null, 2));
+    fs.writeFileSync(MEMORY_FILE, content);
   } catch (error) {
-    console.error('Failed to persist agent memory:', error);
+    if (error.code === 'EROFS' || error.code === 'EACCES') {
+      // Fallback to tmp
+      try {
+        fs.writeFileSync(FALLBACK_FILE, content);
+        console.log(`[agent_memory] Primary path RO, wrote to fallback: ${FALLBACK_FILE}`);
+      } catch (fallbackError) {
+        console.error('CRITICAL: Failed to persist to fallback memory:', fallbackError);
+      }
+    } else {
+      console.error('Failed to persist agent memory:', error);
+    }
   }
 }
 
@@ -173,11 +201,20 @@ module.exports = {
 
   reset() {
     memory = {};
+    // Try delete primary
     if (fs.existsSync(MEMORY_FILE)) {
       try {
         fs.unlinkSync(MEMORY_FILE);
       } catch (error) {
-        console.error('Failed to reset agent memory file:', error);
+        console.error('Failed to reset memory (primary):', error.message);
+      }
+    }
+    // Try delete fallback
+    if (fs.existsSync(FALLBACK_FILE)) {
+      try {
+        fs.unlinkSync(FALLBACK_FILE);
+      } catch (error) {
+        console.error('Failed to reset memory (fallback):', error.message);
       }
     }
   }

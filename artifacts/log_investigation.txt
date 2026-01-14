@@ -1,0 +1,28 @@
+### 🕵️ PROMPT: ANALYSE FORENSIQUE DES LOGS (RUNTIME DEBUG)
+
+**Situation :** L'utilisateur vient de tester l'interface. Il a cliqué sur "Envoyer" dans Zyno.
+**Symptôme :** L'interface a semblé charger, puis est revenue à l'état initial sans afficher de réponse.
+**Hypothèse :** Une erreur s'est produite côté Backend et n'a pas été renvoyée correctement au Frontend, ou le Frontend a reçu une erreur 500 et l'a ignorée.
+
+**TA MISSION :**
+Tu dois lire les fichiers de logs générés par la session en cours pour trouver la cause exacte.
+
+**FICHIERS À ANALYSER :**
+1.  `artifacts/backend.log` (C'est ici que 90% des erreurs se cachent).
+2.  `artifacts/frontend.log` (Pour voir s'il y a des erreurs de build ou de connexion).
+
+**PROTOCOLE D'ENQUÊTE :**
+1.  **Lis les 100 dernières lignes** de `artifacts/backend.log`.
+2.  Cherche la requête **POST /api/orchestration** ou **POST /journey/:id/step**.
+3.  Regarde ce qui s'est passé ensuite :
+    * Y a-t-il une **Stack Trace** (Erreur JS) ?
+    * Y a-t-il un **Timeout** MongoDB ?
+    * Y a-t-il un message "Agent response empty" ?
+    * Est-ce que le serveur a redémarré (crash nodemon) ?
+
+**RESTITUTION ATTENDUE :**
+* **Verdict :** Quelle est l'erreur exacte ? (Copie-colle la ligne du log).
+* **Fichier Coupable :** Quel fichier a provoqué cette erreur ?
+* **Correction :** Quelle modification de code règle ce crash ? (Donne le bloc de code corrigé).
+
+**Action :** Lis les logs maintenant et dis-moi pourquoi ça plante.

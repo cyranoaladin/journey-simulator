@@ -1,0 +1,1 @@
+artifacts/proof/lead_claude_audit_run_005/zero_byte_files.txt

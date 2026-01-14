@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import '@testing-library/jest-dom';
 import { TextDecoder, TextEncoder } from 'node:util';
 import { WritableStream } from 'web-streams-ponyfill';
@@ -97,3 +103,25 @@ jest.mock('agents/tools/solana', () => ({
   })),
   executeReward: jest.fn(async () => ({ txSig: 'test-devnet-txsig' })),
 }))
+
+// Mock NextResponse to avoid edge runtime cookie handling in tests
+jest.mock('next/server', () => {
+  return {
+    NextResponse: {
+      json: (data: any, init?: { status?: number }) => ({
+        status: init?.status ?? 200,
+        body: data,
+        headers: new Map(),
+        json: async () => data,
+      }),
+    },
+  }
+})
+
+// Provide a global fetch stub for node test environment
+if (typeof globalThis.fetch === 'undefined') {
+  ;(globalThis as any).fetch = jest.fn(async () => ({
+    ok: true,
+    json: async () => ({}),
+  }))
+}

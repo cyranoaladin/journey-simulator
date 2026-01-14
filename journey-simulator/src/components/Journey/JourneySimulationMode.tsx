@@ -1,5 +1,11 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { ArrowLeft, CheckCircle2, ChevronRight, LayoutGrid, Maximize2, Minimize2, PanelLeft, PanelRight, Target } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { Component, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { shallow } from 'zustand/shallow';
 import { getPersonaProofData, getProofType } from '../../data/proofsData';
@@ -13,6 +19,8 @@ import { JourneyProgressBar } from './JourneyProgressBar';
 import JourneyTimeline from './JourneyTimeline';
 import ZynoSignalSidebar from './ZynoSignalSidebar';
 import ZynoChat from './ZynoChat';
+import { ActiveAgentsPanel } from './ActiveAgentsPanel';
+import { ResourceDeliveryPanel } from './ResourceDeliveryPanel';
 
 import { usePhaseData } from '../../hooks/usePhaseData';
 
@@ -28,6 +36,25 @@ import { useWorkspaceLayout } from '../../contexts/WorkspaceLayoutContext';
 import { useArtifacts } from '../../hooks/useArtifacts';
 import { ArtifactModal } from '../Artifacts/ArtifactModal';
 import { NeuralOverlay } from '../Artifacts/NeuralOverlay';
+
+class SafeBoundary extends Component<{ fallback?: React.ReactNode; children: React.ReactNode }, { hasError: boolean }> {
+    constructor(props: any) {
+        super(props);
+        this.state = { hasError: false };
+    }
+    static getDerivedStateFromError() {
+        return { hasError: true };
+    }
+    componentDidCatch() {
+        // swallow
+    }
+    render() {
+        if (this.state.hasError) {
+            return this.props.fallback || <div className="text-xs text-amber-300">Section indisponible.</div>;
+        }
+        return this.props.children;
+    }
+}
 
 const buildArtifactCatalog = (artifacts: any[] = []) =>
     artifacts
@@ -132,13 +159,15 @@ interface JourneySimulationModeProps {
 
 const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
     const navigate = useNavigate();
+    const apiJourneyId = useJourneyStore((state) => state.apiJourneyId);
+
     const {
         selectedPersona,
         userProgress,
         currentPhaseIndex,
         lastStep,
         isStepLoading,
-        runInteractiveStep,
+        loadUserProgress,
         setCurrentPhase,
         completePhase,
         ensureApiJourneyId,
@@ -146,6 +175,7 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
         uiTone,
         updateStaking,
         updateVotingPower,
+        runInteractiveStep,
     } = useJourneyStore(
         (state) => ({
             selectedPersona: state.selectedPersona,
@@ -153,7 +183,7 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
             currentPhaseIndex: state.currentPhase,
             lastStep: state.lastStep,
             isStepLoading: state.isStepLoading,
-            runInteractiveStep: state.runInteractiveStep,
+            loadUserProgress: state.loadUserProgress,
             setCurrentPhase: state.setCurrentPhase,
             completePhase: state.completePhase,
             ensureApiJourneyId: state.ensureApiJourneyId,
@@ -161,6 +191,7 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
             uiTone: state.uiTone,
             updateStaking: state.updateStaking,
             updateVotingPower: state.updateVotingPower,
+            runInteractiveStep: state.runInteractiveStep,
         }),
         shallow
     );
@@ -189,6 +220,21 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
         userProgress
     });
 
+    // Legacy properties removed - these don't exist in current store
+    const phaseStatus: string = 'IN_PROGRESS';
+    const phaseFeedback: any = null;
+    const rewardsReady = false;
+    const quizUnlocked = false;
+    const mintUnlocked = false;
+    const rewardsClaimed = false;
+    const mintStatus: string = 'idle';
+    const markQuizPassed = () => console.log('markQuizPassed not implemented');
+    const claimRewards = () => console.log('claimRewards not implemented');
+    const activeAgents: any[] = [];
+    const generatedResources: any[] = [];
+
+
+
     const showNeuralOverlay = (task: string) => {
         const startedAt = Date.now();
         setIsThinking(true);
@@ -208,6 +254,23 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
     const [showStakingModal, setShowStakingModal] = useState(false);
     const [showVoteModal, setShowVoteModal] = useState(false);
     const [isSubmittingPhase, setIsSubmittingPhase] = useState(false);
+    const [userDraft, setUserDraft] = useState('');
+    const handleDemoReset = useCallback(() => {
+        try {
+            window.localStorage.removeItem('mfai-journey-storage');
+        } catch {
+            // ignore
+        }
+        window.location.reload();
+    }, []);
+    const claimLabel = useMemo(() => {
+        if (rewardsClaimed || mintStatus === 'completed') return 'Récompenses prises';
+        if (mintStatus === 'finalizing') return 'Finalisation...';
+        if (mintStatus === 'minting') return 'Minting on Solana...';
+        if (mintStatus === 'initiating') return 'Initiating Transaction...';
+        if (mintStatus === 'pending') return 'En attente du backend...';
+        return 'Mint & Récompenses';
+    }, [rewardsClaimed, mintStatus]);
 
     const {
         focusMode,
@@ -227,14 +290,33 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
         if (!activePhase) return;
         if (!selectedPersona) return;
 
-        const overlayStart = showNeuralOverlay(`Generating ${safeActivePhase.title}…`);
+        const overlayStart = showNeuralOverlay(`Generating ${safeActivePhase.title}`);
         try {
             await runInteractiveStep({
                 phaseId: safeActivePhase.id,
                 trackId: selectedPersona.id,
                 userInput: '',
             });
+            await loadUserProgress(true);
         } finally {
+            await hideNeuralOverlay(overlayStart);
+        }
+    };
+
+    const onSubmitMission = async (input: string) => {
+        if (isStepLoading || isSubmittingPhase) return;
+        if (!activePhase || !selectedPersona) return;
+        setIsSubmittingPhase(true);
+        const overlayStart = showNeuralOverlay(`Submitting ${safeActivePhase.title}`);
+        try {
+            await runInteractiveStep({
+                phaseId: safeActivePhase.id,
+                trackId: selectedPersona.id,
+                userInput: input || safeActivePhase.mission || '',
+            });
+            await loadUserProgress(true);
+        } finally {
+            setIsSubmittingPhase(false);
             await hideNeuralOverlay(overlayStart);
         }
     };
@@ -294,7 +376,7 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
                 language: 'en',
                 mode: uiMode,
                 tone: uiTone,
-                title: `${safeActivePhase.title} — Interaction`,
+                title: `${safeActivePhase.title}  Interaction`,
                 summary: safeActivePhase.mission || safeActivePhase.description,
             },
             ui_blocks: blocks,
@@ -317,22 +399,13 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
         return localInteractionStep;
     }, [lastStep, localInteractionStep, safeActivePhase.id, selectedPersonaId]);
 
-    // Debug logging
-    console.log('JourneySimulationMode Render:', {
-        accessToken: tokenStore.getAccessToken(),
-        selectedPersona: selectedPersona?.id,
-        activePhase
-    });
-
     if (!selectedPersona) {
-        console.log('JourneySimulationMode: No selectedPersona, returning null');
         return null;
     }
     // If activePhase is 0, we might need to show map or onboarding.
     // But standard view expects activePhase >= 1
     if (!activePhase) {
-        console.log('JourneySimulationMode: activePhase falsy, returning JourneyCompletedPage? Or maybe just initializing?');
-        // return <JourneyCompletedPage />; 
+        // return <JourneyCompletedPage />;
     }
     if (activePhaseIndex >= totalPhases) return <JourneyCompletedPage />;
 
@@ -470,6 +543,136 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
                             </div>
                         )}
                     </div>
+                    <div className="grid gap-3 border-b border-white/10 bg-white/5 px-6 py-4 md:grid-cols-3">
+                        <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-xs text-white/80 space-y-1">
+                            <div className="flex items-center gap-2">
+                                <span className="font-semibold text-white">Status</span>
+                                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wide">
+                                    {phaseStatus}
+                                </span>
+                            </div>
+                            <p className="opacity-80">Phase {activePhaseIndex + 1}/{totalPhases || 1}</p>
+                            <p className="opacity-70">Progress: {Math.round((activePhaseIndex / Math.max(1, totalPhases)) * 100)}%</p>
+                        </div>
+                        <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-xs text-white/80 space-y-1">
+                            <div className="font-semibold text-white">Agent feedback</div>
+                            {phaseFeedback ? (
+                                <>
+                                    <p>Score: {phaseFeedback.score}/100 ({phaseFeedback.verdict === 'pass' ? 'OK' : 'To improve'})</p>
+                                    <p>Relevance : {phaseFeedback.relevance}</p>
+                                    <div className="space-y-1">
+                                        {(phaseFeedback?.axes || []).map((axis: any) => (
+                                            <div key={axis.label}>
+                                                <div className="flex items-center justify-between text-[11px]">
+                                                    <span>{axis.label}</span>
+                                                    <span>{axis.value}%</span>
+                                                </div>
+                                                <div className="h-1.5 rounded-full bg-white/10">
+                                                    <div className="h-1.5 rounded-full bg-accent-cyan" style={{ width: `${Math.min(100, axis.value)}%` }} />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <ul className="list-disc pl-4 space-y-1">
+                                        {(phaseFeedback?.nextSteps || []).map((n: string, i: number) => (
+                                            <li key={i}>{n}</li>
+                                        ))}
+                                    </ul>
+                                </>
+                            ) : (
+                                <p className="opacity-70">Waiting for analysis.</p>
+                            )}
+                        </div>
+                        <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-xs text-white/80 space-y-2">
+                            <div className="font-semibold text-white">Actions</div>
+                            <div className="flex flex-wrap gap-2">
+                                <button
+                                    className="btn-primary text-[11px] px-2 py-1.5"
+                                    onClick={() => onSubmitMission(userDraft || safeActivePhase.mission || 'Submission')}
+                                    disabled={isSubmittingPhase || isStepLoading}
+                                >
+                                    {isSubmittingPhase ? 'Submitting...' : 'Submit'}
+                                </button>
+                                <button
+                                    className="btn-secondary text-[11px] px-2 py-1.5"
+                                    onClick={() => markQuizPassed()}
+                                    disabled={!quizUnlocked && phaseStatus !== 'FEEDBACK_AVAILABLE'}
+                                >
+                                    Validate quiz
+                                </button>
+                                <button
+                                    className="btn-secondary text-[11px] px-2 py-1.5"
+                                    onClick={() => claimRewards()}
+                                    disabled={!rewardsReady || rewardsClaimed || !mintUnlocked || mintStatus === 'initiating' || mintStatus === 'minting' || mintStatus === 'finalizing'}
+                                >
+                                    {claimLabel}
+                                </button>
+                                <button
+                                    className="text-[10px] underline text-amber-300 hover:text-amber-200"
+                                    type="button"
+                                    onClick={handleDemoReset}
+                                >
+                                    Reset journey state
+                                </button>
+                            </div>
+                            <div className="text-[11px] opacity-75">
+                                XP: {userProgress.totalXP} | $MFAI: {userProgress.mfaiTokens}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="border-b border-white/10 bg-white/5 px-6 py-4 grid gap-3 md:grid-cols-3">
+                        <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-xs text-white/80 space-y-2">
+                            <div className="flex items-center justify-between">
+                                <span className="font-semibold text-white">Active agents</span>
+                            </div>
+                            <SafeBoundary fallback={<div className="text-[11px] text-amber-300">Agents unavailable.</div>}>
+                                <ActiveAgentsPanel agents={activeAgents || []} />
+                            </SafeBoundary>
+                        </div>
+
+                        <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-xs text-white/80 space-y-2">
+                            <div className="font-semibold text-white">Intel & Briefing</div>
+                            <div className="text-white/80">
+                                <p className="font-semibold text-[12px]">Objective</p>
+                                <p className="text-[11px] opacity-80">{safeActivePhase.mission || 'Deliver the phase objective.'}</p>
+                            </div>
+                            <div className="text-white/80">
+                                <p className="font-semibold text-[12px]">Criteria</p>
+                                <ul className="list-disc pl-4 space-y-1 text-[11px] opacity-80">
+                                    <li>Clarity of the deliverable</li>
+                                    <li>Technical rigor</li>
+                                    <li>Risk management and action plan</li>
+                                </ul>
+                            </div>
+                            <div className="text-white/80">
+                                <p className="font-semibold text-[12px]">Help</p>
+                                <ul className="list-disc pl-4 space-y-1 text-[11px] opacity-80">
+                                    <li>Structure your plan in context, execution, risks.</li>
+                                    <li>Add a success metric and a dated milestone.</li>
+                                    <li>Include a fallback if the key resource fails.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-xs text-white/80 space-y-2">
+                            <div className="flex items-center justify-between">
+                                <span className="font-semibold text-white">Resources loot</span>
+                            </div>
+                            <SafeBoundary fallback={<div className="text-[11px] text-amber-300">Resources unavailable.</div>}>
+                                <ResourceDeliveryPanel resources={generatedResources || []} />
+                            </SafeBoundary>
+                        </div>
+                    </div>
+                    <div className="border-b border-white/10 bg-white/5 px-6 py-4">
+                        <label className="text-xs text-white/70">Deliverable submission</label>
+                        <textarea
+                            value={userDraft}
+                            onChange={(e) => setUserDraft(e.target.value)}
+                            className="mt-2 w-full rounded-lg border border-white/10 bg-black/30 p-3 text-sm text-white placeholder:text-white/40"
+                            rows={3}
+                            placeholder="Describe your deliverable for this phase..."
+                        />
+                    </div>
                     <div className="max-h-[800px] overflow-y-auto bg-black/20 p-6 md:p-8">
                         <UIBlocksRenderer response={interactionResponse} />
                     </div>
@@ -478,18 +681,22 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
         </section>
     );
 
-    const renderRightPanel = () =>
-        showRightPanel ? (
+    const renderRightPanel = () => {
+        const storedId = apiJourneyId || ensureApiJourneyId();
+        const activeJourneyId = /^[0-9a-fA-F]{24}$/.test(storedId) ? storedId : ensureApiJourneyId(); // Fallback if corrupted
+
+        return showRightPanel ? (
             <aside className="sticky top-24 h-[calc(100vh-8rem)] space-y-4 overflow-y-auto rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl">
                 <JourneyNextActionsPanel
                     personaId={selectedPersona.id}
                     currentStepId={activePhase.id}
-                    journeyId={ensureApiJourneyId()}
+                    journeyId={activeJourneyId}
                     onActionClick={handleNextActionClick}
                 />
                 <ZynoSignalSidebar className="w-full" />
             </aside>
         ) : null;
+    };
 
     const renderMain = () => (
         <main className={`relative mx-auto max-w-[1920px] transition-all duration-300 ${focusMode ? 'px-0' : 'px-4 lg:px-8'}`}>
@@ -515,7 +722,7 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
             personaId: selectedPersona.id,
             phaseId: activePhase.id,
             proofType,
-            title: activePhase.nftReward || proofData.name || `Proof-of-${proofType}™`,
+            title: activePhase.nftReward || proofData.name || `Proof-of-${proofType}`,
             description: proofData.description || `Successfully completed the ${activePhase.title} phase.`,
             imageUrl: proofData.imageUrl,
             xpEarned: activePhase.xpReward,
@@ -566,10 +773,17 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
     };
 
     const handleNextActionClick = (actionType: string, _actionId: string) => {
-        toast.info(`Action ${actionType} triggered`);
-        // Sim action
-        if (actionType === 'tool') setIsThinking(true);
-        setTimeout(() => setIsThinking(false), 1500);
+        const overlayStart = showNeuralOverlay(`Initializing ${actionType.toUpperCase()} module...`);
+
+        // Simulate checking requirement or preparing the tool
+        setTimeout(() => {
+            hideNeuralOverlay(overlayStart);
+            toast.success(`Action ${actionType} ready.`);
+            // In a real scenario, this would navigate to the tool or open a modal
+            // For now, we scroll to the workspace
+            const workspace = document.querySelector('section');
+            workspace?.scrollIntoView({ behavior: 'smooth' });
+        }, 1500);
     };
 
     const primaryNextAction = configuredPhase?.nextActions?.[0] ?? null;

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const BaseAgent = require("./BaseAgent");
 const { callGpt5Responses } = require("../llm/callGpt5");
 const { validateAndSanitizeResponse } = require("../utils/resourceValidator");
@@ -324,7 +330,7 @@ class ZynoAgent extends BaseAgent {
                 `;
         }
 
-        return `You are **Zyno**, the cognitive orchestrator of Money Factory AI – Journey Simulator tracks.
+        return `You are **Zyno**, the cognitive orchestrator of Money Factory AI  Journey Simulator tracks.
 
 Your role:
 - Analyze the user's journey state (persona, track, phase, missions, XP, NFTs, etc.).
@@ -341,7 +347,7 @@ Your role:
 **User Context:**
 - Persona: ${persona}
 - Track: ${track}
-- Phase: ${phase} (belonging to the flow Learn → Build → Prove → Activate → Scale)
+- Phase: ${phase} (belonging to the flow Learn  Build  Prove  Activate  Scale)
 - Mode: ${mode} (discovery | builder | expert)
 - Tone: ${tone} (pedagogical | investor_pitch | critical)
 - Language: ${language}
@@ -355,8 +361,8 @@ Your role:
 **Money Factory AI Context:**
 - The platform helps users join or migrate to the Solana ecosystem and Internet Capital Markets.
 - The goal is to support the design, incubation, and launch of Web3 / Solana projects.
-- Each journey generally follows the protocol: Learn → Build → Prove → Activate → Scale.
-- The user can earn Proof-of-*™ NFTs, XP, and access to incubation and DAO features.
+- Each journey generally follows the protocol: Learn  Build  Prove  Activate  Scale.
+- The user can earn Proof-of-* NFTs, XP, and access to incubation and DAO features.
 
 ${personaInstructions}
 

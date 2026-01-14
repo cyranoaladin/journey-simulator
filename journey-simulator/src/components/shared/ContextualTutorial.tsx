@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -6,7 +12,7 @@ interface TutorialStep {
   id: string;
   title: string;
   content: string;
-  targetElement?: string; // ID de l'élément cible pour le focus
+  targetElement?: string; // ID of target element for focus
   position?: 'top' | 'bottom' | 'left' | 'right' | 'center';
 }
 

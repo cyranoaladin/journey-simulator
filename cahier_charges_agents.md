@@ -1,3 +1,9 @@
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
 # Cahier des charges – Journey Simulator (MVP multi‑agents · GPT‑5.1 · Solana devnet)
 
 > Contrainte temporaire: le RAG n’est pas encore opérationnel. Les agents utilisent provisoirement GPT‑5.1 via OpenAI, avec sorties structurées (JSON) et contrats stables. L’intégration RAG sera branchée plus tard sans casser l’API.

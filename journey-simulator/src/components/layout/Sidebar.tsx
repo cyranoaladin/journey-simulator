@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useEffect, useMemo, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Compass, Cpu, Gauge, Home, Layers, LifeBuoy, Network, Rocket, Book, LogOut, X } from 'lucide-react';
@@ -32,7 +38,7 @@ const Sidebar = ({ variant = 'docked', onClose }: SidebarProps) => {
     }),
     shallow
   );
-  logger.debug('Sidebar: render', { selectedPersonaId: selectedPersona?.id, completedPhases: userProgress.completedPhases.length, variant });
+  logger.debug('Sidebar: render', { selectedPersonaId: selectedPersona?.id, completedPhases: userProgress?.completedPhases?.length ?? 0, variant });
   const isOverlay = variant === 'overlay';
   const [expanded, setExpanded] = useState(true);
 
@@ -44,21 +50,21 @@ const Sidebar = ({ variant = 'docked', onClose }: SidebarProps) => {
 
   const completion = useMemo(() => {
     const total = selectedPersona?.phases?.length ?? 0;
-    const completed = userProgress.completedPhases.length;
+    const completed = userProgress?.completedPhases?.length ?? 0;
     const rate = total === 0 ? 0 : Math.round((completed / total) * 100);
     return { total, completed, rate };
-  }, [selectedPersona?.phases?.length, userProgress.completedPhases.length]);
+  }, [selectedPersona?.phases?.length, userProgress?.completedPhases?.length ?? 0]);
 
   const progressValue = Math.max(0, Math.min(100, completion.rate));
 
   const metrics = useMemo(
     () => [
-      { id: 'xp', label: 'Total XP', value: userProgress.totalXP },
-      { id: 'mfai', label: '$MFAI', value: userProgress.mfaiTokens },
-      { id: 'vote', label: 'Voting Power', value: userProgress.votingPower },
-      { id: 'nfts', label: 'NFT Badges', value: userProgress.nfts.length },
+      { id: 'xp', label: 'Total XP', value: userProgress?.totalXP ?? 0 },
+      { id: 'mfai', label: '$MFAI', value: userProgress?.mfaiTokens ?? 0 },
+      { id: 'vote', label: 'Voting Power', value: userProgress?.votingPower ?? 0 },
+      { id: 'nfts', label: 'NFT Badges', value: userProgress?.nfts?.length ?? 0 },
     ],
-    [userProgress.mfaiTokens, userProgress.nfts.length, userProgress.totalXP, userProgress.votingPower]
+    [userProgress?.mfaiTokens ?? 0, userProgress?.nfts?.length ?? 0, userProgress?.totalXP ?? 0, userProgress?.votingPower ?? 0]
   );
 
   const containerClasses = clsx(
@@ -131,11 +137,11 @@ const Sidebar = ({ variant = 'docked', onClose }: SidebarProps) => {
               className="mfai-progress"
               max={100}
               value={progressValue}
-              aria-label="Progression du parcours"
+              aria-label="Journey Progress"
               aria-valuetext={`${completion.completed} sur ${completion.total || 0} phases`}
             />
             <p className="text-[11px] text-indigo-200/80">
-              {completion.completed}/{completion.total || '—'} phases completed
+              {completion.completed}/{completion.total || ''} phases completed
             </p>
           </div>
 

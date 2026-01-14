@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 process.env.LLM_MODEL_NAME = 'gpt-4o';
 require('dotenv').config({ path: '../.env' });
 const { orchestrateZyno } = require('../orchestration/zynoOrchestrator');

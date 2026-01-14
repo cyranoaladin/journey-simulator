@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const registry = require('../agents/registry');
 
 const VALID_MODES = ['demo', 'simulation', 'real'];
@@ -36,13 +42,13 @@ const ensureModeAllowed = (mode) => {
 
   if (mode === 'real') {
     if (!health.llm.hasKey) {
-      issues.push('Clé LLM manquante : OPENAI_API_KEY');
+      issues.push('Missing LLM key: OPENAI_API_KEY');
     }
     if (health.rag.remoteConfigured && !health.rag.hasKey) {
-      issues.push('Clé RAG manquante : RAG_API_KEY pour RAG_SEARCH_URL défini');
+      issues.push('Missing RAG key: RAG_API_KEY for defined RAG_SEARCH_URL');
     }
     if (!health.execution.enabled) {
-      issues.push('EXECUTION_ENABLED doit être à true pour le mode real');
+      issues.push('EXECUTION_ENABLED must be true for real mode');
     }
   }
 

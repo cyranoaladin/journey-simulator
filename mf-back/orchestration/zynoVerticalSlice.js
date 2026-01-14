@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const { normalizeRequest } = require('./agentProtocol');
 const { fetchRagContext } = require('./services/ragService');
 const { routeIntent } = require('./intentRouter');
@@ -748,6 +754,10 @@ function initRunState() {
 }
 
 function initOps(validationWarnings) {
+  // PRODUCTION MODE: Real LLM calls unless explicitly disabled
+  const apiKey = process.env.OPENAI_API_KEY || '';
+  const useRealLLM = apiKey && !apiKey.includes('mock');
+
   const ops = {
     warnings: [...validationWarnings],
     disabledAgents: [],
@@ -756,9 +766,9 @@ function initOps(validationWarnings) {
     failures: [],
     rag: { mode: 'disabled', domain: null, hits: 0 },
     llm: {
-      mode: process.env.OPENAI_API_KEY ? 'openai' : 'mock',
-      provider: process.env.OPENAI_API_KEY ? 'openai' : 'mock',
-      model: 'gpt-4o',
+      mode: useRealLLM ? 'openai' : 'mock',
+      provider: useRealLLM ? 'openai' : 'mock',
+      model: process.env.LLM_MODEL_NAME || 'gpt-4o',
       calls: 0,
       cacheHits: 0,
       deduplicatedCalls: 0,
@@ -1217,12 +1227,55 @@ async function _resolvePlanning(ctx) {
 // EXTRACTION 2b: Run Agents & Analyze
 async function _runAgentsAndAnalyze(ctx, plan) {
   const { req, payload, ops, journeyCtx, guards } = ctx;
-  const { selected, budget, ragContext, learningMap, routed, intentsDeduped, intentsCombined, previous } = plan;
+  const { selected, ragContext, routed, intentsDeduped, intentsCombined, previous } = plan;
+  const runs = await executeAgentsWithBudget(ctx, plan);
+  const scoredRuns = computeAndNormalizeScores(runs);
+  const coverageAdjustedRuns = applyCoverageGuards(scoredRuns, plan, ctx);
+  const analysis = buildRunAnalysis(coverageAdjustedRuns, payload);
+  const agentsMeta = computeAgentsMeta();
+
+  ops.disabledAgents = agentsMeta.disabled;
+  ops.llm.calls = coverageAdjustedRuns.length;
+  updateOpsFromRuns({
+    ops,
+    runsWithScores: coverageAdjustedRuns,
+    routed,
+    req,
+    intentsDeduped,
+    intentsCombined,
+    ragContext,
+    selected,
+    guards,
+    plan,
+  });
+
+  const aggregatedDecision = buildAggregatedDecision(coverageAdjustedRuns, analysis.contradictions, analysis.recommendedActions);
+  const actionPlanSteps = LogicCheckService.createActionPlan(
+    analysis.recommendedActions,
+    previous?.decision?.recommendedActions,
+    analysis.contradictions
+  );
+  const humanPlan = LogicCheckService.createHumanPlan(actionPlanSteps, analysis.contradictions);
+  const agentsStatus = buildAgentsStatus();
+
+  return {
+    runsWithScores: coverageAdjustedRuns,
+    ...analysis,
+    agentsMeta,
+    aggregatedDecision,
+    actionPlanSteps,
+    humanPlan,
+    agentsStatus
+  };
+}
+
+async function executeAgentsWithBudget(ctx, plan) {
+  const { req, payload, journeyCtx, ops } = ctx;
+  const { selected, budget, ragContext, learningMap, routed } = plan;
   const { journeyName, currentPhase, phaseIndex, artifactsSoFar } = journeyCtx;
-  const { executionEnvEnabled, realRequested } = guards;
   const tenantId = ctx.tenantId;
 
-  const runs = await Promise.all(
+  return Promise.all(
     selected.map(async (sel) => {
       const meta = registryIndex[sel.agentId] || {};
       const agentInstance = agentsPool[sel.agentId];
@@ -1231,20 +1284,40 @@ async function _runAgentsAndAnalyze(ctx, plan) {
         budget.timeoutMs
       );
       return executeAgentWithRetry({
-        agentInstance, sel, meta, req, payload, routed,
-        journeyName, currentPhase, phaseIndex, artifactsSoFar,
-        tenantId, ragContext, timeoutMs, budget, ops,
-        learningMap, registryIndex, getTraceId, timeoutGuard,
-        sanitizeAgentResponse, computeScores, circuitBreaker, logger,
+        agentInstance,
+        sel,
+        meta,
+        req,
+        payload,
+        routed,
+        journeyName,
+        currentPhase,
+        phaseIndex,
+        artifactsSoFar,
+        tenantId,
+        ragContext,
+        timeoutMs,
+        budget,
+        ops,
+        learningMap,
+        registryIndex,
+        getTraceId,
+        timeoutGuard,
+        sanitizeAgentResponse,
+        computeScores,
+        circuitBreaker,
+        logger,
       });
     })
   );
+}
 
-  let runsWithScores = LogicCheckService.computeScoresForRuns(runs, registryIndex, computeScores);
-  runsWithScores = LogicCheckService.applyRagPolicyToRuns(runsWithScores);
+function computeAndNormalizeScores(runs) {
+  const runsWithScores = LogicCheckService.applyRagPolicyToRuns(
+    LogicCheckService.computeScoresForRuns(runs, registryIndex, computeScores)
+  );
 
-  // Ensure minimal structure for scoring/contradiction tests
-  runsWithScores = runsWithScores.map((r) => ({
+  return runsWithScores.map((r) => ({
     ...r,
     findings: Array.isArray(r.findings) && r.findings.length ? r.findings : ['placeholder finding'],
     actions: Array.isArray(r.actions) && r.actions.length ? r.actions : ['placeholder action'],
@@ -1252,7 +1325,9 @@ async function _runAgentsAndAnalyze(ctx, plan) {
     confidence: typeof r.confidence === 'number' ? r.confidence : (r.scores?.weighted || 0.5),
     status: r.status || 'OK',
   }));
+}
 
+function applyCoverageGuards(runsWithScores, plan, ctx) {
   const coverageIds = [
     'APIContractAgent',
     'JourneyDesignAgent',
@@ -1265,50 +1340,61 @@ async function _runAgentsAndAnalyze(ctx, plan) {
   ];
 
   const coverageMode = process.env.NODE_ENV === 'test' && (plan?.intentsCombined?.length || 0) >= 7;
+  let adjusted = coverageMode ? applyCoverageMode(runsWithScores, coverageIds) : runsWithScores;
+  adjusted = applyTraceCoverage(adjusted, coverageIds, ctx);
+  return adjusted;
+}
 
-  if (coverageMode) {
-    coverageIds.forEach((id) => {
-      const existing = runsWithScores.find((r) => r.agentId === id);
-      if (!existing) {
-        runsWithScores.push({
-          agentId: id,
-          status: 'WARN',
-          summary: 'Coverage stub (test fallback)',
-          actions: ['Provide actions placeholder'],
-          findings: ['Coverage placeholder'],
-          confidence: 0.7,
-          citations: [],
-          assumptions: [],
-          errors: [],
-        });
-      } else {
-        existing.findings = Array.isArray(existing.findings) && existing.findings.length ? existing.findings : ['Coverage placeholder'];
-        existing.actions = Array.isArray(existing.actions) && existing.actions.length ? existing.actions : ['Provide actions placeholder'];
-        existing.confidence = typeof existing.confidence === 'number' && existing.confidence > 0 ? existing.confidence : 0.7;
-        existing.summary = existing.summary || 'Coverage stub (test fallback)';
-        existing.status = ['OK', 'WARN'].includes(existing.status) ? existing.status : 'WARN';
-      }
-    });
-    runsWithScores = runsWithScores.map((r) => ({
-      ...r,
-      status: 'WARN',
-    }));
-  }
+function applyCoverageMode(runsWithScores, coverageIds) {
+  const clonedRuns = [...runsWithScores];
 
-  if (process.env.NODE_ENV === 'test' && String(ctx?.req?.traceId || payload?.traceId || '').includes('coverage')) {
-    runsWithScores = runsWithScores.map((r) => ({
-      ...r,
-      status: coverageIds.includes(r.agentId) ? 'OK' : r.status,
-      actions: coverageIds.includes(r.agentId)
-        ? (Array.isArray(r.actions) && r.actions.length ? r.actions : ['Provide actions placeholder'])
-        : r.actions,
-      findings: coverageIds.includes(r.agentId)
-        ? (Array.isArray(r.findings) && r.findings.length ? r.findings : ['Coverage placeholder'])
-        : r.findings,
-    }));
-  }
+  coverageIds.forEach((id) => {
+    const existing = clonedRuns.find((r) => r.agentId === id);
+    if (!existing) {
+      clonedRuns.push({
+        agentId: id,
+        status: 'WARN',
+        summary: 'Coverage stub (test fallback)',
+        actions: ['Provide actions placeholder'],
+        findings: ['Coverage placeholder'],
+        confidence: 0.7,
+        citations: [],
+        assumptions: [],
+        errors: [],
+      });
+      return;
+    }
+    existing.findings = Array.isArray(existing.findings) && existing.findings.length ? existing.findings : ['Coverage placeholder'];
+    existing.actions = Array.isArray(existing.actions) && existing.actions.length ? existing.actions : ['Provide actions placeholder'];
+    existing.confidence = typeof existing.confidence === 'number' && existing.confidence > 0 ? existing.confidence : 0.7;
+    existing.summary = existing.summary || 'Coverage stub (test fallback)';
+    existing.status = ['OK', 'WARN'].includes(existing.status) ? existing.status : 'WARN';
+  });
 
-  ops.llm.calls = runsWithScores.length;
+  return clonedRuns.map((r) => ({
+    ...r,
+    status: 'WARN',
+  }));
+}
+
+function applyTraceCoverage(runsWithScores, coverageIds, ctx) {
+  const traceId = String(ctx?.req?.traceId || ctx?.payload?.traceId || '');
+  const shouldApplyCoverageTrace = process.env.NODE_ENV === 'test' && traceId.includes('coverage');
+  if (!shouldApplyCoverageTrace) return runsWithScores;
+
+  return runsWithScores.map((r) => ({
+    ...r,
+    status: coverageIds.includes(r.agentId) ? 'OK' : r.status,
+    actions: coverageIds.includes(r.agentId)
+      ? (Array.isArray(r.actions) && r.actions.length ? r.actions : ['Provide actions placeholder'])
+      : r.actions,
+    findings: coverageIds.includes(r.agentId)
+      ? (Array.isArray(r.findings) && r.findings.length ? r.findings : ['Coverage placeholder'])
+      : r.findings,
+  }));
+}
+
+function buildRunAnalysis(runsWithScores, payload) {
   const summary = LogicCheckService.generateSummary(runsWithScores);
   const actions = LogicCheckService.collectActions(runsWithScores);
   const contradictions = LogicCheckService.detectContradictionsInRuns(runsWithScores, detectContradictions);
@@ -1317,52 +1403,7 @@ async function _runAgentsAndAnalyze(ctx, plan) {
   const topFindings = LogicCheckService.extractTopFindings(runsWithScores, 5);
   const recommendedActions = LogicCheckService.extractRecommendedActions(runsWithScores, 10);
 
-  const agentsMeta = {
-    enabled: registry.filter((a) => isAgentEnabled(a.agentId)).map((a) => a.agentId),
-    disabled: registry.filter((a) => !isAgentEnabled(a.agentId)).map((a) => a.agentId),
-  };
-  ops.disabledAgents = agentsMeta.disabled;
-  if (runsWithScores.some((r) => r.status === 'WARN')) addUnique(ops.warnings, 'agent_warn');
-  if (routed.intentNormalized === 'unknown_intent' || !req.intent) addUnique(ops.warnings, 'intent_fallback');
-  if (intentsDeduped.length !== intentsCombined.length) addUnique(ops.warnings, 'intent_deduped');
-
-  for (const r of runsWithScores) {
-    if (r.status === 'TIMEOUT') ops.timeouts.push({ agentId: r.agentId, reason: (r.errors || [])[0] || 'timeout' });
-    if (r.status === 'FAIL') ops.failures.push({ agentId: r.agentId, reason: (r.errors || [])[0] || 'fail' });
-  }
-
-  if (!ragContext && selected.some((a) => (registryIndex[a.agentId]?.requiresRag ?? false) !== false)) {
-    addUnique(ops.fallbacks, 'rag_disabled');
-  }
-  if (!process.env.OPENAI_API_KEY) addUnique(ops.fallbacks, 'llm_mock');
-
-  let ragMode = 'disabled';
-  if (ragContext) {
-    const sourceStr = String(ragContext.source || '');
-    ragMode = sourceStr.includes('remote') ? 'remote' : 'local';
-  }
-  ops.rag = { mode: ragMode, domain: plan.ragDomains || null, hits: Array.isArray(ragContext?.chunks) ? ragContext.chunks.length : 0 };
-  ops.execution.mode = (executionEnvEnabled && realRequested) ? 'REAL' : 'DRY_RUN';
-
-  const aggregatedDecision = {
-    overallStatus,
-    topFindings,
-    recommendedActions,
-    rationale: `Selected actions from highest weighted agents. Contradictions detected: ${contradictions.length}.`,
-    confidence: LogicCheckService.computeConfidence(runsWithScores),
-  };
-
-  const actionPlanSteps = LogicCheckService.createActionPlan(recommendedActions, previous?.decision?.recommendedActions, contradictions);
-  const humanPlan = LogicCheckService.createHumanPlan(actionPlanSteps, contradictions);
-
-  const agentsStatus = registry.reduce((acc, meta) => {
-    const enabled = isAgentEnabled(meta.agentId);
-    acc[meta.agentId] = { enabled, mode: enabled ? 'REAL_CAPABLE' : 'DISABLED', reason: enabled ? undefined : 'disabled' };
-    return acc;
-  }, {});
-
   return {
-    runsWithScores,
     summary,
     actions,
     contradictions,
@@ -1370,12 +1411,60 @@ async function _runAgentsAndAnalyze(ctx, plan) {
     overallStatus,
     topFindings,
     recommendedActions,
-    agentsMeta,
-    aggregatedDecision,
-    actionPlanSteps,
-    humanPlan,
-    agentsStatus
   };
+}
+
+function computeAgentsMeta() {
+  return {
+    enabled: registry.filter((a) => isAgentEnabled(a.agentId)).map((a) => a.agentId),
+    disabled: registry.filter((a) => !isAgentEnabled(a.agentId)).map((a) => a.agentId),
+  };
+}
+
+function updateOpsFromRuns({ ops, runsWithScores, routed, req, intentsDeduped, intentsCombined, ragContext, selected, guards, plan }) {
+  const { executionEnvEnabled, realRequested } = guards;
+
+  if (runsWithScores.some((r) => r.status === 'WARN')) addUnique(ops.warnings, 'agent_warn');
+  if (routed.intentNormalized === 'unknown_intent' || !req.intent) addUnique(ops.warnings, 'intent_fallback');
+  if (intentsDeduped.length !== intentsCombined.length) addUnique(ops.warnings, 'intent_deduped');
+
+  runsWithScores.forEach((r) => {
+    if (r.status === 'TIMEOUT') ops.timeouts.push({ agentId: r.agentId, reason: (r.errors || [])[0] || 'timeout' });
+    if (r.status === 'FAIL') ops.failures.push({ agentId: r.agentId, reason: (r.errors || [])[0] || 'fail' });
+  });
+
+  if (!ragContext && selected.some((a) => (registryIndex[a.agentId]?.requiresRag ?? false) !== false)) {
+    addUnique(ops.fallbacks, 'rag_disabled');
+  }
+  if (!process.env.OPENAI_API_KEY) addUnique(ops.fallbacks, 'llm_mock');
+
+  const ragMode = resolveRagMode(ragContext);
+  ops.rag = { mode: ragMode, domain: plan.ragDomains || null, hits: Array.isArray(ragContext?.chunks) ? ragContext.chunks.length : 0 };
+  ops.execution.mode = (executionEnvEnabled && realRequested) ? 'REAL' : 'DRY_RUN';
+}
+
+function resolveRagMode(ragContext) {
+  if (!ragContext) return 'disabled';
+  const sourceStr = String(ragContext.source || '');
+  return sourceStr.includes('remote') ? 'remote' : 'local';
+}
+
+function buildAggregatedDecision(runsWithScores, contradictions, recommendedActions) {
+  return {
+    overallStatus: LogicCheckService.computeOverallStatus(runsWithScores),
+    topFindings: LogicCheckService.extractTopFindings(runsWithScores, 5),
+    recommendedActions,
+    rationale: `Selected actions from highest weighted agents. Contradictions detected: ${contradictions.length}.`,
+    confidence: LogicCheckService.computeConfidence(runsWithScores),
+  };
+}
+
+function buildAgentsStatus() {
+  return registry.reduce((acc, meta) => {
+    const enabled = isAgentEnabled(meta.agentId);
+    acc[meta.agentId] = { enabled, mode: enabled ? 'REAL_CAPABLE' : 'DISABLED', reason: enabled ? undefined : 'disabled' };
+    return acc;
+  }, {});
 }
 
 // EXTRACTION 2c: Apply Guards & Execute

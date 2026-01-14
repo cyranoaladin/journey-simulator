@@ -82,7 +82,7 @@ services:
     security_opt:
       - no-new-privileges:true
     # Postgres data directory must remain writable. // nosemgrep
-    read_only: false
+    read_only: true
     tmpfs:
       - /tmp
     healthcheck:

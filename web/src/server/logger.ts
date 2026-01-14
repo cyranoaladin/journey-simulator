@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 export function shouldLog() {
   // En tests, on évite le bruit (sauf si explicitement demandé)
   if (process.env.NODE_ENV === 'test' && process.env.DEBUG_LOGS !== '1') return false

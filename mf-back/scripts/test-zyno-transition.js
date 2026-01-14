@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 process.env.LLM_MODEL_NAME = 'gpt-4o';
 require('dotenv').config({ path: '../.env' });
 const ZynoAgent = require('../agents/ZynoAgent');
@@ -31,7 +37,7 @@ async function testZynoTransition() {
         },
 
         // Last Input triggering the transition
-        lastInput: "C'est validé. Mon concept DePIN 'HeliumKiller' est prêt. On passe à l'architecture."
+        lastInput: "It is validated. My DePIN concept 'HeliumKiller' is ready. Moving on to architecture."
     };
 
     console.log(`Input: "${context.lastInput}"`);

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { BrainCircuit, MessageSquare, Sparkles } from 'lucide-react';
 import { memo } from 'react';
 import type { AgentTimelineEntry } from '../Zyno/types';
@@ -64,7 +70,7 @@ const PhaseInteractionBlock = ({ phaseId, currentStep, onFeedback }: PhaseIntera
           <div>
             <p className="mb-1 font-semibold text-slate-100">Sources</p>
             <ul className="space-y-1">
-              {currentStep.sources.slice(0, 3).map((source) => {
+              {currentStep.sources.slice(0, 3).map((source: { id?: string; title?: string; url?: string }) => {
                 const sourceKey = String(
                   source?.id ?? source?.title ?? source?.url ?? `source-${source?.title ?? 'unknown'}`
                 );
@@ -81,8 +87,8 @@ const PhaseInteractionBlock = ({ phaseId, currentStep, onFeedback }: PhaseIntera
       </div>
 
       <div className="mt-3 flex items-center justify-between text-[11px] text-slate-400">
-        <span>Intent : {currentStep.intent ?? '—'}</span>
-        <span>Duration : {currentStep.durationMs ? `${(currentStep.durationMs / 1000).toFixed(1)}s` : '—'}</span>
+        <span>Intent : {currentStep.intent ?? ''}</span>
+        <span>Duration : {currentStep.durationMs ? `${(currentStep.durationMs / 1000).toFixed(1)}s` : ''}</span>
       </div>
     </div>
   );

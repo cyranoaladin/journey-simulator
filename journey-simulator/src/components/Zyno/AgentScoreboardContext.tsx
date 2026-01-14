@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { AgentScoreboardEntry } from '../../utils/api'
@@ -57,7 +63,7 @@ export function AgentScoreboardProvider({ children }: AgentScoreboardProviderPro
   const fetchScoreboard = useCallback(async (forcedKey?: string) => {
     const keyToUse = forcedKey ?? apiKey
     if (!keyToUse) {
-      setState((prev) => ({ ...prev, error: 'Clé API admin requise.', data: [] }))
+      setState((prev) => ({ ...prev, error: 'Admin API key required.', data: [] }))
       return
     }
 
@@ -69,7 +75,7 @@ export function AgentScoreboardProvider({ children }: AgentScoreboardProviderPro
         loading: false,
         error: null,
         lastUpdated: new Date(),
-        data: response.users
+        data: response.users || []
       })
       if (keyToUse !== apiKey) {
         storeKey(keyToUse)

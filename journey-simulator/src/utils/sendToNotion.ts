@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 export interface NotionPayload {
   userId: string
   personaId?: string
@@ -12,7 +18,7 @@ export async function sendToNotion(payload: NotionPayload, explicitWebhook?: str
   const webhookUrl = explicitWebhook ?? import.meta.env.VITE_NOTION_WEBHOOK_URL
 
   if (!webhookUrl) {
-    throw new Error('Aucune URL de webhook Notion n\'est configurée.');
+    throw new Error('No Notion webhook URL configured.');
   }
 
   const response = await fetch(webhookUrl, {

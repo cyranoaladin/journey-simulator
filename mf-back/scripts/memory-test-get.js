@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 process.env.LLM_MODEL_NAME = 'gpt-4o';
 require('dotenv').config({ path: '../.env' });
 const { orchestrateZyno } = require('../orchestration/zynoOrchestrator');
@@ -76,8 +82,8 @@ async function getMemory() {
     };
 
     // Note: If the agents don't support history injection yet, this test validates the *Storage* (step 4 "Verification de l'Historique") but maybe not the *Recall* if logic is missing.
-    // The User Request: "Vérifie que l'historique complet est récupéré depuis la DB." (We do this via `agentMemory.get`).
-    // "Pose une question... Les agents doivent être capables de lire cet historique".
+    // The User Request: "Verify that full history is retrieved from DB." (We do this via `agentMemory.get`).
+    // "Ask a question... Agents must be able to read this history".
 
     // I will try to pass it.
     const result = await orchestrateZyno(input, context);

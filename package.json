@@ -24,7 +24,7 @@
     "build:all": "npm run build --prefix journey-simulator && npm run build --prefix web",
     "install:all": "npm install --prefix mf-back && npm install --prefix journey-simulator && npm install --prefix web",
     "preflight": "node tools/system-health.js",
-    "dev": "npm run preflight && concurrently \"npm run dev:back\" \"npm run dev:simulator\" \"npm run dev:web\"",
+    "dev": "concurrently \"npm run dev:back\" \"npm run dev:simulator\" \"npm run dev:web\"",
     "release:preflight": "node scripts/release/preflight.js",
     "release:smoke": "node scripts/release/smoke.js",
     "release:rollback": "node scripts/release/rollback.js",
@@ -32,7 +32,11 @@
     "release:go-live": "node scripts/release/go-live.js",
     "compliance:check": "node scripts/compliance/check-compliance.js",
     "test:load:sim": "node scripts/testing/simulate-load.js",
-    "test:chaos:sim": "node scripts/testing/simulate-chaos.js"
+    "test:chaos:sim": "node scripts/testing/simulate-chaos.js",
+    "seed:test-user": "node mf-back/scripts/seed-test-user.js",
+    "qa:full": "node scripts/rseries-check.js",
+    "qa:rag": "node scripts/rag-contract-test.js",
+    "qa:integrity": "node scripts/write-integrity-check.js"
   },
   "devDependencies": {
     "baseline-browser-mapping": "^2.9.11",
@@ -41,12 +45,17 @@
     "lint-staged": "^16.2.7"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
+    "journey-simulator/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "web/**/*.{ts,tsx}": [
       "eslint --fix",
       "prettier --write"
     ],
     "mf-back/**/*.js": [
-      "node --check"
+      "node --check",
+      "prettier --write"
     ]
   },
   "husky": {

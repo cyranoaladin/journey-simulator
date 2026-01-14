@@ -1,0 +1,12 @@
+{
+  "createdAt": "2026-01-07T20:59:11.778Z",
+  "project": "firefox",
+  "statusRaw": "__UNSET__",
+  "statusNorm": "__UNSET__",
+  "keysPresent": [],
+  "runtimeMode": null,
+  "executedAgents": [],
+  "timelineLen": null,
+  "receivedAt": null,
+  "note": "written in finally (fail-safe)"
+}

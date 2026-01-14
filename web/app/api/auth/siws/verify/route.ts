@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { getSiwsChallenge, markSiwsChallengeUsed } from '@/server/siwsStore'
 import { PublicKey } from '@solana/web3.js'
 import bs58 from 'bs58'
@@ -35,7 +41,7 @@ async function signJwtLikeAsync(address: string, nonce: string): Promise<string>
   const payloadB64 = base64Url(JSON.stringify(payload))
   const data = `${headerB64}.${payloadB64}`
 
-  const cryptoMod = await import('crypto')
+  const cryptoMod = await import('node:crypto')
   const secret = process.env.SIWS_JWT_SECRET || 'dev-siws-secret-change-me'
   const sig = base64Url(cryptoMod.createHmac('sha256', secret).update(data).digest())
 

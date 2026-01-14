@@ -1,94 +1,74 @@
-export type AgentSource = {
-  title?: string;
-  content?: string;
-  url?: string;
-  snippet?: string;
-  [key: string]: unknown;
-};
+// Minimal shared types for Zyno components
 
-export type AgentResult = {
+export interface ParcoursTemplate {
+  templateId?: string;
+  fileName?: string;
+  name?: string;
+  phases?: string[];
+}
+
+export interface AgentTimelineEntry {
   agent: string;
-  phase?: string | null;
-  intent?: string | null;
-  prompt?: string | null;
-  reasoning?: string | null;
-  action?: string | null;
-  ae_summary?: string | null;
-  ae_outcome?: string | null;
-  output?: unknown;
-  response?: unknown;
-  sources?: AgentSource[];
-  references?: AgentSource[];
-  ragSnippets?: AgentSource[];
-  ragEnriched?: AgentSource[];
-  activationLevel?: number | null;
-  feedback?: {
-    ae_summary?: string | null;
-    ae_outcome?: string | null;
-    aepo?: number | null;
-    aeco?: number | null;
-  };
-  payload?: unknown;
-  metrics?: {
-    aepo?: number | null;
-    aeco?: number | null;
-    durationMs?: number | null;
-    startedAt?: string | null;
-    completedAt?: string | null;
-    success?: boolean;
-    errorCount?: number;
-    [key: string]: unknown;
-  } | null;
-  raw?: unknown;
-};
+  intent?: string;
+  phase?: string;
+  summary?: string;
+  reasoning?: string;
+  action?: string;
+  status?: 'completed' | 'failed' | 'running' | string;
+  startedAt?: string;
+  completedAt?: string;
+  durationMs?: number;
+  sources?: { title?: string; url?: string; description?: string; snippet?: string }[];
+  feedback?: { ae_summary?: string; ae_outcome?: string; aepo?: number | null; aeco?: number | null };
+  [key: string]: any;
+}
 
-export type AgentTimelineEntry = {
-  agent: string;
-  phase: string | null;
-  intent: string | null;
-  status: 'completed' | 'failed';
-  startedAt: string | null;
-  completedAt: string | null;
-  durationMs: number | null;
-  prompt: string | null;
-  reasoning: string | null;
-  action: string | null;
-  summary: string | null;
-  sources: AgentSource[];
-  feedback?: AgentResult['feedback'];
-};
+export interface AgentResult {
+  agent?: string;
+  agentId?: string;
+  summary?: string;
+  output?: string | object;
+  actions?: string[];
+  findings?: string[];
+  ragEnriched?: { title?: string; url?: string }[];
+  payload?: any;
+  activationLevel?: number;
+  ae_summary?: string;
+  feedback?: { ae_summary?: string; ae_outcome?: string; aepo?: number | null; aeco?: number | null };
+  [key: string]: any;
+}
 
-export type OrchestrationResult = {
+export interface AgentLogEntry extends AgentResult {
+  userId?: string;
+  agentName?: string;
+  timestamp?: string;
+  createdAt?: string;
+  intent?: string;
+  phaseId?: string;
+  ae_summary?: string;
+}
+
+export interface EnrichedAgent {
+  agentId: string;
+  summary?: string;
+  executiveSummary?: string;
+  actions?: string[];
+  findings?: string[];
+  feedback?: { ae_summary?: string };
+  [key: string]: any;
+}
+
+export interface OrchestrationResult {
   intent: string;
   mode: string;
-  executedAgents: string[];
-  results: Record<string, AgentResult | undefined>;
-  timeline: AgentTimelineEntry[];
-  currentStep: AgentTimelineEntry | null;
-  parcoursTemplate?: {
-    templateId?: string;
-    name?: string;
-    description?: string;
-    [key: string]: unknown;
-  } | null;
-};
-
-export type AgentLogEntry = {
-  userId: string;
-  agentName: string;
-  intent?: string;
-  phaseId?: string | null;
-  promptSent?: string | null;
-  reasoning?: string | null;
-  actionTaken?: string | null;
-  response?: unknown;
-  output?: unknown;
-  sources?: AgentSource[];
-  metrics?: AgentResult['metrics'];
-  feedback?: AgentResult['feedback'];
-  payload: unknown;
-  ae_summary?: string;
-  ae_outcome?: string;
-  timestamp: string;
-  ragSnippets?: AgentSource[];
-};
+  parcoursTemplate?: ParcoursTemplate;
+  executedAgents?: string[];
+  agents?: string[];
+  results?: Record<string, AgentResult>;
+  timeline?: AgentTimelineEntry[];
+  currentStep?: AgentTimelineEntry | null;
+  summary?: string;
+  output?: string | object;
+  ui_blocks?: any[];
+  success?: boolean;
+}

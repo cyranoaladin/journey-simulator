@@ -1,0 +1,27 @@
+{
+  "$schema": "https://claude.ai/cli/mcp.schema.json",
+  "servers": {
+    "postgres-local": {
+      "command": "pg_mcp",
+      "args": [],
+      "env": {
+        "PGCONN": "${POSTGRES_URL:-postgres://postgres:postgres@127.0.0.1:5433/postgres}"
+      },
+      "description": "PostgreSQL inspector for web/ (Prisma) and analytics"
+    },
+    "git-history": {
+      "command": "git_mcp",
+      "args": [],
+      "cwd": ".",
+      "description": "Read-only Git history/annotate for monorepo navigation"
+    }
+    /*
+    ,
+    "zyno-log-audit": {
+      "command": "python3",
+      "args": ["tools/mcp/zyno_log_inspector.py"],
+      "description": "Optional: parse Zyno agent logs (enable when script is added)"
+    }
+    */
+  }
+}

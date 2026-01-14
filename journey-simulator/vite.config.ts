@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
@@ -40,7 +46,7 @@ export default defineConfig(({ mode }) => ({
           ...(mode === 'production'
             ? ["script-src 'self'"]
             : ["script-src 'self' 'unsafe-inline' 'unsafe-eval'"]),
-          "connect-src 'self' https: http: ws: wss: http://localhost:3002 http://localhost:3000",
+          "connect-src 'self' https: http: ws: wss: http://localhost:3002 http://localhost:3000 http://localhost:3001 http://127.0.0.1:3002 http://127.0.0.1:3000 http://127.0.0.1:3001 ws://localhost:3002 ws://127.0.0.1:3002 wss://localhost:3002 wss://127.0.0.1:3002",
         ].join('; ');
 
         const cspMeta = `\n<meta http-equiv="Content-Security-Policy" content="${csp}">\n`;
@@ -70,15 +76,31 @@ export default defineConfig(({ mode }) => ({
   ],
   server: {
     host: '127.0.0.1',
-    port: 5173,
+    port: Number(process.env.PORT || process.env.VITE_PORT || 3003),
     strictPort: true,
     // Prevent browser caching during local dev to avoid stale chunk issues.
     headers: {
       'Cache-Control': 'no-store',
     },
+    proxy: {
+      '/api': { target: 'http://127.0.0.1:3002', changeOrigin: true },
+      '/auth': { target: 'http://127.0.0.1:3002', changeOrigin: true },
+      '/user': { target: 'http://127.0.0.1:3002', changeOrigin: true },
+      '/dao': { target: 'http://127.0.0.1:3002', changeOrigin: true },
+      '/demo': { target: 'http://127.0.0.1:3002', changeOrigin: true },
+
+      // IMPORTANT: slash final pour éviter /journeys
+      '/journey/': {
+        target: 'http://127.0.0.1:3002',
+        changeOrigin: true,
+        ws: true,
+        timeout: 30_000,
+        proxyTimeout: 30_000,
+      },
+    },
     hmr: {
       host: '127.0.0.1',
-      port: 5173
+      port: Number(process.env.PORT || process.env.VITE_PORT || 3003)
     }
   },
   preview: {

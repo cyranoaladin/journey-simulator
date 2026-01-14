@@ -1,7 +1,15 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 process.env.JWT_SECRET = 'unit-test-secret';
 
 const request = require('supertest');
 const express = require('express');
+const csrf = require('csurf');
+const cookieParser = require('cookie-parser');
 const { csrfGuard } = require('../middleware/csrfGuard');
 
 jest.mock('dotenv', () => ({
@@ -79,6 +87,8 @@ const auth = require('../middleware/auth');
 const createApp = (mountPath, router) => {
   const app = express();
   app.use(express.json());
+  app.use(cookieParser());
+  app.use(csrf({ ignoreMethods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'DELETE', 'PATCH'] }));
   app.use(csrfGuard);
   app.use(mountPath, router);
   return app;
@@ -114,8 +124,8 @@ let consoleLogSpy;
 let consoleErrorSpy;
 
 beforeAll(() => {
-  consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-  consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+  consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => { });
+  consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
 });
 
 afterAll(() => {
@@ -126,12 +136,12 @@ afterAll(() => {
 describe('Analytics routes', () => {
   const app = createApp('/analytics', analyticsRouter);
 
-  it('POST /analytics/certification-download succeeds with protect middleware', async () => {
+  it('POST /analytics/certificate-download succeeds with protect middleware', async () => {
     User.findByIdAndUpdate.mockResolvedValueOnce({});
 
     const response = await request(app)
-      .post('/analytics/certification-download')
-      .send({ certification_id: 'cert1', download_timestamp: '2025-01-01T00:00:00Z' });
+      .post('/analytics/certificate-download')
+      .send({ certificate_id: 'cert1', download_timestamp: '2025-01-01T00:00:00Z' });
 
     expect(auth.protect).toHaveBeenCalled();
     expect(User.findByIdAndUpdate).toHaveBeenCalledWith('user-1', expect.any(Object));
@@ -139,17 +149,17 @@ describe('Analytics routes', () => {
     expect(response.body.success).toBe(true);
   });
 
-  it('POST /analytics/certification-share handles controller failures', async () => {
+  it('POST /analytics/certificate-share handles controller failures', async () => {
     User.findByIdAndUpdate.mockRejectedValueOnce(new Error('db error'));
 
     const response = await request(app)
-      .post('/analytics/certification-share')
-      .send({ certification_id: 'cert2', share_timestamp: '2025-01-02T00:00:00Z' });
+      .post('/analytics/certificate-share')
+      .send({ certificate_id: 'cert2', share_timestamp: '2025-01-02T00:00:00Z' });
 
     expect(response.status).toBe(500);
     expect(response.body.success).toBe(false);
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Error tracking certification share:',
+      'Error tracking certificate share:',
       expect.any(Error)
     );
   });

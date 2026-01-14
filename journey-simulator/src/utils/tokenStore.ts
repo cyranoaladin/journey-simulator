@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 type NullableString = string | null;
 
 let inMemoryAccessToken: NullableString = null;
@@ -82,6 +88,12 @@ export const tokenStore = {
     if (fromSession) {
       inMemoryAccessToken = fromSession;
       return fromSession;
+    }
+    // Fallback for E2E tests (Playwright persists localStorage, not sessionStorage)
+    const fromLocal = safeLocalStorage.getItem(ACCESS_TOKEN_LEGACY_LOCAL_KEY);
+    if (fromLocal) {
+      inMemoryAccessToken = fromLocal;
+      return fromLocal;
     }
     return null;
   },

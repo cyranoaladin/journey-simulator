@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
@@ -24,7 +30,7 @@ const faqs: FaqItem[] = [
   {
     id: 'aepo-what-is',
     question: 'What is AEPO and how does it help me build my project?',
-    answer: 'AEPO (AI-Enhanced Pathway Orchestration) is the Zyno-driven engine that creates and updates your personalized roadmap. It routes the right agents based on your context (persona, phase, intent), proposes next actions, and adapts content, rewards, and Proof-of-Skill™ outputs as you progress.',
+    answer: 'AEPO (AI-Enhanced Pathway Orchestration) is the Zyno-driven engine that creates and updates your personalized roadmap. It routes the right agents based on your context (persona, phase, intent), proposes next actions, and adapts content, rewards, and Proof-of-Skill outputs as you progress.',
     category: 'Resources'
   },
   {
@@ -35,7 +41,7 @@ const faqs: FaqItem[] = [
   },
   {
     id: 'aepo-vs-aeco',
-    question: 'What’s the difference between AEPO and AECO?',
+    question: 'Whats the difference between AEPO and AECO?',
     answer: 'AEPO orchestrates an individual pathway (your personal roadmap). AECO orchestrates a cohort (group programs, shared deliverables, synchronized milestones). Both are powered by Zyno and share the same agent ecosystem.',
     category: 'Resources'
   },

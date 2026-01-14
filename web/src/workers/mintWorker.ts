@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { Worker, Job } from 'bullmq'
 import { redis } from '../server/redis.ts'
 import {
@@ -20,6 +26,8 @@ type MintJobData = {
   userId?: string | null
 }
 
+const isDryRun = (process.env.MINT_DRY_RUN || 'true').toString().trim().toLowerCase() === 'true'
+
 export const mintWorker = new Worker<MintJobData>(
   'minting',
   async (job: Job<MintJobData>) => {
@@ -27,6 +35,22 @@ export const mintWorker = new Worker<MintJobData>(
     log(`[Worker] Processing mint job ${job.id} for ${spec.recipient}`)
 
     try {
+      if (isDryRun) {
+        const placeholderSig = 'dry-run-disabled'
+        await prisma.mintLog.create({
+          data: {
+            spec: spec as any,
+            network: sim.network,
+            signature: placeholderSig,
+            mintAddress: 'dry-run',
+            status: 'DRY_RUN',
+            userId: userId,
+          },
+        })
+        log(`[Worker] Mint dry-run enabled; skipping on-chain send (job ${job.id})`)
+        return { txSig: placeholderSig, mintAddress: 'dry-run' }
+      }
+
       // Execute the mint
       const result = await executeReward(spec, sim)
 

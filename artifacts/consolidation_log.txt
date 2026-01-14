@@ -1,0 +1,21 @@
+Sur la branche main
+Votre branche est en avance sur 'origin/main' de 3 commits.
+  (utilisez "git push" pour publier vos commits locaux)
+
+Modifications qui ne seront pas validées :
+  (utilisez "git add <fichier>..." pour mettre à jour ce qui sera validé)
+  (utilisez "git restore <fichier>..." pour annuler les modifications dans le répertoire de travail)
+	modifié :         artifacts/e2e-auth-proof.json
+	modifié :         artifacts/final_verdict.md
+	modifié :         artifacts/proof/lead12_r12/routes_visited_raw.txt
+	modifié :         journey-simulator/playwright_report.json
+
+Fichiers non suivis:
+  (utilisez "git add <fichier>..." pour inclure dans ce qui sera validé)
+	artifacts/consolidation_log.txt
+	artifacts/dashboard_consistency_report.md
+	artifacts/isolation_certificate.md
+	journey-simulator/tests/e2e/supreme-auditor.spec.ts
+	journey-simulator/tests/e2e/supreme-isolation.spec.ts
+
+aucune modification n'a été ajoutée à la validation (utilisez "git add" ou "git commit -a")

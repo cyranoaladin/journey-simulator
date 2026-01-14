@@ -1,0 +1,15 @@
+=== STACK STATUS ===
+Timestamp: $(date -Iseconds)
+
+Backend:
+- Port: 3002
+- Health: $(curl -sf http://127.0.0.1:3002/ && echo "OK" || echo "FAIL")
+- PID: $(cat /home/alaeddine/Documents/journey_mfai_back_front/artifacts/proof/lead_claude_audit_run_002/backend_pid.txt 2>/dev/null || echo "N/A")
+
+Frontend Preview:
+- Port: 3003
+- Health: $(curl -sf http://127.0.0.1:3003/ > /dev/null && echo "OK" || echo "FAIL")
+- PID: $(cat /home/alaeddine/Documents/journey_mfai_back_front/artifacts/proof/lead_claude_audit_run_002/preview_pid.txt 2>/dev/null || echo "N/A")
+
+MongoDB:
+- Status: $(pgrep -f mongod > /dev/null && echo "RUNNING" || echo "NOT_RUNNING")

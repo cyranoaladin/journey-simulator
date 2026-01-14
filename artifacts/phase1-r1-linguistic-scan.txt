@@ -1,0 +1,5 @@
+journey-simulator/src/lib/solana-config.ts: * Shared Solana Configuration Module
+journey-simulator/src/lib/solana-config.ts:// Configuration summary
+journey-simulator/src/utils/api-modules/base.ts:// --- Configuration ---
+mf-back/agents/ZynoAgent.js:2. You MUST produce a **"Configuration Roadmap"** using a \`checklist_block\` or structured \`text_block\`.
+mf-back/agents/MintingAgent.js:        '**EXPERTISE**: Candy Machine Configuration, Whitelist Management (Merkle Trees), Token Gating, Anti-Bot measures.',

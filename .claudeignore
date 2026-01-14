@@ -1,0 +1,49 @@
+# Standard ignores
+.git
+node_modules
+.DS_Store
+npm-debug.log
+yarn.lock
+package-lock.json
+.env
+.env.local
+.env.production
+.env.development
+.env.test
+
+# Build / cache / coverage
+dist
+build
+.next
+.turbo
+.cache
+coverage
+.nyc_output
+*.log
+*.sqlite
+*.db
+
+# Artifacts & heavy assets
+artifacts/**
+reports/**
+**/public/**/*.png
+**/public/**/*.jpg
+**/public/**/*.jpeg
+**/public/**/*.gif
+**/public/**/*.webp
+**/public/**/*.mp4
+**/public/**/*.mov
+
+# Simulator / Web generated
+journey-simulator/storybook-static
+journey-simulator/reports
+web/.vercel
+web/.next
+
+# Zyno large dumps (keep agent definitions)
+**/tmp/**
+**/logs/**
+
+# OS / editor
+.idea
+.vscode

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { motion } from 'framer-motion';
 import { Lock, TrendingUp, X } from 'lucide-react';
 import { useState } from 'react';
@@ -69,7 +75,7 @@ const StakingModal: React.FC<StakingModalProps> = ({
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-2">
             <Lock className="text-accent-gold" size={24} />
-            <h2 className="text-xl font-space font-bold">Cognitive Lock™</h2>
+            <h2 className="text-xl font-space font-bold">Cognitive Lock</h2>
           </div>
           <button
             onClick={onClose}
@@ -158,7 +164,7 @@ const StakingModal: React.FC<StakingModalProps> = ({
           <ul className="space-y-2 text-sm">
             <li className="flex items-center space-x-2">
               <div className="w-1 h-1 bg-primary-500 rounded-full" />
-              <span>Automatic Neuro-Dividends™</span>
+              <span>Automatic Neuro-Dividends</span>
             </li>
             <li className="flex items-center space-x-2">
               <div className="w-1 h-1 bg-primary-500 rounded-full" />

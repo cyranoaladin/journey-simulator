@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { motion } from 'framer-motion';
 import { Crown, GaugeCircle, Gem, Gavel } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -19,36 +25,43 @@ const UserMetricsPanel = () => {
     userProgress: state.userProgress,
   }));
 
-  const level = Math.max(1, Math.floor(userProgress.totalXP / 200) + 1);
+  const totalXP = userProgress?.totalXP ?? 0;
+  const mfaiTokens = userProgress?.mfaiTokens ?? 0;
+  const stakedMfai = userProgress?.stakedMfai ?? 0;
+  const votingPower = userProgress?.votingPower ?? 0;
+  const daoProposals = userProgress?.daoProposals ?? 0;
+  const passLevel = userProgress?.passLevel ?? 'Free';
+  const completedPhases = userProgress?.completedPhases?.length ?? 0;
+
+  const level = Math.max(1, Math.floor(totalXP / 200) + 1);
 
   const metrics: Metric[] = [
     {
       id: 'xp',
       label: 'Skillchain XP',
-      value: userProgress.totalXP,
+      value: totalXP,
       hint: `Level ${level}`,
       icon: GaugeCircle,
     },
     {
       id: 'mfai',
       label: '$MFAI Balance',
-      value: userProgress.mfaiTokens,
-      hint: userProgress.stakedMfai > 0
-        ? `${userProgress.stakedMfai.toLocaleString()} staked`
+      value: mfaiTokens,
+      hint: stakedMfai > 0
+        ? `${stakedMfai.toLocaleString()} staked`
         : 'Ready to deploy',
       icon: Gem,
     },
     {
       id: 'vote',
       label: 'Voting Power',
-      value: userProgress.votingPower,
-      hint: `${userProgress.daoProposals} proposals`,
+      value: votingPower,
+      hint: `${daoProposals} proposals`,
       icon: Gavel,
     },
   ];
 
   const totalPhases = selectedPersona?.phases?.length ?? 0;
-  const completedPhases = userProgress.completedPhases.length;
   const completionRate = totalPhases > 0
     ? Math.round((completedPhases / totalPhases) * 100)
     : 0;
@@ -59,7 +72,7 @@ const UserMetricsPanel = () => {
     'Gold': 'bg-warning/15 text-warning border border-warning/30',
     'Free': 'bg-white/5 text-white/80 border border-white/10',
     'default': 'bg-white/5 text-white/80 border border-white/10',
-  }[userProgress.passLevel] || 'bg-white/5 text-white/80 border border-white/10';
+  }[passLevel] || 'bg-white/5 text-white/80 border border-white/10';
 
   const metricLabelClass = isDark ? 'text-white/50' : 'text-slate-500';
   const metricValueClass = isDark ? 'text-white' : 'text-slate-900';

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useWallet } from '@solana/wallet-adapter-react';
 import { motion } from 'framer-motion';
 import { AlertCircle, Award, CheckCircle, Coins, Copy, ExternalLink, Lock, Trophy, Unlock } from 'lucide-react';
@@ -54,21 +60,21 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
 
   // Get persona icon
   const getPersonaIcon = () => {
-    if (!selectedPersona) return '💎';
+    if (!selectedPersona) return '';
 
     switch (selectedPersona.id) {
       case 'cognitive-activation-hub':
-        return '🧠';
+        return '';
       case 'capital-foundry':
-        return '🏛️';
+        return '';
       case 'system-architect':
-        return '🛠️';
+        return '';
       case 'experience-studio':
-        return '🎮';
+        return '';
       case 'impact-engine':
-        return '🌍';
+        return '';
       case 'resilience-master':
-        return '🛡️';
+        return '';
       default:
         return selectedPersona.icon;
     }
@@ -257,7 +263,7 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
             {/* Header */}
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h3 className="font-space font-bold text-white text-lg">Skillchain Card™</h3>
+                <h3 className="font-space font-bold text-white text-lg">Skillchain Card</h3>
                 <div className={`${tier.color} text-sm font-semibold`}>{tier.name} Tier</div>
               </div>
               <div className={`w-12 h-12 ${tier.gradient} rounded-lg flex items-center justify-center shadow-lg`}>
@@ -324,7 +330,7 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
             {selectedPersona && (
               <div className="mb-4">
                 <div className="flex justify-between text-xs text-white/80 mb-1">
-                  <span>Skillchain Mining™ Progress</span>
+                  <span>Skillchain Mining Progress</span>
                   <span>{progressPercentage.toFixed(0)}%</span>
                 </div>
                 <div className="w-full h-2 bg-black/30 rounded-full overflow-hidden">
@@ -454,7 +460,7 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
 
             <div className="mt-3 text-center text-xs italic text-white/60">
               "Every proof you mint is a piece of your sovereign capital. This card grows with your skills."
-              <div className="mt-1 text-white/40">Certified by Zyno AI Co-Founder™</div>
+              <div className="mt-1 text-white/40">Certified by Zyno AI Co-Founder</div>
             </div>
 
             <div className="absolute bottom-2 right-2 text-xs text-white/40">

@@ -1,0 +1,14 @@
+{
+  "run": "RUN_021_ITER1",
+  "timestamp": "2026-01-13T17:41:01.622Z",
+  "duration_ms": 944593,
+  "expected": 102,
+  "unexpected": 16,
+  "skipped": 0,
+  "flaky": 0,
+  "verdict": "FAIL_BLOCKING",
+  "regression": "MINOR",
+  "baseline": {"run": "RUN_014-017", "expected": 104, "unexpected": 14},
+  "delta": {"expected": -2, "unexpected": +2},
+  "fix_applied": "addInitScript with proper zustand persist structure"
+}

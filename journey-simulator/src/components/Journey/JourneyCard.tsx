@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import React, { useMemo, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Sparkles, Compass, Target, RefreshCw } from 'lucide-react';
@@ -78,17 +84,17 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
   const getPersonaIcon = () => {
     switch (persona.id) {
       case 'cognitive-activation-hub':
-        return '🧠';
+        return '';
       case 'capital-foundry':
-        return '🏛️';
+        return '';
       case 'system-architect':
-        return '🛠️';
+        return '';
       case 'experience-studio':
-        return '🎮';
+        return '';
       case 'impact-engine':
-        return '🌍';
+        return '';
       case 'resilience-master':
-        return '🛡️';
+        return '';
       default:
         return persona.icon;
     }

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 class ObservabilityAgent {
   constructor() {
     this.id = 'ObservabilityAgent';
@@ -47,7 +53,7 @@ class ObservabilityAgent {
         details,
         findings,
         confidence,
-        assumptions: hasInput ? [] : ['Inputs limités, SLOs à calibrer'],
+        assumptions: hasInput ? [] : ['Limited inputs, SLOs to be calibrated'],
         actions,
         citations: [],
         metrics: { latencyMs: Date.now() - started },

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
@@ -23,7 +29,7 @@ const generateToken = (user) => {
 // POST /auth/register
 router.post('/register', async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, wallet_address } = req.body;
 
         if (!email || !password) {
             return res.status(400).json({ error: 'Email and password are required' });
@@ -35,17 +41,13 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ error: 'User already exists' });
         }
 
-        // Hash password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
         // Create user
         const user = new User({
             name: name || 'New User',
             email,
-            password: hashedPassword,
+            password: password, // Pass plain password; pre('save') hook hashes it
             persona: 'investor',
-            wallet_address: null // No wallet yet
+            wallet_address: wallet_address || null // Use provided wallet or null
         });
 
         await user.save();
@@ -86,6 +88,86 @@ router.post('/login', async (req, res) => {
     } catch (error) {
         console.error('Login Error:', error);
         res.status(500).json({ error: 'Login failed' });
+    }
+});
+
+// POST /auth/test-cleanup - Delete test user (NON-PRODUCTION ONLY)
+router.post('/test-cleanup', async (req, res) => {
+    if (process.env.NODE_ENV === 'production') {
+        return res.status(403).json({ error: 'Cleanup not available in production' });
+    }
+
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ error: 'Email is required' });
+        }
+
+        await User.deleteOne({ email });
+        res.json({ success: true, message: `User ${email} deleted` });
+
+    } catch (error) {
+        console.error('Test Cleanup Error:', error);
+        res.status(500).json({ error: 'Cleanup failed' });
+    }
+});
+
+// POST /auth/test-login - E2E Test Authentication (NON-PRODUCTION ONLY)
+router.post('/test-login', async (req, res) => {
+    // CRITICAL: Only allow in non-production environments
+    if (process.env.NODE_ENV === 'production') {
+        return res.status(403).json({ error: 'Test login not available in production' });
+    }
+
+    try {
+        const { email, password } = req.body;
+
+        // Default to test user if no credentials provided
+        const testEmail = email || 'test@mfai.app';
+        const testPassword = password || 'password123';
+
+        // Check user
+        const user = await User.findOne({ email: testEmail });
+        if (!user) {
+            return res.status(400).json({ error: 'Test user not found. Run ensureTestUser()' });
+        }
+
+        console.log(`[TEST-LOGIN] User found: ${user.email}`);
+        console.log(`[TEST-LOGIN] Password from request: ${testPassword}`);
+        console.log(`[TEST-LOGIN] Stored hash: ${user.password.substring(0, 20)}...`);
+
+        // Verify password
+        const isMatch = await bcrypt.compare(testPassword, user.password);
+        console.log(`[TEST-LOGIN] Password match: ${isMatch}`);
+
+        if (!isMatch) {
+            return res.status(400).json({ error: 'Invalid test credentials' });
+        }
+
+        // Generate token
+        const token = generateToken(user);
+
+        // Set token in cookie for session persistence
+        res.cookie('mfai_token', token, {
+            httpOnly: true,
+            secure: false, // Set to true in production with HTTPS
+            sameSite: 'lax',
+            maxAge: 3600000 // 1 hour
+        });
+
+        res.json({
+            success: true,
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email
+            }
+        });
+
+    } catch (error) {
+        console.error('Test Login Error:', error);
+        res.status(500).json({ error: 'Test login failed' });
     }
 });
 

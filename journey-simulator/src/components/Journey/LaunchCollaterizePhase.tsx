@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useJourneyStore } from '../../store/journeyStore';
@@ -99,10 +105,10 @@ export const LaunchCollaterizePhase: React.FC<LaunchCollaterizePhaseProps> = ({ 
         >
           {loading ? (
             <>
-              <span className="animate-spin">⏳</span> Simulating...
+              <span className="animate-spin"></span> Simulating...
             </>
           ) : (
-            <>🚀 Simulate Launch with Collaterize</>
+            <> Simulate Launch with Collaterize</>
           )}
         </button>
       </div>
@@ -161,7 +167,7 @@ export const LaunchCollaterizePhase: React.FC<LaunchCollaterizePhaseProps> = ({ 
           </p>
         </div>
 
-        {/* Score communauté */}
+        {/* Community Score */}
         <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
           <h3 className="text-lg font-semibold text-gray-300 mb-4">Community Score</h3>
           <div className="flex items-end gap-2 mb-2">
@@ -232,7 +238,7 @@ export const LaunchCollaterizePhase: React.FC<LaunchCollaterizePhaseProps> = ({ 
               const noteKey = generateStableKey({ text: note }, 'recommendation-note', ['text']);
               return (
                 <li key={noteKey} className="flex items-start gap-2 text-sm text-gray-300">
-                  <span className="text-blue-400 mt-1">•</span>
+                  <span className="text-blue-400 mt-1"></span>
                   {note}
                 </li>
               );
@@ -249,7 +255,7 @@ export const LaunchCollaterizePhase: React.FC<LaunchCollaterizePhaseProps> = ({ 
           rel="noopener noreferrer"
           className="px-8 py-3 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-500 hover:to-teal-500 text-white font-bold rounded-lg shadow-lg transition-all transform hover:scale-105 flex items-center gap-2"
         >
-          🚀 Open Collaterize (Simulation)
+           Open Collaterize (Simulation)
         </a>
         <p className="text-center text-xs text-gray-500 mt-2 max-w-md">
           This is a simulation. In the production version, this will redirect to the actual Collaterize launchpad.

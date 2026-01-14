@@ -1,17 +1,28 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 #!/usr/bin/env node
 /* Smoke E2E API/UI (headless) */
 // CSRF parity applied to mirror app behavior.
 const express = require('express');
 const request = require('supertest');
+const csrf = require('csurf');
+const cookieParser = require('cookie-parser');
 const fs = require('fs');
 const path = require('path');
 const { csrfGuard } = require('../../mf-back/middleware/csrfGuard');
 
 const orchestrationRouter = require('../../mf-back/routes/zyno-routes');
+const testCsrf = csrf({ ignoreMethods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'DELETE', 'PATCH'] });
 
 const buildApp = () => {
   const app = express();
   app.use(express.json());
+  app.use(cookieParser());
+  app.use(testCsrf);
   app.use(csrfGuard);
   app.use('/orchestration', orchestrationRouter);
   return app;

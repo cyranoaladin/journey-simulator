@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const axios = require('axios');
 
 const BASE_URL = process.env.BASE_URL || 'https://journey.mfai.app/api';
@@ -63,7 +69,7 @@ async function runStressTest() {
         console.log('\n   RAG Info:', ragContext);
         if (!ragContext || (ragContext.hits === 0 && ragContext.mode !== 'disabled')) {
             console.warn('⚠️ WARNING: RAG might not have been used effectively (0 hits).');
-            // Strict check? User asked "Prouve-moi que le RAG est sollicité".
+            // Strict check? User asked "Prove to me that RAG is solicited".
             // With OPENAI_API_KEY=mock, RAG might be mocked or return 0 results if no vector store.
             // But we should see the attempt.
         }

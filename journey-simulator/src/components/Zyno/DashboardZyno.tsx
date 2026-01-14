@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useMemo } from 'react';
 import { motion, useReducedMotion, cubicBezier } from 'framer-motion';
 import type { Variants } from 'framer-motion';
@@ -77,18 +83,18 @@ const DashboardZyno = ({ missionSummary }: DashboardZynoProps) => {
       },
       {
         label: 'AEPO Score',
-        value: missionSummary?.aepoScore ?? '—',
+        value: missionSummary?.aepoScore ?? '',
         icon: GaugeCircle,
         tone: 'text-success',
       },
       {
         label: 'Active Agents',
-        value: missionSummary?.agents.length ?? 0,
+        value: missionSummary?.agents?.length ?? 0,
         icon: Flame,
         tone: 'text-warning',
       },
     ],
-    [missionSummary?.aepoScore, missionSummary?.agents.length, userProgress.mfaiTokens, userProgress.totalXP],
+    [missionSummary?.aepoScore, missionSummary?.agents?.length, userProgress.mfaiTokens, userProgress.totalXP],
   );
 
   const containerInitial = shouldReduceMotion ? false : 'hidden';
@@ -176,7 +182,7 @@ const DashboardZyno = ({ missionSummary }: DashboardZynoProps) => {
             <div className="flex items-center justify-between text-sm text-slate-600 dark:text-mfai-text/80">
               <span>{completionRate}% completed</span>
               <span>
-                {completedCount}/{totalPhases || '—'} phases
+                {completedCount}/{totalPhases || ''} phases
               </span>
             </div>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200/70 dark:bg-mfai-surfaceMuted">

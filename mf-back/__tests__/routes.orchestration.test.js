@@ -1,6 +1,14 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 // Tests run stateless bearer flows with CSRF parity middleware.
 const express = require('express');
 const request = require('supertest');
+const csrf = require('csurf');
+const cookieParser = require('cookie-parser');
 const { csrfGuard } = require('../middleware/csrfGuard');
 
 // Mock all orchestration dependencies to prevent module loading errors
@@ -48,6 +56,7 @@ jest.mock('../routes/orchestration-gate', () => {
 const AgentLog = require('../models/agentFeedbackLog');
 const { orchestrateZyno } = require('../orchestration/zynoOrchestrator');
 const { listTemplates } = require('../data/parcoursTemplates');
+const testCsrf = csrf({ ignoreMethods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'DELETE', 'PATCH'] });
 
 describe('Zyno orchestration route', () => {
   let app;
@@ -57,6 +66,8 @@ describe('Zyno orchestration route', () => {
 
     app = express();
     app.use(express.json());
+    app.use(cookieParser());
+    app.use(testCsrf);
     app.use(csrfGuard);
     app.use('/', require('../routes/zyno-routes'));
   });

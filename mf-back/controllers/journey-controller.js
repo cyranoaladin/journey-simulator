@@ -6,9 +6,11 @@ const Journey = require('../models/Journeys');
 const User = require('../models/user');
 const journeyStateService = require('../services/journey-state-service');
 const JourneyService = require('../services/journeyService');
+const { randomUUID } = require('node:crypto');
 
 const DEMO_STATES_DIR = path.join(__dirname, '..', 'data', 'demo-states');
 const SAFE_PERSONA_ID = /^[a-z0-9-]+$/i;
+const DEMO_USER_ID = '507f1f77bcf86cd799439011'; // Demo user ID - never write to DB
 
 const normalizePersonaId = (candidate) => {
     if (typeof candidate !== 'string') {
@@ -57,9 +59,182 @@ const getDisabledDemoModeState = () => ({
     completed_phase_indexes: [],
 });
 
+// In-memory mint job simulation (stub for BullMQ)
+const mintJobs = new Map();
+const MINT_DELAY_MS = 2500;
+
 exports.getJourneySchema = async (req, res) => {
     // MVP stub: return empty schema
     res.status(200).json({ success: true, schema: {} });
+};
+
+const getAnswerKey = () => {
+    try {
+        if (process.env.QUIZ_ANSWER_MAP) {
+            const parsed = JSON.parse(process.env.QUIZ_ANSWER_MAP);
+            if (parsed && typeof parsed === 'object') return parsed;
+        }
+    } catch (e) {
+        console.warn('[API] QUIZ_ANSWER_MAP parse failed, using defaults');
+    }
+    return {
+        default: ['A'],
+        'phase-1': ['A'],
+        'phase-2': ['B'],
+    };
+};
+
+exports.verifyQuiz = async (req, res) => {
+    try {
+        const { answers = [], phaseId } = req.body || {};
+        const answerMap = getAnswerKey();
+        const answerKey = Array.isArray(answerMap?.[phaseId]) ? answerMap[phaseId] : (answerMap.default || []);
+        const total = Math.max(answerKey.length, answers.length, 1);
+        let correct = 0;
+        answers.forEach((val, idx) => {
+            if (String(val).trim().toLowerCase() === (answerKey[idx] || '').toLowerCase()) {
+                correct += 1;
+            }
+        });
+        const score = Math.round((correct / total) * 1000) / 10; // 0..100 with 0.1 precision
+        const passThreshold = Number(process.env.QUIZ_PASS_THRESHOLD || 80);
+        const pass = score >= passThreshold;
+
+        const xpAwarded = pass ? 50 : 10;
+        const mfaiAwarded = pass ? 10 : 0;
+
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            {
+                $inc: {
+                    total_xp: xpAwarded,
+                    'token_transactions.mfai_tokens': mfaiAwarded,
+                },
+                $set: {
+                    last_activity: new Date(),
+                },
+            },
+            { new: true }
+        ).select('-password');
+
+        console.log('[API] Quiz validé', { userId: req.user.id, phaseId, score, pass });
+
+        if (!pass) {
+            return res.status(400).json({
+                success: false,
+                score,
+                pass,
+                message: 'Quiz failed',
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            score,
+            pass,
+            xpAwarded,
+            mfaiAwarded,
+            phaseStatus: 'VALIDATED',
+            progress: {
+                totalXP: user?.total_xp ?? 0,
+                mfaiTokens: user?.token_transactions?.mfai_tokens ?? 0,
+            },
+        });
+    } catch (error) {
+        console.error('[API] Quiz validation error', error);
+        return res.status(500).json({ success: false, message: 'Quiz validation failed' });
+    }
+};
+
+exports.requestMint = async (req, res) => {
+    try {
+        const { score = 0, phaseId, title = 'Phase Certificate' } = req.body || {};
+        const normalizedScore = Number(score) > 10 ? Number(score) / 10 : Number(score);
+        const MIN_SCORE = Number(process.env.MINT_MIN_SCORE || 8);
+        if (normalizedScore < MIN_SCORE) {
+            return res.status(403).json({ success: false, message: 'Score insufficient for mint' });
+        }
+        const user = await User.findById(req.user.id).select('-password');
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        if (!user.wallet_address) {
+            return res.status(400).json({ success: false, message: 'Wallet address required' });
+        }
+
+        const jobId = randomUUID();
+        mintJobs.set(jobId, { status: 'PENDING', userId: user.id, phaseId, createdAt: Date.now() });
+
+        const processJob = async () => {
+            const job = mintJobs.get(jobId);
+            if (!job) return;
+            job.status = 'COMPLETED';
+            job.signature = randomUUID().replace(/-/g, '').slice(0, 32);
+            job.mintAddress = randomUUID().replace(/-/g, '').slice(0, 32);
+            mintJobs.set(jobId, job);
+            try {
+                await User.findByIdAndUpdate(
+                    user.id,
+                    {
+                        $push: {
+                            nft_certificates: {
+                                phase: Number(phaseId) || 0,
+                                nft_address: job.mintAddress,
+                                mint_address: job.signature,
+                                score,
+                                title,
+                                description: 'Certification minted (simulated)',
+                                rarity: 'epic',
+                                xp_earned: 0,
+                            },
+                        },
+                        $set: { last_activity: new Date() },
+                    },
+                    { new: true }
+                ).select('-password');
+                console.log('[MockWorker] Minting NFT...', { jobId, userId: user.id, phaseId, signature: job.signature });
+            } catch (e) {
+                console.error('[MockWorker] Failed to update user after mint', e);
+            }
+        };
+
+        if (process.env.NODE_ENV === 'test') {
+            await processJob();
+        } else {
+            setTimeout(processJob, MINT_DELAY_MS);
+        }
+
+        console.log('[API] Mint request enqueued', { jobId, userId: user.id, phaseId });
+
+        return res.status(202).json({
+            success: true,
+            jobId,
+            status: 'PENDING',
+        });
+    } catch (error) {
+        console.error('[API] Mint request error', error);
+        return res.status(500).json({ success: false, message: 'Mint request failed' });
+    }
+};
+
+exports.getMintStatus = async (req, res) => {
+    try {
+        const { jobId } = req.params || {};
+        const job = mintJobs.get(jobId);
+        if (!job) {
+            return res.status(404).json({ success: false, message: 'Job not found' });
+        }
+        return res.status(200).json({
+            success: true,
+            status: job.status,
+            signature: job.signature,
+            mintAddress: job.mintAddress,
+            phaseId: job.phaseId,
+        });
+    } catch (error) {
+        console.error('[API] Mint status error', error);
+        return res.status(500).json({ success: false, message: 'Mint status failed' });
+    }
 };
 
 exports.getUserArtifacts = async (req, res) => {
@@ -132,7 +307,13 @@ exports.loadDemoState = async (req, res) => {
             demo_mode: demoModeState
         };
 
-        if (req.user?.id) {
+        // 🛡️ Security: Block demo user write to prevent DB corruption
+        const isDemoUser = req.user?.id === DEMO_USER_ID;
+        const authorizationHeader = req.headers.authorization || '';
+        const token = authorizationHeader.startsWith('Bearer ') ? authorizationHeader.slice(7) : null;
+        const hasDemoToken = token === 'demo-token';
+
+        if (req.user?.id && !isDemoUser && !hasDemoToken) {
             await User.findByIdAndUpdate(
                 req.user.id,
                 {
@@ -482,6 +663,44 @@ const ZynoAgent = require('../agents/ZynoAgent');
 const TokenomicsAgent = require('../agents/TokenomicsAgent');
 const { orchestrateZyno } = require('../orchestration/zynoOrchestrator');
 
+const buildPersonaContent = (trackId = '') => {
+    const persona = (trackId || '').toLowerCase();
+    if (persona.includes('capital') || persona === 'capital-foundry') {
+        return {
+            active_agents: [
+                { id: 'agent-liquidity', role: 'Liquidity', name: 'Liquidity Architect', status: 'analyzing', bio: 'Designs pools and optimizes depth and incentives.' },
+                { id: 'agent-risk', role: 'Risk', name: 'Risk Manager', status: 'analyzing', bio: 'Measures IL/volatility and sets guardrails.' },
+            ],
+            resources: [
+                { kind: 'code', title: 'Rust Liquidity Pool Template', code: '// pool.rs\npub fn add_liquidity(...) { /* ... */ }', language: 'rust' },
+                { kind: 'cheatsheet', title: 'Impermanent Loss Calculator', url: 'https://defillama.com/il-calculator', description: 'IL estimation for volatile pairs.' },
+            ],
+        };
+    }
+    if (persona.includes('impact') || persona === 'impact-engine') {
+        return {
+            active_agents: [
+                { id: 'agent-governance', role: 'Governance', name: 'Governance Strategist', status: 'analyzing', bio: 'Designs governance, quorum, and voting rights.' },
+                { id: 'agent-treasury', role: 'Finance', name: 'Treasury Auditor', status: 'analyzing', bio: 'Audits treasury, runway, and reconciliations.' },
+            ],
+            resources: [
+                { kind: 'cheatsheet', title: 'DAO Bylaws Template', url: 'https://dao-template.example/charter', description: 'Charter template for tokenized governance.' },
+                { kind: 'link', title: 'Realms Setup Guide', url: 'https://realms.today/guides', description: 'Step-by-step to configure a Realms DAO.' },
+            ],
+        };
+    }
+    return {
+        active_agents: [
+            { id: 'agent-security', role: 'Security', name: 'Security Sentinel', status: 'analyzing', bio: 'Scans vulnerabilities and threat surface.' },
+            { id: 'agent-tokenomics', role: 'Economics', name: 'Tokenomics Expert', status: 'analyzing', bio: 'Optimizes distribution and economic balance.' },
+        ],
+        resources: [
+            { kind: 'cheatsheet', title: 'Solana Token Standards Guide', url: 'https://solana.com/docs', description: 'SPL standards quick reference.' },
+            { kind: 'code', title: 'Rust Program Template', code: '// entrypoint\npub fn process(...) { /* ... */ }', language: 'rust' },
+        ],
+    };
+};
+
 exports.step = async (req, res) => {
     try {
         const { journeyId } = req.params;
@@ -502,11 +721,12 @@ exports.step = async (req, res) => {
         // In a real app, we might fetch the journey from DB to verify ownership/state
         // const journey = await Journey.findById(journeyId);
 
-        const userId = req.user?.id || req.body?.userId || req.headers['x-user-id'];
+        // 🛡️ Security: Only trust req.user.id from authenticated middleware
+        const userId = req.user?.id;
         if (!userId) {
             return res.status(401).json({
                 success: false,
-                message: 'User context is required for orchestration',
+                error: 'Authentication required'
             });
         }
         const ctx = {
@@ -526,15 +746,25 @@ exports.step = async (req, res) => {
             journeyState: resolvedJourneyState
         };
 
+        const personaId = trackId || ctx.userProfile?.persona;
+
         if (process.env.NODE_ENV === 'test') {
             const agent = new ZynoAgent();
             const result = await agent.run(ctx);
-            return res.status(200).json(result?.payload ?? result ?? { success: true });
+            const payload = result?.payload ?? result ?? { success: true };
+            const personaContent = buildPersonaContent(personaId);
+            payload.active_agents = payload.active_agents || personaContent.active_agents;
+            payload.resources = payload.resources || personaContent.resources;
+            return res.status(200).json(payload);
         }
 
         const result = await orchestrateZyno(userInput, ctx);
+        const payload = result || {};
+        const personaContent = buildPersonaContent(personaId);
+        payload.active_agents = payload.active_agents || personaContent.active_agents;
+        payload.resources = payload.resources || personaContent.resources;
 
-        res.status(200).json(result);
+        res.status(200).json(payload);
 
     } catch (error) {
         console.error('Zyno Step Error:', error);
@@ -573,9 +803,11 @@ exports.submit = async (req, res) => {
         const authorizationHeader = req.headers.authorization || '';
         const token = authorizationHeader.startsWith('Bearer ') ? authorizationHeader.slice(7) : null;
         const isDemoToken = token === 'demo-token';
+        const isDemoUser = req.user?.id === DEMO_USER_ID;
 
         let progressPayload;
-        if (!isDemoToken && req.user?.id) {
+        // 🛡️ Security: Block demo user write to prevent DB corruption
+        if (!isDemoToken && !isDemoUser && req.user?.id) {
             const updatedUser = await JourneyService.updateUserProgress(
                 req.user.id,
                 xpDelta,

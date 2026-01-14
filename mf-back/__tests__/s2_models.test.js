@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const mongoose = require('mongoose');
 const JourneyRun = require('../models/JourneyRun');
 const PhaseProgress = require('../models/PhaseProgress');
@@ -14,7 +20,7 @@ jest.setTimeout(20000);
 beforeAll(async () => {
     // Try to connect to local test DB since we don't have memory server in package.json
     // and we cannot add dependencies easily.
-    const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/mf_back_test_s2';
+    const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27018/mf_back_test_s2';
 
     try {
         await mongoose.connect(mongoUri, {

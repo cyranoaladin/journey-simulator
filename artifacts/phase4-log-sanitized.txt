@@ -1,0 +1,210 @@
+=== Phase 4 Execute (AUDIT.md §9) ===
+Step 1: Preflight Check
+-------------------------------------------------------------------
+=== Phase 2 Preflight Check ===
+
+Backend (port 3002): ✅ UP
+Frontend Preview (port 4173): ✅ UP
+
+✅ PREFLIGHT PASS - Ready for Phase 2 gate execution
+
+Step 2: Execute Phase 4 Gate (--trace off)
+-------------------------------------------------------------------
+🔐 Global Setup: seeding + authentification prod-like...
+   ⏳ Seeding user via modèle (hash unique)...
+[dotenv@17.2.0] injecting env (12) from mf-back/.env (tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] })
+✅ MongoDB Connected
+🗑️  Deleted 1 existing test user(s)
+✅ Created test user: test@mfai.app
+   ID: 695ac9a99a6f9ea237343583
+   Password: MFAITest2026!
+✅ Password verification: SUCCESS
+✅ Seeding complete
+   🔗 Auth vers http://127.0.0.1:3002/auth/login
+   ✅ Backend authenticated: test@mfai.app
+   ✅ StorageState sauvegardé: /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/.auth/user.json
+   🛡️ RUN_MODE_GUARD=real
+   🔑 AUTH_STATE=loaded
+AUTH_STATE_PATH=/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/.auth/user.json
+AUTH_STATE_EXISTS=true
+   🧾 Auth proof écrit: /home/alaeddine/Documents/journey_mfai_back_front/artifacts/e2e-auth-proof.json
+
+Running 45 tests using 1 worker
+
+(node:140453) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:140453) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Agent GuideAgent not invocable via /api/agent/invoke
+  ✓   1 [chromium] › tests/e2e/05-agents-orchestration/agent-contracts.spec.ts:28:9 › Phase 4: Agent Contracts › GuideAgent contract validation (23ms)
+Agent BuilderAgent not invocable via /api/agent/invoke
+  ✓   2 [chromium] › tests/e2e/05-agents-orchestration/agent-contracts.spec.ts:28:9 › Phase 4: Agent Contracts › BuilderAgent contract validation (10ms)
+Agent TokenomicsAgent not invocable via /api/agent/invoke
+  ✓   3 [chromium] › tests/e2e/05-agents-orchestration/agent-contracts.spec.ts:28:9 › Phase 4: Agent Contracts › TokenomicsAgent contract validation (8ms)
+Agent SecurityAgent not invocable via /api/agent/invoke
+  ✓   4 [chromium] › tests/e2e/05-agents-orchestration/agent-contracts.spec.ts:28:9 › Phase 4: Agent Contracts › SecurityAgent contract validation (6ms)
+Agent DesignAgent not invocable via /api/agent/invoke
+  ✓   5 [chromium] › tests/e2e/05-agents-orchestration/agent-contracts.spec.ts:28:9 › Phase 4: Agent Contracts › DesignAgent contract validation (8ms)
+✅ Intent "builder" → BuilderAgent (confidence: 1, duration: 3ms)
+  ✓   6 [chromium] › tests/e2e/05-agents-orchestration/intent-routing.spec.ts:22:9 › Phase 4: Intent Routing (Tier 1 - Explicit Intents) › Routes intent "builder" to BuilderAgent (15ms)
+✅ Intent "guide" → GuideAgent (confidence: 1, duration: 2ms)
+  ✓   7 [chromium] › tests/e2e/05-agents-orchestration/intent-routing.spec.ts:22:9 › Phase 4: Intent Routing (Tier 1 - Explicit Intents) › Routes intent "guide" to GuideAgent (12ms)
+✅ Intent "tokenomics" → TokenomicsAgent (confidence: 1, duration: 3ms)
+  ✓   8 [chromium] › tests/e2e/05-agents-orchestration/intent-routing.spec.ts:22:9 › Phase 4: Intent Routing (Tier 1 - Explicit Intents) › Routes intent "tokenomics" to TokenomicsAgent (8ms)
+✅ Intent "security_attack" → SecurityAgent (confidence: 1, duration: 5ms)
+  ✓   9 [chromium] › tests/e2e/05-agents-orchestration/intent-routing.spec.ts:22:9 › Phase 4: Intent Routing (Tier 1 - Explicit Intents) › Routes intent "security_attack" to SecurityAgent (11ms)
+✅ Intent "design" → DesignAgent (confidence: 1, duration: 4ms)
+  ✓  10 [chromium] › tests/e2e/05-agents-orchestration/intent-routing.spec.ts:22:9 › Phase 4: Intent Routing (Tier 1 - Explicit Intents) › Routes intent "design" to DesignAgent (13ms)
+⚠️  Registration failed for testA@mfai.app: Request failed with status code 500, attempting login...
+❌ Login failed for testA@mfai.app: { error: [32m'Invalid credentials'[39m }
+  ✘  11 [chromium] › tests/e2e/05-agents-orchestration/multi-user-isolation.spec.ts:14:5 › Phase 4: Multi-User Isolation › Two users have isolated orchestration state (69ms)
+(node:140505) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:140505) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  12 [chromium] › tests/e2e/05-agents-orchestration/orchestrator-resilience.spec.ts:12:5 › Phase 4: Orchestrator Resilience › Handles empty input gracefully (24ms)
+  ✓  13 [chromium] › tests/e2e/05-agents-orchestration/orchestrator-resilience.spec.ts:38:5 › Phase 4: Orchestrator Resilience › Handles ambiguous input gracefully (12ms)
+  ✓  14 [chromium] › tests/e2e/05-agents-orchestration/orchestrator-resilience.spec.ts:72:5 › Phase 4: Orchestrator Resilience › Handles timeout gracefully (10ms)
+  ✓  15 [chromium] › tests/e2e/05-agents-orchestration/orchestrator-resilience.spec.ts:102:5 › Phase 4: Orchestrator Resilience › Handles network error gracefully (6ms)
+(node:140517) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:140517) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Agent GuideAgent not invocable via /api/agent/invoke
+  ✓  16 [firefox] › tests/e2e/05-agents-orchestration/agent-contracts.spec.ts:28:9 › Phase 4: Agent Contracts › GuideAgent contract validation (21ms)
+Agent BuilderAgent not invocable via /api/agent/invoke
+  ✓  17 [firefox] › tests/e2e/05-agents-orchestration/agent-contracts.spec.ts:28:9 › Phase 4: Agent Contracts › BuilderAgent contract validation (12ms)
+Agent TokenomicsAgent not invocable via /api/agent/invoke
+  ✓  18 [firefox] › tests/e2e/05-agents-orchestration/agent-contracts.spec.ts:28:9 › Phase 4: Agent Contracts › TokenomicsAgent contract validation (9ms)
+Agent SecurityAgent not invocable via /api/agent/invoke
+  ✓  19 [firefox] › tests/e2e/05-agents-orchestration/agent-contracts.spec.ts:28:9 › Phase 4: Agent Contracts › SecurityAgent contract validation (6ms)
+Agent DesignAgent not invocable via /api/agent/invoke
+  ✓  20 [firefox] › tests/e2e/05-agents-orchestration/agent-contracts.spec.ts:28:9 › Phase 4: Agent Contracts › DesignAgent contract validation (9ms)
+✅ Intent "builder" → BuilderAgent (confidence: 1, duration: 4ms)
+  ✓  21 [firefox] › tests/e2e/05-agents-orchestration/intent-routing.spec.ts:22:9 › Phase 4: Intent Routing (Tier 1 - Explicit Intents) › Routes intent "builder" to BuilderAgent (21ms)
+✅ Intent "guide" → GuideAgent (confidence: 1, duration: 5ms)
+  ✓  22 [firefox] › tests/e2e/05-agents-orchestration/intent-routing.spec.ts:22:9 › Phase 4: Intent Routing (Tier 1 - Explicit Intents) › Routes intent "guide" to GuideAgent (18ms)
+✅ Intent "tokenomics" → TokenomicsAgent (confidence: 1, duration: 3ms)
+  ✓  23 [firefox] › tests/e2e/05-agents-orchestration/intent-routing.spec.ts:22:9 › Phase 4: Intent Routing (Tier 1 - Explicit Intents) › Routes intent "tokenomics" to TokenomicsAgent (10ms)
+✅ Intent "security_attack" → SecurityAgent (confidence: 1, duration: 4ms)
+  ✓  24 [firefox] › tests/e2e/05-agents-orchestration/intent-routing.spec.ts:22:9 › Phase 4: Intent Routing (Tier 1 - Explicit Intents) › Routes intent "security_attack" to SecurityAgent (9ms)
+✅ Intent "design" → DesignAgent (confidence: 1, duration: 3ms)
+  ✓  25 [firefox] › tests/e2e/05-agents-orchestration/intent-routing.spec.ts:22:9 › Phase 4: Intent Routing (Tier 1 - Explicit Intents) › Routes intent "design" to DesignAgent (11ms)
+⚠️  Registration failed for testA@mfai.app: Request failed with status code 500, attempting login...
+❌ Login failed for testA@mfai.app: { error: [32m'Invalid credentials'[39m }
+  ✘  26 [firefox] › tests/e2e/05-agents-orchestration/multi-user-isolation.spec.ts:14:5 › Phase 4: Multi-User Isolation › Two users have isolated orchestration state (69ms)
+(node:140738) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:140738) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  27 [firefox] › tests/e2e/05-agents-orchestration/orchestrator-resilience.spec.ts:12:5 › Phase 4: Orchestrator Resilience › Handles empty input gracefully (26ms)
+  ✓  28 [firefox] › tests/e2e/05-agents-orchestration/orchestrator-resilience.spec.ts:38:5 › Phase 4: Orchestrator Resilience › Handles ambiguous input gracefully (9ms)
+  ✓  29 [firefox] › tests/e2e/05-agents-orchestration/orchestrator-resilience.spec.ts:72:5 › Phase 4: Orchestrator Resilience › Handles timeout gracefully (8ms)
+  ✓  30 [firefox] › tests/e2e/05-agents-orchestration/orchestrator-resilience.spec.ts:102:5 › Phase 4: Orchestrator Resilience › Handles network error gracefully (11ms)
+(node:140750) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:140750) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Agent GuideAgent not invocable via /api/agent/invoke
+  ✓  31 [mobile-chrome] › tests/e2e/05-agents-orchestration/agent-contracts.spec.ts:28:9 › Phase 4: Agent Contracts › GuideAgent contract validation (22ms)
+Agent BuilderAgent not invocable via /api/agent/invoke
+  ✓  32 [mobile-chrome] › tests/e2e/05-agents-orchestration/agent-contracts.spec.ts:28:9 › Phase 4: Agent Contracts › BuilderAgent contract validation (14ms)
+Agent TokenomicsAgent not invocable via /api/agent/invoke
+  ✓  33 [mobile-chrome] › tests/e2e/05-agents-orchestration/agent-contracts.spec.ts:28:9 › Phase 4: Agent Contracts › TokenomicsAgent contract validation (6ms)
+Agent SecurityAgent not invocable via /api/agent/invoke
+  ✓  34 [mobile-chrome] › tests/e2e/05-agents-orchestration/agent-contracts.spec.ts:28:9 › Phase 4: Agent Contracts › SecurityAgent contract validation (5ms)
+Agent DesignAgent not invocable via /api/agent/invoke
+  ✓  35 [mobile-chrome] › tests/e2e/05-agents-orchestration/agent-contracts.spec.ts:28:9 › Phase 4: Agent Contracts › DesignAgent contract validation (10ms)
+✅ Intent "builder" → BuilderAgent (confidence: 1, duration: 3ms)
+  ✓  36 [mobile-chrome] › tests/e2e/05-agents-orchestration/intent-routing.spec.ts:22:9 › Phase 4: Intent Routing (Tier 1 - Explicit Intents) › Routes intent "builder" to BuilderAgent (16ms)
+✅ Intent "guide" → GuideAgent (confidence: 1, duration: 2ms)
+  ✓  37 [mobile-chrome] › tests/e2e/05-agents-orchestration/intent-routing.spec.ts:22:9 › Phase 4: Intent Routing (Tier 1 - Explicit Intents) › Routes intent "guide" to GuideAgent (12ms)
+✅ Intent "tokenomics" → TokenomicsAgent (confidence: 1, duration: 2ms)
+  ✓  38 [mobile-chrome] › tests/e2e/05-agents-orchestration/intent-routing.spec.ts:22:9 › Phase 4: Intent Routing (Tier 1 - Explicit Intents) › Routes intent "tokenomics" to TokenomicsAgent (9ms)
+✅ Intent "security_attack" → SecurityAgent (confidence: 1, duration: 2ms)
+  ✓  39 [mobile-chrome] › tests/e2e/05-agents-orchestration/intent-routing.spec.ts:22:9 › Phase 4: Intent Routing (Tier 1 - Explicit Intents) › Routes intent "security_attack" to SecurityAgent (9ms)
+✅ Intent "design" → DesignAgent (confidence: 1, duration: 3ms)
+  ✓  40 [mobile-chrome] › tests/e2e/05-agents-orchestration/intent-routing.spec.ts:22:9 › Phase 4: Intent Routing (Tier 1 - Explicit Intents) › Routes intent "design" to DesignAgent (9ms)
+⚠️  Registration failed for testA@mfai.app: Request failed with status code 500, attempting login...
+❌ Login failed for testA@mfai.app: { error: [32m'Invalid credentials'[39m }
+  ✘  41 [mobile-chrome] › tests/e2e/05-agents-orchestration/multi-user-isolation.spec.ts:14:5 › Phase 4: Multi-User Isolation › Two users have isolated orchestration state (68ms)
+(node:140802) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:140802) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  42 [mobile-chrome] › tests/e2e/05-agents-orchestration/orchestrator-resilience.spec.ts:12:5 › Phase 4: Orchestrator Resilience › Handles empty input gracefully (25ms)
+  ✓  43 [mobile-chrome] › tests/e2e/05-agents-orchestration/orchestrator-resilience.spec.ts:38:5 › Phase 4: Orchestrator Resilience › Handles ambiguous input gracefully (14ms)
+  ✓  44 [mobile-chrome] › tests/e2e/05-agents-orchestration/orchestrator-resilience.spec.ts:72:5 › Phase 4: Orchestrator Resilience › Handles timeout gracefully (11ms)
+  ✓  45 [mobile-chrome] › tests/e2e/05-agents-orchestration/orchestrator-resilience.spec.ts:102:5 › Phase 4: Orchestrator Resilience › Handles network error gracefully (6ms)
+
+
+  1) [chromium] › tests/e2e/05-agents-orchestration/multi-user-isolation.spec.ts:14:5 › Phase 4: Multi-User Isolation › Two users have isolated orchestration state 
+
+    AxiosError: Request failed with status code 400
+
+       at helpers/authStates.ts:73
+
+      71 |     // Login
+      72 |     try {
+    > 73 |         const loginResponse = await axios.post(`${BASE_URL}/auth/login`, {
+         |                               ^
+      74 |             email: user.email,
+      75 |             password: user.password,
+      76 |         });
+        at settle (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/node_modules/axios/lib/core/settle.js:19:12)
+        at IncomingMessage.handleStreamEnd (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/node_modules/axios/lib/adapters/http.js:793:11)
+        at Axios.request (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/node_modules/axios/lib/core/Axios.js:45:41)
+        at ensureUserAndLogin (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/helpers/authStates.ts:73:31)
+        at createDualAuthStates (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/helpers/authStates.ts:40:5)
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/05-agents-orchestration/multi-user-isolation.spec.ts:16:9
+
+  2) [firefox] › tests/e2e/05-agents-orchestration/multi-user-isolation.spec.ts:14:5 › Phase 4: Multi-User Isolation › Two users have isolated orchestration state 
+
+    AxiosError: Request failed with status code 400
+
+       at helpers/authStates.ts:73
+
+      71 |     // Login
+      72 |     try {
+    > 73 |         const loginResponse = await axios.post(`${BASE_URL}/auth/login`, {
+         |                               ^
+      74 |             email: user.email,
+      75 |             password: user.password,
+      76 |         });
+        at settle (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/node_modules/axios/lib/core/settle.js:19:12)
+        at IncomingMessage.handleStreamEnd (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/node_modules/axios/lib/adapters/http.js:793:11)
+        at Axios.request (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/node_modules/axios/lib/core/Axios.js:45:41)
+        at ensureUserAndLogin (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/helpers/authStates.ts:73:31)
+        at createDualAuthStates (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/helpers/authStates.ts:40:5)
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/05-agents-orchestration/multi-user-isolation.spec.ts:16:9
+
+  3) [mobile-chrome] › tests/e2e/05-agents-orchestration/multi-user-isolation.spec.ts:14:5 › Phase 4: Multi-User Isolation › Two users have isolated orchestration state 
+
+    AxiosError: Request failed with status code 400
+
+       at helpers/authStates.ts:73
+
+      71 |     // Login
+      72 |     try {
+    > 73 |         const loginResponse = await axios.post(`${BASE_URL}/auth/login`, {
+         |                               ^
+      74 |             email: user.email,
+      75 |             password: user.password,
+      76 |         });
+        at settle (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/node_modules/axios/lib/core/settle.js:19:12)
+        at IncomingMessage.handleStreamEnd (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/node_modules/axios/lib/adapters/http.js:793:11)
+        at Axios.request (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/node_modules/axios/lib/core/Axios.js:45:41)
+        at ensureUserAndLogin (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/helpers/authStates.ts:73:31)
+        at createDualAuthStates (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/helpers/authStates.ts:40:5)
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/05-agents-orchestration/multi-user-isolation.spec.ts:16:9
+
+  3 failed
+    [chromium] › tests/e2e/05-agents-orchestration/multi-user-isolation.spec.ts:14:5 › Phase 4: Multi-User Isolation › Two users have isolated orchestration state 
+    [firefox] › tests/e2e/05-agents-orchestration/multi-user-isolation.spec.ts:14:5 › Phase 4: Multi-User Isolation › Two users have isolated orchestration state 
+    [mobile-chrome] › tests/e2e/05-agents-orchestration/multi-user-isolation.spec.ts:14:5 › Phase 4: Multi-User Isolation › Two users have isolated orchestration state 
+  42 passed (9.2s)
+
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report test-results/html-report[39m
+[36m[39m

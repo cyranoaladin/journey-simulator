@@ -1,0 +1,11 @@
+                                             List of databases
+   Name    | Owner  | Encoding |  Collate   |   Ctype    | ICU Locale | Locale Provider | Access privileges 
+-----------+--------+----------+------------+------------+------------+-----------------+-------------------
+ postgres  | prisma | UTF8     | en_US.utf8 | en_US.utf8 |            | libc            | 
+ prisma    | prisma | UTF8     | en_US.utf8 | en_US.utf8 |            | libc            | 
+ template0 | prisma | UTF8     | en_US.utf8 | en_US.utf8 |            | libc            | =c/prisma        +
+           |        |          |            |            |            |                 | prisma=CTc/prisma
+ template1 | prisma | UTF8     | en_US.utf8 | en_US.utf8 |            | libc            | =c/prisma        +
+           |        |          |            |            |            |                 | prisma=CTc/prisma
+(4 rows)
+

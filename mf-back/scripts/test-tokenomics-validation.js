@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 process.env.LLM_MODEL_NAME = 'gpt-4o'; // Enforce high-capability model for math checks
 require('dotenv').config({ path: '../.env' });
 const TokenomicsAgent = require('../agents/TokenomicsAgent');
@@ -17,7 +23,7 @@ async function valdiateTokenomicsLogic() {
             traceId: 'validation-test-001',
             input: input,
             context: {
-                journey: { phaseId: 'certification' },
+                journey: { phaseId: 'certificate' },
                 orchestrationMode: 'AEPO'
             }
         });

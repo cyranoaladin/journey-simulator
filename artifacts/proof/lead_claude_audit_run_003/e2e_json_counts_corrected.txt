@@ -1,0 +1,14 @@
+=== ACTUAL E2E RESULTS (from console output) ===
+Total tests: 118
+Passed: 48
+Failed (unexpected): 63
+Skipped: 7
+Flaky: 0
+Duration: 4.7m
+
+VERDICT: FAIL_BLOCKING
+- skipped=7 (REQUIREMENT: skipped=0)
+- unexpected=63 (REQUIREMENT: unexpected=0)
+
+Note: JSON reporter may not have captured full results correctly.
+Console output is authoritative for this run.

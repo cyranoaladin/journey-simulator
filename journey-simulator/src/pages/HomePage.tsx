@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -140,7 +146,7 @@ const HomePage = () => {
                 <span className="flex h-2 w-2 rounded-full bg-gradient-to-br from-purple-500 via-blue-500 to-green-400" />
                 Solana Powered
               </span>
-              <span className="hidden text-white/60 sm:inline">Internet Capital Markets • Coordinated by AI</span>
+              <span className="hidden text-white/60 sm:inline">Internet Capital Markets  Coordinated by AI</span>
             </motion.div>
 
             <motion.h1
@@ -251,7 +257,7 @@ const HomePage = () => {
             <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/10 via-indigo-500/10 to-purple-500/10 blur-3xl" aria-hidden="true" />
             <div className="relative z-10 space-y-4 text-sm text-white/80">
               <div className="flex items-center justify-between text-xs uppercase tracking-[0.35em] text-white/50">
-                <span>Mission control — Solana devnet/testnet</span>
+                <span>Mission control  Solana devnet/testnet</span>
                 <span>DAO readiness 76%</span>
               </div>
               <div className="rounded-2xl border border-white/10 bg-[#0f0f21]/80 p-5">
@@ -407,9 +413,9 @@ const HomePage = () => {
                       transition={{ duration: 0.4 }}
                       className="space-y-4 text-white/80"
                     >
-                      <p className="text-lg leading-relaxed">“{reaction}”</p>
-                      <p className="text-xs uppercase tracking-[0.3em] text-white/40">Phase cue — {phaseDescriptions[activePhase.key]}</p>
-                      <footer className="text-sm uppercase tracking-[0.3em] text-white/40">Mission Phase — {activePhase.label}</footer>
+                      <p className="text-lg leading-relaxed">{reaction}</p>
+                      <p className="text-xs uppercase tracking-[0.3em] text-white/40">Phase cue  {phaseDescriptions[activePhase.key]}</p>
+                      <footer className="text-sm uppercase tracking-[0.3em] text-white/40">Mission Phase  {activePhase.label}</footer>
                     </motion.blockquote>
                   </AnimatePresence>
                 </div>
@@ -430,7 +436,7 @@ const HomePage = () => {
             Internet Capital Markets, On Demand
           </motion.h3>
           <p className="max-w-2xl text-lg text-white/70">
-            Graduate from simulation to live liquidity with staking funnels, tokenomics orchestration, and governance automation wired to Solana’s high-performance rails.
+            Graduate from simulation to live liquidity with staking funnels, tokenomics orchestration, and governance automation wired to Solanas high-performance rails.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <Button size="lg" className="w-full sm:w-auto" onClick={() => navigate('/journeys')}>
@@ -450,7 +456,7 @@ const HomePage = () => {
 
       <footer className="relative z-10 border-t border-white/10 bg-[#0d0d1a]/80 py-10 text-center text-sm text-white/50">
         <p className="font-semibold uppercase tracking-[0.3em] text-white/40">Internet Capital Markets for builders. Powered by Solana. Coordinated by AI.</p>
-        <p className="mt-3">Money Factory AI Journey Simulator © {new Date().getFullYear()}</p>
+        <p className="mt-3">Money Factory AI Journey Simulator  {new Date().getFullYear()}</p>
       </footer>
     </div>
   )

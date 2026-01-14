@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 export interface Persona {
   id: string;
   name: string;
@@ -28,6 +34,8 @@ export interface JourneyPhase {
   modules?: PhaseModule[];
   isLocked?: boolean;
   requirements?: string[];
+  quizId?: string;
+  resources?: string[] | GeneratedResource[];
   stakingRequired?: number;
   daoVoteRequired?: boolean;
   isIncubation?: boolean;
@@ -82,7 +90,7 @@ export interface AccessPassHolder {
   passLevel: 'Gold' | 'Platinum' | 'Diamond';
   avatar: string;
   duration: string;
-  certifications: number;
+  certificates: number;
   roi: string;
   projects: string;
   testimonial: string;
@@ -93,7 +101,7 @@ export interface AccessPassHolder {
   recommendedPersonaId?: string;
 }
 
-export interface Certification {
+export interface Certificate {
   id: string;
   name: string;
   description: string;
@@ -115,3 +123,27 @@ export interface TestnetFeatures {
   daoVoting: boolean;
   socialSharing: boolean;
 }
+
+export type PhaseStatus = 'IDLE' | 'SUBMITTING' | 'AGENTS_ANALYZING' | 'FEEDBACK_AVAILABLE' | 'VALIDATED' | 'REJECTED' | 'REWARDS_CLAIMED';
+export type MintStatus = 'idle' | 'initiating' | 'minting' | 'finalizing' | 'completed' | 'pending';
+
+export type ActiveAgent = {
+  id: string;
+  name: string;
+  role: string;
+  status: 'waiting' | 'analyzing' | 'done';
+  bio: string;
+};
+
+export type GeneratedResource =
+  | { kind: 'cheatsheet'; title: string; url: string; description?: string }
+  | { kind: 'code'; title: string; code: string; language: string }
+  | { kind: 'link'; title: string; url: string; description?: string };
+
+export type PhaseFeedback = {
+  score: number;
+  relevance: string;
+  nextSteps: string[];
+  verdict: 'pass' | 'fail';
+  axes?: { label: string; value: number }[];
+};

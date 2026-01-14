@@ -1,22 +1,28 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 // Feature flag middleware for gradual feature rollout
 const featureFlags = {
   // Core features (always enabled)
   userAuthentication: true,
   journeyProgress: true,
   nftMinting: true,
-  
+
   // New features (can be toggled)
   analytics: true,
   platformStats: true,
   holderInteractions: true,
-  certificationTracking: true,
-  
+  certificateTracking: true,
+
   // Experimental features (disabled by default)
   aiRecommendations: false,
   socialFeatures: false,
   advancedAnalytics: false,
   betaFeatures: false,
-  
+
   // A/B testing features
   newUI: false,
   enhancedAnimations: false,
@@ -47,7 +53,7 @@ const addFeatureFlags = (req, res, next) => {
 // Admin endpoint to update feature flags
 const updateFeatureFlag = (req, res) => {
   const { feature, enabled } = req.body;
-  
+
   if (featureFlags.hasOwnProperty(feature)) {
     featureFlags[feature] = enabled;
     res.json({

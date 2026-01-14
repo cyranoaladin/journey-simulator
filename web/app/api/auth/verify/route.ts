@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import nacl from 'tweetnacl'
@@ -6,7 +12,7 @@ import { cookies } from 'next/headers'
 
 // Simple JWT-like session implementation for MVP
 // In production, use a real auth library like NextAuth or IronSession
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-change-me-in-prod'
 

@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node ./bin/www",
     "dev": "nodemon ./bin/www",
+    "build": "echo \"mf-back: build (no-op)\"",
     "test": "cross-env NODE_ENV=test SKIP_DB_CONNECTION=true jest --passWithNoTests --runInBand",
     "test:coverage": "cross-env NODE_ENV=test SKIP_DB_CONNECTION=true jest --coverage --passWithNoTests --runInBand",
     "rag:upload": "node scripts/rag_upload.js",
@@ -14,6 +15,7 @@
     "@solana/web3.js": "^1.98.4",
     "axios": "^1.7.7",
     "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
     "bs58": "^6.0.0",
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
@@ -50,5 +52,10 @@
   },
   "overrides": {
     "js-yaml": "^4.1.1"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^csurf$": "<rootDir>/__mocks__/csurf.js"
+    }
   }
 }

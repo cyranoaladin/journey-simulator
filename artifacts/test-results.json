@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "date": "2026-01-07",
+  "backend": {
+    "status": "PASS",
+    "tests_total": 387,
+    "tests_passed": 387
+  },
+  "e2e_critical_path": {
+    "status": "PASS",
+    "browsers": ["chromium", "firefox"],
+    "scenarios": {
+      "dao_voting": "PASS (network-first sync, admin toggle post-reload)",
+      "mode_switching": "PASS (Demo → Simulation → Real, localStorage via page.evaluate)",
+      "resource_unlock": "PASS"
+    }
+  },
+  "infrastructure": {
+    "hardening": "read_only_rootfs, uid=101, tmpfs /tmp",
+    "secret_scan": "0_hits"
+  },
+  "verdict": "PASS_READY_FOR_PROD"
+}

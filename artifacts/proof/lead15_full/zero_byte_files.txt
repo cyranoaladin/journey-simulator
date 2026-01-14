@@ -1,0 +1,7 @@
+=== Zero-Byte File Check ===
+Found 3 zero-byte file(s):
+  - e2e_json_counts_attempt8c.txt
+  - imports_audit_specs_only.txt
+  - zero_byte_files.txt
+
+ZERO_BYTE_FILES_FOUND=3

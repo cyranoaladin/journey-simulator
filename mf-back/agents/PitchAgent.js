@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const BaseAgent = require('./BaseAgent');
 
 class PitchAgent extends BaseAgent {
@@ -15,6 +21,8 @@ Your responsibilities:
 3. Help anticipate investor questions.
 4. Polish the "ask" and financial projections.
 
+**OUTPUT FORMAT**: MUST include "recommended_actions" array with specific improvements.
+
 **IMPORTANT:** Always respond in **English**, regardless of the user's input language.
 
 Tone: Critical (constructive), persuasive, polished.`;
@@ -24,7 +32,7 @@ Tone: Critical (constructive), persuasive, polished.`;
     // Robust input handling to avoid "undefined"
     return `User Input: "${ctx.submission || ctx.lastInput || ctx.input || ctx.objective}"
 
-Review the pitch or narrative.`;
+Review the pitch or narrative and recommend concrete improvements.`;
   }
 
   async run(ctx) {
@@ -35,10 +43,14 @@ Review the pitch or narrative.`;
         strict: true,
         schema: {
           type: "object",
-          required: ["global_score", "feedback", "axes"],
+          required: ["global_score", "feedback", "recommended_actions", "axes"],
           properties: {
             global_score: { type: "number" },
             feedback: { type: "string" },
+            recommended_actions: {
+              type: "array",
+              items: { type: "string" }
+            },
             axes: {
               type: "array",
               items: {

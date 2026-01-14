@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
@@ -202,11 +208,11 @@ const userSchema = new mongoose.Schema({
 
     // Analytics fields
     analytics: {
-        certification_downloads: {
+        certificate_downloads: {
             type: Number,
             default: 0,
         },
-        certification_shares: {
+        certificate_shares: {
             type: Number,
             default: 0,
         },
@@ -215,12 +221,12 @@ const userSchema = new mongoose.Schema({
             default: 0,
         },
         download_history: [{
-            certification_id: String,
+            certificate_id: String,
             phase: Number,
             timestamp: Date,
         }],
         share_history: [{
-            certification_id: String,
+            certificate_id: String,
             platform: String,
             phase: Number,
             timestamp: Date,

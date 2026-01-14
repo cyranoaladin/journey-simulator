@@ -1,5 +1,11 @@
-import type { Page } from '@playwright/test';
-import { expect } from '@playwright/test';
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
+import type { Page } from '../_support/fixtures';
+import { expect } from '../_support/fixtures';
 
 export async function dismissWalletModalIfPresent(page: Page) {
   // Wallet-adapter modal occasionally appears in Firefox and can steal clicks/focus.

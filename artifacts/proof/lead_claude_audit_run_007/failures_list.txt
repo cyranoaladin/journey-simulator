@@ -1,0 +1,14 @@
+00-preflight/runmode-guard-violation.spec.ts:should crash immediately when runMode=simulation but guard expects real
+01-navigation/comprehensive-menu.spec.ts:Menu Navigation: DAO
+01-navigation/header-navigation.spec.ts:should switch to Demo mode and update UI
+01-navigation/header-navigation.spec.ts:should switch to Simulation mode and update UI
+02-agent-core/phase-2-strategy.spec.ts:Phase 2 Transition: Discovery -> Strategy -> Plan Generation
+02-agent-core/zyno-interaction.spec.ts:Complex Prompt -> Markdown Output Verification
+03-agent-workflows/resource-production.spec.ts:Simulate InvestorDemoAgent execution and verify dashboard summary
+04-core-game-loop.spec.ts:quiz pass and mint queued (mocked backend)
+04-data-validation/rag-upload.spec.ts:Verify RAG upload includes x-api-key and returns non-403
+05-agents-orchestration/multi-user-isolation.spec.ts:Two users have isolated orchestration state
+supreme-auditor.spec.ts:Dashboards & Navigation Consistency Check
+supreme-integrity.spec.ts:Security Breach: Mode Mismatch Rejection
+supreme-integrity.spec.ts:UI Stress: Double-Click Protection
+supreme-integrity.spec.ts:Solana: Real Transaction Proof

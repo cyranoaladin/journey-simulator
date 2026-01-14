@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const User = require('../models/user');
@@ -26,6 +32,22 @@ const protect = async (req, res, next) => {
       return res.status(401).json({
         success: false,
         message: 'Access denied. No token provided.'
+      });
+    }
+
+    // BRUTAL TRUTH SECURITY: Enforce Mode/Token Consistency
+    const mode = req.headers['x-run-mode'];
+    const isDemoToken = token === 'demo-token';
+    const isDemoMode = mode === 'demo';
+
+    // 1. If Token is 'demo-token' but Mode is 'real' -> REJECT (Prevent polluting Real UI with demo data)
+    // 2. If Token is REAL but Mode is 'demo' -> REJECT (Prevent leaking Real data to Demo UI)
+    // Note: If mode header is missing, we proceed (legacy compat), or default to 'real' depending on policy.
+    // For Brutal Truth, we ENFORCE if header is present.
+    if (mode && (isDemoToken !== isDemoMode)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Security Mismatch: Token type does not match x-run-mode header.'
       });
     }
 

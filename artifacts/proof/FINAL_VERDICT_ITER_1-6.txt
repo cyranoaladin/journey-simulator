@@ -1,0 +1,111 @@
+# AUDIT CAMPAIGN: RUN_014 → RUN_019 (6 ITERATIONS)
+
+## VERDICT: FAIL_BLOCKING
+
+### FINAL COUNTS (Baseline RUN_014-017)
+- expected: 104
+- unexpected: 14 (stable)
+- skipped: 0
+- flaky: 0
+- timedOut: 0
+- interrupted: 0
+
+### REGRESSION (RUN_018 PATH_B)
+- expected: 38
+- unexpected: 37
+- skipped: 43
+- CATASTROPHIC: +23 unexpected, +43 skipped
+
+### ROOT CAUSE
+Playwright storageState persistence contract:
+- storageState() captures state from FIRST navigation
+- page.evaluate() modifications AFTER page.goto() are NOT persisted
+- AuthContext bootstrap reads empty localStorage on test execution
+- Result: 11 protected routes redirect to /login despite valid token
+
+### ITERATIONS SUMMARY
+
+**RUN_014** (ITER 0 - Baseline)
+- Applied: Guard window flag, DAO testid, supreme unskip
+- Result: 104 passed, 14 unexpected
+
+**RUN_015** (ITER 1)
+- Applied: Multi-user 409 handling, registration resilience
+- Result: 104 passed, 14 unexpected (ZERO IMPROVEMENT)
+
+**RUN_016** (ITER 2)
+- Applied: tokenStore localStorage-first, AuthContext isLoading=false
+- Result: 104 passed, 14 unexpected (ZERO IMPROVEMENT)
+
+**RUN_017** (ITER 3)
+- Applied: Zustand store runMode injection in global-setup
+- Result: 104 passed, 14 unexpected (ZERO IMPROVEMENT)
+
+**RUN_018** (ITER 4 - PATH_B)
+- Applied: Zustand hasHydrated, app-ready marker, persist rehydrate callback
+- Result: 38 passed, 37 unexpected (CATASTROPHIC REGRESSION)
+
+**RUN_019** (ITER 5 - Build failure)
+- Rollback attempted, TypeScript errors, aborted
+
+### BLOCKING FAILURES (14 stable tests)
+
+**P0 AUTH_FLOW (3)**
+1. rag-upload.spec.ts
+2. multi-user-isolation.spec.ts
+3. ui-runtime.spec.ts
+
+**P0 SUPREME_INTEGRITY (3)**
+4. Mode Mismatch Rejection
+5. Double-Click Protection
+6. Solana Real Transaction Proof
+
+**P0 RUNMODE (1)**
+7. supreme-auditor Navigation Consistency
+
+**P0 ISOLATION (1)**
+8. supreme-isolation Headers and Data Sync
+
+**P1 OTHER (6)**
+9. resource-production.spec.ts
+10. phase-2-strategy.spec.ts
+11. zyno-interaction.spec.ts
+12. core-game-loop.spec.ts
+13. runmode-guard-violation.spec.ts
+14. comprehensive-menu.spec.ts (DAO nav)
+
+### MINIMAL NEXT FIX
+
+In `global-setup.ts`, replace:
+```typescript
+await page.goto(baseURL);
+await page.evaluate(() => { localStorage.setItem('accessToken', token); });
+await context.storageState({ path });
+```
+
+With:
+```typescript
+await page.addInitScript(({ token, zustandState }) => {
+  localStorage.setItem('accessToken', token);
+  localStorage.setItem('mfai-journey-storage', JSON.stringify(zustandState));
+}, { token: authData.token, zustandState: { state: { runMode: 'real', ... }, version: 0 } });
+
+await page.goto(baseURL);
+await context.storageState({ path });
+```
+
+This ensures storageState captures the seeded localStorage, not empty initial state.
+
+### PROOF PACKS
+- RUN_014: artifacts/proof/lead_claude_audit_run_014/
+- RUN_015: artifacts/proof/lead_claude_audit_run_015/
+- RUN_016: artifacts/proof/lead_claude_audit_run_016/
+- RUN_017: artifacts/proof/lead_claude_audit_run_017/
+- RUN_018: artifacts/proof/lead_claude_audit_run_018/ (BLOCKING_LIST.md included)
+
+### CONCLUSION
+MAX_ITERS=6 exhausted. 14 unexpected failures remain stable across 4 baseline runs. PATH_B contract implementation caused catastrophic regression. Recommended approach: Fix global-setup.ts storageState seeding timing (addInitScript before goto).
+
+---
+Generated: 2026-01-13 13:23 UTC
+Campaign: lead_claude_audit_run_014-019

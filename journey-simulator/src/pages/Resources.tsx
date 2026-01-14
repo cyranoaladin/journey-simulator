@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import WalletConnectionBanner from '../components/shared/WalletConnectionBanner';

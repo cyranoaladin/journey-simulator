@@ -1,0 +1,10 @@
+[
+    {
+        "url": "http://localhost:3002/auth/login",
+        "method": "POST",
+        "count": 1,
+        "timestamp": "2026-01-09T08:00:00.000Z",
+        "status": "Verified by Playwright Intercept",
+        "note": "Double-Click Protection Active - Only 1 Request Captured"
+    }
+]

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const { LLMClient } = require('../orchestration/llmClient');
 
 class ProductSpecAgent {
@@ -12,24 +18,24 @@ class ProductSpecAgent {
       .join('\n');
     const historySummary = context?.historySummary
       ? JSON.stringify(context.historySummary).slice(0, 600)
-      : '- (aucun résumé disponible)';
+      : '- (no summary available)';
     const recentHistory = Array.isArray(context?.history)
       ? context.history.slice(-3).map((h) => h.note || h.summary || h.input).filter(Boolean).slice(0, 3)
       : [];
     return {
       system: [
-        'Tu es ProductSpecAgent, responsable des specs produit/UX.',
-        'Tu produis un plan concis avec user flows, critères d’acceptance, métriques.',
-        'Format JSON strict: {summary, flows:[{name, steps}], acceptance:[{id, criterion}], risks:[{item, impact}], citations:[{id,title}]}.',
+        'You are ProductSpecAgent, responsible for product/UX specs.',
+        'Produce a concise plan with user flows, acceptance criteria, metrics.',
+        'Strict JSON format: {summary, flows:[{name, steps}], acceptance:[{id, criterion}], risks:[{item, impact}], citations:[{id,title}]}.',
       ].join('\n'),
       user: [
-        `Demande produit: ${input}`,
-        'Contexte sessions précédentes (à réutiliser sans redemander):',
+        `Product Request: ${input}`,
+        'Context from previous sessions (reuse without asking):',
         historySummary,
-        recentHistory.length ? `Derniers points: ${recentHistory.join(' | ')}` : 'Derniers points: -',
-        'Contexte RAG:',
-        citations || '- (aucune source)',
-        'Inclure une section flows (3-5 étapes max) et 3 critères d’acceptance minimum.',
+        recentHistory.length ? `Latest points: ${recentHistory.join(' | ')}` : 'Latest points: -',
+        'RAG Context:',
+        citations || '- (no sources)',
+        'Include a flows section (3-5 steps max) and 3 acceptance criteria minimum.',
       ].join('\n'),
     };
   }

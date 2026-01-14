@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertCircle, ExternalLink, RefreshCw, TrendingUp, Trophy, Zap } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
@@ -89,7 +95,7 @@ const AccessPassHolders: React.FC = () => {
                 </span>
               </h2>
               <p className="text-lg opacity-80 max-w-3xl mx-auto">
-                Meet the pioneers who transformed their skills into digital sovereignty through the <span className="font-semibold text-accent-cyan">Cognitive Activation Protocol™</span>
+                Meet the pioneers who transformed their skills into digital sovereignty through the <span className="font-semibold text-accent-cyan">Cognitive Activation Protocol</span>
               </p>
             </div>
 
@@ -179,8 +185,8 @@ const AccessPassHolders: React.FC = () => {
                   <div className="font-bold">{holder.duration}</div>
                 </div>
                 <div className="builders-circle-metric">
-                  <div className="text-sm opacity-70">Certifications</div>
-                  <div className="font-bold">{holder.certifications}</div>
+                  <div className="text-sm opacity-70">Certificates</div>
+                  <div className="font-bold">{holder.certificates}</div>
                 </div>
                 <div className="builders-circle-metric">
                   <div className="text-sm opacity-70">ROI</div>

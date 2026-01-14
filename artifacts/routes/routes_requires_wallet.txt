@@ -1,0 +1,17 @@
+# Routes Requiring Wallet Connection
+
+## Frontend (Wallet-Protected Layout)
+/journeys (real journeys, not demo)
+/journeys/:journeyId
+/journeys/completed
+/dao
+/debug/mint
+
+## Backend (Wallet/Web3 operations)
+/api/solana/connect
+/api/solana/verify
+/api/solana/transaction/*
+/api/dao/vote/*
+/api/dao/stake/*
+
+Note: In connect-only mode, wallet connect is permitted but on-chain transactions (mint, stake, vote) are blocked/simulated.

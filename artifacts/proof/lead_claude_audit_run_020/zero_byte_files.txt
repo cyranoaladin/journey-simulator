@@ -1,0 +1,4 @@
+journey-simulator/tests/e2e/06-security-chaos/llm-failure-chaos.spec.ts
+journey-simulator/tests/e2e/06-security-chaos/rag-failure-chaos.spec.ts
+journey-simulator/tests/e2e/06-security-chaos/orchestrator-timeout-chaos.spec.ts
+journey-simulator/tests/e2e/06-security-chaos/rate-limit-chaos.spec.ts

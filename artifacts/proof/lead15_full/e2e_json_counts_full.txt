@@ -1,0 +1,9 @@
+=== Playwright Test Counts (Auto-Parsed) ===
+    "expected": 80,
+    "skipped": 0,
+    "unexpected": 39,
+    "flaky": 0
+
+VERDICT:
+⚠️ ISSUES DETECTED:
+  - unexpected (failures): 39

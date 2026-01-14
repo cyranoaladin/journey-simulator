@@ -1,10 +1,17 @@
 /**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
+/**
  * @file feedback.test.js
  * @description Unit tests for POST /api/feedback endpoint
  */
 
 const request = require('supertest');
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const { csrfGuard } = require('../middleware/csrfGuard');
 
@@ -26,6 +33,8 @@ describe('POST /api/feedback – AECO Registration', () => {
   beforeAll(() => {
     app = express();
     app.use(bodyParser.json());
+    app.use(cookieParser());
+    // csrfGuard handles CSRF internally - no need for separate csrf() call
     app.use(csrfGuard);
     app.use('/api/feedback', feedbackRouter);
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });

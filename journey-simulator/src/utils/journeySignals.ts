@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import type { UserProgress } from '../types/journey'
 
 export type JourneySignalScores = {
@@ -7,15 +13,28 @@ export type JourneySignalScores = {
 }
 
 export const deriveJourneySignals = (
-  progress: UserProgress,
+  progress: UserProgress | undefined,
   totalPhases?: number
 ): JourneySignalScores => {
-  const normalizedXp = Math.min(1, progress.totalXP / 2500)
-  const completionRatio = totalPhases && totalPhases > 0
-    ? Math.min(1, progress.completedPhases.length / totalPhases)
-    : 0.25
-  const proposalFactor = Math.min(0.25, progress.daoProposals / 12)
-  const votingFactor = Math.min(0.3, progress.votingPower / 400)
+  const safeProgress: UserProgress = progress || {
+    totalXP: 0,
+    nfts: [],
+    passLevel: 'Free',
+    mfaiTokens: 0,
+    stakedMfai: 0,
+    walletConnected: false,
+    completedPhases: [],
+    votingPower: 0,
+    daoProposals: 0,
+    collaterizeSimulation: undefined,
+  };
+
+  const normalizedXp = Math.min(1, safeProgress.totalXP / 2500);
+  const completed = Array.isArray(safeProgress.completedPhases) ? safeProgress.completedPhases.length : 0;
+  const denominator = totalPhases && totalPhases > 0 ? totalPhases : 1;
+  const completionRatio = Math.min(1, completed / denominator);
+  const proposalFactor = Math.min(0.25, (safeProgress.daoProposals || 0) / 12);
+  const votingFactor = Math.min(0.3, (safeProgress.votingPower || 0) / 400);
 
   const aepoBase = 58
   const aecoBase = 55

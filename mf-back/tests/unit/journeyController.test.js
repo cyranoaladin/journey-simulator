@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const journeyController = require('../../controllers/journey-controller');
 const User = require('../../models/user');
 const Journey = require('../../models/Journeys');

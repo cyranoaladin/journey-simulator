@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 process.env.JWT_SECRET = 'unit-test-secret';
 
 jest.mock('dotenv', () => ({
@@ -76,8 +82,8 @@ let consoleLogSpy;
 let consoleErrorSpy;
 
 beforeAll(() => {
-  consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-  consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+  consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => { });
+  consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
 });
 
 afterAll(() => {
@@ -95,12 +101,12 @@ beforeEach(() => {
 });
 
 describe('Analytics Controller', () => {
-  it('tracks certification downloads successfully', async () => {
+  it('tracks certificate downloads successfully', async () => {
     User.findByIdAndUpdate.mockResolvedValueOnce({});
 
     const req = {
       body: {
-        certification_id: 'cert1',
+        certificate_id: 'cert1',
         phase: 1,
         user_persona: 'builder',
         download_timestamp: '2025-01-01T00:00:00Z',
@@ -109,7 +115,7 @@ describe('Analytics Controller', () => {
     };
     const res = createRes();
 
-    await analyticsController.trackCertificationDownload(req, res);
+    await analyticsController.trackCertificateDownload(req, res);
 
     expect(User.findByIdAndUpdate).toHaveBeenCalledTimes(1);
     expect(res.status).toHaveBeenCalledWith(200);
@@ -117,16 +123,16 @@ describe('Analytics Controller', () => {
       expect.objectContaining({ success: true })
     );
     expect(consoleLogSpy).toHaveBeenCalledWith(
-      'User user-1 downloaded certification cert1 at 2025-01-01T00:00:00Z'
+      'User user-1 downloaded certificate cert1 at 2025-01-01T00:00:00Z'
     );
   });
 
-  it('handles certification share failures', async () => {
+  it('handles certificate share failures', async () => {
     User.findByIdAndUpdate.mockRejectedValueOnce(new Error('db error'));
 
     const req = {
       body: {
-        certification_id: 'cert2',
+        certificate_id: 'cert2',
         platform: 'x',
         phase: 2,
         user_persona: 'founder',
@@ -136,14 +142,14 @@ describe('Analytics Controller', () => {
     };
     const res = createRes();
 
-    await analyticsController.trackCertificationShare(req, res);
+    await analyticsController.trackCertificateShare(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({ success: false })
     );
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Error tracking certification share:',
+      'Error tracking certificate share:',
       expect.any(Error)
     );
   });

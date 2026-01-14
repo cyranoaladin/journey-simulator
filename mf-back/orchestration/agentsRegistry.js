@@ -1,41 +1,54 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 module.exports = {
-  // Cognitive Hub
-  GuideAgent: require('../agents/GuideAgent'),
-  CoachAgent: require('../agents/CoachAgent'),
-  EducationAgent: require('../agents/EducationAgent'),
-  ReflectionAgent: require('../agents/ReflectionAgent'),
-
-  // System Architect Cluster
-  BuilderAgent: require('../agents/BuilderAgent'),
-  ProtocolAgent: require('../agents/ProtocolAgent'),
-  DevAgent: require('../agents/DevAgent'),
-  SolanaAnchorAgent: require('../agents/SolanaAnchorAgent'),
+  AnalyticsAgent: require('../agents/AnalyticsAgent'),
+  APIContractAgent: require('../agents/APIContractAgent'),
   AuditAgent: require('../agents/AuditAgent'),
-  SecurityAgent: require('../agents/SecurityAgent'),
-  SecurityAuditAgent: require('../agents/SecurityAuditAgent'), // Legacy/Alias?
-
-  // Experience & Growth Cluster
-  NFTAgent: require('../agents/NFTAgent'),
-  GrowthAgent: require('../agents/GrowthAgent'),
-  DesignAgent: require('../agents/DesignAgent'),
+  BuilderAgent: require('../agents/BuilderAgent'),
+  CoachAgent: require('../agents/CoachAgent'),
+  CommunityAgent: require('../agents/CommunityAgent'),
+  ComplianceAgent: require('../agents/ComplianceAgent'),
+  CurriculumAgent: require('../agents/CurriculumAgent'),
   DAOAgent: require('../agents/DAOAgent'),
+  DataIntegrityAgent: require('../agents/DataIntegrityAgent'),
+  DesignAgent: require('../agents/DesignAgent'),
+  DevAgent: require('../agents/DevAgent'),
+  DevOpsAgent: require('../agents/DevOpsAgent'),
+  EducationAgent: require('../agents/EducationAgent'),
+  EvaluationAgent: require('../agents/EvaluationAgent'),
+  GovernanceAgent: require('../agents/GovernanceAgent'),
   GovernanceDAOAgent: require('../agents/GovernanceDAOAgent'),
+  GrowthAgent: require('../agents/GrowthAgent'),
+  GuideAgent: require('../agents/GuideAgent'),
+  InvestorAgent: require('../agents/InvestorAgent'),
+  InvestorDemoAgent: require('../agents/InvestorDemoAgent'),
+  JourneyDesignAgent: require('../agents/JourneyDesignAgent'),
+  LaunchpadAgent: require('../agents/LaunchpadAgent'),
   MarketplaceAgent: require('../agents/MarketplaceAgent'),
   MintingAgent: require('../agents/MintingAgent'),
-  CommunityAgent: require('../agents/CommunityAgent'),
-  AnalyticsAgent: require('../agents/AnalyticsAgent'),
-
-  // Resilience & Capital
-  TokenomicsAgent: require('../agents/TokenomicsAgent'),
-  InvestorAgent: require('../agents/InvestorAgent'),
-  ComplianceAgent: require('../agents/ComplianceAgent'),
-  Web3LegalAgent: require('../agents/Web3LegalAgent'),
-
-  // Design/Legacy
+  NFTAgent: require('../agents/NFTAgent'),
+  ObservabilityAgent: require('../agents/ObservabilityAgent'),
+  OnboardingAgent: require('../agents/OnboardingAgent'),
+  PerformanceAgent: require('../agents/PerformanceAgent'),
   PitchAgent: require('../agents/PitchAgent'),
-  TokenAgent: require('../agents/TokenomicsAgent'), // Updated validation: Mapped to new Refactored Agent
-  ProductSpecAgent: require('../agents/ProductSpecAgent'),
-  LaunchpadAgent: require('../agents/LaunchpadAgent'),
   ProductAgent: require('../agents/ProductAgent'),
-  OnboardingAgent: require('../agents/OnboardingAgent')
+  ProductSpecAgent: require('../agents/ProductSpecAgent'),
+  ProtocolAgent: require('../agents/ProtocolAgent'),
+  QAPlaywrightAgent: require('../agents/QAPlaywrightAgent'),
+  RAGOpsAgent: require('../agents/RAGOpsAgent'),
+  ReflectionAgent: require('../agents/ReflectionAgent'),
+  RiskFraudAgent: require('../agents/RiskFraudAgent'),
+  SecurityAgent: require('../agents/SecurityAgent'),
+  SecurityAuditAgent: require('../agents/SecurityAuditAgent'),
+  SolanaAnchorAgent: require('../agents/SolanaAnchorAgent'),
+  TokenAgent: require('../agents/TokenAgent'),
+  TokenomicsAgent: require('../agents/TokenomicsAgent'),
+  UXWritingAgent: require('../agents/UXWritingAgent'),
+  WalletAuthAgent: require('../agents/WalletAuthAgent'),
+  Web3LegalAgent: require('../agents/Web3LegalAgent'),
+  ZynoAgent: require('../agents/ZynoAgent')
 };

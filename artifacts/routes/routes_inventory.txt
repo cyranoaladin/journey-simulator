@@ -1,0 +1,67 @@
+# Routes Inventory — MFAI Platform
+
+## Frontend Routes (journey-simulator)
+
+### Public Routes (no authentication required)
+- / (HomePage)
+- /login (LoginPage)
+- /register (RegisterPage)
+- /journeys/demo (JourneyDemo - public demo)
+- /journeys/demo/:journeyId (JourneyDemo with specific journey)
+
+### Protected Routes (authentication required, no wallet)
+- /dashboard (Dashboard)
+- /playground (Playground)
+- /resources (Resources)
+- /support (Support)
+- /zyno (Zyno console)
+- /guide (GuidePage)
+
+### Wallet-Protected Routes (authentication + wallet context)
+- /debug/mint (DebugMint - development only)
+- /journeys (Journey listing/workspace)
+- /journeys/:journeyId (Journey detail/workspace)
+- /journeys/completed (JourneyCompleted)
+- /dao (DAO interface)
+
+### Catch-all
+- /* → Navigate to / (404 handling)
+
+---
+
+## Backend Routes (mf-back)
+
+Main route modules:
+- auth-routes.js (authentication endpoints)
+- journey-routes.js (journey CRUD, progress, phases)
+- zyno-routes.js (AI agent orchestration)
+- dao-routes.js (DAO operations)
+- agent-routes.js (agent management)
+- user-routes.js (user profile, settings)
+- solana-routes.js (wallet/blockchain operations)
+- orchestration-routes.js (orchestration endpoints)
+- rag-routes.js (RAG search)
+- analytics-routes.js (analytics tracking)
+- demo-routes.js (demo mode endpoints)
+- health-routes.js (health checks)
+- feedback.js (feedback endpoints)
+- favorites.js (favorites management)
+- cours-routes.js (course/content routes)
+- export-routes.js (export functionality)
+
+## Authentication Matrix
+
+### Public (no auth)
+- Frontend: /, /login, /register, /journeys/demo/*
+- Backend: /health, /auth/login, /auth/register, /auth/nonce
+
+### Authenticated (JWT required)
+- Frontend: /dashboard, /playground, /resources, /support, /zyno, /guide
+- Backend: Most journey, user, agent, orchestration endpoints
+
+### Wallet-gated (auth + wallet context)
+- Frontend: /journeys (real), /journeys/:id, /dao, /debug/mint
+- Backend: /solana/*, some DAO operations
+
+### Admin-only
+- Backend: Admin routes (if configured via adminAuth middleware)

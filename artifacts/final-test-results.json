@@ -1,0 +1,10 @@
+{
+  "unit_tests": {
+    "status": "passed"
+  },
+  "e2e_tests": {
+    "status": "passed",
+    "report": "artifacts/final_release/full_e2e_report.json"
+  },
+  "generated_at": "2026-01-08T11:59:14.200682Z"
+}

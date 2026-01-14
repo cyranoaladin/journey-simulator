@@ -1,0 +1,6 @@
+{
+  "mf-back": {"status": "PASS"},
+  "journey-simulator": {"status": "PASS"},
+  "web": {"status": "PASS"},
+  "overall": "PASS"
+}

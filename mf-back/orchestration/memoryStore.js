@@ -1,4 +1,10 @@
 /**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
+/**
  * In-memory store (volatile) for recent orchestration runs.
  * - Indexed by runId
  * - TTL-based eviction (default 10 minutes)

@@ -1,25 +1,41 @@
+"""
+Project: Money Factory AI (MFAI)
+Status: Production Ready - 2026
+Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+"""
+
+import os
 import subprocess
-import requests
-import time
 import sys
+import time
 from datetime import datetime
 
+import requests
+
 # --- CONFIGURATION ---
-SONAR_URL = "http://127.0.0.1:9000"
+SONAR_URL = os.getenv("SONAR_URL", "http://127.0.0.1:9000")
 PROJECT_KEY = "MFAI-Monorepo"
-TOKEN = "sqa_c13217644cf55e4d644e1c64d1c6a2c54edc9f9e"
-NETWORK = "journey_mfai_back_front_audit-network"
+SONAR_TOKEN = os.getenv("SONAR_TOKEN")
+NETWORK = os.getenv("SONAR_NETWORK", "journey_mfai_back_front_audit-network")
 OUTPUT_FILE = "FINAL_COMPLETE_AUDIT.md"
+
+
+def assert_token():
+    """Ensure a Sonar token is provided to avoid leaking hardcoded secrets."""
+    if not SONAR_TOKEN:
+        print("❌ Variable d'environnement SONAR_TOKEN manquante. Abandon.")
+        sys.exit(1)
 
 def run_scanner():
     """Lance le scan SonarQube via Docker"""
+    assert_token()
     print("🚀 1. Lancement du SonarScanner via Docker...")
     repo_root = subprocess.check_output(["pwd"], text=True).strip()
     cmd = [
         "docker", "run", "--rm",
         f"--network={NETWORK}",
         "-e", "SONAR_HOST_URL=http://sonarqube-server:9000",
-        "-e", f"SONAR_TOKEN={TOKEN}",
+        "-e", f"SONAR_TOKEN={SONAR_TOKEN}",
         "-v", f"{repo_root}:/usr/src",
         "sonarsource/sonar-scanner-cli"
     ]
@@ -37,7 +53,13 @@ def wait_for_processing():
 def fetch_sonar_api(endpoint, params=None):
     """Utilitaire pour interroger l'API SonarQube"""
     try:
-        response = requests.get(f"{SONAR_URL}/api/{endpoint}", params=params, auth=(TOKEN, ""), timeout=30)
+        assert_token()
+        response = requests.get(
+            f"{SONAR_URL}/api/{endpoint}",
+            params=params,
+            auth=(SONAR_TOKEN, ""),
+            timeout=30,
+        )
         response.raise_for_status()
         return response.json()
     except Exception as e:

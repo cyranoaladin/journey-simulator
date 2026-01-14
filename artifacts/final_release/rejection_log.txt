@@ -1,0 +1,94 @@
+🔐 Global Setup: seeding + authentification prod-like...
+   ⏳ Seeding user via model (unique hash)...
+[dotenv@17.2.0] injecting env (6) from mf-back/.env (tip: 🔐 encrypt with dotenvx: https://dotenvx.com)
+✅ MongoDB Connected
+🗑️  Deleted 1 existing test user(s)
+✅ Created test user: test@mfai.app
+   ID: 69609e7c2d56d351b0e31cb0
+   Password: MFAITest2026!
+✅ Password verification: SUCCESS
+✅ Seeding complete
+   🔗 Auth vers http://127.0.0.1:3002/auth/login
+   ✅ Backend authenticated: test@mfai.app
+   ✅ StorageState saved: /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/.auth/user.json
+   🛡️ RUN_MODE_GUARD=real
+   🔑 AUTH_STATE=loaded
+AUTH_STATE_PATH=/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/.auth/user.json
+AUTH_STATE_EXISTS=true
+   🧾 Auth proof written: /home/alaeddine/Documents/journey_mfai_back_front/artifacts/e2e-auth-proof.json
+
+Running 2 tests using 2 workers
+
+DEBUG: CWD is /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator
+DEBUG: OutDir is /home/alaeddine/Documents/journey_mfai_back_front/artifacts/proof/lead12_r12
+DEBUG: RawPath is /home/alaeddine/Documents/journey_mfai_back_front/artifacts/proof/lead12_r12/routes_visited_raw.txt
+DEBUG: CWD is /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator
+DEBUG: OutDir is /home/alaeddine/Documents/journey_mfai_back_front/artifacts/proof/lead12_r12
+DEBUG: RawPath is /home/alaeddine/Documents/journey_mfai_back_front/artifacts/proof/lead12_r12/routes_visited_raw.txt
+ROUTE_VISIT: http://127.0.0.1:3000/auth/login
+ROUTE_VISIT: http://127.0.0.1:3000/dashboard
+ROUTE_VISIT: http://127.0.0.1:3000/dashboard
+ROUTE_VISIT: http://127.0.0.1:3000/auth/login
+ROUTE_VISIT: http://127.0.0.1:3000/
+ROUTE_VISIT: http://127.0.0.1:3000/journeys
+ROUTE_VISIT: http://127.0.0.1:3000/journeys
+  ✘  1 [chromium] › tests/e2e/supreme-integrity.spec.ts:6:5 › Supreme Integrity: Security & Stress › Security Breach: Mode Mismatch Rejection (30.8s)
+  ✘  2 [chromium] › tests/e2e/supreme-integrity.spec.ts:54:5 › Supreme Integrity: Security & Stress › UI Stress: Double-Click Protection (30.9s)
+
+
+  1) [chromium] › tests/e2e/supreme-integrity.spec.ts:6:5 › Supreme Integrity: Security & Stress › Security Breach: Mode Mismatch Rejection 
+
+    TimeoutError: page.waitForRequest: Timeout 30000ms exceeded while waiting for event "request"
+
+      20 |
+      21 |         // Ensure we wait for the request pattern BEFORE loading the page that triggers it
+    > 22 |         const reqPromise = page.waitForRequest(r => r.url().includes('/api/'));
+         |                                 ^
+      23 |
+      24 |         await page.goto('/journeys'); // Journeys page usually fetches the list
+      25 |
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/supreme-integrity.spec.ts:22:33
+
+    Error: apiRequestContext._wrapApiCall: ENOENT: no such file or directory, open '/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/.playwright-artifacts-0/traces/93b1d1f02d31d1ccfb0d-5655686c31e2b2c83925.trace'
+
+    Error: ENOENT: no such file or directory, open '/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/.playwright-artifacts-0/44c7e3884d1fe1b39b7d9c12e7e52c7f.zip'
+
+    [31mTest timeout of 90000ms exceeded.[39m
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/artifacts/supreme-integrity-Supreme--30d11-ach-Mode-Mismatch-Rejection-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/artifacts/supreme-integrity-Supreme--30d11-ach-Mode-Mismatch-Rejection-chromium/error-context.md
+
+  2) [chromium] › tests/e2e/supreme-integrity.spec.ts:54:5 › Supreme Integrity: Security & Stress › UI Stress: Double-Click Protection 
+
+    TimeoutError: locator.fill: Timeout 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByPlaceholder('Email')[22m
+
+
+      57 |
+      58 |         // Fill form to enable button if needed
+    > 59 |         await page.getByPlaceholder('Email').fill('stress@test.com');
+         |                                              ^
+      60 |         await page.getByPlaceholder('Password').fill('StressTest123!');
+      61 |
+      62 |         const submitBtn = page.getByRole('button', { name: 'Sign In' });
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/supreme-integrity.spec.ts:59:46
+
+    Error: apiRequestContext._wrapApiCall: ENOENT: no such file or directory, open '/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/.playwright-artifacts-1/traces/93b1d1f02d31d1ccfb0d-2d0541c08dd36d5f9e9d.trace'
+
+    Error: ENOENT: no such file or directory, open '/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/.playwright-artifacts-1/10f99f47040af4257eed789e663431ab.zip'
+
+    [31mTest timeout of 90000ms exceeded.[39m
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/artifacts/supreme-integrity-Supreme--be3db-ess-Double-Click-Protection-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/artifacts/supreme-integrity-Supreme--be3db-ess-Double-Click-Protection-chromium/error-context.md
+
+  2 failed
+    [chromium] › tests/e2e/supreme-integrity.spec.ts:6:5 › Supreme Integrity: Security & Stress › Security Breach: Mode Mismatch Rejection 
+    [chromium] › tests/e2e/supreme-integrity.spec.ts:54:5 › Supreme Integrity: Security & Stress › UI Stress: Double-Click Protection 

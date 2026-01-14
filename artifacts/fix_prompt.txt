@@ -1,0 +1,40 @@
+### 🔴 PROMPT D'INTERVENTION CRITIQUE : RÉPARATION WORKFLOW & UI
+
+**Rôle :** Tu es Senior Lead Developer & UX Architect.
+**Situation :** L'audit forensique a confirmé que l'UI est "muette" et bloquante. Les tests passent mais l'expérience est cassée.
+
+**TA MISSION : "FIX & PROVE"**
+Exécute les 3 Chantiers de Réparation suivants, séquentiellement, en modifiant directement le code :
+
+#### 🏗️ CHANTIER 1 : LE CERVEAU (Zyno & Agents)
+*Le symptôme confirmé : Zyno attend la réponse backend (bloquante) sans rien afficher.*
+1.  **Modifie `journey-simulator/src/components/Zyno/ZynoConsole.tsx` :**
+    * Utilise la variable `isSending` pour **désactiver** le bouton d'envoi et le textarea.
+    * Affiche un spinner ou un texte "Thinking..." explicite quand `isSending === true`.
+2.  **Modifie `journey-simulator/src/store/journeyStore.ts` :**
+    * Dans `sendMessageToAgent`, assure-toi que `isSending` est bien reset à `false` même en cas d'erreur (dans le `finally`).
+    * Ajoute un `toast.error` (si non présent) dans le catch pour que l'erreur ne soit pas silencieuse.
+
+#### 🔄 CHANTIER 2 : LA COLONNE VERTÉBRALE (Synchro Phases)
+*Le symptôme confirmé : Pas de feedback visuel pendant la transition de phase.*
+1.  **Modifie `journey-simulator/src/store/journeyStore.ts` :**
+    * Vérifie que `isLoading` passe à `true` au début de `completeMission` et `false` à la fin.
+2.  **Modifie `journey-simulator/src/components/Journey/JourneyWorkspace.tsx` (ou équivalent) :**
+    * Affiche un Overlay de chargement (Spinner centré) si `store.isLoading === true`. L'utilisateur ne doit pas pouvoir cliquer ailleurs pendant la transition.
+
+#### 🎨 CHANTIER 3 : GESTION D'ERREUR GLOBALE
+*Le symptôme confirmé : Les erreurs API sont stockées dans le store mais jamais affichées.*
+1.  **Crée ou Modifie un composant `GlobalErrorHandler.tsx` (ou dans `App.tsx`) :**
+    * Ce composant doit s'abonner à `store.error`.
+    * Si `store.error` n'est pas null, il doit déclencher un `toast.error(store.error)` ou afficher une bannière rouge en haut de page.
+    * Il doit permettre de "dismiss" l'erreur (reset `store.error` à null).
+
+---
+
+**MÉTHODOLOGIE :**
+1.  Lis le fichier.
+2.  Applique la correction (Code React/TS).
+3.  Passe au fichier suivant.
+4.  À la fin, ne lance PAS les tests (je le ferai). Confirme juste : "Corrections Appliquées".
+
+**Action :** Exécute les modifications maintenant.

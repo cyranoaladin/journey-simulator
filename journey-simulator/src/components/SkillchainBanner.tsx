@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { motion } from 'framer-motion'
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import { Ticket as Pickaxe, Coins } from 'lucide-react'
@@ -13,7 +19,7 @@ const shouldShowWalletUi = (path: string) =>
   path.startsWith('/journeys') || path.startsWith('/dao') || path.startsWith('/debug/mint')
 
 const SkillchainBannerInner = () => {
-  const { userProgress, completeMission } = useJourneyStore()
+  const { userProgress, completeMission, openModal } = useJourneyStore()
   const { connected } = useWallet()
   const bannerRef = useRef<HTMLDivElement | null>(null)
 
@@ -51,9 +57,9 @@ const SkillchainBannerInner = () => {
       root.style.setProperty('--skillchain-banner-offset', '0px')
     }
   }, [])
-  
+
   // Calculate progress based on completed phases
-  const progress = Math.min((userProgress.totalXP / 500) * 100, 100)
+  const progress = Math.min(((userProgress?.totalXP ?? 0) / 500) * 100, 100)
 
   return (
     <motion.div
@@ -75,19 +81,19 @@ const SkillchainBannerInner = () => {
                 <Pickaxe size={16} className="text-accent-cyan" />
               </motion.div>
               <span className="font-space font-semibold">
-                Skillchain Mining™
+                Skillchain Mining
               </span>
-              
+
               {/* Tooltip */}
               <div className="absolute bottom-full left-0 mb-2 w-64 p-2 bg-primary-900 border border-white/20 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                 <div className="text-xs">
-                  <p className="font-semibold mb-1">Skillchain Mining™</p>
-                  <p className="opacity-80">XP gained through the Cognitive Activation Protocol™ that transforms your skills into digital capital.</p>
+                  <p className="font-semibold mb-1">Skillchain Mining</p>
+                  <p className="opacity-80">XP gained through the Cognitive Activation Protocol that transforms your skills into digital capital.</p>
                 </div>
                 <div className="absolute bottom-0 left-4 transform translate-y-1/2 rotate-45 w-2 h-2 bg-primary-900 border-r border-b border-white/20"></div>
               </div>
             </div>
-            
+
             <div className="hidden sm:flex items-center space-x-2">
               <div className="w-32 h-2 bg-white/20 rounded-full overflow-hidden">
                 <motion.div
@@ -105,12 +111,12 @@ const SkillchainBannerInner = () => {
             <div className="flex items-center space-x-1">
               <Coins size={16} className="text-accent-gold" />
               <span className="font-mono text-accent-gold">
-                {userProgress.mfaiTokens.toFixed(1)} $MFAI
+                {(userProgress?.mfaiTokens ?? 0).toFixed(1)} $MFAI
               </span>
             </div>
-            
+
             {connected && <WalletFaucetButton />}
-            
+
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -118,6 +124,35 @@ const SkillchainBannerInner = () => {
               className="text-xs bg-gradient-primary px-3 py-1 rounded-full text-white font-medium"
             >
               Complete mission
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                // Use a default demo cert if none exists (for testing/demo purposes)
+                const demoCert = {
+                  id: 'cert-123',
+                  name: 'Agentic Architect',
+                  description: 'Mastery of Zyno Orchestration',
+                  imageUrl: 'https://placehold.co/400x400/0ea5e9/ffffff?text=Proof-of-Skill',
+                  attributes: [
+                    { trait_type: 'XP Earned', value: '500' },
+                    { trait_type: 'Phase', value: 'Strategy' },
+                    { trait_type: 'Rarity', value: 'Epic' }
+                  ],
+                  phaseId: 'phase-1',
+                  rarity: 'epic'
+                };
+
+                openModal({
+                  type: 'certificate',
+                  certificate: demoCert
+                });
+              }}
+              className="text-xs border border-accent-gold/50 text-accent-gold px-3 py-1 rounded-full font-medium hover:bg-accent-gold/10"
+            >
+              Claim NFT
             </motion.button>
           </div>
         </div>

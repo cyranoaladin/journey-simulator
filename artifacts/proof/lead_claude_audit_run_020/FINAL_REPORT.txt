@@ -1,0 +1,38 @@
+# RUN_020 FINAL REPORT
+
+## VERDICT: FAIL_BLOCKING (REGRESSION)
+
+## FILES CHANGED
+1. journey-simulator/global-setup.ts (lines 98-167)
+   - Applied: page.addInitScript() BEFORE page.goto()
+   - Seeds: accessToken, mfai_token, refreshToken, mfai-journey-storage with runMode="real"
+   - Changed: waitUntil='domcontentloaded' + 2000ms timeout
+   
+2. journey-simulator/src/store/journeyStore.ts (lines 1028-1050)
+   - Added: stub methods for build compatibility
+   
+3. journey-simulator/src/components/Journey/JourneyCard.tsx (lines 10, 307-312)
+   - Removed: broken ZynoMissionModal import and usage
+
+## TEST COUNTS
+- expected: 91 (baseline: 104) → DELTA: -13
+- unexpected: 27 (baseline: 14) → DELTA: +13
+- skipped: 0 (baseline: 0) → DELTA: 0
+- flaky: 0 (baseline: 0) → DELTA: 0
+
+## RESULT
+FIX FAILED - addInitScript approach introduced REGRESSION
+- 13 previously passing tests now fail
+- 0 of the 14 baseline failures resolved
+- NEW failures likely due to timing/initialization issues
+
+## PROOF PACK
+artifacts/proof/lead_claude_audit_run_020/
+
+## CHECKSUMS
+SHA256 proof_sha256.txt verified (13 files)
+
+---
+Generated: 2026-01-13T17:21:43Z
+Duration: 21.5 minutes (1287s)
+Campaign: lead_claude_audit_run_020

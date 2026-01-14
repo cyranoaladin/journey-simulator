@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const Journey = require('../models/Journeys');
 const AgentRun = require('../models/agent-run');
 
@@ -5,7 +11,7 @@ const AgentRun = require('../models/agent-run');
  * Get global metrics across all journeys
  */
 async function getGlobalMetrics() {
-    const [journeyStats] = await Journey.aggregate([
+    const journeyAggResult = await Journey.aggregate([
         {
             $group: {
                 _id: null,
@@ -17,7 +23,8 @@ async function getGlobalMetrics() {
                 avgCompletion: { $avg: '$completion_percentage' }
             }
         }
-    ]) || [{}];
+    ]);
+    const journeyStats = journeyAggResult[0] || {};
 
     // manual grouping for state map if needed, or use $group by state
     const stateDistribution = await Journey.aggregate([
@@ -35,7 +42,7 @@ async function getGlobalMetrics() {
     }, {});
 
     // Agent Runs Global Stats
-    const [agentStats] = await AgentRun.aggregate([
+    const agentAggResult = await AgentRun.aggregate([
         {
             $group: {
                 _id: null,
@@ -46,21 +53,23 @@ async function getGlobalMetrics() {
                 }
             }
         }
-    ]) || [{}];
+    ]);
+    const agentStats = agentAggResult[0] || {};
 
     // Count Investor Demo Runs (unique journeys)
-    const [demoStats] = await AgentRun.aggregate([
+    const demoAggResult = await AgentRun.aggregate([
         { $match: { journeyMode: 'investor_demo' } },
         { $group: { _id: '$journeyId' } },
         { $count: 'uniqueDemoJourneys' }
-    ]) || [];
+    ]);
+    const demoStats = (demoAggResult && demoAggResult[0]) || {};
 
     return {
         totalJourneys: journeyStats.totalJourneys || 0,
         completedJourneys: journeyStats.completedCount || 0,
         journeysByState,
         globalCompletionAvg: Math.round((journeyStats.avgCompletion || 0) * 100) / 100,
-        investorDemoRuns: (demoStats && demoStats.uniqueDemoJourneys) || 0,
+        investorDemoRuns: demoStats.uniqueDemoJourneys || 0,
         agentRuns: {
             total: agentStats.totalRuns || 0,
             avgDurationMs: Math.round(agentStats.avgDuration || 0),

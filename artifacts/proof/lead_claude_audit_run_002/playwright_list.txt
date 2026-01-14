@@ -1,0 +1,56 @@
+
+Error: E2E_AUTH_STATE_MISSING: expected storage state at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/.auth/user.json for runMode=real. Hint: re-run Playwright global setup (npx playwright test --config=playwright.config.ts --project=chromium --workers=1) or ensure backend auth is available.
+
+   at fixtures/realModeTest.ts:33
+
+  31 |   }
+  32 |
+> 33 |   throw new Error(
+     |         ^
+  34 |     `E2E_AUTH_STATE_MISSING: expected storage state at ${canonicalPath} for runMode=${RUN_MODE}. Hint: re-run Playwright global setup (npx playwright test --config=playwright.config.ts --project=chromium --workers=1) or ensure backend auth is available.`
+  35 |   );
+  36 | };
+    at resolveStorageStatePath (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/fixtures/realModeTest.ts:33:9)
+    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/fixtures/realModeTest.ts:38:28
+
+Error: E2E_AUTH_STATE_MISSING: expected storage state at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/.auth/user.json for runMode=real. Hint: re-run Playwright global setup (npx playwright test --config=playwright.config.ts --project=chromium --workers=1) or ensure backend auth is available.
+
+   at fixtures/realModeTest.ts:33
+
+  31 |   }
+  32 |
+> 33 |   throw new Error(
+     |         ^
+  34 |     `E2E_AUTH_STATE_MISSING: expected storage state at ${canonicalPath} for runMode=${RUN_MODE}. Hint: re-run Playwright global setup (npx playwright test --config=playwright.config.ts --project=chromium --workers=1) or ensure backend auth is available.`
+  35 |   );
+  36 | };
+    at resolveStorageStatePath (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/fixtures/realModeTest.ts:33:9)
+    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/fixtures/realModeTest.ts:38:28
+
+Error: E2E_AUTH_STATE_MISSING: expected storage state at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/.auth/user.json for runMode=real. Hint: re-run Playwright global setup (npx playwright test --config=playwright.config.ts --project=chromium --workers=1) or ensure backend auth is available.
+
+   at fixtures/realModeTest.ts:33
+
+  31 |   }
+  32 |
+> 33 |   throw new Error(
+     |         ^
+  34 |     `E2E_AUTH_STATE_MISSING: expected storage state at ${canonicalPath} for runMode=${RUN_MODE}. Hint: re-run Playwright global setup (npx playwright test --config=playwright.config.ts --project=chromium --workers=1) or ensure backend auth is available.`
+  35 |   );
+  36 | };
+    at resolveStorageStatePath (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/fixtures/realModeTest.ts:33:9)
+    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/fixtures/realModeTest.ts:38:28
+
+Error: E2E_AUTH_STATE_MISSING: expected storage state at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/.auth/user.json for runMode=real. Hint: re-run Playwright global setup (npx playwright test --config=playwright.config.ts --project=chromium --workers=1) or ensure backend auth is available.
+
+   at fixtures/realModeTest.ts:33
+
+  31 |   }
+  32 |
+> 33 |   throw new Error(
+     |         ^
+  34 |     `E2E_AUTH_STATE_MISSING: expected storage state at ${canonicalPath} for runMode=${RUN_MODE}. Hint: re-run Playwright global setup (npx playwright test --config=playwright.config.ts --project=chromium --workers=1) or ensure backend auth is available.`
+  35 |   );
+  36 | };
+    at resolveStorageStatePath (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/fixtures/realModeTest.ts:33:9)
+    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/fixtures/realModeTest.ts:38:28

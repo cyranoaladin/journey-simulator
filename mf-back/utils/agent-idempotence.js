@@ -1,11 +1,26 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const AgentRun = require('../models/agent-run');
 const crypto = require('node:crypto');
 
 /**
  * Generates a deterministic key based on inputs.
+ * v2: Includes promptHash to ensure different prompts generate different cache keys.
  */
 exports.generateIdempotencyKey = (journeyId, stepId, agentName, context = {}) => {
-    const data = `${journeyId}:${stepId}:${agentName}:${JSON.stringify(context)}`;
+    const { userPrompt, ...restContext } = context;
+
+    // Generate prompt hash (12 chars) if userPrompt is provided
+    const promptHash = userPrompt
+        ? crypto.createHash('sha256').update(String(userPrompt)).digest('hex').slice(0, 12)
+        : 'no-prompt';
+
+    // v2 tag to avoid collisions with old cache keys
+    const data = `idem:v2:${journeyId}:${stepId}:${agentName}:${JSON.stringify(restContext)}:${promptHash}`;
     return crypto.createHash('sha256').update(data).digest('hex');
 };
 

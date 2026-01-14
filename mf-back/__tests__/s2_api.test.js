@@ -1,6 +1,13 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const request = require('supertest');
 // Tests run stateless bearer flows with CSRF parity middleware.
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const journeyEngineRoutes = require('../routes/journey-engine-routes');
@@ -27,16 +34,23 @@ process.env.RAG_SEARCH_URL = ''; // Force local fallback
 
 const app = express();
 app.use(bodyParser.json());
-// Stateless API: skip csurf in tests; csrfGuard is already a no-op without cookies
+app.use(cookieParser());
+// csrfGuard handles CSRF internally - no need for separate csrf() call
 app.use(csrfGuard);
 app.use('/api/engine', journeyEngineRoutes);
+
+// Error handler to capture 500 errors
+app.use((err, req, res, next) => {
+    console.error('Test Error Handler:', err.message || err);
+    res.status(500).json({ error: err.message || 'Internal Server Error' });
+});
 
 // DB Setup (Same as s2_logic)
 // Increase timeout for CI environments
 jest.setTimeout(20000);
 
 beforeAll(async () => {
-    const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/mf_back_test_s2_api';
+    const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27018/mf_back_test_s2_api';
     try {
         await mongoose.connect(mongoUri, {
             serverSelectionTimeoutMS: 10000,

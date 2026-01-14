@@ -1,3 +1,9 @@
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
 # Project Knowledge Base — Manuel de Référence Design System & IA
 
 **Guide de contexte unifié** pour les agents IA (v0.dev, Lovable, etc.) et les développeurs afin de générer ou modifier le front sans hallucination et cohérent avec le monorepo.

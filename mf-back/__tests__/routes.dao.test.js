@@ -1,6 +1,14 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 // Tests run stateless bearer flows with CSRF parity middleware.
 const express = require('express');
 const request = require('supertest');
+const csrf = require('csurf');
+const cookieParser = require('cookie-parser');
 const { csrfGuard } = require('../middleware/csrfGuard');
 
 const mockDb = new Map();
@@ -53,6 +61,8 @@ jest.mock('mongoose', () => ({
   model: jest.fn(() => mockModel)
 }));
 
+const testCsrf = csrf({ ignoreMethods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'DELETE', 'PATCH'] });
+
 describe('dao routes', () => {
   let app;
   let consoleErrorSpy;
@@ -64,6 +74,8 @@ describe('dao routes', () => {
 
     app = express();
     app.use(express.json());
+    app.use(cookieParser());
+    app.use(testCsrf);
     app.use(csrfGuard);
     app.use('/dao', require('../routes/dao-routes'));
   });

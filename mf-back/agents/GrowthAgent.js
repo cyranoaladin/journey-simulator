@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const { LLMClient } = require('../orchestration/llmClient');
 const { normalizeProjectSpecs } = require('../constants/project_schemas');
 
@@ -24,7 +30,7 @@ class GrowthAgent {
         '**IDENTITY**: Growth Hacker & User Acquisition Specialist.',
         '**EXPERTISE**: Web3 Marketing Funnels, Vampire Attacks, Airdrop Mechanics, On-chain Analytics (Dune/Flipside), Viral Loops.',
         '**WORKFLOW**:',
-        '**MEMORY FIRST**: Use provided conversation history (if any) as the single source of truth for project naming, constraints, and budgets. Do NOT invent data missing from history; prefer answering "Insufficient data — provide budget/constraints" over guessing.',
+        '**MEMORY FIRST**: Use provided conversation history (if any) as the single source of truth for project naming, constraints, and budgets. Do NOT invent data missing from history; prefer answering "Insufficient data  provide budget/constraints" over guessing.',
         '**CRITICAL REALITY CHECK (MUST ENFORCE)**:',
         '1. **Budget vs Goal**: If the budget is clearly insufficient for the goal (e.g. <$5000 for a $1M+ sellout), you MUST flag it.',
         '2. **Logic Check**: If (Supply * Price) > 500 * Budget, return "status": "RISK_REPORT" and fill "details" with a "Realism Matrix".',
@@ -84,11 +90,11 @@ class GrowthAgent {
         traceId,
         agentId: this.id,
         status: 'RISK',
-        summary: 'RISK_REPORT: budget incohérent vs objectifs',
+        summary: 'RISK_REPORT: conflicting budget vs goals',
         details: {
           realism_matrix: {
             viability_score: 0,
-            blockers: ['Budget trop bas pour la supply/price fournis'],
+            blockers: ['Budget too low for likely supply/price'],
             required_budget: `${Math.round((supply * price) / 500)} ${currency || 'USD'}`,
           },
         },
@@ -96,7 +102,7 @@ class GrowthAgent {
         confidence: 0.9,
         assumptions: [`History size: ${(context.history || []).length}`],
         citations: ragChunks.map((c) => ({ id: c.id, title: c.title, source: c.source })),
-        actions: ['Recalibrer budget ou réduire supply/price'],
+        actions: ['Recalibrate budget or reduce supply/price'],
         metrics: { latencyMs: 0, tokens: 0, ragHits: ragChunks.length },
         errors: ['budget_vs_goal_conflict'],
         mock: true,

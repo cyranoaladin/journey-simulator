@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const DEFAULT_PRICING = {
   'gpt-4o': { prompt: 0.0000025, completion: 0.00001 }, // USD per token mock
   'mock-llm': { prompt: 0, completion: 0 },
@@ -14,7 +20,7 @@ function aggregateCosts(runs = []) {
   let total = 0;
   runs.forEach((r) => {
     const model = r.llm?.model || 'gpt-4o';
-    const tokensUsed = r.llm?.tokensUsed ?? 50; // valeur par défaut minimale
+    const tokensUsed = r.llm?.tokensUsed ?? 50; // minimal default value
     const { cost } = estimateCall({ model, promptTokens: tokensUsed, completionTokens: 0 });
     total += cost;
     if (!byAgent[r.agentId]) byAgent[r.agentId] = { cost: 0, model, calls: 0 };

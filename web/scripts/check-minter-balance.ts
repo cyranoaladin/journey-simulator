@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { Connection, clusterApiUrl, Keypair } from '@solana/web3.js'
 import fs from 'node:fs'
 const secret = JSON.parse(fs.readFileSync('minter.json', 'utf8')) as number[]

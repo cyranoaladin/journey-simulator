@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 jest.mock('axios', () => ({
     head: jest.fn((url) => {
         if (
@@ -13,12 +19,15 @@ jest.mock('axios', () => ({
 
 const request = require('supertest');
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const { validateAndSanitizeResponse } = require('../../utils/resourceValidator');
 const { csrfGuard } = require('../../middleware/csrfGuard');
 
 // Create a minimal Express app for testing
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
+// csrfGuard handles CSRF internally - no need for separate csrf() call
 app.use(csrfGuard);
 
 // Mock route that uses the validator

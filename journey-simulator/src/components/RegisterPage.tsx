@@ -1,8 +1,15 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight, AlertCircle, CheckCircle, Wallet } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { toast } from 'sonner';
 import { logger } from '../utils/logger';
 
 const RegisterPage: React.FC = () => {
@@ -108,8 +115,16 @@ const RegisterPage: React.FC = () => {
       } else {
         setError('Registration failed. Please try again.');
       }
-    } catch (err) {
+    } catch (err: any) {
+      const msg = (err?.message || '').toLowerCase();
       logger.error('Registration failed', err);
+      if (msg.includes('exists')) {
+        toast.error("This email is already in use. Redirecting to login...");
+        setTimeout(() => {
+          navigate('/auth/login');
+        }, 2000);
+        return;
+      }
       setError('Registration failed. Please check your connection and try again.');
     } finally {
       setIsSubmitting(false);

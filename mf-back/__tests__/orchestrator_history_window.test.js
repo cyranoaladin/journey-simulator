@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 jest.mock('../orchestration/agentsRegistry', () => {
   let lastContext = null;
   let lastPromptTokens = 0;
@@ -67,7 +73,8 @@ describe('orchestrateZyno history window + summary preservation', () => {
       await orchestrateZyno(msg, { userId });
     }
 
-    const { lastContext, lastPromptTokens } = require('../orchestration/agentsRegistry').__getMemoryProbeState();
+    const agentsRegistry = require('../orchestration/agentsRegistry');
+    const { lastContext, lastPromptTokens } = agentsRegistry.__getMemoryProbeState();
     const fullHistory = agentMemory.get(userId).history;
     const firstPayload = fullHistory.find((h) => h.payload);
     const visionEntries = fullHistory.filter((h) => h.payload?.vision);

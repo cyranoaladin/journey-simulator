@@ -1,0 +1,200 @@
+Mode
+REAL
+Select:
+Demo (mock)
+Simulation (dry-run)
+Launch with Zyno (real)
+Money Factory AI
+COGNITIVE ACTIVATION PROTOCOL
+PASS LEVEL
+Free
+JOURNEY
+0% complete
+ZYNO HANDBOOK
+Deterministic orchestration. Traceable decisions. Controlled execution.
+Thought Partner (academic tone): each response is a structured plan, aligned with the Reality Matrix. Default dry-run, real execution conditioned by an approved gate.
+Decision Tree: ProductSpec Tokenomics
+Framing: ProductSpecAgent sets functional requirements and acceptance criteria.
+Journey Design: JourneyDesignAgent aligns personas/phases and AEPO/AECO.
+Validation: EvaluationAgent builds the success rubric and checkpoints.
+Economics: TokenomicsAgent calculates the curve (m, b), checks monotonicity P'(S)>0 and liquidity cap.
+Governance: GovernanceDAOAgent defines rights/quorum, ComplianceAgent applies MiCA/KYC constraints.
+Launch: MintingAgent prepares the BullMQ queue, SecurityAuditAgent verifies attack surface before execution.
+Default Dry-Run Mode
+All actions start in SIMULATED (dry-run) without side-effects.
+Real execution only if `executionGate=APPROVED` and agent authorized by the Reality Matrix for the phase.
+In case of refusal or inconsistency: automatic fallback to simulation, complete logs (traceId, plan, constraints).
+No real action without explicit gate. Plans are signed, cited, and archived before any execution.
+37 EXPERTS
+Roster Zyno
+How to solicit them and which logic engine they rely on.
+Active
+Restricted/Disabled
+GuideAgent
+Strategy-driven
+Active
+Journey Orientation
+Entry: Learn / AEPO
+CoachAgent
+Strategy-driven
+Active
+Strategic Coaching
+Entry: Build / Activate
+EducationAgent
+Knowledge-fed
+Active
+Pedagogical Transmission
+Entry: Learn
+ReflectionAgent
+Reasoning-focused
+Active
+Meta-feedback
+Entry: Learn / Prove
+BuilderAgent
+RAG-based architecture
+Active
+System Architecture
+Entry: Build
+ProtocolAgent
+RAG-based compliance
+Active
+Standards & tokens
+Entry: Build / Prove
+DevAgent
+Execution-driven
+Active
+Code Implementation
+Entry: Build
+DesignAgent
+Experience-centric
+Active
+Design/UI
+Entry: Build
+NFTAgent
+RAG-based metadata
+Active
+NFT Strategy/Metadata
+Entry: Build / Activate
+DAOAgent
+Governance strategy
+Active
+DAO Tools/Structures
+Entry: Activate
+GovernanceDAOAgent
+RAG-based governance
+Active
+Governance & Voting
+Entry: Activate / Scale
+TokenomicsAgent
+Math-heavy (curves)
+Active
+Economics & Supply
+Entry: Scale / Launch
+ProductSpecAgent
+RAG-based specs
+Active
+Detailed Specs
+Entry: Learn / Build
+JourneyDesignAgent
+Mapping/strategy
+Active
+Journey Mapping
+Entry: Learn / Build
+EvaluationAgent
+Rubric/metrics
+Active
+Quality Rubric
+Entry: Prove
+InvestorAgent
+Strategy/valuation
+Active
+Fundraising
+Entry: Scale
+InvestorDemoAgent
+Narrative-driven
+Active
+Investor Demo
+Entry: Activate
+GrowthAgent
+Experimentation-driven
+Active
+Acquisition/Growth
+Entry: Activate / Scale
+AnalyticsAgent
+Data/analytics
+Active
+Insights/Metrics
+Entry: Prove / Scale
+MarketplaceAgent
+Pricing models
+Active
+Pricing/Listing
+Entry: Scale
+PerformanceAgent
+Perf heuristics
+Active
+Perf Optimization
+Entry: Build / Prove
+DevOpsAgent
+Automation-driven
+Active
+CI/CD & Infra
+Entry: Build
+ObservabilityAgent
+Telemetry-focused
+Active
+Logs/Metrics/Traces
+Entry: Build / Prove
+QAPlaywrightAgent
+Test harness
+Active
+E2E Playwright
+Entry: Prove
+SecurityAgent
+Adversarial
+Active
+Red Team/Exploits
+Entry: Scale / Launch
+SecurityAuditAgent
+RAG-based audit
+Active
+Security Audit
+Entry: Scale / Launch
+ComplianceAgent
+Policy-driven
+Active
+Compliance/Regulation
+Entry: Scale
+Web3LegalAgent
+RAG-based legal
+Active
+Web3 Legal/MiCA
+Entry: Scale / Launch
+AuditAgent
+Static/dynamic checks
+Active
+Code Quality/Security
+Entry: Prove
+SolanaAnchorAgent
+Chain-runtime
+Active
+Anchor Stack
+Entry: Build
+MintingAgent
+Queue-driven
+Active
+Mint Pipeline
+Entry: Activate / Launch
+WalletAuthAgent
+Auth/crypto
+Active
+Wallet Auth
+Entry: Build
+RAGOpsAgent
+RAG ingestion
+Active
+Ingestion/Search
+Entry: Learn / Build
+DataIntegrityAgent
+Consistency checks
+Active

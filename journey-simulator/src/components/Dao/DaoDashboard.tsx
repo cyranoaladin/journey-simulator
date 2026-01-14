@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
@@ -21,7 +27,7 @@ import { AgentScoreboardProvider } from '../Zyno/AgentScoreboardContext'
 const formatRelativeTime = (isoString: string) => {
   const date = new Date(isoString)
   if (Number.isNaN(date.getTime())) {
-    return '—'
+    return ''
   }
 
   const diff = date.getTime() - Date.now()
@@ -51,8 +57,8 @@ const statusStyles: Record<DaoProposal['status'], string> = {
 }
 
 const outcomeCopy: Record<string, string> = {
-  accepted: 'Adopted — implementation recommended',
-  rejected: 'Rejected — to be revised',
+  accepted: 'Adopted  implementation recommended',
+  rejected: 'Rejected  to be revised',
   quorum_failed: 'Quorum not reached'
 }
 
@@ -149,7 +155,7 @@ const DaoDashboard = () => {
       suffix: '%',
       hint: config
         ? `${config.quorumPercent}% quorum required`
-        : 'Loading quorum…',
+        : 'Loading quorum',
       icon: Users
     },
     {
@@ -177,7 +183,7 @@ const DaoDashboard = () => {
                 <ShieldCheck size={14} />
                 Money Factory Governance
               </span>
-              <h1 className="text-3xl font-semibold text-white lg:text-4xl">
+              <h1 data-testid="dao-title" className="text-3xl font-semibold text-white lg:text-4xl">
                 Consolidate your influence in the Zyno DAO
               </h1>
               <p className="text-sm text-white/75 lg:text-base">
@@ -217,6 +223,7 @@ const DaoDashboard = () => {
                 type="button"
                 onClick={() => setShowAdminPanel((prev) => !prev)}
                 className="inline-flex items-center justify-between rounded-2xl bg-white/15 px-4 py-2 text-sm font-semibold backdrop-blur transition hover:bg-white/25"
+                data-testid="toggle-admin-console"
               >
                 Open Admin Console
                 {showAdminPanel ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -269,7 +276,7 @@ const DaoDashboard = () => {
           {loading && (
             <div className="flex items-center gap-3 rounded-2xl border border-white/5 bg-white/5 px-4 py-3 text-sm text-white/70">
               <Loader2 size={18} className="animate-spin" />
-              Synchronizing community decisions…
+              Synchronizing community decisions
             </div>
           )}
 
@@ -334,7 +341,7 @@ const DaoDashboard = () => {
                       <span className="font-semibold text-red-400">{proposal.votes.no.toLocaleString()}</span>
                     </div>
                     <div className="text-xs text-white/50">
-                      Quorum {proposal.quorumMet ? 'reached' : 'in progress'} • Total {totalVotes.toLocaleString()} votes
+                      Quorum {proposal.quorumMet ? 'reached' : 'in progress'}  Total {totalVotes.toLocaleString()} votes
                     </div>
                   </div>
 

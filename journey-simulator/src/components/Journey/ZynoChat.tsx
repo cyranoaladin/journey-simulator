@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { useJourneyStore } from '../../store/journeyStore';
@@ -141,7 +147,7 @@ export default function ZynoChat({ className = '' }: ZynoChatProps) {
             {conversation.length === 0 ? (
               <div className="text-center text-gray-500 mt-8">
                 <div className="mx-auto w-16 h-16 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center mb-4">
-                  <span className="text-2xl">🤖</span>
+                  <span className="text-2xl"></span>
                 </div>
                 <p>Start asking Zyno a question</p>
                 <p className="text-xs mt-2">Specialized AI for your {selectedPersona?.title} journey</p>
@@ -217,7 +223,7 @@ export default function ZynoChat({ className = '' }: ZynoChatProps) {
           data-testid="zyno-fab"
           className="w-14 h-14 rounded-full bg-gradient-to-r from-cyan-600 to-purple-600 flex items-center justify-center shadow-lg hover:shadow-cyan-500/30"
         >
-          <span className="text-xl">🤖</span>
+          <span className="text-xl"></span>
         </motion.button>
       )}
     </div>

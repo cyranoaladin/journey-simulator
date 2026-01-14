@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useMemo } from 'react';
 import { BarChart3, RefreshCw } from 'lucide-react';
 import type { AgentScoreboardEntry } from '../../utils/api';
@@ -6,7 +12,7 @@ import { useAgentScoreboardContext } from './AgentScoreboardContext';
 export default function ZynoAgentScoreboard() {
   const { state, apiKey, setApiKey, fetchScoreboard } = useAgentScoreboardContext();
 
-  const totalAgents = state.data.length;
+  const totalAgents = state.data?.length ?? 0;
   const averageAepo = useMemo(() => {
     if (!totalAgents) return 0;
     const sum = state.data.reduce<number>((acc, entry) => acc + entry.aepo, 0);
@@ -101,14 +107,14 @@ export default function ZynoAgentScoreboard() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 dark:divide-slate-700/40">
-            {state.data.map((entry: AgentScoreboardEntry) => {
+            {state.data?.map((entry: AgentScoreboardEntry) => {
               const profileName = (() => {
                 const details = entry.profile as { name?: unknown } | undefined;
                 return typeof details?.name === 'string' ? details.name : entry.userId;
               })();
               const lastUpdate = entry.updatedAt
                 ? new Date(entry.updatedAt).toLocaleString()
-                : '—';
+                : '';
 
               return (
                 <tr key={entry.userId} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">

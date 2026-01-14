@@ -1,8 +1,15 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useEffect, useMemo } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { personas } from '../data/personas';
 import { useJourneyStore } from '../store/journeyStore';
+import { useRunModeStore } from '../store/runModeStore';
 import { isDemoSession } from '../utils/demoSession';
 import JourneyWorkspace from '../components/Journey/JourneyWorkspace';
 
@@ -11,6 +18,7 @@ const JourneyDemo = () => {
   const { loginAsDemo, logout, isLoading } = useAuth();
   const { journeyId } = useParams();
   const { selectedPersona, setSelectedPersona } = useJourneyStore();
+  const { runMode, setRunMode } = useRunModeStore();
 
   const personaFromUrl = useMemo(() => {
     if (!journeyId) return null;
@@ -23,6 +31,13 @@ const JourneyDemo = () => {
       void loginAsDemo();
     }
   }, [loginAsDemo]);
+
+  // Force sortie si l'UI est en mode real/simulation : ne pas rester sur le parcours demo
+  useEffect(() => {
+    if (runMode === 'real' || runMode === 'simulation') {
+      navigate('/journeys', { replace: true });
+    }
+  }, [runMode, navigate]);
 
   useEffect(() => {
     if (!personaFromUrl) {
@@ -38,7 +53,7 @@ const JourneyDemo = () => {
   if (!isDemoSession() && isLoading) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center text-sm text-white/70">
-        Loading demo session…
+        Loading demo session
       </div>
     );
   }
@@ -65,7 +80,9 @@ const JourneyDemo = () => {
             </div>
             <button
               onClick={() => {
+                setRunMode('real');
                 logout();
+                navigate('/journeys', { replace: true });
               }}
               className="rounded-full bg-white text-black px-4 py-2 text-sm font-bold hover:bg-gray-200 transition"
             >
@@ -87,7 +104,7 @@ const JourneyDemo = () => {
                     <div className="mt-1 text-sm text-white/70">{persona.description}</div>
                   </div>
                   <div className="shrink-0 rounded-full bg-gradient-accent px-4 py-2 text-sm font-semibold text-white">
-                    Launch Demo →
+                    Launch Demo
                   </div>
                 </div>
               </button>

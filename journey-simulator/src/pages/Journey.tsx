@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import WalletConnectionBanner from '../components/shared/WalletConnectionBanner';
 import SkillchainBanner from '../components/SkillchainBanner';
 import HeroSection from '../components/HeroSection';
@@ -13,28 +19,41 @@ import JourneyWorkspace from '../components/Journey/JourneyWorkspace';
 import { isDemoSession } from '../utils/demoSession';
 
 const Journey = () => {
-  const { selectedPersona, setSelectedPersona } = useJourneyStore();
+  const { selectedPersona, setSelectedPersona, setApiJourneyId } = useJourneyStore();
   const { startTutorial } = useTutorial();
   const { journeyId } = useParams();
   const demo = isDemoSession()
 
   useEffect(() => {
     if (demo) return
+
     if (journeyId) {
+      console.log('[Journey.tsx] URL journeyId found:', journeyId);
+
+      // Only set apiJourneyId if it looks like a valid MongoID (24 hex chars)
+      // Otherwise, let loadUserProgress resolve the real ID from the backend.
+      if (/^[0-9a-fA-F]{24}$/.test(journeyId)) {
+        setApiJourneyId(journeyId);
+      } else {
+        console.log('[Journey.tsx] URL ID is a slug/persona, skipping strict ID set. Waiting for sync.');
+      }
+
       const persona = personas.find(p => p.id === journeyId);
-      if (persona && persona.id !== selectedPersona?.id) {
+      if (persona && persona.id !== useJourneyStore.getState().selectedPersona?.id) {
+        console.log('[Journey.tsx] Setting selectedPersona:', persona.id);
         setSelectedPersona(persona);
         // Reload progress to ensure we have the latest backend state for this journey
         // This replaces the call in JourneyCard to avoid race conditions
-        const state = useJourneyStore.getState?.();
-        state?.loadUserProgress?.().catch(console.error);
+        const state = useJourneyStore.getState();
+        state.loadUserProgress(true).catch(console.error);
       }
-    } else if (selectedPersona) {
+    } else {
+      console.log('[Journey.tsx] No journeyId in URL params');
       // If no journeyId in URL but we have a selected persona, clear it
       // This ensures /journeys route always shows the list
       setSelectedPersona(null);
     }
-  }, [demo, journeyId, selectedPersona, setSelectedPersona]);
+  }, [journeyId]);
 
   // Hard separation: demo sessions should not live under real journey routes.
   if (demo) {
@@ -86,7 +105,7 @@ const Journey = () => {
         )}
         <button
           onClick={showJourneyTutorial}
-          className="fixed bottom-6 right-6 z-50 p-3 rounded-full bg-gradient-to-r from-cyan-600 to-purple-600 shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 transition-all"
+          className="fixed bottom-6 right-6 z-40 p-3 rounded-full bg-gradient-to-r from-cyan-600 to-purple-600 shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 transition-all"
           aria-label="Start tutorial"
         >
           <HelpCircle size={20} className="text-white" />

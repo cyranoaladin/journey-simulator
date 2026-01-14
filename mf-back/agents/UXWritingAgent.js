@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const { getSystemPrompt } = require('./prompts');
 
 class UXWritingAgent {
@@ -26,7 +32,7 @@ class UXWritingAgent {
         },
         findings,
         confidence,
-        assumptions: input ? [] : ['Texte source non fourni, propositions génériques'],
+        assumptions: input ? [] : ['Source text not provided, generic proposals'],
         actions,
         citations,
         metrics: { latencyMs: Date.now() - started, ragHits: citations.length },

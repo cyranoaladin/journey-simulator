@@ -1,0 +1,10 @@
+   ✅ StorageState saved: /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/.auth/user.json
+AUTH_STATE_PATH=/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/.auth/user.json
+   🧾 Auth proof written: /home/alaeddine/Documents/journey_mfai_back_front/artifacts/e2e-auth-proof.json
+      44 |             const data = await response!.json();
+      44 |             const data = await response!.json();
+      44 |             const data = await response!.json();
+      44 |             const data = await response!.json();
+      44 |             const data = await response!.json();
+      23 |         const data = await response.json();
+      62 |         const data = await response.json();

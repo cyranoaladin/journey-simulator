@@ -1,0 +1,100 @@
+    MongooseServerSelectionError: connect ECONNREFUSED 127.0.0.1:27017
+
+      20 |     const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27018/mf_back_test_s2_eval';
+      21 |     try {
+--
+FAIL __tests__/routes.export.test.js
+  ● export routes › rejects mission export when api key mismatches
+
+    expected 403 "Forbidden", got 500 "Internal Server Error"
+
+      49 |       .set('x-api-key', 'invalid')
+--
+FAIL __tests__/routes.admin.test.js
+  ● admin routes › rejects RAG uploads when ADMIN_API_KEY is missing
+
+    expected 503 "Service Unavailable", got 500 "Internal Server Error"
+
+      140 |       .post('/admin/rag/upload')
+--
+FAIL __tests__/e2e/orchestration.e2e.test.js
+  ● E2E /orchestration/vslice › handles simple intent
+
+    expected 200 "OK", got 500 "Internal Server Error"
+
+      64 |       .post('/orchestration/vslice')
+--
+FAIL __tests__/routes.dao.test.js
+  ● dao routes › returns DAO configuration and voters
+
+    expected 200 "OK", got 500 "Internal Server Error"
+
+      106 |     const res = await request(app)
+--
+FAIL tests/routes.supertest.spec.js
+  ● Analytics routes › POST /analytics/certificate-download succeeds with protect middleware
+
+    expect(jest.fn()).toHaveBeenCalled()
+
+    Expected number of calls: >= 1
+--
+FAIL __tests__/zynoOrchestrator.test.js
+  ● orchestrateZyno › normalizes agent outputs, including references and AEPO metrics
+
+    TypeError: Cannot read properties of undefined (reading 'length')
+
+      23 |     });
+--
+FAIL __tests__/demoMission.test.js
+  ● Demo mission orchestration › replays the demo mission scenario and returns structured agent outputs
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "launch_nft"
+--
+FAIL tests/integration/resourceValidator.integration.test.js
+  ● Resource Validator Integration › should sanitize resources in a full API response
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+--
+FAIL tests/feedback.test.js
+  ● POST /api/feedback – AECO Registration › should save valid user feedback
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+--
+FAIL __tests__/routes.orchestration.test.js
+  ● Zyno orchestration route › returns orchestration response enriched with templates and logs agent output
+
+    expected 200 "OK", got 500 "Internal Server Error"
+
+      106 |       .post('/orchestration')
+--
+FAIL __tests__/orchestrator_history_window.test.js
+  ● orchestrateZyno history window + summary preservation › preserves early critical variables via historySummary and keeps prompt under 4000 tokens
+
+    expect(received).toBeGreaterThanOrEqual(expected)
+
+    Expected: >= 20
+--
+FAIL __tests__/memory_persistence.test.js
+  ● Memory persistence into agent context › injects history from agentMemory into orchestrateZyno context
+
+    expect(received).toContain(expected) // indexOf
+
+    Matcher error: received value must not be null nor undefined
+--
+FAIL tests/unit/phase4-contracts.test.js
+  ● Test suite failed to run
+
+    Jest encountered an unexpected token
+
+    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.
+--
+Tests:       74 failed, 309 passed, 383 total
+Snapshots:   0 total
+Time:        36.872 s, estimated 37 s
+Ran all test suites.

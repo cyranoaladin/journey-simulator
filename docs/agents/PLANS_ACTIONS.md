@@ -1,3 +1,9 @@
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
 # Plans d’action par agent (R3.3)
 
 Format par agent : objectif, cas d’usage, checklist actionnable. Les actions sont verb-first, vérifiables, et connectées aux checklists sécurité / coverage. Agents désactivés (ex : RiskFraudAgent) restent documentés mais doivent être activés de façon contrôlée avant usage.

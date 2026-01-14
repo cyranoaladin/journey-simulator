@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 // Mock env
 process.env.JWT_SECRET = 'unit-test-secret';
 process.env.ENABLE_STRICT_WALLET_LOGIN = 'true'; // Enable strict mode for these tests

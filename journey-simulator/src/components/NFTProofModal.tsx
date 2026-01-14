@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -333,7 +339,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
       case 1: return 'Preparing metadata...';
       case 2: return 'Connecting to Solana testnet...';
       case 3: return 'Creating on-chain token...';
-      case 4: return `Finalizing Proof-of-${proofType}™ NFT...`;
+      case 4: return `Finalizing Proof-of-${proofType} NFT...`;
       default: return 'Processing...';
     }
   };
@@ -398,7 +404,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
         ctx.font = 'bold 24px Arial';
         ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
         ctx.textAlign = 'center';
-        ctx.fillText(`Money Factory AI - Proof-of-${proofType}™`, canvas.width / 2, canvas.height - 30);
+        ctx.fillText(`Money Factory AI - Proof-of-${proofType}`, canvas.width / 2, canvas.height - 30);
 
         // Convert to blob and save
         canvas.toBlob((blob) => {
@@ -425,7 +431,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
 
   // Share NFT
   const shareNFT = (platform: 'twitter' | 'linkedin' | 'discord') => {
-    const text = `I just earned my Proof-of-${proofType}™ NFT "${title}" on Money Factory AI! #MoneyFactoryAI #ProofEconomy`;
+    const text = `I just earned my Proof-of-${proofType} NFT "${title}" on Money Factory AI! #MoneyFactoryAI #ProofEconomy`;
     const url = explorerUrl || 'https://moneyfactory.ai';
 
     let shareUrl = '';
@@ -481,7 +487,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
-        aria-label={`Proof-of-${proofType}™ NFT`}
+        aria-label={`Proof-of-${proofType} NFT`}
         data-testid="proof-modal"
         className="bg-primary-900 rounded-2xl p-6 max-w-md w-full border border-white/20 shadow-xl max-h-[90vh] overflow-hidden flex flex-col"
       >
@@ -489,7 +495,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
         <div className="flex items-center justify-between mb-4 sticky top-0 bg-primary-900 z-10 pb-2">
           <div className="flex items-center space-x-2">
             {getProofTypeIcon()}
-            <h2 className="text-xl font-space font-bold">Proof-of-{proofType}™ NFT</h2>
+            <h2 className="text-xl font-space font-bold">Proof-of-{proofType} NFT</h2>
           </div>
           <button
             onClick={onClose}
@@ -514,7 +520,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
             {/* Persona Badge */}
             <div className="absolute top-2 right-2 z-10">
               <span className="px-2 py-1 rounded-full text-xs font-semibold bg-black/50 text-white capitalize">
-                {selectedPersona?.title || 'Certification'}
+                {selectedPersona?.title || 'Certificate'}
               </span>
             </div>
 
@@ -546,7 +552,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-700 to-primary-900">
                   <div className="text-center p-4">
                     <Award size={48} className="mx-auto mb-4 text-white/80" />
-                    <h3 className="text-white font-bold text-lg mb-2">Proof-of-{proofType}™</h3>
+                    <h3 className="text-white font-bold text-lg mb-2">Proof-of-{proofType}</h3>
                     <p className="text-white/80 text-sm">{title}</p>
                   </div>
                 </div>
@@ -623,7 +629,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
               ) : (
                 <div className="flex flex-col items-center space-y-3">
                   <p className="text-sm text-center opacity-80 mb-2">
-                    Connect your wallet to mint this Proof-of-{proofType}™ NFT
+                    Connect your wallet to mint this Proof-of-{proofType} NFT
                   </p>
 
                   <div className="wallet-adapter-dropdown">
@@ -663,10 +669,10 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
             <div className="mb-6 bg-green-500/20 border border-green-500/30 rounded-lg p-4">
               <div className="flex items-center space-x-2 mb-3">
                 <CheckCircle className="text-green-400" size={20} />
-                <h3 className="font-semibold text-green-400">Proof-of-{proofType}™ Minted!</h3>
+                <h3 className="font-semibold text-green-400">Proof-of-{proofType} Minted!</h3>
               </div>
               <p className="text-sm opacity-80 mb-3">
-                Your Proof-of-{proofType}™ NFT has been successfully minted on Solana Testnet
+                Your Proof-of-{proofType} NFT has been successfully minted on Solana Testnet
               </p>
               <div className="bg-black/20 rounded-lg p-2">
                 <div className="text-xs opacity-70 mb-1">NFT Address:</div>
@@ -681,7 +687,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
                   className="w-full mt-3 py-2 px-3 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium flex items-center justify-center space-x-2 transition-colors"
                 >
                   <Award size={16} />
-                  <span>View on Skillchain Card™</span>
+                  <span>View on Skillchain Card</span>
                 </motion.button>
               )}
             </div>
@@ -742,14 +748,14 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
           {/* Minting Tutorial */}
           {!mintedAddress && !isMinting && (
             <div className="p-3 bg-blue-500/20 border border-blue-500/30 rounded-lg">
-              <h4 className="text-sm font-semibold text-blue-400 mb-2">How to mint your Proof-of-{proofType}™ NFT:</h4>
+              <h4 className="text-sm font-semibold text-blue-400 mb-2">How to mint your Proof-of-{proofType} NFT:</h4>
               <ol className="text-sm space-y-1 list-decimal list-inside">
                 <li>Connect your Phantom wallet in Devnet mode</li>
-                <li>Click "Mint Proof-of-{proofType}™ NFT" button</li>
+                <li>Click "Mint Proof-of-{proofType} NFT" button</li>
                 <li>Approve the transaction in your wallet</li>
                 <li>View your NFT on Solana Explorer</li>
                 <li>Download or share your achievement</li>
-                <li>Find your NFT in your Skillchain Card™</li>
+                <li>Find your NFT in your Skillchain Card</li>
               </ol>
             </div>
           )}
@@ -783,7 +789,7 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
               aria-label="Mint NFT"
             >
               <Zap size={16} />
-              <span>Mint Proof-of-{proofType}™ NFT</span>
+              <span>Mint Proof-of-{proofType} NFT</span>
             </motion.button>
           )}
 

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useMemo, useState } from 'react';
 import { Download, PenSquare } from 'lucide-react';
 import { api } from '../../utils/api';
@@ -120,7 +126,7 @@ export default function MissionFeedbackSummary({ summary }: Props) {
   return (
     <section className="space-y-3 rounded-lg bg-white p-4 shadow dark:bg-slate-900/70">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-xl font-semibold">📊 Mission Summary</h2>
+        <h2 className="text-xl font-semibold"> Mission Summary</h2>
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -191,7 +197,7 @@ export default function MissionFeedbackSummary({ summary }: Props) {
       )}
 
       <div>
-        <h4 className="text-sm font-semibold">🧠 Generated Summary:</h4>
+        <h4 className="text-sm font-semibold"> Generated Summary:</h4>
         <pre className="mt-2 max-h-64 overflow-y-auto whitespace-pre-wrap rounded-md bg-slate-900 p-3 text-xs text-slate-100">
           {summary.generatedText}
         </pre>

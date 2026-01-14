@@ -1,0 +1,23 @@
+{
+  "r1": {
+    "status": "PASS",
+    "nonAsciiFiles": []
+  },
+  "r2": {
+    "status": "PASS",
+    "missing": [],
+    "present": {
+      "NFT Certificates": true,
+      "Staking": true,
+      "DAO Governance": true,
+      "Simulation Mode": true
+    }
+  },
+  "r3": {
+    "status": "PASS",
+    "totalSpecs": 38,
+    "mockSpecs": 1,
+    "ratio": 0.02631578947368421
+  },
+  "timestamp": "2026-01-07T13:30:33.701Z"
+}

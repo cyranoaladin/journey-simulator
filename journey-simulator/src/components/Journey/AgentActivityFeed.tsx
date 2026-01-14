@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { generateStableKey } from '../../utils/generateStableKey';
@@ -18,7 +24,7 @@ interface AgentActivityFeedProps {
 }
 
 export default function AgentActivityFeed({ step }: AgentActivityFeedProps) {
-  // Extraire les informations pertinentes des données du step
+  // Extract relevant information from step data
   const agentLogs: AgentLog[] = step.agent_actions?.map((action: any) => ({
     agent: action.agent_name || 'Unknown Agent',
     phase: step.metadata?.phase_id || 'N/A',
@@ -29,7 +35,7 @@ export default function AgentActivityFeed({ step }: AgentActivityFeedProps) {
     timestamp: new Date().toISOString()
   })) || [];
 
-  // Ajouter manuellement une entrée pour le step actuel
+  // Manually add an entry for the current step
   const currentStepLog: AgentLog = {
     agent: 'Zyno (Orchestrateur)',
     phase: step.metadata?.phase_id || 'N/A',
@@ -52,7 +58,7 @@ export default function AgentActivityFeed({ step }: AgentActivityFeedProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="p-3 bg-white/5 rounded-lg border border-white/10"
+            className="p-3 bg-white/5 backdrop-blur-md rounded-lg border border-white/10 shadow-sm"
           >
             <div className="flex items-start justify-between">
               <div className="flex items-center">

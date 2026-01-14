@@ -1,12 +1,18 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useEffect, useMemo, useState } from 'react';
-import type { AgentLogEntry } from './types';
 import { api } from '../../utils/api';
 import { logger } from '../../utils/logger';
 import LazyLoadList from '../shared/LazyLoadList';
+import type { AgentLogEntry } from './types';
 
 const fetchAgentLogs = async (): Promise<AgentLogEntry[]> => {
   try {
-    const logs = await api.getAgentLogs("default");
+    const logs = await api.getAgentLogs();
     return Array.isArray(logs) ? logs : [];
   } catch (error) {
     logger.error('[AgentLogViewer] Failed to fetch agent logs', error);
@@ -31,9 +37,9 @@ export default function AgentLogViewer() {
   const filteredLogs = useMemo(() => {
     return logs.filter((log) => {
       const matchesUser =
-        normalizedUser.length === 0 || toLower(log.userId).includes(normalizedUser);
+        normalizedUser.length === 0 || toLower(log.userId || '').includes(normalizedUser);
       const matchesAgent =
-        normalizedAgent.length === 0 || toLower(log.agentName).includes(normalizedAgent);
+        normalizedAgent.length === 0 || toLower(log.agentName || '').includes(normalizedAgent);
       return matchesUser && matchesAgent;
     });
   }, [logs, normalizedUser, normalizedAgent]);
@@ -41,7 +47,7 @@ export default function AgentLogViewer() {
   return (
     <section className="flex flex-col gap-4">
       <header className="flex flex-col gap-2">
-        <h2 className="text-xl font-semibold">📊 Agent Interaction Logs</h2>
+        <h2 className="text-xl font-semibold"> Agent Interaction Logs</h2>
         <div className="flex flex-wrap gap-2">
           <input
             className="border border-slate-300 rounded-md px-3 py-2 text-sm"
@@ -67,7 +73,7 @@ export default function AgentLogViewer() {
           threshold={200}
           containerHeight="520px"
           className="grid gap-3"
-          getKey={(log, index) => `${log.userId}-${log.agentName}-${log.timestamp}-${index}`}
+          getKey={(log, index) => `${log.userId ?? 'user'}-${log.agentName ?? 'agent'}-${log.timestamp ?? 'ts'}-${index}`}
           renderItem={(log, index) => {
             const payload = log.payload as unknown;
             const payloadKeyCount =
@@ -75,16 +81,16 @@ export default function AgentLogViewer() {
 
             return (
               <article
-                key={`${log.userId}-${log.agentName}-${log.timestamp}-${index}`}
+                key={`${log.userId ?? 'user'}-${log.agentName ?? 'agent'}-${log.timestamp ?? 'ts'}-${index}`}
                 className="border border-slate-200 rounded-lg p-3 bg-white shadow-sm"
               >
                 <div className="flex items-center justify-between gap-4">
-                  <strong className="text-sm font-medium">{log.agentName}</strong>
+                  <strong className="text-sm font-medium">{log.agentName ?? 'Agent'}</strong>
                   <span className="text-xs text-slate-500">
-                    {new Date(log.timestamp).toLocaleString()}
+                    {log.timestamp ? new Date(log.timestamp).toLocaleString() : 'N/A'}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500">User: {log.userId}</p>
+                <p className="text-xs text-slate-500">User: {log.userId ?? 'unknown'}</p>
                 {log.ae_summary && (
                   <p className="text-sm">
                     <span className="font-semibold">Summary:</span> {log.ae_summary}

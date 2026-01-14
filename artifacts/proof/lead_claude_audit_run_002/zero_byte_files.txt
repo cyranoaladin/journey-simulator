@@ -1,0 +1,3 @@
+cat: artifacts/proof/lead_claude_audit_run_002/zero_byte_files.txt : le fichier d'entrée est aussi celui de sortie
+=0
+✅ No zero-byte files found

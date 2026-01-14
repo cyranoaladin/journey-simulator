@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { motion } from "framer-motion";
 
 interface Proposal {
@@ -45,7 +51,7 @@ export default function GovernanceDashboard({
 
             {/* Proposals List */}
             <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Gouvernance Active</h3>
+                <h3 className="text-lg font-semibold">Active Governance</h3>
                 {proposals.map((p) => (
                     <motion.div
                         key={p.id}

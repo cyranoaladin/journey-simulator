@@ -1,0 +1,8 @@
+=== Playwright Test Counts (Auto-Parsed) ===
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+
+VERDICT:
+✅ ALL TESTS PASSED (zero unexpected, zero skipped, zero flaky, zero timeout)

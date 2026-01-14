@@ -1,0 +1,14 @@
+=== ENVIRONMENT SNAPSHOT ===
+Timestamp: $(date -Iseconds)
+
+Node: $(node -v)
+NPM: $(npm -v)
+Playwright: $(cd journey-simulator && npx playwright --version)
+
+OS: $(uname -a)
+CWD: $(pwd)
+
+Services:
+- MongoDB: $(pgrep -f mongod > /dev/null && echo "RUNNING" || echo "NOT_RUNNING")
+- Backend expected port: 3002
+- Frontend expected port: 3003

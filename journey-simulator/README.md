@@ -1010,7 +1010,7 @@ Les routes ci-dessous sont celles effectivement déclarées dans `src/App.tsx` :
 | Route | Fichier | Rôle | Protégée |
 |---|---|---|---|
 | `/` | `src/pages/HomePage.tsx` | Landing “product” (AEPO/AECO, pitch UX) | Non |
-| `/login` | `src/components/LoginPage.tsx` | Connexion (email/wallet/démo) | Non |
+| `/login` | `src/components/LoginPage.tsx` | Connection (email/wallet/démo) | Non |
 | `/register` | `src/components/RegisterPage.tsx` | Inscription | Non |
 | `/dashboard` | `src/pages/Dashboard.tsx` | Dashboard d’entrée + preview journeys | Oui |
 | `/journeys` | `src/pages/Journey.tsx` | Liste journeys vs workspace selon `selectedPersona` | Oui |
@@ -1032,7 +1032,7 @@ La protection est assurée par :
 #### Contexts (session, wallet, tutoriel, layout)
 
 - `src/contexts/AuthContext.tsx` : auth JWT + refresh + “loginAsDemo”, chargement progress via `journeyStore.loadUserProgress()`.
-- `src/contexts/WalletContext.tsx` : provider wallet (adapters Solana) + état connexion.
+- `src/contexts/WalletContext.tsx` : provider wallet (adapters Solana) + état connection.
 - `src/contexts/TutorialContext.tsx` : moteur de tutoriel (steps, autoStart) utilisé par `Journey.tsx`.
 - `src/contexts/WorkspaceLayoutContext.tsx` : état UI/layout du workspace (panneaux, focus mode, etc.).
 
@@ -1067,7 +1067,7 @@ Le backend est une API Express + MongoDB qui sert :
 
 #### Entrypoints & câblage
 
-- `mf-back/app.js` : configuration Express, connexion Mongo, et **mount** des routes :
+- `mf-back/app.js` : configuration Express, connection Mongo, et **mount** des routes :
   - `/auth` → `routes/auth-routes.js`
   - `/journey` → `routes/journey-routes.js`
   - `/orchestration` → `routes/zyno-routes.js`
@@ -2128,11 +2128,11 @@ Commande: `node journey-simulator/scripts/generate-api-surface.mjs`
 
 ## 🧩 Component Architecture
 
-Description structurée des composants React majeurs : rôle, responsabilités, et points de connexion (stores, context, API).
+Description structurée des composants React majeurs : rôle, responsabilités, et points de connection (stores, context, API).
 
 ### Core Components
 
-Les composants ci-dessous constituent le “squelette” de l’app : routeur, page principale, affichage progression, et connexion wallet.
+Les composants ci-dessous constituent le “squelette” de l’app : routeur, page principale, affichage progression, et connection wallet.
 
 #### App.tsx
 

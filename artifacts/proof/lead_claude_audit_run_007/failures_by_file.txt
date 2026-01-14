@@ -1,0 +1,11 @@
+      3 supreme-integrity.spec.ts
+      2 01-navigation/header-navigation.spec.ts
+      1 supreme-auditor.spec.ts
+      1 05-agents-orchestration/multi-user-isolation.spec.ts
+      1 04-data-validation/rag-upload.spec.ts
+      1 04-core-game-loop.spec.ts
+      1 03-agent-workflows/resource-production.spec.ts
+      1 02-agent-core/zyno-interaction.spec.ts
+      1 02-agent-core/phase-2-strategy.spec.ts
+      1 01-navigation/comprehensive-menu.spec.ts
+      1 00-preflight/runmode-guard-violation.spec.ts

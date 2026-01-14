@@ -1,0 +1,7 @@
+/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/03-agent-workflows/resource-production.spec.ts:107:    test.skip('Simulate InvestorDemoAgent execution and verify dashboard summary', async ({ page }) => {
+/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/99-english-compliance/ui-runtime.spec.ts:6:test.skip('UI Runtime English Compliance - Guide Page', async ({ page }) => {
+/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/supreme-isolation.spec.ts:42:    test.skip('Real Mode Integrity: Headers and Data Sync', async ({ page }) => {
+/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/supreme-integrity.spec.ts:6:    test.skip('Security Breach: Mode Mismatch Rejection', async ({ page }) => {
+/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/supreme-integrity.spec.ts:54:    test.skip('UI Stress: Double-Click Protection', async ({ page }) => {
+/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/supreme-integrity.spec.ts:118:    test.skip('Solana: Real Transaction Proof', async ({ request }) => {
+/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/supreme-auditor.spec.ts:6:    test.skip('Dashboards & Navigation Consistency Check', async ({ page }) => {

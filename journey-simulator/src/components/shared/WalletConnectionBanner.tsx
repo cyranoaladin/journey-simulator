@@ -1,6 +1,12 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { motion, AnimatePresence } from 'framer-motion'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { AlertCircle, X, Loader } from 'lucide-react'
+import { X, Loader, Sparkles } from 'lucide-react'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import LazyWalletMultiButton from '../wallet/LazyWalletMultiButton'
@@ -67,41 +73,43 @@ const WalletConnectionBannerInner = () => {
         exit={{ opacity: 0, y: -50 }}
         className="fixed left-0 right-0 z-40 mx-4 top-[calc(var(--header-height)+var(--skillchain-banner-offset)+12px)]"
       >
-        <div className="max-w-4xl mx-auto bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg p-4 shadow-lg">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+        <div className="max-w-4xl mx-auto bg-slate-900/60 border border-white/10 rounded-2xl p-4 shadow-2xl backdrop-blur-xl">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center space-x-4">
               {connecting ? (
-                <div className="w-6 h-6 rounded-full bg-yellow-500/30 flex items-center justify-center">
-                  <Loader className="text-yellow-400 animate-spin" size={16} />
+                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
+                  <Loader className="text-accent-cyan animate-spin" size={18} />
                 </div>
               ) : (
-                <AlertCircle className="text-yellow-400 flex-shrink-0" size={20} />
+                <div className="w-10 h-10 rounded-full bg-accent-cyan/10 flex items-center justify-center shadow-neon-ring-sm">
+                  <Sparkles className="text-accent-cyan" size={18} />
+                </div>
               )}
               <div>
-                <h3 className="font-semibold text-yellow-400">
-                  {connecting ? 'Connecting wallet...' : 'Wallet not connected'}
+                <h3 className="font-semibold text-white">
+                  {connecting ? 'Establishing connection...' : 'Start your journey'}
                 </h3>
-                <p className="text-sm text-yellow-300/80">
-                  {connecting 
-                    ? 'Please approve the connection request in your wallet' 
-                    : 'Connect your Solana wallet (set to Devnet) to unlock all features and start minting Proof-of-Skill™ NFTs'}
+                <p className="text-sm text-white/60">
+                  {connecting
+                    ? 'Check your wallet to confirm'
+                    : 'Connect your wallet to enable mission tracking and rewards'}
                 </p>
               </div>
             </div>
-            
-            <div className="flex items-center space-x-2">
+
+            <div className="flex items-center space-x-3">
               {!connecting && (
                 <div className="wallet-adapter-dropdown">
-                  <LazyWalletMultiButton className="!bg-yellow-500 !text-black !px-4 !py-2 !rounded-lg !font-medium !hover:bg-yellow-400 !transition-colors !flex !items-center !space-x-2" />
+                  <LazyWalletMultiButton className="!bg-accent-cyan !text-black !px-5 !py-2.5 !rounded-xl !font-bold !hover:bg-cyan-400 !transition-all !flex !items-center !space-x-2 !shadow-neon-cyan" />
                 </div>
               )}
-              
+
               <button
                 onClick={() => setIsDismissed(true)}
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/40 hover:text-white"
                 aria-label="Dismiss"
               >
-                <X size={16} className="text-yellow-400" />
+                <X size={16} />
               </button>
             </div>
           </div>

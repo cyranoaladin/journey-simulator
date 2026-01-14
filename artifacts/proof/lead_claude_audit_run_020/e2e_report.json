@@ -1,0 +1,23 @@
+{
+  "run": "RUN_020",
+  "timestamp": "2026-01-13T17:00:36.227Z",
+  "duration_ms": 1287306,
+  "expected": 91,
+  "unexpected": 27,
+  "skipped": 0,
+  "flaky": 0,
+  "timedOut": 0,
+  "verdict": "FAIL_BLOCKING",
+  "regression": "NEGATIVE",
+  "baseline": {
+    "run": "RUN_014-017",
+    "expected": 104,
+    "unexpected": 14
+  },
+  "delta": {
+    "expected": -13,
+    "unexpected": +13
+  },
+  "fix_applied": "addInitScript before page.goto in global-setup.ts",
+  "result": "FIX_FAILED - Auth state seeding did not resolve failures, introduced new failures"
+}

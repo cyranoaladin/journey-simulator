@@ -1,21 +1,27 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const User = require('../models/user');
 const Journey = require('../models/Journeys');
 
-// Track certification downloads
-exports.trackCertificationDownload = async (req, res) => {
+// Track certificate downloads
+exports.trackCertificateDownload = async (req, res) => {
   try {
-    const { certification_id, phase, download_timestamp } = req.body;
+    const { certificate_id, phase, download_timestamp } = req.body;
     const userId = req.user.id;
 
     // Log the download event
-    console.log(`User ${userId} downloaded certification ${certification_id} at ${download_timestamp}`);
+    console.log(`User ${userId} downloaded certificate ${certificate_id} at ${download_timestamp}`);
 
     // Update user's download count
     await User.findByIdAndUpdate(userId, {
-      $inc: { 'analytics.certification_downloads': 1 },
+      $inc: { 'analytics.certificate_downloads': 1 },
       $push: {
         'analytics.download_history': {
-          certification_id,
+          certificate_id,
           phase,
           timestamp: download_timestamp
         }
@@ -27,7 +33,7 @@ exports.trackCertificationDownload = async (req, res) => {
       message: 'Download tracked successfully'
     });
   } catch (error) {
-    console.error('Error tracking certification download:', error);
+    console.error('Error tracking certificate download:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to track download'
@@ -35,21 +41,21 @@ exports.trackCertificationDownload = async (req, res) => {
   }
 };
 
-// Track certification shares
-exports.trackCertificationShare = async (req, res) => {
+// Track certificate shares
+exports.trackCertificateShare = async (req, res) => {
   try {
-    const { certification_id, platform, phase, share_timestamp } = req.body;
+    const { certificate_id, platform, phase, share_timestamp } = req.body;
     const userId = req.user.id;
 
     // Log the share event
-    console.log(`User ${userId} shared certification ${certification_id} on ${platform} at ${share_timestamp}`);
+    console.log(`User ${userId} shared certificate ${certificate_id} on ${platform} at ${share_timestamp}`);
 
     // Update user's share count
     await User.findByIdAndUpdate(userId, {
-      $inc: { 'analytics.certification_shares': 1 },
+      $inc: { 'analytics.certificate_shares': 1 },
       $push: {
         'analytics.share_history': {
-          certification_id,
+          certificate_id,
           platform,
           phase,
           timestamp: share_timestamp
@@ -62,7 +68,7 @@ exports.trackCertificationShare = async (req, res) => {
       message: 'Share tracked successfully'
     });
   } catch (error) {
-    console.error('Error tracking certification share:', error);
+    console.error('Error tracking certificate share:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to track share'

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import type { Meta, StoryObj } from '@storybook/react';
 import MissionFeedbackSummary, { MissionSummary } from './MissionFeedbackSummary';
 
@@ -19,7 +25,7 @@ const baseSummary: MissionSummary = {
   aepoScore: 82,
   aecoPhase: 'launch_dao',
   agents: ['DAOArchitect', 'ComplianceExpert', 'GrowthNavigator'],
-  generatedText: '• DAOArchitect → Gouvernance validée\n• ComplianceExpert → Checklist prête\n• GrowthNavigator → Stratégie de lancement en cours',
+  generatedText: ' DAOArchitect  Governance validated\n ComplianceExpert  Checklist ready\n GrowthNavigator  Launch strategy in progress',
   title: 'Mission Launch DAO',
   actions: ['Publier le whitepaper', 'Programmer le vote communautaire']
 };

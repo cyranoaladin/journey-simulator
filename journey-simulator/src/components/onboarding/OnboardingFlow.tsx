@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useState, useEffect } from 'react';
 import ContextualTutorial from '../shared/ContextualTutorial';
 
@@ -15,7 +21,7 @@ const onboardingSteps = [
   {
     id: 'journey-phases',
     title: 'Journey Phases',
-    content: 'Each journey follows the sequence Learn → Build → Prove → Activate → Scale. You can return to each phase.'
+    content: 'Each journey follows the sequence Learn  Build  Prove  Activate  Scale. You can return to each phase.'
   },
   {
     id: 'zyno-assistant',
@@ -25,7 +31,7 @@ const onboardingSteps = [
   {
     id: 'rewards-system',
     title: 'Rewards System',
-    content: 'Earn XP, Proof-of-*™ NFTs, and $MFAI tokens for your achievements.'
+    content: 'Earn XP, Proof-of-* NFTs, and $MFAI tokens for your achievements.'
   },
   {
     id: 'community',
@@ -43,7 +49,7 @@ interface OnboardingFlowProps {
 const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
   const [showTutorial, setShowTutorial] = useState(false);
 
-  // Vérifier si le tutoriel a déjà été complété
+  // Check if tutorial has already been completed
   useEffect(() => {
     const hasCompletedTutorial = localStorage.getItem('onboarding-completed');
     if (!hasCompletedTutorial) {

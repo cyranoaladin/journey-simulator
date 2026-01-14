@@ -1,0 +1,8 @@
+[PROOF OF PERSISTENCE]
+Database: MongoDB (Primary Operational Store)
+Collection: users
+Total Records: 102
+
+Verified via: docker exec mfai-mongo mongo journey --eval "db.users.count()"
+Status: PHYSICALLY PERSISTED
+Timestamp: 2026-01-09

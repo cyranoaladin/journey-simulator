@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "simulation": {
+    "accepted": true,
+    "eligibilityScore": 84,
+    "tier": "CORE",
+    "targetRaiseUSD": 2000000,
+    "softCapUSD": 500000,
+    "hardCapUSD": 2000000,
+    "liquidityUSD": 800000,
+    "initialPriceUSD": 8,
+    "communityScore": 78,
+    "riskScore": 0.1,
+    "simulatedLaunchUrl": "https://launchpad.collaterize.com/",
+    "status": "READY_FOR_BONDING"
+  },
+  "input": {
+    "wallet": "So11111111111111111111111111111111111111112",
+    "tokenMint": "TokenMint11111111111111111111111111111111111",
+    "tokenSymbol": "MFAI",
+    "totalSupply": 1000000,
+    "circulatingAtTGE": 250000,
+    "fundraisingGoalUSD": 2000000,
+    "journeyScore": 85,
+    "riskScore": 0.1,
+    "communityScore": 78,
+    "docsScore": 82
+  }
+}

@@ -1,0 +1,17 @@
+journey-simulator/tests/e2e/utils/pageStability.ts:7:import { Page } from '@playwright/test';
+journey-simulator/tests/e2e/utils/navigation-helpers.ts:7:import { Page, expect } from '@playwright/test';
+journey-simulator/tests/e2e/utils/journeyMocks.ts:7:import type { Page, Route } from '@playwright/test';
+journey-simulator/tests/e2e/utils/uiActions.ts:7:import type { Page } from '@playwright/test';
+journey-simulator/tests/e2e/utils/uiActions.ts:8:import { expect } from '@playwright/test';
+journey-simulator/tests/e2e/README.md:72:import { test, expect } from '@playwright/test';
+journey-simulator/tests/e2e/helpers/ui-security.ts:7:import type { Page } from '@playwright/test';
+journey-simulator/tests/e2e/0X-web3-simulation-only/connect-only.spec.ts:2:import { test, expect } from '@playwright/test';
+journey-simulator/tests/e2e/helpers/progression.ts:6:import { Page } from '@playwright/test';
+journey-simulator/tests/e2e/helpers/console-guard.ts:6:import type { Page, ConsoleMessage } from '@playwright/test';
+journey-simulator/tests/e2e/fixtures/realModeTest.ts:7:import { test as base, expect, APIRequestContext } from '@playwright/test';
+journey-simulator/tests/e2e/05-agents-orchestration/multi-user-isolation.spec.ts:7:import { test, expect } from '@playwright/test';
+journey-simulator/tests/e2e/helpers/rbac.ts:6:import { Page, expect, APIRequestContext } from '@playwright/test';
+journey-simulator/tests/e2e/00-preflight/runmode-guard-violation.spec.ts:11:import { test, expect } from '@playwright/test';
+journey-simulator/tests/e2e/_support/route-tracker.ts:1:import type { Page } from '@playwright/test';
+journey-simulator/tests/e2e/_support/fixtures.ts:1:import { test as base } from '@playwright/test';
+journey-simulator/tests/e2e/_support/fixtures.ts:11:export { expect } from '@playwright/test';

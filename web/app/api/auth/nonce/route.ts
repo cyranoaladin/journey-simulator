@@ -1,5 +1,11 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { NextResponse } from 'next/server'
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 
 // In a real production app, you might store this in Redis with an expiration
 // For this MVP, we'll use a simple in-memory store or stateless approach (signed cookie)

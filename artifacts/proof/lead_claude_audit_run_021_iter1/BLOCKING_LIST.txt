@@ -1,0 +1,15 @@
+00-preflight/runmode-guard-violation.spec.ts → should crash immediately when runMode=simulation but guard expects real
+01-navigation/header-navigation.spec.ts → should switch to Demo mode and update UI
+01-navigation/header-navigation.spec.ts → should switch to Simulation mode and update UI
+01-navigation/mode-persistence.spec.ts → Mode Switching: Demo -> Simulation -> Real -> Demo with API Context Check
+03-agent-workflows/resource-production.spec.ts → Simulate InvestorDemoAgent execution and verify dashboard summary
+03-user-workflows/persona-onboarding.spec.ts → Persona can onboard and access journey workspace
+04-core-game-loop.spec.ts → quiz pass and mint queued (mocked backend)
+04-dashboard-intel/zyno-chat-scroll.spec.ts → Chat messages scroll behavior is stable
+04-dashboard-intel/zyno-chat-scroll.spec.ts → Zyno chat panel opens and displays messages without console errors
+05-agents-orchestration/multi-user-isolation.spec.ts → Two users have isolated orchestration state
+supreme-auditor.spec.ts → Dashboards & Navigation Consistency Check
+supreme-integrity.spec.ts → Security Breach: Mode Mismatch Rejection
+supreme-integrity.spec.ts → Solana: Real Transaction Proof
+supreme-integrity.spec.ts → UI Stress: Double-Click Protection
+supreme-isolation.spec.ts → Real Mode Integrity: Headers and Data Sync

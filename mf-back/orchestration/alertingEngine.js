@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const { listSLOs } = require('./sloRegistry');
 
 const MAX_ALERTS = 50;
@@ -35,9 +41,9 @@ class AlertingEngine {
     pushIfExceeds('dry_run_rate', metricsSummary.rates.dryRun);
     pushIfExceeds('agents_disabled_rate', metricsSummary.rates.agentsDisabled);
     if (metricsSummary.rates.rag < 0.5) {
-      pushIfExceeds('rag_usage_rate', 1); // déclenche si RAG faible
+      pushIfExceeds('rag_usage_rate', 1); // triggers if RAG is low
     }
-    // llm_usage_rate: alerte si jamais de LLM réel
+    // llm_usage_rate: alerts if no real LLM used
     if (metricsSummary.rates.llmReal === 0) {
       pushIfExceeds('llm_usage_rate', 1);
     }

@@ -1,4 +1,9 @@
 #!/usr/bin/env node
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
 /* Smoke S0 orchestrateur (local, sans HTTP) */
 const path = require('path');
 const { orchestrateVerticalSlice } = require(path.join(__dirname, '../../mf-back/orchestration/zynoVerticalSlice'));

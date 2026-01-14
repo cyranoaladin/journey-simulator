@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -15,7 +21,7 @@ vi.mock('../AgentFeedbackForm', () => ({
   __esModule: true,
   default: ({ onSuccess }: { onSuccess?: () => void }) => (
     <button data-testid="mock-feedback-form" onClick={() => onSuccess?.()}>
-      Soumettre un retour
+      Submit feedback
     </button>
   ),
 }));

@@ -1,4 +1,10 @@
 /**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
+/**
  * Generate a stable, unique key for React list items
  * Priority order:
  * 1. id or uuid if available
@@ -33,7 +39,8 @@ export function generateStableKey(
   // Priority 4: Last resort - use prefix with a deterministic hash of the item
   const itemStr = JSON.stringify(item);
   const hash = itemStr.split('').reduce((acc, char) => {
-    return ((acc << 5) - acc) + char.charCodeAt(0) | 0;
+    const updated = ((acc << 5) - acc) + char.charCodeAt(0);
+    return Math.trunc(updated);
   }, 0);
   return `${fallbackPrefix}-${Math.abs(hash)}`;
 }

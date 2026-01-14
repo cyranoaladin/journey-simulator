@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const { RAGClient } = require('../ragClient');
 const ragClient = new RAGClient();
 
@@ -49,13 +55,15 @@ async function fetchRagContext({
   try {
     ragDomains = resolveRagDomains(selected, registryIndex);
     if (process.env.NODE_ENV !== 'test') {
-      // Observabilité RAG: trace la requête exacte avant envoi au store vectoriel
+      // RAG Observability: trace actual request before sending to vector store
       // eslint-disable-next-line no-console
       console.log('[RAG_DEBUG]: Querying vector store with:', req.input || routed.intentNormalized || req.intent);
     }
+    const RAG_MAX_TOPK = 10;
+
     ragContext = await ragClient.search({
       query: req.input || routed.intentNormalized || req.intent,
-      topK: req.context?.rag?.topK || 4,
+      topK: Math.min(req.context?.rag?.topK || 4, RAG_MAX_TOPK),
       traceId: getTraceId(req, payload),
       domain: ragDomains,
     });

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MessageCircle, X, Send, Sparkles } from 'lucide-react'
@@ -7,7 +13,7 @@ const ZynoAssistant = () => {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "Hi! I'm Zyno, your AI Co-Founder™. I'm here to guide you through your cognitive activation journey. How can I help you?",
+      text: "Hi! I'm Zyno, your AI Co-Founder. I'm here to guide you through your cognitive activation journey. How can I help you?",
       isZyno: true,
       timestamp: new Date()
     }
@@ -21,9 +27,9 @@ const ZynoAssistant = () => {
   }
 
   const zynoResponses = [
-    "Excellent question! The Cognitive Activation Protocol™ transforms your skills into tokenized assets. Each step proves your evolution.",
+    "Excellent question! The Cognitive Activation Protocol transforms your skills into tokenized assets. Each step proves your evolution.",
     "Your journey is unique. Based on your profile, I recommend starting with the Learn phase to build solid foundations.",
-    "Proof-of-Skill™ NFTs aren't decorative - they're cryptographic proof of your transformation and open opportunities.",
+    "Proof-of-Skill NFTs aren't decorative - they're cryptographic proof of your transformation and open opportunities.",
     "The Proof Economy rewards created value, not time spent. Your skills become your capital.",
     "Each completed phase brings you closer to digital sovereignty. Keep going, you're on the right track!",
     "Coordination isn't management. It's strategy made relational.",
@@ -99,7 +105,7 @@ const ZynoAssistant = () => {
                 </div>
                 <div>
                   <h3 className="font-space font-semibold text-white">Zyno</h3>
-                  <p className="text-xs text-white/80">AI Co-Founder™</p>
+                  <p className="text-xs text-white/80">AI Co-Founder</p>
                 </div>
               </div>
               <motion.button

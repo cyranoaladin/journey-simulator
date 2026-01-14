@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const { validateRequest } = require('../vsliceSchema');
 const workflowMap = require('../workflowMap');
 const path = require('node:path');
@@ -23,12 +29,12 @@ const loadPresets = () => {
 const PRESETS = loadPresets();
 
 /**
- * Service de validation pour l'orchestration
- * Réduit la complexité cognitive en isolant toute la logique de validation
+ * Validation Service for orchestration
+ * Reduces cognitive complexity by isolating all validation logic
  */
 class ValidationService {
   /**
-   * Valide le payload initial et retourne la requête normalisée
+   * Validates initial payload and returns normalized request
    */
   static validatePayload(payload) {
     const validation = validateRequest(payload);
@@ -39,7 +45,7 @@ class ValidationService {
   }
 
   /**
-   * Résout le nom du journey à partir de la requête et du preset
+   * Resolves journey name from request and preset
    */
   static resolveJourneyName(req, preset) {
     if (preset?.journey) return preset.journey;
@@ -56,7 +62,7 @@ class ValidationService {
   }
 
   /**
-   * Résout la séquence des phases pour un journey donné
+   * Resolves phase sequence for a given journey
    */
   static resolvePhaseSequence(journeyName) {
     const phases = workflowMap[journeyName]?.phases || {};
@@ -64,7 +70,7 @@ class ValidationService {
   }
 
   /**
-   * Applique un preset à la requête si présent
+   * Applies a preset to the request if present
    */
   static applyPreset(req, payload, ops) {
     const presetName = payload?.preset;
@@ -83,7 +89,7 @@ class ValidationService {
       },
     };
     ops.warnings = ops.warnings.filter((w) => w !== 'invalid_input_schema');
-    // Marque explicitement l’application du preset pour les assertions de tests
+    // Explicitly marks preset application for test assertions
     if (!ops.warnings.includes('preset_applied')) {
       ops.warnings.push('preset_applied');
     }
@@ -91,7 +97,7 @@ class ValidationService {
   }
 
   /**
-   * Résout la phase courante à partir de la requête et des phases complétées
+   * Resolves current phase from request and completed phases
    */
   static resolveCurrentPhase(req, phaseSequence, completedPhases) {
     const requestedPhase = req?.constraints?.phase || req?.context?.journey?.phaseId;
@@ -108,7 +114,7 @@ class ValidationService {
   }
 
   /**
-   * Met à jour la requête avec le contexte de journey résolu
+   * Updates request with resolved journey context
    */
   static enrichRequestWithJourney(req, journeyName, currentPhase, phaseSequence) {
     return {

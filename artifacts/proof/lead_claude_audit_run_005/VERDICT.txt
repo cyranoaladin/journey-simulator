@@ -1,0 +1,265 @@
+═══════════════════════════════════════════════════════════════════════════
+AUDIT RUN 005 — FINAL VERDICT
+═══════════════════════════════════════════════════════════════════════════
+Run ID: lead_claude_audit_run_005
+Timestamp: 2026-01-12T15:35:00+01:00
+Profile: PROFILE_B (prod-like preview, no HMR)
+Auditor: Claude Code (Acting Project Lead + QA/Audit Owner)
+
+───────────────────────────────────────────────────────────────────────────
+VERDICT: FAIL_BLOCKING
+───────────────────────────────────────────────────────────────────────────
+
+═══════════════════════════════════════════════════════════════════════════
+SECTION 1: E2E TEST RESULTS (JSON AUTHORITATIVE)
+═══════════════════════════════════════════════════════════════════════════
+
+Source: journey-simulator/test-results/playwright_report.json
+Command: AUDIT_MODE=true npx playwright test --forbid-only --project=chromium
+Duration: 500.5s (8.3 minutes)
+Suites: 36
+
+ACCEPTANCE CRITERIA (AUDIT.md):
+  ✓ skipped=0       [PASS]
+  ✗ unexpected=0    [FAIL: 70 unexpected failures]
+  ✓ flaky=0         [PASS]
+  ✓ retries=0       [PASS: configured via AUDIT_MODE]
+  ✓ forbidOnly=true [PASS: enforced]
+
+ACTUAL RESULTS:
+  expected:    48 (passed tests)
+  unexpected:  70 (failed + timedOut tests)
+  skipped:     0
+  flaky:       0
+
+DETAILED BREAKDOWN (from JSON):
+  - failed:    68
+  - timedOut:  1
+  - passed:    47 (note: stats.expected=48 includes one additional passing context)
+
+═══════════════════════════════════════════════════════════════════════════
+SECTION 2: BLOCKING ISSUES
+═══════════════════════════════════════════════════════════════════════════
+
+BLOCKER #1: 70 Unexpected Test Failures
+─────────────────────────────────────────
+Root Cause: Multiple functional regressions and orchestration failures
+Impact: Production readiness CANNOT be certified with 59% pass rate
+
+FAILURE DISTRIBUTION (Top Categories):
+  • 05-agents-orchestration/agent-sweep.spec.ts: 21 failures
+    - All agent invocation tests failing (SecurityAuditAgent, ProductSpecAgent,
+      JourneyDesignAgent, EvaluationAgent, RAGOpsAgent, DataIntegrityAgent,
+      APIContractAgent, TokenomicsAgent, GovernanceDAOAgent, GrowthAgent, etc.)
+    - Pattern: Agent orchestration endpoints not responding correctly
+
+  • 01-navigation/header-navigation.spec.ts: 2 failures
+    - Demo mode switching
+    - Simulation mode switching
+
+  • Single failures across:
+    - 00-preflight/runmode-guard-violation.spec.ts (guard not detecting violations)
+    - 01-navigation/comprehensive-menu.spec.ts (DAO navigation)
+    - 02-agent-core/phase-2-strategy.spec.ts (phase transitions)
+    - 02-agent-core/zyno-interaction.spec.ts (markdown output)
+    - 03-agent-workflows/resource-production.spec.ts (InvestorDemoAgent)
+    - 04-core-game-loop.spec.ts (quiz/mint flow)
+    - 04-data-validation/rag-upload.spec.ts (RAG API auth)
+
+BLOCKER #2: N/A (Sonar skipped due to missing credentials - acceptable per AUDIT.md)
+─────────────────────────────────────────────────────────────────────────────────
+Status: SONAR_SKIPPED_MISSING_CREDS=1
+Impact: No impact on verdict per AUDIT.md section 4.2
+
+═══════════════════════════════════════════════════════════════════════════
+SECTION 3: WHAT WORKED (Positive Evidence)
+═══════════════════════════════════════════════════════════════════════════
+
+✓ JSON Reporter: NOW FUNCTIONAL (absolute path fix successful)
+✓ Route Tracking: 182 ROUTE_VISIT events, 19 unique routes
+✓ Test Configuration: retries=0, forbidOnly=true enforced
+✓ Zero Skipped Tests: All test.skip() removed (7 tests activated)
+✓ Zero Flaky Tests: No intermittent failures
+✓ 48 Tests Passing: Core navigation, auth, and some workflows functional
+✓ Stack Operational: Backend 3002, Preview 3003 (prod-like)
+✓ Security Scans: Executed (token/trace/no-onchain)
+✓ Proof Pack: Complete with checksums
+
+INFRASTRUCTURE WINS:
+  - Playwright fixture compilation fixed (realModeTest.ts scope parameter)
+  - JSON reporter path corrected (relative → absolute)
+  - All mandatory artifacts generated and non-empty
+  - Route tracking working correctly
+
+═══════════════════════════════════════════════════════════════════════════
+SECTION 4: REMEDIATION PLAN (Prioritized)
+═══════════════════════════════════════════════════════════════════════════
+
+PRIORITY 1: Agent Orchestration Sweep Failures (21 tests)
+──────────────────────────────────────────────────────────
+File: tests/e2e/05-agents-orchestration/agent-sweep.spec.ts
+Issue: All agent invocation endpoints returning errors
+Investigation Required:
+  1. Check mf-back agent routes registration (routes/zyno-routes.js)
+  2. Verify agent orchestrator initialization (orchestration/zynoOrchestrator.js)
+  3. Review agent memory store accessibility
+  4. Validate API authentication headers in real mode
+  5. Check backend logs for 500/404 errors during agent calls
+
+Estimated Fix Complexity: MEDIUM
+  - Likely backend route/middleware issue
+  - May require orchestrator initialization fix
+  - Could be auth header propagation issue in real mode
+
+PRIORITY 2: RunMode Guard Violation Test (1 test)
+──────────────────────────────────────────────────
+File: tests/e2e/00-preflight/runmode-guard-violation.spec.ts
+Issue: Guard not detecting simulation/real mode mismatch
+Investigation Required:
+  1. Review guard implementation in frontend
+  2. Verify runMode enforcement in orchestration calls
+  3. Check localStorage vs fixture auth state interaction
+
+PRIORITY 3: Navigation Mode Switching (2 tests)
+────────────────────────────────────────────────
+File: tests/e2e/01-navigation/header-navigation.spec.ts
+Issue: Demo/Simulation mode toggle not working
+Investigation Required:
+  1. Check UI state update on mode switch
+  2. Verify localStorage persistence
+  3. Review component re-render triggers
+
+PRIORITY 4: Remaining 7 Failures (individual investigation needed)
+───────────────────────────────────────────────────────────────────
+  - DAO navigation
+  - Phase 2 strategy transitions
+  - Zyno markdown output
+  - Resource production workflows
+  - Core game loop (quiz/mint)
+  - RAG upload auth
+
+═══════════════════════════════════════════════════════════════════════════
+SECTION 5: PROOF PACK INVENTORY
+═══════════════════════════════════════════════════════════════════════════
+
+Directory: artifacts/proof/lead_claude_audit_run_005/
+
+MANDATORY ARTIFACTS (All Present):
+  ✓ audit_read_proof.log           (238 bytes,  SHA256: c343996a...)
+  ✓ e2e_console.log                (141K,       SHA256: ee803ee1...)
+  ✓ e2e_exit_code.txt              (1 byte,     SHA256: 01ba4719...)
+  ✓ e2e_json_counts.txt            (135 bytes,  SHA256: [generated])
+  ✓ playwright_report.json         (421K,       SHA256: cebd14e8...)
+  ✓ routes_visited_raw.txt         (7.6K,       SHA256: 1e53d3f0...)
+  ✓ routes_visited.txt             (408 bytes,  SHA256: 0c207bdf...)
+  ✓ scan_token.txt                 (3 bytes,    SHA256: 4355a46b...)
+  ✓ scan_trace.txt                 (2 bytes,    SHA256: 4355a46b...)
+  ✓ scan_no_onchain.txt            (2 bytes,    SHA256: 95aebc97...)
+  ✓ sonar.log                      (116 bytes,  SHA256: [generated])
+  ✓ sha256.txt                     (complete)
+  ✓ zero_byte_files.txt            (complete)
+
+Zero-Byte Files: 0 (all artifacts populated)
+
+═══════════════════════════════════════════════════════════════════════════
+SECTION 6: ROUTE COVERAGE
+═══════════════════════════════════════════════════════════════════════════
+
+Total Events: 182
+Unique Routes: 19
+
+Routes Visited:
+  • http://127.0.0.1:3003/
+  • http://localhost:3003/
+  • http://localhost:3003/auth/login
+  • http://localhost:3003/auth/login?demo=1
+  • http://localhost:3003/dao
+  • http://localhost:3003/dashboard
+  • http://localhost:3003/debug/mint
+  • http://localhost:3003/guide
+  • http://localhost:3003/journeys
+  • http://localhost:3003/journeys/cognitive-activation-hub
+  • http://localhost:3003/journeys/demo
+  • http://localhost:3003/journeys/demo/invalid-persona-id
+  • http://localhost:3003/journeys/e2e-persona
+  • http://localhost:3003/journeys/invalid-journey-id-xyz
+  • http://localhost:3003/login
+  • http://localhost:3003/non-existent-page-12345
+  • http://localhost:3003/register
+  • http://localhost:3003/resources
+  • http://localhost:3003/zyno
+
+Coverage: Good breadth across auth, journey, DAO, resources, error pages
+
+═══════════════════════════════════════════════════════════════════════════
+SECTION 7: SECURITY SCANS
+═══════════════════════════════════════════════════════════════════════════
+
+Token Scan (sk- patterns):    80 matches (needs manual review)
+Trace Scan (console.trace):   1 occurrence (acceptable for dev)
+No-Onchain Scan (devnet):     1 reference (verify restriction)
+
+Note: Token scan matches likely false positives (comments, test data).
+Manual review recommended before production deployment.
+
+═══════════════════════════════════════════════════════════════════════════
+SECTION 8: NEXT STEPS (Mandatory for Re-Certification)
+═══════════════════════════════════════════════════════════════════════════
+
+1. INVESTIGATE & FIX BLOCKER #1 (70 failures)
+   - Focus on agent orchestration (21 failures) first
+   - Review backend routes, orchestrator, auth propagation
+   - Apply surgical fixes with targeted testing
+
+2. RE-RUN AUDIT (Run 006)
+   - Same command, same profile (PROFILE_B)
+   - Target: unexpected=0, skipped=0, flaky=0
+   - Generate new proof pack with SHA256
+
+3. VERIFY PROOF PACK
+   - Ensure e2e_json_counts.txt shows unexpected=0
+   - Confirm all artifacts non-empty
+   - Validate route coverage maintained
+
+4. SONAR (Optional Enhancement)
+   - Add .sonarqube/credentials if available
+   - Run quality gate scan
+   - Document results in sonar.log
+
+5. FINAL VERDICT GENERATION
+   - PASS_READY_FOR_PROD if all criteria met
+   - Otherwise iterate with additional blocker analysis
+
+═══════════════════════════════════════════════════════════════════════════
+SECTION 9: AUDIT TRAIL INTEGRITY
+═══════════════════════════════════════════════════════════════════════════
+
+✓ AUDIT.md read and documented (audit_read_proof.log)
+✓ JSON reporter configured and validated
+✓ Console output archived (e2e_console.log)
+✓ Routes emitted via framenavigated events
+✓ No manual interventions during test execution
+✓ Checksums generated for all artifacts
+✓ Reproducible command documented
+
+AUDIT INTEGRITY: VERIFIED
+PROOF PACK COMPLETENESS: 100%
+
+═══════════════════════════════════════════════════════════════════════════
+FINAL AUTHORIZATION
+═══════════════════════════════════════════════════════════════════════════
+
+This verdict is produced under full authority as Acting Project Lead and
+QA/Audit Owner per AUDIT.md mandate. The system is NOT production-ready
+due to 70 unexpected test failures (59% pass rate).
+
+Certification BLOCKED pending remediation of agent orchestration failures
+and re-execution of audit suite with unexpected=0.
+
+Auditor: Claude Code (Sonnet 4.5)
+Signature: FAIL_BLOCKING
+Date: 2026-01-12T15:35:00+01:00
+
+═══════════════════════════════════════════════════════════════════════════
+END OF VERDICT — RUN 005
+═══════════════════════════════════════════════════════════════════════════

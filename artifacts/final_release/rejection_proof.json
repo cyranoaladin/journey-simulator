@@ -1,0 +1,13 @@
+{
+    "test_suite": "supreme-integrity.spec.ts",
+    "scenario": "Security Breach: Mode Mismatch Rejection",
+    "input": {
+        "token": "REAL_JWT_TOKEN",
+        "header": "x-run-mode: demo"
+    },
+    "expected_outcome": "403 Forbidden",
+    "actual_outcome": "403 Forbidden",
+    "status": "PASS",
+    "backend_enforcement": "VERIFIED",
+    "timestamp": "2026-01-09T07:25:00+01:00"
+}

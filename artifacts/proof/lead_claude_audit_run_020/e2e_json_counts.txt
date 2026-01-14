@@ -1,0 +1,6 @@
+  "stats": {
+    "startTime": "2026-01-13T17:00:36.227Z",
+    "duration": 1287306.063,
+    "expected": 91,
+    "skipped": 0,
+    "unexpected": 27,

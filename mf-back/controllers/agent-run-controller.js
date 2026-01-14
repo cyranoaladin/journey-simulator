@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const AgentRun = require('../models/agent-run');
 const mongoose = require('mongoose');
 
@@ -51,9 +57,19 @@ exports.getAgentRunDetails = async (req, res) => {
 
 exports.getHealth = async (req, res) => {
     const mongoStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+    const env = process.env.NODE_ENV || 'development';
+    const solanaRpc = process.env.SOLANA_RPC_URL;
+    const solanaCluster = process.env.SOLANA_CLUSTER || 'devnet';
+    const solana = solanaRpc ? 'active' : 'missing';
+    const mintDryRun = (process.env.MINT_DRY_RUN || '').toString().toLowerCase() === 'true';
+
     res.status(200).json({
         status: 'ok',
+        env,
         mongo: mongoStatus,
+        solana,
+        solanaCluster,
+        mintDryRun,
         uptime: process.uptime(),
         timestamp: new Date().toISOString()
     });

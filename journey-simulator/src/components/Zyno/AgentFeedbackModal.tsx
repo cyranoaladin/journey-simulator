@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useEffect, useMemo, useRef } from 'react';
 import { Clock, MessageSquare, X } from 'lucide-react';
 import { useJourneyStore } from '../../store/journeyStore';
@@ -12,7 +18,7 @@ interface AgentFeedbackModalProps {
 
 const formatDuration = (durationMs: number | null | undefined) => {
   if (!durationMs || durationMs <= 0) {
-    return 'Non mesure';
+    return 'Not measured';
   }
 
   if (durationMs < 1000) {
@@ -67,16 +73,16 @@ export default function AgentFeedbackModal({ step, userId, missionId }: AgentFee
       <header className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-4 dark:border-slate-700">
         <div>
           <p className="text-xs uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">Agent Feedback</p>
-          <h2 className="mt-1 text-xl font-semibold">Partagez votre avis sur {step.agent}</h2>
+          <h2 className="mt-1 text-xl font-semibold">Share your feedback on {step.agent}</h2>
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Phase : {step.phase ?? 'Non specifiee'} • Intent : {step.intent ?? 'Indefinie'}
+            Phase: {step.phase ?? 'Unspecified'}  Intent: {step.intent ?? 'Undefined'}
           </p>
         </div>
         <button
           type="button"
           onClick={closeModal}
           className="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-slate-100"
-          aria-label="Fermer le module de feedback"
+          aria-label="Close feedback modal"
         >
           <X size={18} />
         </button>
@@ -86,31 +92,31 @@ export default function AgentFeedbackModal({ step, userId, missionId }: AgentFee
         <section className="space-y-4">
           <article className="rounded-xl border border-slate-200 p-4 text-sm dark:border-slate-700">
             <header className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
-              <MessageSquare size={14} /> Contexte propose par Zyno
+              <MessageSquare size={14} /> Context proposed by Zyno
             </header>
             <div className="space-y-3">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Raisonnement</p>
+                <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Reasoning</p>
                 <p className="mt-1 leading-relaxed text-slate-700 dark:text-slate-200">
-                  {step.reasoning ?? 'Aucun raisonnement transmis.'}
+                  {step.reasoning ?? 'No reasoning provided.'}
                 </p>
               </div>
               <div>
-                <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Action proposee</p>
+                <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Proposed Action</p>
                 <p className="mt-1 leading-relaxed text-slate-700 dark:text-slate-200">
-                  {step.action ?? 'Action en attente.'}
+                  {step.action ?? 'Action pending.'}
                 </p>
               </div>
               <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                <Clock size={14} /> Duree d'execution : {formatDuration(step.durationMs ?? null)}
+                <Clock size={14} /> Execution time: {formatDuration(step.durationMs ?? null)}
               </div>
               {sources.length > 0 ? (
                 <div>
                   <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Sources</p>
                   <ul className="mt-1 space-y-1">
-                    {sources.map((source, index) => (
+                    {sources.map((source: { title?: string; url?: string }, index: number) => (
                       <li key={`${source?.title ?? 'source'}-${index}`} className="text-xs text-slate-600 dark:text-slate-300">
-                        {source?.title ?? source?.url ?? 'Source non nommee'}
+                        {source?.title ?? source?.url ?? 'Unnamed source'}
                       </li>
                     ))}
                   </ul>

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { ReactNode } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
@@ -27,7 +33,7 @@ const LayoutShell = ({ children, enableWallet = true }: LayoutProps) => {
   logger.debug('LayoutShell: render', { focusMode, leftPanelOpen, rightPanelOpen });
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-b from-[#09081a] via-[#0D0B1F] to-[#0D0B1F] text-slate-100" data-focus-mode={focusMode}>
+    <div className="relative min-h-screen bg-gradient-to-b from-[#09081a] via-[#0D0B1F] to-[#0D0B1F] text-slate-100" data-focus-mode={focusMode} data-testid="trinity-layout app-ready">
       <Header enableWallet={enableWallet} />
       <div className="relative flex w-full justify-center">
         <div className="relative flex w-full flex-col pt-[calc(var(--header-height,4rem)+var(--skillchain-banner-offset,0px)+var(--wallet-banner-offset,0px)+1.5rem)]">

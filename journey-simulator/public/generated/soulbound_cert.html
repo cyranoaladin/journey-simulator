@@ -1,47 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Proof of Skill NFT</title>
-    <script src="https://cdn.tailwindcss.com" integrity="sha384-OLBgp1GsljhM2TJ+sbHjaiH9txEUvgdDTAzHv2P24donTt6/529l+9Ua0vFImLlb" crossorigin="anonymous"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"
+        integrity="sha384-OLBgp1GsljhM2TJ+sbHjaiH9txEUvgdDTAzHv2P24donTt6/529l+9Ua0vFImLlb"
+        crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;600&display=swap"
+        rel="stylesheet">
     <style>
-        body { background: #000; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        body {
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
         .nft-card {
-            width: 380px; height: 550px;
+            width: 380px;
+            height: 550px;
             background: linear-gradient(145deg, #1a1a2e, #16213e);
             border-radius: 20px;
-            border: 1px solid rgba(255,215,0,0.3);
+            border: 1px solid rgba(255, 215, 0, 0.3);
             box-shadow: 0 0 40px rgba(160, 32, 240, 0.3);
-            position: relative; overflow: hidden;
-            display: flex; flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
+
         .holo-overlay {
-            position: absolute; inset: 0;
-            background: linear-gradient(125deg, transparent 30%, rgba(255,255,255,0.1) 40%, transparent 50%);
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(125deg, transparent 30%, rgba(255, 255, 255, 0.1) 40%, transparent 50%);
             animation: shine 4s infinite linear;
         }
-        @keyframes shine { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
         .seal {
-            width: 120px; height: 120px; margin: 40px auto 20px;
-            background: url('https://upload.wikimedia.org/wikipedia/commons/3/3b/Solana_logo.png') no-repeat center/contain; /* Placeholder for Solana Logo */
+            width: 120px;
+            height: 120px;
+            margin: 40px auto 20px;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/3/3b/Solana_logo.png') no-repeat center/contain;
+            /* Placeholder for Solana Logo */
             filter: drop-shadow(0 0 10px #A020F0);
         }
     </style>
 </head>
+
 <body>
     <div class="nft-card">
         <div class="holo-overlay"></div>
         <div class="p-6 text-center text-white z-10 h-full flex flex-col">
             <div class="text-xs uppercase tracking-[0.3em] text-yellow-500 mb-8">Money Factory AI</div>
-            
-            <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center shadow-lg shadow-purple-500/50">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10v6M12 2v20M12 12H2M12 12h10M12 12l-5-5M12 12l5-5M12 12l-5 5M12 12l5 5"/></svg>
+
+            <div
+                class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center shadow-lg shadow-purple-500/50">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                    stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 10v6M2 10v6M12 2v20M12 12H2M12 12h10M12 12l-5-5M12 12l5-5M12 12l-5 5M12 12l5 5" />
+                </svg>
             </div>
 
             <h1 class="font-[Cinzel] text-2xl font-bold mb-2">Solana Architect</h1>
-            <div class="text-sm text-purple-300 mb-8">Level 1 Certification</div>
+            <div class="text-sm text-purple-300 mb-8">Level 1 Certificate</div>
 
             <div class="mt-auto border-t border-white/10 pt-4 text-left">
                 <div class="flex justify-between text-xs text-gray-400 mb-1">
@@ -60,4 +95,5 @@
         </div>
     </div>
 </body>
+
 </html>

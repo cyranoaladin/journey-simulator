@@ -1,0 +1,26 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://localhost:3003",
+      "localStorage": [
+        {
+          "name": "accessToken",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NjYzNWRhNzQzMDMyY2ExNmZiYTc4ZCIsIndhbGxldCI6IkUyRVRlc3RXYWxsZXQxMTExMTExMTExMTExMTExMTExMTExMTExMTExIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3NjgzMDYxMzksImV4cCI6MTc2ODMwOTczOX0.MZFzulx9O2P1Xy6GpX1czMdfOaqktfQnpVd8DHQGNmo"
+        },
+        {
+          "name": "mfai_token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NjYzNWRhNzQzMDMyY2ExNmZiYTc4ZCIsIndhbGxldCI6IkUyRVRlc3RXYWxsZXQxMTExMTExMTExMTExMTExMTExMTExMTExMTExIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3NjgzMDYxMzksImV4cCI6MTc2ODMwOTczOX0.MZFzulx9O2P1Xy6GpX1czMdfOaqktfQnpVd8DHQGNmo"
+        },
+        {
+          "name": "loglevel:http-helpers",
+          "value": "INFO"
+        },
+        {
+          "name": "mfai-journey-storage",
+          "value": "{\"state\":{\"userProgress\":{\"totalXP\":0,\"nfts\":[],\"nftMints\":[],\"passLevel\":\"Free\",\"mfaiTokens\":0,\"stakedMfai\":0,\"walletConnected\":false,\"completedPhases\":[],\"votingPower\":0,\"daoProposals\":0,\"testnetAirdropClaimed\":false,\"socialShareCount\":0,\"shareHistory\":[]},\"selectedPersona\":null,\"runMode\":\"real\",\"phaseStatus\":\"IDLE\",\"phaseFeedback\":null,\"activeAgents\":[],\"generatedResources\":[],\"quizUnlocked\":false,\"mintUnlocked\":false,\"rewardsReady\":false,\"rewardsClaimed\":false,\"mintStatus\":\"idle\",\"agentLogs\":[]},\"version\":0}"
+        }
+      ]
+    }
+  ]
+}

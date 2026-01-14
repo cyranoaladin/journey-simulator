@@ -1,8 +1,15 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi, beforeAll, afterAll } from 'vitest';
 import React from 'react';
 import { API_BASE_URL } from '../../../utils/api';
+import { useRunModeStore } from '../../../store/runModeStore';
 
 vi.mock('../AgentLogViewer', () => ({
   __esModule: true,
@@ -77,7 +84,7 @@ describe('ZynoConsole', () => {
   let consoleErrorSpy: ReturnType<typeof vi.spyOn> | undefined;
 
   beforeAll(() => {
-    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
   });
 
   afterAll(() => {
@@ -95,7 +102,7 @@ describe('ZynoConsole', () => {
           BuilderAgent: {
             agent: 'BuilderAgent',
             activationLevel: 0.72,
-            ae_summary: 'Plan établi',
+            ae_summary: 'Plan tabli',
           },
         },
         parcoursTemplate: { templateId: 'template-1' },
@@ -107,6 +114,7 @@ describe('ZynoConsole', () => {
   afterEach(() => {
     vi.clearAllMocks();
     vi.useRealTimers();
+    useRunModeStore.setState({ runMode: 'simulation' });
   });
 
   it('enables mission launch and renders mission feedback after success', async () => {
@@ -140,6 +148,32 @@ describe('ZynoConsole', () => {
     expect(orchestrationCall?.[1]).toEqual(expect.objectContaining({ method: 'POST' }));
   });
 
+  it('extends the orchestration timeout when run mode is real', async () => {
+    const timeoutSpy = vi.spyOn(globalThis, 'setTimeout');
+    useRunModeStore.setState({ runMode: 'real' });
+
+    const { ZynoConsole } = await import('../ZynoConsole');
+
+    render(<ZynoConsole />);
+
+    const textarea = screen.getByLabelText('Mission Input / Intent');
+    await userEvent.type(textarea, 'Investigate treasury strategy');
+
+    const launchButton = screen.getByRole('button', { name: 'Start Simulation' });
+    await userEvent.click(launchButton);
+
+    await waitFor(() => {
+      const orchestrationCalls = mockFetch.mock.calls.filter(([url]) =>
+        typeof url === 'string' && url.includes('/orchestration')
+      );
+      expect(orchestrationCalls).toHaveLength(1);
+    });
+
+    expect(timeoutSpy.mock.calls.some(([, delay]) => delay === 180000)).toBe(true);
+
+    timeoutSpy.mockRestore();
+  });
+
   it('should display a timeout error immediately if fetch rejects with AbortError', async () => {
     // Mock global.fetch ONLY for this test to immediately reject with AbortError
     globalThis.fetch = vi.fn(() => Promise.reject(new DOMException('Aborted', 'AbortError'))) as unknown as typeof fetch;
@@ -152,13 +186,13 @@ describe('ZynoConsole', () => {
 
     const launchButton = screen.getByRole('button', { name: 'Start Simulation' });
     await userEvent.click(launchButton);
-    
+
     // Now, the error message should be displayed because the fetch mock immediately rejected
     await waitFor(() => {
       const errorLi = screen.getByText(/Request timed out\. Please try again\./i);
       expect(errorLi).toBeInTheDocument();
     });
-    
+
     // And the button should be re-enabled
     expect(screen.getByRole('button', { name: 'Start Simulation' })).toBeEnabled();
   });

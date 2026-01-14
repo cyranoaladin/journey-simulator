@@ -1,0 +1,20 @@
+Listing tests:
+  [chromium] › 00-preflight/runmode-guard-violation.spec.ts:18:5 › RunMode Guard Violation › should crash immediately when runMode=simulation but guard expects real
+  [chromium] › 01-navigation/comprehensive-menu.spec.ts:15:5 › Supreme Navigation: Comprehensive Menu & Links › Header: Verify all top-level links are strictly visible and clickable
+  [chromium] › 01-navigation/comprehensive-menu.spec.ts:46:5 › Supreme Navigation: Comprehensive Menu & Links › Menu Dropdown: strict verification of all items
+  [chromium] › 01-navigation/comprehensive-menu.spec.ts:66:5 › Supreme Navigation: Comprehensive Menu & Links › Menu Navigation: DAO
+  [chromium] › 01-navigation/comprehensive-menu.spec.ts:85:5 › Supreme Navigation: Comprehensive Menu & Links › Menu Navigation: Zyno Console
+  [chromium] › 01-navigation/comprehensive-menu.spec.ts:92:5 › Supreme Navigation: Comprehensive Menu & Links › Menu Navigation: Resources
+  [chromium] › 01-navigation/error-pages.spec.ts:10:5 › Error Pages - Zero-Failure Path › should handle 404 for non-existent routes
+  [chromium] › 01-navigation/error-pages.spec.ts:19:5 › Error Pages - Zero-Failure Path › should handle invalid journey ID
+  [chromium] › 01-navigation/error-pages.spec.ts:28:5 › Error Pages - Zero-Failure Path › should handle invalid demo journey ID
+  [chromium] › 01-navigation/header-navigation.spec.ts:15:5 › Header Navigation - Zero-Failure Path › should display all header navigation elements
+  [chromium] › 01-navigation/header-navigation.spec.ts:62:5 › Header Navigation - Zero-Failure Path › should switch to Demo mode and update UI
+  [chromium] › 01-navigation/header-navigation.spec.ts:78:5 › Header Navigation - Zero-Failure Path › should switch to Simulation mode and update UI
+  [chromium] › 01-navigation/header-navigation.spec.ts:87:5 › Header Navigation - Zero-Failure Path › should switch to Real mode and update UI
+  [chromium] › 01-navigation/header-navigation.spec.ts:96:5 › Header Navigation - Zero-Failure Path › should navigate to Journeys page
+  [chromium] › 01-navigation/header-navigation.spec.ts:110:5 › Header Navigation - Zero-Failure Path › should open Menu dropdown
+  [chromium] › 01-navigation/header-navigation.spec.ts:123:5 › Header Navigation - Zero-Failure Path › should navigate to DAO from Menu
+  [chromium] › 01-navigation/header-navigation.spec.ts:130:5 › Header Navigation - Zero-Failure Path › should toggle theme (dark/light mode)
+  [chromium] › 01-navigation/header-navigation.spec.ts:143:5 › Header Navigation - Zero-Failure Path › should logout and redirect to home
+  [chromium] › 01-navigation/mode-persistence.spec.ts:15:5 › Supreme Navigation: Mode Persistence › Mode Switching: Demo -> Simulation -> Real -> Demo with API Context Check

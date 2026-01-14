@@ -1,0 +1,54 @@
+### 🕵️ PROMPT: AUDIT FORENSIQUE & CARTOGRAPHIE DES FLUX (CODE-REALITY CHECK)
+
+**Rôle :** Tu es Auditeur Technique Senior spécialisé en Reverse Engineering.
+**Contexte :** Le projet souffre de dysfonctionnements majeurs en UI/UX et logique métier. Il y a un fossé entre les tests (verts) et l'expérience utilisateur (brisée).
+**Objectif :** Produire la "Carte de Vérité" de l'application. Je ne veux pas savoir ce que l'app *devrait* faire, je veux savoir ce que le code *fait actuellement*.
+
+**TA MISSION :**
+Tu vas lire, parser et analyser l'intégralité du codebase (Frontend `journey-simulator` et Backend `mf-back`) pour rédiger un document de référence nommé `artifacts/CURRENT_WORKFLOW_REALITY.md`.
+
+**CONTRAINTES ABSOLUES (TOLÉRANCE ZÉRO) :**
+1.  **Code is Law :** Si une fonctionnalité n'est pas explicitement dans le code, elle n'existe pas. Interdiction d'halluciner ou de supposer.
+2.  **Pas de généralités :** Interdit d'utiliser des phrases vagues comme "le système gère les étapes". Je veux : "Le fichier `JourneyStore.ts` ligne 45 met à jour la variable `currentPhase`".
+3.  **Focus Interaction :** Analyse précisément le lien de cause à effet : Clic UI -> Handler -> API -> DB -> Réponse -> Mise à jour State -> Rerender UI.
+
+---
+
+**STRUCTURE OBLIGATOIRE DU DOCUMENT À PRODUIRE :**
+
+#### 1. 🗺️ Cartographie des Parcours (Static Data Analysis)
+*Analyse les fichiers de définition (JSON, Configs, Constants).*
+* Quels sont **exactement** les IDs des parcours définis dans le code ?
+* Pour chaque Parcours :
+    * Liste les **Phases** (IDs, Titres, Ordre).
+    * Liste les **Étapes/Missions** par phase.
+    * Identifie les conditions de déblocage codées en dur (hardcoded checks).
+
+#### 2. 🧠 Machine à État & Synchro (Frontend Logic)
+*Analyse `journeyStore.ts`, `AuthContext.tsx`, et les Hooks.*
+* Comment l'application détermine-t-elle l'étape active ? (Montre la logique de calcul).
+* Quel est le **mécanisme exact** de passage de la Phase N à N+1 ? (Quel trigger ? Quelle vérification ?).
+* Où sont stockées les "Ressources produites" ? (LocalStorage ? Variable volatile ? DB ?).
+
+#### 3. 🗣️ Pipeline d'Interaction Zyno (The "Hot Path")
+*Trace le flux complet d'une interaction utilisateur.*
+* **Input :** Analyse le composant `ZynoConsole` ou la zone de prompt. Quel événement écoute la soumission ?
+* **Transit :** Quelle route API exacte est appelée ? Avec quel payload ?
+* **Traitement (Backend) :** Quel Agent est invoqué ? Comment la réponse est-elle construite (Stream vs Block) ?
+* **Rendu (Frontend) :** Comment le frontend reçoit-il la réponse ? Quel composant (exactement) est chargé de l'afficher ? **Pourquoi ça bloque actuellement ?** (Identifie les conditions `if(!message) return null` ou CSS `display: none`).
+
+#### 4. 🖼️ Affichages Dynamiques & UI (Component Tree)
+*Analyse les composants de rendu (`JourneyWorkspace`, `UIBlocksRenderer`, etc.).*
+* Comment les "Blocks" (texte, bouton, image) sont-ils instanciés ?
+* Quelles sont les règles de visibilité conditionnelle (ex: "Afficher ce bouton seulement si `status === 'completed'`") ?
+* Liste les incohérences flagrantes entre le state et le rendu (ex: state dit "loading", UI ne montre pas de spinner).
+
+---
+
+**MÉTHODOLOGIE D'EXÉCUTION :**
+1.  Commence par **lire les fichiers sources** (ne te fie pas aux noms de fichiers, lis le contenu).
+    * Cibles prioritaires : `journey-simulator/src/store/*`, `journey-simulator/src/components/Journey/*`, `mf-back/orchestration/*`, `mf-back/parcours/*`.
+2.  **Simule mentalement l'exécution** du code pour détecter les ruptures de logique (ex: une promesse non attendue, un state non mis à jour).
+3.  **Rédige le rapport** `artifacts/CURRENT_WORKFLOW_REALITY.md`.
+
+**Action :** Exécute l'analyse maintenant et livre le document. Je veux voir la réalité crue du code. GO.

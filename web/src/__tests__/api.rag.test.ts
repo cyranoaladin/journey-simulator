@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 /** @jest-environment node */
 import { POST as queryPost } from '../../app/api/rag/query/route'
 import { POST as docPost } from '../../app/api/rag/doc/route'

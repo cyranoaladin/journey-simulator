@@ -1,3 +1,9 @@
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
 # Journey → Agents map (R3.3)
 
 Source de vérité : `mf-back/orchestration/workflowMap.js`. Objectif : rendre lisible l’enchaînement Journey → Phase → Intents → Agents et l’output attendu, en signalant les agents désactivés ou stub.

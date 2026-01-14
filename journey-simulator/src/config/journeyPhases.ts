@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { personas } from '../data/personas';
 
 export interface NextActionConfig {
@@ -55,5 +61,5 @@ export function getJourneyPhases(personaId: string): JourneyPhaseConfig[] {
 
 export function getPhaseFromStepId(personaId: string, stepId: string): JourneyPhaseConfig | undefined {
   const phases = getJourneyPhases(personaId);
-  return phases.find(p => p.id === stepId);
+  return phases.find(p => p.id === stepId || p.originalId === stepId);
 }

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useEffect, useRef } from 'react';
 import { generateStableKey } from '../../utils/generateStableKey';
 
@@ -8,8 +14,8 @@ export interface IndicatorBlock {
   indicators: Array<{
     name: string;
     value: number; // 0-100
-    max: number; // généralement 100
-    color?: string; // couleur personnalisée
+    max: number; // usually 100
+    color?: string; // custom color
   }>;
   type: 'gauge' | 'radar' | 'bar'; // Type de visualisation
 }

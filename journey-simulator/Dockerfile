@@ -29,8 +29,13 @@ COPY --from=build /app/dist /usr/share/nginx/html
 # nginx official entrypoint will render /etc/nginx/templates/*.template -> /etc/nginx/conf.d/*.conf
 COPY nginx.conf /etc/nginx/templates/default.conf.template
 
-# Run as root (default) to allow binding to port 80 and writing to /var/run
-# Nginx drops privileges to 'nginx' user automatically for workers
+RUN apk add --no-cache libcap \
+    && addgroup -g 101 app \
+    && adduser -S -G app -u 101 app \
+    && setcap 'cap_net_bind_service=+ep' /usr/sbin/nginx \
+    && chown -R app:app /usr/share/nginx/html /var/cache/nginx /var/run
+
+USER 101
 
 EXPOSE 80
 

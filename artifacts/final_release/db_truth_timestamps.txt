@@ -1,0 +1,703 @@
+Users: 102
+Logs: 30
+Runs: 0
+{
+  _id: ObjectId('695eda9b681d52a4c9b85831'),
+  userId: '695ebff4819e756d021e0f9d',
+  agentName: 'Web3LegalAgent',
+  intent: 'launch_dao',
+  phaseId: 'Learn',
+  promptSent: 'Build a DAO voting plan with quorum, power levels, and AEPO/AECO tracking.',
+  reasoning: 'Building a DAO voting plan with quorum, power levels, and AEPO/AECO tracking involves multiple legal considerations, particularly around governance structure, token utility, and regulatory compliance. Without a clear current phase or existing legal documentation, there is moderate risk related to securities classification, governance disputes, and jurisdictional compliance.',
+  actionTaken: null,
+  response: {
+    agentId: 'Web3LegalAgent',
+    status: 'OK',
+    summary: 'Building a DAO voting plan with quorum, power levels, and AEPO/AECO tracking involves multiple legal considerations, particularly around governance structure, token utility, and regulatory compliance. Without a clear current phase or existing legal documentation, there is moderate risk related to securities classification, governance disputes, and jurisdictional compliance.',
+    details: '{\n' +
+      '  "status": "OK",\n' +
+      '  "legal_risk_score": 45,\n' +
+      '  "summary": "Building a DAO voting plan with quorum, power levels, and AEPO/AECO tracking involves multiple legal considerations, particularly around governance structure, token utility, and regulatory compliance. Without a clear current phase or existing legal documentation, there is moderate risk related to securities classification, governance disputes, and jurisdictional compliance.",\n' +
+      '  "considerations": [\n' +
+      '    {\n' +
+      '      "topic": "Entity Formation and Governance",\n' +
+      '      "risk_level": "Medium",\n' +
+      `      "advice": "Consider structuring the DAO under a recognized legal wrapper such as a Wyoming DAO LLC or a Swiss Foundation to provide legal personality and limit liability. Define clear governance rules, quorum requirements, and power levels in the DAO's operating agreement or charter to reduce internal disputes."\n` +
+      '    },\n' +
+      '    {\n' +
+      '      "topic": "Token Classification and Securities Law",\n' +
+      '      "risk_level": "High",\n' +
+      '      "advice": "Evaluate whether AEPO/AECO tokens could be deemed securities under the Howey Test or other jurisdictional standards. If tokens confer governance rights or economic benefits, they may trigger securities regulations, requiring registration or exemption filings."\n' +
+      '    },\n' +
+      '    {\n' +
+      '      "topic": "Consumer Protection and Transparency",\n' +
+      '      "risk_level": "Medium",\n' +
+      '      "advice": "Implement comprehensive Terms of Use, Privacy Policies, and Risk Disclosures for DAO participants, especially if the voting mechanism impacts financial interests. Transparency about voting power and token tracking mechanisms is critical to maintain trust and comply with consumer protection laws."\n' +
+      '    },\n' +
+      '    {\n' +
+      '      "topic": "Jurisdictional Considerations",\n' +
+      '      "risk_level": "Medium",\n' +
+      '      "advice": "Select a jurisdiction that aligns with your DAO’s operational model and regulatory comfort. Wyoming offers favorable DAO LLC statutes, while Swiss Foundations provide neutrality. Consider regulatory clarity and enforcement risk in your jurisdiction choice."\n' +
+      '    }\n' +
+      '  ],\n' +
+      '  "actions": [\n' +
+      '    "Engage with legal counsel experienced in DAO structuring to draft or review governance documents.",\n' +
+      '    "Conduct a securities law analysis of AEPO/AECO tokens to determine regulatory status.",\n' +
+      '    "Develop clear and accessible participant agreements including voting rules and risk disclosures.",\n' +
+      '    "Evaluate and select an appropriate legal jurisdiction for DAO registration or wrapping."\n' +
+      '  ],\n' +
+      '  "disclaimer": "This output is for educational and strategic guidance only and does not constitute legal advice. Consult a qualified attorney for advice tailored to your specific circumstances."\n' +
+      '}',
+    considerations: [
+      {
+        topic: 'Entity Formation and Governance',
+        risk_level: 'Medium',
+        advice: "Consider structuring the DAO under a recognized legal wrapper such as a Wyoming DAO LLC or a Swiss Foundation to provide legal personality and limit liability. Define clear governance rules, quorum requirements, and power levels in the DAO's operating agreement or charter to reduce internal disputes."
+      },
+      {
+        topic: 'Token Classification and Securities Law',
+        risk_level: 'High',
+        advice: 'Evaluate whether AEPO/AECO tokens could be deemed securities under the Howey Test or other jurisdictional standards. If tokens confer governance rights or economic benefits, they may trigger securities regulations, requiring registration or exemption filings.'
+      },
+      {
+        topic: 'Consumer Protection and Transparency',
+        risk_level: 'Medium',
+        advice: 'Implement comprehensive Terms of Use, Privacy Policies, and Risk Disclosures for DAO participants, especially if the voting mechanism impacts financial interests. Transparency about voting power and token tracking mechanisms is critical to maintain trust and comply with consumer protection laws.'
+      },
+      {
+        topic: 'Jurisdictional Considerations',
+        risk_level: 'Medium',
+        advice: 'Select a jurisdiction that aligns with your DAO’s operational model and regulatory comfort. Wyoming offers favorable DAO LLC statutes, while Swiss Foundations provide neutrality. Consider regulatory clarity and enforcement risk in your jurisdiction choice.'
+      }
+    ],
+    riskScore: 45,
+    confidence: 0.85,
+    assumptions: [
+      'RAG hits: 0'
+    ],
+    citations: [],
+    actions: [
+      'Engage with legal counsel experienced in DAO structuring to draft or review governance documents.',
+      'Conduct a securities law analysis of AEPO/AECO tokens to determine regulatory status.',
+      'Develop clear and accessible participant agreements including voting rules and risk disclosures.',
+      'Evaluate and select an appropriate legal jurisdiction for DAO registration or wrapping.'
+    ],
+    metrics: {
+      latencyMs: 6192,
+      tokens: 761,
+      ragHits: 0,
+      aepo: 100,
+      durationMs: 0,
+      success: true,
+      errorCount: 0
+    },
+    errors: [],
+    mock: false
+  },
+  output: null,
+  sources: [],
+  metrics: {
+    latencyMs: 6192,
+    tokens: 761,
+    ragHits: 0,
+    aepo: 100,
+    durationMs: 0,
+    success: true,
+    errorCount: 0,
+    startedAt: '2026-01-07T22:13:46.866Z',
+    completedAt: '2026-01-07T22:13:46.955Z'
+  },
+  feedback: {
+    ae_summary: null,
+    ae_outcome: null,
+    aepo: 100,
+    aeco: null
+  },
+  timelineIndex: 1,
+  payload: {
+    agentId: 'Web3LegalAgent',
+    status: 'OK',
+    summary: 'Building a DAO voting plan with quorum, power levels, and AEPO/AECO tracking involves multiple legal considerations, particularly around governance structure, token utility, and regulatory compliance. Without a clear current phase or existing legal documentation, there is moderate risk related to securities classification, governance disputes, and jurisdictional compliance.',
+    details: '{\n' +
+      '  "status": "OK",\n' +
+      '  "legal_risk_score": 45,\n' +
+      '  "summary": "Building a DAO voting plan with quorum, power levels, and AEPO/AECO tracking involves multiple legal considerations, particularly around governance structure, token utility, and regulatory compliance. Without a clear current phase or existing legal documentation, there is moderate risk related to securities classification, governance disputes, and jurisdictional compliance.",\n' +
+      '  "considerations": [\n' +
+      '    {\n' +
+      '      "topic": "Entity Formation and Governance",\n' +
+      '      "risk_level": "Medium",\n' +
+      `      "advice": "Consider structuring the DAO under a recognized legal wrapper such as a Wyoming DAO LLC or a Swiss Foundation to provide legal personality and limit liability. Define clear governance rules, quorum requirements, and power levels in the DAO's operating agreement or charter to reduce internal disputes."\n` +
+      '    },\n' +
+      '    {\n' +
+      '      "topic": "Token Classification and Securities Law",\n' +
+      '      "risk_level": "High",\n' +
+      '      "advice": "Evaluate whether AEPO/AECO tokens could be deemed securities under the Howey Test or other jurisdictional standards. If tokens confer governance rights or economic benefits, they may trigger securities regulations, requiring registration or exemption filings."\n' +
+      '    },\n' +
+      '    {\n' +
+      '      "topic": "Consumer Protection and Transparency",\n' +
+      '      "risk_level": "Medium",\n' +
+      '      "advice": "Implement comprehensive Terms of Use, Privacy Policies, and Risk Disclosures for DAO participants, especially if the voting mechanism impacts financial interests. Transparency about voting power and token tracking mechanisms is critical to maintain trust and comply with consumer protection laws."\n' +
+      '    },\n' +
+      '    {\n' +
+      '      "topic": "Jurisdictional Considerations",\n' +
+      '      "risk_level": "Medium",\n' +
+      '      "advice": "Select a jurisdiction that aligns with your DAO’s operational model and regulatory comfort. Wyoming offers favorable DAO LLC statutes, while Swiss Foundations provide neutrality. Consider regulatory clarity and enforcement risk in your jurisdiction choice."\n' +
+      '    }\n' +
+      '  ],\n' +
+      '  "actions": [\n' +
+      '    "Engage with legal counsel experienced in DAO structuring to draft or review governance documents.",\n' +
+      '    "Conduct a securities law analysis of AEPO/AECO tokens to determine regulatory status.",\n' +
+      '    "Develop clear and accessible participant agreements including voting rules and risk disclosures.",\n' +
+      '    "Evaluate and select an appropriate legal jurisdiction for DAO registration or wrapping."\n' +
+      '  ],\n' +
+      '  "disclaimer": "This output is for educational and strategic guidance only and does not constitute legal advice. Consult a qualified attorney for advice tailored to your specific circumstances."\n' +
+      '}',
+    considerations: [
+      {
+        topic: 'Entity Formation and Governance',
+        risk_level: 'Medium',
+        advice: "Consider structuring the DAO under a recognized legal wrapper such as a Wyoming DAO LLC or a Swiss Foundation to provide legal personality and limit liability. Define clear governance rules, quorum requirements, and power levels in the DAO's operating agreement or charter to reduce internal disputes."
+      },
+      {
+        topic: 'Token Classification and Securities Law',
+        risk_level: 'High',
+        advice: 'Evaluate whether AEPO/AECO tokens could be deemed securities under the Howey Test or other jurisdictional standards. If tokens confer governance rights or economic benefits, they may trigger securities regulations, requiring registration or exemption filings.'
+      },
+      {
+        topic: 'Consumer Protection and Transparency',
+        risk_level: 'Medium',
+        advice: 'Implement comprehensive Terms of Use, Privacy Policies, and Risk Disclosures for DAO participants, especially if the voting mechanism impacts financial interests. Transparency about voting power and token tracking mechanisms is critical to maintain trust and comply with consumer protection laws.'
+      },
+      {
+        topic: 'Jurisdictional Considerations',
+        risk_level: 'Medium',
+        advice: 'Select a jurisdiction that aligns with your DAO’s operational model and regulatory comfort. Wyoming offers favorable DAO LLC statutes, while Swiss Foundations provide neutrality. Consider regulatory clarity and enforcement risk in your jurisdiction choice.'
+      }
+    ],
+    riskScore: 45,
+    confidence: 0.85,
+    assumptions: [
+      'RAG hits: 0'
+    ],
+    citations: [],
+    actions: [
+      'Engage with legal counsel experienced in DAO structuring to draft or review governance documents.',
+      'Conduct a securities law analysis of AEPO/AECO tokens to determine regulatory status.',
+      'Develop clear and accessible participant agreements including voting rules and risk disclosures.',
+      'Evaluate and select an appropriate legal jurisdiction for DAO registration or wrapping.'
+    ],
+    metrics: {
+      latencyMs: 6192,
+      tokens: 761,
+      ragHits: 0,
+      aepo: 100,
+      durationMs: 0,
+      success: true,
+      errorCount: 0
+    },
+    errors: [],
+    mock: false
+  },
+  ragSnippets: [],
+  ae_summary: '',
+  ae_outcome: '',
+  timestamp: ISODate('2026-01-07T22:13:47.039Z'),
+  __v: 0
+}
+{
+  _id: ObjectId('695eda9b681d52a4c9b85832'),
+  userId: '695ebff4819e756d021e0f9d',
+  agentName: 'AuditAgent',
+  intent: 'launch_dao',
+  phaseId: 'Learn',
+  promptSent: 'Build a DAO voting plan with quorum, power levels, and AEPO/AECO tracking.',
+  reasoning: 'The DAO voting plan concept includes important elements such as quorum, power levels, and AEPO/AECO tracking, which are essential for a robust governance system. However, the current implementation lacks clarity on architecture, state management, and upgradeability. There is insufficient documentation and no evidence of test coverage. Dependency management and gas optimization strategies are not addressed, which could impact performance and security.',
+  actionTaken: null,
+  response: {
+    agentId: 'AuditAgent',
+    status: 'OK',
+    summary: 'The DAO voting plan concept includes important elements such as quorum, power levels, and AEPO/AECO tracking, which are essential for a robust governance system. However, the current implementation lacks clarity on architecture, state management, and upgradeability. There is insufficient documentation and no evidence of test coverage. Dependency management and gas optimization strategies are not addressed, which could impact performance and security.',
+    details: '{\n' +
+      '  "status": "OK",\n' +
+      '  "quality_score": 65,\n' +
+      '  "summary": "The DAO voting plan concept includes important elements such as quorum, power levels, and AEPO/AECO tracking, which are essential for a robust governance system. However, the current implementation lacks clarity on architecture, state management, and upgradeability. There is insufficient documentation and no evidence of test coverage. Dependency management and gas optimization strategies are not addressed, which could impact performance and security.",\n' +
+      '  "issues": [\n' +
+      '    {\n' +
+      '      "category": "Architecture",\n' +
+      '      "severity": "High",\n' +
+      '      "description": "The voting plan lacks modularity and clear separation of concerns, making future upgrades and maintenance challenging.",\n' +
+      '      "recommendation": "Refactor the system into modular components with well-defined interfaces to improve upgradeability and maintainability."\n' +
+      '    },\n' +
+      '    {\n' +
+      '      "category": "Architecture",\n' +
+      '      "severity": "Medium",\n' +
+      '      "description": "State management for quorum, power levels, and AEPO/AECO tracking is not clearly defined, risking inconsistent or incorrect state updates.",\n' +
+      '      "recommendation": "Implement explicit state management patterns and ensure atomic updates to voting-related state variables."\n' +
+      '    },\n' +
+      '    {\n' +
+      '      "category": "Code Quality",\n' +
+      '      "severity": "High",\n' +
+      '      "description": "There is a lack of documentation and comments explaining the voting plan logic and parameters.",\n' +
+      '      "recommendation": "Add comprehensive documentation and inline comments to improve code readability and facilitate audits."\n' +
+      '    },\n' +
+      '    {\n' +
+      '      "category": "Code Quality",\n' +
+      '      "severity": "High",\n' +
+      '      "description": "No evidence of unit, integration, or end-to-end tests for the voting plan.",\n' +
+      '      "recommendation": "Develop thorough test coverage to validate quorum calculations, power level assignments, and AEPO/AECO tracking under various scenarios."\n' +
+      '    },\n' +
+      '    {\n' +
+      '      "category": "Gas Optimization",\n' +
+      '      "severity": "Medium",\n' +
+      '      "description": "Potential inefficiencies in state updates and calculations could lead to higher gas costs.",\n' +
+      '      "recommendation": "Optimize data structures and minimize on-chain computations to reduce gas consumption."\n' +
+      '    },\n' +
+      '    {\n' +
+      '      "category": "Dependency Integrity",\n' +
+      '      "severity": "Low",\n' +
+      '      "description": "No information on dependencies or version pinning is provided.",\n' +
+      '      "recommendation": "Ensure all dependencies are version pinned and audited for known vulnerabilities."\n' +
+      '    }\n' +
+      '  ],\n' +
+      '  "actions": [\n' +
+      '    "Define a modular architecture separating voting logic, power level management, and AEPO/AECO tracking.",\n' +
+      '    "Implement explicit and atomic state management for voting parameters.",\n' +
+      '    "Add comprehensive documentation and inline comments.",\n' +
+      '    "Develop and integrate unit, integration, and E2E tests covering all voting scenarios.",\n' +
+      '    "Review and optimize gas usage in state updates and calculations.",\n' +
+      '    "Audit and pin all dependencies to secure versions."\n' +
+      '  ]\n' +
+      '}',
+    issues: [
+      {
+        category: 'Architecture',
+        severity: 'High',
+        description: 'The voting plan lacks modularity and clear separation of concerns, making future upgrades and maintenance challenging.',
+        recommendation: 'Refactor the system into modular components with well-defined interfaces to improve upgradeability and maintainability.'
+      },
+      {
+        category: 'Architecture',
+        severity: 'Medium',
+        description: 'State management for quorum, power levels, and AEPO/AECO tracking is not clearly defined, risking inconsistent or incorrect state updates.',
+        recommendation: 'Implement explicit state management patterns and ensure atomic updates to voting-related state variables.'
+      },
+      {
+        category: 'Code Quality',
+        severity: 'High',
+        description: 'There is a lack of documentation and comments explaining the voting plan logic and parameters.',
+        recommendation: 'Add comprehensive documentation and inline comments to improve code readability and facilitate audits.'
+      },
+      {
+        category: 'Code Quality',
+        severity: 'High',
+        description: 'No evidence of unit, integration, or end-to-end tests for the voting plan.',
+        recommendation: 'Develop thorough test coverage to validate quorum calculations, power level assignments, and AEPO/AECO tracking under various scenarios.'
+      },
+      {
+        category: 'Gas Optimization',
+        severity: 'Medium',
+        description: 'Potential inefficiencies in state updates and calculations could lead to higher gas costs.',
+        recommendation: 'Optimize data structures and minimize on-chain computations to reduce gas consumption.'
+      },
+      {
+        category: 'Dependency Integrity',
+        severity: 'Low',
+        description: 'No information on dependencies or version pinning is provided.',
+        recommendation: 'Ensure all dependencies are version pinned and audited for known vulnerabilities.'
+      }
+    ],
+    qualityScore: 65,
+    confidence: 0.9,
+    assumptions: [
+      'RAG hits: 0'
+    ],
+    citations: [],
+    actions: [
+      'Define a modular architecture separating voting logic, power level management, and AEPO/AECO tracking.',
+      'Implement explicit and atomic state management for voting parameters.',
+      'Add comprehensive documentation and inline comments.',
+      'Develop and integrate unit, integration, and E2E tests covering all voting scenarios.',
+      'Review and optimize gas usage in state updates and calculations.',
+      'Audit and pin all dependencies to secure versions.'
+    ],
+    metrics: {
+      latencyMs: 8443,
+      tokens: 796,
+      ragHits: 0,
+      aepo: 100,
+      durationMs: 0,
+      success: true,
+      errorCount: 0
+    },
+    errors: [],
+    mock: false
+  },
+  output: null,
+  sources: [],
+  metrics: {
+    latencyMs: 8443,
+    tokens: 796,
+    ragHits: 0,
+    aepo: 100,
+    durationMs: 0,
+    success: true,
+    errorCount: 0,
+    startedAt: '2026-01-07T22:13:46.955Z',
+    completedAt: '2026-01-07T22:13:47.036Z'
+  },
+  feedback: {
+    ae_summary: null,
+    ae_outcome: null,
+    aepo: 100,
+    aeco: null
+  },
+  timelineIndex: 2,
+  payload: {
+    agentId: 'AuditAgent',
+    status: 'OK',
+    summary: 'The DAO voting plan concept includes important elements such as quorum, power levels, and AEPO/AECO tracking, which are essential for a robust governance system. However, the current implementation lacks clarity on architecture, state management, and upgradeability. There is insufficient documentation and no evidence of test coverage. Dependency management and gas optimization strategies are not addressed, which could impact performance and security.',
+    details: '{\n' +
+      '  "status": "OK",\n' +
+      '  "quality_score": 65,\n' +
+      '  "summary": "The DAO voting plan concept includes important elements such as quorum, power levels, and AEPO/AECO tracking, which are essential for a robust governance system. However, the current implementation lacks clarity on architecture, state management, and upgradeability. There is insufficient documentation and no evidence of test coverage. Dependency management and gas optimization strategies are not addressed, which could impact performance and security.",\n' +
+      '  "issues": [\n' +
+      '    {\n' +
+      '      "category": "Architecture",\n' +
+      '      "severity": "High",\n' +
+      '      "description": "The voting plan lacks modularity and clear separation of concerns, making future upgrades and maintenance challenging.",\n' +
+      '      "recommendation": "Refactor the system into modular components with well-defined interfaces to improve upgradeability and maintainability."\n' +
+      '    },\n' +
+      '    {\n' +
+      '      "category": "Architecture",\n' +
+      '      "severity": "Medium",\n' +
+      '      "description": "State management for quorum, power levels, and AEPO/AECO tracking is not clearly defined, risking inconsistent or incorrect state updates.",\n' +
+      '      "recommendation": "Implement explicit state management patterns and ensure atomic updates to voting-related state variables."\n' +
+      '    },\n' +
+      '    {\n' +
+      '      "category": "Code Quality",\n' +
+      '      "severity": "High",\n' +
+      '      "description": "There is a lack of documentation and comments explaining the voting plan logic and parameters.",\n' +
+      '      "recommendation": "Add comprehensive documentation and inline comments to improve code readability and facilitate audits."\n' +
+      '    },\n' +
+      '    {\n' +
+      '      "category": "Code Quality",\n' +
+      '      "severity": "High",\n' +
+      '      "description": "No evidence of unit, integration, or end-to-end tests for the voting plan.",\n' +
+      '      "recommendation": "Develop thorough test coverage to validate quorum calculations, power level assignments, and AEPO/AECO tracking under various scenarios."\n' +
+      '    },\n' +
+      '    {\n' +
+      '      "category": "Gas Optimization",\n' +
+      '      "severity": "Medium",\n' +
+      '      "description": "Potential inefficiencies in state updates and calculations could lead to higher gas costs.",\n' +
+      '      "recommendation": "Optimize data structures and minimize on-chain computations to reduce gas consumption."\n' +
+      '    },\n' +
+      '    {\n' +
+      '      "category": "Dependency Integrity",\n' +
+      '      "severity": "Low",\n' +
+      '      "description": "No information on dependencies or version pinning is provided.",\n' +
+      '      "recommendation": "Ensure all dependencies are version pinned and audited for known vulnerabilities."\n' +
+      '    }\n' +
+      '  ],\n' +
+      '  "actions": [\n' +
+      '    "Define a modular architecture separating voting logic, power level management, and AEPO/AECO tracking.",\n' +
+      '    "Implement explicit and atomic state management for voting parameters.",\n' +
+      '    "Add comprehensive documentation and inline comments.",\n' +
+      '    "Develop and integrate unit, integration, and E2E tests covering all voting scenarios.",\n' +
+      '    "Review and optimize gas usage in state updates and calculations.",\n' +
+      '    "Audit and pin all dependencies to secure versions."\n' +
+      '  ]\n' +
+      '}',
+    issues: [
+      {
+        category: 'Architecture',
+        severity: 'High',
+        description: 'The voting plan lacks modularity and clear separation of concerns, making future upgrades and maintenance challenging.',
+        recommendation: 'Refactor the system into modular components with well-defined interfaces to improve upgradeability and maintainability.'
+      },
+      {
+        category: 'Architecture',
+        severity: 'Medium',
+        description: 'State management for quorum, power levels, and AEPO/AECO tracking is not clearly defined, risking inconsistent or incorrect state updates.',
+        recommendation: 'Implement explicit state management patterns and ensure atomic updates to voting-related state variables.'
+      },
+      {
+        category: 'Code Quality',
+        severity: 'High',
+        description: 'There is a lack of documentation and comments explaining the voting plan logic and parameters.',
+        recommendation: 'Add comprehensive documentation and inline comments to improve code readability and facilitate audits.'
+      },
+      {
+        category: 'Code Quality',
+        severity: 'High',
+        description: 'No evidence of unit, integration, or end-to-end tests for the voting plan.',
+        recommendation: 'Develop thorough test coverage to validate quorum calculations, power level assignments, and AEPO/AECO tracking under various scenarios.'
+      },
+      {
+        category: 'Gas Optimization',
+        severity: 'Medium',
+        description: 'Potential inefficiencies in state updates and calculations could lead to higher gas costs.',
+        recommendation: 'Optimize data structures and minimize on-chain computations to reduce gas consumption.'
+      },
+      {
+        category: 'Dependency Integrity',
+        severity: 'Low',
+        description: 'No information on dependencies or version pinning is provided.',
+        recommendation: 'Ensure all dependencies are version pinned and audited for known vulnerabilities.'
+      }
+    ],
+    qualityScore: 65,
+    confidence: 0.9,
+    assumptions: [
+      'RAG hits: 0'
+    ],
+    citations: [],
+    actions: [
+      'Define a modular architecture separating voting logic, power level management, and AEPO/AECO tracking.',
+      'Implement explicit and atomic state management for voting parameters.',
+      'Add comprehensive documentation and inline comments.',
+      'Develop and integrate unit, integration, and E2E tests covering all voting scenarios.',
+      'Review and optimize gas usage in state updates and calculations.',
+      'Audit and pin all dependencies to secure versions.'
+    ],
+    metrics: {
+      latencyMs: 8443,
+      tokens: 796,
+      ragHits: 0,
+      aepo: 100,
+      durationMs: 0,
+      success: true,
+      errorCount: 0
+    },
+    errors: [],
+    mock: false
+  },
+  ragSnippets: [],
+  ae_summary: '',
+  ae_outcome: '',
+  timestamp: ISODate('2026-01-07T22:13:47.039Z'),
+  __v: 0
+}
+{
+  _id: ObjectId('695eda9b681d52a4c9b85830'),
+  userId: '695ebff4819e756d021e0f9d',
+  agentName: 'DAOAgent',
+  intent: 'launch_dao',
+  phaseId: 'Learn',
+  promptSent: 'Build a DAO voting plan with quorum, power levels, and AEPO/AECO tracking.',
+  reasoning: 'DAO analysis failed to parse',
+  actionTaken: null,
+  response: {
+    agentId: 'DAOAgent',
+    status: 'OK',
+    summary: 'DAO analysis failed to parse',
+    resources: {
+      documentation: '### Error\nCould not parse DAO JSON.'
+    },
+    confidence: 0.9,
+    assumptions: [
+      'RAG hits: 0'
+    ],
+    citations: [],
+    actions: [],
+    metrics: {
+      latencyMs: 14087,
+      tokens: 1094,
+      ragHits: 0,
+      aepo: 100,
+      durationMs: 1,
+      success: true,
+      errorCount: 0
+    },
+    errors: [],
+    mock: false
+  },
+  output: null,
+  sources: [],
+  metrics: {
+    latencyMs: 14087,
+    tokens: 1094,
+    ragHits: 0,
+    aepo: 100,
+    durationMs: 1,
+    success: true,
+    errorCount: 0,
+    startedAt: '2026-01-07T22:13:46.735Z',
+    completedAt: '2026-01-07T22:13:46.866Z'
+  },
+  feedback: {
+    ae_summary: null,
+    ae_outcome: null,
+    aepo: 100,
+    aeco: null
+  },
+  timelineIndex: 0,
+  payload: {
+    agentId: 'DAOAgent',
+    status: 'OK',
+    summary: 'DAO analysis failed to parse',
+    resources: {
+      documentation: '### Error\nCould not parse DAO JSON.'
+    },
+    confidence: 0.9,
+    assumptions: [
+      'RAG hits: 0'
+    ],
+    citations: [],
+    actions: [],
+    metrics: {
+      latencyMs: 14087,
+      tokens: 1094,
+      ragHits: 0,
+      aepo: 100,
+      durationMs: 1,
+      success: true,
+      errorCount: 0
+    },
+    errors: [],
+    mock: false
+  },
+  ragSnippets: [],
+  ae_summary: '',
+  ae_outcome: '',
+  timestamp: ISODate('2026-01-07T22:13:47.038Z'),
+  __v: 0
+}
+Recent Users:
+{
+  _id: ObjectId('695f9bfda9b9ed99f54eef52'),
+  name: 'Test User B 1767873531719',
+  email: 'testB_1767873531719@mfai.app',
+  password: '<REDACTED_BCRYPT_HASH>',
+  wallet_address: 'TEST_WALLET_testB_1767873531719@mfai.app',
+  persona: 'cognitive-activation-hub',
+  role: 'user',
+  is_active: true,
+  total_xp: 0,
+  current_level: 0,
+  completed_phases: 0,
+  token_transactions: {
+    mfai_tokens: 0,
+    last_updated: ISODate('2026-01-08T11:58:53.870Z')
+  },
+  subscription: 'free plan',
+  subscription_date: null,
+  preferences: {
+    language: 'en',
+    notifications: true
+  },
+  demo_mode: {
+    enabled: false,
+    persona_id: null,
+    last_loaded_at: null,
+    completed_phase_indexes: []
+  },
+  refreshTokenHash: '290e91d761154459d32c70d4a4128773275e7a7ffc2dfca23f25ed21fa3b1b9f',
+  refreshTokenExpiry: ISODate('2026-01-15T11:58:54.017Z'),
+  wallet_nonce: null,
+  wallet_nonce_expiry: null,
+  analytics: {
+    certificate_downloads: 0,
+    certificate_shares: 0,
+    holder_interactions: 0,
+    download_history: [],
+    share_history: [],
+    interaction_history: []
+  },
+  createdAt: ISODate('2026-01-08T11:58:53.870Z'),
+  wallets: [],
+  last_activity: ISODate('2026-01-08T11:58:53.870Z'),
+  nft_certificates: [],
+  __v: 0
+}
+{
+  _id: ObjectId('695f9bfba9b9ed99f54eef4c'),
+  name: 'Test User A 1767873531719',
+  email: 'testA_1767873531719@mfai.app',
+  password: '<REDACTED_BCRYPT_HASH>',
+  wallet_address: 'TEST_WALLET_testA_1767873531719@mfai.app',
+  persona: 'cognitive-activation-hub',
+  role: 'user',
+  is_active: true,
+  total_xp: 0,
+  current_level: 0,
+  completed_phases: 0,
+  token_transactions: {
+    mfai_tokens: 0,
+    last_updated: ISODate('2026-01-08T11:58:51.736Z')
+  },
+  subscription: 'free plan',
+  subscription_date: null,
+  preferences: {
+    language: 'en',
+    notifications: true
+  },
+  demo_mode: {
+    enabled: false,
+    persona_id: null,
+    last_loaded_at: null,
+    completed_phase_indexes: []
+  },
+  refreshTokenHash: '0a6e462faf5374a7eae477c1684ce97311d52e741f9a209a5ed6e1cc45b875b6',
+  refreshTokenExpiry: ISODate('2026-01-15T11:58:51.847Z'),
+  wallet_nonce: null,
+  wallet_nonce_expiry: null,
+  analytics: {
+    certificate_downloads: 0,
+    certificate_shares: 0,
+    holder_interactions: 0,
+    download_history: [],
+    share_history: [],
+    interaction_history: []
+  },
+  createdAt: ISODate('2026-01-08T11:58:51.736Z'),
+  wallets: [],
+  last_activity: ISODate('2026-01-08T11:58:51.736Z'),
+  nft_certificates: [],
+  __v: 0
+}
+{
+  _id: ObjectId('695f9b41a9b9ed99f54eec15'),
+  name: 'Test User B 1767873343220',
+  email: 'testB_1767873343220@mfai.app',
+  password: '<REDACTED_BCRYPT_HASH>',
+  wallet_address: 'TEST_WALLET_testB_1767873343220@mfai.app',
+  persona: 'cognitive-activation-hub',
+  role: 'user',
+  is_active: true,
+  total_xp: 0,
+  current_level: 0,
+  completed_phases: 0,
+  token_transactions: {
+    mfai_tokens: 0,
+    last_updated: ISODate('2026-01-08T11:55:45.363Z')
+  },
+  subscription: 'free plan',
+  subscription_date: null,
+  preferences: {
+    language: 'en',
+    notifications: true
+  },
+  demo_mode: {
+    enabled: false,
+    persona_id: null,
+    last_loaded_at: null,
+    completed_phase_indexes: []
+  },
+  refreshTokenHash: '52d05e1d4dd642a521afdca61a5ac926e37304251e77d8a66ac7c31a4b6df874',
+  refreshTokenExpiry: ISODate('2026-01-15T11:55:45.471Z'),
+  wallet_nonce: null,
+  wallet_nonce_expiry: null,
+  analytics: {
+    certificate_downloads: 0,
+    certificate_shares: 0,
+    holder_interactions: 0,
+    download_history: [],
+    share_history: [],
+    interaction_history: []
+  },
+  createdAt: ISODate('2026-01-08T11:55:45.363Z'),
+  wallets: [],
+  last_activity: ISODate('2026-01-08T11:55:45.363Z'),
+  nft_certificates: [],
+  __v: 0
+}

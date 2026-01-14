@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 export type Language = 'fr' | 'en'
 export type Mode = 'discovery' | 'builder' | 'expert' | 'investor_demo'
 export type RunMode = 'demo' | 'simulation' | 'real'
@@ -130,9 +136,15 @@ export type UIBlock =
 export type AgentAction = { agent_name: string; reason: string; action: string; parameters?: Record<string, any> }
 export type NextState = { phase_id: string; completed_missions: string[]; xp_delta: number; notes?: string }
 
+import type { GeneratedResource } from './journey';
+
 export interface JourneyStepResponse {
-  metadata: Metadata
-  ui_blocks: UIBlock[]
-  agent_actions: AgentAction[]
-  next_state: NextState
+  metadata: Metadata;
+  ui_blocks: UIBlock[];
+  agent_actions: AgentAction[];
+  next_state: NextState;
+  id?: string;
+  message?: string;
+  resources?: GeneratedResource[];
+  userInput?: string;
 }

@@ -1,0 +1,100 @@
+DEBUG: RawPath is /home/alaeddine/Documents/journey_mfai_back_front/artifacts/proof/lead_claude_audit_run_004/routes_visited_raw.txt
+
+[1A[2KROUTE_VISIT: http://localhost:3003/dashboard
+
+[1A[2K[PERF AUDIT] WS Stress test placeholder.
+
+[1A[2KROUTE_VISIT: http://localhost:3003/dashboard
+
+[1A[2K[116/118] [chromium] › tests/e2e/supreme-isolation.spec.ts:6:5 › Supreme Isolation Proof › Demo Mode Safety: Data should not persist to Real Backend
+[1A[2K[chromium] › tests/e2e/supreme-isolation.spec.ts:6:5 › Supreme Isolation Proof › Demo Mode Safety: Data should not persist to Real Backend
+DEBUG: RawPath is /home/alaeddine/Documents/journey_mfai_back_front/artifacts/proof/lead_claude_audit_run_004/routes_visited_raw.txt
+
+[1A[2KROUTE_VISIT: http://localhost:3003/
+
+[1A[2KROUTE_VISIT: http://localhost:3003/
+
+[1A[2KROUTE_VISIT: http://localhost:3003/
+
+[1A[2K[PROOF] Current Mode: demo
+
+[1A[2KROUTE_VISIT: http://localhost:3003/register
+
+[1A[2K[PROOF] Demo Test Complete
+
+[1A[2K[117/118] [chromium] › tests/e2e/supreme-isolation.spec.ts:42:5 › Supreme Isolation Proof › Real Mode Integrity: Headers and Data Sync
+[1A[2K[chromium] › tests/e2e/supreme-isolation.spec.ts:42:5 › Supreme Isolation Proof › Real Mode Integrity: Headers and Data Sync
+DEBUG: RawPath is /home/alaeddine/Documents/journey_mfai_back_front/artifacts/proof/lead_claude_audit_run_004/routes_visited_raw.txt
+
+[1A[2KROUTE_VISIT: http://localhost:3003/
+
+[1A[2KROUTE_VISIT: http://localhost:3003/
+
+[1A[2KROUTE_VISIT: http://localhost:3003/
+
+[1A[2K  68) [chromium] › tests/e2e/supreme-integrity.spec.ts:54:5 › Supreme Integrity: Security & Stress › UI Stress: Double-Click Protection 
+
+    TimeoutError: locator.fill: Timeout 60000ms exceeded.
+    Call log:
+    [2m  - waiting for getByPlaceholder('Email')[22m
+
+
+      57 |
+      58 |         // Fill form to enable button if needed
+    > 59 |         await page.waitForTimeout(1000); await page.getByPlaceholder('Email').fill('stress@test.com');
+         |                                                                               ^
+      60 |         await page.waitForTimeout(1000); await page.getByPlaceholder('Password').fill('StressTest123!');
+      61 |
+      62 |         const submitBtn = page.getByRole('button', { name: 'Sign In' });
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/supreme-integrity.spec.ts:59:79
+
+    Error Context: test-results/supreme-integrity-Supreme--be3db-ess-Double-Click-Protection-chromium/error-context.md
+
+
+[1A[2K[118/118] [chromium] › tests/e2e/03-agent-workflows/resource-production.spec.ts:107:5 › Production Resource Test - InvestorDemoAgent › Simulate InvestorDemoAgent execution and verify dashboard summary
+[1A[2K[chromium] › tests/e2e/03-agent-workflows/resource-production.spec.ts:107:5 › Production Resource Test - InvestorDemoAgent › Simulate InvestorDemoAgent execution and verify dashboard summary
+DEBUG: RawPath is /home/alaeddine/Documents/journey_mfai_back_front/artifacts/proof/lead_claude_audit_run_004/routes_visited_raw.txt
+
+[1A[2KROUTE_VISIT: http://localhost:3003/journeys
+
+[1A[2KROUTE_VISIT: http://localhost:3003/journeys
+
+[1A[2KROUTE_VISIT: http://localhost:3003/journeys
+
+[1A[2KROUTE_VISIT: http://localhost:3003/journeys
+
+[1A[2KROUTE_VISIT: http://localhost:3003/login
+
+[1A[2KROUTE_VISIT: http://localhost:3003/login
+
+[1A[2K  69) [chromium] › tests/e2e/03-agent-workflows/resource-production.spec.ts:107:5 › Production Resource Test - InvestorDemoAgent › Simulate InvestorDemoAgent execution and verify dashboard summary 
+
+    TimeoutError: locator.waitFor: Timeout 10000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('article').filter({ has: getByRole('heading', { name: 'The Cognitive Activation Hub' }) })[22m
+
+
+      115 |             has: page.getByRole('heading', { name: 'The Cognitive Activation Hub' })
+      116 |         });
+    > 117 |         await personaCard.waitFor({ state: 'attached', timeout: 10000 });
+          |                           ^
+      118 |         await personaCard.scrollIntoViewIfNeeded();
+      119 |         personaCard = page.locator('article').filter({
+      120 |             has: page.getByRole('heading', { name: 'The Cognitive Activation Hub' })
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/03-agent-workflows/resource-production.spec.ts:117:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/03-agent-workflows-resourc-4721e-nd-verify-dashboard-summary-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/03-agent-workflows-resourc-4721e-nd-verify-dashboard-summary-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/03-agent-workflows-resourc-4721e-nd-verify-dashboard-summary-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/03-agent-workflows-resourc-4721e-nd-verify-dashboard-summary-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+

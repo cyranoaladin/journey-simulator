@@ -1,0 +1,2 @@
+Total events: 364
+Unique routes: 19

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useState, useRef } from 'react';
 import { toast } from 'sonner';
 import { Persona } from '../types/journey';
@@ -50,7 +56,7 @@ export const useAutoSimulation = ({
                 // Let React render the phase switch before requesting.
                 await new Promise((r) => setTimeout(r, 150));
 
-                const overlayStart = onThinkingStart(`Generating ${phase.title}…`);
+                const overlayStart = onThinkingStart(`Generating ${phase.title}`);
                 try {
                     await runInteractiveStep({
                         phaseId: phase.id,

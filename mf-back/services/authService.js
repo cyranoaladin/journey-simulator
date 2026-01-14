@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const crypto = require('node:crypto');
@@ -11,12 +17,12 @@ if (!JWT_SECRET) {
 }
 
 /**
- * Service d'authentification
- * Extrait la logique métier des controllers pour réduire la complexité cognitive
+ * Authentication Service
+ * Extracts business logic from controllers to reduce cognitive complexity
  */
 class AuthService {
   /**
-   * Génère un token d'accès
+   * Generates an access token
    */
   static generateAccessToken(user) {
     return jwt.sign(
@@ -31,14 +37,14 @@ class AuthService {
   }
 
   /**
-   * Hash un refresh token
+   * Hashes a refresh token
    */
   static hashRefreshToken(token) {
     return crypto.createHash('sha256').update(String(token)).digest('hex');
   }
 
   /**
-   * Génère un refresh token
+   * Generates a refresh token
    */
   static generateRefreshToken(user) {
     const refreshToken = crypto.randomBytes(40).toString('hex');
@@ -53,7 +59,7 @@ class AuthService {
   }
 
   /**
-   * Valide les credentials d'un utilisateur
+   * Validates user credentials
    */
   static async validateCredentials(email, password) {
     const user = await User.findOne({ email });
@@ -74,7 +80,7 @@ class AuthService {
   }
 
   /**
-   * Crée un utilisateur
+   * Creates a user
    */
   static async createUser(userData) {
     const { name, email, password, wallet_address, persona } = userData;
@@ -99,7 +105,7 @@ class AuthService {
   }
 
   /**
-   * Prépare la réponse utilisateur (sans données sensibles)
+   * Prepares user response (without sensitive data)
    */
   static sanitizeUserResponse(user) {
     return {
@@ -113,7 +119,7 @@ class AuthService {
   }
 
   /**
-   * Génère un challenge pour l'authentification wallet
+   * Generates a challenge for wallet authentication
    */
   static async createWalletChallenge(walletAddress) {
     const user = await User.findOne({ wallet_address: walletAddress });
@@ -131,7 +137,7 @@ class AuthService {
   }
 
   /**
-   * Valide le format du message de challenge
+   * Validates challenge message format
    */
   static validateMessageFormat(message, nonce) {
     const expectedMessage = `Sign this message to log in to Money Factory AI\n\nNonce: ${nonce}`;
@@ -145,7 +151,7 @@ class AuthService {
   }
 
   /**
-   * Vérifie la signature wallet
+   * Verifies wallet signature
    */
   static verifyWalletSignature(signature, message, walletAddress) {
     try {
@@ -166,7 +172,7 @@ class AuthService {
   }
 
   /**
-   * Valide le challenge wallet
+   * Validates wallet challenge
    */
   static validateChallenge(user) {
     if (!user.wallet_nonce || !user.wallet_nonce_expiry || user.wallet_nonce_expiry < new Date()) {
@@ -179,7 +185,7 @@ class AuthService {
   }
 
   /**
-   * Effectue une connexion sécurisée avec wallet
+   * Performs a secure connection with wallet
    */
   static async performSecureLogin(user, signature, message, walletAddress) {
     const challengeCheck = this.validateChallenge(user);

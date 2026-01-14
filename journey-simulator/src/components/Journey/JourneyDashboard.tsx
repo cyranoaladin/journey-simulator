@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useEffect, useState, type FC } from "react";
 import { motion } from "framer-motion";
 import {
@@ -314,7 +320,7 @@ const JourneyDashboard: FC = () => {
                         })()
                       }`}
                     >
-                      {isCompleted ? "✓" : index + 1}
+                      {isCompleted ? "" : index + 1}
                     </div>
                     <div className="text-xs font-medium">{phase.title}</div>
                     <div className="text-xs opacity-60">

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const { mkFinding, mkAction, estimateConfidence, safeRun } = require('./agentUtils');
 
 class CurriculumAgent {
@@ -7,10 +13,10 @@ class CurriculumAgent {
 
     return safeRun('CurriculumAgent', () => {
       const findings = [
-        mkFinding('modules', 'ok', 'medium', 'Modules structurés (intro, sécurité, web3, anchor)'),
-        mkFinding('prerequisites', 'warn', 'low', 'Prerequis à clarifier (JS/TS, wallets, CLI)'),
-        mkFinding('timeline', 'ok', 'low', 'Timeline 4-6 semaines proposée'),
-        mkFinding('assessment', 'warn', 'medium', 'Rubrique d’évaluation à valider'),
+        mkFinding('modules', 'ok', 'medium', 'Structured modules (intro, security, web3, anchor)'),
+        mkFinding('prerequisites', 'warn', 'low', 'Prerequisites to clarify (JS/TS, wallets, CLI)'),
+        mkFinding('timeline', 'ok', 'low', 'Timeline 4-6 weeks proposed'),
+        mkFinding('assessment', 'warn', 'medium', 'Assessment rubric to validate'),
       ];
 
       const actions = [
@@ -28,8 +34,8 @@ class CurriculumAgent {
 
       const status = inputPresent ? 'OK' : 'WARN';
       const summary = inputPresent ? 'Curriculum drafted' : 'Curriculum drafted with limited input';
-      const assumptions = inputPresent ? [] : ['Pas de détails sur audience; utiliser parcours générique'];
-      const limits = ['Aucune délivrance de contenu réel ici', 'RAG non utilisé (déterministe)'];
+      const assumptions = inputPresent ? [] : ['No audience details; use generic path'];
+      const limits = ['No real content delivery here', 'RAG not used (deterministic)'];
 
       return {
         status,

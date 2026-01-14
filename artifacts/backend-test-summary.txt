@@ -1,0 +1,97 @@
+FAIL __tests__/s2_api.test.js (10.52 s)
+FAIL __tests__/s2_logic.test.js (10.173 s)
+  ● S2.3 Journey Engine Logic › Submit Phase: Should FAIL if phase is LOCKED
+  ● S2.3 Journey Engine Logic › Submit Phase: Should FAIL if invalid User/Run
+FAIL __tests__/s2_evaluation.test.js (10.134 s)
+  ● S2.4 Evaluation Service › Deterministic Mode: Should EVALUATE logicless submission as PASS
+  ● S2.4 Evaluation Service › Deterministic Mode: Should FAIL empty submission
+FAIL __tests__/routes.export.test.js
+FAIL __tests__/routes.admin.test.js
+FAIL __tests__/orchestrator_history_window.test.js
+FAIL __tests__/e2e/orchestration.e2e.test.js
+FAIL __tests__/routes.dao.test.js
+FAIL tests/routes.supertest.spec.js
+FAIL __tests__/zynoOrchestrator.test.js
+FAIL __tests__/demoMission.test.js
+FAIL tests/feedback.test.js
+FAIL tests/integration/resourceValidator.integration.test.js
+FAIL __tests__/routes.orchestration.test.js
+FAIL __tests__/memory_persistence.test.js
+PASS __tests__/verticalSliceOrchestration.test.js
+      [telemetry] {"ts":1768066772585,"type":"orchestration","level":"INFO","data":{"traceId":"trace-fail","tenantId":"default","intent":"security_audit+product_spec","runId":"run-fail","status":"FAIL","fallbacks":["llm_mock","secrets_warn","kill_switch"],"alerts":[{"level":"CRITICAL","sloId":"status_fail_timeout_rate","message":"status_fail_timeout_rate exceeded target","currentValue":1,"target":0.05,"tenantId":"default","timestamp":1768066772585},{"level":"INFO","sloId":"dry_run_rate","message":"dry_run_rate exceeded target","currentValue":1,"target":0.95,"tenantId":"default","timestamp":1768066772585},{"level":"INFO","sloId":"llm_usage_rate","message":"llm_usage_rate exceeded target","currentValue":1,"target":0.5,"tenantId":"default","timestamp":1768066772585},{"level":"WARN","sloId":"real_block_rate","message":"real_block_rate exceeded target","currentValue":1,"target":0.1,"tenantId":"default","timestamp":1768066772585}],"durationMs":1,"journey":"product_launch","phase":"discovery","phaseIndex":0}}
+      [telemetry] {"ts":1768066772673,"type":"orchestration","level":"INFO","data":{"traceId":"trace-kill-auto","tenantId":"default","intent":"security_audit+product_spec","runId":"run-kill-auto","status":"FAIL","fallbacks":["llm_mock","secrets_warn","kill_switch"],"alerts":[{"level":"CRITICAL","sloId":"status_fail_timeout_rate","message":"status_fail_timeout_rate exceeded target","currentValue":1,"target":0.05,"tenantId":"default","timestamp":1768066772673},{"level":"INFO","sloId":"dry_run_rate","message":"dry_run_rate exceeded target","currentValue":1,"target":0.95,"tenantId":"default","timestamp":1768066772673},{"level":"INFO","sloId":"llm_usage_rate","message":"llm_usage_rate exceeded target","currentValue":1,"target":0.5,"tenantId":"default","timestamp":1768066772673},{"level":"WARN","sloId":"real_block_rate","message":"real_block_rate exceeded target","currentValue":1,"target":0.1,"tenantId":"default","timestamp":1768066772673}],"durationMs":0,"journey":"product_launch","phase":"discovery","phaseIndex":0}}
+      1007 |       status: 'FAIL',
+PASS tests/wallet-auth.test.js
+PASS tests/unit/journeyController.test.js
+PASS tests/e2e/orchestrator_with_feedback.test.js
+PASS __tests__/admin.rag.e2e.test.js
+PASS __tests__/s2_models.test.js
+PASS tests/unit/nft_verification.test.js
+PASS tests/controllers.spec.js
+PASS __tests__/golden/goldenOutputs.test.js
+PASS tests/unit/BaseAgent.test.js
+PASS __tests__/journeyController.step.test.js
+PASS __tests__/agents.test.js
+PASS tests/agent-runs.test.js
+PASS __tests__/cache-key.test.js
+PASS __tests__/baseAgent_resilience.test.js
+PASS tests/manual_rag.test.js
+PASS __tests__/full_pipeline_resilience.test.js
+PASS tests/integration/multiAgentFeedback.test.js
+PASS __tests__/registry.test.js
+PASS tests/unit/phaseTestnetV0_onchain_disabled.test.js
+PASS tests/user-guardrails.test.js
+PASS __tests__/agents/agentsImpl.e2e-lite.test.js
+PASS tests/unit/phaseTestnetV0_web3_agents_sim_only.test.js
+PASS tests/unit/phase5_rag_contract.test.js
+PASS __tests__/growth_tokenomics_conflict.test.js
+PASS tests/unit/resourceValidator.test.js
+PASS __tests__/web3/web3Pipeline.test.js
+PASS tests/unit/phase6_llm_failure.test.js
+      SCENARIO_PASS: 403 handled gracefully
+      SCENARIO_PASS: 404 Model Not Found handled
+PASS __tests__/exec/actionToolMapper.test.js
+PASS __tests__/intentRouter.test.js
+PASS __tests__/parcoursTemplates.test.js
+PASS tests/unit/phase6_rate_limit.test.js
+      SCENARIO_PASS: 429 handled. Duration: 0ms
+PASS __tests__/runtimeMode.test.js
+PASS tests/journey-state.test.js
+PASS tests/agent-idempotence.test.js
+PASS __tests__/ragClient.fallback.integration.test.js
+PASS tests/unit/phase6_timeout.test.js
+      SCENARIO_PASS: Timeout caught and reported
+PASS __tests__/exec/toolsRegistry.test.js
+PASS tests/journey-metrics.test.js
+PASS __tests__/sloExporter.test.js
+PASS __tests__/ragClient.remote.test.js
+PASS tests/unit/orchestrator_collision.test.js
+PASS tests/unit/computeAEPO.test.js
+PASS tests/unit/phase6_rag_failure.test.js
+      SCENARIO_PASS: RAG Connection Refused -> Fallback Tagged
+      SCENARIO_PASS: High TopK input clamped safely
+PASS __tests__/ragClient.test.js
+PASS __tests__/workflows/workflowPhases.test.js
+PASS __tests__/ragops_strict_grounding.test.js
+PASS __tests__/setup.js
+FAIL tests/unit/phase4-contracts.test.js
+FAIL __tests__/s2_api.test.js (10.52 s)
+FAIL __tests__/s2_logic.test.js (10.173 s)
+  ● S2.3 Journey Engine Logic › Submit Phase: Should FAIL if phase is LOCKED
+  ● S2.3 Journey Engine Logic › Submit Phase: Should FAIL if invalid User/Run
+FAIL __tests__/s2_evaluation.test.js (10.134 s)
+  ● S2.4 Evaluation Service › Deterministic Mode: Should EVALUATE logicless submission as PASS
+  ● S2.4 Evaluation Service › Deterministic Mode: Should FAIL empty submission
+FAIL __tests__/routes.export.test.js
+FAIL __tests__/routes.admin.test.js
+FAIL __tests__/orchestrator_history_window.test.js
+FAIL __tests__/e2e/orchestration.e2e.test.js
+FAIL __tests__/routes.dao.test.js
+FAIL tests/routes.supertest.spec.js
+FAIL __tests__/zynoOrchestrator.test.js
+FAIL __tests__/demoMission.test.js
+FAIL tests/feedback.test.js
+FAIL tests/integration/resourceValidator.integration.test.js
+FAIL __tests__/routes.orchestration.test.js
+FAIL __tests__/memory_persistence.test.js
+FAIL tests/unit/phase4-contracts.test.js

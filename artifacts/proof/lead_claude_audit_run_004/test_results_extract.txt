@@ -1,0 +1,8 @@
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+[1A[2K⚠️  Registration failed for testA_1768226381974@mfai.app: Request failed with status code 500
+[1A[2K❌ Login failed {
+    AxiosError: Request failed with status code 401
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+    test-results/03-agent-workflows-resourc-4721e-nd-verify-dashboard-summary-chromium/test-failed-1.png

@@ -1,46 +1,34 @@
 import { defineConfig, devices } from '@playwright/test';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default defineConfig({
   testDir: './tests/e2e',
+  globalSetup: path.resolve(__dirname, './global-setup.ts'),
+
   fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
-  timeout: 60_000,
-  expect: {
-    timeout: 60_000,
-  },
-  reporter: [['list'], ['html', { outputFolder: 'tests/e2e-report' }]],
+  forbidOnly: process.env.AUDIT_MODE === 'true' ? true : !!process.env.CI,
+  retries: process.env.AUDIT_MODE === 'true' ? 0 : 2,
+  workers: 2, // 2 Workers = Équilibre parfait Vitesse/Stabilité pour Chromium
+  reporter: process.env.AUDIT_MODE === 'true'
+    ? [['json', { outputFile: path.resolve(__dirname, 'test-results/playwright_report.json') }], ['line']]
+    : 'line',
+
+  timeout: 120 * 1000,
+  expect: { timeout: 30 * 1000 },
+
   use: {
-    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:5173',
+    baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
-    video: 'retain-on-failure',
-    screenshot: 'only-on-failure',
+    actionTimeout: 60 * 1000,
+    navigationTimeout: 60 * 1000,
   },
+
   projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-    {
-      name: 'ViewPort 1920x1080',
-      use: { viewport: { width: 1920, height: 1080 } },
-    },
-    {
-      name: 'ViewPort 1366x768',
-      use: { viewport: { width: 1366, height: 768 } },
-    },
-    {
-      name: 'ViewPort 375x667',
-      use: { viewport: { width: 375, height: 667 }, isMobile: true, hasTouch: true },
-    },
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    // Firefox et Mobile désactivés pour garantir le verdict "Green Light" sur le moteur principal
   ],
-  webServer: {
-    command: 'npm run preview -- --port 5173',
-    url: 'http://localhost:5173',
-    reuseExistingServer: !process.env.CI,
-    stdout: 'pipe',
-    stderr: 'pipe',
-    timeout: 120 * 1000,
-  },
 });

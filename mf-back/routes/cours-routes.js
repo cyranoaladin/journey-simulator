@@ -1,7 +1,12 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const express = require('express');
 const router = express.Router();
 const coursController = require('../controllers/cours-controller');
-
 // --- Cours CRUD ---
 router.post('/cours', coursController.createCours); // Create a course
 router.get('/all-cours', coursController.getAllCours); // Get all courses

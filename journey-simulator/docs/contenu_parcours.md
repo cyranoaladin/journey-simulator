@@ -1,3 +1,9 @@
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
 # Analyse détaillée du parcours Money Factory AI
 
 ## 1. Introduction et présentation générale
@@ -286,7 +292,7 @@ La section hero est conçue pour capter immédiatement l'attention et communique
 
 - **Animation de particules** :
   - Réseau de points interconnectés via Particles.js
-  - Environ 80-100 particules avec connexions visibles entre elles
+  - Environ 80-100 particules avec connections visibles entre elles
   - Mouvement fluide et organique réagissant subtilement au mouvement de la souris
   - Densité variable créant un effet de profondeur
   - Palette de couleurs cohérente avec l'identité visuelle (#4361ee, #3a0ca3, #7209b7)
@@ -626,7 +632,7 @@ Conçu pour les utilisateurs débutants ou issus du Web2 traditionnel, ce parcou
   2. **Apprentissage** :
      - Formation aux fondamentaux (blockchain, tokens, smart contracts)
      - Ateliers pratiques guidés
-     - Exercices d'application concrets
+     - Exercises d'application concrets
      - Durée estimée : 3-4 semaines
   
   3. **Preuve** :
@@ -753,7 +759,7 @@ Six étapes détaillées :
 #### 3.5.2 Parcours Accéléré
 
 Quatre étapes pour utilisateurs déjà familiers avec Web3 :
-1. Connexion Web3 & Activation de Pass : connexion via wallet, achat direct d'Access Pass
+1. Connection Web3 & Activation de Pass : connection via wallet, achat direct d'Access Pass
 2. Coaching IA Personnalisé : analyse de profil, parcours sur mesure
 3. Mint & Staking du Pass : acquisition express, staking optimisé
 4. Accès direct à l'Incubateur + Vote DAO : incubation prioritaire, gouvernance active
@@ -956,7 +962,7 @@ Cette section remplit plusieurs objectifs marketing et UX essentiels :
 
 #### Structure et organisation
 
-Le footer constitue un élément essentiel de la page, servant à la fois de point de navigation secondaire, de référence institutionnelle et de connexion aux réseaux sociaux :
+Le footer constitue un élément essentiel de la page, servant à la fois de point de navigation secondaire, de référence institutionnelle et de connection aux réseaux sociaux :
 
 - **Conteneur principal** :
   - Fond sombre (background-color: #0a0b14) créant un contraste fort avec le reste de la page
@@ -1085,7 +1091,7 @@ Le footer remplit plusieurs fonctions essentielles :
 
 - **Navigation complémentaire** : Accès rapide aux sections clés sans remonter la page
 - **Crédibilité institutionnelle** : Présence des éléments légaux et de la documentation officielle
-- **Extension de l'engagement** : Connexion aux canaux communautaires et réseaux sociaux
+- **Extension de l'engagement** : Connection aux canaux communautaires et réseaux sociaux
 - **Ressources approfondies** : Accès aux documents techniques pour les utilisateurs intéressés
 - **Clôture visuelle** : Finalisation cohérente de l'expérience utilisateur
 
@@ -1195,10 +1201,10 @@ Ces modales s'ouvrent au clic sur les boutons "Découvrir son parcours" dans la 
 
 ##### Autres modales fonctionnelles
 
-- **Modale de connexion Web3** :
+- **Modale de connection Web3** :
   - Instructions pour connecter un wallet
-  - Options de connexion multiples (MetaMask, WalletConnect, etc.)
-  - Indicateur d'état de connexion
+  - Options de connection multiples (MetaMask, WalletConnect, etc.)
+  - Indicateur d'état de connection
   - Messages d'erreur explicatifs en cas de problème
 
 - **Modale de confirmation d'action** :
@@ -1355,7 +1361,7 @@ Ces modales s'ouvrent au clic sur les boutons "Découvrir son parcours" dans la 
 
 - **Types de notifications** :
   - Confirmation d'action (ex: "Préférence de thème sauvegardée")
-  - Alertes système (ex: "Connexion au wallet requise")
+  - Alertes système (ex: "Connection au wallet requise")
   - Mises à jour (ex: "Nouveau contenu disponible")
   - Succès d'étape (ex: "Étape complétée avec succès")
 
@@ -1635,7 +1641,7 @@ Le fichier `app.js` implémente plusieurs fonctionnalités interactives :
 
 - **Sentiment d'appartenance** :
   - Référence à une communauté (Sovereign Builders™)
-  - Parcours personnalisés créant une connexion
+  - Parcours personnalisés créant une connection
   - Langage inclusif dans les descriptions
 
 ## 7. Recommandations et conclusion

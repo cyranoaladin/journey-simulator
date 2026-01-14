@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useMemo } from 'react';
 import { Persona, UserProgress } from '../types/journey';
 import { getPhaseFromStepId } from '../config/journeyPhases';
@@ -33,9 +39,9 @@ export const usePhaseData = ({
 
     const activePhaseNumber = activePhaseIndex + 1;
     // Ensure strict number comparison for completion
-    const isPhaseCompleted = userProgress.completedPhases.includes(activePhaseIndex);
+    const isPhaseCompleted = (userProgress?.completedPhases || []).includes(activePhaseIndex);
     const totalPhases = phases.length;
-    const completedCount = userProgress.completedPhases.length;
+    const completedCount = (userProgress?.completedPhases || []).length;
     const completionPercent = totalPhases === 0 ? 0 : Math.min(100, Math.round((completedCount / totalPhases) * 100));
     const currentPhaseOrdinal = Math.min(totalPhases || 1, Math.max(1, activePhaseNumber));
 

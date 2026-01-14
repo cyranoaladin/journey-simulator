@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 export const LIMITS = { feeMax: 1_000_000, riskMax: 0.8, humanGate: 200_000 }
 
 export function guard(sim: { ok: boolean; estFeeLamports?: number; riskScore?: number }) {

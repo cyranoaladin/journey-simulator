@@ -1,22 +1,35 @@
-const { URL } = require('url');
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
+const { URL } = require('node:url');
 const axios = require('axios');
+const debug = require('debug')('resourceValidator');
 
 const ALLOWED_DOMAINS = ['mfai.app', 'solana.com', 'github.com', 'wikipedia.org'];
 
-function isValidUrl(urlString) {
-    if (!urlString || typeof urlString !== 'string') return false;
+function safeParseUrl(urlString) {
+    if (!urlString || typeof urlString !== 'string') return null;
     try {
-        const url = new URL(urlString);
-        return (url.protocol === 'http:' || url.protocol === 'https:');
-    } catch (e) { return false; }
+        return new URL(urlString);
+    } catch (error) {
+        debug('Invalid URL provided', { urlString, error: error.message });
+        return null;
+    }
+}
+
+function isValidUrl(urlString) {
+    const url = safeParseUrl(urlString);
+    return !!url && (url.protocol === 'http:' || url.protocol === 'https:');
 }
 
 function isTrustedDomain(urlString) {
-    try {
-        const url = new URL(urlString);
-        if (process.env.NODE_ENV === 'test') return true;
-        return ALLOWED_DOMAINS.some(domain => url.hostname.endsWith(domain));
-    } catch (e) { return false; }
+    const url = safeParseUrl(urlString);
+    if (!url) return false;
+    if (process.env.NODE_ENV === 'test') return true;
+    return ALLOWED_DOMAINS.some(domain => url.hostname.endsWith(domain));
 }
 
 async function checkUrlReachability(url) {
@@ -25,7 +38,10 @@ async function checkUrlReachability(url) {
     try {
         await axios.head(url, { timeout: 2000, validateStatus: (s) => s < 400 });
         return true;
-    } catch (e) { return false; }
+    } catch (error) {
+        debug('URL reachability check failed', { url, error: error.message });
+        return false;
+    }
 }
 
 function generateFallbackUrl(resource) {

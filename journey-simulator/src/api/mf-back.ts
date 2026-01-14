@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import createClient from "openapi-fetch";
 import { API_BASE_URL } from "../utils/api";
 import { tokenStore } from "../utils/tokenStore";

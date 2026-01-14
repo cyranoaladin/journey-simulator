@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { ArrowLeft, LayoutGrid, Loader2, Maximize2, Minimize2, PanelLeft, PanelRight, Sparkles, Target } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -35,7 +41,7 @@ interface JourneyDemoModeProps {
     onBack?: () => void;
 }
 
-const JourneyDemoMode = ({ onBack }: JourneyDemoModeProps) => {
+const JourneyDemoMode = ({ onBack: _onBack }: JourneyDemoModeProps) => {
     const navigate = useNavigate();
     const {
         selectedPersona,
@@ -180,7 +186,7 @@ const JourneyDemoMode = ({ onBack }: JourneyDemoModeProps) => {
                 language: 'en',
                 mode: uiMode,
                 tone: uiTone,
-                title: `${safeActivePhase.title} — Demo`,
+                title: `${safeActivePhase.title}  Demo`,
                 summary: 'Demo execution',
             },
             ui_blocks: blocks,
@@ -206,14 +212,6 @@ const JourneyDemoMode = ({ onBack }: JourneyDemoModeProps) => {
             console.error('Error clearing tokens:', error);
         }
         navigate('/');
-    };
-
-    const handleBack = () => {
-        if (onBack) {
-            onBack();
-            return;
-        }
-        navigate('/journeys');
     };
 
     const handleNavigationToggle = () => {
@@ -246,7 +244,7 @@ const JourneyDemoMode = ({ onBack }: JourneyDemoModeProps) => {
             {/* HEADER */}
             <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-white/10 bg-[#0A0A1F]/95 px-6 backdrop-blur">
                 <div className="flex items-center gap-3">
-                    <button onClick={handleBack} className="group flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 transition hover:bg-white/10">
+                    <button onClick={handleExitDemo} className="group flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 transition hover:bg-white/10">
                         <ArrowLeft size={14} className="text-white/60 group-hover:text-white" />
                         <span className="text-xs font-medium text-white/60 group-hover:text-white">Exit Demo</span>
                     </button>

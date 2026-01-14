@@ -1,0 +1,25 @@
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+=== Playwright Test Results Summary ===
+            }
+          ],
+          "id": "7373402522c17d02c2f0-58e3b0a7e7b458f4fa4e",
+          "file": "0X-web3-simulation-only/connect-only.spec.ts",
+          "line": 10,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-01-06T21:40:56.794Z",
+    "duration": 10004.877999999999,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

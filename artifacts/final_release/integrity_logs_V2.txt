@@ -1,0 +1,155 @@
+🔐 Global Setup: seeding + authentification prod-like...
+   ⏳ Seeding user via model (unique hash)...
+[dotenv@17.2.0] injecting env (6) from mf-back/.env (tip: ⚙️  suppress all logs with { quiet: true })
+✅ MongoDB Connected
+🗑️  Deleted 1 existing test user(s)
+✅ Created test user: test@mfai.app
+   ID: 6960a1372487e8cbb3ef3666
+   Password: MFAITest2026!
+✅ Password verification: SUCCESS
+✅ Seeding complete
+   🔗 Auth vers http://127.0.0.1:3002/auth/login
+   ✅ Backend authenticated: test@mfai.app
+   ✅ StorageState saved: /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/.auth/user.json
+   🛡️ RUN_MODE_GUARD=real
+   🔑 AUTH_STATE=loaded
+AUTH_STATE_PATH=/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/.auth/user.json
+AUTH_STATE_EXISTS=true
+   🧾 Auth proof written: /home/alaeddine/Documents/journey_mfai_back_front/artifacts/e2e-auth-proof.json
+
+Running 5 tests using 5 workers
+
+DEBUG: CWD is /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator
+DEBUG: OutDir is /home/alaeddine/Documents/journey_mfai_back_front/artifacts/proof/lead12_r12
+DEBUG: RawPath is /home/alaeddine/Documents/journey_mfai_back_front/artifacts/proof/lead12_r12/routes_visited_raw.txt
+DEBUG: CWD is /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator
+DEBUG: OutDir is /home/alaeddine/Documents/journey_mfai_back_front/artifacts/proof/lead12_r12
+DEBUG: RawPath is /home/alaeddine/Documents/journey_mfai_back_front/artifacts/proof/lead12_r12/routes_visited_raw.txt
+DEBUG: CWD is /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator
+DEBUG: OutDir is /home/alaeddine/Documents/journey_mfai_back_front/artifacts/proof/lead12_r12
+DEBUG: RawPath is /home/alaeddine/Documents/journey_mfai_back_front/artifacts/proof/lead12_r12/routes_visited_raw.txt
+ROUTE_VISIT: http://127.0.0.1:3000/dashboard
+DEBUG: CWD is /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator
+DEBUG: OutDir is /home/alaeddine/Documents/journey_mfai_back_front/artifacts/proof/lead12_r12
+DEBUG: RawPath is /home/alaeddine/Documents/journey_mfai_back_front/artifacts/proof/lead12_r12/routes_visited_raw.txt
+ROUTE_VISIT: http://127.0.0.1:3000/auth/login
+ROUTE_VISIT: http://127.0.0.1:3000/dashboard
+[SOLANA DEBUG] Status: 200, Body: <!doctype html>
+<html lang="en">
+
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data: blob: http
+  ✘  4 [chromium] › tests/e2e/supreme-integrity.spec.ts:118:5 › Supreme Integrity: Security & Stress › Solana: Real Transaction Proof (483ms)
+ROUTE_VISIT: http://127.0.0.1:3000/dashboard
+ROUTE_VISIT: http://127.0.0.1:3000/dashboard
+[PERF AUDIT] WS Stress test placeholder.
+ROUTE_VISIT: http://127.0.0.1:3000/auth/login
+ROUTE_VISIT: http://127.0.0.1:3000/
+ROUTE_VISIT: http://127.0.0.1:3000/journeys
+  ✓  3 [chromium] › tests/e2e/supreme-integrity.spec.ts:151:5 › Supreme Integrity: Security & Stress › Performance: Zyno Pulse WebSocket Audit (1.3s)
+ROUTE_VISIT: http://127.0.0.1:3000/journeys
+[RESILIENCE] Final URL: http://127.0.0.1:3000/
+  ✓  5 [chromium] › tests/e2e/supreme-integrity.spec.ts:86:5 › Supreme Integrity: Security & Stress › Resilience: Infinite Loop Chaos Test (401 on Login) (4.1s)
+  ✘  1 [chromium] › tests/e2e/supreme-integrity.spec.ts:54:5 › Supreme Integrity: Security & Stress › UI Stress: Double-Click Protection (31.5s)
+  ✘  2 [chromium] › tests/e2e/supreme-integrity.spec.ts:6:5 › Supreme Integrity: Security & Stress › Security Breach: Mode Mismatch Rejection (31.5s)
+
+
+  1) [chromium] › tests/e2e/supreme-integrity.spec.ts:6:5 › Supreme Integrity: Security & Stress › Security Breach: Mode Mismatch Rejection 
+
+    TimeoutError: page.waitForRequest: Timeout 30000ms exceeded while waiting for event "request"
+
+      20 |
+      21 |         // Ensure we wait for the request pattern BEFORE loading the page that triggers it
+    > 22 |         const reqPromise = page.waitForRequest(r => r.url().includes('/api/'));
+         |                                 ^
+      23 |
+      24 |         await page.goto('/journeys'); // Journeys page usually fetches the list
+      25 |
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/supreme-integrity.spec.ts:22:33
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/artifacts/supreme-integrity-Supreme--30d11-ach-Mode-Mismatch-Rejection-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/artifacts/supreme-integrity-Supreme--30d11-ach-Mode-Mismatch-Rejection-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/artifacts/supreme-integrity-Supreme--30d11-ach-Mode-Mismatch-Rejection-chromium/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/artifacts/supreme-integrity-Supreme--30d11-ach-Mode-Mismatch-Rejection-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/artifacts/supreme-integrity-Supreme--30d11-ach-Mode-Mismatch-Rejection-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests/e2e/supreme-integrity.spec.ts:54:5 › Supreme Integrity: Security & Stress › UI Stress: Double-Click Protection 
+
+    TimeoutError: locator.fill: Timeout 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByPlaceholder('Email')[22m
+
+
+      57 |
+      58 |         // Fill form to enable button if needed
+    > 59 |         await page.getByPlaceholder('Email').fill('stress@test.com');
+         |                                              ^
+      60 |         await page.getByPlaceholder('Password').fill('StressTest123!');
+      61 |
+      62 |         const submitBtn = page.getByRole('button', { name: 'Sign In' });
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/supreme-integrity.spec.ts:59:46
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/artifacts/supreme-integrity-Supreme--be3db-ess-Double-Click-Protection-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/artifacts/supreme-integrity-Supreme--be3db-ess-Double-Click-Protection-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/artifacts/supreme-integrity-Supreme--be3db-ess-Double-Click-Protection-chromium/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/artifacts/supreme-integrity-Supreme--be3db-ess-Double-Click-Protection-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/artifacts/supreme-integrity-Supreme--be3db-ess-Double-Click-Protection-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › tests/e2e/supreme-integrity.spec.ts:118:5 › Supreme Integrity: Security & Stress › Solana: Real Transaction Proof 
+
+    SyntaxError: Unexpected token '<', "<!doctype "... is not valid JSON
+
+      139 |         expect(status).toBe(200); // Expect success even if mock
+      140 |
+    > 141 |         const result = JSON.parse(text);
+          |                             ^
+      142 |         expect(result.ok).toBe(true);
+      143 |         expect(result.tx).toBeDefined();
+      144 |
+        at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/supreme-integrity.spec.ts:141:29
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/artifacts/supreme-integrity-Supreme--33573-lana-Real-Transaction-Proof-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/artifacts/supreme-integrity-Supreme--33573-lana-Real-Transaction-Proof-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/artifacts/supreme-integrity-Supreme--33573-lana-Real-Transaction-Proof-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/artifacts/supreme-integrity-Supreme--33573-lana-Real-Transaction-Proof-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [chromium] › tests/e2e/supreme-integrity.spec.ts:6:5 › Supreme Integrity: Security & Stress › Security Breach: Mode Mismatch Rejection 
+    [chromium] › tests/e2e/supreme-integrity.spec.ts:54:5 › Supreme Integrity: Security & Stress › UI Stress: Double-Click Protection 
+    [chromium] › tests/e2e/supreme-integrity.spec.ts:118:5 › Supreme Integrity: Security & Stress › Solana: Real Transaction Proof 
+  2 passed (35.0s)

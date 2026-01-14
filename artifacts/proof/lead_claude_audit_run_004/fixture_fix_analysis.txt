@@ -1,0 +1,22 @@
+FIXTURE PARAMETER ERROR - ROOT CAUSE ANALYSIS
+
+Current code at realModeTest.ts:64-66:
+```
+export const test = base.extend<Fixtures>({
+  // eslint-disable-next-line no-empty-pattern  
+  authHeaders: async ({}, use) => {
+```
+
+Error message: "First argument must use the object destructuring pattern"
+
+Playwright's fixture extension requires the first parameter to follow object destructuring pattern.
+The issue is that `{}` (empty object pattern) is being rejected by Playwright's type system.
+
+SOLUTION: Use proper destructuring with at least one property, even if unused.
+
+Options:
+1. Use `{ }, use` with space (rejected - same issue)
+2. Use named parameter `fixtures` (rejected - triggers unused warning)
+3. Use destructuring with actual base fixtures even if not used
+
+Best approach: Check what base fixtures are available and destructure properly.

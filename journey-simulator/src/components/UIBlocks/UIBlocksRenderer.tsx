@@ -1,12 +1,16 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { AnimatePresence, motion } from "framer-motion";
-import { Brain, ChevronDown, ShieldCheck, Database, AlertTriangle } from "lucide-react";
 import katex from "katex";
 import "katex/dist/katex.min.css";
+import { AlertTriangle, Brain, ChevronDown, Database, ShieldCheck } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 import { useJourneyStore } from "../../store/journeyStore";
-import { api } from '../../utils/api';
-import { generateStableKey } from '../../utils/generateStableKey';
-import { logger } from '../../utils/logger';
 import type {
   ActionSuggestionsBlock,
   ChecklistBlock,
@@ -23,6 +27,9 @@ import type {
   UIBlock,
   XpBlock,
 } from "../../types/uiBlocks";
+import { api } from '../../utils/api';
+import { generateStableKey } from '../../utils/generateStableKey';
+import { logger } from '../../utils/logger';
 import GovernanceDashboard from "../Governance/GovernanceDashboard";
 import IndicatorBlockComponent from "./IndicatorBlock";
 import InteractiveTemplateComponent from "./InteractiveTemplateBlock";
@@ -339,6 +346,7 @@ function Quiz({ block }: { block: QuizBlock; }) {
   const selectedPersona = useJourneyStore((s) => s.selectedPersona);
   const lastStep = useJourneyStore((s) => s.lastStep);
   const updateProgress = useJourneyStore((s) => s.updateProgress);
+  const setLastStep = useJourneyStore((s) => s.setLastStep);
 
   const score = questions.reduce(
     (acc, q) =>
@@ -382,7 +390,7 @@ function Quiz({ block }: { block: QuizBlock; }) {
       const nextStep = json.next_step || json;
 
       // Update global lastStep so renderer can show evaluation/xp blocks
-      useJourneyStore.setState({ lastStep: nextStep });
+      setLastStep(nextStep);
 
       // Apply XP delta locally
       const xpDelta = Number(json?.rewards?.xp_delta || json?.next_state?.xp_delta || 0);
@@ -485,7 +493,7 @@ function Quiz({ block }: { block: QuizBlock; }) {
             disabled={!allAnswered || submitting}
             onClick={onSubmit}
           >
-            {submitting ? "Submitting..." : "Submit Certification"}
+            {submitting ? "Submitting..." : "Submit Certificate"}
           </button>
         )}
 
@@ -504,11 +512,16 @@ function Mission({ block }: { block: MissionBlock; }) {
   const [showHelp, setShowHelp] = useState(false);
   const [value, setValue] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const ensureApiJourneyId = useJourneyStore((s) => s.ensureApiJourneyId);
+  const apiJourneyId = useJourneyStore((s) => s.apiJourneyId);
   const selectedPersona = useJourneyStore((s) => s.selectedPersona);
   const lastStep = useJourneyStore((s) => s.lastStep);
   const updateProgress = useJourneyStore((s) => s.updateProgress);
+  const setLastStep = useJourneyStore((s) => s.setLastStep);
+  const { isAuthenticated } = useAuth();
+  const isSyncing = !apiJourneyId;
 
   const onSubmit = async () => {
     try {
@@ -532,31 +545,68 @@ function Mission({ block }: { block: MissionBlock; }) {
       };
       const json = await api.submitMission(id, body);
 
+      setIsSubmitted(true);
+
       // Extract next_step from the response
       const nextStep = json.next_step || json;
 
-      // Update global lastStep so renderer can show evaluation/xp blocks
-      useJourneyStore.setState({ lastStep: nextStep });
+      // Delay transition to allow user to see the success message
+      setTimeout(async () => {
+        // Update global lastStep so renderer can show evaluation/xp blocks
+        setLastStep(nextStep);
 
-      // Apply XP delta locally
-      const xpDelta = Number(json?.rewards?.xp_delta || json?.next_state?.xp_delta || 0);
-      if (
-        !Number.isNaN(xpDelta) &&
-        xpDelta > 0 &&
-        typeof updateProgress === "function"
-      ) {
-        await updateProgress(xpDelta);
-      }
+        // Apply XP delta locally
+        const xpDelta = Number(json?.rewards?.xp_delta || json?.next_state?.xp_delta || 0);
+        if (
+          !Number.isNaN(xpDelta) &&
+          xpDelta > 0 &&
+          typeof updateProgress === "function"
+        ) {
+          await updateProgress(xpDelta);
+        }
+      }, 2500);
+
       setValue("");
     } catch (e: any) {
       setError(e?.message || String(e));
+      setSubmitting(false); // Only unset submitting on error, otherwise keep it true while showing success
     } finally {
-      setSubmitting(false);
+      // If success, we keep submitting=true/isSubmitted=true until unmount or timeout
+      if (error) setSubmitting(false);
     }
   };
 
+  if (isSubmitted) {
+    return (
+      <div className="bg-white/5 rounded-xl p-6 text-center border border-green-500/30 bg-green-500/10 animate-fade-in">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+            <svg className="w-5 h-5 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <h4 className="font-semibold text-green-100">Deliverable Received!</h4>
+          <p className="text-xs text-green-200/80 max-w-[250px]">
+            Your mission has been submitted internally. The analysis agent is processing your input.
+          </p>
+          <button
+            onClick={() => setIsSubmitted(false)}
+            className="mt-2 text-[11px] underline opacity-60 hover:opacity-100"
+          >
+            Submit another version
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white/5 rounded-xl p-4">
+      {!isAuthenticated && (
+        <div className="mb-3 rounded-md border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
+          Mode Démo : Connectez-vous pour sauvegarder votre progression réelle.
+        </div>
+      )}
       <div className="flex items-center justify-between mb-2">
         <h4 className="font-semibold">{block.title}</h4>
         <div className="text-xs opacity-70">XP: {block.xp_reward}</div>
@@ -610,11 +660,21 @@ function Mission({ block }: { block: MissionBlock; }) {
       {error && <div className="text-xs text-red-400 mb-2">{error}</div>}
       <button
         className="px-3 py-2 rounded bg-gradient-primary text-white disabled:opacity-50"
-        disabled={submitting || !value.trim()}
+        disabled={submitting || !value.trim() || isSyncing}
         onClick={onSubmit}
       >
-        {submitting ? "Sending..." : "Submit mission"}
+        {isSyncing ? "Synchronisation..." : submitting ? "ZYNO IS THINKING..." : "Submit mission"}
       </button>
+      {isSyncing && (
+        <div className="mt-2 text-[11px] text-amber-200 opacity-90">
+          En attente de synchronisation avec la blockchain...
+        </div>
+      )}
+      {submitting && !isSyncing && (
+        <div className="mt-2 text-[11px] text-cyan-200 opacity-90">
+          ZYNO IS THINKING... analyse en cours.
+        </div>
+      )}
     </div>
   );
 }
@@ -650,7 +710,7 @@ function Resources({ block }: { block: ResourceBlock; }) {
                   <div className="text-xs opacity-80">{r.description}</div>
                 )}
                 <div className="text-[11px] opacity-70 mt-1">
-                  Proposed by {r.agent_owner} • {r.resource_type}
+                  Proposed by {r.agent_owner}  {r.resource_type}
                 </div>
               </div>
               <div className="flex gap-2">
@@ -729,7 +789,7 @@ function closeListIfOpen(out: string[], inList: boolean): boolean {
 }
 
 // Helper to process header lines
-function processHeader(line: string, pattern: RegExp, tag: string, out: string[], inList: boolean): { processed: boolean; newInList: boolean } {
+function processHeader(line: string, pattern: RegExp, tag: string, out: string[], inList: boolean): { processed: boolean; newInList: boolean; } {
   if (pattern.test(line)) {
     const newInList = closeListIfOpen(out, inList);
     const content = line.replace(pattern, "");
@@ -740,7 +800,7 @@ function processHeader(line: string, pattern: RegExp, tag: string, out: string[]
 }
 
 // Helper to process list items
-function processListItem(line: string, out: string[], inList: boolean): { processed: boolean; newInList: boolean } {
+function processListItem(line: string, out: string[], inList: boolean): { processed: boolean; newInList: boolean; } {
   if (/^[-*]\s+/.test(line)) {
     if (!inList) {
       out.push("<ul>");
@@ -877,6 +937,7 @@ function ActionSuggestions({ block }: { block: ActionSuggestionsBlock; }) {
   const ensureApiJourneyId = useJourneyStore((s) => s.ensureApiJourneyId);
   const selectedPersona = useJourneyStore((s) => s.selectedPersona);
   const lastStep = useJourneyStore((s) => s.lastStep);
+  const setLastStep = useJourneyStore((s) => s.setLastStep);
   const [busy, setBusy] = useState<string | null>(null);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [lastFailedActionId, setLastFailedActionId] = useState<string | null>(
@@ -920,7 +981,7 @@ function ActionSuggestions({ block }: { block: ActionSuggestionsBlock; }) {
       });
       if (!response.ok) throw new Error(`step failed: ${response.status}`);
       const json = await response.json();
-      useJourneyStore.setState({ lastStep: json });
+      setLastStep(json);
     } catch (e: any) {
       console.error("ActionSuggestions step failed", e);
       // Simplify nested template literal
@@ -1108,7 +1169,7 @@ function Diagram({ block }: { block: DiagramBlock; }) {
       {!shouldRender ? (
         <div className="rounded-lg border border-white/10 bg-black/20 p-4">
           <div className="text-xs opacity-80">
-            Diagramme Mermaid (chargement à la demande pour perf).
+            Mermaid diagram (lazy loaded for perf).
           </div>
           <div className="mt-3 flex items-center gap-2">
             <button
@@ -1129,7 +1190,7 @@ function Diagram({ block }: { block: DiagramBlock; }) {
           className="overflow-x-auto flex justify-center bg-black/20 rounded-lg p-4 min-h-[120px]"
           dangerouslySetInnerHTML={{
             __html: isLoading
-              ? '<div class="text-xs opacity-70">Loading diagram…</div>'
+              ? '<div class="text-xs opacity-70">Loading diagram</div>'
               : (svg || '<div class="text-xs opacity-70">Diagram empty.</div>'),
           }}
         />

@@ -1,0 +1,30 @@
+00-preflight/runmode-guard-violation.spec.ts:should crash immediately when runMode=simulation but guard expects real
+01-navigation/comprehensive-menu.spec.ts:Menu Navigation: DAO
+01-navigation/header-navigation.spec.ts:should switch to Demo mode and update UI
+01-navigation/header-navigation.spec.ts:should switch to Simulation mode and update UI
+02-agent-core/phase-2-strategy.spec.ts:Phase 2 Transition: Discovery -> Strategy -> Plan Generation
+02-agent-core/zyno-interaction.spec.ts:Complex Prompt -> Markdown Output Verification
+03-agent-workflows/resource-production.spec.ts:Simulate InvestorDemoAgent execution and verify dashboard summary
+04-core-game-loop.spec.ts:quiz pass and mint queued (mocked backend)
+04-data-validation/rag-upload.spec.ts:Verify RAG upload includes x-api-key and returns non-403
+05-agents-orchestration/agent-sweep.spec.ts:Invoke SecurityAuditAgent (security)
+05-agents-orchestration/agent-sweep.spec.ts:Invoke ProductSpecAgent (product)
+05-agents-orchestration/agent-sweep.spec.ts:Invoke JourneyDesignAgent (journey)
+05-agents-orchestration/agent-sweep.spec.ts:Invoke EvaluationAgent (quality)
+05-agents-orchestration/agent-sweep.spec.ts:Invoke RAGOpsAgent (rag)
+05-agents-orchestration/agent-sweep.spec.ts:Invoke DataIntegrityAgent (data)
+05-agents-orchestration/agent-sweep.spec.ts:Invoke APIContractAgent (api)
+05-agents-orchestration/agent-sweep.spec.ts:Invoke TokenomicsAgent (tokenomics)
+05-agents-orchestration/agent-sweep.spec.ts:Invoke GovernanceDAOAgent (governance)
+05-agents-orchestration/agent-sweep.spec.ts:Invoke GrowthAgent (growth)
+05-agents-orchestration/agent-sweep.spec.ts:Invoke InvestorDemoAgent (investor)
+05-agents-orchestration/agent-sweep.spec.ts:Invoke InvestorAgent (investor)
+05-agents-orchestration/agent-sweep.spec.ts:Invoke UXWritingAgent (ux)
+05-agents-orchestration/agent-sweep.spec.ts:Invoke QAPlaywrightAgent (qa)
+05-agents-orchestration/agent-sweep.spec.ts:Invoke DevOpsAgent (devops)
+05-agents-orchestration/agent-sweep.spec.ts:Invoke ObservabilityAgent (observability)
+05-agents-orchestration/agent-sweep.spec.ts:Invoke ComplianceAgent (compliance)
+05-agents-orchestration/agent-sweep.spec.ts:Invoke RiskFraudAgent (risk)
+05-agents-orchestration/agent-sweep.spec.ts:Invoke CurriculumAgent (education)
+05-agents-orchestration/agent-sweep.spec.ts:Invoke MarketplaceAgent (marketplace)
+05-agents-orchestration/agent-sweep.spec.ts:Invoke AnalyticsAgent (analytics)

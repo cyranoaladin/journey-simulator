@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, Sparkles, TrendingUp, Users, Award } from 'lucide-react';
@@ -103,43 +109,29 @@ const HeroSection = () => {
               className="text-lg md:text-xl mb-8 opacity-90 max-w-2xl"
             >
               Discover how Money Factory AI transforms your skills into capital
-              through the <span className="font-semibold text-accent-cyan">Cognitive Activation Protocol™</span>
+              through the <span className="font-semibold text-accent-cyan">Cognitive Activation Protocol</span>
             </motion.p>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.8 }}
-              className="flex flex-col sm:flex-row gap-4 mb-8 justify-center lg:justify-start"
+              className="flex flex-col sm:flex-row gap-6 mb-8 justify-center lg:justify-start items-center"
             >
               <motion.button
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.05, boxShadow: "0 10px 30px -10px rgba(124, 58, 237, 0.5)" }}
                 whileTap={{ scale: 0.95 }}
                 onClick={scrollToPersonas}
-                className="btn-primary flex items-center justify-center space-x-2"
+                className="relative overflow-hidden rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 py-4 font-bold text-white shadow-lg shadow-violet-900/20 flex items-center justify-center space-x-2 group transition-all"
               >
-                <Sparkles size={20} />
-                <span>Explore journeys</span>
+                <Sparkles size={20} className="group-hover:rotate-12 transition-transform" />
+                <span>Start Your Mission</span>
+                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
               </motion.button>
 
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="btn-secondary flex items-center justify-center space-x-2"
-                onClick={handleUnlockSovereignty}
-              >
-                <Sparkles size={20} />
-                <span>Unlock your digital sovereignty</span>
-              </motion.button>
-
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="btn-secondary flex items-center justify-center space-x-2"
-                onClick={handleTryDemo}
-              >
-                <span>Try Demo</span>
-              </motion.button>
+              <div className="flex gap-4">
+                {/* Secondary CTAs removed for cleaner UX */}
+              </div>
             </motion.div>
 
             <motion.div
@@ -220,31 +212,33 @@ const HeroSection = () => {
             transition={{ delay: 0.4, duration: 0.8 }}
             className="flex flex-col items-center justify-center lg:justify-end space-y-6"
           >
-            <div className="w-full max-w-md rounded-2xl border border-white/15 bg-white/5 p-6 backdrop-blur-md">
-              <h2 className="text-xl font-space font-bold mb-2">
-                Wallet & NFTs — loaded only inside Journeys
-              </h2>
-              <p className="text-sm opacity-80 leading-relaxed">
-                To keep the landing page ultra-light (performance + CSP), the Solana/wallet-adapter stack is loaded
-                only when you enter <span className="font-semibold">Journeys</span>.
-              </p>
-              <div className="mt-4">
-                <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={handleUnlockSovereignty}
-                  className="btn-primary w-full"
-                >
-                  Open Journeys
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={handleTryDemo}
-                  className="btn-secondary w-full mt-3"
-                >
-                  Try Demo
-                </motion.button>
+            <div className="w-full max-w-md rounded-3xl border border-white/10 bg-gray-900/40 p-8 backdrop-blur-md shadow-2xl relative overflow-hidden group hover:-translate-y-1 hover:border-purple-500/50 hover:shadow-[0_0_30px_-10px_rgba(168,85,247,0.3)] transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-accent-cyan/5 to-transparent opacity-50" />
+              <div className="relative z-10">
+                <h2 className="text-xl font-space font-bold mb-3 text-white">
+                  Wallet & NFTs
+                </h2>
+                <p className="text-sm text-white/60 leading-relaxed mb-6">
+                  Connect to the <span className="text-accent-cyan font-semibold">Solana Devnet</span> inside a Journey to mint real Proof-of-Skill NFTs.
+                </p>
+                <div className="flex flex-col gap-3">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleUnlockSovereignty}
+                    className="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/5 hover:border-white/20 text-white font-medium transition-all"
+                  >
+                    Enter App
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleTryDemo}
+                    className="w-full py-3 rounded-xl border border-white/10 text-white/50 hover:text-white hover:border-white/30 transition-all text-sm"
+                  >
+                    Try Demo Mode
+                  </motion.button>
+                </div>
               </div>
             </div>
           </motion.div>

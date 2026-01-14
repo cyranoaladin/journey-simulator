@@ -1,6 +1,14 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 // Tests run stateless bearer flows with CSRF parity middleware.
 const express = require('express');
 const request = require('supertest');
+const csrf = require('csurf');
+const cookieParser = require('cookie-parser');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
@@ -43,6 +51,8 @@ jest.mock('../memory/agent_memory', () => ({
 jest.mock('../utils/aepoAeco', () => ({
   getOrchestrationGlossary: jest.fn().mockReturnValue({})
 }));
+
+const testCsrf = csrf({ ignoreMethods: ['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'DELETE', 'PATCH'] });
 
 jest.mock('multer', () => {
   const mock = jest.fn(() => ({
@@ -91,7 +101,8 @@ describe('admin routes', () => {
 
     app = express();
     app.use(express.json());
-    // Stateless API: skip csurf in tests; csrfGuard is already a no-op without cookies
+    app.use(cookieParser());
+    app.use(testCsrf);
     app.use(csrfGuard);
     // Load routes after mocks are set up
     try {

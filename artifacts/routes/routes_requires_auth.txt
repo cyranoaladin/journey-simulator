@@ -1,0 +1,33 @@
+# Routes Requiring Authentication
+
+## Frontend (Protected Routes)
+/dashboard
+/playground
+/resources
+/support
+/zyno
+/guide
+/journeys
+/journeys/:journeyId
+/journeys/completed
+/dao
+/debug/mint
+
+## Backend (Require JWT)
+All routes under:
+- /api/journey/*
+- /api/agents/*
+- /api/user/*
+- /api/orchestration/*
+- /api/zyno/*
+- /api/rag/*
+- /api/analytics/*
+- /api/dao/* (most endpoints)
+- /api/solana/* (most endpoints)
+
+Exceptions (public):
+- /health
+- /auth/login
+- /auth/register
+- /auth/nonce
+- /demo/*

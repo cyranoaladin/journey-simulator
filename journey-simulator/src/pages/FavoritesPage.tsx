@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useEffect } from 'react';
 import { useFavoritesStore } from '../store/favoritesStore';
 import { Star, ExternalLink, Trash2 } from 'lucide-react';
@@ -26,9 +32,9 @@ export default function FavoritesPage() {
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center max-w-md">
                     <Star size={64} className="mx-auto mb-4 text-slate-600" />
-                    <h2 className="text-2xl font-bold mb-2">Aucun favori</h2>
+                    <h2 className="text-2xl font-bold mb-2">No favorites</h2>
                     <p className="text-slate-400">
-                        Les ressources que vous marquez comme favorites apparaîtront ici.
+                        Resources you mark as favorites will appear here.
                     </p>
                 </div>
             </div>
@@ -40,10 +46,10 @@ export default function FavoritesPage() {
             <div className="max-w-4xl mx-auto">
                 <div className="flex items-center gap-3 mb-6">
                     <Star size={32} className="text-accent-gold fill-accent-gold" />
-                    <h1 className="text-3xl font-bold">Mes Ressources Favorites</h1>
+                    <h1 className="text-3xl font-bold">My Favorite Resources</h1>
                 </div>
                 <p className="text-slate-400 mb-8">
-                    {favorites.length} ressource{favorites.length > 1 ? 's' : ''} sauvegardée{favorites.length > 1 ? 's' : ''}
+                    {favorites.length} resource{favorites.length > 1 ? 's' : ''} saved
                 </p>
 
                 <div className="grid gap-4">

@@ -1,3 +1,11 @@
+**/*.ts
+**/*.tsx
+**/*.js
+**/*.jsx
+artifacts/**
+journey-simulator/public/**
+journey-simulator/artifacts/**
+mf-back/**/*
 web/
 dist/
 node_modules/

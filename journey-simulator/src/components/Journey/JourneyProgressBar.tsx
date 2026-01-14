@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { motion } from 'framer-motion';
 import { Check, Sparkles, Zap } from 'lucide-react';
 import React from 'react';
@@ -17,6 +23,7 @@ export const JourneyProgressBar: React.FC<Props> = ({ personaId, currentStepId }
   const totalPhases = phases.length;
   const completedCount = Math.max(0, Math.min(activeIndex, totalPhases));
   const progressPercent = totalPhases === 0 ? 0 : Math.round((completedCount / totalPhases) * 100);
+  const progressDenominator = Math.max(1, totalPhases - 1);
 
   const getNodeClasses = (isCompleted: boolean, isCurrent: boolean) => {
     if (isCompleted) {
@@ -91,7 +98,7 @@ export const JourneyProgressBar: React.FC<Props> = ({ personaId, currentStepId }
         {/* Active Progress Bar */}
         <motion.div
           initial={{ width: 0 }}
-          animate={{ width: `${(activeIndex / (Math.max(1, phases.length - 1))) * 100}%` }}
+          animate={{ width: `${(activeIndex / progressDenominator) * 100}%` }}
           transition={{ duration: 1, ease: 'circOut' }}
           className="absolute left-0 top-[20px] h-1 bg-gradient-to-r from-accent-blue via-accent-cyan to-accent-cyan shadow-[0_0_15px_rgba(34,211,238,0.5)] z-0 rounded-full"
         />

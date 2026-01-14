@@ -1,4 +1,10 @@
 /**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
+/**
  * Shared utility for persona-specific styling
  * Extracted from duplicated switch/case blocks in CertificationModal, NFTMintingModal, and ProofCertificationsBoard
  */

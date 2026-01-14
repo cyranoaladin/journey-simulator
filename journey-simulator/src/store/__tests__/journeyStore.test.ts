@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 // src/store/__tests__/journeyStore.test.ts
 import { afterEach, beforeEach, describe, expect, it, Mocked, vi } from 'vitest';
 import { personas } from '../../data/personas';
@@ -13,10 +19,22 @@ vi.mock('../../utils/api', () => ({
     getUserProgress: vi.fn().mockResolvedValue({
       success: true,
       progress: {
-        total_xp: 500,
-        completed_phases: 1,
+        totalXP: 500,
+        completedPhases: [0],
+        nfts: [],
+        nftMints: [],
+        passLevel: 'Free',
+        mfaiTokens: 0,
+        stakedMfai: 0,
+        walletConnected: false,
+        votingPower: 0,
+        daoProposals: 0,
+        testnetAirdropClaimed: false,
+        socialShareCount: 0,
+        shareHistory: [],
       }
     }),
+    getUserJourneys: vi.fn().mockResolvedValue({ journeys: [] }),
   }
 }));
 

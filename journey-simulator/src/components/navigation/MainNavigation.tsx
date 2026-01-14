@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject, lazy, Suspense } from 'react'
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Menu, X, Sun, Moon, Crown, Sparkles, Waypoints, BrainCircuit, Atom, Vote, LibraryBig, LifeBuoy, GaugeCircle, Gem, Gavel, Award } from 'lucide-react'
@@ -6,9 +12,11 @@ import type { LucideIcon } from 'lucide-react'
 import { useThemeStore } from '../../store/themeStore'
 import { useAuth } from '../../contexts/AuthContext'
 import { useJourneyStoreShallow } from '../../store/journeyStore'
+import { useRunModeStore } from '../../store/runModeStore'
+import { tokenStore } from '../../utils/tokenStore'
 import UserMetricsPanel from './UserMetricsPanel'
 
-const WalletButton = lazy(() => import('../WalletButton'))
+import WalletButton from '../WalletButton'
 
 type NavItem = {
   label: string
@@ -45,6 +53,45 @@ type NavSharedProps = {
   readonly navDisabledTone?: string
 }
 
+const waitMs = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+
+
+const safeGetFromStorage = (storage: Storage | undefined, key: string) => {
+  try {
+    return storage?.getItem(key) || null
+  } catch {
+    return null
+  }
+}
+
+const resolveZustandToken = () => {
+  const storageStr = safeGetFromStorage(globalThis.localStorage, 'mfai-token-storage')
+  if (!storageStr) return null
+  try {
+    const parsed = JSON.parse(storageStr)
+    return parsed?.state?.accessToken || null
+  } catch {
+    return null
+  }
+}
+
+const resolveCurrentToken = () => {
+  const candidates = [
+    tokenStore.getAccessToken(),
+    safeGetFromStorage(globalThis.sessionStorage, 'accessToken'),
+    safeGetFromStorage(globalThis.localStorage, 'accessToken'),
+    resolveZustandToken(),
+  ]
+  return candidates.find((token) => token && token !== 'demo-token') || null
+}
+
+const shouldRequireLogin = (token: string | null, user: { id?: string } | null, isAuthenticated: boolean) =>
+  !token || user?.id === 'demo-user-id' || !isAuthenticated
+
+const navigateToLogin = (navigate: ReturnType<typeof useNavigate>, target: string) =>
+  navigate(`/login?redirect=${encodeURIComponent(target)}`)
+
 const RunModeSelector = ({
   runMode,
   setRunModePersisted,
@@ -63,6 +110,7 @@ const RunModeSelector = ({
   const renderButton = (mode: 'demo' | 'simulation' | 'real', label: string, activeClass: string, inactiveClass: string) => (
     <button
       type="button"
+      data-testid={`mode-switch-${mode}`}
       onClick={() => setRunModePersisted(mode)}
       className={`rounded-full border px-3 py-1 font-semibold transition ${runMode === mode ? activeClass : inactiveClass}`}
     >
@@ -74,13 +122,13 @@ const RunModeSelector = ({
     <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs backdrop-blur md:text-sm">
       <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 font-semibold shadow-sm ${runModeTone}`}>
         <span>Mode</span>
-        <span className="uppercase tracking-wide">{runMode}</span>
+        <span data-testid="mode-badge" className="uppercase tracking-wide">{runMode}</span>
         {runMode === 'real' && <Crown size={14} aria-hidden="true" />}
         {runMode === 'simulation' && <Sparkles size={14} aria-hidden="true" />}
         {runMode === 'demo' && <Atom size={14} aria-hidden="true" />}
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-semibold text-muted-foreground">Sélection :</span>
+        <span className="font-semibold text-muted-foreground">Select:</span>
         {renderButton('demo', 'Demo (mock)', 'border-blue-500 bg-blue-500 text-white', 'border-transparent bg-white/5 text-muted-foreground hover:border-blue-200 hover:text-blue-600')}
         {renderButton('simulation', 'Simulation (dry-run)', 'border-amber-500 bg-amber-500 text-white', 'border-transparent bg-white/5 text-muted-foreground hover:border-amber-200 hover:text-amber-600')}
         {renderButton('real', 'Launch with Zyno (real)', 'border-emerald-600 bg-emerald-600 text-white', 'border-transparent bg-white/5 text-muted-foreground hover:border-emerald-200 hover:text-emerald-700')}
@@ -100,7 +148,7 @@ const BrandButton = ({ navigate, mutedCaptionClass }: { readonly navigate: Retur
     </div>
     <div className="flex flex-col">
       <span className="font-space text-lg font-semibold tracking-wide">Money Factory AI</span>
-      <span className={`text-xs font-medium uppercase tracking-[0.2em] ${mutedCaptionClass}`}>Cognitive Activation Protocol™</span>
+      <span className={`text-xs font-medium uppercase tracking-[0.2em] ${mutedCaptionClass}`}>Cognitive Activation Protocol</span>
     </div>
   </button>
 )
@@ -128,7 +176,7 @@ const UserAuthButtons = ({ user, navigate, logout }: { user: any, navigate: any,
         </motion.button>
       </>
     ) : (
-      <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} onClick={logout} className="btn-secondary flex items-center justify-center">
+      <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} onClick={() => { logout(); navigate('/'); }} className="btn-secondary flex items-center justify-center" data-testid="logout-button">
         <span>Logout</span>
       </motion.button>
     )}
@@ -136,7 +184,7 @@ const UserAuthButtons = ({ user, navigate, logout }: { user: any, navigate: any,
 );
 
 const MobileStatsBlock = ({ completionRate, userProgress, passBadgeStyles, mutedCaptionClass, metricLabelClass, metricHintClass }: { completionRate: number, userProgress: any, passBadgeStyles: string, mutedCaptionClass: string, metricLabelClass: string, metricHintClass: string }) => (
-  <div className="flex items-center justify-between gap-3 lg:hidden" aria-label="Progression du parcours mobile">
+  <div className="flex items-center justify-between gap-3 lg:hidden" aria-label="Mobile journey progress">
     <div className="glass-effect flex items-center gap-3 rounded-2xl px-4 py-3">
       <Crown size={16} className="text-accent-neon" aria-hidden="true" />
       <div className="flex flex-col">
@@ -183,7 +231,7 @@ const DesktopNav = ({
       case 'Live': return 'bg-success/20 text-success';
       case 'Beta': return 'bg-warning/20 text-warning';
       case 'New': return 'bg-primary-400/20 text-primary-500';
-      case 'Guide': return 'bg-info/15 text-info';
+      case 'Guide': return 'bg-gray-900/60 border border-violet-500/50 text-violet-300 shadow-[0_0_15px_-5px_rgba(168,85,247,0.5)] animate-pulse'; // Mini MissionCard style
       default: return navSoonBadge;
     }
   };
@@ -198,7 +246,7 @@ const DesktopNav = ({
   };
 
   return (
-    <nav aria-label="Navigation principale" className="hidden flex-1 items-center justify-center gap-6 lg:flex">
+    <nav aria-label="Main navigation" className="hidden flex-1 items-center justify-center gap-6 lg:flex">
       <ul className="flex items-center gap-2">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon
@@ -229,10 +277,11 @@ const DesktopNav = ({
 
       <div ref={moreRef} className="relative">
         <motion.button
-          whileHover={{ y: -2 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           type="button"
           onClick={() => setIsMoreOpen((v) => !v)}
-          className={`relative flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold transition-colors ${navDefaultTone}`}
+          className={`relative flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm font-semibold transition-all duration-300 hover:border-accent-cyan/50 hover:bg-white/5 hover:text-accent-cyan hover:shadow-neon-ring ${navDefaultTone}`}
           aria-haspopup="menu"
           aria-expanded={isMoreOpen}
         >
@@ -263,6 +312,7 @@ const DesktopNav = ({
                       onClick={() => handleNavigate(item)}
                       className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${stateClass}`}
                       disabled={item.disabled}
+                      data-testid={`nav-menu-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
                     >
                       <span className="flex items-center gap-2">
                         <Icon size={16} aria-hidden="true" />
@@ -341,6 +391,7 @@ const MobileMenu = ({
                 onClick={() => handleNavigate(item)}
                 className={`flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold transition-colors ${stateClass}`}
                 disabled={item.disabled}
+                data-testid={`nav-menu-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
               >
                 <span className="flex items-center gap-2">
                   <Icon size={18} />
@@ -370,7 +421,7 @@ const MobileMenu = ({
               </button>
             </>
           ) : (
-            <button type="button" className="btn-secondary w-full" onClick={logout}>
+            <button type="button" className="btn-secondary w-full" onClick={logout} data-testid="logout-button">
               Logout
             </button>
           )}
@@ -399,7 +450,7 @@ const MobileMenu = ({
               <motion.div initial={false} animate={{ width: `${completionRate}%` }} transition={{ duration: 0.6, ease: 'easeOut' }} className="h-full rounded-full bg-gradient-accent" />
             </div>
             <span className={`text-[11px] ${metricHintClass}`}>
-              {completedPhases}/{totalPhases || '—'} phases
+              {completedPhases}/{totalPhases || ''} phases
             </span>
           </div>
         </div>
@@ -413,6 +464,7 @@ const MobileMenu = ({
               </div>
               <button
                 onClick={logout}
+                data-testid="logout-button"
                 className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide transition-colors ${isDark ? 'border-white/20 text-white/60 hover:text-white' : 'border-surface-300 text-surface-500 hover:text-surface-900'}`}
               >
                 Log out
@@ -462,25 +514,18 @@ const ProgressTicker = ({
 const MainNavigation = ({ enableWallet = false }: MainNavigationProps) => {
   const { isDark, toggleTheme } = useThemeStore()
   const { logout, user, loginAsDemo, isAuthenticated } = useAuth()
-  const { selectedPersona, userProgress, runMode, setRunMode } = useJourneyStoreShallow((state) => ({
+  const { selectedPersona, userProgress } = useJourneyStoreShallow((state) => ({
     selectedPersona: state.selectedPersona,
     userProgress: state.userProgress,
-    runMode: state.runMode,
-    setRunMode: state.setRunMode,
   }))
+  const { runMode, setRunMode } = useRunModeStore((state) => ({ runMode: state.runMode, setRunMode: state.setRunMode }))
   const location = useLocation()
   const navigate = useNavigate()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isMoreOpen, setIsMoreOpen] = useState(false)
 
-  // Hydrate runMode from persisted value on mount if available
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const persisted = window.localStorage.getItem('mfai-run-mode') as 'demo' | 'simulation' | 'real' | null
-    if (persisted && persisted !== runMode) {
-      setRunMode(persisted)
-    }
-  }, [runMode, setRunMode])
+  // 🛡️ runMode hydration is handled by journeyStore persist middleware
+  // No need for duplicate hydration logic here
   const headerRef = useRef<HTMLElement | null>(null)
   const moreRef = useRef<HTMLDivElement | null>(null)
 
@@ -490,7 +535,7 @@ const MainNavigation = ({ enableWallet = false }: MainNavigationProps) => {
    */
 
   const totalPhases = selectedPersona?.phases?.length ?? 0
-  const completedPhases = userProgress.completedPhases.length
+  const completedPhases = userProgress.completedPhases?.length ?? 0
   const completionRate = totalPhases > 0 ? Math.round((completedPhases / totalPhases) * 100) : 0
   const level = useMemo(() => Math.max(1, Math.floor(userProgress.totalXP / 200) + 1), [userProgress.totalXP])
 
@@ -514,15 +559,15 @@ const MainNavigation = ({ enableWallet = false }: MainNavigationProps) => {
 
   const navBadges = useMemo(
     () => [
-      { id: 'xp', label: 'Skillchain XP', value: `${userProgress.totalXP.toLocaleString()} XP`, icon: GaugeCircle },
-      { id: 'mfai', label: '$MFAI', value: userProgress.mfaiTokens.toLocaleString(), icon: Gem },
-      { id: 'nft', label: 'Proof NFTs', value: userProgress.nfts.length.toString(), icon: Award },
-      { id: 'vote', label: 'Voting Power', value: userProgress.votingPower.toLocaleString(), icon: Gavel },
+      { id: 'xp', label: 'Skillchain XP', value: `${userProgress.totalXP?.toLocaleString?.() ?? '0'} XP`, icon: GaugeCircle },
+      { id: 'mfai', label: '$MFAI', value: userProgress.mfaiTokens?.toLocaleString?.() ?? '0', icon: Gem },
+      { id: 'nft', label: 'Proof NFTs', value: (userProgress.nfts?.length ?? 0).toString(), icon: Award },
+      { id: 'vote', label: 'Voting Power', value: userProgress.votingPower?.toLocaleString?.() ?? '0', icon: Gavel },
     ],
-    [userProgress.mfaiTokens, userProgress.nfts.length, userProgress.totalXP, userProgress.votingPower]
+    [userProgress.mfaiTokens, userProgress.nfts?.length ?? 0, userProgress.totalXP, userProgress.votingPower]
   )
 
-  const headerTone = isDark ? 'border-white/10 bg-background/80 text-white' : 'border-surface-200/80 bg-white/85 text-surface-900'
+  const headerTone = isDark ? 'border-white/5 bg-background/60 text-white supports-[backdrop-filter]:bg-background/40' : 'border-surface-200/80 bg-white/70 text-surface-900 supports-[backdrop-filter]:bg-white/50'
   const navSoonBadge = isDark ? 'bg-white/10 text-white/70' : 'bg-surface-200 text-surface-600'
   const navDefaultTone = isDark ? 'text-white/70 hover:text-white' : 'text-surface-600 hover:text-surface-900'
   const navDisabledTone = isDark ? 'text-white/40' : 'text-surface-300'
@@ -531,40 +576,34 @@ const MainNavigation = ({ enableWallet = false }: MainNavigationProps) => {
   const tickerTone = isDark ? 'border-white/10 bg-white/5 text-white/75' : 'border-surface-200/70 bg-white text-surface-600'
 
   const setRunModePersisted = useCallback(async (mode: 'demo' | 'simulation' | 'real') => {
-    // 1. Update persisted preference
-    try {
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem('mfai-run-mode', mode)
-      }
-    } catch { /* ignore */ }
+    setRunMode(mode)
 
-    // 2. Handle Authentication Side Effects
     if (mode === 'demo') {
-      // If not already in demo mode (e.g. real user), switch identity
       if (user?.id !== 'demo-user-id') {
-        await loginAsDemo();
+        await loginAsDemo()
+        await waitMs(50)
       }
-    } else if (mode === 'real') {
-      // Requires real authentication
-      if (!isAuthenticated || user?.id === 'demo-user-id') {
-        // If current user is demo, we must logout and ask for login
-        // OR just navigate to login.
-        if (user?.id === 'demo-user-id') {
-          await logout(); // Clear demo state
-        }
-        navigate('/login');
-        return; // Do not set mode until logged in
-      }
-    } else if (mode === 'simulation') {
-      // Simulation can be run by anyone, but usually implies logged in
-      if (!isAuthenticated) {
-        await loginAsDemo(); // Fallback to demo if not logged in? Or force login?
-        // Let's assume Simulation = Demo capabilities for now if not logged in
-      }
+      navigate('/journeys/demo')
+      return
     }
 
-    setRunMode(mode)
-  }, [setRunMode, loginAsDemo, isAuthenticated, user, logout, navigate])
+    if (mode === 'real') {
+      const target = '/journeys'
+      const token = resolveCurrentToken()
+      if (shouldRequireLogin(token, user, isAuthenticated)) {
+        navigateToLogin(navigate, target)
+        return
+      }
+      navigate(target)
+      return
+    }
+
+    if (!isAuthenticated && user?.id !== 'demo-user-id') {
+      await loginAsDemo()
+      await waitMs(50)
+    }
+    navigate('/journeys')
+  }, [isAuthenticated, loginAsDemo, navigate, setRunMode, user])
 
   const metricLabelClass = isDark ? 'text-white/50' : 'text-surface-500'
   const metricValueClass = isDark ? 'text-white' : 'text-surface-900'
@@ -575,8 +614,8 @@ const MainNavigation = ({ enableWallet = false }: MainNavigationProps) => {
   const mobileItemDisabled = isDark ? 'bg-white/5 text-white/40' : 'bg-surface-100 text-surface-300'
   const mobileItemActive = isDark ? 'bg-white/15 text-white' : 'bg-surface-200 text-surface-900'
 
-  const activePhaseTitle = selectedPersona?.phases?.[Math.min(userProgress.completedPhases.length, Math.max((selectedPersona?.phases?.length ?? 1) - 1, 0))]?.title
-  const zynoTicker = selectedPersona ? `Zyno says: ${activePhaseTitle || 'Journey ready'} · ${completionRate}% complete` : 'Zyno syncs once you choose a journey.'
+  const activePhaseTitle = selectedPersona?.phases?.[Math.min(userProgress.completedPhases?.length ?? 0, Math.max((selectedPersona?.phases?.length ?? 1) - 1, 0))]?.title
+  const zynoTicker = selectedPersona ? `Zyno says: ${activePhaseTitle || 'Journey ready'}  ${completionRate}% complete` : 'Zyno syncs once you choose a journey.'
 
   const updateHeaderHeight = useCallback(() => {
     if (!headerRef.current) return
@@ -641,7 +680,7 @@ const MainNavigation = ({ enableWallet = false }: MainNavigationProps) => {
       initial={{ y: -48, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className={`fixed inset-x-0 top-0 z-50 border-b backdrop-blur-2xl shadow-glass ${headerTone}`}
+      className={`fixed inset-x-0 top-0 z-50 border-b backdrop-blur-xl shadow-2xl ${headerTone}`}
       role="banner"
     >
       <div className="flex w-full flex-col gap-3 px-2 py-3 sm:px-3 lg:px-4">
@@ -649,6 +688,15 @@ const MainNavigation = ({ enableWallet = false }: MainNavigationProps) => {
 
         <div className="flex items-center justify-between gap-3">
           <BrandButton navigate={navigate} mutedCaptionClass={mutedCaptionClass} />
+
+          {runMode === 'demo' && (
+            <span
+              className="rounded-full border border-red-300/60 bg-red-600/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow-glow"
+              aria-label="Demo mode actif"
+            >
+              DEMO MODE
+            </span>
+          )}
 
           <DesktopNav
             location={location}
@@ -669,9 +717,7 @@ const MainNavigation = ({ enableWallet = false }: MainNavigationProps) => {
             </div>
 
             {enableWallet ? (
-              <Suspense fallback={<div className="h-10 w-[160px]" />}>
-                <WalletButton />
-              </Suspense>
+              <WalletButton />
             ) : null}
 
             <UserAuthButtons user={user} navigate={navigate} logout={logout} />

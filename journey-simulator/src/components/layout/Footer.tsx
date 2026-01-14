@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { motion } from 'framer-motion';
 import { FileText, Github, Send, Twitter as XIcon, Users } from 'lucide-react';
 
@@ -6,7 +12,7 @@ const Footer = () => {
     journeys: [
       { label: 'Personas', href: '#personas' },
       { label: 'Activation Journey', href: '#journey' },
-      { label: 'Skillchain Mining™', href: '#skillchain' },
+      { label: 'Skillchain Mining', href: '#skillchain' },
     ],
     community: [
       // Note: Discord URL is intentionally omitted here until a canonical invite is published.
@@ -40,7 +46,7 @@ const Footer = () => {
               <span className="font-space text-xl font-bold gradient-text">Money Factory AI</span>
             </div>
             <p className="max-w-xs text-sm opacity-80">
-              Transform your skills into capital in the Proof Economy through the Cognitive Activation Protocol™
+              Transform your skills into capital in the Proof Economy through the Cognitive Activation Protocol
             </p>
             <div className="mt-4 flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-white/60">
               <span>Powered by</span>
@@ -105,7 +111,7 @@ const Footer = () => {
           viewport={{ once: true }}
           className="mt-12 flex flex-col items-center justify-between border-t border-white/10 pt-8 text-sm opacity-60 md:flex-row"
         >
-          <p>© 2024 Money Factory AI. All rights reserved.</p>
+          <p> 2024 Money Factory AI. All rights reserved.</p>
           <div className="mt-4 flex items-center space-x-4 md:mt-0">
             {[
               { Icon: XIcon, href: 'https://x.com/Moneyfactoryai' },

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState, type FC } from "react";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +12,7 @@ import { useJourneyStore } from "../store/journeyStore";
 import JourneyCard from "./Journey/JourneyCard";
 import ZynoBox from "./Journey/ZynoBox";
 import { shallow } from "zustand/shallow";
+import { toast } from "sonner";
 
 import { personas } from "../data/personas";
 import JourneyWorkspace from "./Journey/JourneyWorkspace";
@@ -37,7 +44,7 @@ const JourneysPage: FC = () => {
         bullets: [
           "Design studio for strategy, token economics, and governance stress tests",
           "Real-time AI pair for code reviews, prompt engineering, and architectural simulations",
-          "Cognitive activator that adapts missions based on Proof-of-Skill™ signals",
+          "Cognitive activator that adapts missions based on Proof-of-Skill signals",
         ],
       },
       {
@@ -61,8 +68,7 @@ const JourneysPage: FC = () => {
       try {
         setIsLoading(true);
         setError(null);
-        // NOTE: Some store implementations return unstable function references.
-        // Using getState() avoids effect loops in production builds.
+        // NOTE: keep progress load, but cards must render regardless of user state
         await useJourneyStore.getState().loadUserProgress();
         logger.debug("JourneysPage: progress loaded successfully");
       } catch (err) {
@@ -92,8 +98,31 @@ const JourneysPage: FC = () => {
   const navigate = useNavigate();
 
   const personaId = selectedPersona?.id ?? "none";
+  const completedPhasesCount = userProgress?.completedPhases?.length ?? 0;
   const personaTips =
-    selectedPersona?.phases?.[userProgress.completedPhases.length]?.zynoTips ?? EMPTY_TIPS;
+    selectedPersona?.phases?.[completedPhasesCount]?.zynoTips ?? EMPTY_TIPS;
+
+  const totalPhases = selectedPersona?.phases?.length ?? 0;
+  const completionRate = totalPhases === 0 ? 0 : Math.round((completedPhasesCount / totalPhases) * 100);
+  const currentPhaseNumber = Math.min(totalPhases || 1, completedPhasesCount + 1);
+  const currentPhase = selectedPersona?.phases?.[currentPhaseNumber - 1];
+  const pendingQuiz = !!currentPhase?.quizId;
+  const pendingMint = !!currentPhase?.nftReward;
+  const pendingResources = (currentPhase?.resources as string[] | undefined)?.length ?? 0;
+
+  const handleQuiz = () => {
+    toast.info("Quiz lancé (placeholder) : répondez aux questions pour valider la phase.");
+  };
+
+  const handleMint = () => {
+    toast.success("Mint déclenché (placeholder) : certificat en cours de génération.");
+  };
+
+  const handleResources = () => {
+    toast.message("Ressources ouvertes", {
+      description: "Consultez les guides et références de la phase.",
+    });
+  };
 
   const handleBackToPersonas = () => {
     setSelectedPersona(null);
@@ -102,24 +131,7 @@ const JourneysPage: FC = () => {
     navigate('/journeys');
   };
 
-  if (isLoading && !selectedPersona) {
-    return (
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center min-h-[400px]">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="text-center"
-            >
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-accent-cyan mx-auto mb-4" />
-              <p className="text-white text-lg">Loading your journey...</p>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  // Do NOT block rendering of personas on auth/progress state
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900">
@@ -145,7 +157,7 @@ const JourneysPage: FC = () => {
                 disabled={isLoading}
                 className="ml-4 px-4 py-2 rounded-lg bg-red-600/20 hover:bg-red-700/20 border border-red-500/30 text-red-300 disabled:opacity-50 text-sm self-start"
               >
-                {isLoading ? 'Refreshing...' : '🔄 Refresh'}
+                {isLoading ? 'Refreshing...' : ' Refresh'}
               </button>
             </div>
           )}
@@ -168,7 +180,7 @@ const JourneysPage: FC = () => {
               <p className="text-xl opacity-80 max-w-4xl mx-auto mb-8 leading-relaxed">
                 Discover how the{" "}
                 <span className="font-semibold text-accent-cyan">
-                  Cognitive Activation Protocol™
+                  Cognitive Activation Protocol
                 </span>{" "}
                 transforms your skills into capital based on your unique profile
               </p>
@@ -260,9 +272,75 @@ const JourneysPage: FC = () => {
           </motion.div>
         )}
 
+        {selectedPersona && (
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] opacity-70">Phase status</p>
+                  <p className="text-lg font-semibold">Phase {currentPhaseNumber}/{totalPhases || 1}</p>
+                </div>
+                <div className="text-sm font-semibold text-accent-cyan">{completionRate}%</div>
+              </div>
+              <div className="h-2 rounded-full bg-white/10">
+                <div className="h-2 rounded-full bg-gradient-accent" style={{ width: `${completionRate}%` }} />
+              </div>
+              <p className="mt-2 text-xs opacity-70">
+                {pendingQuiz ? 'Quiz requis avant validation.' : 'Quiz non requis.'}{" "}
+                {pendingMint ? 'Certification disponible après réussite.' : 'Mint non requis sur cette phase.'}
+              </p>
+              <p className="mt-1 text-xs opacity-80">
+                Ressources disponibles : {pendingResources}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
+              <p className="text-xs uppercase tracking-[0.2em] opacity-70">Actions suivantes</p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  className="btn-primary text-xs px-3 py-2"
+                  onClick={() => navigate(`/journeys/${selectedPersona.id}`)}
+                >
+                  Continuer la phase
+                </button>
+                <button
+                  className="btn-secondary text-xs px-3 py-2"
+                  onClick={handleQuiz}
+                  disabled={!pendingQuiz}
+                >
+                  Lancer le quiz
+                </button>
+                <button
+                  className="btn-secondary text-xs px-3 py-2"
+                  onClick={handleMint}
+                  disabled={!pendingMint}
+                >
+                  Lancer le mint
+                </button>
+                <button
+                  className="btn-secondary text-xs px-3 py-2"
+                  onClick={handleResources}
+                  disabled={!pendingResources}
+                >
+                  Ressources ({pendingResources})
+                </button>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-xs text-white/80">
+                <p className="font-semibold">Récapitulatif</p>
+                <p className="opacity-80">
+                  Dernière saisie : {useJourneyStore.getState().lastStep?.userInput || 'Non disponible'}.
+                </p>
+                <p className="opacity-80">
+                  Prochain livrable attendu : {currentPhase?.mission || 'Décrire votre intention pour cette phase.'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {
-          userProgress.completedPhases.length ===
-          selectedPersona?.phases.length && selectedPersona && (
+          completedPhasesCount ===
+          (selectedPersona?.phases?.length ?? -1) && selectedPersona && (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -273,7 +351,7 @@ const JourneysPage: FC = () => {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-accent-gold/20 rounded-full -translate-y-16 translate-x-16" />
                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent-cyan/20 rounded-full translate-y-12 -translate-x-12" />
                 <div className="relative">
-                  <div className="text-8xl mb-6">🎉</div>
+                  <div className="text-8xl mb-6"></div>
                   <h3 className="text-4xl font-space font-bold mb-4 gradient-text">
                     Journey Completed!
                   </h3>
@@ -294,13 +372,13 @@ const JourneysPage: FC = () => {
                     </div>
                     <div className="glass-effect rounded-xl p-4">
                       <div className="text-3xl font-bold text-accent-purple mb-2">
-                        {userProgress.nfts.length}
+                        {userProgress.nfts?.length ?? 0}
                       </div>
                       <div className="text-sm opacity-70">NFTs Earned</div>
                     </div>
                     <div className="glass-effect rounded-xl p-4">
                       <div className="text-3xl font-bold text-accent-cyan mb-2">
-                        {userProgress.mfaiTokens.toFixed(1)}
+                        {(userProgress.mfaiTokens ?? 0).toFixed(1)}
                       </div>
                       <div className="text-sm opacity-70">$MFAI Tokens</div>
                     </div>
@@ -330,7 +408,7 @@ const JourneysPage: FC = () => {
 
       {!selectedPersona && (
         <ZynoBox
-          context={`persona:${personaId};phase:${userProgress.completedPhases.length}`}
+          context={`persona:${personaId};phase:${completedPhasesCount}`}
           tips={personaTips}
           onPrompt={(msg) => logger.debug("User asked Zyno:", msg)}
         />
