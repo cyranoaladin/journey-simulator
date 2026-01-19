@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 // Minimal schema subset for runtime validation
 export const JourneyStepResponseSchema = {
   $schema: 'http://json-schema.org/draft-07/schema#',

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -150,6 +156,8 @@ const WalletButton = () => {
           whileTap={{ scale: 0.95 }}
           onClick={handleConnect}
           disabled={connecting || isConnecting}
+          aria-label="Connect Wallet"
+          data-testid="wallet-connect-button"
           className="flex items-center space-x-2 bg-gradient-primary text-white px-4 py-2 rounded-lg font-medium transition-all hover:shadow-lg disabled:opacity-70"
         >
           {connecting || isConnecting ? (
@@ -160,7 +168,7 @@ const WalletButton = () => {
               <img src="/images/solana.svg" alt="Solana" className="w-5 h-5" />
             </div>
           )}
-          <span>{connecting || isConnecting ? 'Connecting...' : 'Connect Wallet'}</span>
+          <span className="hidden sm:inline">{connecting || isConnecting ? 'Connecting...' : 'Connect Wallet'}</span>
         </motion.button>
 
         {/* Error message */}
@@ -198,6 +206,7 @@ const WalletButton = () => {
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        data-testid="wallet-connected"
         className="flex items-center space-x-2 bg-white/10 backdrop-blur-md border border-white/20 text-white px-4 py-2 rounded-lg font-medium transition-all hover:bg-white/20"
       >
         <div className="flex items-center space-x-2">

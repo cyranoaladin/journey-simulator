@@ -1,16 +1,23 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { useJourneyStore } from '../../store/journeyStore';
 
 interface ZynoChatProps {
   readonly className?: string;
+  readonly externalMessages?: Array<{ role: string; content: string; source?: string; timestamp: Date }>;
 }
 
-export default function ZynoChat({ className = '' }: ZynoChatProps) {
+export default function ZynoChat({ className = '', externalMessages }: ZynoChatProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
-  const [conversation, setConversation] = useState<Array<{ role: string, content: string, timestamp: Date; }>>([]);
+  const [conversation, setConversation] = useState<Array<{ role: string, content: string, source?: string, timestamp: Date; }>>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -23,8 +30,14 @@ export default function ZynoChat({ className = '' }: ZynoChatProps) {
   };
 
   useEffect(() => {
+    if (className.includes('external-override') && externalMessages) {
+      setConversation(externalMessages);
+    }
+  }, [externalMessages, className]);
+
+  useEffect(() => {
     scrollToBottom();
-  }, [conversation]);
+  }, [conversation, isOpen]);
 
   const adjustTextareaHeight = () => {
     if (textareaRef.current) {
@@ -73,6 +86,23 @@ export default function ZynoChat({ className = '' }: ZynoChatProps) {
       if (!response.ok) throw new Error(`Error: ${response.status}`);
 
       const data = await response.json();
+      console.log('[ZynoChat] Response received', { agent_actions: data.agent_actions?.length }); // E2E Debug
+
+      const newMessages: Array<{ role: string, content: string, source?: string, timestamp: Date; }> = [];
+
+      // Process Agent Actions (for Consortium)
+      if (data.agent_actions && Array.isArray(data.agent_actions)) {
+        for (const action of data.agent_actions) {
+          if (action.type === 'message' && action.content) {
+            newMessages.push({
+              role: 'assistant',
+              content: action.content,
+              source: action.source, // Capture source agent
+              timestamp: new Date()
+            });
+          }
+        }
+      }
 
       // Extract text content from UI blocks for the response
       let aiResponse = '';
@@ -86,18 +116,23 @@ export default function ZynoChat({ className = '' }: ZynoChatProps) {
         }
       }
 
-      if (!aiResponse.trim()) {
-        aiResponse = "I am Zyno, your cognitive assistant. I have analyzed your question and generated a response in the interface blocks above.";
-      }
-
-      setConversation(prev => [
-        ...prev,
-        {
+      if (aiResponse.trim()) {
+        newMessages.push({
           role: 'assistant',
           content: aiResponse,
           timestamp: new Date()
-        }
-      ]);
+        });
+      } else if (newMessages.length === 0) {
+        // Fallback only if NO agent actions and NO ui blocks text
+        newMessages.push({
+          role: 'assistant',
+          content: "I am Zyno, your cognitive assistant. I have analyzed your question and generated a response in the interface blocks above.",
+          timestamp: new Date()
+        });
+      }
+
+      setConversation(prev => [...prev, ...newMessages]);
+
     } catch (error) {
       console.error('Error sending message:', error);
       setConversation(prev => [
@@ -141,7 +176,7 @@ export default function ZynoChat({ className = '' }: ZynoChatProps) {
             {conversation.length === 0 ? (
               <div className="text-center text-gray-500 mt-8">
                 <div className="mx-auto w-16 h-16 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center mb-4">
-                  <span className="text-2xl">🤖</span>
+                  <span className="text-2xl"></span>
                 </div>
                 <p>Start asking Zyno a question</p>
                 <p className="text-xs mt-2">Specialized AI for your {selectedPersona?.title} journey</p>
@@ -154,8 +189,17 @@ export default function ZynoChat({ className = '' }: ZynoChatProps) {
                     key={msgKey}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start items-end'}`}
                   >
+                    {msg.role === 'assistant' && msg.source && (
+                      <div
+                        data-testid={`consortium-avatar-${msg.source}`}
+                        className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-[10px] font-bold text-white mr-2 mb-1 shadow-lg"
+                        title={msg.source}
+                      >
+                        {msg.source[0]}
+                      </div>
+                    )}
                     <div
                       className={`max-w-[85%] rounded-2xl px-4 py-3 ${msg.role === 'user'
                         ? 'bg-gradient-to-r from-cyan-600 to-cyan-700 rounded-br-none'
@@ -217,7 +261,7 @@ export default function ZynoChat({ className = '' }: ZynoChatProps) {
           data-testid="zyno-fab"
           className="w-14 h-14 rounded-full bg-gradient-to-r from-cyan-600 to-purple-600 flex items-center justify-center shadow-lg hover:shadow-cyan-500/30"
         >
-          <span className="text-xl">🤖</span>
+          <span className="text-xl"></span>
         </motion.button>
       )}
     </div>

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { Persona } from '../types/journey'
 
 export const personas: Persona[] = [
@@ -6,7 +12,7 @@ export const personas: Persona[] = [
     name: 'cognitive-activation-hub',
     title: 'The Cognitive Activation Hub',
     description: 'A foundational launchpad into Web3 that forges the right mental models, tooling, and conviction to build on Solana.',
-    icon: '🧠',
+    icon: '',
     color: 'from-sky-500 to-cyan-400',
     targetProfile: 'Ambitious newcomers, cross-over professionals, and curious builders entering decentralized technologies.',
     motivation: 'Master Web3 paradigms, Solana fundamentals, and tokenized economies to operate confidently in decentralized markets.',
@@ -20,7 +26,7 @@ export const personas: Persona[] = [
         duration: '1 week',
         xpReward: 60,
         mfaiReward: 6,
-        nftReward: 'Proof-of-Skill™: Web3 Orientation',
+        nftReward: 'Proof-of-Skill: Web3 Orientation',
         tools: ['Zyno Learning Blocks', 'Interactive protocol atlas', 'Narrative reframing workshops'],
         outcomes: ['Shared language with protocol natives', 'Documented learning thesis', 'First Skillchain credential'],
         zynoTip: 'Concepts are capital. Every mental model you refine becomes leverage for the builds ahead.',
@@ -28,7 +34,7 @@ export const personas: Persona[] = [
       {
         id: 'solana-fluency',
         title: 'Solana Systems Lab',
-        description: 'Dive into Solana’s execution model, runtime, and composability so performance decisions become instinctive.',
+        description: 'Dive into Solanas execution model, runtime, and composability so performance decisions become instinctive.',
         mission: 'Complete validator walk-throughs, inspect transaction flows, and prototype a Solana interaction in the playground.',
         duration: '10 days',
         xpReward: 80,
@@ -74,7 +80,7 @@ export const personas: Persona[] = [
         duration: '2 weeks',
         xpReward: 120,
         mfaiReward: 12,
-        nftReward: 'Proof-of-Skill™: Activation',
+        nftReward: 'Proof-of-Skill: Activation',
         tools: ['Skillchain contributor portal', 'Community feedback loops', 'DAO sandbox'],
         outcomes: ['Published activation brief', 'DAO onboarding path', 'Real-world initiative backlog'],
         zynoTip: 'Apply fast. The ecosystem rewards those who convert knowledge into shared momentum.',
@@ -98,8 +104,8 @@ export const personas: Persona[] = [
     id: 'capital-foundry',
     name: 'capital-foundry',
     title: 'The Capital Foundry',
-    description: 'A protocol builder’s crucible for inventing the next generation of Solana-native financial infrastructure.',
-    icon: '🏛️',
+    description: 'A protocol builders crucible for inventing the next generation of Solana-native financial infrastructure.',
+    icon: '',
     color: 'from-emerald-500 to-teal-500',
     targetProfile: 'FinTech founders, DeFi engineers, quantitative teams, and treasury strategists pursuing decentralized finance.',
     motivation: 'Design, prototype, and deploy performant Solana DeFi primitives that withstand market and security scrutiny.',
@@ -108,7 +114,7 @@ export const personas: Persona[] = [
       {
         id: 'capital-discovery',
         title: 'Protocol Discovery Sprint',
-        description: 'Audit Solana’s DeFi landscape, inspect program architectures, and outline unmet market needs.',
+        description: 'Audit Solanas DeFi landscape, inspect program architectures, and outline unmet market needs.',
         mission: 'Benchmark leading Solana protocols, analyze composability patterns, and publish an opportunity matrix.',
         duration: '8 days',
         xpReward: 80,
@@ -129,7 +135,7 @@ export const personas: Persona[] = [
         nftReward: 'Anchor Mastery Crest',
         tools: ['Anchor test harness', 'Zyno code peer', 'Continuous fuzzing suite'],
         outcomes: ['Auditable program skeleton', 'Gas profile benchmarks', 'Deployment playbook'],
-        zynoTip: 'Performance is product-market fit for DeFi. Optimize every compute unit like capital depends on it—because it does.',
+        zynoTip: 'Performance is product-market fit for DeFi. Optimize every compute unit like capital depends on itbecause it does.',
       },
       {
         id: 'oracle-integration',
@@ -142,7 +148,7 @@ export const personas: Persona[] = [
         nftReward: 'Liquidity Architect Token',
         tools: ['Oracle network simulator', 'Liquidity shock dashboard', 'Interoperability blueprints'],
         outcomes: ['Oracle validation matrix', 'Liquidity risk drills', 'Cross-chain response kit'],
-        zynoTip: 'Data truth feeds capital trust. Protect your oracle layer like it is the protocol’s nervous system.',
+        zynoTip: 'Data truth feeds capital trust. Protect your oracle layer like it is the protocols nervous system.',
       },
       {
         id: 'risk-command',
@@ -152,7 +158,7 @@ export const personas: Persona[] = [
         duration: '2 weeks',
         xpReward: 130,
         mfaiReward: 13,
-        nftReward: 'Proof-of-Yield™ Sentinel',
+        nftReward: 'Proof-of-Yield Sentinel',
         stakingRequired: 75,
         tools: ['Risk scenario engine', 'Treasury telemetry hub', 'Synaptic governance templates'],
         outcomes: ['Protocol risk runbook', 'Governance vote packages', 'Stress-tested fee framework'],
@@ -192,7 +198,7 @@ export const personas: Persona[] = [
     name: 'system-architect',
     title: 'The System Architect',
     description: 'An advanced builder journey for inventing Solana-powered infrastructure, from AI services to DePIN networks.',
-    icon: '🛠️',
+    icon: '',
     color: 'from-purple-500 to-indigo-500',
     targetProfile: 'Systems engineers, AI researchers, hardware innovators, and distributed computing experts.',
     motivation: 'Architect high-throughput decentralized infrastructure that fuses Solana performance with real-world utility.',
@@ -223,7 +229,7 @@ export const personas: Persona[] = [
         stakingRequired: 90,
         tools: ['Device orchestration sandbox', 'Token incentive modeler', 'Telemetry validation suite'],
         outcomes: ['Device lifecycle plan', 'Reward mechanics blueprint', 'Telemetry integrity lake'],
-        zynoTip: 'Hardware meets blockspace—ensure every sensor event becomes trustworthy economic signal.',
+        zynoTip: 'Hardware meets blockspaceensure every sensor event becomes trustworthy economic signal.',
       },
       {
         id: 'onchain-ai',
@@ -285,7 +291,7 @@ export const personas: Persona[] = [
     name: 'experience-studio',
     title: 'The Experience Studio',
     description: 'A creator-tech journey to craft culturally resonant dApps, NFT universes, and on-chain experiences.',
-    icon: '🎮',
+    icon: '',
     color: 'from-rose-500 to-fuchsia-500',
     targetProfile: 'Creative technologists, UX designers, game builders, and storytellers shipping Solana experiences.',
     motivation: 'Design immersive Web3 applications where user delight and protocol performance combine seamlessly.',
@@ -376,7 +382,7 @@ export const personas: Persona[] = [
     name: 'impact-engine',
     title: 'The Impact Engine',
     description: 'A governance and coordination pathway for building transparent, equitable DAO and philanthropy systems.',
-    icon: '🌍',
+    icon: '',
     color: 'from-amber-500 to-lime-500',
     targetProfile: 'Community strategists, policy innovators, NGO leaders, and social entrepreneurs.',
     motivation: 'Design participatory governance, decentralized funding rails, and regenerative economic mechanisms.',
@@ -467,7 +473,7 @@ export const personas: Persona[] = [
     name: 'resilience-master',
     title: 'The Resilience Master',
     description: 'A security-forward journey for safeguarding Solana protocols, capital markets, and ecosystem trust.',
-    icon: '🛡️',
+    icon: '',
     color: 'from-slate-500 to-cyan-600',
     targetProfile: 'Security engineers, auditors, threat hunters, and reliability guardians.',
     motivation: 'Detect, mitigate, and prevent attack vectors across Solana programs and decentralized infrastructure.',
@@ -476,7 +482,7 @@ export const personas: Persona[] = [
       {
         id: 'security-baseline',
         title: 'Security Baseline Forge',
-        description: 'Build auditing muscle memory across Solana’s runtime, accounts model, and memory safety patterns.',
+        description: 'Build auditing muscle memory across Solanas runtime, accounts model, and memory safety patterns.',
         mission: 'Complete Solana-specific threat model, deconstruct historical exploits, and assemble secure coding checklist.',
         duration: '9 days',
         xpReward: 90,
@@ -502,7 +508,7 @@ export const personas: Persona[] = [
       {
         id: 'defense-systems',
         title: 'Defense Systems Orchestrator',
-        description: 'Engineer runtime protections—multisigs, timelocks, guardians, and kill-switch patterns.',
+        description: 'Engineer runtime protectionsmultisigs, timelocks, guardians, and kill-switch patterns.',
         mission: 'Implement guardian agents, configure circuit breakers, and deploy anomaly detection monitors.',
         duration: '12 days',
         xpReward: 130,
@@ -556,27 +562,17 @@ export const personas: Persona[] = [
   {
     id: 'e2e-persona',
     name: 'e2e-persona',
-    title: 'E2E Persona',
-    description: 'Synthetic persona used for automated journeys tests.',
-    icon: '🧪',
-    color: 'from-indigo-500 to-purple-500',
-    targetProfile: 'QA automation',
-    motivation: 'Validate guided mission flows end-to-end.',
+    title: 'E2E Test Persona',
+    description: 'Persona for E2E testing',
+    icon: '',
+    color: 'from-gray-500 to-gray-500',
+    targetProfile: 'Tester',
+    motivation: 'Testing',
     passType: 'Test Pass',
     phases: [
-      {
-        id: 'e2e-phase',
-        title: 'E2E Phase',
-        description: 'Instrumentation phase for automation.',
-        mission: 'Trigger the Zyno pipeline in a controlled environment.',
-        duration: '1 day',
-        xpReward: 10,
-        mfaiReward: 1,
-        nftReward: 'E2E Proof',
-        tools: ['Automation harness'],
-        outcomes: ['Validated UI flow'],
-        zynoTip: 'Leverage deterministic inputs for consistent outputs.'
-      }
-    ]
+      { id: 'discovery', title: 'Discovery', description: 'Discovery Phase', mission: 'Analyze market trends', duration: '1d', xpReward: 10, mfaiReward: 1, nftReward: 'Test NFT 1', tools: [], outcomes: [], zynoTip: 'Test Tip' },
+      { id: 'strategy', title: 'Strategy', description: 'Strategy Phase', mission: 'Strategize', duration: '1d', xpReward: 10, mfaiReward: 1, nftReward: 'Test NFT 2', tools: [], outcomes: [], zynoTip: 'Test Tip' },
+      { id: 'plan', title: 'Plan Generation', description: 'Plan Phase', mission: 'Plan', duration: '1d', xpReward: 10, mfaiReward: 1, nftReward: 'Test NFT 3', tools: [], outcomes: [], zynoTip: 'Test Tip' },
+    ],
   },
 ]

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 // Helper functions to reduce cognitive complexity
 const buildDiagnostics = (proof, anchor, mint) => ({
   proof: {

@@ -1,6 +1,14 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useJourneyStore } from '../../store/journeyStore';
+import { tokenStore } from '../../utils/tokenStore';
 import { Persona } from '../../types/journey';
 import { generateStableKey } from '../../utils/generateStableKey';
 
@@ -25,6 +33,8 @@ export default function InvestorDemoMode({ personas }: InvestorDemoModeProps) {
     "Results & Metrics"
   ];
 
+  const navigate = useNavigate();
+
   const handleDemoStart = async () => {
     if (!selectedPersonaId) return;
 
@@ -36,23 +46,11 @@ export default function InvestorDemoMode({ personas }: InvestorDemoModeProps) {
       if (persona) {
         setSelectedPersona(persona);
 
-        // Simulate some journey steps
-        setTimeout(() => {
-          setDemoData({
-            totalXP: 2500,
-            currentLevel: 4,
-            completedPhases: ['learn', 'build', 'prove'],
-            nftCertificates: [
-              { id: 'proof_of_skill_1', name: 'Proof of Skill', description: 'Complete mission in Learn phase' },
-              { id: 'proof_of_build_1', name: 'Proof of Build', description: 'Complete mission in Build phase' }
-            ],
-            tokenomicsScore: 8.5,
-            governanceScore: 9.2,
-            userEngagement: 7.8
-          });
-          setIsSimulating(false);
-          setCurrentStep(demoSteps.length);
-        }, 2000);
+        // ACTIVATE SOVEREIGN SEQUENCER DEMO
+        tokenStore.setAccessToken('demo-token'); // Triggers JourneyDemoMode in JourneyWorkspace
+
+        // Force reload to ensure clean state for the demo
+        navigate(0);
       }
     } catch (error) {
       console.error('Error launching demo mode:', error);
@@ -139,7 +137,7 @@ export default function InvestorDemoMode({ personas }: InvestorDemoModeProps) {
             </div>
           </div>
 
-          {/* Sélection du persona */}
+          {/* Persona Selection */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold mb-4">Select a persona for the demo</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -190,7 +188,7 @@ export default function InvestorDemoMode({ personas }: InvestorDemoModeProps) {
             </button>
           </div>
 
-          {/* Résultats de la simulation */}
+          {/* Simulation Results */}
           {demoData && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -224,7 +222,7 @@ export default function InvestorDemoMode({ personas }: InvestorDemoModeProps) {
                     return (
                       <div key={nftKey} className="flex items-center p-3 bg-black/30 rounded-lg border border-white/10">
                         <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg flex items-center justify-center mr-3">
-                          <span className="text-lg">🏆</span>
+                          <span className="text-lg"></span>
                         </div>
                         <div>
                           <div className="font-medium">{nft.name}</div>
@@ -284,7 +282,7 @@ export default function InvestorDemoMode({ personas }: InvestorDemoModeProps) {
         </div>
 
         <div className="p-4 border-t border-white/10 text-center text-sm text-gray-500">
-          Money Factory AI - Journey Simulator • Investor Demo Mode
+          Money Factory AI - Journey Simulator  Investor Demo Mode
         </div>
       </motion.div>
     </motion.div>

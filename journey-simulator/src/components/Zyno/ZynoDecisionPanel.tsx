@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useMemo } from 'react';
 import { Clock, Compass, MessageSquare, Route, Sparkles, Target } from 'lucide-react';
 import type { AgentTimelineEntry } from './types';
@@ -9,7 +15,7 @@ interface ZynoDecisionPanelProps {
 
 const formatDuration = (durationMs: number | null | undefined) => {
   if (!durationMs || durationMs < 0) {
-    return '—';
+    return '';
   }
   if (durationMs < 1000) {
     return `${durationMs} ms`;
@@ -100,7 +106,7 @@ export default function ZynoDecisionPanel({ currentStep, timeline }: ZynoDecisio
         </div>
       ) : (
         <div className="rounded-3xl border border-dashed border-slate-300/60 p-4 text-sm text-slate-600 dark:border-mfai-border/60 dark:text-mfai-text/70">
-          No recent Zyno interaction – start a mission to see orchestration here.
+          No recent Zyno interaction  start a mission to see orchestration here.
         </div>
       )}
 

@@ -1,0 +1,2189 @@
+🔐 Global Setup: seeding + authentification prod-like...
+   ⏳ Seeding user via modèle (hash unique)...
+[dotenv@17.2.0] injecting env (12) from mf-back/.env (tip: 🔐 encrypt with dotenvx: https://dotenvx.com)
+✅ MongoDB Connected
+🗑️  Deleted 1 existing test user(s)
+✅ Created test user: test@mfai.app
+   ID: 695a78b10dfc4e46c414d0a8
+   Password: MFAITest2026!
+✅ Password verification: SUCCESS
+✅ Seeding complete
+   🔗 Auth vers http://127.0.0.1:3002/auth/login
+   ✅ Backend authenticated: test@mfai.app
+   ✅ StorageState sauvegardé: /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/.auth/user.json
+   🛡️ RUN_MODE_GUARD=real
+   🔑 AUTH_STATE=loaded
+AUTH_STATE_PATH=/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/.auth/user.json
+AUTH_STATE_EXISTS=true
+   🧾 Auth proof écrit: /home/alaeddine/Documents/journey_mfai_back_front/artifacts/e2e-auth-proof.json
+{
+  "config": {
+    "configFile": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/playwright.config.ts",
+    "rootDir": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/global-setup.ts",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 240000
+      },
+      {
+        "outputDir": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 240000
+      },
+      {
+        "outputDir": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-chrome",
+        "name": "mobile-chrome",
+        "testDir": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 240000
+      }
+    ],
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.57.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run preview -- --port 4173",
+      "url": "http://127.0.0.1:4173",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "02-visual-regression/console-guard.spec.ts",
+      "file": "02-visual-regression/console-guard.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Phase 2: Console Guard (Zero Errors)",
+          "file": "02-visual-regression/console-guard.spec.ts",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Journey workspace has zero console errors",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5166,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:26:59.605Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f7799b648bfdf0a012dc-5c9a63a25a37ec665a53",
+              "file": "02-visual-regression/console-guard.spec.ts",
+              "line": 11,
+              "column": 5
+            },
+            {
+              "title": "Navigation flow has zero console errors",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4334,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:04.867Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f7799b648bfdf0a012dc-4fd761ffb3276582b215",
+              "file": "02-visual-regression/console-guard.spec.ts",
+              "line": 32,
+              "column": 5
+            },
+            {
+              "title": "Journey workspace has zero console errors",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 1278,
+                      "error": {
+                        "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/console-guard.spec.ts:14:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/console-guard.spec.ts:14:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:21.007Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-conso-6f19f-ace-has-zero-console-errors-firefox/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-conso-6f19f-ace-has-zero-console-errors-firefox/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-conso-6f19f-ace-has-zero-console-errors-firefox/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "f7799b648bfdf0a012dc-6799be1b9c9a3a96d6b5",
+              "file": "02-visual-regression/console-guard.spec.ts",
+              "line": 11,
+              "column": 5
+            },
+            {
+              "title": "Navigation flow has zero console errors",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 1338,
+                      "error": {
+                        "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/console-guard.spec.ts:35:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/console-guard.spec.ts:35:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:23.968Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-conso-a8a19-low-has-zero-console-errors-firefox/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-conso-a8a19-low-has-zero-console-errors-firefox/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-conso-a8a19-low-has-zero-console-errors-firefox/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "f7799b648bfdf0a012dc-a94d3d70d7129253a89e",
+              "file": "02-visual-regression/console-guard.spec.ts",
+              "line": 32,
+              "column": 5
+            },
+            {
+              "title": "Journey workspace has zero console errors",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 17,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 308,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/console-guard.spec.ts:14:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/console-guard.spec.ts:14:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:53.167Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-conso-6f19f-ace-has-zero-console-errors-mobile-chrome/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-conso-6f19f-ace-has-zero-console-errors-mobile-chrome/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "f7799b648bfdf0a012dc-82f93c9f23fd59a31c27",
+              "file": "02-visual-regression/console-guard.spec.ts",
+              "line": 11,
+              "column": 5
+            },
+            {
+              "title": "Navigation flow has zero console errors",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 18,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 287,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/console-guard.spec.ts:35:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/console-guard.spec.ts:35:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:54.138Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-conso-a8a19-low-has-zero-console-errors-mobile-chrome/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-conso-a8a19-low-has-zero-console-errors-mobile-chrome/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "f7799b648bfdf0a012dc-d55b2776be49b2094ac2",
+              "file": "02-visual-regression/console-guard.spec.ts",
+              "line": 32,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "02-visual-regression/layout-trinity.spec.ts",
+      "file": "02-visual-regression/layout-trinity.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Phase 2: Trinity Layout Invariants",
+          "file": "02-visual-regression/layout-trinity.spec.ts",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Trinity layout: Navigator, Pulse, Stage have no overlap",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5144,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:09.219Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ddc9ef852b23d92fe922-b5dd5ffb7e0b942139a2",
+              "file": "02-visual-regression/layout-trinity.spec.ts",
+              "line": 16,
+              "column": 5
+            },
+            {
+              "title": "No unintended horizontal scroll in Trinity layout",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 245,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/layout-trinity.spec.ts:13:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/layout-trinity.spec.ts:13:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:14.375Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-layou-3130e-al-scroll-in-Trinity-layout-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-layou-3130e-al-scroll-in-Trinity-layout-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "ddc9ef852b23d92fe922-65ef48f00021fc7f0091",
+              "file": "02-visual-regression/layout-trinity.spec.ts",
+              "line": 76,
+              "column": 5
+            },
+            {
+              "title": "Trinity layout: Navigator, Pulse, Stage have no overlap",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 1431,
+                      "error": {
+                        "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/layout-trinity.spec.ts:13:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/layout-trinity.spec.ts:13:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:26.901Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-layou-b3936-Pulse-Stage-have-no-overlap-firefox/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-layou-b3936-Pulse-Stage-have-no-overlap-firefox/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-layou-b3936-Pulse-Stage-have-no-overlap-firefox/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "ddc9ef852b23d92fe922-ddc145e4b4485222d22a",
+              "file": "02-visual-regression/layout-trinity.spec.ts",
+              "line": 16,
+              "column": 5
+            },
+            {
+              "title": "No unintended horizontal scroll in Trinity layout",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 4285,
+                      "error": {
+                        "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/layout-trinity.spec.ts:13:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/layout-trinity.spec.ts:13:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:29.894Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-layou-3130e-al-scroll-in-Trinity-layout-firefox/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-layou-3130e-al-scroll-in-Trinity-layout-firefox/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-layou-3130e-al-scroll-in-Trinity-layout-firefox/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "ddc9ef852b23d92fe922-33caa2efb98aedb43698",
+              "file": "02-visual-regression/layout-trinity.spec.ts",
+              "line": 76,
+              "column": 5
+            },
+            {
+              "title": "Trinity layout: Navigator, Pulse, Stage have no overlap",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 19,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 505,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/layout-trinity.spec.ts:13:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/layout-trinity.spec.ts:13:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:55.100Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-layou-b3936-Pulse-Stage-have-no-overlap-mobile-chrome/test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "ddc9ef852b23d92fe922-484debfc7a61b23f786a",
+              "file": "02-visual-regression/layout-trinity.spec.ts",
+              "line": 16,
+              "column": 5
+            },
+            {
+              "title": "No unintended horizontal scroll in Trinity layout",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 20,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 526,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/layout-trinity.spec.ts:13:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/layout-trinity.spec.ts:13:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:56.280Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-layou-3130e-al-scroll-in-Trinity-layout-mobile-chrome/test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "ddc9ef852b23d92fe922-17f988608f71ea7275cb",
+              "file": "02-visual-regression/layout-trinity.spec.ts",
+              "line": 76,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "02-visual-regression/screenshots-desktop.spec.ts",
+      "file": "02-visual-regression/screenshots-desktop.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Phase 2: Screenshots (Visual Proofs)",
+          "file": "02-visual-regression/screenshots-desktop.spec.ts",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Screenshot: Home page (desktop)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 287,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/screenshots-desktop.spec.ts:16:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/screenshots-desktop.spec.ts:16:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:15.220Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-scree-2f430-reenshot-Home-page-desktop--chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-scree-2f430-reenshot-Home-page-desktop--chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "9beeb21840cea1b3ecb4-10449aba40cebb377c9c",
+              "file": "02-visual-regression/screenshots-desktop.spec.ts",
+              "line": 15,
+              "column": 5
+            },
+            {
+              "title": "Screenshot: Journeys page (desktop)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 288,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/screenshots-desktop.spec.ts:29:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/screenshots-desktop.spec.ts:29:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:16.165Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-scree-921eb-shot-Journeys-page-desktop--chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-scree-921eb-shot-Journeys-page-desktop--chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "9beeb21840cea1b3ecb4-aca44a20c9e4195e648a",
+              "file": "02-visual-regression/screenshots-desktop.spec.ts",
+              "line": 28,
+              "column": 5
+            },
+            {
+              "title": "Screenshot: Journey workspace (desktop)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 300,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/screenshots-desktop.spec.ts:43:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/screenshots-desktop.spec.ts:43:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:17.124Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-scree-dcdbd--Journey-workspace-desktop--chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-scree-dcdbd--Journey-workspace-desktop--chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "9beeb21840cea1b3ecb4-c2ce785bd1cafd625cce",
+              "file": "02-visual-regression/screenshots-desktop.spec.ts",
+              "line": 42,
+              "column": 5
+            },
+            {
+              "title": "Screenshot: Home page (desktop)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 1393,
+                      "error": {
+                        "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/screenshots-desktop.spec.ts:16:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/screenshots-desktop.spec.ts:16:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:35.733Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-scree-2f430-reenshot-Home-page-desktop--firefox/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-scree-2f430-reenshot-Home-page-desktop--firefox/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-scree-2f430-reenshot-Home-page-desktop--firefox/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "9beeb21840cea1b3ecb4-658c67f58e514eb5d670",
+              "file": "02-visual-regression/screenshots-desktop.spec.ts",
+              "line": 15,
+              "column": 5
+            },
+            {
+              "title": "Screenshot: Journeys page (desktop)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 12,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 1371,
+                      "error": {
+                        "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/screenshots-desktop.spec.ts:29:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/screenshots-desktop.spec.ts:29:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:38.683Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-scree-921eb-shot-Journeys-page-desktop--firefox/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-scree-921eb-shot-Journeys-page-desktop--firefox/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-scree-921eb-shot-Journeys-page-desktop--firefox/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "9beeb21840cea1b3ecb4-678a4af47ea7a3c48333",
+              "file": "02-visual-regression/screenshots-desktop.spec.ts",
+              "line": 28,
+              "column": 5
+            },
+            {
+              "title": "Screenshot: Journey workspace (desktop)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 1300,
+                      "error": {
+                        "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/screenshots-desktop.spec.ts:43:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/screenshots-desktop.spec.ts:43:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:41.652Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-scree-dcdbd--Journey-workspace-desktop--firefox/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-scree-dcdbd--Journey-workspace-desktop--firefox/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-scree-dcdbd--Journey-workspace-desktop--firefox/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "9beeb21840cea1b3ecb4-b11f47328c90ad3f9f0b",
+              "file": "02-visual-regression/screenshots-desktop.spec.ts",
+              "line": 42,
+              "column": 5
+            },
+            {
+              "title": "Screenshot: Home page (desktop)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 21,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 492,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/screenshots-desktop.spec.ts:16:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/screenshots-desktop.spec.ts:16:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:57.475Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-scree-2f430-reenshot-Home-page-desktop--mobile-chrome/test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "9beeb21840cea1b3ecb4-32513d6f675c2866d27e",
+              "file": "02-visual-regression/screenshots-desktop.spec.ts",
+              "line": 15,
+              "column": 5
+            },
+            {
+              "title": "Screenshot: Journeys page (desktop)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 22,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 574,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/screenshots-desktop.spec.ts:29:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/screenshots-desktop.spec.ts:29:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:58.628Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-scree-921eb-shot-Journeys-page-desktop--mobile-chrome/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-scree-921eb-shot-Journeys-page-desktop--mobile-chrome/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "9beeb21840cea1b3ecb4-c2e6f52c6745fc33ccf2",
+              "file": "02-visual-regression/screenshots-desktop.spec.ts",
+              "line": 28,
+              "column": 5
+            },
+            {
+              "title": "Screenshot: Journey workspace (desktop)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 23,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 514,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/screenshots-desktop.spec.ts:43:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/02-visual-regression/screenshots-desktop.spec.ts:43:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:59.869Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/02-visual-regression-scree-dcdbd--Journey-workspace-desktop--mobile-chrome/test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "9beeb21840cea1b3ecb4-39abb731c2d4b9ffefd4",
+              "file": "02-visual-regression/screenshots-desktop.spec.ts",
+              "line": 42,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "04-dashboard-intel/resource-rendering.spec.ts",
+      "file": "04-dashboard-intel/resource-rendering.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Supreme Dashboard: Intel Rendering",
+          "file": "04-dashboard-intel/resource-rendering.spec.ts",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Journey workspace surfaces intel panels in real mode",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 267,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/04-dashboard-intel/resource-rendering.spec.ts:13:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/04-dashboard-intel/resource-rendering.spec.ts:13:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:18.093Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/04-dashboard-intel-resourc-44ccf-s-intel-panels-in-real-mode-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/04-dashboard-intel-resourc-44ccf-s-intel-panels-in-real-mode-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1dbb00794f8fdfdf396c-ce9c68211f987a9652c1",
+              "file": "04-dashboard-intel/resource-rendering.spec.ts",
+              "line": 16,
+              "column": 9
+            },
+            {
+              "title": "Journey workspace surfaces intel panels in real mode",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 14,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 1267,
+                      "error": {
+                        "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/04-dashboard-intel/resource-rendering.spec.ts:13:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/04-dashboard-intel/resource-rendering.spec.ts:13:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:44.522Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/04-dashboard-intel-resourc-44ccf-s-intel-panels-in-real-mode-firefox/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/04-dashboard-intel-resourc-44ccf-s-intel-panels-in-real-mode-firefox/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/04-dashboard-intel-resourc-44ccf-s-intel-panels-in-real-mode-firefox/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1dbb00794f8fdfdf396c-9e0628c69c2a99c432be",
+              "file": "04-dashboard-intel/resource-rendering.spec.ts",
+              "line": 16,
+              "column": 9
+            },
+            {
+              "title": "Journey workspace surfaces intel panels in real mode",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 24,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 303,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/04-dashboard-intel/resource-rendering.spec.ts:13:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/04-dashboard-intel/resource-rendering.spec.ts:13:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:28:01.053Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/04-dashboard-intel-resourc-44ccf-s-intel-panels-in-real-mode-mobile-chrome/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/04-dashboard-intel-resourc-44ccf-s-intel-panels-in-real-mode-mobile-chrome/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1dbb00794f8fdfdf396c-ea8efda70dbdf8c2ac28",
+              "file": "04-dashboard-intel/resource-rendering.spec.ts",
+              "line": 16,
+              "column": 9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "04-dashboard-intel/zyno-chat-scroll.spec.ts",
+      "file": "04-dashboard-intel/zyno-chat-scroll.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Phase 2: Zyno Chat Scroll & Pagination",
+          "file": "04-dashboard-intel/zyno-chat-scroll.spec.ts",
+          "line": 11,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Zyno chat panel opens and displays messages without console errors",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 298,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/04-dashboard-intel/zyno-chat-scroll.spec.ts:14:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/04-dashboard-intel/zyno-chat-scroll.spec.ts:14:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:19.037Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/04-dashboard-intel-zyno-ch-2695c-ages-without-console-errors-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/04-dashboard-intel-zyno-ch-2695c-ages-without-console-errors-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "62a655722f28f01665ad-8d75eb3f901ebb078728",
+              "file": "04-dashboard-intel/zyno-chat-scroll.spec.ts",
+              "line": 17,
+              "column": 5
+            },
+            {
+              "title": "Chat messages scroll behavior is stable",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 335,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/04-dashboard-intel/zyno-chat-scroll.spec.ts:14:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/04-dashboard-intel/zyno-chat-scroll.spec.ts:14:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:20.003Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/04-dashboard-intel-zyno-ch-9c7e9-s-scroll-behavior-is-stable-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/04-dashboard-intel-zyno-ch-9c7e9-s-scroll-behavior-is-stable-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "62a655722f28f01665ad-84da3f410a97ea7b023d",
+              "file": "04-dashboard-intel/zyno-chat-scroll.spec.ts",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "Zyno chat panel opens and displays messages without console errors",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 15,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 1326,
+                      "error": {
+                        "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/04-dashboard-intel/zyno-chat-scroll.spec.ts:14:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/04-dashboard-intel/zyno-chat-scroll.spec.ts:14:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:47.292Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/04-dashboard-intel-zyno-ch-2695c-ages-without-console-errors-firefox/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/04-dashboard-intel-zyno-ch-2695c-ages-without-console-errors-firefox/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/04-dashboard-intel-zyno-ch-2695c-ages-without-console-errors-firefox/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "62a655722f28f01665ad-4783c012a42fceabda41",
+              "file": "04-dashboard-intel/zyno-chat-scroll.spec.ts",
+              "line": 17,
+              "column": 5
+            },
+            {
+              "title": "Chat messages scroll behavior is stable",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 16,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 1378,
+                      "error": {
+                        "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/04-dashboard-intel/zyno-chat-scroll.spec.ts:14:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/04-dashboard-intel/zyno-chat-scroll.spec.ts:14:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:27:50.097Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/04-dashboard-intel-zyno-ch-9c7e9-s-scroll-behavior-is-stable-firefox/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/04-dashboard-intel-zyno-ch-9c7e9-s-scroll-behavior-is-stable-firefox/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/04-dashboard-intel-zyno-ch-9c7e9-s-scroll-behavior-is-stable-firefox/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "62a655722f28f01665ad-936dd8f00982939e0d79",
+              "file": "04-dashboard-intel/zyno-chat-scroll.spec.ts",
+              "line": 51,
+              "column": 5
+            },
+            {
+              "title": "Zyno chat panel opens and displays messages without console errors",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 25,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 524,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/04-dashboard-intel/zyno-chat-scroll.spec.ts:14:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/04-dashboard-intel/zyno-chat-scroll.spec.ts:14:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:28:02.023Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/04-dashboard-intel-zyno-ch-2695c-ages-without-console-errors-mobile-chrome/test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "62a655722f28f01665ad-24ecea279c618550ef58",
+              "file": "04-dashboard-intel/zyno-chat-scroll.spec.ts",
+              "line": 17,
+              "column": 5
+            },
+            {
+              "title": "Chat messages scroll behavior is stable",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 26,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 523,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/04-dashboard-intel/zyno-chat-scroll.spec.ts:14:9",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                          "column": 16,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mutils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4173/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4173/\", waiting until \"load\"\u001b[22m\n\n\n   at utils/navigation-helpers.ts:37\n\n  35 | export async function navigateToHome(page: Page) {\n  36 |     await ensureAuthenticated(page); // Enforce auth\n> 37 |     await page.goto('/');\n     |                ^\n  38 |     await page.waitForLoadState('networkidle');\n  39 | }\n  40 |\n    at navigateToHome (/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts:37:16)\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/04-dashboard-intel/zyno-chat-scroll.spec.ts:14:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-04T14:28:03.231Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/04-dashboard-intel-zyno-ch-9c7e9-s-scroll-behavior-is-stable-mobile-chrome/test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/utils/navigation-helpers.ts",
+                        "column": 16,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "62a655722f28f01665ad-976521c64c35c19e24a4",
+              "file": "04-dashboard-intel/zyno-chat-scroll.spec.ts",
+              "line": 51,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-01-04T14:26:56.633Z",
+    "duration": 67273.595,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 27,
+    "flaky": 0
+  }
+}

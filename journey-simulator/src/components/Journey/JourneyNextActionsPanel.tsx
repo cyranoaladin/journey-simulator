@@ -1,6 +1,13 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import React, { useEffect, useMemo, useState } from 'react';
 import { getPhaseFromStepId } from '../../config/journeyPhases';
 import { getRecentAgentRuns } from '../../api/agentRuns';
+import { useJourneyStore } from '../../store/journeyStore';
 import {
     Bot,
     CheckCircle2,
@@ -44,16 +51,19 @@ export const JourneyNextActionsPanel: React.FC<Props> = ({
     const currentPhase = getPhaseFromStepId(personaId, currentStepId);
     const [recentRuns, setRecentRuns] = useState<any[]>([]);
     const [isLoadingRuns, setIsLoadingRuns] = useState(false);
+    const { apiJourneyId } = useJourneyStore();
 
     useEffect(() => {
         let isMounted = true;
-        if (!journeyId) {
+        const effectiveJourneyId = apiJourneyId || journeyId;
+
+        if (!effectiveJourneyId) {
             setRecentRuns([]);
             return () => { isMounted = false; };
         }
 
         setIsLoadingRuns(true);
-        getRecentAgentRuns({ journeyId, limit: 3 })
+        getRecentAgentRuns({ journeyId: effectiveJourneyId, limit: 3 })
             .then((runs) => {
                 if (isMounted) {
                     setRecentRuns(runs ?? []);
@@ -110,7 +120,7 @@ export const JourneyNextActionsPanel: React.FC<Props> = ({
 
     return (
         <div
-            className={`glass-effect rounded-3xl border border-white/10 bg-white/5 p-6 shadow-lg ${className}`}
+            className={`glass-effect rounded-3xl border border-white/10 bg-white/5 p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-lg ${className}`}
             data-testid="journey-next-actions"
         >
             <div className="flex items-center justify-between gap-3 mb-4">
@@ -222,11 +232,11 @@ export const JourneyNextActionsPanel: React.FC<Props> = ({
                                         {run.createdAt ? new Date(run.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                                     </span>
                                 </div>
-                                <p className="text-white/70 italic line-clamp-3">
+                                <div className="text-white/70 italic whitespace-pre-wrap max-h-40 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                                     {typeof run.output === 'string'
                                         ? run.output
-                                        : JSON.stringify(run.output || '').slice(0, 150)}
-                                </p>
+                                        : JSON.stringify(run.output || '', null, 2)}
+                                </div>
                             </div>
                         ))}
                     </div>

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 type SolanaWeb3 = typeof import('@solana/web3.js')
 
 let loader: Promise<SolanaWeb3> | null = null

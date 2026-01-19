@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 #!/usr/bin/env node
 /* Go-live helper: preflight + smoke + smoke-e2e + golden tests + SLO snapshot + optional UI-E2E */
 const { execSync } = require('child_process');

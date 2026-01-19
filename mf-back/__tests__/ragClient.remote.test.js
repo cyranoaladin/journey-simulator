@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 jest.mock('axios');
 const fs = require('node:fs');
 const os = require('node:os');
@@ -52,7 +58,12 @@ describe('ragClient remote success paths', () => {
       },
       { headers: { 'x-api-key': 'remote-key' }, timeout: 5000 }
     );
-    expect(results).toEqual([{ title: 'remote doc', content: 'From API' }]);
+    expect(results[0]).toEqual(expect.objectContaining({
+      title: 'remote doc',
+      content: 'From API',
+      text: 'From API',
+      source: 'remote-collection'
+    }));
   });
 
   it('returns remote ingestion metadata when the ingest service succeeds', async () => {

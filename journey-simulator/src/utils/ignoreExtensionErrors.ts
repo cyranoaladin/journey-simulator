@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 // Development-time filter to ignore errors originating from browser extensions
 // (e.g., chrome-extension://, moz-extension://). This avoids noisy false positives
 // in the console like "Cannot access 'ae' before initialization" from injected scripts.

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 export interface Persona {
   id: string;
   name: string;
@@ -59,7 +65,7 @@ export interface UserProgress {
   testnetAirdropClaimed?: boolean;
   socialShareCount?: number;
   lastSharedPlatform?: string;
-  shareHistory?: { platform: string; timestamp: string }[];
+  shareHistory?: { platform: string; timestamp: string; url?: string }[];
   collaterizeSimulation?: {
     accepted: boolean
     eligibilityScore: number
@@ -73,6 +79,20 @@ export interface UserProgress {
     simulatedLaunchUrl: string
   };
   demoModeEnabled?: boolean;
+  globalXP?: number;
+  currentSubStep?: number;
+  masteredPersonas?: string[];
+  unlockedVaultDocs?: string[];
+  interaction_logs?: { role: string; content: string; source?: string; timestamp: Date }[];
+}
+
+export interface GeneratedResource {
+  id: string;
+  title: string;
+  type: string;
+  content: string;
+  agentId: string;
+  createdAt: string;
 }
 
 export interface AccessPassHolder {
@@ -82,7 +102,7 @@ export interface AccessPassHolder {
   passLevel: 'Gold' | 'Platinum' | 'Diamond';
   avatar: string;
   duration: string;
-  certifications: number;
+  certificates: number;
   roi: string;
   projects: string;
   testimonial: string;
@@ -93,7 +113,7 @@ export interface AccessPassHolder {
   recommendedPersonaId?: string;
 }
 
-export interface Certification {
+export interface Certificate {
   id: string;
   name: string;
   description: string;

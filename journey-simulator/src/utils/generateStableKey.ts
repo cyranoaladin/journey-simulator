@@ -1,4 +1,10 @@
 /**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
+/**
  * Generate a stable, unique key for React list items
  * Priority order:
  * 1. id or uuid if available

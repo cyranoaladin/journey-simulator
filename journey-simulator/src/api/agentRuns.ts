@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { Components } from './mf-back-client';
 import { API_BASE_URL } from '../utils/api';
 import { tokenStore } from '../utils/tokenStore';
@@ -39,7 +45,11 @@ export async function getRecentAgentRuns({ journeyId, limit = 3 }: GetAgentRunsO
         // Assuming the response structure based on generated types (array of AgentRun)
         // If wrapped in success: true, data: [], adjust accordingly.
         // The spec usually defines the response shape.
-        return json.data || []; // Adjust based on actual response wrapper if generic wrapper is used
+        const runs = json.data || [];
+        return runs.map((run: any) => ({
+            ...run,
+            output: run.output || run.ae_summary || run.summary || (run.payload ? JSON.stringify(run.payload) : '')
+        }));
     } catch (error) {
         console.error('Error fetching agent runs:', error);
         return [];

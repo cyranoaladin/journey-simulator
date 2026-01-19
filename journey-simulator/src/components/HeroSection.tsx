@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, Sparkles, TrendingUp, Users, Award } from 'lucide-react';
@@ -103,7 +109,7 @@ const HeroSection = () => {
               className="text-lg md:text-xl mb-8 opacity-90 max-w-2xl"
             >
               Discover how Money Factory AI transforms your skills into capital
-              through the <span className="font-semibold text-accent-cyan">Cognitive Activation Protocol™</span>
+              through the <span className="font-semibold text-accent-cyan">Cognitive Activation Protocol</span>
             </motion.p>
 
             <motion.div
@@ -222,7 +228,7 @@ const HeroSection = () => {
           >
             <div className="w-full max-w-md rounded-2xl border border-white/15 bg-white/5 p-6 backdrop-blur-md">
               <h2 className="text-xl font-space font-bold mb-2">
-                Wallet & NFTs — loaded only inside Journeys
+                Wallet & NFTs  loaded only inside Journeys
               </h2>
               <p className="text-sm opacity-80 leading-relaxed">
                 To keep the landing page ultra-light (performance + CSP), the Solana/wallet-adapter stack is loaded

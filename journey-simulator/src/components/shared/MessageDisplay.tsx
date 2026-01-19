@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -10,34 +16,34 @@ interface MessageProps {
 }
 
 const MessageDisplay = ({ type, message, onClose, showIcon = true }: MessageProps) => {
-  // Définir les couleurs et icônes selon le type
+  // Define colors and icons according to type
   const config = {
     success: {
       bg: 'bg-green-500/20',
       border: 'border-green-500/30',
       text: 'text-green-300',
-      icon: '🎉',
+      icon: '',
       iconColor: 'text-green-400'
     },
     error: {
       bg: 'bg-red-500/20',
       border: 'border-red-500/30',
       text: 'text-red-300',
-      icon: '⚠️',
+      icon: '',
       iconColor: 'text-red-400'
     },
     warning: {
       bg: 'bg-yellow-500/20',
       border: 'border-yellow-500/30',
       text: 'text-yellow-300',
-      icon: '⚠️',
+      icon: '',
       iconColor: 'text-yellow-400'
     },
     info: {
       bg: 'bg-blue-500/20',
       border: 'border-blue-500/30',
       text: 'text-blue-300',
-      icon: 'ℹ️',
+      icon: '',
       iconColor: 'text-blue-400'
     }
   };

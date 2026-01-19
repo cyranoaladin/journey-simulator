@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const express = require('express');
 const router = express.Router();
 const Journey = require('../models/Journeys');
@@ -13,17 +19,17 @@ router.post('/journeys/:id/phases/launch-collaterize/simulate', async (req, res)
         const user = await User.findById(journey.user_id);
         if (!user) return res.status(404).json({ error: 'user_not_found' });
 
-        // Récupérer les métriques réelles du parcours si disponibles
-        const journeyScore = journey.score || user.total_xp / 10 || 75; // Utiliser le score XP comme base
-        const riskScore = Math.min(0.9, Math.max(0, (100 - (user.total_xp / 10 || 75)) / 100)); // Risque inversement proportionnel au score
-        const communityScore = 70 + (Math.random() * 20); // Score aléatoire entre 70-90 pour démo
-        const docsScore = 65 + (Math.random() * 25); // Score aléatoire entre 65-90 pour démo
+        // Retrieve real journey metrics if available
+        const journeyScore = journey.score || user.total_xp / 10 || 75; // Use XP score as base
+        const riskScore = Math.min(0.9, Math.max(0, (100 - (user.total_xp / 10 || 75)) / 100)); // Risk inversely proportional to score
+        const communityScore = 70 + (Math.random() * 20); // Random score 70-90 for demo
+        const docsScore = 65 + (Math.random() * 25); // Random score 65-90 for demo
 
-        // Configuration du token (à partir des données du parcours ou valeurs par défaut)
+        // Token configuration (from journey data or defaults)
         const tokenSymbol = 'MFAI';
         const totalSupply = 1_000_000_000;
-        const circulatingAtTGE = 50_000_000 + (user.total_xp * 1000); // Plus de XP = plus de tokens en circulation
-        const fundraisingGoalUSD = 200_000 + (user.total_xp * 10); // Plus de XP = objectif de levée plus élevé
+        const circulatingAtTGE = 50_000_000 + (user.total_xp * 1000); // Higher XP = more tokens in circulation
+        const fundraisingGoalUSD = 200_000 + (user.total_xp * 10); // Higher XP = higher fundraising goal
 
         const simulation = await simulateCollaterizeLaunch({
             wallet: journey.user_wallet,
@@ -37,10 +43,10 @@ router.post('/journeys/:id/phases/launch-collaterize/simulate', async (req, res)
             docsScore,
         });
 
-        // Mettre à jour le parcours avec le résultat de la simulation
+        // Update journey with simulation result
         journey.collaterizeSimulation = simulation;
 
-        // Mettre à jour l'état des phases
+        // Update phase status
         const launchPhaseIndex = journey.phases_status.findIndex(p => p.phase_number === 4);
         if (launchPhaseIndex !== -1) {
             journey.phases_status[launchPhaseIndex].status = 'completed';

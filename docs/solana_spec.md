@@ -1,3 +1,9 @@
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
 # Spécifications Solana (MVP devnet)
 
 Objectif: prouver un flux réel devnet minimal (simulate/execute), intégration wallet, et pratiques de sécurité.

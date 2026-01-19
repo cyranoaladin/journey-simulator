@@ -1,5 +1,32 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 /** @jest-environment node */
 import { NextResponse } from 'next/server'
+
+// Mock NextResponse.json to avoid "Cannot read properties of undefined (reading 'getSetCookie')"
+// which happens in JSDOM/Node environments with older Next.js/Jest configurations.
+jest.mock('next/server', () => {
+  const actual = jest.requireActual('next/server')
+  return {
+    ...actual,
+    NextResponse: {
+      ...actual.NextResponse,
+      json: (body: any, init?: any) => {
+        return new Response(JSON.stringify(body), {
+          status: init?.status || 200,
+          headers: {
+            'Content-Type': 'application/json',
+            ...(init?.headers || {}),
+          },
+        })
+      },
+    },
+  }
+})
 
 describe('Misc API coverage', () => {
   it('GET /api/healthz returns ok', async () => {

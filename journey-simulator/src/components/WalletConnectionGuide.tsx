@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { motion } from 'framer-motion';
 import { Wallet, Download, AlertCircle, Settings, Zap } from 'lucide-react';
 import LazyWalletMultiButton from './wallet/LazyWalletMultiButton';
@@ -7,10 +13,10 @@ const WalletConnectionGuide: React.FC = () => {
     <div className="p-6 bg-primary-900/80 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl">
       <h2 className="text-xl font-space font-bold mb-4 flex items-center">
         <Wallet className="mr-2 text-accent-cyan" size={20} />
-        <span className="gradient-text">Skillchain Card™ Setup</span>
+        <span className="gradient-text">Skillchain Card Setup</span>
       </h2>
       <p className="text-sm opacity-80 mb-6">
-        Connect your Solana wallet to activate your Skillchain Card™ and start your journey in the Proof Economy.
+        Connect your Solana wallet to activate your Skillchain Card and start your journey in the Proof Economy.
       </p>
 
       <div className="space-y-6">
@@ -67,7 +73,7 @@ const WalletConnectionGuide: React.FC = () => {
             </p>
             <div className="flex items-center space-x-2 text-xs text-yellow-400">
               <Settings size={12} />
-              <span>Settings → Developer Settings → Network → Devnet</span>
+              <span>Settings  Developer Settings  Network  Devnet</span>
             </div>
           </div>
         </motion.div>

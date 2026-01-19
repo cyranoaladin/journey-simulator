@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const { LLMClient } = require('../orchestration/llmClient');
 const { normalizeProjectSpecs } = require('../constants/project_schemas');
 
@@ -37,11 +43,11 @@ class TokenomicsAgent {
         '5. **CRITICAL VALIDATION**: SUM(Allocations) MUST equal 100%. If the input or your design implies >100% or <100%, you MUST return "status": "ERROR" and "summary": "ERROR: TOTAL_ALLOCATION_MISMATCH".',
         '',
         '**WORKFLOW**:',
-        '1. Définir la dynamique de supply (inflation/déflation/hard cap).',
-        '2. Allouer les tokens (Team, Treasury, Community, Investors) et vérifier que la somme = 100%.',
-        '3. Cartographier l’utilité (staking, burn) en expliquant avec une analogie de graphe de flux.',
-        '4. Simuler la pression de vente vs achat avec une petite démonstration (penser série/graphes de flux).',
-        '5. **Double Check Sum**: vérifier la somme avant de sortir la réponse; si !=100% => status ERROR.',
+        '1. Define supply dynamics (inflation/deflation/hard cap).',
+        '2. Allocate tokens (Team, Treasury, Community, Investors) and verify the sum = 100%.',
+        '3. Map utility (staking, burn) explaining with a flow graph analogy.',
+        '4. Simulate sell vs buy pressure with a small demonstration (think series/flow graphs).',
+        '5. **Double Check Sum**: verify the sum before outputting the response; if !=100% => status ERROR.',
         '',
         `**TONE**: ${tone}`,
         '**OUTPUT FORMAT**: STRICT JSON: {',
@@ -51,7 +57,7 @@ class TokenomicsAgent {
         '  "resources": {',
         '     "diagram": "Mermaid diagram string (graph TD... for token flow OR pie chart for allocation)",',
         '     "data": { "allocations": [{ "category": "Team", "percentage": 15, "vesting": "..." }, ...], "inflation_schedule": [...] },',
-        '     "documentation": "Markdown tokenomics paper, incluant toutes les formules en LaTeX $$...$$"',
+        '     "documentation": "Markdown tokenomics paper, including all formulas in LaTeX $$...$$"',
         '  },',
         '  "actions": ["..."]',
         '}',
@@ -104,16 +110,16 @@ class TokenomicsAgent {
         status: 'ERROR',
         summary: 'ERROR: MARKET_CAP_INCONSISTENT',
         details: {
-          reason: 'Initial market cap is incohérent vs supply',
+          reason: 'Initial market cap is inconsistent vs supply',
           detectedCap,
           detectedSupply,
           impliedPrice,
         },
-        findings: [{ item: 'market_cap', status: 'error', detail: 'Market cap trop bas par rapport à la supply' }],
+        findings: [{ item: 'market_cap', status: 'error', detail: 'Market cap too low compared to supply' }],
         confidence: 0.91,
         assumptions: [`History size: ${(context.history || []).length}`],
         citations: [],
-        actions: ['Recalculer le price per token avec des contraintes réalistes'],
+        actions: ['Recalculate price per token with realistic constraints'],
         metrics: { latencyMs: 0, tokens: 0, ragHits: ragChunks.length },
         errors: ['market_cap_aberration'],
         mock: true,

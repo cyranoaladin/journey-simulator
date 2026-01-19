@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const OpenAI = require("openai");
 require("dotenv").config({ quiet: true });
 
@@ -58,7 +64,9 @@ async function callGpt5({
     const shouldMockResponse =
       !hasRealApiKey ||
       process.env.NODE_ENV === "test" ||
-      process.env.SKIP_OPENAI === "true";
+      process.env.SKIP_OPENAI === "true" ||
+      (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.includes('mock')) ||
+      (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.includes('dummy'));
 
     const resolvedMaxTokens =
       Number(maxOutputTokens ?? max_output_tokens ?? maxTokens ?? DEFAULT_LLM_MAX_OUTPUT_TOKENS) ||

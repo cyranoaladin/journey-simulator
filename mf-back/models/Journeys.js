@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const mongoose = require('mongoose');
 
 
@@ -37,7 +43,7 @@ const journeySchema = new mongoose.Schema({
         type: String,
         enum: ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED', 'FAILED'],
         default: 'IN_PROGRESS',
-        // index défini via journeySchema.index({ state: 1 })
+        // index defined via journeySchema.index({ state: 1 })
     },
     currentStepId: {
         type: String,

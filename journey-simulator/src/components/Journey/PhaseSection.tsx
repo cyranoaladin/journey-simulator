@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
@@ -302,15 +308,15 @@ const PhaseSection: FC<PhaseSectionProps> = ({
                       onMint={() => {
                         const cert = {
                           id: `proof-${phaseId}`,
-                          name: `Proof-of-Skill™: ${phaseId}`,
-                          description: evalBlock.feedback || 'Skill certification',
+                          name: `Proof-of-Skill: ${phaseId}`,
+                          description: evalBlock.feedback || 'Skill certificate',
                           imageUrl: '',
                           attributes: [
                             { trait_type: 'Score', value: `${score}/${maxScore}` },
                             { trait_type: 'Phase', value: phaseId },
                           ]
                         };
-                        openModal({ type: 'certification', certification: cert });
+                        openModal({ type: 'certificate', certificate: cert });
                       }}
                     />
                   </div>
@@ -363,7 +369,7 @@ const PhaseSection: FC<PhaseSectionProps> = ({
         {phase.nftReward && (
           <div className="text-center">
             <Award className="text-accent-purple mx-auto mb-1" size={16} />
-            <div className="text-xs font-semibold">Proof-of-{getProofTypeForPhase()}™</div>
+            <div className="text-xs font-semibold">Proof-of-{getProofTypeForPhase()}</div>
           </div>
         )}
 
@@ -429,7 +435,7 @@ const PhaseSection: FC<PhaseSectionProps> = ({
             className="py-2 px-4 rounded-lg border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition-all flex items-center justify-center space-x-2"
           >
             <Award size={16} />
-            <span>View Proof-of-{getProofTypeForPhase()}™</span>
+            <span>View Proof-of-{getProofTypeForPhase()}</span>
           </motion.button>
         )}
 

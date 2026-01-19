@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useEffect, useMemo } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -38,7 +44,7 @@ const JourneyDemo = () => {
   if (!isDemoSession() && isLoading) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center text-sm text-white/70">
-        Loading demo session…
+        Loading demo session
       </div>
     );
   }
@@ -66,6 +72,7 @@ const JourneyDemo = () => {
             <button
               onClick={() => {
                 logout();
+                navigate('/');
               }}
               className="rounded-full bg-white text-black px-4 py-2 text-sm font-bold hover:bg-gray-200 transition"
             >
@@ -87,7 +94,7 @@ const JourneyDemo = () => {
                     <div className="mt-1 text-sm text-white/70">{persona.description}</div>
                   </div>
                   <div className="shrink-0 rounded-full bg-gradient-accent px-4 py-2 text-sm font-semibold text-white">
-                    Launch Demo →
+                    Launch Demo 
                   </div>
                 </div>
               </button>

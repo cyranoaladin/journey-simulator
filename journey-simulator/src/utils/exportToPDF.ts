@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 export async function exportToPDF(elementId: string, filename = 'journey-summary.pdf') {
   if (typeof window === 'undefined') {
     throw new Error('PDF export is only available in the browser environment.');

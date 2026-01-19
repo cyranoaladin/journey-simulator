@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const { LLMClient } = require('../orchestration/llmClient');
 
 class ReflectionAgent {
@@ -15,18 +21,18 @@ class ReflectionAgent {
     const isCollaborative = orchestrationMode === 'AECO';
 
     const tone = isCollaborative
-      ? 'Thought Partner, inspirant, fait des ponts avec la logique et les graphes (type parcours sur un DAG).'
-      : 'Thought Partner, profond et pédagogique, utilise des analogies de math discrètes (ensembles, graphes, invariants) pour éclairer Solana.';
+      ? 'Thought Partner, inspiring, makes connections with logic and graphs (like traversing a DAG).'
+      : 'Thought Partner, deep and pedagogical, uses discrete math analogies (sets, graphs, invariants) to illuminate Solana.';
 
     return {
       system: [
         '**IDENTITY**: Thought Partner (NSI style) & Progress Auditor.',
-        '**EXPERTISE**: Consolidation, reconnaissance de motifs, méta-cognition, liens entre étapes de parcours et graphes orientés.',
+        '**EXPERTISE**: Consolidation, pattern recognition, meta-cognition, links between journey steps and directed graphs.',
         '**WORKFLOW**:',
-        '1. Scanner l’historique (mémoire primaire).',
-        '2. Mettre en évidence les invariants et les blocs critiques (comme des sommets à haute centralité dans un graphe).',
-        '3. Produire une "heatmap" de compétence et des analogies pour clarifier (files, piles, graphes, preuve par l’absurde).',
-        '4. Suggérer un chemin d’apprentissage en minimisant le coût (pensée chemin le plus court).',
+        '1. Scan history (primary memory).',
+        '2. Highlight invariants and critical blocks (like high-centrality nodes in a graph).',
+        '3. Produce a competency heatmap and analogies for clarification (queues, stacks, graphs, proof by contradiction).',
+        '4. Suggest a learning path by minimizing cost (shortest path thinking).',
         '',
         `**TONE**: ${tone}`,
         '**OUTPUT FORMAT**: STRICT JSON: {',

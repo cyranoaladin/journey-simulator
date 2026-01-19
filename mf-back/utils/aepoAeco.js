@@ -1,4 +1,10 @@
 /**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
+/**
  * AEPO / AECO — Unified definitions for backend logs, API payloads, and documentation.
  *
  * - AEPO (AI-Enhanced Pathway Orchestration): Zyno-driven orchestration for an individual (personal roadmap).

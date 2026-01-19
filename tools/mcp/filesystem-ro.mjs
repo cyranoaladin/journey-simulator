@@ -177,6 +177,9 @@ async function handle(req) {
           for (const e of entries) {
             if (results.length >= max) return;
             const p = path.join(dir, e.name);
+            // Ignore binary assets in search
+            if (/\.(png|jpg|jpeg|gif|ico|pdf|woff|woff2|ttf|eot|mp4|webm|mp3|zip|gz|tar)$/i.test(e.name)) continue;
+
             if (e.isDirectory()) {
               await walk(p);
             } else if (!isEnvLike(p)) {

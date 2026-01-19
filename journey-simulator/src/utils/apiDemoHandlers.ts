@@ -1,4 +1,10 @@
 /**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
+/**
  * Demo mode request handlers - extracted from api.ts to reduce cognitive complexity
  */
 
@@ -209,7 +215,7 @@ export const handleDemoCompletePhase = <T>(
       if (phaseIndex === 0) {
         xpReward = 60;
         tokenReward = 6;
-        nftReward = "Proof-of-Skill™: Activation";
+        nftReward = "Proof-of-Skill: Activation";
       } else if (phaseIndex === 1) {
         xpReward = 80;
         tokenReward = 8;
@@ -282,7 +288,7 @@ export const handleDemoStep = async <T>(
         description: "Submit a brief statement about your goals for this journey.",
         expected_input_type: "text",
         xp_reward: 100,
-        nft_reward_id: "Proof-of-Skill™: Activation"
+        nft_reward_id: "Proof-of-Skill: Activation"
       }
     ];
   } else if (phaseIndex === 1 || phaseId.includes('staking')) {

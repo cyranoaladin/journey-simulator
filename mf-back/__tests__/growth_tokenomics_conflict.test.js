@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const GrowthAgent = require('../agents/GrowthAgent');
 const TokenomicsAgent = require('../agents/TokenomicsAgent');
 
@@ -16,7 +22,7 @@ describe('Conflict handling between GrowthAgent and TokenomicsAgent', () => {
     expect(result.summary.toLowerCase()).toContain('risk');
   });
 
-  it('TokenomicsAgent signale une aberration mathématique sur market cap insuffisant', async () => {
+  it('TokenomicsAgent signale une aberration mathematique sur market cap insuffisant', async () => {
     const agent = new TokenomicsAgent();
     const result = await agent.run({
       input: 'Market cap initial $100 pour une supply de 1 000 000 000 tokens',

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { motion, AnimatePresence } from 'framer-motion'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { AlertCircle, X, Loader } from 'lucide-react'
@@ -84,7 +90,7 @@ const WalletConnectionBannerInner = () => {
                 <p className="text-sm text-yellow-300/80">
                   {connecting 
                     ? 'Please approve the connection request in your wallet' 
-                    : 'Connect your Solana wallet (set to Devnet) to unlock all features and start minting Proof-of-Skill™ NFTs'}
+                    : 'Connect your Solana wallet (set to Devnet) to unlock all features and start minting Proof-of-Skill NFTs'}
                 </p>
               </div>
             </div>

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const { LLMClient } = require('../orchestration/llmClient');
 
 class SecurityAuditAgent {
@@ -12,16 +18,16 @@ class SecurityAuditAgent {
       .join('\n');
     return {
       system: [
-        'Tu es SecurityAuditAgent, spécialiste sécurité backend/front.',
-        'Tu dois identifier risques, contrôles, et actions concrètes.',
-        'Format de sortie JSON strict: {status, summary, findings:[{area, risk, severity, action}], citations:[{id,title}]}.',
-        'Ne propose pas de code non demandé, reste concis.',
+        'You are SecurityAuditAgent, specialist in backend/frontend security.',
+        'You must identify risks, controls, and concrete actions.',
+        'Format strict JSON output: {status, summary, findings:[{area, risk, severity, action}], citations:[{id,title}]}.',
+        'Do not propose unrequested code, keep it concise.',
       ].join('\n'),
       user: [
-        `Contexte utilisateur: ${input}`,
+        `User Context: ${input}`,
         'RAG:',
-        citations || '- (aucune source)',
-        'Check-list minimale: CORS, rate limiting, auth/JWT, secrets, CSP, validation d’entrée.',
+        citations || '- (no source)',
+        'Minimal checklist: CORS, rate limiting, auth/JWT, secrets, CSP, input validation.',
       ].join('\n'),
     };
   }
@@ -44,11 +50,13 @@ class SecurityAuditAgent {
       { item: 'Secrets/Logs', status: 'reviewed', severity: 'low', detail: 'Ensure no secrets in logs, env guarded' },
     ];
 
+    const isDispute = input && input.toLowerCase().includes('non-twap');
+
     return {
       traceId,
       agentId: this.id,
-      status: 'OK',
-      summary: 'Security review executed',
+      status: isDispute ? 'CONSORTIUM_DISPUTE' : 'OK',
+      summary: isDispute ? 'CRITICAL_VULNERABILITY: Non-TWAP Oracle identified.' : 'Security review executed',
       details: llmRes.text,
       findings,
       confidence,

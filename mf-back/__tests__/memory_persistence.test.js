@@ -1,10 +1,16 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const agentMemory = require('../memory/agent_memory');
 
 let capturedContext = null;
 
 jest.mock('../orchestration/agentsRegistry', () => ({
   MemoryProbeAgent: class {
-    async run(input, context) {
+    async run(context) {
       capturedContext = context;
       return {
         summary: context.history?.[0]?.note || 'missing history',
@@ -13,6 +19,15 @@ jest.mock('../orchestration/agentsRegistry', () => ({
       };
     }
   },
+}));
+
+jest.mock('../data/parcoursTemplates', () => ({
+  loadTemplateForIntent: () => ({
+    content: {
+      phases: [{ agent: 'MemoryProbeAgent' }]
+    }
+  }),
+  intentToTemplate: {}
 }));
 
 jest.mock('../orchestration/journey-tasks.json', () => ({

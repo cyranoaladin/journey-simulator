@@ -1,10 +1,209 @@
 {
-  "track": "Web3 Legal",
+  "track": "web3legal",
+  "name": "Web3 Legal Engineer",
+  "description": "Navigating the regulatory landscape.",
   "phases": [
-    { "phase": "Guide", "agent": "GuideAgent" },
-    { "phase": "Compliance", "agent": "Web3LegalAgent" },
-    { "phase": "DAO Governance", "agent": "DAOAgent" },
-    { "phase": "Security Audit", "agent": "AuditAgent" },
-    { "phase": "Token Compliance", "agent": "TokenAgent" }
-  ]
+    {
+      "phase_id": 1,
+      "name": "Jurisdiction Mapping",
+      "agent": "Web3LegalAgent",
+      "objective": "Select the legal wrapper.",
+      "narrative_arc": {
+        "intro": "Code is global. Law is local. Where does your entity exist?",
+        "activity": {
+          "title": "Entity Selection",
+          "instructions": "Compare Wyoming DAO, Swiss Foundation, and BVI. Select the best fit for a DeFi protocol."
+        },
+        "evaluation": {
+          "criteria": [
+            "Liability Protection",
+            "Tax Efficiency",
+            "Operational Flexibility"
+          ]
+        },
+        "handoff": {
+          "agent_name": "Web3LegalAgent",
+          "specialty": "Corporate Structuring",
+          "resource_list": [
+            {
+              "type": "matrix",
+              "label": "Entity Comparison",
+              "url": "pdf://entity-matrix"
+            }
+          ]
+        }
+      },
+      "validation_criteria": {
+        "min_score": 100,
+        "required_keywords": [
+          "entity",
+          "liability",
+          "tax"
+        ]
+      },
+      "resources": []
+    },
+    {
+      "phase_id": 2,
+      "name": "IP Strategy",
+      "agent": "Web3LegalAgent",
+      "objective": "Protect or open the code.",
+      "narrative_arc": {
+        "intro": "Open Source or Proprietary? Validating the license strategy.",
+        "activity": {
+          "title": "License Selection",
+          "instructions": "Choose between MIT, GPL, or Business Source License (BSL). Justify based on defensibility vs adoption."
+        },
+        "evaluation": {
+          "criteria": [
+            "Community Growth",
+            "Fork Resistance",
+            "Commercial Rights"
+          ]
+        },
+        "handoff": {
+          "agent_name": "Web3LegalAgent",
+          "specialty": "IP Law",
+          "resource_list": [
+            {
+              "type": "guide",
+              "label": "Open Source Licenses",
+              "url": "doc://licenses"
+            }
+          ]
+        }
+      },
+      "validation_criteria": {
+        "min_score": 100,
+        "required_keywords": [
+          "license",
+          "open source",
+          "copyright"
+        ]
+      },
+      "resources": []
+    },
+    {
+      "phase_id": 3,
+      "name": "Token Classification",
+      "agent": "Web3LegalAgent",
+      "objective": "Avoid the security label.",
+      "narrative_arc": {
+        "intro": "The Howey Test. The invisible line. Does your token offer an expectation of profit from the efforts of others?",
+        "activity": {
+          "title": "Howey Analysis",
+          "instructions": "Analyze your token utility against the 4 prongs of Howey. Document the 'Sufficient Decentralization' argument."
+        },
+        "evaluation": {
+          "criteria": [
+            "Money Investment",
+            "Common Enterprise",
+            "Profit Expectation",
+            "Efforts of Others"
+          ]
+        },
+        "handoff": {
+          "agent_name": "Web3LegalAgent",
+          "specialty": "Securities Law",
+          "resource_list": [
+            {
+              "type": "pdf",
+              "label": "Howey Guide",
+              "url": "pdf://howey"
+            }
+          ]
+        }
+      },
+      "validation_criteria": {
+        "min_score": 100,
+        "required_keywords": [
+          "howey",
+          "security",
+          "utility"
+        ]
+      },
+      "resources": []
+    },
+    {
+      "phase_id": 4,
+      "name": "User Terms",
+      "agent": "Web3LegalAgent",
+      "objective": "Define the interface liability.",
+      "narrative_arc": {
+        "intro": "The protocol is decentralized. The website is not. You need Terms of Service.",
+        "activity": {
+          "title": "ToS Drafting",
+          "instructions": "Draft the disclaimers for the frontend. Explicitly separate the UI from the Protocol."
+        },
+        "evaluation": {
+          "criteria": [
+            "Liability Waiver",
+            "Jurisdiction Clause",
+            "Risk Disclosure"
+          ]
+        },
+        "handoff": {
+          "agent_name": "Web3LegalAgent",
+          "specialty": "Contract Law",
+          "resource_list": [
+            {
+              "type": "template",
+              "label": "DeFi ToS",
+              "url": "doc://tos-template"
+            }
+          ]
+        }
+      },
+      "validation_criteria": {
+        "min_score": 100,
+        "required_keywords": [
+          "terms",
+          "liability",
+          "disclaimer"
+        ]
+      },
+      "resources": []
+    },
+    {
+      "phase_id": 5,
+      "name": "Legal Certification",
+      "agent": "ZynoAgent",
+      "objective": "Final compliance audit.",
+      "narrative_arc": {
+        "intro": "The legal wrapper is tight. The risks are disclosed. Certify the framework.",
+        "activity": {
+          "title": "Compliance Package Assembly",
+          "instructions": "Bundle the Entity docs, License, Token Opinion, and ToS. publish the hash."
+        },
+        "evaluation": {
+          "criteria": [
+            "Completeness",
+            "Consistency",
+            "Risk Mitigation"
+          ]
+        },
+        "handoff": {
+          "agent_name": "ZynoCore",
+          "specialty": "Legal Sovereign",
+          "resource_list": [
+            {
+              "type": "certificate",
+              "label": "Legal Engineer Cert",
+              "url": "nft://cert-legal"
+            }
+          ]
+        }
+      },
+      "validation_criteria": {
+        "min_score": 100,
+        "required_keywords": [
+          "compliance",
+          "package",
+          "hash"
+        ]
+      },
+      "resources": []
+    }
+  ],
+  "total_substeps": 25
 }

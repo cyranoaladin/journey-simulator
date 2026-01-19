@@ -1,3 +1,9 @@
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
 Je vais structurer le retour comme un **audit complet**, mais en gardant un focus fort sur la **couche web3** (wallets, NFT, Pass, lien on-chain/off-chain), tout en signalant les points d’architecture généraux qui impactent justement cette couche.
 
 ---

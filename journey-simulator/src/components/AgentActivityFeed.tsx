@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useJourneyStore } from '../store/journeyStore';
 import { API_BASE_URL } from '../utils/api';
@@ -12,35 +18,15 @@ interface AgentLogItem {
   details?: Record<string, unknown>;
 }
 
-const buildDemoLogs = (): AgentLogItem[] => {
-  const now = Date.now();
-  return [
-    {
-      ts: now - 1000 * 45,
-      agent: 'zyno-orchestrator',
-      action: 'Mission state recalibrated',
-      details: {
-        phase: 'Topology Reconnaissance',
-        aepoDelta: '+4.2',
-      },
-    },
-    {
-      ts: now - 1000 * 90,
-      agent: 'guardian-agent',
-      action: 'Risk dashboard synced',
-      details: {
-        finding: 'DePIN validator lag resolved',
-      },
-    },
-    {
-      ts: now - 1000 * 150,
-      agent: 'coach-agent',
-      action: 'Issued proof coaching prompt',
-      details: {
-        focus: 'Solana Systems Lab',
-      },
-    },
-  ];
+// ADAPTER: Connect to Real-Time Neural Core (JourneyStore)
+const useDemoLogs = () => {
+  const demoHistory = useJourneyStore(s => s.demoState?.demoHistory || []);
+  return demoHistory.map(item => ({
+    ts: item.timestamp ? new Date(item.timestamp).getTime() : Date.now(),
+    agent: item.source || 'Zyno',
+    action: item.content.slice(0, 50) + (item.content.length > 50 ? '...' : ''),
+    details: { full_thought: item.content }
+  }));
 };
 
 const isDemoSession = (): boolean => {
@@ -70,15 +56,19 @@ export default function AgentActivityFeed() {
     }
   }, []);
 
+  // REAL-TIME DEMO SYNC
+  const demoLogs = useDemoLogs();
+
   // Helper to handle demo mode
   const handleDemoMode = useCallback(() => {
     updateStateIfMounted(() => {
-      setLogs(buildDemoLogs());
+      // Direct Sync with Store (No more fake logs)
+      setLogs(demoLogs);
       setFetchFailed(false);
       setLoading(false);
     });
     fetchInFlightRef.current = false;
-  }, [updateStateIfMounted]);
+  }, [updateStateIfMounted, demoLogs]);
 
   // Helper to fetch logs from API
   const fetchLogsFromApi = useCallback(async (journeyId: string) => {
@@ -175,7 +165,7 @@ export default function AgentActivityFeed() {
       <div className="flex items-center justify-between mb-2">
         <h4 className="text-sm font-semibold">Agent Activity</h4>
         <button className="text-xs opacity-70 hover:opacity-100" onClick={fetchLogs} disabled={loading}>
-          {loading ? '…' : 'Refresh'}
+          {loading ? '' : 'Refresh'}
         </button>
       </div>
       {(demoModeActive || fetchFailed) && (
@@ -199,7 +189,7 @@ export default function AgentActivityFeed() {
               <div className="flex items-center justify-between">
                 <div>
                   <span className="font-semibold">{l.agent}</span>
-                  <span className="opacity-70"> — {l.action}</span>
+                  <span className="opacity-70">  {l.action}</span>
                 </div>
                 <span className="opacity-60">{time}</span>
               </div>

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const DEFAULT_TTL_MS = Number(process.env.ARTIFACT_TTL_MS || 10 * 60 * 1000);
 const MAX_ENTRIES = Number(process.env.ARTIFACT_MAX_ENTRIES || 200);
 

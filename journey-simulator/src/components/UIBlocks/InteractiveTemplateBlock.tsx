@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useState } from 'react';
 import { generateStableKey } from '../../utils/generateStableKey';
 
@@ -36,7 +42,7 @@ export default function InteractiveTemplate({ block }: InteractiveTemplateBlockP
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Générer le contenu basé sur les champs remplis
+    // Generate content based on filled fields
     let content = `# ${block.title}\n\n`;
 
     if (block.description) {

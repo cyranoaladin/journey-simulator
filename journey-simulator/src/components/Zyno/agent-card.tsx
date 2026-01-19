@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { generateStableKey } from '../../utils/generateStableKey';
 import type { AgentResult } from './types';
 
@@ -11,7 +17,7 @@ const renderReferenceLabel = (entry: { title?: string; content?: string; } | und
   }
 
   if (entry.content) {
-    return `${entry.content.slice(0, 60)}…`;
+    return `${entry.content.slice(0, 60)}`;
   }
 
   return `Reference ${index + 1}`;
@@ -25,7 +31,7 @@ export default function AgentCard({ agent }: Props) {
   return (
     <article className="border border-slate-200 rounded-xl p-4 shadow-sm bg-white space-y-3">
       <header className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">🤖 {agent.agent}</h3>
+        <h3 className="text-lg font-semibold"> {agent.agent}</h3>
         {typeof agent.activationLevel === 'number' && (
           <span className="text-xs font-medium text-slate-500">
             Activation level: {Math.round(agent.activationLevel * 100) / 100}

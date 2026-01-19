@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 class APIContractAgent {
   constructor() {
     this.id = 'APIContractAgent';
@@ -56,7 +62,7 @@ class APIContractAgent {
         details,
         findings,
         confidence,
-        assumptions: hasInput ? [] : ['Scope incomplet, exemples à enrichir'],
+        assumptions: hasInput ? [] : ['Incomplete scope, examples to enrich'],
         actions,
         citations: [],
         metrics: { latencyMs: Date.now() - started },

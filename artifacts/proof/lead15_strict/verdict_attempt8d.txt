@@ -1,0 +1,5 @@
+PLAYWRIGHT_EXIT=1
+SEED_EXIT=0
+JSON_REPORT=artifacts/proof/lead15_strict/playwright_report_full_attempt8d.json
+COUNTS=artifacts/proof/lead15_strict/e2e_json_counts_attempt8d.txt
+FAIL_INDEX=artifacts/proof/lead15_strict/failures_index_attempt8d.md

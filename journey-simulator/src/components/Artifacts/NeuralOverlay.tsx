@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import React from 'react';
 
 interface Props {
@@ -11,7 +17,7 @@ export const NeuralOverlay: React.FC<Props> = ({ isVisible, agentName, taskName 
 
   return (
     <div
-      className="absolute inset-0 z-50 flex flex-col items-center justify-center overflow-hidden rounded-3xl bg-black/80 backdrop-blur-sm"
+      className="absolute inset-0 z-40 flex flex-col items-center justify-center overflow-hidden rounded-3xl bg-black/80 backdrop-blur-sm pointer-events-none"
       data-testid="neural-overlay"
     >
       {/* Iframe vers le Canvas HTML */}

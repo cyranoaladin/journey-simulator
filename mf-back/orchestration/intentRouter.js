@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const registry = require('../agents/registry');
 
 const FALLBACK_INTENT = 'product.spec';
@@ -26,20 +32,23 @@ function normalizeIntents(intent) {
   return [];
 }
 
-function selectAgentsForIntents(intents = []) {
+function selectAgentsForIntents(intents = [], strict = false) {
   const matches = new Map();
 
-  const wanted = intents.length > 0 ? intents : [FALLBACK_INTENT];
+  const wanted = intents.length > 0 ? intents : (strict ? [] : [FALLBACK_INTENT]);
 
   for (const intent of wanted) {
     let intentMatched = false;
-    for (const agent of registry.filter((a) => a.enabled !== false)) {
-      if (agent.intents.includes(intent)) {
+    for (const agent of registry) {
+      const envKey = `AGENT_${agent.agentId?.toUpperCase?.() || ''}_ENABLED`;
+      const isEnabled = process.env[envKey] !== undefined ? process.env[envKey] === 'true' : agent.enabled !== false;
+
+      if (isEnabled && agent.intents.includes(intent)) {
         matches.set(agent.agentId, agent);
         intentMatched = true;
       }
     }
-    if (!intentMatched) {
+    if (!intentMatched && !strict) {
       const fallback = registry.find((a) => a.agentId === FALLBACK_AGENT_ID);
       if (fallback) {
         matches.set(fallback.agentId, fallback);
@@ -47,7 +56,7 @@ function selectAgentsForIntents(intents = []) {
     }
   }
 
-  if (matches.size === 0) {
+  if (matches.size === 0 && !strict) {
     const fallback = registry.find((a) => a.agentId === FALLBACK_AGENT_ID);
     if (fallback) {
       matches.set(fallback.agentId, fallback);
@@ -60,10 +69,10 @@ function selectAgentsForIntents(intents = []) {
   });
 }
 
-function routeIntent({ intent, input, context }) {
+function routeIntent({ intent, input, context, strict = false }) {
   const intents = normalizeIntents(intent);
-  const selected = selectAgentsForIntents(intents);
-  let intentNormalized = intents.length > 0 ? intents.join('+') : normalizeToken(FALLBACK_INTENT);
+  const selected = selectAgentsForIntents(intents, strict);
+  let intentNormalized = intents.length > 0 ? intents.join('+') : (strict ? null : normalizeToken(FALLBACK_INTENT));
 
   // Strictly enforce snake_case normalization (User Request)
   if (intentNormalized) {

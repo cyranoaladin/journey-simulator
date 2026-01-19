@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const {
   normalizeMode,
   ensureModeAllowed,
@@ -12,7 +18,7 @@ describe('runtimeMode helpers', () => {
     jest.resetModules();
   });
 
-  test('normalizeMode renvoie simulation par défaut', () => {
+  test('normalizeMode renvoie simulation par defaut', () => {
     expect(normalizeMode(undefined)).toBe('simulation');
     expect(normalizeMode('Demo')).toBe('demo');
     expect(normalizeMode('REAL')).toBe('real');
@@ -50,17 +56,20 @@ describe('runtimeMode helpers', () => {
     expect(guard.health.execution.enabled).toBe(true);
   });
 
-  test('registryCoverage reflète les overrides env pour les agents', () => {
-    // RiskFraudAgent est disabled par défaut ; on vérifie l’état, puis on force à true.
+  test('registryCoverage reflete les overrides env pour les agents', () => {
+    // RiskFraudAgent is enabled by default; we verify this, then force to false.
     delete process.env.AGENT_RISKFRAUDAGENT_ENABLED;
     let coverage = registryCoverage();
     const risk = coverage.intents.find((i) => i.intent === 'risk_fraud');
     expect(risk).toBeDefined();
-    expect(risk.enabledAgents).toHaveLength(0);
+    // Default enabled
+    expect(risk.enabledAgents).toHaveLength(1);
+    expect(risk.enabledAgents).toContain('RiskFraudAgent');
 
-    process.env.AGENT_RISKFRAUDAGENT_ENABLED = 'true';
+    // Force disable
+    process.env.AGENT_RISKFRAUDAGENT_ENABLED = 'false';
     coverage = registryCoverage();
-    const riskEnabled = coverage.intents.find((i) => i.intent === 'risk_fraud');
-    expect(riskEnabled.enabledAgents).toContain('RiskFraudAgent');
+    const riskDisabled = coverage.intents.find((i) => i.intent === 'risk_fraud');
+    expect(riskDisabled.enabledAgents).toHaveLength(0);
   });
 });

@@ -1,133 +1,76 @@
-version: "3.9"
+version: '3.8'
 
 services:
-  mfai-redis:
-    container_name: mfai-redis
-    image: redis:7-alpine
-    restart: unless-stopped
-    ports: [ "127.0.0.1:6380:6379" ]
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - mfai-redis-data:/data
-    read_only: true
-    tmpfs:
-      - /tmp
-    # Stateful cache requires writable filesystem (redis data). // nosemgrep
-    networks:
-      - mfai-network
-
-  mfai-api:
-    container_name: mfai-api
+  # --- Neural Core (API) ---
+  api:
     build:
       context: ./mf-back
       dockerfile: Dockerfile
-    command: npm start
+    container_name: mfai_neural_core
+    restart: always
     environment:
-      NODE_ENV: production
-      PORT: 3002
-      MONGO_URI: mongodb://mfai-mongo:27017/journey
-      SKIP_NPM_INSTALL: "true"
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://mongo:27017/journey
+      - PORT=3002
     env_file:
-      - .env
+      - ./mf-back/.env
     ports:
       - "3002:3002"
-    security_opt:
-      - no-new-privileges:true
-    read_only: true
-    tmpfs:
-      - /tmp
+    volumes:
+      - ./mf-back:/usr/src/app
+      - /usr/src/app/node_modules
     depends_on:
-      mfai-mongo:
-        condition: service_healthy
-    restart: always
+      - mongo
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
     networks:
-      - mfai-network
+      - mfai_net
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3002/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  mfai-mongo:
-    container_name: mfai-mongo
-    image: mongo:6
+  # --- Memory Persistence ---
+  mongo:
+    image: mongo:6.0
+    container_name: mfai_memory_bank
     restart: always
     ports:
-      - "127.0.0.1:27017:27017"
+      - "27018:27017"
     volumes:
-      - mfai-mongo-data:/data/db
-    security_opt:
-      - no-new-privileges:true
-    # Mongo data directory must remain writable. // nosemgrep
-    read_only: true
-    tmpfs:
-      - /tmp
-    healthcheck:
-      test: [ "CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
+      - mfai_data:/data/db
     networks:
-      - mfai-network
+      - mfai_net
+    deploy:
+      resources:
+        limits:
+          memory: 1G
 
-  mfai-postgres:
-    container_name: mfai-postgres
-    image: postgres:15-alpine
-    restart: always
-    environment:
-      POSTGRES_DB: prisma
-      POSTGRES_USER: prisma
-      POSTGRES_PASSWORD: prisma
-    ports:
-      - "127.0.0.1:5433:5432"
-    volumes:
-      - mfai-postgres-data:/var/lib/postgresql/data
-    security_opt:
-      - no-new-privileges:true
-    # Postgres data directory must remain writable. // nosemgrep
-    read_only: false
-    tmpfs:
-      - /tmp
-    healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "prisma" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-    networks:
-      - mfai-network
-
-  mfai-web:
-    container_name: mfai-web
+  # --- Holo-Interface (Frontend) ---
+  journey-web:
     build:
       context: ./journey-simulator
       dockerfile: Dockerfile
-      args:
-        VITE_API_BASE_URL: http://localhost:3002
-    environment:
-      VITE_API_BASE_URL: https://journey.mfai.app/api
-      VITE_RESOURCE_LIBRARY_BASE_URL: /documents
-      API_UPSTREAM: mfai-api:3002
-    ports:
-      - "127.0.0.1:3003:80"
-    security_opt:
-      - no-new-privileges:true
-    read_only: false
-    tmpfs:
-      - /tmp
-      - /var/cache/nginx
-      - /run
-      - /var/run
-      - /etc/nginx/conf.d
-    depends_on:
-      - mfai-api
+    container_name: mfai_holo_interface
     restart: always
+    ports:
+      - "3000:80"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:3002
     networks:
-      - mfai-network
-
-volumes:
-  mfai-redis-data:
-  mfai-mongo-data:
-  mfai-postgres-data:
-
+      - mfai_net
 
 networks:
-  mfai-network:
+  mfai_net:
     driver: bridge
+
+volumes:
+  mfai_data:

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useEffect, useMemo, useState } from 'react';
 import type { AgentLogEntry } from './types';
 import { api } from '../../utils/api';
@@ -41,7 +47,7 @@ export default function AgentLogViewer() {
   return (
     <section className="flex flex-col gap-4">
       <header className="flex flex-col gap-2">
-        <h2 className="text-xl font-semibold">📊 Agent Interaction Logs</h2>
+        <h2 className="text-xl font-semibold"> Agent Interaction Logs</h2>
         <div className="flex flex-wrap gap-2">
           <input
             className="border border-slate-300 rounded-md px-3 py-2 text-sm"

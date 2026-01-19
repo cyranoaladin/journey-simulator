@@ -1,10 +1,16 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import requests
 import json
 
 # Configuration
 SONAR_URL = "http://127.0.0.1:9000"
 PROJECT_KEY = "MFAI-Monorepo"
-TOKEN = "sqa_c13217644cf55e4d644e1c64d1c6a2c54edc9f9e"
+TOKEN = "[REDACTED_TOKEN]"
 OUTPUT_FILE = "FULL_AUDIT_REPORT.md"
 
 def fetch_sonar_data(endpoint, params=None):

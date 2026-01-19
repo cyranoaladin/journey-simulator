@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowRight,
@@ -16,7 +22,7 @@ import { useJourneyStore } from '../../store/journeyStore';
 import type { AccessPassHolder } from '../../types/journey';
 import { generateStableKey } from '../../utils/generateStableKey';
 
-const CertificationModal = lazy(() => import('../CertificationModal'));
+const CertificateModal = lazy(() => import('../CertificateModal'));
 const StakingModal = lazy(() => import('../StakingModal'));
 const DAOVoteModal = lazy(() => import('../DAOVoteModal'));
 const AgentFeedbackModal = lazy(() => import('../Zyno/AgentFeedbackModal'));
@@ -113,7 +119,7 @@ const JourneyModal = () => {
                 {phase.nftReward && (
                   <div className="flex justify-between">
                     <span>NFT Reward:</span>
-                    <span className="font-mono text-accent-gold">🏆 {phase.nftReward}</span>
+                    <span className="font-mono text-accent-gold"> {phase.nftReward}</span>
                   </div>
                 )}
               </div>
@@ -189,7 +195,7 @@ const JourneyModal = () => {
 
   const renderHolderModal = () => {
     const { holder } = modalContent as { holder: AccessPassHolder; };
-    const passIcon = ({ Gold: '🥇', Platinum: '🥈' } as Record<string, string>)[holder.passLevel] ?? '💎';
+    const passIcon = ({ Gold: '', Platinum: '' } as Record<string, string>)[holder.passLevel] ?? '';
     return (
       <div className="max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="glass-effect rounded-2xl p-8">
@@ -204,7 +210,7 @@ const JourneyModal = () => {
                 <div className="flex items-center space-x-2 mt-2">
                   <span className="text-3xl">{passIcon}</span>
                   <span className="text-lg font-semibold">
-                    {holder.passLevel} Skillchain Card™
+                    {holder.passLevel} Skillchain Card
                   </span>
                 </div>
               </div>
@@ -252,7 +258,7 @@ const JourneyModal = () => {
 
             <div>
               <div className="mb-6">
-                <h3 className="font-semibold text-lg mb-3">Skillchain Card™</h3>
+                <h3 className="font-semibold text-lg mb-3">Skillchain Card</h3>
                 <div className="flex justify-center">
                   <div className="w-full max-w-xs">
                     <Suspense fallback={<div className="h-[280px] w-full rounded-2xl bg-white/5" />}>
@@ -271,10 +277,10 @@ const JourneyModal = () => {
                     </div>
                     <div>
                       <div className="font-semibold">
-                        {holder.certifications} Certifications
+                        {holder.certificates} Certificates
                       </div>
                       <div className="text-sm opacity-70">
-                        Proof-of-Skill™ NFTs earned
+                        Proof-of-Skill NFTs earned
                       </div>
                     </div>
                   </div>
@@ -320,7 +326,7 @@ const JourneyModal = () => {
               className="flex-1 btn-secondary flex items-center justify-center space-x-2"
             >
               <ExternalLink size={20} />
-              <span>Learn more about Skillchain Card™</span>
+              <span>Learn more about Skillchain Card</span>
             </motion.button>
           </div>
         </div>
@@ -339,7 +345,7 @@ const JourneyModal = () => {
           return null;
         }
         return (
-          <Suspense fallback={<div className="w-full max-w-2xl rounded-2xl bg-white/5 p-8">Loading…</div>}>
+          <Suspense fallback={<div className="w-full max-w-2xl rounded-2xl bg-white/5 p-8">Loading</div>}>
             <AgentFeedbackModal
               step={modalContent.step}
               userId={modalContent.userId || 'demo_user'}
@@ -347,18 +353,18 @@ const JourneyModal = () => {
             />
           </Suspense>
         );
-      case 'certification':
+      case 'certificate':
         return (
-          <Suspense fallback={<div className="w-full max-w-2xl rounded-2xl bg-white/5 p-8">Loading…</div>}>
-            <CertificationModal
-              certification={modalContent.certification}
+          <Suspense fallback={<div className="w-full max-w-2xl rounded-2xl bg-white/5 p-8">Loading</div>}>
+            <CertificateModal
+              certificate={modalContent.certificate}
               onClose={closeModal}
             />
           </Suspense>
         );
       case 'staking':
         return (
-          <Suspense fallback={<div className="w-full max-w-2xl rounded-2xl bg-white/5 p-8">Loading…</div>}>
+          <Suspense fallback={<div className="w-full max-w-2xl rounded-2xl bg-white/5 p-8">Loading</div>}>
             <StakingModal
               availableAmount={modalContent.availableAmount || 0}
               currentStaked={modalContent.currentStaked || 0}
@@ -368,7 +374,7 @@ const JourneyModal = () => {
         );
       case 'daoVote':
         return (
-          <Suspense fallback={<div className="w-full max-w-2xl rounded-2xl bg-white/5 p-8">Loading…</div>}>
+          <Suspense fallback={<div className="w-full max-w-2xl rounded-2xl bg-white/5 p-8">Loading</div>}>
             <DAOVoteModal
               phase={modalContent.phase}
               votingPower={modalContent.votingPower || 0}

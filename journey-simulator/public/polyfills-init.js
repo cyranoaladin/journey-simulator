@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 // Loaded before Vite modules to provide minimal globals required by some libraries.
 // This file is referenced from index.html so we can keep CSP strict (no inline scripts).
 

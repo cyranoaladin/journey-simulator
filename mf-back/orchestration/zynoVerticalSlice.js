@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const { normalizeRequest } = require('./agentProtocol');
 const { fetchRagContext } = require('./services/ragService');
 const { routeIntent } = require('./intentRouter');
@@ -748,6 +754,10 @@ function initRunState() {
 }
 
 function initOps(validationWarnings) {
+  // PRODUCTION MODE: Real LLM calls unless explicitly disabled
+  const apiKey = process.env.OPENAI_API_KEY || '';
+  const useRealLLM = apiKey && !apiKey.includes('mock');
+
   const ops = {
     warnings: [...validationWarnings],
     disabledAgents: [],
@@ -756,9 +766,9 @@ function initOps(validationWarnings) {
     failures: [],
     rag: { mode: 'disabled', domain: null, hits: 0 },
     llm: {
-      mode: process.env.OPENAI_API_KEY ? 'openai' : 'mock',
-      provider: process.env.OPENAI_API_KEY ? 'openai' : 'mock',
-      model: 'gpt-4o',
+      mode: useRealLLM ? 'openai' : 'mock',
+      provider: useRealLLM ? 'openai' : 'mock',
+      model: process.env.LLM_MODEL_NAME || 'gpt-4o',
       calls: 0,
       cacheHits: 0,
       deduplicatedCalls: 0,
@@ -954,7 +964,8 @@ async function orchestrateVerticalSlice(payload) {
 }
 
 // REDUCED COGNITIVE COMPLEXITY IMPLEMENTATION
-async function orchestrateVerticalSliceCore(payload) {
+async function orchestrateVerticalSliceCore(payloadRaw) {
+  const payload = payloadRaw || {};
   const state = initRunState();
   let slot = null;
   let acquiredSlot = false;

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 export type Language = 'fr' | 'en'
 export type Mode = 'discovery' | 'builder' | 'expert' | 'investor_demo'
 export type RunMode = 'demo' | 'simulation' | 'real'
@@ -48,10 +54,21 @@ export type EvaluationBlock = {
   global_score: number
   max_score: number
   feedback: string
+  feedback_markdown?: string
+  status?: string
   axes: EvaluationAxis[]
 }
 export type ActionSuggestion = { label: string; action_id: string }
 export type ActionSuggestionsBlock = { kind: 'action_suggestions_block'; id: string; title: string; suggestions: ActionSuggestion[] }
+export type HintBlock = {
+  kind: 'hint_block';
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'warning' | 'success' | 'error';
+  link?: string;
+  linkText?: string;
+}
 export type XpBlock = { kind: 'xp_block'; id: string; title?: string; current_xp: number; gained_xp: number; next_level_xp: number; comment?: string }
 
 export type DiagramBlock = { kind: 'diagram_block'; id: string; title: string; diagram_type: 'mermaid'; content: string; caption?: string }
@@ -110,6 +127,41 @@ export type IndicatorBlock = {
   type: 'gauge' | 'radar' | 'bar';
 }
 
+export type BondingCurveBlock = {
+  kind: 'bonding_curve_block';
+  id: string;
+  title: string;
+  description: string;
+  curveType: 'linear' | 'exponential' | 'custom';
+  data: {
+    currentSupply: number;
+    maxSupply: number;
+    reserveRatio: number;
+    basePrice: number;
+  };
+}
+
+export type CodeAuditorBlock = {
+  kind: 'code_auditor_block';
+  id: string;
+  title: string;
+  code: string;
+  language: string;
+  vulnerableLine?: number;
+  explanation: string;
+  vulnerabilities?: any[]; // Array of vulnerability objects
+}
+
+export type MarketLaunchpadBlock = {
+  kind: 'market_launchpad_block';
+  id: string;
+  title: string;
+  protocolName: string;
+  ticker: string;
+  launchUrl: string;
+  initialProgress: number;
+}
+
 export type UIBlock =
   | TextBlock
   | ChecklistBlock
@@ -126,6 +178,10 @@ export type UIBlock =
   | NarrativeChoiceBlock
   | IndicatorBlock
   | InteractiveTemplateBlock
+  | HintBlock
+  | BondingCurveBlock
+  | CodeAuditorBlock
+  | MarketLaunchpadBlock
 
 export type AgentAction = { agent_name: string; reason: string; action: string; parameters?: Record<string, any> }
 export type NextState = { phase_id: string; completed_missions: string[]; xp_delta: number; notes?: string }

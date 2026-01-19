@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { motion } from 'framer-motion'
 import { ArrowLeft, Sparkles, Trophy, Coins, Shield, GaugeCircle } from 'lucide-react'
 import ResetProgressButton from '../ResetProgressButton'
@@ -9,7 +15,7 @@ interface JourneyOverviewHeaderProps {
 }
 
 const personaMessages: Record<string, string> = {
-  'cognitive-activation-hub': 'Each completed ritual unlocks sharper decision capital—keep the cadence steady.',
+  'cognitive-activation-hub': 'Each completed ritual unlocks sharper decision capitalkeep the cadence steady.',
   'capital-foundry': 'Deal velocity loves clarity. Keep treasury health and launch runway visible to every contributor.',
   'system-architect': 'Blueprints are compasses. Capture each assumption so Guardian Agents can harden it.',
   'experience-studio': 'Design the feeling first, then layer incentives. Momentum follows immersion.',
@@ -36,7 +42,7 @@ const JourneyOverviewHeader = ({ onBack }: JourneyOverviewHeaderProps) => {
     {
       label: 'Skillchain XP',
       value: userProgress.totalXP.toLocaleString(),
-      hint: `Level ${level} · ${xpToNextLevel} XP to next`,
+      hint: `Level ${level}  ${xpToNextLevel} XP to next`,
       icon: Trophy,
     },
     {
@@ -54,7 +60,7 @@ const JourneyOverviewHeader = ({ onBack }: JourneyOverviewHeaderProps) => {
       icon: Shield,
     },
     {
-      label: 'Proof-of-Skill™',
+      label: 'Proof-of-Skill',
       value: userProgress.nfts.length.toString(),
       hint: 'Collect rare artifacts',
       icon: Sparkles,

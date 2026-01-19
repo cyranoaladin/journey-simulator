@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import '@testing-library/jest-dom';
 import { TextDecoder, TextEncoder } from 'node:util';
 import { WritableStream } from 'web-streams-ponyfill';
@@ -5,14 +11,14 @@ import { Buffer } from 'node:buffer';
 import crypto from 'node:crypto';
 
 if (typeof globalThis.WritableStream === 'undefined') {
-  ;(globalThis as any).WritableStream = WritableStream
+  ; (globalThis as any).WritableStream = WritableStream
 }
 
 // Polyfill for libs requiring TextEncoder/TextDecoder (e.g., noble)
-;(globalThis as any).TextEncoder = TextEncoder
-;(globalThis as any).TextDecoder = TextDecoder as unknown as typeof globalThis.TextDecoder
+; (globalThis as any).TextEncoder = TextEncoder
+  ; (globalThis as any).TextDecoder = TextDecoder as unknown as typeof globalThis.TextDecoder
 
-;(globalThis as any).Buffer = Buffer
+  ; (globalThis as any).Buffer = Buffer
 
 Object.defineProperty(globalThis, 'crypto', {
   value: {
@@ -76,7 +82,7 @@ if (typeof BroadcastChannel === 'undefined') {
       // console.log('BroadcastChannelMock: closed');
     }
   }
-  ;(globalThis as any).BroadcastChannel = BroadcastChannelMock
+  ; (globalThis as any).BroadcastChannel = BroadcastChannelMock
 }
 
 // Ensure tests use in-memory state store and demo fallbacks by default
@@ -86,14 +92,31 @@ process.env.KILL_SWITCH = '0'
 // Ensure MINTER_SECRET_KEY is unset by default in tests
 if (process.env.MINTER_SECRET_KEY) delete process.env.MINTER_SECRET_KEY
 
-// Mock Solana tools to avoid network during tests
-jest.mock('agents/tools/solana', () => ({
-  simulateTx: jest.fn(async () => ({
-    ok: true,
-    estFeeLamports: 5000,
-    riskScore: 0.12,
-    network: 'devnet',
-    txB64: 'AQID',
-  })),
-  executeReward: jest.fn(async () => ({ txSig: 'test-devnet-txsig' })),
-}))
+// Mock fetch to avoid "Property fetch does not exist"
+if (typeof globalThis.fetch === 'undefined') {
+  globalThis.fetch = jest.fn(() =>
+    Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({}),
+    } as any)
+  ) as any
+}
+// Mock NextResponse for all tests to avoid edge-runtime issues with getSetCookie
+jest.mock('next/server', () => {
+  const actual = jest.requireActual('next/server')
+  return {
+    ...actual,
+    NextResponse: {
+      ...actual.NextResponse,
+      json: (body: any, init?: any) => {
+        return new Response(JSON.stringify(body), {
+          status: init?.status || 200,
+          headers: {
+            'Content-Type': 'application/json',
+            ...(init?.headers || {}),
+          },
+        })
+      },
+    },
+  }
+})

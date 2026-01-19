@@ -49,3 +49,44 @@ journey-simulator/public/images/coming_soon.png
 # Prisma artifacts
 prisma/dev.db
 prisma/*.db
+
+# --- MFAI hygiene ---
+.env
+.env.*
+*.log
+*.pid
+*.trace
+*.zip
+*.tar
+*.gz
+.DS_Store
+Thumbs.db
+
+# Node / build
+node_modules/
+dist/
+build/
+coverage/
+.nyc_output/
+.cache/
+.turbo/
+
+# Playwright
+playwright-report/
+test-results/
+blob-report/
+**/test-results/
+**/playwright-report/
+
+# Local reporting (NEVER VERSIONED)
+qa-report.md
+task.md
+**/qa-report.md
+**/task.md
+
+# Any report snapshots / tails / heads (common patterns)
+**/*qa_report*
+**/*task_*
+**/*phase*_execution*.log
+**/*files_list*.log
+**/*sha256*.txt

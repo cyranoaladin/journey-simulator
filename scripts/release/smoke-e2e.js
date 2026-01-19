@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 #!/usr/bin/env node
 /* Smoke E2E API/UI (headless) */
 // CSRF parity applied to mirror app behavior.

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState, type FC } from "react";
 import { useNavigate } from "react-router-dom";
@@ -37,7 +43,7 @@ const JourneysPage: FC = () => {
         bullets: [
           "Design studio for strategy, token economics, and governance stress tests",
           "Real-time AI pair for code reviews, prompt engineering, and architectural simulations",
-          "Cognitive activator that adapts missions based on Proof-of-Skill™ signals",
+          "Cognitive activator that adapts missions based on Proof-of-Skill signals",
         ],
       },
       {
@@ -145,7 +151,7 @@ const JourneysPage: FC = () => {
                 disabled={isLoading}
                 className="ml-4 px-4 py-2 rounded-lg bg-red-600/20 hover:bg-red-700/20 border border-red-500/30 text-red-300 disabled:opacity-50 text-sm self-start"
               >
-                {isLoading ? 'Refreshing...' : '🔄 Refresh'}
+                {isLoading ? 'Refreshing...' : ' Refresh'}
               </button>
             </div>
           )}
@@ -168,7 +174,7 @@ const JourneysPage: FC = () => {
               <p className="text-xl opacity-80 max-w-4xl mx-auto mb-8 leading-relaxed">
                 Discover how the{" "}
                 <span className="font-semibold text-accent-cyan">
-                  Cognitive Activation Protocol™
+                  Cognitive Activation Protocol
                 </span>{" "}
                 transforms your skills into capital based on your unique profile
               </p>
@@ -273,7 +279,7 @@ const JourneysPage: FC = () => {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-accent-gold/20 rounded-full -translate-y-16 translate-x-16" />
                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent-cyan/20 rounded-full translate-y-12 -translate-x-12" />
                 <div className="relative">
-                  <div className="text-8xl mb-6">🎉</div>
+                  <div className="text-8xl mb-6"></div>
                   <h3 className="text-4xl font-space font-bold mb-4 gradient-text">
                     Journey Completed!
                   </h3>

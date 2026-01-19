@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useEffect, useMemo, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Compass, Cpu, Gauge, Home, Layers, LifeBuoy, Network, Rocket, Book, LogOut, X } from 'lucide-react';
@@ -6,6 +12,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import clsx from 'clsx';
 import { logger } from '../../utils/logger';
 import { shallow } from 'zustand/shallow';
+import Odometer from '../Shared/Odometer';
 
 type SidebarProps = {
   variant?: 'docked' | 'overlay';
@@ -131,11 +138,11 @@ const Sidebar = ({ variant = 'docked', onClose }: SidebarProps) => {
               className="mfai-progress"
               max={100}
               value={progressValue}
-              aria-label="Progression du parcours"
+              aria-label="Journey Progress"
               aria-valuetext={`${completion.completed} sur ${completion.total || 0} phases`}
             />
             <p className="text-[11px] text-indigo-200/80">
-              {completion.completed}/{completion.total || '—'} phases completed
+              {completion.completed}/{completion.total || ''} phases completed
             </p>
           </div>
 
@@ -146,7 +153,9 @@ const Sidebar = ({ variant = 'docked', onClose }: SidebarProps) => {
                 className="rounded-2xl border border-indigo-500/20 bg-indigo-500/10 px-4 py-3 text-indigo-100"
               >
                 <p className="text-[11px] uppercase tracking-[0.3em] text-indigo-200/70">{metric.label}</p>
-                <p className="mt-1 font-mono text-lg">{metric.value.toLocaleString()}</p>
+                <p className="mt-1 font-mono text-lg">
+                  <Odometer value={metric.value} />
+                </p>
               </li>
             ))}
           </ul>

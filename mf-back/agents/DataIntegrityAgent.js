@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 class DataIntegrityAgent {
   constructor() {
     this.id = 'DataIntegrityAgent';
@@ -48,7 +54,7 @@ class DataIntegrityAgent {
         details,
         findings,
         confidence,
-        assumptions: hasInput ? [] : ['Entrée partielle, contrôles à affiner'],
+        assumptions: hasInput ? [] : ['Partial input, controls to be refined'],
         actions,
         citations: [],
         metrics: { latencyMs: Date.now() - started },

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 // Tests run stateless bearer flows with CSRF parity middleware.
 const express = require('express');
 const request = require('supertest');
@@ -11,7 +17,7 @@ process.env.VSLICE_TEST_STUB = 'true';
 const buildApp = () => {
   const app = express();
   app.use(express.json());
-  // CSRF désactivé pour isolation test
+  // CSRF desactive pour isolation test
   // app.use(csrfGuard);
   app.use('/orchestration', orchestrationRouter);
   return app;

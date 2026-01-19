@@ -1,8 +1,14 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Award, Lock, CheckCircle, ExternalLink, Download, Share2, Sparkles } from 'lucide-react';
 import { useJourneyStore } from '../store/journeyStore';
-import { Certification } from '../types/journey';
+import { Certificate } from '../types/journey';
 import { getProofType, getPersonaProofData } from '../data/proofsData';
 import NFTProofModal from './NFTProofModal';
 import { getPersonaStyle } from '../utils/personaStyles';
@@ -43,7 +49,7 @@ const getIconContainerClass = (isLocked: boolean, gradient: string) => {
 
 const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ className = '' }) => {
   const { userProgress, selectedPersona } = useJourneyStore();
-  const [selectedCertification, setSelectedCertification] = useState<Certification | null>(null);
+  const [selectedCertificate, setSelectedCertificate] = useState<Certificate | null>(null);
   const [showProofModal, setShowProofModal] = useState(false);
   const [hoveredCertId, setHoveredCertId] = useState<string | null>(null);
 
@@ -54,7 +60,7 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
     if (!selectedPersona) return [];
 
     const personaId = selectedPersona.id;
-    const certifications: Certification[] = [];
+    const certificates: Certificate[] = [];
 
     selectedPersona.phases.forEach((phase, index) => {
       if (!phase.nftReward) return;
@@ -70,7 +76,7 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
         phaseNumber
       );
 
-      const baseCertification: Certification = {
+      const baseCertificate: Certificate = {
         id: `${personaId}-${phase.id}`,
         name: proofData.name,
         description: proofData.description,
@@ -81,19 +87,19 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
       };
 
       if (userProgress.completedPhases.includes(index)) {
-        certifications.push({
-          ...baseCertification,
+        certificates.push({
+          ...baseCertificate,
           earnedAt: new Date(),
         });
         return;
       }
 
-      certifications.push({
-        ...baseCertification,
+      certificates.push({
+        ...baseCertificate,
         id: `${personaId}-${phase.id}-locked`,
-        description: `Complete the ${phase.title} phase to unlock this certification.`,
+        description: `Complete the ${phase.title} phase to unlock this certificate.`,
         attributes: [
-          { trait_type: 'Proof Type', value: `Proof-of-${proofType}™` },
+          { trait_type: 'Proof Type', value: `Proof-of-${proofType}` },
           { trait_type: 'XP Reward', value: phase.xpReward },
           { trait_type: 'Phase', value: phase.title },
           { trait_type: 'Status', value: 'Locked' },
@@ -101,15 +107,15 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
       });
     });
 
-    return certifications;
+    return certificates;
   };
 
-  const certifications = getCertifications();
+  const certificates = getCertifications();
 
-  const handleCertificationClick = (certification: Certification) => {
-    if (certification.id.includes('locked')) return;
-    
-    setSelectedCertification(certification);
+  const handleCertificateClick = (certificate: Certificate) => {
+    if (certificate.id.includes('locked')) return;
+
+    setSelectedCertificate(certificate);
     setShowProofModal(true);
   };
 
@@ -123,22 +129,22 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
           <Award className="mr-2 text-accent-gold" size={20} />
           Proof Certifications
         </h3>
-        <span className="text-sm opacity-70">{userProgress.nfts.length} / {certifications.length}</span>
+        <span className="text-sm opacity-70">{userProgress.nfts.length} / {certificates.length}</span>
       </div>
 
-      {certifications.length === 0 ? (
+      {certificates.length === 0 ? (
         <div className="text-center py-8 bg-white/5 rounded-xl border border-white/10">
           <Award className="mx-auto mb-3 opacity-50" size={32} />
-          <p className="text-lg opacity-80">No certifications yet</p>
-          <p className="text-sm opacity-60">Complete journey phases to earn Proof-of-Skill™ NFTs</p>
+          <p className="text-lg opacity-80">No certificates yet</p>
+          <p className="text-sm opacity-60">Complete journey phases to earn Proof-of-Skill NFTs</p>
         </div>
       ) : (
         <div className="space-y-3">
-          {certifications.map((certification, index) => {
-            const isLocked = certification.id.includes('locked');
-            const isClaimed = userProgress.nfts.includes(certification.name);
-            const proofType = getProofType(selectedPersona?.id || '', certification.phaseId || certification.id);
-            const isHovered = hoveredCertId === certification.id;
+          {certificates.map((certificate, index) => {
+            const isLocked = certificate.id.includes('locked');
+            const isClaimed = userProgress.nfts.includes(certificate.name);
+            const proofType = getProofType(selectedPersona?.id || '', certificate.phaseId || certificate.id);
+            const isHovered = hoveredCertId === certificate.id;
             const borderClass = getBorderClass(isLocked, isClaimed);
             const statusMeta = getStatusMeta(isLocked, isClaimed);
 
@@ -150,11 +156,11 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
                   </div>
                 );
               }
-              if (certification.imageUrl) {
+              if (certificate.imageUrl) {
                 return (
                   <img
-                    src={certification.imageUrl}
-                    alt={certification.name}
+                    src={certificate.imageUrl}
+                    alt={certificate.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
@@ -170,17 +176,17 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
                 </div>
               );
             };
-            
+
             return (
               <motion.div
-                key={certification.id}
+                key={certificate.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ scale: isLocked ? 1 : 1.02 }}
                 whileTap={{ scale: isLocked ? 1 : 0.98 }}
-                onClick={() => !isLocked && handleCertificationClick(certification)}
-                onHoverStart={() => setHoveredCertId(certification.id)}
+                onClick={() => !isLocked && handleCertificateClick(certificate)}
+                onHoverStart={() => setHoveredCertId(certificate.id)}
                 onHoverEnd={() => setHoveredCertId(null)}
                 className={`relative overflow-hidden rounded-lg border ${borderClass} bg-white/5 p-3 cursor-pointer transition-all`}
               >
@@ -189,21 +195,21 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
                   <div className={`w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 ${getIconContainerClass(isLocked, personaStyle.bgGradient)}`}>
                     {renderVisual()}
                   </div>
-                  
+
                   {/* NFT Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
                       <h4 className={`font-semibold text-sm truncate ${isLocked ? 'opacity-50' : ''}`}>
-                        {certification.name}
+                        {certificate.name}
                       </h4>
-                      <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${getRarityColor(certification.rarity)}`}>
-                        {certification.rarity}
+                      <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${getRarityColor(certificate.rarity)}`}>
+                        {certificate.rarity}
                       </span>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <span className={`text-xs ${isLocked ? 'opacity-50' : 'opacity-80'}`}>
-                        Proof-of-{proofType}™
+                        Proof-of-{proofType}
                       </span>
                       <span className={`text-xs flex items-center ${statusMeta.className}`}>
                         {statusMeta.icon}
@@ -212,21 +218,21 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Hover Card - Additional Details */}
                 <AnimatePresence>
                   {isHovered && !isLocked && (
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 20 }}
                       className="absolute inset-0 bg-gradient-to-br from-black/80 to-black/60 backdrop-blur-sm p-3 flex flex-col justify-between"
                     >
                       <div>
-                        <h4 className="font-semibold text-sm text-white mb-1">{certification.name}</h4>
-                        <p className="text-xs text-white/80 line-clamp-2">{certification.description}</p>
+                        <h4 className="font-semibold text-sm text-white mb-1">{certificate.name}</h4>
+                        <p className="text-xs text-white/80 line-clamp-2">{certificate.description}</p>
                       </div>
-                      
+
                       <div className="grid grid-cols-3 gap-2 mt-2">
                         <button className="p-1 bg-white/10 hover:bg-white/20 rounded text-xs text-white flex items-center justify-center">
                           <Download size={10} className="mr-1" />
@@ -244,7 +250,7 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
                     </motion.div>
                   )}
                 </AnimatePresence>
-                
+
                 {/* Hover Overlay */}
                 <div className="absolute inset-0 bg-gradient-primary opacity-0 hover:opacity-10 transition-opacity duration-300" />
               </motion.div>
@@ -255,12 +261,12 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
 
       {/* NFT Proof Modal */}
       <AnimatePresence>
-        {showProofModal && selectedCertification && (
+        {showProofModal && selectedCertificate && (
           (() => {
-            const proofType = getProofType(selectedPersona?.id || '', selectedCertification.phaseId || selectedCertification.id)
-            const xpAttribute = selectedCertification.attributes.find((a) => a.trait_type === 'XP Earned')
-            const phaseAttribute = selectedCertification.attributes.find((a) => a.trait_type === 'Phase')
-            const completionAttr = selectedCertification.attributes.find((a) => a.trait_type === 'Completion Date')
+            const proofType = getProofType(selectedPersona?.id || '', selectedCertificate.phaseId || selectedCertificate.id)
+            const xpAttribute = selectedCertificate.attributes.find((a) => a.trait_type === 'XP Earned')
+            const phaseAttribute = selectedCertificate.attributes.find((a) => a.trait_type === 'Phase')
+            const completionAttr = selectedCertificate.attributes.find((a) => a.trait_type === 'Completion Date')
 
             const xpValue = typeof xpAttribute?.value === 'number'
               ? xpAttribute.value
@@ -275,8 +281,8 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
               : new Date().toLocaleDateString()
 
             const phaseNumber = (() => {
-              if (selectedPersona && selectedCertification.phaseId) {
-                const index = selectedPersona.phases.findIndex((phase) => phase.id === selectedCertification.phaseId)
+              if (selectedPersona && selectedCertificate.phaseId) {
+                const index = selectedPersona.phases.findIndex((phase) => phase.id === selectedCertificate.phaseId)
                 if (index !== -1) {
                   return index + 1
                 }
@@ -285,20 +291,20 @@ const ProofCertificationsBoard: React.FC<ProofCertificationsProps> = ({ classNam
             })()
 
             return (
-          <NFTProofModal
-            personaId={selectedPersona?.id}
-            phaseId={selectedCertification.phaseId}
-            proofType={proofType}
-            title={selectedCertification.name}
-            description={selectedCertification.description}
-            imageUrl={selectedCertification.imageUrl}
-            xpEarned={xpValue}
-            phase={phaseValue}
-            phaseNumber={phaseNumber}
-            completionDate={completionValue}
-            rarity={selectedCertification.rarity}
-            onClose={() => setShowProofModal(false)}
-          />
+              <NFTProofModal
+                personaId={selectedPersona?.id}
+                phaseId={selectedCertificate.phaseId}
+                proofType={proofType}
+                title={selectedCertificate.name}
+                description={selectedCertificate.description}
+                imageUrl={selectedCertificate.imageUrl}
+                xpEarned={xpValue}
+                phase={phaseValue}
+                phaseNumber={phaseNumber}
+                completionDate={completionValue}
+                rarity={selectedCertificate.rarity}
+                onClose={() => setShowProofModal(false)}
+              />
             )
           })()
         )}

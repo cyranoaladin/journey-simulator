@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { ArrowLeft, CheckCircle2, ChevronRight, LayoutGrid, Maximize2, Minimize2, PanelLeft, PanelRight, Target } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -130,8 +136,12 @@ interface JourneySimulationModeProps {
     onBack?: () => void;
 }
 
+import LiveCommunicationThread from './LiveCommunicationThread';
+
 const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
     const navigate = useNavigate();
+    const apiJourneyId = useJourneyStore((state) => state.apiJourneyId);
+
     const {
         selectedPersona,
         userProgress,
@@ -139,6 +149,7 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
         lastStep,
         isStepLoading,
         runInteractiveStep,
+        loadUserProgress,
         setCurrentPhase,
         completePhase,
         ensureApiJourneyId,
@@ -154,6 +165,7 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
             lastStep: state.lastStep,
             isStepLoading: state.isStepLoading,
             runInteractiveStep: state.runInteractiveStep,
+            loadUserProgress: state.loadUserProgress,
             setCurrentPhase: state.setCurrentPhase,
             completePhase: state.completePhase,
             ensureApiJourneyId: state.ensureApiJourneyId,
@@ -169,6 +181,31 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
     const [currentTask, setCurrentTask] = useState({ agent: '', task: '' });
     const [viewingArtifact, setViewingArtifact] = useState<any>(null);
     const [selectedArtifactKey, setSelectedArtifactKey] = useState<string | null>(null);
+    const [interactionHistory, setInteractionHistory] = useState<any[]>([]);
+
+    useEffect(() => {
+        // Load history on mount
+        const fetchHistory = async () => {
+            try {
+                const res = await api.getInteractionHistory();
+                if (res.success && Array.isArray(res.history)) {
+                    // Map backend history format to frontend format
+                    const formatted = res.history.map((h: any) => ({
+                        role: h.role === 'agent' ? 'assistant' : h.role,
+                        content: h.message,
+                        agentName: h.agentName,
+                        timestamp: h.timestamp,
+                        isResource: h.context?.isResource,
+                        resourceType: h.context?.resourceType
+                    }));
+                    setInteractionHistory(formatted);
+                }
+            } catch (e) {
+                console.error("Failed to load history", e);
+            }
+        };
+        fetchHistory();
+    }, []);
 
     const { artifacts } = useArtifacts({
         fallbackToStatic: false,
@@ -227,13 +264,56 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
         if (!activePhase) return;
         if (!selectedPersona) return;
 
-        const overlayStart = showNeuralOverlay(`Generating ${safeActivePhase.title}…`);
+        const overlayStart = showNeuralOverlay(`Generating ${safeActivePhase.title}`);
         try {
-            await runInteractiveStep({
+            const stepResult = await runInteractiveStep({
                 phaseId: safeActivePhase.id,
                 trackId: selectedPersona.id,
                 userInput: '',
             });
+
+            // UX-OPTIMIZER: Optimistic History Update (Fixes Communication Blackout)
+            if (stepResult?.agent_actions && Array.isArray(stepResult.agent_actions)) {
+                const newMessages = stepResult.agent_actions.map((action: any) => ({
+                    role: 'assistant',
+                    content: action.message || action.payload?.message || "Processing...",
+                    agentName: action.agentName || "Zyno Agent",
+                    timestamp: new Date().toISOString(),
+                    isResource: false // simplistic
+                }));
+                // Append only if not empty to avoid flicker
+                if (newMessages.length > 0) {
+                    setInteractionHistory(prev => [...prev, ...newMessages]);
+                }
+            }
+
+            // Force refresh to hydrate dashboard with new persisted runs
+            await loadUserProgress(true);
+
+            // Refresh history (Corrective Sync)
+            const res = await api.getInteractionHistory();
+            if (res.success && Array.isArray(res.history)) {
+                // ... mapped code ...
+                const formatted = res.history.map((h: any) => ({
+                    role: h.role === 'agent' ? 'assistant' : h.role,
+                    content: h.message,
+                    agentName: h.agentName,
+                    timestamp: h.timestamp,
+                    isResource: h.context?.isResource,
+                    resourceType: h.context?.resourceType
+                }));
+
+                // ONLY update if we got more messages, or replace to be safe. 
+                // Replacing is fine as backend is source of truth.
+                setInteractionHistory(formatted);
+
+                // Check for new resource to trigger animation
+                const lastMsg = formatted[formatted.length - 1];
+                if (lastMsg?.isResource) {
+                    toast.success(lastMsg.content); // Simple trigger for now
+                }
+            }
+
         } finally {
             await hideNeuralOverlay(overlayStart);
         }
@@ -294,7 +374,7 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
                 language: 'en',
                 mode: uiMode,
                 tone: uiTone,
-                title: `${safeActivePhase.title} — Interaction`,
+                title: `${safeActivePhase.title}  Interaction`,
                 summary: safeActivePhase.mission || safeActivePhase.description,
             },
             ui_blocks: blocks,
@@ -319,9 +399,9 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
 
     // Debug logging
     console.log('JourneySimulationMode Render:', {
-        accessToken: tokenStore.getAccessToken(),
+        hasAccessToken: !!tokenStore.getAccessToken(),
         selectedPersona: selectedPersona?.id,
-        activePhase
+        activePhase,
     });
 
     if (!selectedPersona) {
@@ -381,6 +461,14 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
                     </span>
                     <h1 className="text-sm font-bold uppercase tracking-wider text-white">{safeActivePhase.title}</h1>
                 </div>
+                {/* Odometer / Balance Display */}
+                <div className="mt-1 flex items-center gap-4 text-xs font-mono text-accent-cyan/80">
+                    <div className="flex items-center gap-1.5 bg-black/40 px-3 py-1 rounded-full border border-white/5">
+                        <span className="w-2 h-2 rounded-full bg-accent-cyan animate-pulse shadow-[0_0_8px_currentColor]" />
+                        <span className="font-bold text-white text-sm">{userProgress.mfaiTokens.toLocaleString()}</span>
+                        <span className="opacity-70">$MFAI</span>
+                    </div>
+                </div>
             </div>
             <div className="flex items-center gap-3">
                 <button
@@ -434,62 +522,80 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
             {showLaunchPhase ? (
                 <LaunchCollaterizePhase onComplete={handleCompletePhase} />
             ) : (
-                <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/10 to-white/5 p-1 shadow-2xl backdrop-blur-2xl">
-                    <div className="flex items-center justify-between border-b border-white/10 bg-white/5 px-6 py-4">
-                        <div className="flex items-center gap-3">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-accent-purple to-blue-600 text-white shadow-lg">
-                                <Target size={16} />
-                            </div>
-                            <h2 className="text-sm font-bold uppercase tracking-wider text-white">
-                                Mission Workspace
-                                {' '}
-                                <span className="hidden sm:inline ml-2 text-[10px] text-white/40 font-normal normal-case tracking-normal border-l border-white/10 pl-2">
-                                    {safeActivePhase.mission ? 'Execute objectives & Validation' : 'View details'}
-                                </span>
-                            </h2>
-                        </div>
-                        {!isPhaseCompleted && (
-                            <div className="flex gap-2">
-                                {primaryNextAction && (
-                                    <button
-                                        data-testid="primary-action-button"
-                                        onClick={() => handleNextActionClick(primaryNextAction.type, primaryNextAction.id)}
-                                        className="flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/20"
-                                    >
-                                        {primaryNextAction.label}
-                                    </button>
-                                )}
-                                <button
-                                    data-testid="complete-phase-button"
-                                    onClick={handleCompletePhase}
-                                    className="flex items-center gap-2 rounded-lg bg-accent-cyan px-3 py-1.5 text-xs font-bold text-black shadow-lg shadow-cyan-500/20 hover:bg-accent-cyan/90 transition-all"
-                                >
-                                    <CheckCircle2 size={14} />
-                                    {getCompletionCtaLabel()}
-                                </button>
-                            </div>
-                        )}
+                <div className="flex flex-col gap-6">
+                    {/* LIVE COMMUNICATION THREAD (Top) */}
+                    <div className="h-[400px]">
+                        <LiveCommunicationThread
+                            messages={interactionHistory}
+                            isTyping={isThinking}
+                            typingAgent={currentTask.agent}
+                            className="h-full shadow-2xl"
+                        />
                     </div>
-                    <div className="max-h-[800px] overflow-y-auto bg-black/20 p-6 md:p-8">
-                        <UIBlocksRenderer response={interactionResponse} />
+
+                    {/* MISSION WORKSPACE (Bottom) */}
+                    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/10 to-white/5 p-1 shadow-2xl backdrop-blur-2xl">
+                        <div className="flex items-center justify-between border-b border-white/10 bg-white/5 px-6 py-4">
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-accent-purple to-blue-600 text-white shadow-lg">
+                                    <Target size={16} />
+                                </div>
+                                <h2 className="text-sm font-bold uppercase tracking-wider text-white">
+                                    Mission Workspace
+                                    {' '}
+                                    <span className="hidden sm:inline ml-2 text-[10px] text-white/40 font-normal normal-case tracking-normal border-l border-white/10 pl-2">
+                                        {safeActivePhase.mission ? 'Execute objectives & Validation' : 'View details'}
+                                    </span>
+                                </h2>
+                            </div>
+                            {!isPhaseCompleted && (
+                                <div className="flex gap-2">
+                                    {primaryNextAction && (
+                                        <button
+                                            data-testid="primary-action-button"
+                                            onClick={() => handleNextActionClick(primaryNextAction.type, primaryNextAction.id)}
+                                            className="flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/20"
+                                        >
+                                            {primaryNextAction.label}
+                                        </button>
+                                    )}
+                                    <button
+                                        data-testid="complete-phase-button"
+                                        onClick={handleCompletePhase}
+                                        className="flex items-center gap-2 rounded-lg bg-accent-cyan px-3 py-1.5 text-xs font-bold text-black shadow-lg shadow-cyan-500/20 hover:bg-accent-cyan/90 transition-all"
+                                    >
+                                        <CheckCircle2 size={14} />
+                                        {getCompletionCtaLabel()}
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                        <div className="max-h-[600px] overflow-y-auto bg-black/20 p-6 md:p-8">
+                            <UIBlocksRenderer response={interactionResponse} />
+                        </div>
                     </div>
                 </div>
             )}
         </section>
     );
 
-    const renderRightPanel = () =>
-        showRightPanel ? (
+    const renderRightPanel = () => {
+        const storedId = apiJourneyId || ensureApiJourneyId();
+        const activeJourneyId = /^[0-9a-fA-F]{24}$/.test(storedId) ? storedId : ensureApiJourneyId();
+        console.log('[JourneySimulationMode] Current activeJourneyId:', activeJourneyId);
+
+        return showRightPanel ? (
             <aside className="sticky top-24 h-[calc(100vh-8rem)] space-y-4 overflow-y-auto rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl">
                 <JourneyNextActionsPanel
                     personaId={selectedPersona.id}
                     currentStepId={activePhase.id}
-                    journeyId={ensureApiJourneyId()}
+                    journeyId={activeJourneyId}
                     onActionClick={handleNextActionClick}
                 />
                 <ZynoSignalSidebar className="w-full" />
             </aside>
         ) : null;
+    };
 
     const renderMain = () => (
         <main className={`relative mx-auto max-w-[1920px] transition-all duration-300 ${focusMode ? 'px-0' : 'px-4 lg:px-8'}`}>
@@ -515,7 +621,7 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
             personaId: selectedPersona.id,
             phaseId: activePhase.id,
             proofType,
-            title: activePhase.nftReward || proofData.name || `Proof-of-${proofType}™`,
+            title: activePhase.nftReward || proofData.name || `Proof-of-${proofType}`,
             description: proofData.description || `Successfully completed the ${activePhase.title} phase.`,
             imageUrl: proofData.imageUrl,
             xpEarned: activePhase.xpReward,

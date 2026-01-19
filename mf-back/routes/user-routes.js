@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/user-controller');
@@ -39,5 +45,9 @@ router.put('/subscription/:id', protect, adminOnly, userController.subscription)
 /* Token and progress routes */
 router.put('/tokens', protect, userController.updateTokenBalance);
 router.post('/nft-certificates', protect, userController.addNFTCertificate);
+
+/* Neural Handshake (Phase 5) */
+router.get('/neural-handshake', protect, userController.getNeuralHandshakeStatus);
+router.post('/neural-handshake/sync', protect, userController.syncNeuralHandshake);
 
 module.exports = router;

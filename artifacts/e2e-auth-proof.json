@@ -1,0 +1,17 @@
+{
+  "project": "journey-simulator",
+  "projects": [
+    "chromium",
+    "firefox"
+  ],
+  "createdAt": "2026-01-19T06:19:35.165Z",
+  "timestamp": "2026-01-19T06:19:35.165Z",
+  "backendBaseUrl": "http://127.0.0.1:3002",
+  "backendLoginEndpoint": "http://127.0.0.1:3002/auth/login",
+  "authStatePath": "journey-simulator/test-results/.auth/user.json",
+  "exists": true,
+  "authStateExists": true,
+  "runModeGuard": "real",
+  "auth_ok": true,
+  "user_handle": "hash:37102d41c1ea"
+}

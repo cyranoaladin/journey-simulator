@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 jest.mock('../utils/agent-idempotence', () => ({
   findOrCreateAgentRun: jest.fn().mockResolvedValue({ run: null, isNew: true }),
   generateIdempotencyKey: jest.fn().mockReturnValue('idempo'),

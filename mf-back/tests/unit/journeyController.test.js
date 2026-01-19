@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const journeyController = require('../../controllers/journey-controller');
 const User = require('../../models/user');
 const Journey = require('../../models/Journeys');
@@ -29,6 +35,7 @@ describe('Journey Controller', () => {
             const mockUser = {
                 completed_phases: 1,
                 nft_certificates: [{ phase_number: 1 }],
+                token_transactions: { mfai_tokens: 100 },
                 select: jest.fn().mockReturnThis() // Handle .select('-password')
             };
             // Since controller calls .select('-password') after findByIdAndUpdate

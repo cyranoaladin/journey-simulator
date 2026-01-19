@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Twitter as XIcon, Linkedin, MessageSquare, Copy, CheckCircle } from 'lucide-react';
@@ -17,7 +23,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
 
-  const shareText = `I just earned my Proof-of-${proofType}™ NFT "${title}" on Money Factory AI! #MoneyFactoryAI #ProofEconomy`;
+  const shareText = `I just earned my Proof-of-${proofType} NFT "${title}" on Money Factory AI! #MoneyFactoryAI #ProofEconomy`;
   const shareUrl = explorerUrl || 'https://moneyfactory.ai';
 
   const shareToX = () => {

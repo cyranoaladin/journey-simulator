@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 
 import {
   createContext,
@@ -205,7 +211,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         logger.warn("Unable to clear userId on logout", storageError);
       }
       await resetProgress();
-      navigate("/login");
+      navigate("/auth/login");
     }
   }, [navigate, resetProgress]);
 

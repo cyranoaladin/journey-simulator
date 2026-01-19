@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -36,11 +42,15 @@ export const WorkspaceLayoutProvider = ({ children }: { children: ReactNode }) =
 
     const isDesktop = typeof window !== 'undefined' ? window.matchMedia('(min-width: 1280px)').matches : true;
 
-    if (path.startsWith('/journeys')) {
+    if (path === '/journeys') {
       setFocusMode(false);
       setLeftPanelOpen(false);
       setRightPanelOpen(false);
       setDensity('comfortable');
+    } else if (path.startsWith('/journeys/')) {
+      setFocusMode(false);
+      setLeftPanelOpen(isDesktop);
+      setRightPanelOpen(false);
     } else {
       setFocusMode(false);
       setLeftPanelOpen(isDesktop);

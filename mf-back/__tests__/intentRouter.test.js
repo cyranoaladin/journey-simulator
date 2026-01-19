@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const { normalizeIntents, selectAgentsForIntents, routeIntent } = require('../orchestration/intentRouter');
 
 describe('Intent Router', () => {
@@ -43,9 +49,11 @@ describe('Intent Router', () => {
   });
 
   it('ignores disabled agents and falls back gracefully', () => {
+    process.env.AGENT_RISKFRAUDAGENT_ENABLED = 'false';
     const res = routeIntent({ intent: 'risk.fraud' });
     expect(res.selectedAgents.every((a) => a.agentId !== 'RiskFraudAgent')).toBe(true);
     expect(res.selectedAgents.some((a) => a.agentId === 'ProductSpecAgent')).toBe(true);
+    delete process.env.AGENT_RISKFRAUDAGENT_ENABLED;
   });
 
   it('normalizeIntents splits strings and trims', () => {

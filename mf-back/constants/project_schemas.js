@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const numberLikeToFloat = (value) => {
   if (value === null || value === undefined) return null;
   const normalized = String(value).replace(/[^0-9.,-]/g, '').replace(/[\s,]+/g, '');

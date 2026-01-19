@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 'use strict';
 
 const fs = require('node:fs');
@@ -36,10 +42,15 @@ describe('Demo mission orchestration', () => {
 
     expect(result.intent).toBe(missionFixture.expectedIntent);
     expect(result.mode).toBe(missionFixture.expectedMode);
-    expect(result.executedAgents).toEqual(expect.arrayContaining(missionFixture.expectedAgents));
-    expect(Object.keys(result.results)).toEqual(
-      expect.arrayContaining(missionFixture.expectedAgents)
-    );
+    expect(result.executedAgents).toBeDefined();
+    missionFixture.expectedAgents.forEach(agent => {
+      expect(result.executedAgents).toContain(agent);
+    });
+
+    expect(result.results).toBeDefined();
+    missionFixture.expectedAgents.forEach(agent => {
+      expect(Object.keys(result.results)).toContain(agent);
+    });
 
     expect(result.timeline.length).toBeGreaterThan(0);
     const timelineAgents = result.timeline.map((entry) => entry.agent);

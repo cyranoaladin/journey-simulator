@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const axios = require('axios');
 
 async function simulateCollaterizeLaunch(params) {
@@ -8,7 +14,7 @@ async function simulateCollaterizeLaunch(params) {
             timeout: 10000, // Augmenter le timeout
             headers: {
                 'Content-Type': 'application/json',
-                // 'x-internal-api-key': process.env.INTERNAL_API_KEY_MFBACK // Décommenter si auth est requise
+                // 'x-internal-api-key': process.env.INTERNAL_API_KEY_MFBACK // Uncomment if auth is required
             }
         });
 

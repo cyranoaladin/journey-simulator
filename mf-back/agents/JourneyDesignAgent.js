@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 class JourneyDesignAgent {
   constructor() {
     this.id = 'JourneyDesignAgent';
@@ -47,7 +53,7 @@ class JourneyDesignAgent {
         details,
         findings,
         confidence,
-        assumptions: hasInput ? [] : ['Input manquant, frictions à confirmer'],
+        assumptions: hasInput ? [] : ['Input missing, frictions to confirm'],
         actions,
         citations: [],
         metrics: { latencyMs: Date.now() - started },

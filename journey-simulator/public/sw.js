@@ -1,5 +1,11 @@
-// Service Worker désactivé pour les tests
-// Ce SW se désinstalle automatiquement
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
+// Service Worker disabled for tests
+// This SW uninstalls itself automatically
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -23,6 +29,6 @@ self.addEventListener('activate', (event) => {
 
 // Ne rien intercepter
 self.addEventListener('fetch', (event) => {
-  // Laisser passer toutes les requêtes sans intervention
+  // Pass through all requests without intervention
   return;
 });

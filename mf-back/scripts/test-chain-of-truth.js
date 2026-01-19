@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 process.env.LLM_MODEL_NAME = 'gpt-4o';
 require('dotenv').config({ path: '../.env' });
 const NFTAgent = require('../agents/NFTAgent');
@@ -10,7 +16,7 @@ async function runChainOfTruth() {
     console.log('\n[1] Executing NFTAgent to define collection...');
     const nftAgent = new NFTAgent();
 
-    const nftInput = 'Conçois une collection de 10 000 NFTs à un prix de 5 SOL. Le thème est "Cyber-Samurai".';
+    const nftInput = 'Design a collection of 10,000 NFTs at a price of 5 SOL. The theme is "Cyber-Samurai".';
 
     const nftResponse = await nftAgent.run({
         traceId: 'chain-test-nft',
@@ -31,7 +37,7 @@ async function runChainOfTruth() {
     console.log('\n[2] Executing GrowthAgent with INHERITED CONTEXT...');
     const growthAgent = new GrowthAgent();
 
-    const growthInput = 'Budget marketing total : 1000$ USD. Objectif : Sold out en 24h. Est-ce réaliste ?';
+    const growthInput = 'Total marketing budget: $1000 USD. Goal: Sold out in 24h. Is this realistic?';
 
     // SIMULATING ORCHESTRATOR PASSING CONTEXT
     const contextData = {
@@ -55,7 +61,7 @@ async function runChainOfTruth() {
 
     // LOGIC CHECK
     const summaryLower = growthResponse.summary.toLowerCase();
-    const successfulDetection = summaryLower.includes('impossible') || summaryLower.includes('unrealistic') || summaryLower.includes('not realistic') || summaryLower.includes('irréalisable');
+    const successfulDetection = summaryLower.includes('impossible') || summaryLower.includes('unrealistic') || summaryLower.includes('not realistic');
 
     if (successfulDetection) {
         console.log('\n✅ TEST PASSED: GrowthAgent correctly identified the budget discrepancy (Chain of Truth respected).');

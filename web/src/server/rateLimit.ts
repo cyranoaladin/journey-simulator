@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 /* Simple in-memory rate limiter (per-process). Suitable for MVP/dev/demo only. */
 
 const buckets = new Map<string, { count: number; resetAt: number }>()

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const mongoose = require('mongoose');
 const EvaluationService = require('../services/EvaluationService');
 const Submission = require('../models/Submission');
@@ -11,7 +17,7 @@ const newId = () => new mongoose.Types.ObjectId();
 jest.setTimeout(20000);
 
 beforeAll(async () => {
-    const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/mf_back_test_s2_eval';
+    const mongoUri = 'mongodb://127.0.0.1:27018/mf_back_test_s2_eval';
     try {
         await mongoose.connect(mongoUri, {
             serverSelectionTimeoutMS: 10000,

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const { LLMClient } = require('../orchestration/llmClient');
 
 class GuideAgent {
@@ -16,7 +22,7 @@ class GuideAgent {
 
     const tone = isCollaborative
       ? 'Thought Partner, chaleureux, fait des ponts entre agents et explique avec analogies (graphes, files, logique).'
-      : 'Pédagogue, précis, oriente avec des métaphores de logique et de graphes (chemin le plus court, preuve par cas).';
+      : 'Pedagogical, precise, guides with logic and graph metaphors (shortest path, proof by case).';
 
     return {
       system: [
@@ -24,8 +30,8 @@ class GuideAgent {
         '**EXPERTISE**: Navigation de plateforme, explication des phases, vulgarisation par analogies (graphes, invariants, logique).',
         '**WORKFLOW**:',
         '1. Welcome the user and context-set based on current Phase.',
-        '2. Expliquer les actions/agents disponibles avec métaphores (ex: file d’attente pour la pipeline, graphe pour les dépendances).',
-        '3. Débloquer les questions simples sans noyer sous les détails, tout en restant techniquement correct.',
+        '2. Explain available actions/agents with metaphors (e.g., pipeline queue, dependency graph).',
+        '3. Unblock simple questions without overwhelming details, while remaining technically correct.',
         '',
         `**TONE**: ${tone}`,
         '**OUTPUT FORMAT**: STRICT JSON: {',

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Wallet, Zap, CheckCircle, ExternalLink, Download, Share2, Award } from 'lucide-react';
@@ -5,7 +11,7 @@ import { Wallet, Zap, CheckCircle, ExternalLink, Download, Share2, Award } from 
 const NFTMintingTutorial: React.FC = () => {
   return (
     <div className="p-4 bg-blue-500/20 border border-blue-500/30 rounded-lg">
-      <h3 className="text-lg font-semibold text-blue-400 mb-3">How to Mint Your Proof-of-Skill™ NFT</h3>
+      <h3 className="text-lg font-semibold text-blue-400 mb-3">How to Mint Your Proof-of-Skill NFT</h3>
       
       <div className="space-y-4">
         <motion.div 
@@ -104,11 +110,11 @@ const NFTMintingTutorial: React.FC = () => {
             <span className="text-white text-xs font-bold">5</span>
           </div>
           <div>
-            <h4 className="font-semibold text-sm">View on Skillchain Card™</h4>
-            <p className="text-sm opacity-80 mb-2">Your NFT is now part of your Skillchain Card™ collection.</p>
+            <h4 className="font-semibold text-sm">View on Skillchain Card</h4>
+            <p className="text-sm opacity-80 mb-2">Your NFT is now part of your Skillchain Card collection.</p>
             <div className="flex items-center space-x-2 mt-1 text-xs text-accent-gold">
               <Award size={12} />
-              <span>All your proofs are visible in your Skillchain Card™</span>
+              <span>All your proofs are visible in your Skillchain Card</span>
             </div>
           </div>
         </motion.div>

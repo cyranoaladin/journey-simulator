@@ -1,11 +1,17 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import NFTMintingModal from '../NFTMintingModal'
-import type { Certification } from '../../types/journey'
+import type { Certificate } from '../../types/journey'
 import { useJourneyStore } from '../../store/journeyStore'
 
 vi.mock('@solana/wallet-adapter-react', () => ({
-  useWallet: () => ({ publicKey: { toBase58: ()=>'F11111111111111111111111111111111111111111' } })
+  useWallet: () => ({ publicKey: { toBase58: () => 'F11111111111111111111111111111111111111111' } })
 }))
 
 vi.mock('../../utils/api', () => ({
@@ -17,29 +23,29 @@ vi.mock('../../utils/api', () => ({
 }))
 
 describe('NFTMintingModal', () => {
-  const cert: Certification = {
+  const cert: Certificate = {
     id: 'phase-1-skill',
     name: 'Skill Proof',
     description: 'Test certification',
     imageUrl: 'https://example.com/img.png',
-    attributes: [ { trait_type: 'XP Earned', value: '100' }, { trait_type: 'Phase', value: 'learn' } ]
+    attributes: [{ trait_type: 'XP Earned', value: '100' }, { trait_type: 'Phase', value: 'learn' }]
   } as any
 
   beforeEach(() => {
     // Ensure store has loadUserProgress to avoid side effects
-    useJourneyStore.setState((s:any)=>({ ...s, loadUserProgress: vi.fn(async()=>{}) }))
+    useJourneyStore.setState((s: any) => ({ ...s, loadUserProgress: vi.fn(async () => { }) }))
     window.open = vi.fn() as any
   })
 
   it('runs simulate then execute and shows tx signature + explorer link', async () => {
     const onMinted = vi.fn()
     const onClose = vi.fn()
-    render(<NFTMintingModal certification={cert} onClose={onClose} onMinted={onMinted} />)
+    render(<NFTMintingModal certificate={cert} onClose={onClose} onMinted={onMinted} />)
 
     const button = screen.getByRole('button', { name: /Mint Proof-of-Skill/i })
     fireEvent.click(button)
 
-    await waitFor(()=>expect(screen.getByText(/Transaction Signature/i)).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText(/Transaction Signature/i)).toBeInTheDocument())
     expect(screen.getByText('SIG123')).toBeInTheDocument()
 
     // Explorer button

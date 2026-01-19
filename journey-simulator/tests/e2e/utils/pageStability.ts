@@ -1,4 +1,10 @@
-import { Page } from '@playwright/test';
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
+import { Page } from '../_support/fixtures';
 
 /**
  * Keeps Playwright interactions deterministic by neutralizing transitions and animations.

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { AECO, AEPO } from '@/content/aepoAeco';
 import { motion } from 'framer-motion';
 import {
@@ -49,7 +55,7 @@ const resourceLibrary: Resource[] = [
   },
   {
     id: 'web3-transformation',
-    title: 'Web2 ➝ Web3 Activation Guide',
+    title: 'Web2  Web3 Activation Guide',
     summary: 'Detailed pathway to transform a Web2 team into autonomous Web3 builders.',
     tags: ['Onboarding', 'Execution', 'Playbook'],
     format: 'Guide',
@@ -188,7 +194,7 @@ const ResourceHub = () => {
               </div>
               <div className="flex items-center gap-3">
                 <Layers size={18} />
-                <span>Seamless Product ⇄ Governance handoff</span>
+                <span>Seamless Product  Governance handoff</span>
               </div>
               <div className="flex items-center gap-3">
                 <Globe size={18} />

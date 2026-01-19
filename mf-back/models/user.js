@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
@@ -130,6 +136,12 @@ const userSchema = new mongoose.Schema({
             default: Date.now,
         },
     },
+    staking: {
+        amount: { type: Number, default: 0 },
+        staked_at: { type: Date, default: null },
+        apy: { type: Number, default: 12.5 }, // 12.5% APY
+        pending_rewards: { type: Number, default: 0 }
+    },
 
     subscription: {
         type: String,
@@ -202,11 +214,11 @@ const userSchema = new mongoose.Schema({
 
     // Analytics fields
     analytics: {
-        certification_downloads: {
+        certificate_downloads: {
             type: Number,
             default: 0,
         },
-        certification_shares: {
+        certificate_shares: {
             type: Number,
             default: 0,
         },
@@ -215,12 +227,12 @@ const userSchema = new mongoose.Schema({
             default: 0,
         },
         download_history: [{
-            certification_id: String,
+            certificate_id: String,
             phase: Number,
             timestamp: Date,
         }],
         share_history: [{
-            certification_id: String,
+            certificate_id: String,
             platform: String,
             phase: Number,
             timestamp: Date,
@@ -231,6 +243,19 @@ const userSchema = new mongoose.Schema({
             timestamp: Date,
         }],
     },
+
+    // Neural Handshake Persistence (Phase 5+)
+    neural_handshake: {
+        last_sync_at: { type: Date, default: null },
+        progress: { type: Number, default: 0 }, // 0-100
+        integrity_hash: { type: String, default: null }, // SHA256 of the total state
+        files_transferred: [{
+            filename: String,
+            size: Number,
+            status: { type: String, enum: ['PENDING', 'VALIDATED', 'FAILED'] },
+            hash: String
+        }]
+    }
 
 });
 

@@ -1,14 +1,20 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject, lazy, Suspense } from 'react'
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Menu, X, Sun, Moon, Crown, Sparkles, Waypoints, BrainCircuit, Atom, Vote, LibraryBig, LifeBuoy, GaugeCircle, Gem, Gavel, Award } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useThemeStore } from '../../store/themeStore'
 import { useAuth } from '../../contexts/AuthContext'
-import { useJourneyStoreShallow } from '../../store/journeyStore'
+import { useJourneyStoreShallow, JourneyState } from '../../store/journeyStore'
 import UserMetricsPanel from './UserMetricsPanel'
 
-const WalletButton = lazy(() => import('../WalletButton'))
+import WalletButton from '../WalletButton'
 
 type NavItem = {
   label: string
@@ -80,7 +86,7 @@ const RunModeSelector = ({
         {runMode === 'demo' && <Atom size={14} aria-hidden="true" />}
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-semibold text-muted-foreground">Sélection :</span>
+        <span className="font-semibold text-muted-foreground">Select:</span>
         {renderButton('demo', 'Demo (mock)', 'border-blue-500 bg-blue-500 text-white', 'border-transparent bg-white/5 text-muted-foreground hover:border-blue-200 hover:text-blue-600')}
         {renderButton('simulation', 'Simulation (dry-run)', 'border-amber-500 bg-amber-500 text-white', 'border-transparent bg-white/5 text-muted-foreground hover:border-amber-200 hover:text-amber-600')}
         {renderButton('real', 'Launch with Zyno (real)', 'border-emerald-600 bg-emerald-600 text-white', 'border-transparent bg-white/5 text-muted-foreground hover:border-emerald-200 hover:text-emerald-700')}
@@ -100,7 +106,7 @@ const BrandButton = ({ navigate, mutedCaptionClass }: { readonly navigate: Retur
     </div>
     <div className="flex flex-col">
       <span className="font-space text-lg font-semibold tracking-wide">Money Factory AI</span>
-      <span className={`text-xs font-medium uppercase tracking-[0.2em] ${mutedCaptionClass}`}>Cognitive Activation Protocol™</span>
+      <span className={`text-xs font-medium uppercase tracking-[0.2em] ${mutedCaptionClass}`}>Cognitive Activation Protocol</span>
     </div>
   </button>
 )
@@ -128,7 +134,7 @@ const UserAuthButtons = ({ user, navigate, logout }: { user: any, navigate: any,
         </motion.button>
       </>
     ) : (
-      <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} onClick={logout} className="btn-secondary flex items-center justify-center">
+      <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} onClick={() => { logout(); navigate('/'); }} className="btn-secondary flex items-center justify-center" data-testid="logout-button">
         <span>Logout</span>
       </motion.button>
     )}
@@ -136,7 +142,7 @@ const UserAuthButtons = ({ user, navigate, logout }: { user: any, navigate: any,
 );
 
 const MobileStatsBlock = ({ completionRate, userProgress, passBadgeStyles, mutedCaptionClass, metricLabelClass, metricHintClass }: { completionRate: number, userProgress: any, passBadgeStyles: string, mutedCaptionClass: string, metricLabelClass: string, metricHintClass: string }) => (
-  <div className="flex items-center justify-between gap-3 lg:hidden" aria-label="Progression du parcours mobile">
+  <div className="flex items-center justify-between gap-3 lg:hidden" aria-label="Mobile journey progress">
     <div className="glass-effect flex items-center gap-3 rounded-2xl px-4 py-3">
       <Crown size={16} className="text-accent-neon" aria-hidden="true" />
       <div className="flex flex-col">
@@ -198,7 +204,7 @@ const DesktopNav = ({
   };
 
   return (
-    <nav aria-label="Navigation principale" className="hidden flex-1 items-center justify-center gap-6 lg:flex">
+    <nav aria-label="Main navigation" className="hidden flex-1 items-center justify-center gap-6 lg:flex">
       <ul className="flex items-center gap-2">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon
@@ -263,6 +269,7 @@ const DesktopNav = ({
                       onClick={() => handleNavigate(item)}
                       className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${stateClass}`}
                       disabled={item.disabled}
+                      data-testid={`nav-menu-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
                     >
                       <span className="flex items-center gap-2">
                         <Icon size={16} aria-hidden="true" />
@@ -341,6 +348,7 @@ const MobileMenu = ({
                 onClick={() => handleNavigate(item)}
                 className={`flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold transition-colors ${stateClass}`}
                 disabled={item.disabled}
+                data-testid={`nav-menu-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
               >
                 <span className="flex items-center gap-2">
                   <Icon size={18} />
@@ -370,7 +378,7 @@ const MobileMenu = ({
               </button>
             </>
           ) : (
-            <button type="button" className="btn-secondary w-full" onClick={logout}>
+            <button type="button" className="btn-secondary w-full" onClick={logout} data-testid="logout-button">
               Logout
             </button>
           )}
@@ -399,7 +407,7 @@ const MobileMenu = ({
               <motion.div initial={false} animate={{ width: `${completionRate}%` }} transition={{ duration: 0.6, ease: 'easeOut' }} className="h-full rounded-full bg-gradient-accent" />
             </div>
             <span className={`text-[11px] ${metricHintClass}`}>
-              {completedPhases}/{totalPhases || '—'} phases
+              {completedPhases}/{totalPhases || ''} phases
             </span>
           </div>
         </div>
@@ -413,6 +421,7 @@ const MobileMenu = ({
               </div>
               <button
                 onClick={logout}
+                data-testid="logout-button"
                 className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide transition-colors ${isDark ? 'border-white/20 text-white/60 hover:text-white' : 'border-surface-300 text-surface-500 hover:text-surface-900'}`}
               >
                 Log out
@@ -462,7 +471,7 @@ const ProgressTicker = ({
 const MainNavigation = ({ enableWallet = false }: MainNavigationProps) => {
   const { isDark, toggleTheme } = useThemeStore()
   const { logout, user, loginAsDemo, isAuthenticated } = useAuth()
-  const { selectedPersona, userProgress, runMode, setRunMode } = useJourneyStoreShallow((state) => ({
+  const { selectedPersona, userProgress, runMode, setRunMode } = useJourneyStoreShallow((state: JourneyState) => ({
     selectedPersona: state.selectedPersona,
     userProgress: state.userProgress,
     runMode: state.runMode,
@@ -531,40 +540,35 @@ const MainNavigation = ({ enableWallet = false }: MainNavigationProps) => {
   const tickerTone = isDark ? 'border-white/10 bg-white/5 text-white/75' : 'border-surface-200/70 bg-white text-surface-600'
 
   const setRunModePersisted = useCallback(async (mode: 'demo' | 'simulation' | 'real') => {
-    // 1. Update persisted preference
+    // 1. Always update mode immediately for UI responsiveness
+    setRunMode(mode)
+
+    // 2. Persist preference
     try {
       if (typeof window !== 'undefined') {
         window.localStorage.setItem('mfai-run-mode', mode)
       }
     } catch { /* ignore */ }
 
-    // 2. Handle Authentication Side Effects
+    // 3. Handle Authentication Side Effects
     if (mode === 'demo') {
-      // If not already in demo mode (e.g. real user), switch identity
+      // Switch to demo user if not already
       if (user?.id !== 'demo-user-id') {
         await loginAsDemo();
       }
     } else if (mode === 'real') {
       // Requires real authentication
       if (!isAuthenticated || user?.id === 'demo-user-id') {
-        // If current user is demo, we must logout and ask for login
-        // OR just navigate to login.
-        if (user?.id === 'demo-user-id') {
-          await logout(); // Clear demo state
-        }
+        // Navigate to login but keep the mode selection
         navigate('/login');
-        return; // Do not set mode until logged in
       }
     } else if (mode === 'simulation') {
-      // Simulation can be run by anyone, but usually implies logged in
+      // Simulation can run with demo credentials if not logged in
       if (!isAuthenticated) {
-        await loginAsDemo(); // Fallback to demo if not logged in? Or force login?
-        // Let's assume Simulation = Demo capabilities for now if not logged in
+        await loginAsDemo();
       }
     }
-
-    setRunMode(mode)
-  }, [setRunMode, loginAsDemo, isAuthenticated, user, logout, navigate])
+  }, [setRunMode, loginAsDemo, isAuthenticated, user, navigate])
 
   const metricLabelClass = isDark ? 'text-white/50' : 'text-surface-500'
   const metricValueClass = isDark ? 'text-white' : 'text-surface-900'
@@ -576,7 +580,7 @@ const MainNavigation = ({ enableWallet = false }: MainNavigationProps) => {
   const mobileItemActive = isDark ? 'bg-white/15 text-white' : 'bg-surface-200 text-surface-900'
 
   const activePhaseTitle = selectedPersona?.phases?.[Math.min(userProgress.completedPhases.length, Math.max((selectedPersona?.phases?.length ?? 1) - 1, 0))]?.title
-  const zynoTicker = selectedPersona ? `Zyno says: ${activePhaseTitle || 'Journey ready'} · ${completionRate}% complete` : 'Zyno syncs once you choose a journey.'
+  const zynoTicker = selectedPersona ? `Zyno says: ${activePhaseTitle || 'Journey ready'}  ${completionRate}% complete` : 'Zyno syncs once you choose a journey.'
 
   const updateHeaderHeight = useCallback(() => {
     if (!headerRef.current) return
@@ -669,9 +673,7 @@ const MainNavigation = ({ enableWallet = false }: MainNavigationProps) => {
             </div>
 
             {enableWallet ? (
-              <Suspense fallback={<div className="h-10 w-[160px]" />}>
-                <WalletButton />
-              </Suspense>
+              <WalletButton />
             ) : null}
 
             <UserAuthButtons user={user} navigate={navigate} logout={logout} />

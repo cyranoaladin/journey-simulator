@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const User = require('../models/user');
 const dotenv = require('dotenv');
 const AuthService = require('../services/authService');
@@ -681,5 +687,62 @@ exports.addNFTCertificate = async (req, res) => {
       message: 'Failed to add NFT certificate',
       error: error.message
     });
+  }
+};
+
+/**
+ * PHASE 5: Neural Handshake Status Retrieval
+ */
+exports.getNeuralHandshakeStatus = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('neural_handshake');
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    res.status(200).json({
+      success: true,
+      neural_handshake: user.neural_handshake || { progress: 0, files_transferred: [] }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * PHASE 5: Neural Handshake State Synchronization
+ * Saves progress and validated file hashes to user profile.
+ */
+exports.syncNeuralHandshake = async (req, res) => {
+  try {
+    const { progress, integrity_hash, files } = req.body;
+
+    const updateData = {
+      'neural_handshake.last_sync_at': new Date(),
+      'neural_handshake.progress': progress || 0,
+      'neural_handshake.integrity_hash': integrity_hash || null,
+    };
+
+    if (Array.isArray(files)) {
+      updateData['neural_handshake.files_transferred'] = files.map(f => ({
+        filename: f.filename,
+        size: f.size,
+        status: f.status || 'VALIDATED',
+        hash: f.hash
+      }));
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: updateData },
+      { new: true }
+    ).select('neural_handshake');
+
+    res.status(200).json({
+      success: true,
+      message: 'Neuro-state synced to core.',
+      handshake: user.neural_handshake
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };

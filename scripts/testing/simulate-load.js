@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 #!/usr/bin/env node
 /* Load test simulation script (no real high-load infrastructure) */
 const { orchestrateVerticalSlice } = require('../../mf-back/orchestration/zynoVerticalSlice');

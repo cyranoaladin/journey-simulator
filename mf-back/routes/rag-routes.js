@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const express = require('express');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -62,6 +68,35 @@ router.get('/admin/rag/documents', async (req, res) => {
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
     console.error('RAG list error:', errorMsg);
+    return res.status(500).json({ error: 'Unable to list documents' });
+  }
+});
+
+// PUBLIC ENDPOINT: List RAG documents for authenticated users
+// Used by frontend Zyno Console and Resource Rendering components
+router.get('/resources/rag', async (req, res) => {
+  // Optional auth - allow unauthenticated access but could be locked down
+  // If you want to require auth, uncomment below and import auth middleware
+  // const { authenticateJWT } = require('../middleware/auth');
+  // Apply: router.get('/resources/rag', authenticateJWT, async (req, res) => {
+
+  try {
+    if (!fs.existsSync(ragDataPath)) {
+      return res.json({ documents: [] });
+    }
+
+    const documents = fs.readdirSync(ragDataPath)
+      .filter((file) => /\.(md|txt)$/i.test(file))
+      .map((file) => ({
+        name: file,
+        path: path.join(ragDataPath, file),
+        url: `/resources/rag/${file}` // Provide a public URL for each document
+      }));
+
+    return res.json({ documents });
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error('RAG public list error:', errorMsg);
     return res.status(500).json({ error: 'Unable to list documents' });
   }
 });

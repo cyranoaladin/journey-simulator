@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const RAGOpsAgent = require('../agents/RAGOpsAgent');
 
 describe('RAGOpsAgent strict grounding', () => {
@@ -6,7 +12,7 @@ describe('RAGOpsAgent strict grounding', () => {
     const res = await agent.run({ input: 'Test grounding without chunks', ragContext: { chunks: [] } });
     expect(res.status).toBe('FAIL');
     expect(res.errors).toContain('insufficient_rag_context');
-    expect(res.summary).toMatch(/Information insuffisante/);
+    expect(res.summary).toMatch(/Insufficient information/);
   });
 
   it('accepts when RAG citations exist', async () => {
@@ -32,7 +38,7 @@ describe('RAGOpsAgent strict grounding', () => {
       },
     });
     expect(res.status).toBe('FAIL');
-    expect(res.summary).toMatch(/Information insuffisante/);
+    expect(res.summary).toMatch(/Insufficient information/);
     expect(res.details.rag.avgScore).toBeLessThan(0.6);
   });
 });

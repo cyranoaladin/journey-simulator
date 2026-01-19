@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 export type AgentSource = {
   title?: string;
   content?: string;
@@ -58,13 +64,47 @@ export type AgentTimelineEntry = {
   feedback?: AgentResult['feedback'];
 };
 
+// New enriched agent type matching backend structure
+export type EnrichedAgent = {
+  agentId: string;
+  summary: string | null;
+  executiveSummary: string | null;
+  actions: string[];
+};
+
 export type OrchestrationResult = {
   intent: string;
   mode: string;
-  executedAgents: string[];
+  executedAgents: string[]; // Keep for backward compatibility
+  agents?: EnrichedAgent[]; // New structure from backend
   results: Record<string, AgentResult | undefined>;
   timeline: AgentTimelineEntry[];
   currentStep: AgentTimelineEntry | null;
+  systemStatus?: {
+    idempotent: boolean;
+    agents: Record<string, { enabled: boolean }>;
+    web3Pipeline: string;
+  };
+  ops?: {
+    warnings: string[];
+    fallbacks: string[];
+    execution: {
+      shadowComparison: {
+        delta: {
+          summary: string;
+        };
+      };
+    };
+  };
+  journey?: {
+    phase: string;
+    runId: string;
+  };
+  executionPlan?: {
+    mode: string;
+    steps: Array<{ id: string; status: string; agent: string; action: string | null }>;
+    summary: string;
+  };
   parcoursTemplate?: {
     templateId?: string;
     name?: string;

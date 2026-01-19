@@ -1,11 +1,34 @@
 {
   "track": "NFT",
+  "mode": "parallel",
   "phases": [
-    { "phase": "Guide", "agent": "GuideAgent" },
-    { "phase": "Coach", "agent": "CoachAgent" },
-    { "phase": "NFT Design", "agent": "NFTAgent" },
-    { "phase": "Legal Review", "agent": "Web3LegalAgent" },
-    { "phase": "Community", "agent": "CommunityAgent" },
-    { "phase": "Launch", "agent": "LaunchpadAgent" }
+    {
+      "phase": "Guide",
+      "agent": "GuideAgent"
+    },
+    {
+      "phase": "Coach",
+      "agent": "CoachAgent"
+    },
+    {
+      "phase": "NFT Design",
+      "agent": "NFTAgent"
+    },
+    {
+      "phase": "Tokenomics",
+      "agent": "TokenAgent"
+    },
+    {
+      "phase": "Legal Review",
+      "agent": "Web3LegalAgent"
+    },
+    {
+      "phase": "Community",
+      "agent": "CommunityAgent"
+    },
+    {
+      "phase": "Launch",
+      "agent": "LaunchpadAgent"
+    }
   ]
 }

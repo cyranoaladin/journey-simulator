@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 // memory/agent_metrics.js
 const fs = require('node:fs');
 const path = require('node:path');
@@ -106,7 +112,7 @@ async function saveFeedback(payload) {
   }, missionId);
 
   const satisfactionScore = feedbackValue.satisfaction ?? feedbackValue.rating ?? feedbackValue.score ?? null;
-  agentMemory.saveInteraction(agentName, userId, {
+  await agentMemory.saveInteraction(agentName, userId, {
     type: 'AECO',
     missionId,
     rating: satisfactionScore,

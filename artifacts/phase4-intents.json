@@ -1,0 +1,528 @@
+{
+    "source": "mf-back/agents/registry.js + mf-back/orchestration/intentRouter.js",
+    "timestamp": "2026-01-04T20:45:00+01:00",
+    "fallback": {
+        "intent": "product_spec",
+        "agentId": "ProductSpecAgent",
+        "agentName": "ProductSpecAgent",
+        "reason": "unknown_intent or no intent provided"
+    },
+    "intents": [
+        {
+            "intent": "guide",
+            "agentId": "GuideAgent",
+            "agentName": "GuideAgent",
+            "priority": 99,
+            "tags": [
+                "cognitive",
+                "orientation",
+                "help"
+            ]
+        },
+        {
+            "intent": "help",
+            "agentId": "GuideAgent",
+            "agentName": "GuideAgent",
+            "priority": 99,
+            "tags": [
+                "cognitive",
+                "orientation",
+                "help"
+            ]
+        },
+        {
+            "intent": "education",
+            "agentId": "EducationAgent",
+            "agentName": "EducationAgent",
+            "priority": 98,
+            "tags": [
+                "cognitive",
+                "teaching",
+                "explaining"
+            ]
+        },
+        {
+            "intent": "explain",
+            "agentId": "EducationAgent",
+            "agentName": "EducationAgent",
+            "priority": 98,
+            "tags": [
+                "cognitive",
+                "teaching",
+                "explaining"
+            ]
+        },
+        {
+            "intent": "reflection",
+            "agentId": "ReflectionAgent",
+            "agentName": "ReflectionAgent",
+            "priority": 97,
+            "tags": [
+                "cognitive",
+                "analysis",
+                "meta"
+            ]
+        },
+        {
+            "intent": "coach",
+            "agentId": "CoachAgent",
+            "agentName": "CoachAgent",
+            "priority": 96,
+            "tags": [
+                "cognitive",
+                "strategy",
+                "advice"
+            ]
+        },
+        {
+            "intent": "security_audit",
+            "agentId": "SecurityAuditAgent",
+            "agentName": "SecurityAuditAgent",
+            "priority": 95,
+            "tags": [
+                "security",
+                "audit",
+                "risk",
+                "compliance"
+            ],
+            "requiresRag": true
+        },
+        {
+            "intent": "default",
+            "agentId": "SecurityAuditAgent",
+            "agentName": "SecurityAuditAgent",
+            "priority": 95,
+            "tags": [
+                "security",
+                "audit",
+                "risk",
+                "compliance"
+            ],
+            "requiresRag": true
+        },
+        {
+            "intent": "audit",
+            "agentId": "AuditAgent",
+            "agentName": "AuditAgent",
+            "priority": 94,
+            "tags": [
+                "audit",
+                "code_quality",
+                "security"
+            ],
+            "requiresRag": true
+        },
+        {
+            "intent": "security_attack",
+            "agentId": "SecurityAgent",
+            "agentName": "SecurityAgent",
+            "priority": 94,
+            "tags": [
+                "security",
+                "red_team",
+                "exploits"
+            ],
+            "requiresRag": true
+        },
+        {
+            "intent": "product_spec",
+            "agentId": "ProductSpecAgent",
+            "agentName": "ProductSpecAgent",
+            "priority": 90,
+            "tags": [
+                "product",
+                "spec",
+                "flows",
+                "acceptance"
+            ],
+            "requiresRag": true
+        },
+        {
+            "intent": "builder",
+            "agentId": "BuilderAgent",
+            "agentName": "BuilderAgent",
+            "priority": 89,
+            "tags": [
+                "architecture",
+                "system_design",
+                "stack"
+            ],
+            "requiresRag": true
+        },
+        {
+            "intent": "architecture",
+            "agentId": "BuilderAgent",
+            "agentName": "BuilderAgent",
+            "priority": 89,
+            "tags": [
+                "architecture",
+                "system_design",
+                "stack"
+            ],
+            "requiresRag": true
+        },
+        {
+            "intent": "journey_design",
+            "agentId": "JourneyDesignAgent",
+            "agentName": "JourneyDesignAgent",
+            "priority": 88,
+            "tags": [
+                "journey",
+                "design",
+                "mapping"
+            ]
+        },
+        {
+            "intent": "protocol",
+            "agentId": "ProtocolAgent",
+            "agentName": "ProtocolAgent",
+            "priority": 88,
+            "tags": [
+                "protocol",
+                "standards",
+                "token_2022"
+            ],
+            "requiresRag": true
+        },
+        {
+            "intent": "standards",
+            "agentId": "ProtocolAgent",
+            "agentName": "ProtocolAgent",
+            "priority": 88,
+            "tags": [
+                "protocol",
+                "standards",
+                "token_2022"
+            ],
+            "requiresRag": true
+        },
+        {
+            "intent": "dev",
+            "agentId": "DevAgent",
+            "agentName": "DevAgent",
+            "priority": 88,
+            "tags": [
+                "development",
+                "code",
+                "implementation"
+            ]
+        },
+        {
+            "intent": "code",
+            "agentId": "DevAgent",
+            "agentName": "DevAgent",
+            "priority": 88,
+            "tags": [
+                "development",
+                "code",
+                "implementation"
+            ]
+        },
+        {
+            "intent": "evaluation",
+            "agentId": "EvaluationAgent",
+            "agentName": "EvaluationAgent",
+            "priority": 87,
+            "tags": [
+                "quality",
+                "evaluation",
+                "rubric"
+            ]
+        },
+        {
+            "intent": "rag_ops",
+            "agentId": "RAGOpsAgent",
+            "agentName": "RAGOpsAgent",
+            "priority": 86,
+            "tags": [
+                "rag",
+                "ingest",
+                "search"
+            ]
+        },
+        {
+            "intent": "design",
+            "agentId": "DesignAgent",
+            "agentName": "DesignAgent",
+            "priority": 85,
+            "tags": [
+                "design",
+                "visuals",
+                "ux"
+            ]
+        },
+        {
+            "intent": "visuals",
+            "agentId": "DesignAgent",
+            "agentName": "DesignAgent",
+            "priority": 85,
+            "tags": [
+                "design",
+                "visuals",
+                "ux"
+            ]
+        },
+        {
+            "intent": "data_integrity",
+            "agentId": "DataIntegrityAgent",
+            "agentName": "DataIntegrityAgent",
+            "priority": 85,
+            "tags": [
+                "data",
+                "integrity",
+                "validation"
+            ]
+        },
+        {
+            "intent": "api_contract",
+            "agentId": "APIContractAgent",
+            "agentName": "APIContractAgent",
+            "priority": 84,
+            "tags": [
+                "api",
+                "contracts",
+                "schemas"
+            ]
+        },
+        {
+            "intent": "nft_design",
+            "agentId": "NFTAgent",
+            "agentName": "NFTAgent",
+            "priority": 84,
+            "tags": [
+                "nft",
+                "metadata",
+                "strategy"
+            ]
+        },
+        {
+            "intent": "dao_tooling",
+            "agentId": "DAOAgent",
+            "agentName": "DAOAgent",
+            "priority": 84,
+            "tags": [
+                "dao",
+                "tooling",
+                "structure"
+            ]
+        },
+        {
+            "intent": "tokenomics",
+            "agentId": "TokenomicsAgent",
+            "agentName": "TokenomicsAgent",
+            "priority": 83,
+            "tags": [
+                "tokenomics",
+                "economy",
+                "supply"
+            ]
+        },
+        {
+            "intent": "legal",
+            "agentId": "Web3LegalAgent",
+            "agentName": "Web3LegalAgent",
+            "priority": 83,
+            "tags": [
+                "legal",
+                "mica"
+            ],
+            "requiresRag": true
+        },
+        {
+            "intent": "governance_dao",
+            "agentId": "GovernanceDAOAgent",
+            "agentName": "GovernanceDAOAgent",
+            "priority": 82,
+            "tags": [
+                "governance",
+                "dao",
+                "voting"
+            ],
+            "requiresRag": true
+        },
+        {
+            "intent": "growth",
+            "agentId": "GrowthAgent",
+            "agentName": "GrowthAgent",
+            "priority": 81,
+            "tags": [
+                "growth",
+                "marketing"
+            ]
+        },
+        {
+            "intent": "investor_demo",
+            "agentId": "InvestorDemoAgent",
+            "agentName": "InvestorDemoAgent",
+            "priority": 80,
+            "tags": [
+                "investor",
+                "demo",
+                "pitch"
+            ]
+        },
+        {
+            "intent": "investor_fundraise",
+            "agentId": "InvestorAgent",
+            "agentName": "InvestorAgent",
+            "priority": 79,
+            "tags": [
+                "investor",
+                "fundraise",
+                "pitch"
+            ]
+        },
+        {
+            "intent": "ux_writing",
+            "agentId": "UXWritingAgent",
+            "agentName": "UXWritingAgent",
+            "priority": 79,
+            "tags": [
+                "ux",
+                "ux_writing"
+            ],
+            "requiresRag": true
+        },
+        {
+            "intent": "qa_playwright",
+            "agentId": "QAPlaywrightAgent",
+            "agentName": "QAPlaywrightAgent",
+            "priority": 78,
+            "tags": [
+                "qa",
+                "e2e",
+                "playwright"
+            ]
+        },
+        {
+            "intent": "devops",
+            "agentId": "DevOpsAgent",
+            "agentName": "DevOpsAgent",
+            "priority": 77,
+            "tags": [
+                "devops",
+                "ci_cd",
+                "infra"
+            ]
+        },
+        {
+            "intent": "observability",
+            "agentId": "ObservabilityAgent",
+            "agentName": "ObservabilityAgent",
+            "priority": 76,
+            "tags": [
+                "observability",
+                "logs",
+                "metrics",
+                "tracing"
+            ]
+        },
+        {
+            "intent": "compliance",
+            "agentId": "ComplianceAgent",
+            "agentName": "ComplianceAgent",
+            "priority": 75,
+            "tags": [
+                "compliance",
+                "policy",
+                "regulation"
+            ],
+            "requiresRag": true
+        },
+        {
+            "intent": "risk_fraud",
+            "agentId": "RiskFraudAgent",
+            "agentName": "RiskFraudAgent",
+            "priority": 74,
+            "tags": [
+                "risk",
+                "fraud",
+                "risk"
+            ],
+            "requiresRag": true,
+            "enabled": false
+        },
+        {
+            "intent": "curriculum",
+            "agentId": "CurriculumAgent",
+            "agentName": "CurriculumAgent",
+            "priority": 73,
+            "tags": [
+                "education",
+                "curriculum",
+                "learning_path"
+            ]
+        },
+        {
+            "intent": "marketplace",
+            "agentId": "MarketplaceAgent",
+            "agentName": "MarketplaceAgent",
+            "priority": 72,
+            "tags": [
+                "marketplace",
+                "listing",
+                "pricing"
+            ]
+        },
+        {
+            "intent": "analytics",
+            "agentId": "AnalyticsAgent",
+            "agentName": "AnalyticsAgent",
+            "priority": 71,
+            "tags": [
+                "analytics",
+                "insights"
+            ]
+        },
+        {
+            "intent": "performance",
+            "agentId": "PerformanceAgent",
+            "agentName": "PerformanceAgent",
+            "priority": 70,
+            "tags": [
+                "performance",
+                "perf",
+                "optimization"
+            ]
+        },
+        {
+            "intent": "wallet_auth",
+            "agentId": "WalletAuthAgent",
+            "agentName": "WalletAuthAgent",
+            "priority": 69,
+            "tags": [
+                "auth",
+                "wallet",
+                "auth"
+            ]
+        },
+        {
+            "intent": "solana_anchor",
+            "agentId": "SolanaAnchorAgent",
+            "agentName": "SolanaAnchorAgent",
+            "priority": 68,
+            "tags": [
+                "blockchain",
+                "anchor",
+                "solana"
+            ]
+        },
+        {
+            "intent": "minting",
+            "agentId": "MintingAgent",
+            "agentName": "MintingAgent",
+            "priority": 67,
+            "tags": [
+                "mint",
+                "nft"
+            ]
+        }
+    ],
+    "notes": {
+        "intentFormat": "Intents are snake_case strings (e.g., 'security_audit', 'builder', 'tokenomics')",
+        "normalization": "IntentRouter normalizes dots to underscores (e.g., 'security.audit' → 'security_audit')",
+        "fallbackBehavior": "If no intent matches, ProductSpecAgent is selected as fallback",
+        "multipleIntents": "Multiple intents can be combined with '+' (e.g., 'security_audit+product_spec')",
+        "naturalLanguage": "Router does NOT support natural language prompts - expects explicit intent strings"
+    }
+}

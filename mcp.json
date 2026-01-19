@@ -81,6 +81,53 @@
         "./verify-production.sh",
         "./start_dev.sh"
       ]
+    },
+    {
+      "name": "mfai-mongo",
+      "transport": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-mongodb"
+      ],
+      "env": {
+        "MONGODB_CONNECTION_STRING": "mongodb://localhost:27017/mfai-journey"
+      }
+    },
+    {
+      "name": "mfai-github",
+      "transport": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "<USER_MUST_PROVIDE_THIS>"
+      }
+    },
+    {
+      "name": "mfai-firecrawl",
+      "transport": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "firecrawl-mcp"
+      ],
+      "env": {
+        "FIRECRAWL_API_KEY": "<USER_MUST_PROVIDE_THIS>"
+      }
+    },
+    {
+      "name": "mfai-memory",
+      "transport": "stdio",
+      "command": "node",
+      "args": [
+        "./tools/mcp/memory-server.mjs"
+      ],
+      "env": {
+        "MEMORY_FILE": "./.agent/memory/agent_memory.json"
+      }
     }
   ]
 }

@@ -1,3 +1,11 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,6 +15,13 @@
     --header-height: 92px;
     --skillchain-banner-offset: 0px;
     --wallet-banner-offset: 0px;
+
+    /* Power Tools & Mode-Specific Colors */
+    --color-zyno: #00F0FF;
+    /* Cyan - Demo/Simulation Mode */
+    --color-real: #00FF9D;
+    /* Green - Real/Production Mode */
+
     /* Solana Light Theme (Optional, but keeping structure) */
     --color-page: #F9FAFB;
     --color-surface: #FFFFFF;
@@ -315,6 +330,64 @@
   top: 0;
   left: 0;
   z-index: 0;
+}
+
+/* --- AAA GLASSMORPHISM (PREMIUM SPEC) --- */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.glass-panel-heavy {
+  background: rgba(13, 11, 24, 0.6);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* --- TYPOGRAPHY ENFORCEMENT --- */
+.font-mono,
+pre,
+code,
+.terminal-text {
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.display-text {
+  font-family: 'Space Grotesk', sans-serif !important;
+  letter-spacing: -0.02em;
+  /* Tight Elite Tracking */
+}
+
+/* --- ANIMATIONS (PREMIUM) --- */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+.text-glow {
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.7);
 }
 
 /* Custom scrollbar */

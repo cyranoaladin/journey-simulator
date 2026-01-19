@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { JSX } from 'react';
@@ -74,7 +80,7 @@ describe('JourneyCard', () => {
         title: 'Test Persona',
         name: 'Test Name',
         description: 'Test Description',
-        icon: '🧪',
+        icon: '',
         role: 'Test Role',
         targetProfile: 'Testers',
         color: 'blue',

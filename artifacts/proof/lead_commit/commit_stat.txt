@@ -1,0 +1,6 @@
+b17a8dd hardening: read-only rootfs + non-root mfai-api (phase 5.3)
+ docker-compose.deploy.yml           |  7 ++++---
+ docs/ops/DEPLOY_HARDENING.md        |  8 ++++++++
+ docs/ops/ENV_VARIABLES_CHECKLIST.md | 10 ++++++++++
+ mf-back/Dockerfile                  |  5 +++--
+ 4 files changed, 25 insertions(+), 5 deletions(-)

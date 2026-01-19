@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import LazyConfetti from './shared/LazyConfetti'
@@ -43,10 +49,10 @@ export default function MintCelebrationBanner({ score, maxScore, phaseId, onMint
         <div className="relative flex items-center justify-between gap-3">
           <div>
             <div className="text-sm font-semibold text-accent-gold">Great job on phase {phaseId}!</div>
-            <div className="text-xs opacity-80">Score {score}/{maxScore} — you’ve unlocked a Proof-of-Skill™ mint.</div>
+            <div className="text-xs opacity-80">Score {score}/{maxScore}  youve unlocked a Proof-of-Skill mint.</div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="px-3 py-2 rounded bg-accent-gold text-black text-sm font-semibold" onClick={onMint}>Mint Proof-of-Skill™</button>
+            <button className="px-3 py-2 rounded bg-accent-gold text-black text-sm font-semibold" onClick={onMint}>Mint Proof-of-Skill</button>
             <button className="px-2 py-2 text-xs opacity-70 hover:opacity-100" onClick={()=>setShow(false)}>Dismiss</button>
           </div>
         </div>

@@ -1,13 +1,19 @@
-import type { Page, Route } from '@playwright/test';
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
 
-export type JourneyMockOptions = {
+import type { Page, Route } from '../_support/fixtures';
+
+export type JourneysandboxOptions = {
   personaId?: string;
   completedPhases?: number[];
   totalXP?: number;
   tokens?: number;
   nftTitles?: string[];
   artifacts?: Array<{ id: string; title: string }>; // minimal artifacts list
-  mockMint?: boolean;
+  sampleMint?: boolean;
   mintTxSignature?: string;
 };
 
@@ -19,7 +25,7 @@ const fulfillJson = async (route: Route, data: unknown, status = 200) => {
   });
 };
 
-export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions = {}) => {
+export const setupJourneysandboxs = async (page: Page, options: JourneysandboxOptions = {}) => {
   // Mark E2E context so the app can avoid auto-running steps that would disable CTAs pre-click
   await page.addInitScript(() => { (window as any).__E2E__ = true })
   const personaId = options.personaId ?? 'cognitive-activation-hub';
@@ -43,7 +49,7 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
     }
   });
 
-  await page.route('**/user/profile', async (route) => {
+  await page.route('**/user/profile', async (route: Route) => {
     await fulfillJson(route, {
       success: true,
       user: {
@@ -56,7 +62,7 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
     });
   });
 
-  await page.route('**/user/verify', async (route) => {
+  await page.route('**/user/verify', async (route: Route) => {
     await fulfillJson(route, {
       success: true,
       user: {
@@ -69,7 +75,7 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
     });
   });
 
-  await page.route('**/user/update-profile', async (route) => {
+  await page.route('**/user/update-profile', async (route: Route) => {
     try {
       const body = JSON.parse(route.request().postData() || '{}');
       if (body?.persona) {
@@ -81,7 +87,7 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
     await fulfillJson(route, { success: true });
   });
 
-  await page.route('**/journey/user-progress', async (route) => {
+  await page.route('**/journey/user-progress', async (route: Route) => {
     if (route.request().method() === 'GET') {
       await fulfillJson(route, buildProgressPayload());
       return;
@@ -103,7 +109,7 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
     await fulfillJson(route, { success: true });
   });
 
-  await page.route('**/journey/reset-progress', async (route) => {
+  await page.route('**/journey/reset-progress', async (route: Route) => {
     progressState.completedPhases.clear();
     progressState.totalXP = 0;
     progressState.tokens = 0;
@@ -111,7 +117,7 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
     await fulfillJson(route, { success: true });
   });
 
-  await page.route('**/journey/load-demo', async (route) => {
+  await page.route('**/journey/load-demo', async (route: Route) => {
     await fulfillJson(route, {
       success: true,
       journey: { id: progressState.personaId },
@@ -124,7 +130,7 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
     });
   });
 
-  await page.route('**/journey/complete-phase', async (route) => {
+  await page.route('**/journey/complete-phase', async (route: Route) => {
     let body: any = {};
     try {
       body = JSON.parse(route.request().postData() || '{}');
@@ -149,9 +155,9 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
       ui_blocks: [
         {
           kind: 'text_block',
-          id: 'mock-phase-complete',
-          title: 'Mocked Mission Guidance',
-          body_markdown: 'Phase completed successfully in mock.'
+          id: 'sample-phase-complete',
+          title: 'sandboxed Mission Guidance',
+          body_markdown: 'Phase completed successfully in sample.'
         }
       ],
       agent_actions: [],
@@ -163,7 +169,7 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
     });
   });
 
-  await page.route('**/journey/artifacts', async (route) => {
+  await page.route('**/journey/artifacts', async (route: Route) => {
     await fulfillJson(route, {
       success: true,
       artifacts: (options.artifacts ?? [
@@ -178,19 +184,19 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
     });
   });
 
-  await page.route('**/admin/agent-logs*', async (route) => {
+  await page.route('**/admin/agent-logs*', async (route: Route) => {
     await fulfillJson(route, [
       {
         userId: 'e2e-user-id',
         agentName: 'Zyno Orchestrator',
-        ae_summary: 'Mocked agent log entry.',
+        ae_summary: 'sandboxed agent log entry.',
         ae_outcome: 'success',
         timestamp: new Date().toISOString()
       }
     ]);
   });
 
-  await page.route('**/journey/*/step', async (route) => {
+  await page.route('**/journey/*/step', async (route: Route) => {
     await fulfillJson(route, {
       metadata: {
         persona_id: progressState.personaId,
@@ -201,9 +207,9 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
       ui_blocks: [
         {
           kind: 'text_block',
-          id: 'mock-step-guidance',
-          title: 'Mocked Mission Guidance',
-          body_markdown: 'This response is generated by the Playwright mock layer to unblock UI rendering.'
+          id: 'sample-step-guidance',
+          title: 'sandboxed Mission Guidance',
+          body_markdown: 'This response is generated by the Playwright sample layer to unblock UI rendering.'
         }
       ],
       agent_actions: [],
@@ -215,7 +221,7 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
     });
   });
 
-  await page.route('**/journey/**/submit', async (route) => {
+  await page.route('**/journey/**/submit', async (route: Route) => {
     await fulfillJson(route, {
       success: true,
       evaluation: { global_score: 10, max_score: 10 },
@@ -228,9 +234,9 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
       ui_blocks: [
         {
           kind: 'text_block',
-          id: 'mock-submit',
+          id: 'sample-submit',
           title: 'Submission Received',
-          body_markdown: 'Submission accepted via mock route.'
+          body_markdown: 'Submission accepted via sample route.'
         }
       ],
       agent_actions: [],
@@ -243,7 +249,7 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
   });
 
   // Token balance updates
-  await page.route('**/user/tokens', async (route) => {
+  await page.route('**/user/tokens', async (route: Route) => {
     try {
       const body = JSON.parse(route.request().postData() || '{}');
       if (typeof body?.mfai_tokens === 'number') {
@@ -255,7 +261,7 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
     await fulfillJson(route, { success: true });
   });
 
-  await page.route('**/user/nft-certificates', async (route) => {
+  await page.route('**/user/nft-certificates', async (route: Route) => {
     try {
       const body = JSON.parse(route.request().postData() || '{}');
       if (body?.title) {
@@ -267,13 +273,13 @@ export const setupJourneyMocks = async (page: Page, options: JourneyMockOptions 
     await fulfillJson(route, { success: true });
   });
 
-  if (options.mockMint) {
-    await setupMintMocks(page, options.mintTxSignature);
+  if (options.sampleMint) {
+    await setupMintsandboxs(page, options.mintTxSignature);
   }
 };
 
-export const setupMintMocks = async (page: Page, txSignature = 'PLAYWRIGHT_SIG') => {
-  await page.route('**/solana/mint/simulate', async (route) => {
+export const setupMintsandboxs = async (page: Page, txSignature = 'PLAYWRIGHT_SIG') => {
+  await page.route('**/solana/mint/simulate', async (route: Route) => {
     await fulfillJson(route, {
       ok: true,
       sim: {
@@ -285,7 +291,7 @@ export const setupMintMocks = async (page: Page, txSignature = 'PLAYWRIGHT_SIG')
     });
   });
 
-  await page.route('**/solana/mint/execute', async (route) => {
+  await page.route('**/solana/mint/execute', async (route: Route) => {
     await fulfillJson(route, {
       ok: true,
       jobId: 'playwright-job',
@@ -303,7 +309,7 @@ export const seedDemoUser = async (
   personaId: string | null = 'cognitive-activation-hub',
   accessToken: string = 'demo-token'
 ) => {
-  await page.addInitScript(({ persona, token }) => {
+  await page.addInitScript(({ persona, token }: { persona: string | null, token: string }) => {
     sessionStorage.setItem('accessToken', token);
     sessionStorage.setItem('refreshToken', 'demo-refresh-token');
     localStorage.setItem('userId', 'demo-user-id');

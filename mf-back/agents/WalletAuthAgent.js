@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const { mkFinding, mkAction, estimateConfidence, safeRun } = require('./agentUtils');
 
 class WalletAuthAgent {
@@ -28,8 +34,8 @@ class WalletAuthAgent {
 
       const status = inputPresent ? 'OK' : 'WARN';
       const summary = inputPresent ? 'Wallet auth plan ready' : 'Wallet auth plan drafted with defaults';
-      const assumptions = inputPresent ? [] : ['Chaîne cible non précisée, utiliser testnet'];
-      const limits = ['Aucune connexion réelle effectuée (plan only)'];
+      const assumptions = inputPresent ? [] : ['Target chain not specified, using testnet'];
+      const limits = ['No real connection performed (plan only)'];
 
       return {
         status,

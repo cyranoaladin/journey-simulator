@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { Routes, Route, MemoryRouter } from 'react-router-dom';
@@ -59,9 +65,16 @@ describe('Journey Component - Deep Linking', () => {
         vi.clearAllMocks();
 
         // Default mock implementation
-        (useJourneyStore as any).mockReturnValue({
+        const mockStore = {
             selectedPersona: null,
-            setSelectedPersona: mockSetSelectedPersona
+            setSelectedPersona: mockSetSelectedPersona,
+            setApiJourneyId: vi.fn(),
+        };
+
+        (useJourneyStore as any).mockReturnValue(mockStore);
+        (useJourneyStore as any).getState = vi.fn().mockReturnValue({
+            ...mockStore,
+            loadUserProgress: vi.fn().mockResolvedValue({})
         });
     });
 
@@ -87,9 +100,16 @@ describe('Journey Component - Deep Linking', () => {
 
     it('should not auto-select if persona is already selected', async () => {
         // Mock with already selected persona
-        (useJourneyStore as any).mockReturnValue({
+        const mockStore = {
             selectedPersona: personas[1],
-            setSelectedPersona: mockSetSelectedPersona
+            setSelectedPersona: mockSetSelectedPersona,
+            setApiJourneyId: vi.fn(),
+        };
+
+        (useJourneyStore as any).mockReturnValue(mockStore);
+        (useJourneyStore as any).getState = vi.fn().mockReturnValue({
+            ...mockStore,
+            loadUserProgress: vi.fn().mockResolvedValue({})
         });
 
         render(
@@ -138,9 +158,16 @@ describe('Journey Component - Deep Linking', () => {
         for (const persona of personas) {
             vi.clearAllMocks();
 
-            (useJourneyStore as any).mockReturnValue({
+            const mockStore = {
                 selectedPersona: null,
-                setSelectedPersona: mockSetSelectedPersona
+                setSelectedPersona: mockSetSelectedPersona,
+                setApiJourneyId: vi.fn(),
+            };
+
+            (useJourneyStore as any).mockReturnValue(mockStore);
+            (useJourneyStore as any).getState = vi.fn().mockReturnValue({
+                ...mockStore,
+                loadUserProgress: vi.fn().mockResolvedValue({})
             });
 
             const { unmount } = render(

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const executionEngine = require('../executionEngine');
 const executionGate = require('../executionGate');
 const actionToolMapper = require('../actionToolMapper');
@@ -5,12 +11,12 @@ const { timeoutGuard } = require('../timeoutGuard');
 const logger = require('../../utils/logger').createLogger(__filename);
 
 /**
- * Service d'exécution pour l'orchestration
- * Réduit la complexité cognitive en isolant toute la logique d'exécution
+ * Execution Service for orchestration
+ * Reduces cognitive complexity by isolating all execution logic
  */
 class ExecutionService {
   /**
-   * Construit le plan d'exécution à partir des actions recommandées
+   * Builds execution plan from recommended actions
    */
   static buildExecutionPlan(actionPlanSteps, ops) {
     const executionTools = actionPlanSteps.map((step, index) => {
@@ -54,7 +60,7 @@ class ExecutionService {
   }
 
   /**
-   * Gère le gate d'exécution (approbation humaine)
+   * Manages execution gate (human approval)
    */
   static handleExecutionGate(executionTools, previous, req, payload, getTraceId) {
     let executionGateInfo = null;
@@ -76,7 +82,7 @@ class ExecutionService {
   }
 
   /**
-   * Simule l'exécution du plan
+   * Simulates plan execution
    */
   static simulateExecution(executionTools, traceId, runId, tenantId, gateApproved) {
     return executionEngine.simulate({
@@ -89,7 +95,7 @@ class ExecutionService {
   }
 
   /**
-   * Exécute réellement le plan (si autorisé)
+   * Executes plan for real (if authorized)
    */
   static executePlan(executionTools, traceId, runId, tenantId, gateApproved) {
     return executionEngine.execute({
@@ -102,11 +108,11 @@ class ExecutionService {
   }
 
   /**
-   * Gère l'exécution avec tous les modes (REAL, DRY_RUN, SHADOW)
+   * Handles execution with all modes (REAL, DRY_RUN, SHADOW)
    * Reduced signature: options object groups detailed params
    */
   /**
-   * Gère l'exécution avec tous les modes (REAL, DRY_RUN, SHADOW)
+   * Handles execution with all modes (REAL, DRY_RUN, SHADOW)
    * Reduced signature: options object groups detailed params
    */
   static handleExecution(executionTools, { req, payload }, options = {}) {
@@ -133,7 +139,7 @@ class ExecutionService {
   }
 
   /**
-   * Exécution avec gate (privé)
+   * Execution with gate (private)
    */
   static _executeWithGate(executionTools, options) {
     const { state, shadowMode, req, payload, tenantId, getTraceId, ops } = options;
@@ -173,7 +179,7 @@ class ExecutionService {
   }
 
   /**
-   * Exécution sans gate (privé)
+   * Execution without gate (private)
    */
   static _executeWithoutGate(executionTools, options) {
     const { guardDecision, shadowMode, req, payload, tenantId, getTraceId, ops } = options;
@@ -188,7 +194,7 @@ class ExecutionService {
   }
 
   /**
-   * Mode shadow: compare DRY_RUN et REAL simulé (privé)
+   * Shadow mode: compares DRY_RUN and simulated REAL (private)
    */
   static _executeShadowMode(executionTools, req, payload, tenantId, getTraceId, ops, baseSimulation = null) {
     const dryRun = baseSimulation || ExecutionService.simulateExecution(executionTools, getTraceId(req, payload), req.runId || req.traceId || 'unknown', tenantId, false);
@@ -232,7 +238,7 @@ class ExecutionService {
   }
 
   /**
-   * Wrapper pour l'exécution d'un agent avec retry
+   * Wrapper for agent execution with retry
    */
   static async executeAgentWithRetry(params) {
     return executionEngine.executeAgentWithRetry({
@@ -242,7 +248,7 @@ class ExecutionService {
   }
 
   /**
-   * Gère le flux d'exécution complet
+   * Manages full execution flow
    */
   static handleExecutionFlow({
     executionTools,
@@ -284,7 +290,7 @@ class ExecutionService {
   }
 
   /**
-   * Attache les métriques d'exécution
+   * Attaches execution metrics
    */
   static attachExecutionMetrics(ops, executionPlan) {
     if (executionPlan && executionPlan.steps && executionPlan.steps.length > 0) {

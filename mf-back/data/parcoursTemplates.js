@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -16,6 +22,8 @@ const intentToTemplate = {
   reflection_phase: 'web3legal_track.json',
   product_build: 'demo_day_track.json',
   user_onboarding: 'demo_day_track.json',
+  level_1_hub: 'hub_track.json',
+  level_2_defi: 'foundry_track.json',
   default: 'demo_day_track.json'
 };
 

@@ -277,6 +277,7 @@ exports.getUserProgress = async (req, res) => {
                     : [],
                 nft_certificates: user.nft_certificates,
                 token_transactions: user.token_transactions,
+                staking: user.staking || { amount: 0, rewards: 0 },
                 subscription: user.subscription,
                 persona: user.persona,
                 demo_mode: user.demo_mode || getDisabledDemoModeState()
@@ -299,6 +300,7 @@ exports.updateUserProgress = async (req, res) => {
         if (total_xp !== undefined) updateData.total_xp = total_xp;
         if (current_level !== undefined) updateData.current_level = current_level;
         if (completed_phases !== undefined) updateData.completed_phases = completed_phases;
+        if (req.body.nft_certificates !== undefined) updateData.nft_certificates = req.body.nft_certificates;
 
         const user = await User.findByIdAndUpdate(
             req.user.id,
@@ -344,6 +346,7 @@ exports.resetUserProgress = async (req, res) => {
                     mfai_tokens: 0,
                     last_updated: new Date()
                 },
+                staking: { amount: 0, rewards: 0, staked_at: null },
                 demo_mode: getDisabledDemoModeState()
             },
             { new: true }
@@ -371,46 +374,78 @@ exports.resetUserProgress = async (req, res) => {
 
 exports.completePhase = async (req, res) => {
     try {
+        console.log(`[CompletePhase] User: ${req.user ? req.user.id : 'NONE'}, Phase: ${req.body.phase_number}`);
         const { phase_number, score, nft_address } = req.body;
+        const phaseNum = Number(phase_number);
 
-        // Update user progress
-        const user = await User.findByIdAndUpdate(
-            req.user.id,
-            {
-                $inc: { completed_phases: 1, total_xp: 100 },
-                $push: {
-                    nft_certificates: {
-                        phase: phase_number,
-                        nft_address: nft_address || '',
-                        score: score || 0,
-                        mint_date: new Date(),
-                        title: req.body.title,
-                        description: req.body.description,
-                        image_url: req.body.image_url,
-                        rarity: req.body.rarity,
-                        xp_earned: req.body.xp_reward
-                    }
-                },
-                $set: {
-                    demo_mode: getDisabledDemoModeState()
+        const updateOps = {
+            $inc: { completed_phases: 1, total_xp: 100 },
+            $push: {
+                nft_certificates: {
+                    phase: phaseNum,
+                    nft_address: nft_address || 'mock-solana-address-' + Date.now(),
+                    score: score || 0,
+                    mint_date: new Date(),
+                    title: req.body.title || `Phase ${phaseNum} Certified`,
+                    description: req.body.description || 'Mastery Achieved',
+                    image_url: req.body.image_url || 'https://arweave.net/mock-cert',
+                    rarity: req.body.rarity || 'Common',
+                    xp_earned: req.body.xp_reward || 100
                 }
             },
-            { new: true }
-        ).select('-password');
+            $set: {
+                demo_mode: getDisabledDemoModeState()
+            }
+        };
 
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'User not found'
-            });
+        // --- AIRDROP TRIGGER (Phase 2) ---
+        if (phaseNum === 2) {
+            updateOps.$inc["token_transactions.mfai_tokens"] = 1000;
+            // Notify user of airdrop? Handled by frontend via response balance check
         }
+
+        // Update user progress
+        // Update user progress
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Explicitly apply updates
+        user.completed_phases = (user.completed_phases || 0) + 1;
+        user.total_xp = (user.total_xp || 0) + 100;
+
+        user.nft_certificates.push({
+            phase: phaseNum,
+            nft_address: nft_address || 'mock-solana-address-' + Date.now(),
+            score: score || 0,
+            mint_date: new Date(),
+            title: req.body.title || `Phase ${phaseNum} Certified`,
+            description: req.body.description || 'Mastery Achieved',
+            image_url: req.body.image_url || 'https://arweave.net/mock-cert',
+            rarity: req.body.rarity || 'Common',
+            xp_earned: req.body.xp_reward || 100
+        });
+
+        // Disable demo mode
+        user.demo_mode = getDisabledDemoModeState();
+
+        // --- AIRDROP TRIGGER (Phase 2) ---
+        if (phaseNum === 2) {
+            user.token_transactions.mfai_tokens = (user.token_transactions.mfai_tokens || 0) + 1000;
+        }
+
+        // Force Save
+        await user.save();
 
         res.status(200).json({
             success: true,
             message: 'Phase completed successfully',
             progress: {
                 completed_phases: user.completed_phases,
-                nft_certificates: user.nft_certificates
+                nft_certificates: user.nft_certificates,
+                tokens: user.token_transactions.mfai_tokens,
+                total_xp: user.total_xp
             }
         });
     } catch (error) {
@@ -419,6 +454,72 @@ exports.completePhase = async (req, res) => {
             message: 'Failed to complete phase',
             error: error.message
         });
+    }
+};
+
+exports.stakeTokens = async (req, res) => {
+    try {
+        const { amount } = req.body;
+        const stakeAmount = Number(amount);
+        if (isNaN(stakeAmount) || stakeAmount <= 0) {
+            return res.status(400).json({ success: false, message: 'Invalid staking amount' });
+        }
+
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+        const currentBalance = user.token_transactions?.mfai_tokens || 0;
+        if (currentBalance < stakeAmount) {
+            return res.status(400).json({ success: false, message: 'Insufficient balance' });
+        }
+
+        // Logic: specific formula requested? 
+        // "Voting Power = (Total XP / 100) + (Staked $MFAI * 2)"
+        // Staking just moves tokens.
+
+        // Init staking if missing
+        if (!user.staking) user.staking = { amount: 0, rewards: 0, staked_at: new Date() };
+
+        // Transaction
+        user.token_transactions.mfai_tokens -= stakeAmount;
+        user.staking.amount += stakeAmount;
+        user.staking.staked_at = new Date(); // Reset staking time? Or avg? Simple reset for now.
+
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: `${stakeAmount} $MFAI Staked Successfully`,
+            new_balance: user.token_transactions.mfai_tokens,
+            total_staked: user.staking.amount
+        });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Staking failed', error: error.message });
+    }
+};
+
+exports.getVotingPower = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+        const xp = user.total_xp || 0;
+        const staked = user.staking?.amount || 0;
+
+        // Exact formula required: (Total XP / 100) + (Staked $MFAI * 2)
+        const votingPower = Math.floor((xp / 100) + (staked * 2));
+
+        res.status(200).json({
+            success: true,
+            voting_power: votingPower,
+            breakdown: {
+                from_xp: Math.floor(xp / 100),
+                from_staking: staked * 2
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Failed to calc voting power', error: error.message });
     }
 };
 
@@ -481,6 +582,26 @@ exports.deleteJourney = async (req, res) => {
 const ZynoAgent = require('../agents/ZynoAgent');
 const TokenomicsAgent = require('../agents/TokenomicsAgent');
 const { orchestrateZyno } = require('../orchestration/zynoOrchestrator');
+const JourneyRun = require('../models/JourneyRun');
+
+exports.getInteractionHistory = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const journeyRun = await JourneyRun.findOne({ userId, status: 'IN_PROGRESS' }).sort({ lastActivityAt: -1 });
+
+        res.status(200).json({
+            success: true,
+            history: journeyRun ? journeyRun.interaction_logs : []
+        });
+    } catch (error) {
+        console.error('Get History Error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch history',
+            error: error.message
+        });
+    }
+};
 
 exports.step = async (req, res) => {
     try {
@@ -502,13 +623,30 @@ exports.step = async (req, res) => {
         // In a real app, we might fetch the journey from DB to verify ownership/state
         // const journey = await Journey.findById(journeyId);
 
-        const userId = req.user?.id || req.body?.userId || req.headers['x-user-id'];
+        const userId = req.user?.id || req.body?.userId || req.headers?.['x-user-id'];
         if (!userId) {
             return res.status(401).json({
                 success: false,
                 message: 'User context is required for orchestration',
             });
         }
+
+        // --- INTERACTION MEMORY HUB ---
+        // Find active run for history context
+        let journeyRun = await JourneyRun.findOne({ userId, status: 'IN_PROGRESS' }).sort({ lastActivityAt: -1 });
+
+        // If no active run but we have a user, create one for continuity (self-healing)
+        if (!journeyRun) {
+            journeyRun = new JourneyRun({
+                userId,
+                journeyDefinitionId: journeyId || 'sovereign-v1',
+                status: 'IN_PROGRESS'
+            });
+            await journeyRun.save();
+        }
+
+        const history = journeyRun.interaction_logs || [];
+
         const ctx = {
             userId,
             user: { id: userId },
@@ -532,9 +670,55 @@ exports.step = async (req, res) => {
             return res.status(200).json(result?.payload ?? result ?? { success: true });
         }
 
-        const result = await orchestrateZyno(userInput, ctx);
+        const result = await orchestrateZyno(userInput, ctx, history);
 
-        res.status(200).json(result);
+        // --- PERSISTENCE GUARD ---
+        // Save User Input
+        journeyRun.interaction_logs.push({
+            role: 'user',
+            message: userInput,
+            timestamp: new Date(),
+            context: { phaseId, intent: trackId }
+        });
+
+        // Save Agent Responses
+        if (result.results) {
+            for (const [agentName, agentData] of Object.entries(result.results)) {
+
+                // standard message log
+                if (agentData.summary || agentData.reasoning) {
+                    journeyRun.interaction_logs.push({
+                        role: 'agent',
+                        agentName: agentName,
+                        message: agentData.summary || agentData.reasoning || 'Action performed.',
+                        timestamp: new Date(),
+                        context: { phaseId, intent: trackId }
+                    });
+                }
+
+                // resource log
+                if (agentData.resources && (agentData.resources.diagram || agentData.resources.documentation || agentData.resources.data)) {
+                    journeyRun.interaction_logs.push({
+                        role: 'agent',
+                        agentName: agentName,
+                        message: 'Resource Generated: ' + (agentData.resources.title || 'Artifact'),
+                        timestamp: new Date(),
+                        context: { phaseId, intent: trackId, isResource: true, resourceType: 'Artifact' }
+                    });
+                }
+            }
+        }
+
+        journeyRun.lastActivityAt = new Date();
+        await journeyRun.save();
+
+        // Inject history into response for frontend
+        const responseWithHistory = {
+            ...result,
+            interaction_history: journeyRun.interaction_logs
+        };
+
+        res.status(200).json(responseWithHistory);
 
     } catch (error) {
         console.error('Zyno Step Error:', error);
@@ -624,6 +808,10 @@ exports.journeyAction = async (req, res) => {
         switch (action) {
             case 'complete_phase':
                 return exports.completePhase(req, res);
+            case 'stake_tokens':
+                return exports.stakeTokens(req, res);
+            case 'get_voting_power':
+                return exports.getVotingPower(req, res);
             default:
                 return res.status(400).json({
                     success: false,

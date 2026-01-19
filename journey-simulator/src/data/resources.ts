@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { FileText, BookOpen, Layout, ClipboardList } from 'lucide-react';
 
 export interface Resource {
@@ -31,7 +37,7 @@ export const resources: Resource[] = [
     },
     {
         id: 'activation-guide',
-        title: 'Web2 ➝ Web3 Activation Guide',
+        title: 'Web2  Web3 Activation Guide',
         type: 'Guide',
         duration: '14 min',
         description: 'Detailed pathway to transform a Web2 team into autonomous Web3 builders.',

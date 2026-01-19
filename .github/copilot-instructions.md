@@ -1,3 +1,9 @@
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
 # Money Factory AI Journey Simulator - AI Agent Instructions
 
 This is a **full-stack Web3 learning platform** implementing the Cognitive Activation Protocol™. The system combines a React/TypeScript frontend, Node.js/Express backend, MongoDB persistence, and simulated Solana blockchain integration with a multi-agent AI orchestration layer (Zyno).

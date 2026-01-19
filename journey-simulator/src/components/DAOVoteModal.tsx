@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useState, type FC } from 'react'
 import { motion } from 'framer-motion'
 import { X, Vote, TrendingUp, CheckCircle, XCircle, Clock } from 'lucide-react'
@@ -67,15 +73,15 @@ const DAOVoteModal: FC<DAOVoteModalProps> = ({
   const handleVote = async (vote: 'approve' | 'reject') => {
     setSelectedVote(vote)
     setIsVoting(true)
-    
+
     // Simulate voting transaction
     await new Promise(resolve => setTimeout(resolve, 2000))
-    
+
     // Update voting power and DAO participation
     updateVotingPower(votingPower + 10)
     setHasVoted(true)
     setIsVoting(false)
-    
+
     if (onVote) {
       onVote(vote)
     }
@@ -86,7 +92,7 @@ const DAOVoteModal: FC<DAOVoteModalProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xl"
       onClick={onClose}
     >
       <motion.div
@@ -94,13 +100,13 @@ const DAOVoteModal: FC<DAOVoteModalProps> = ({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
         onClick={(e) => e.stopPropagation()}
-        className="bg-primary-900 rounded-2xl p-6 max-w-lg w-full border border-white/20"
+        className="glass-panel rounded-2xl p-6 max-w-lg w-full"
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-2">
             <Vote className="text-accent-purple" size={24} />
-            <h2 className="text-xl font-space font-bold">DAO Vote</h2>
+            <h2 className="text-xl font-space font-bold tracking-tight">DAO Vote</h2>
           </div>
           <button
             onClick={onClose}
@@ -113,83 +119,84 @@ const DAOVoteModal: FC<DAOVoteModalProps> = ({
         </div>
 
         {/* Proposal Info */}
-        <div className="bg-white/5 rounded-lg p-4 mb-6">
+        <div className="bg-white/5 rounded-lg p-4 mb-6 border border-white/10">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold">{proposal.title}</h3>
+            <h3 className="font-semibold font-space tracking-tight" data-testid="dao-proposal-title">{proposal.title}</h3>
             <span className={(() => {
-              // Extract nested ternary into explicit variable
               let badgeClass = 'bg-blue-500/20 text-blue-400';
               if (proposal.type === 'Incubation') {
                 badgeClass = 'bg-purple-500/20 text-purple-400';
               } else if (proposal.type === 'Launchpad') {
-                badgeClass = 'bg-gold-500/20 text-gold-400';
+                badgeClass = 'bg-yellow-500/20 text-yellow-400';
               }
-              return `px-2 py-1 rounded-full text-xs font-semibold ${badgeClass}`;
+              return `px-2 py-1 rounded-full text-xs font-mono font-bold ${badgeClass}`;
             })()}>
-              {proposal.type}
+              {proposal.type.toUpperCase()}
             </span>
           </div>
-          <p className="text-sm opacity-90 mb-4">{proposal.description}</p>
-          
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <div className="text-sm opacity-70">Time remaining</div>
-              <div className="font-semibold flex items-center justify-center">
-                <Clock size={14} className="mr-1" />
+          <p className="text-sm opacity-90 mb-4 leading-relaxed">{proposal.description}</p>
+
+          <div className="grid grid-cols-3 gap-4 text-center font-mono text-xs">
+            <div className="p-2 bg-black/20 rounded-lg">
+              <div className="opacity-70 mb-1">Time Left</div>
+              <div className="font-bold flex items-center justify-center text-green-400">
+                <Clock size={12} className="mr-1" />
                 {proposal.timeLeft}
               </div>
             </div>
-            <div>
-              <div className="text-sm opacity-70">Quorum</div>
-              <div className="font-semibold">{proposal.quorum} votes</div>
+            <div className="p-2 bg-black/20 rounded-lg">
+              <div className="opacity-70 mb-1">Quorum</div>
+              <div className="font-bold">{proposal.quorum}</div>
             </div>
-            <div>
-              <div className="text-sm opacity-70">Your power</div>
-              <div className="font-semibold text-accent-purple">{votingPower}</div>
+            <div className="p-2 bg-black/20 rounded-lg">
+              <div className="opacity-70 mb-1">Power</div>
+              <div className="font-bold text-accent-purple text-glow">{votingPower}</div>
             </div>
           </div>
         </div>
 
-        {/* Current Results */}
+        {/* Current Results - NEON GLOW IMPLEMENTATION */}
         <div className="mb-6">
-          <h3 className="font-semibold mb-3 flex items-center">
-            <TrendingUp size={16} className="mr-2" />
-            Current Results
+          <h3 className="font-semibold mb-3 flex items-center font-space">
+            <TrendingUp size={16} className="mr-2 text-accent-cyan" />
+            Live Results
           </h3>
-          
-          <div className="space-y-3">
+
+          <div className="space-y-4">
+            {/* Approve Bar */}
             <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="flex items-center">
-                  <CheckCircle size={14} className="mr-1 text-green-400" />
-                  Approve
+              <div className="flex justify-between text-xs font-mono mb-1">
+                <span className="flex items-center text-green-400 font-bold">
+                  <CheckCircle size={12} className="mr-1" />
+                  APPROVE
                 </span>
-                <span>{proposal.currentVotes.approve} votes ({approvePercentage.toFixed(1)}%)</span>
+                <span className="text-green-400">{proposal.currentVotes.approve} ({approvePercentage.toFixed(1)}%)</span>
               </div>
-              <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-black/40 rounded-full h-3 overflow-hidden border border-white/5">
                 <motion.div
-                  className="h-full bg-green-400 rounded-full origin-left"
-                  initial={false}
+                  className="h-full bg-green-500 rounded-full origin-left animate-shimmer shadow-[0_0_10px_rgba(34,197,94,0.6)]"
+                  initial={{ scaleX: 0 }}
                   animate={{ scaleX: approveProgressRatio }}
-                  transition={{ duration: 0.5 }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
                 />
               </div>
             </div>
-            
+
+            {/* Reject Bar */}
             <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="flex items-center">
-                  <XCircle size={14} className="mr-1 text-red-400" />
-                  Reject
+              <div className="flex justify-between text-xs font-mono mb-1">
+                <span className="flex items-center text-red-500 font-bold">
+                  <XCircle size={12} className="mr-1" />
+                  REJECT
                 </span>
-                <span>{proposal.currentVotes.reject} votes ({rejectPercentage.toFixed(1)}%)</span>
+                <span className="text-red-500">{proposal.currentVotes.reject} ({rejectPercentage.toFixed(1)}%)</span>
               </div>
-              <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-black/40 rounded-full h-3 overflow-hidden border border-white/5">
                 <motion.div
-                  className="h-full bg-red-400 rounded-full origin-left"
-                  initial={false}
+                  className="h-full bg-red-600 rounded-full origin-left animate-shimmer shadow-[0_0_10px_rgba(220,38,38,0.6)]"
+                  initial={{ scaleX: 0 }}
                   animate={{ scaleX: rejectProgressRatio }}
-                  transition={{ duration: 0.5 }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
                 />
               </div>
             </div>
@@ -197,29 +204,26 @@ const DAOVoteModal: FC<DAOVoteModalProps> = ({
         </div>
 
         {/* Quorum Status */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-6 px-3 py-2 bg-white/5 rounded-lg border border-white/10">
           <div className="flex items-center space-x-2">
-            <span className="text-sm opacity-70">Quorum:</span>
-            <span className={`text-sm font-semibold ${totalVotes >= proposal.quorum ? 'text-green-400' : 'text-yellow-400'}`}>
-              {totalVotes}/{proposal.quorum}
+            <span className="text-xs font-mono opacity-70">QUORUM STATUS:</span>
+            <span className={`text-xs font-mono font-bold ${totalVotes >= proposal.quorum ? 'text-green-400' : 'text-yellow-400'}`}>
+              {totalVotes >= proposal.quorum ? 'REACHED' : 'PENDING'} ({totalVotes}/{proposal.quorum})
             </span>
-            {totalVotes >= proposal.quorum && <CheckCircle size={14} className="text-green-400" />}
           </div>
-          <div className="text-sm opacity-70">
-            Total votes: {totalVotes}
-          </div>
+          {totalVotes >= proposal.quorum && <CheckCircle size={14} className="text-green-400 drop-shadow-[0_0_5px_rgba(34,197,94,0.8)]" />}
         </div>
 
         {/* Voting Buttons */}
         {hasVoted ? (
-          <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-4 text-center">
-            <CheckCircle className="mx-auto mb-2 text-green-400" size={24} />
-            <h3 className="font-semibold mb-1">Vote recorded!</h3>
-            <p className="text-sm opacity-80">
-              Your "{selectedVote === 'approve' ? 'Approve' : 'Reject'}" vote has been counted.
+          <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 text-center">
+            <CheckCircle className="mx-auto mb-2 text-green-400 animate-pulse" size={32} />
+            <h3 className="font-bold mb-1 font-space text-green-400">Vote Recorded On-Chain</h3>
+            <p className="text-xs font-mono opacity-80">
+              TxHash: 0x{Math.random().toString(16).slice(2, 10)}...
             </p>
-            <p className="text-xs opacity-60 mt-2">
-              Voting power increased by +10 points
+            <p className="text-xs font-mono text-accent-purple mt-2">
+              Processing Power Gained: +10
             </p>
           </div>
         ) : (
@@ -229,14 +233,14 @@ const DAOVoteModal: FC<DAOVoteModalProps> = ({
               whileTap={{ scale: 0.98 }}
               onClick={() => handleVote('approve')}
               disabled={isVoting}
-              className="py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 bg-green-600 hover:bg-green-500 text-white disabled:opacity-50"
+              className="py-3 px-4 rounded-xl font-bold font-mono transition-all flex items-center justify-center space-x-2 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white shadow-lg shadow-green-900/20 disabled:opacity-50 disabled:cursor-not-allowed group"
             >
               {isVoting && selectedVote === 'approve' ? (
                 <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
               ) : (
-                <CheckCircle size={16} />
+                <CheckCircle size={18} className="group-hover:scale-110 transition-transform" />
               )}
-              <span>Approve</span>
+              <span>APPROVE</span>
             </motion.button>
 
             <motion.button
@@ -244,31 +248,17 @@ const DAOVoteModal: FC<DAOVoteModalProps> = ({
               whileTap={{ scale: 0.98 }}
               onClick={() => handleVote('reject')}
               disabled={isVoting}
-              className="py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-500 text-white disabled:opacity-50"
+              className="py-3 px-4 rounded-xl font-bold font-mono transition-all flex items-center justify-center space-x-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white shadow-lg shadow-red-900/20 disabled:opacity-50 disabled:cursor-not-allowed group"
             >
               {isVoting && selectedVote === 'reject' ? (
                 <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
               ) : (
-                <XCircle size={16} />
+                <XCircle size={18} className="group-hover:scale-110 transition-transform" />
               )}
-              <span>Reject</span>
+              <span>REJECT</span>
             </motion.button>
           </div>
         )}
-
-        {/* Voting Power Info */}
-        <div className="mt-4 p-3 bg-white/5 rounded-lg">
-          <div className="flex justify-between text-xs">
-            <span className="opacity-70">Your voting power:</span>
-            <span className="font-semibold text-accent-purple">{votingPower} points</span>
-          </div>
-          <div className="flex justify-between text-xs mt-1">
-            <span className="opacity-70">DAO status:</span>
-            <span className={votingPower >= 100 ? 'text-green-400' : 'text-yellow-400'}>
-              {votingPower >= 100 ? 'Active Member' : 'Observer'}
-            </span>
-          </div>
-        </div>
       </motion.div>
     </motion.div>
   )

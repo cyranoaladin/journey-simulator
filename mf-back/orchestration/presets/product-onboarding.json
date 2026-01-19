@@ -1,6 +1,6 @@
 {
   "name": "product-onboarding",
-  "description": "Onboarding produit avec UX et spec cadrées",
+  "description": "Onboarding produit avec UX et spec cadrees",
   "intents": "product.spec+ux.writing+journey.design+observability",
   "journey": {
     "journeyType": "onboarding",
@@ -14,5 +14,5 @@
     "ObservabilityAgent"
   ],
   "sampleInput": "Concevoir un onboarding clair pour le nouveau module.",
-  "sampleOutput": "Spec concise, CTA verb-first, frictions identifiées, SLOs définis."
+  "sampleOutput": "Spec concise, CTA verb-first, frictions identifiees, SLOs definis."
 }

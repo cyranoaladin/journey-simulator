@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useMemo } from 'react';
 import { Persona, UserProgress } from '../types/journey';
 import { getPhaseFromStepId } from '../config/journeyPhases';

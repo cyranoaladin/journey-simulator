@@ -1,0 +1,278 @@
+{
+  "config": {
+    "configFile": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/playwright.config.ts",
+    "rootDir": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/global-setup.ts",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 2
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "line",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "playwright_report.json"
+        }
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "test-results/html-report",
+          "open": "never"
+        }
+      ],
+      [
+        "list",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 2
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 90000
+      },
+      {
+        "outputDir": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 2
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 90000
+      }
+    ],
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.57.0",
+    "workers": 8,
+    "webServer": {
+      "command": "npm run preview -- --port 3000",
+      "url": "http://127.0.0.1:3000",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "final-demo-verification.spec.ts",
+      "file": "final-demo-verification.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Full Demo Phase 6 Verification",
+          "file": "final-demo-verification.spec.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Complete Demo Flow to Phase 6 & Veteran Status",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 63824,
+                      "error": {
+                        "message": "TimeoutError: locator.click: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('link', { name: 'Journeys' })\u001b[22m\n",
+                        "stack": "TimeoutError: locator.click: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('link', { name: 'Journeys' })\u001b[22m\n\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/final-demo-verification.spec.ts:40:60",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/final-demo-verification.spec.ts",
+                          "column": 60,
+                          "line": 40
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 38 |\u001b[39m\n \u001b[90m 39 |\u001b[39m         \u001b[90m// Navigate to Journeys\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 40 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'link'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[32m'Journeys'\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 41 |\u001b[39m\n \u001b[90m 42 |\u001b[39m         \u001b[90m// Select Capital Foundry\u001b[39m\n \u001b[90m 43 |\u001b[39m         \u001b[90m// Look for the card or link. Adjust selector based on actual text.\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/final-demo-verification.spec.ts",
+                            "column": 60,
+                            "line": 40
+                          },
+                          "message": "TimeoutError: locator.click: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('link', { name: 'Journeys' })\u001b[22m\n\n\n\u001b[0m \u001b[90m 38 |\u001b[39m\n \u001b[90m 39 |\u001b[39m         \u001b[90m// Navigate to Journeys\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 40 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'link'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[32m'Journeys'\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 41 |\u001b[39m\n \u001b[90m 42 |\u001b[39m         \u001b[90m// Select Capital Foundry\u001b[39m\n \u001b[90m 43 |\u001b[39m         \u001b[90m// Look for the card or link. Adjust selector based on actual text.\u001b[39m\u001b[0m\n\u001b[2m    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/final-demo-verification.spec.ts:40:60\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-18T15:32:10.977Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/final-demo-verification-Fu-8e0ef-w-to-Phase-6-Veteran-Status-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/final-demo-verification-Fu-8e0ef-w-to-Phase-6-Veteran-Status-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/final-demo-verification-Fu-8e0ef-w-to-Phase-6-Veteran-Status-chromium/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/final-demo-verification-Fu-8e0ef-w-to-Phase-6-Veteran-Status-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/final-demo-verification.spec.ts",
+                        "column": 60,
+                        "line": 40
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e92c1f4cc65d96363b65-0bdf6e53da698a817e1a",
+              "file": "final-demo-verification.spec.ts",
+              "line": 28,
+              "column": 5
+            },
+            {
+              "title": "Complete Demo Flow to Phase 6 & Veteran Status",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 65602,
+                      "error": {
+                        "message": "TimeoutError: locator.click: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('link', { name: 'Journeys' })\u001b[22m\n",
+                        "stack": "TimeoutError: locator.click: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('link', { name: 'Journeys' })\u001b[22m\n\n    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/final-demo-verification.spec.ts:40:60",
+                        "location": {
+                          "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/final-demo-verification.spec.ts",
+                          "column": 60,
+                          "line": 40
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 38 |\u001b[39m\n \u001b[90m 39 |\u001b[39m         \u001b[90m// Navigate to Journeys\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 40 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'link'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[32m'Journeys'\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 41 |\u001b[39m\n \u001b[90m 42 |\u001b[39m         \u001b[90m// Select Capital Foundry\u001b[39m\n \u001b[90m 43 |\u001b[39m         \u001b[90m// Look for the card or link. Adjust selector based on actual text.\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/final-demo-verification.spec.ts",
+                            "column": 60,
+                            "line": 40
+                          },
+                          "message": "TimeoutError: locator.click: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('link', { name: 'Journeys' })\u001b[22m\n\n\n\u001b[0m \u001b[90m 38 |\u001b[39m\n \u001b[90m 39 |\u001b[39m         \u001b[90m// Navigate to Journeys\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 40 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'link'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[32m'Journeys'\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 41 |\u001b[39m\n \u001b[90m 42 |\u001b[39m         \u001b[90m// Select Capital Foundry\u001b[39m\n \u001b[90m 43 |\u001b[39m         \u001b[90m// Look for the card or link. Adjust selector based on actual text.\u001b[39m\u001b[0m\n\u001b[2m    at /home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/final-demo-verification.spec.ts:40:60\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-18T15:32:11.072Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/final-demo-verification-Fu-8e0ef-w-to-Phase-6-Veteran-Status-firefox/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/final-demo-verification-Fu-8e0ef-w-to-Phase-6-Veteran-Status-firefox/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/final-demo-verification-Fu-8e0ef-w-to-Phase-6-Veteran-Status-firefox/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/test-results/artifacts/final-demo-verification-Fu-8e0ef-w-to-Phase-6-Veteran-Status-firefox/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/alaeddine/Documents/journey_mfai_back_front/journey-simulator/tests/e2e/final-demo-verification.spec.ts",
+                        "column": 60,
+                        "line": 40
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e92c1f4cc65d96363b65-a6b07664f326f1cc1d6d",
+              "file": "final-demo-verification.spec.ts",
+              "line": 28,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-01-18T15:32:06.854Z",
+    "duration": 71961.789,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

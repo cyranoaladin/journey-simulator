@@ -1,6 +1,12 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { simulateTx } from '../../../../packages/agents/tools/solana'
+import { simulateTx } from 'agents/tools/solana'
 
 const Body = z.object({
   recipient: z.string(),

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useState, useEffect, type FC, type MouseEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -9,20 +15,20 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { Certification } from "../types/journey";
+import { Certificate } from "../types/journey";
 import { useJourneyStore } from "../store/journeyStore";
 import { api } from "../utils/api";
 import { getPersonaStyle } from "../utils/personaStyles";
 
 interface NFTMintingModalProps {
-  certification: Certification;
+  certificate: Certificate;
   onClose: () => void;
   onMinted: (mintAddress: string) => void;
   debugRecipient?: string;
 }
 
 const NFTMintingModal: FC<NFTMintingModalProps> = ({
-  certification,
+  certificate,
   onClose,
   onMinted,
   debugRecipient,
@@ -66,9 +72,9 @@ const NFTMintingModal: FC<NFTMintingModalProps> = ({
       // Step 1: simulate
       const simulatePayload = {
         recipient,
-        name: certification.name,
+        name: certificate.name,
         symbol: "MFAI",
-        uri: certification.imageUrl || "https://example.com/metadata.json",
+        uri: certificate.imageUrl || "https://example.com/metadata.json",
       };
       setCurrentStep(2);
       const sim = await api.solanaMintSimulate(simulatePayload);
@@ -95,11 +101,11 @@ const NFTMintingModal: FC<NFTMintingModalProps> = ({
       try {
         await api.addNFTCertificateEnhanced({
           phase: 1,
-          title: certification.name,
-          description: certification.description,
-          image_url: certification.imageUrl,
+          title: certificate.name,
+          description: certificate.description,
+          image_url: certificate.imageUrl,
           mint_address: txSig,
-          rarity: certification.rarity || "rare",
+          rarity: certificate.rarity || "rare",
           xp_earned: 100,
         });
 
@@ -137,7 +143,7 @@ const NFTMintingModal: FC<NFTMintingModalProps> = ({
       case 3:
         return "Creating on-chain token...";
       case 4:
-        return "Finalizing Proof-of-Skill™ NFT...";
+        return "Finalizing Proof-of-Skill NFT...";
       default:
         return "Processing...";
     }
@@ -158,12 +164,12 @@ const NFTMintingModal: FC<NFTMintingModalProps> = ({
         onClick={(e: MouseEvent) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
-        aria-label="Mint Proof-of-Skill™ NFT"
+        aria-label="Mint Proof-of-Skill NFT"
         className="bg-primary-900 rounded-2xl p-6 max-w-md w-full border border-white/20"
       >
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-space font-bold">
-            Mint Proof-of-Skill™ NFT
+            Mint Proof-of-Skill NFT
           </h2>
           <button
             onClick={onClose}
@@ -180,10 +186,10 @@ const NFTMintingModal: FC<NFTMintingModalProps> = ({
             } border-white/20`}
         >
           <div className="w-full h-48 bg-black/20 rounded-lg mb-4 flex items-center justify-center">
-            {certification.imageUrl ? (
+            {certificate.imageUrl ? (
               <img
-                src={certification.imageUrl}
-                alt={certification.name}
+                src={certificate.imageUrl}
+                alt={certificate.name}
                 className="w-full h-full object-cover rounded-lg"
               />
             ) : (
@@ -196,9 +202,9 @@ const NFTMintingModal: FC<NFTMintingModalProps> = ({
             )}
           </div>
           <h3 className="font-space font-bold text-white mb-2">
-            {certification.name}
+            {certificate.name}
           </h3>
-          <p className="text-white/80 text-sm">{certification.description}</p>
+          <p className="text-white/80 text-sm">{certificate.description}</p>
         </div>
 
         {!mintTxSig && !error && !isMinting && (
@@ -212,13 +218,13 @@ const NFTMintingModal: FC<NFTMintingModalProps> = ({
               <div className="flex justify-between">
                 <span className="opacity-70">Estimated fee:</span>
                 <span className="text-green-400">
-                  {simDetails ? `${simDetails.estFeeLamports} lamports` : "—"}
+                  {simDetails ? `${simDetails.estFeeLamports} lamports` : ""}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="opacity-70">Risk score:</span>
                 <span>
-                  {simDetails ? simDetails.riskScore.toFixed(2) : "—"}
+                  {simDetails ? simDetails.riskScore.toFixed(2) : ""}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -261,11 +267,11 @@ const NFTMintingModal: FC<NFTMintingModalProps> = ({
             <div className="flex items-center space-x-2 mb-3">
               <CheckCircle className="text-green-400" size={20} />
               <h3 className="font-semibold text-green-400">
-                Proof-of-Skill™ Minted!
+                Proof-of-Skill Minted!
               </h3>
             </div>
             <p className="text-sm opacity-80 mb-3">
-              Your Proof-of-Skill™ transaction has been submitted on Solana
+              Your Proof-of-Skill transaction has been submitted on Solana
             </p>
             <div className="bg-black/20 rounded-lg p-2">
               <div className="text-xs opacity-70 mb-1">
@@ -310,7 +316,7 @@ const NFTMintingModal: FC<NFTMintingModalProps> = ({
                 } text-white disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               <Award size={16} />
-              <span>Mint Proof-of-Skill™ NFT</span>
+              <span>Mint Proof-of-Skill NFT</span>
             </motion.button>
           )}
 
@@ -344,7 +350,7 @@ const NFTMintingModal: FC<NFTMintingModalProps> = ({
         {!publicKey && !debugRecipient && (
           <div className="mt-4 p-3 bg-yellow-500/20 border border-yellow-500/30 rounded-lg">
             <p className="text-sm text-yellow-400">
-              Connect your Solana wallet to mint this Proof-of-Skill™ NFT
+              Connect your Solana wallet to mint this Proof-of-Skill NFT
             </p>
           </div>
         )}
@@ -361,7 +367,7 @@ const NFTMintingModal: FC<NFTMintingModalProps> = ({
                 <CheckCircle className="text-green-400 mt-0.5" size={18} />
                 <div className="flex-1">
                   <div className="text-sm font-semibold mb-1">
-                    Proof-of-Skill™ minted
+                    Proof-of-Skill minted
                   </div>
                   <div className="text-xs opacity-80 mb-2 break-all">
                     Tx: {mintTxSig}

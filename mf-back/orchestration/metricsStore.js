@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const MAX_WINDOW = 100;
 
 class MetricsStore {
@@ -43,6 +49,8 @@ class MetricsStore {
       queueQueued: runResult.ops?.concurrency?.queued || 0,
       queueShed: Boolean(runResult.ops?.concurrency?.shed),
       coldStart: Boolean(runResult.systemStatus?.runtime?.coldStart),
+      fallbackCount: (runResult.ops?.fallbacks || []).length,
+      rateLimitCount: (runResult.ops?.concurrency?.shed ? 1 : 0) + (runResult.ops?.execution?.blocked ? 1 : 0),
     };
     const bucket = this.ensureTenant(tenantId);
     bucket.push(entry);
@@ -83,6 +91,8 @@ class MetricsStore {
     const coldStartCount = items.filter((e) => e.coldStart).length;
     const agentsDisabledRateAvg =
       items.reduce((acc, e) => acc + (e.agentsDisabledRate || 0), 0) / count;
+    const fallbackCountTotal = items.reduce((acc, e) => acc + (e.fallbackCount || 0), 0);
+    const rateLimitCountTotal = items.reduce((acc, e) => acc + (e.rateLimitCount || 0), 0);
     const presetUsage = items.reduce((acc, e) => {
       if (e.preset) acc[e.preset] = (acc[e.preset] || 0) + 1;
       return acc;
@@ -104,7 +114,13 @@ class MetricsStore {
         realBlocked: realBlockedCount / count,
         agentsDisabled: agentsDisabledRateAvg,
         cbOpen: cbOpenCount / count,
+        cbOpen: cbOpenCount / count,
         queueShed: queueShedCount / count,
+      },
+      counts: {
+        fallback_count: fallbackCountTotal,
+        rate_limit_count: rateLimitCountTotal,
+        timeout_count: statusCounts.TIMEOUT,
       },
       llm: {
         cacheHitRate: llmCalls > 0 ? llmCacheHits / llmCalls : 0,

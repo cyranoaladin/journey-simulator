@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
@@ -128,6 +134,14 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
     sampleMissionSummary as MissionSummary,
   );
   const runMode = useJourneyStore((state) => state.runMode);
+
+  // E2E fail-fast guard: ensure runMode='real' when RUN_MODE_GUARD=real
+  const isE2EGuardReal =
+    typeof window !== 'undefined' && (window as any).__E2E_RUN_MODE_GUARD__ === 'real';
+
+  if (isE2EGuardReal && runMode !== 'real') {
+    throw new Error(`E2E_RUN_MODE_GUARD_REAL_VIOLATION: runMode=${runMode}`);
+  }
   const [history, setHistory] = useState<PromptHistoryEntry[]>([]);
   const [healthProbes, setHealthProbes] = useState<Record<ProbeKey, ProbeState>>(() => ({
     healthz: createProbeState(),
@@ -183,7 +197,7 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
       if (process.env.NODE_ENV === 'test') {
         storedUserId = 'test-user';
       } else {
-        throw new Error('userId manquant : connectez-vous puis réessayez.');
+        throw new Error('Missing userId: please login and try again.');
       }
     }
 
@@ -312,7 +326,7 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
 
     const generatedTextLines = timeline.map((entry) => {
       const reasoning = entry.reasoning ?? payload.results?.[entry.agent]?.feedback?.ae_summary ?? 'Summary unavailable';
-      return `• ${entry.agent} → ${reasoning}`;
+      return ` ${entry.agent}  ${reasoning}`;
     });
 
     return {
@@ -320,12 +334,13 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
       timestamp: new Date().toISOString(),
       aepoScore,
       aecoPhase: payload.intent,
-      agents: timeline.length ? timeline.map((entry) => entry.agent) : payload.executedAgents,
+      agents: timeline.length ? timeline.map((entry) => entry.agent) : (payload.executedAgents || []),
       generatedText: `Automatically generated synthesis:\n${generatedTextLines.join('\n')}`,
     };
   };
 
   const handleRunSimulation = async (prompt?: string) => {
+    console.log('ZYNO_CLICK_TRIGGERED', prompt, userInput);
     const intent = prompt ?? userInput;
     const trimmed = intent.trim();
     if (!trimmed) {
@@ -336,7 +351,9 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
 
     setStatus('loading');
 
-    const { controller, clear } = createAbortableTimeout(10000);
+    const timeoutMs = runMode === 'real' ? 180000 : 10000;
+    console.info(`[ZYNO] RUN_MODE_EFFECTIVE=${runMode} ORCH_TIMEOUT_ARMED_MS=${timeoutMs}`);
+    const { controller, clear } = createAbortableTimeout(timeoutMs);
 
     try {
       const payload = await submitSimulation(trimmed, controller.signal);
@@ -369,7 +386,7 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
 
     return {
       aepo: missionSummary.aepoScore,
-      agents: missionSummary.agents.length,
+      agents: missionSummary.agents?.length ?? 0,
       timestamp: new Date(missionSummary.timestamp).toLocaleString(),
     };
   }, [missionSummary]);
@@ -384,177 +401,177 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
     return { className: 'bg-info/15 text-info', label: 'Pending' };
   };
 
-type MissionHighlights = {
-  aepo: number;
-  agents: number;
-  timestamp: string | null;
-};
+  type MissionHighlights = {
+    aepo: number;
+    agents: number;
+    timestamp: string | null;
+  };
 
-const MissionStats = ({
-  missionHighlights,
-  refreshHealthStatus,
-  healthRefreshState,
-  healthProbes,
-  latestHealthCheck,
-  failingProbe,
-}: {
-  readonly missionHighlights: MissionHighlights;
-  readonly refreshHealthStatus: () => Promise<void>;
-  readonly healthRefreshState: 'idle' | 'refreshing';
-  readonly healthProbes: Record<ProbeKey, ProbeState>;
-  readonly latestHealthCheck: string;
-  readonly failingProbe: ProbeState | undefined;
-}) => (
-  <div className="flex flex-wrap items-start justify-between gap-4">
-    <div className="flex items-center gap-3">
-      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-accent text-white shadow-neon-ring">
-        <Bot size={22} />
+  const MissionStats = ({
+    missionHighlights,
+    refreshHealthStatus,
+    healthRefreshState,
+    healthProbes,
+    latestHealthCheck,
+    failingProbe,
+  }: {
+    readonly missionHighlights: MissionHighlights;
+    readonly refreshHealthStatus: () => Promise<void>;
+    readonly healthRefreshState: 'idle' | 'refreshing';
+    readonly healthProbes: Record<ProbeKey, ProbeState>;
+    readonly latestHealthCheck: string;
+    readonly failingProbe: ProbeState | undefined;
+  }) => (
+    <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="flex items-center gap-3">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-accent text-white shadow-neon-ring">
+          <Bot size={22} />
+        </div>
+        <div>
+          <p className="text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-mfai-text/60">Zyno Mission Control</p>
+          <h2 className="mt-1 text-2xl font-semibold text-slate-900 dark:text-mfai-text md:text-3xl">Interactive Agentic Console</h2>
+        </div>
       </div>
-      <div>
-        <p className="text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-mfai-text/60">Zyno Mission Control</p>
-        <h2 className="mt-1 text-2xl font-semibold text-slate-900 dark:text-mfai-text md:text-3xl">Interactive Agentic Console</h2>
+      <div className="grid grid-cols-2 gap-3 text-sm text-slate-600 dark:text-mfai-text/80 sm:grid-cols-4">
+        <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
+          <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">AEPO Score</span>
+          <p className="mt-1 text-lg font-semibold text-accent">{missionHighlights.aepo || ''}</p>
+        </div>
+        <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
+          <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">Agents Activated</span>
+          <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-mfai-text">{missionHighlights.agents}</p>
+        </div>
+        <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
+          <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">Last Sync</span>
+          <p className="mt-1 text-xs text-slate-600 dark:text-mfai-text/70">{missionHighlights.timestamp ?? 'Never'}</p>
+        </div>
+        <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">Stack Health</span>
+            <button
+              type="button"
+              onClick={refreshHealthStatus}
+              disabled={healthRefreshState === 'refreshing'}
+              className="inline-flex items-center rounded-full border border-slate-200/60 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-600 transition hover:border-accent/50 hover:text-accent disabled:opacity-60 dark:border-mfai-border/50 dark:text-mfai-text/70"
+              title="Refresh health probes"
+            >
+              {healthRefreshState === 'refreshing' ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
+            </button>
+          </div>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {probeKeys.map((key) => {
+              const probe = healthProbes[key];
+              const label = probeConfig[key].label;
+              return (
+                <span key={key} className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-semibold ${getProbeBadgeClasses(probe.status)}`}>
+                  {label}
+                  <span className="text-[10px] opacity-70">{typeof probe.latencyMs === 'number' ? `${probe.latencyMs}ms` : ''}</span>
+                </span>
+              );
+            })}
+          </div>
+          <p className="mt-2 text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">Last check: {latestHealthCheck}</p>
+          {failingProbe?.error ? <p className="mt-1 text-xs text-rose-400">{failingProbe.error}</p> : null}
+        </div>
       </div>
     </div>
-    <div className="grid grid-cols-2 gap-3 text-sm text-slate-600 dark:text-mfai-text/80 sm:grid-cols-4">
-      <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
-        <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">AEPO Score</span>
-        <p className="mt-1 text-lg font-semibold text-accent">{missionHighlights.aepo || '—'}</p>
-      </div>
-      <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
-        <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">Agents Activated</span>
-        <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-mfai-text">{missionHighlights.agents}</p>
-      </div>
-      <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
-        <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">Last Sync</span>
-        <p className="mt-1 text-xs text-slate-600 dark:text-mfai-text/70">{missionHighlights.timestamp ?? 'Never'}</p>
-      </div>
-      <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
-        <div className="flex items-center justify-between">
-          <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">Stack Health</span>
-          <button
+  );
+
+  const QuickTemplatesSection = ({
+    onSelect,
+    shouldReduceMotion,
+    setUserInput,
+  }: {
+    readonly onSelect: (value: string) => void;
+    readonly shouldReduceMotion: boolean;
+    readonly setUserInput: (value: string) => void;
+  }) => (
+    <div className="mfai-console-panel space-y-3">
+      <p className="text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-mfai-text/60">Quick Templates</p>
+      <div className="flex flex-wrap gap-2">
+        {quickIntents.map((intent) => (
+          <motion.button
             type="button"
-            onClick={refreshHealthStatus}
-            disabled={healthRefreshState === 'refreshing'}
-            className="inline-flex items-center rounded-full border border-slate-200/60 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-600 transition hover:border-accent/50 hover:text-accent disabled:opacity-60 dark:border-mfai-border/50 dark:text-mfai-text/70"
-            title="Refresh health probes"
+            key={intent.label}
+            whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
+            whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
+            onClick={() => {
+              setUserInput(intent.value);
+              onSelect(intent.value);
+            }}
+            className="inline-flex items-center gap-2 rounded-2xl border border-accent/40 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-accent transition-colors hover:bg-accent/10 dark:bg-mfai-surface/60"
           >
-            {healthRefreshState === 'refreshing' ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
-          </button>
+            <intent.icon size={14} />
+            {intent.label}
+          </motion.button>
+        ))}
+      </div>
+    </div>
+  );
+
+  const RequestHistory = ({
+    history,
+    shouldReduceMotion,
+    onClear,
+    onReuse,
+    onRelaunch,
+  }: {
+    readonly history: PromptHistoryEntry[];
+    readonly shouldReduceMotion: boolean;
+    readonly onClear: () => void;
+    readonly onReuse: (text: string) => void;
+    readonly onRelaunch: (text: string) => void;
+  }) => (
+    <div className="mfai-console-panel space-y-4">
+      <header className="flex items-center justify-between text-sm text-slate-600 dark:text-mfai-text/70">
+        <div className="flex items-center gap-2">
+          <History size={16} />
+          Request History
         </div>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {probeKeys.map((key) => {
-            const probe = healthProbes[key];
-            const label = probeConfig[key].label;
+        <button type="button" className="text-xs text-accent underline-offset-4 hover:underline" onClick={onClear}>
+          Clear
+        </button>
+      </header>
+      {history.length === 0 ? (
+        <p className="text-sm text-slate-600 dark:text-mfai-text/60">No missions recorded yet.</p>
+      ) : (
+        <ul className="flex flex-col gap-3">
+          {history.map((entry) => {
+            const badge = getHistoryBadge(entry.status);
             return (
-              <span key={key} className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-semibold ${getProbeBadgeClasses(probe.status)}`}>
-                {label}
-                <span className="text-[10px] opacity-70">{typeof probe.latencyMs === 'number' ? `${probe.latencyMs}ms` : '—'}</span>
-              </span>
+              <li key={entry.id} className="rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm text-slate-700 dark:border-mfai-border/60 dark:bg-mfai-surfaceAlt/40 dark:text-mfai-text/80">
+                <div className="flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-mfai-text/60">
+                  <span>{new Date(entry.createdAt).toLocaleTimeString()}</span>
+                  <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${badge.className}`}>{badge.label}</span>
+                </div>
+                <p className="mt-2 text-sm font-medium text-slate-800 dark:text-mfai-text">{entry.text}</p>
+                <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                  <motion.button
+                    type="button"
+                    whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
+                    whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
+                    className="rounded-full border border-slate-200/70 px-3 py-1 text-xs text-slate-600 hover:border-accent/60 hover:text-accent dark:border-mfai-border/60 dark:text-mfai-text/70"
+                    onClick={() => onReuse(entry.text)}
+                  >
+                    Reuse
+                  </motion.button>
+                  <motion.button
+                    type="button"
+                    whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
+                    whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
+                    className="rounded-full border border-accent/40 px-3 py-1 text-xs text-accent hover:bg-accent/10"
+                    onClick={() => onRelaunch(entry.text)}
+                  >
+                    Relaunch
+                  </motion.button>
+                </div>
+              </li>
             );
           })}
-        </div>
-        <p className="mt-2 text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">Last check: {latestHealthCheck}</p>
-        {failingProbe?.error ? <p className="mt-1 text-xs text-rose-400">{failingProbe.error}</p> : null}
-      </div>
+        </ul>
+      )}
     </div>
-  </div>
-);
-
-const QuickTemplatesSection = ({
-  onSelect,
-  shouldReduceMotion,
-  setUserInput,
-}: {
-  readonly onSelect: (value: string) => void;
-  readonly shouldReduceMotion: boolean;
-  readonly setUserInput: (value: string) => void;
-}) => (
-  <div className="mfai-console-panel space-y-3">
-    <p className="text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-mfai-text/60">Quick Templates</p>
-    <div className="flex flex-wrap gap-2">
-      {quickIntents.map((intent) => (
-        <motion.button
-          type="button"
-          key={intent.label}
-          whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
-          whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
-          onClick={() => {
-            setUserInput(intent.value);
-            onSelect(intent.value);
-          }}
-          className="inline-flex items-center gap-2 rounded-2xl border border-accent/40 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-accent transition-colors hover:bg-accent/10 dark:bg-mfai-surface/60"
-        >
-          <intent.icon size={14} />
-          {intent.label}
-        </motion.button>
-      ))}
-    </div>
-  </div>
-);
-
-const RequestHistory = ({
-  history,
-  shouldReduceMotion,
-  onClear,
-  onReuse,
-  onRelaunch,
-}: {
-  readonly history: PromptHistoryEntry[];
-  readonly shouldReduceMotion: boolean;
-  readonly onClear: () => void;
-  readonly onReuse: (text: string) => void;
-  readonly onRelaunch: (text: string) => void;
-}) => (
-  <div className="mfai-console-panel space-y-4">
-    <header className="flex items-center justify-between text-sm text-slate-600 dark:text-mfai-text/70">
-      <div className="flex items-center gap-2">
-        <History size={16} />
-        Request History
-      </div>
-      <button type="button" className="text-xs text-accent underline-offset-4 hover:underline" onClick={onClear}>
-        Clear
-      </button>
-    </header>
-    {history.length === 0 ? (
-      <p className="text-sm text-slate-600 dark:text-mfai-text/60">No missions recorded yet.</p>
-    ) : (
-      <ul className="flex flex-col gap-3">
-        {history.map((entry) => {
-          const badge = getHistoryBadge(entry.status);
-          return (
-            <li key={entry.id} className="rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm text-slate-700 dark:border-mfai-border/60 dark:bg-mfai-surfaceAlt/40 dark:text-mfai-text/80">
-              <div className="flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-mfai-text/60">
-                <span>{new Date(entry.createdAt).toLocaleTimeString()}</span>
-                <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${badge.className}`}>{badge.label}</span>
-              </div>
-              <p className="mt-2 text-sm font-medium text-slate-800 dark:text-mfai-text">{entry.text}</p>
-              <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                <motion.button
-                  type="button"
-                  whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
-                  whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
-                  className="rounded-full border border-slate-200/70 px-3 py-1 text-xs text-slate-600 hover:border-accent/60 hover:text-accent dark:border-mfai-border/60 dark:text-mfai-text/70"
-                  onClick={() => onReuse(entry.text)}
-                >
-                  Reuse
-                </motion.button>
-                <motion.button
-                  type="button"
-                  whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
-                  whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
-                  className="rounded-full border border-accent/40 px-3 py-1 text-xs text-accent hover:bg-accent/10"
-                  onClick={() => onRelaunch(entry.text)}
-                >
-                  Relaunch
-                </motion.button>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
-    )}
-  </div>
-);
+  );
 
   const latestHealthCheck = useMemo(() => {
     const epochs = probeKeys
@@ -591,6 +608,18 @@ const RequestHistory = ({
         viewport={shouldReduceMotion ? undefined : { once: true, margin: '-120px' }}
         className="space-y-8"
       >
+        {status === 'loading' && (
+          <div className="w-full h-32 rounded-lg overflow-hidden border border-cyan-500/30 shadow-neon bg-[#0B0E14] relative mb-4">
+            <iframe
+              src="/neural_swarm.html"
+              className="w-full h-full border-none pointer-events-none opacity-80"
+              title="Neural Swarm Processing"
+            />
+            <div className="absolute inset-0 flex items-center justify-center text-cyan-400 font-mono text-sm tracking-widest animate-pulse">
+              ZYNO ANALYZING...
+            </div>
+          </div>
+        )}
         <header className="mfai-console-panel flex flex-col gap-4">
           <MissionStats
             missionHighlights={missionHighlights}
@@ -632,7 +661,7 @@ const RequestHistory = ({
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3 text-xs text-slate-600 dark:text-mfai-text/70">
                   <ClipboardList size={14} />
-                  <span>History stored locally — your prompts remain private.</span>
+                  <span>History stored locally  your prompts remain private.</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <motion.button
@@ -652,8 +681,8 @@ const RequestHistory = ({
                     whileTap={shouldReduceMotion || status === 'loading' || !userInput.trim() ? undefined : { scale: 0.97 }}
                     disabled={status === 'loading' || !userInput.trim()}
                     className={`inline-flex items-center gap-2 rounded-2xl px-5 py-2 text-sm font-semibold transition duration-300 ease-out-quart focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${status === 'loading' || !userInput.trim()
-                        ? 'cursor-not-allowed border border-slate-200/70 bg-slate-100 text-slate-500 dark:border-mfai-border/60 dark:bg-mfai-surfaceMuted dark:text-mfai-text/50 opacity-70'
-                        : 'bg-gradient-accent text-white shadow-neon-ring'
+                      ? 'cursor-not-allowed border border-slate-200/70 bg-slate-100 text-slate-500 dark:border-mfai-border/60 dark:bg-mfai-surfaceMuted dark:text-mfai-text/50 opacity-70'
+                      : 'bg-gradient-accent text-white shadow-neon-ring'
                       }`}
                   >
                     {status === 'loading' ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
@@ -694,6 +723,7 @@ const RequestHistory = ({
                   intent={result.intent}
                   mode={result.mode}
                   executedAgents={result.executedAgents}
+                  agents={result.agents}
                   results={result.results}
                 />
               </div>

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const fs = require('node:fs');
 const path = require('node:path');
 const { mkFinding, mkAction, estimateConfidence, safeRun } = require('./agentUtils');
@@ -31,7 +37,7 @@ class QAPlaywrightAgent {
 
       const status = 'OK';
       const summary = 'Playwright E2E test plan generated';
-      const assumptions = inputPresent ? [] : ['Input limité, scénarios basés sur defaults'];
+      const assumptions = inputPresent ? [] : ['Limited input, scenarios based on defaults'];
       const limits = ['No real browser execution here (plan only)'];
 
       return {

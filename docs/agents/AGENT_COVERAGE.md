@@ -1,3 +1,9 @@
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
 # Matrice de couverture des agents (R3.3)
 
 Objectif : cartographier l’état réel des 24 agents référencés dans `mf-back/agents/registry.js`, sans modifier le code, afin de préparer leur mise en qualité finale. Statuts : 🟢 REAL (utile/structuré), 🟡 PARTIAL (utile mais incomplet/désactivé), 🔴 STUB (placeholder).

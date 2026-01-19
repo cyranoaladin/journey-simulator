@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useJourneyStore } from '../../store/journeyStore';
@@ -107,10 +113,10 @@ export default function NarrativeChoice({ block }: NarrativeChoiceBlockProps) {
                 <p className="text-xs opacity-75 mt-1">{choice.description}</p>
               </div>
               {selectedChoice === choice.id && !isSubmitted && (
-                <span className="text-cyan-400 text-lg">✓</span>
+                <span className="text-cyan-400 text-lg"></span>
               )}
               {selectedChoice === choice.id && isSubmitted && (
-                <span className="text-green-400 text-lg">✓</span>
+                <span className="text-green-400 text-lg"></span>
               )}
             </div>
           </motion.div>

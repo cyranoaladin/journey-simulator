@@ -1,7 +1,13 @@
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
 # Money Factory AI - Backend API (mf-back)
 
 *Version*: 0.0.0
-*Dernière mise à jour*: Décembre 2025
+*Derniere mise a jour*: Decembre 2025
 *Stack*: Node.js >= 18.0.0, Express 4.21.2, MongoDB (Mongoose 8.10.0), OpenAI 6.9.1
 
 The core backend service for Money Factory AI, responsible for agent orchestration, user management, and journey execution state.

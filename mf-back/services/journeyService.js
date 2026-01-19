@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const User = require('../models/user');
 const Journey = require('../models/Journeys');
 const journeyStateService = require('./journey-state-service');
@@ -5,12 +11,12 @@ const { generateIdempotencyKey } = require('../utils/agent-idempotence');
 const AgentFactory = require('../agents/AgentFactory');
 
 /**
- * Service de gestion des journeys
- * Extrait la logique métier des controllers pour réduire la complexité cognitive
+ * Journey Management Service
+ * Extracts business logic from controllers to reduce cognitive complexity
  */
 class JourneyService {
   /**
-   * Parse et résout le numéro de phase
+   * Parses and resolves phase number
    */
   static parsePhaseNumber(candidate) {
     const parsed = Number(candidate);
@@ -18,7 +24,7 @@ class JourneyService {
   }
 
   /**
-   * Résout le numéro de phase à partir de plusieurs sources
+   * Resolves phase number from multiple sources
    */
   static resolvePhaseNumber(phaseNumber, legacyPhaseNumber, journeyState) {
     return this.parsePhaseNumber(phaseNumber)
@@ -28,7 +34,7 @@ class JourneyService {
   }
 
   /**
-   * Calcule le delta XP à partir du score
+   * Calculates XP delta from score
    */
   static calculateXpDelta(evaluationPayload) {
     const rawScore = Number(evaluationPayload.global_score);
@@ -36,7 +42,7 @@ class JourneyService {
   }
 
   /**
-   * Prépare le payload de progression pour un utilisateur
+   * Prepares progress payload for a user
    */
   static prepareProgressPayload(user) {
     return {
@@ -47,7 +53,7 @@ class JourneyService {
   }
 
   /**
-   * Prépare le payload de progression pour le mode demo
+   * Prepares progress payload for demo mode
    */
   static prepareDemoProgressPayload(journeyState, xpDelta) {
     const baseXp = Number(journeyState?.xp ?? journeyState?.totalXP ?? 0);
@@ -66,7 +72,7 @@ class JourneyService {
   }
 
   /**
-   * Met à jour la progression utilisateur après soumission
+   * Updates user progress after submission
    */
   static async updateUserProgress(userId, xpDelta, missionId, phaseId, trackId, journeyId, resolvedPhaseNumber) {
     const updateOps = {};
@@ -93,7 +99,7 @@ class JourneyService {
   }
 
   /**
-   * Synchronise l'état du journey après soumission
+   * Syncs journey state after submission
    */
   static async syncJourneyState(userId, resolvedPhaseNumber) {
     try {
@@ -123,7 +129,7 @@ class JourneyService {
   }
 
   /**
-   * Prépare le contexte pour l'exécution d'un agent
+   * Prepares agent execution context
    */
   static prepareAgentContext(req, journeyId, phaseId, trackId, submission, inputType, language, mode, tone, journeyState) {
     return {
@@ -142,7 +148,7 @@ class JourneyService {
   }
 
   /**
-   * Exécute un agent pour une soumission
+   * Executes agent for a submission
    */
   static async executeAgentSubmission(ctx, trackId, phaseId, missionId, journeyId) {
     const agent = AgentFactory.getAgentForContext({ trackId, phaseId, missionId });

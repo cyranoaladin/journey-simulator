@@ -1,0 +1,12 @@
+{
+  "createdAt": "2026-01-16T22:52:57.792Z",
+  "project": "mobile-chrome",
+  "statusRaw": "__UNSET__",
+  "statusNorm": "__UNSET__",
+  "keysPresent": [],
+  "runtimeMode": null,
+  "executedAgents": [],
+  "timelineLen": null,
+  "receivedAt": null,
+  "note": "written in finally (fail-safe)"
+}

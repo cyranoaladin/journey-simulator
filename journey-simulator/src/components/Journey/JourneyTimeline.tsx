@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { type KeyboardEvent } from 'react';
 import { CheckCircle2, Lock, PlayCircle, Sparkles } from 'lucide-react';
 import EmptyState from '../shared/EmptyState';
@@ -114,7 +120,7 @@ export default function JourneyTimeline({ phases, currentPhase, onPhaseChange }:
           const isSelectable = Boolean(onPhaseChange) && !isLocked;
 
           return (
-            <li key={phaseKey} className="relative flex gap-3 pl-3">
+            <li key={phaseKey} className="relative flex gap-3 pl-3" data-testid={`timeline-phase-${index}`} data-status={statusLabel}>
               {index < totalPhases - 1 && (
                 <span className="absolute left-[15px] top-10 h-[calc(100%-2.5rem)] w-px bg-white/10" aria-hidden="true" />
               )}
@@ -127,6 +133,7 @@ export default function JourneyTimeline({ phases, currentPhase, onPhaseChange }:
                 className={getButtonClasses(isSelectable)}
                 aria-current={isActive ? 'step' : undefined}
                 aria-disabled={isSelectable ? undefined : 'true'}
+                data-testid={`timeline-phase-button-${index}`}
               >
                 <div className={`flex h-10 w-10 items-center justify-center rounded-full border text-sm transition ${nodeClasses}`}>
                   <NodeIcon size={18} aria-hidden="true" />

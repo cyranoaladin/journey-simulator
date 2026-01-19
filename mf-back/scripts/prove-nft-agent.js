@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 process.env.LLM_MODEL_NAME = 'gpt-4o'; // Enforce standard model
 require('dotenv').config({ path: '../.env' });
 const NFTAgent = require('../agents/NFTAgent');
@@ -6,7 +12,7 @@ async function runTest() {
     console.log('--- STARTING STRENGTH TEST: NFTAgent ---');
 
     const agent = new NFTAgent();
-    const input = 'Conçois une collection de 5555 NFTs pour un projet DePIN sur Solana, incluant la structure des traits et la stratégie de mint sur Candy Machine v3.';
+    const input = 'Design a collection of 5555 NFTs for a DePIN project on Solana, including trait structure and mint strategy on Candy Machine v3.';
 
     console.log(`Input: "${input}"`);
 

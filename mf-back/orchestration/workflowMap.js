@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 // Source of truth for journey → phase → agent intents mapping.
 // This is intentionally simple and in-memory (no DB).
 
@@ -14,7 +20,7 @@ module.exports = {
       tech: ['security_audit', 'api_contract'],
     },
   },
-  certification: {
+  certificate: {
     phases: {
       tokenomics: ['tokenomics'],
       curriculum: ['curriculum'],
@@ -40,6 +46,13 @@ module.exports = {
       discovery: ['investor_demo'],
       validation: ['risk_fraud'],
       execution: ['product_spec'],
+    },
+  },
+  'e2e-persona': {
+    phases: {
+      discovery: ['investor_demo'],
+      strategy: ['product_spec'],
+      plan: ['ux_writing'],
     },
   },
 };

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate, Navigate } from 'react-router-dom'
 import LazyConfetti from './shared/LazyConfetti'
@@ -57,7 +63,7 @@ const useWindowSize = () => {
 function buildCompletionMarkdown(summary: JourneyCompletionSummary, phaseDetails: JourneyPhaseSnapshot[], userIdentifier: string) {
   // Use array literal instead of multiple push calls
   const lines = [
-    `# Journey Completion – ${summary.personaTitle}`,
+    `# Journey Completion  ${summary.personaTitle}`,
     '',
     `- **User:** ${userIdentifier}`,
     `- **Completed:** ${summary.completedAt}`,
@@ -70,7 +76,7 @@ function buildCompletionMarkdown(summary: JourneyCompletionSummary, phaseDetails
   ];
 
   if (summary.mintedNfts.length > 0) {
-    lines.push('## Proof-of-Skill™ Earned')
+    lines.push('## Proof-of-Skill Earned')
     summary.mintedNfts.forEach((nft) => {
       lines.push(`- ${nft}`)
     })
@@ -261,7 +267,7 @@ const JourneyCompletedPage = () => {
             Digital Sovereignty Achieved
           </h1>
           <p className="mx-auto max-w-3xl text-lg text-white/70">
-            You have fully completed the {summary.personaTitle} journey. Zyno recorded every Proof-of-Skill™ and delivered your activation dossier.
+            You have fully completed the {summary.personaTitle} journey. Zyno recorded every Proof-of-Skill and delivered your activation dossier.
           </p>
         </header>
 
@@ -287,7 +293,7 @@ const JourneyCompletedPage = () => {
                 <p className="text-2xl font-semibold text-accent-purple">{summary.votingPower}</p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/10 p-4">
-                <p className="text-sm text-white/60">Proof-of-Skill™ Earned</p>
+                <p className="text-sm text-white/60">Proof-of-Skill Earned</p>
                 <p className="text-2xl font-semibold text-accent-gold">{summary.mintedNfts.length}</p>
               </div>
             </div>
@@ -306,7 +312,7 @@ const JourneyCompletedPage = () => {
             {summary.mintedNfts.length > 0 && (
               <div className="space-y-2">
                 <h3 className="flex items-center gap-2 text-lg font-semibold text-white">
-                  <Trophy size={18} className="text-accent-gold" /> Proof-of-Skill™ Inventory
+                  <Trophy size={18} className="text-accent-gold" /> Proof-of-Skill Inventory
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {summary.mintedNfts.map((nft) => (
@@ -389,9 +395,9 @@ const JourneyCompletedPage = () => {
             <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
               <h3 className="mb-3 text-lg font-semibold text-white">Next Moves</h3>
               <ul className="space-y-3 text-sm text-white/70">
-                <li>→ Start a new journey to strengthen your Proof-of-Skill™ stack.</li>
-                <li>→ Share your dossier with the Sovereign Builders Network to capture missions.</li>
-                <li>→ Activate Zyno to convert this report into a DAO update or investor pitch.</li>
+                <li> Start a new journey to strengthen your Proof-of-Skill stack.</li>
+                <li> Share your dossier with the Sovereign Builders Network to capture missions.</li>
+                <li> Activate Zyno to convert this report into a DAO update or investor pitch.</li>
               </ul>
             </div>
           </aside>

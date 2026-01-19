@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const { LLMClient } = require('../orchestration/llmClient');
 
 class MintingAgent {
@@ -85,7 +91,7 @@ class MintingAgent {
       parsed.resources = { documentation: '### Error\nCould not parse Minting JSON.' };
     }
 
-    return {
+    const baseResult = {
       traceId,
       agentId: this.id,
       status: 'OK',
@@ -100,6 +106,16 @@ class MintingAgent {
       errors: [],
       mock: llmRes.mock || false,
     };
+
+    if (process.env.MFAI_ONCHAIN_MODE === 'connect-only') {
+      return {
+        ...baseResult,
+        mode: 'simulated',
+        onchainExecuted: false,
+        limits: [...(baseResult.limits || []), 'Simulation only — no on-chain execution in Testnet v0'],
+      };
+    }
+    return baseResult;
   }
 }
 

@@ -32,7 +32,11 @@
     "release:go-live": "node scripts/release/go-live.js",
     "compliance:check": "node scripts/compliance/check-compliance.js",
     "test:load:sim": "node scripts/testing/simulate-load.js",
-    "test:chaos:sim": "node scripts/testing/simulate-chaos.js"
+    "test:chaos:sim": "node scripts/testing/simulate-chaos.js",
+    "seed:test-user": "node mf-back/scripts/seed-test-user.js",
+    "qa:full": "node scripts/rseries-check.js",
+    "qa:rag": "node scripts/rag-contract-test.js",
+    "qa:integrity": "node scripts/write-integrity-check.js"
   },
   "devDependencies": {
     "baseline-browser-mapping": "^2.9.11",

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { FileText, FolderOpen, Loader2, RefreshCw, Shield, UploadCloud } from 'lucide-react';
 import { api, RagDocument } from '../../utils/api';
@@ -26,24 +32,28 @@ const ResourceUploader = () => {
   const hasApiKey = useMemo(() => Boolean(apiKey?.trim()), [apiKey]);
 
   const loadDocuments = useCallback(async () => {
-    if (!hasApiKey) {
-      setDocuments([]);
-      return;
-    }
+    // If using public endpoint, we don't strictly need apiKey for listing,
+    // but the component logic seems to couple them. 
+    // We'll allow loading even without API key since I switched to public endpoint.
+    // However, existing logic lines 36-39 prevented it. 
+    // I will RELAX this restriction to allow public viewing.
+
+    // if (!hasApiKey) { setDocuments([]); return; } // REMOVED CONSTRAINT
 
     setFetchState({ loading: true, error: null });
     try {
       const response = await api.listRagDocuments();
-      setDocuments(response.documents);
+      console.log('[ResourceUploader] Response:', response);
+      setDocuments(response?.documents || []);
       setFetchState({ loading: false, error: null });
     } catch (error) {
       console.error('Unable to load RAG documents:', error);
       setFetchState({
         loading: false,
-        error: error instanceof Error ? error.message : 'Impossible de récupérer la liste des documents.',
+        error: error instanceof Error ? error.message : 'Unable to retrieve document list.',
       });
     }
-  }, [apiKey, hasApiKey]);
+  }, []); // Removed deps since we don't block on apiKey anymore
 
   useEffect(() => {
     loadDocuments();
@@ -84,9 +94,10 @@ const ResourceUploader = () => {
         title: selectedFile.name,
         content: fileContent,
         tags: 'rag,document',
+        apiKey: apiKey?.trim()
       });
 
-      setUploadMessage(`✅ ${selectedFile.name} successfully ingested.`);
+      setUploadMessage(` ${selectedFile.name} successfully ingested.`);
       setSelectedFile(null);
       await loadDocuments();
     } catch (error) {
@@ -102,7 +113,7 @@ const ResourceUploader = () => {
       return (
         <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-500 dark:bg-slate-800 dark:text-slate-300">
           <Loader2 size={16} className="animate-spin" />
-          Syncing…
+          Syncing
         </div>
       );
     }
@@ -209,7 +220,7 @@ const ResourceUploader = () => {
           {uploading ? (
             <>
               <Loader2 size={16} className="animate-spin" />
-              Ingestion in progress…
+              Ingestion in progress
             </>
           ) : (
             <>

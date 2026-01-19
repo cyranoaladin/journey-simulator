@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 /** @jest-environment node */
 import { NextResponse } from 'next/server'
 
@@ -9,6 +15,17 @@ jest.mock('@/server/queue', () => ({
   mintQueue: {
     add: jest.fn(async () => ({ id: 'job-1' })),
   },
+}))
+
+jest.mock('agents/tools/solana', () => ({
+  simulateTx: jest.fn(() =>
+    Promise.resolve({
+      ok: true,
+      logs: ['Mocked'],
+      unitsWithError: 0,
+      estFeeLamports: 1000,
+    })
+  ),
 }))
 
 describe('API /api/mint', () => {

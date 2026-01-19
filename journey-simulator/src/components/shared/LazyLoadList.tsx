@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 interface LazyLoadProps<T> {
@@ -57,7 +63,7 @@ const LazyLoadList = <T,>({
 
     observerRef.current = new IntersectionObserver(handleObserver, options);
 
-    // Observer le dernier élément visible
+    // Observe the last visible element
     if (visibleItems.length > 0 && visibleItems.length < items.length) {
       const lastItemIndex = visibleItems.length - 1;
       const lastItem = containerRef.current.querySelector(`[data-lazy-item="${lastItemIndex}"]`);
@@ -73,7 +79,7 @@ const LazyLoadList = <T,>({
     };
   }, [visibleItems, items, itemsPerBatch, threshold]);
 
-  // Réinitialiser si la liste change
+  // Reset if list changes
   useEffect(() => {
     allLoadedRef.current = false;
     setBatchSize(itemsPerBatch);

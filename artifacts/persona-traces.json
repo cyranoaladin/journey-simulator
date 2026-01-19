@@ -1,0 +1,33 @@
+[
+  {
+    "persona": "web2-migrator",
+    "journey": [
+      { "step": "onboarding", "status": "pass", "proof": "token issued" },
+      { "step": "resources_unlocked", "status": "pass", "items": ["starter-kit", "api-templates"] },
+      { "step": "launch_attempt", "status": "pass", "mode": "simulation" }
+    ]
+  },
+  {
+    "persona": "web3-builder",
+    "journey": [
+      { "step": "onboarding", "status": "pass" },
+      { "step": "bonding_curve_eval", "status": "pass", "cfo_agent": "sigmoid_selected", "input": "project-metadata-s1", "output": "P(S)=m*S+b, sigmoid fallback" },
+      { "step": "deploy_sandbox", "status": "pass" }
+    ]
+  },
+  {
+    "persona": "learner",
+    "journey": [
+      { "step": "onboarding", "status": "pass" },
+      { "step": "badge_check", "status": "fail", "reason": "Proof-of-Skill missing", "gate": "launch_with_zyno_blocked" }
+    ]
+  },
+  {
+    "persona": "investor",
+    "journey": [
+      { "step": "onboarding", "status": "pass" },
+      { "step": "dao_pitch", "status": "pass" },
+      { "step": "resource_unlock", "status": "pass", "artifacts": ["pitch-deck", "tokenomics-sheet"] }
+    ]
+  }
+]

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const REQUIRED_PROD = ['OPENAI_API_KEY'];
 const OPTIONAL_DEV = ['OPENAI_API_KEY'];
 

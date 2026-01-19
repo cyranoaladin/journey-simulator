@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const express = require('express');
 const router = express.Router();
 console.log('Journey Routes Loaded');
@@ -21,6 +27,7 @@ router.post('/complete-phase', protect, journeyController.completePhase);
 router.post('/action', protect, journeyController.journeyAction);
 router.post('/reset-progress', protect, journeyController.resetUserProgress);
 router.get('/user-journeys', protect, journeyController.getUserJourneys);
+router.get('/history', protect, journeyController.getInteractionHistory);
 
 // Protected routes (general)
 router.post('/add-journey', protect, journeyController.createJourney);

@@ -1,4 +1,10 @@
-import { Certification } from '../types/journey';
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
+import { Certificate } from '../types/journey';
 
 const LOGO_IMAGE_PATH = '/images/logo_mfai.png';
 
@@ -89,7 +95,7 @@ export const getPersonaProofData = (
   xpEarned: number,
   phase: string,
   phaseNumber: number
-): Certification => {
+): Certificate => {
   // Get persona-specific descriptions
   const getProofDescription = () => {
     switch (personaId) {
@@ -134,12 +140,12 @@ export const getPersonaProofData = (
 
   return {
     id: uniqueId,
-    name: `Proof-of-${proofType}™: ${phase}`,
+    name: `Proof-of-${proofType}: ${phase}`,
     description: getProofDescription(),
     imageUrl: getImageUrl(),
     rarity: getRarity(),
     attributes: [
-      { trait_type: 'Proof Type', value: `Proof-of-${proofType}™` },
+      { trait_type: 'Proof Type', value: `Proof-of-${proofType}` },
       { trait_type: 'XP Earned', value: xpEarned },
       { trait_type: 'Phase', value: phase },
       { trait_type: 'Completion Date', value: new Date().toLocaleDateString() },
@@ -189,7 +195,7 @@ export const getNFTMetadata = (
     description: proofData.description || description,
     image: proofData.imageUrl || LOGO_IMAGE_PATH,
     attributes: [
-      { trait_type: "Proof Type", value: `Proof-of-${proofType}™` },
+      { trait_type: "Proof Type", value: `Proof-of-${proofType}` },
       { trait_type: "XP Earned", value: xpEarned },
       { trait_type: "Phase", value: phase },
       { trait_type: "Completion Date", value: new Date().toLocaleDateString() },

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const express = require('express');
 const router = express.Router();
 const FavoriteResource = require('../models/FavoriteResource');
@@ -101,7 +107,7 @@ router.delete('/resource/:resourceId', async (req, res) => {
 
 /**
  * PATCH /api/favorites/:id
- * Met à jour les notes/tags d'un favori
+ * Updates the notes/tags of a favorite
  */
 router.patch('/:id', async (req, res) => {
     try {

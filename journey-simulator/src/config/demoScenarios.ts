@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 export const DEMO_SCENARIOS: Record<string, Record<number, string>> = {
     'cognitive-activation-hub': {
         1: 'art-002', // Surface litepaper on first interactive run for demo flows

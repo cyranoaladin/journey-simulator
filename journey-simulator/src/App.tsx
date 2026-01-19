@@ -1,4 +1,10 @@
-import { useEffect, lazy, Suspense } from 'react';
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
+import { useEffect, lazy } from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useThemeStore } from './store/themeStore';
 import { WalletContextProvider } from './contexts/WalletContext';
@@ -9,7 +15,8 @@ import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 import { initParticles } from './utils/particles';
 import Layout from './components/layout/Layout';
-const Dashboard = lazy(() => import('./pages/Dashboard'));
+import Dashboard from './pages/Dashboard';
+// const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Journey = lazy(() => import('./pages/Journey'));
 const JourneyDemo = lazy(() => import('./pages/JourneyDemo'));
 const Playground = lazy(() => import('./pages/Playground'));
@@ -48,13 +55,11 @@ const DemoLayout = () => (
 
 const DebugMint = lazy(() => import('./pages/DebugMint'));
 
-const RouteSkeleton = () => (
+export const RouteSkeleton = () => (
   <div className="flex min-h-[30vh] items-center justify-center text-sm font-semibold text-slate-600 dark:text-slate-200">
-    Loading experience…
+    Loading experience
   </div>
 );
-
-
 
 function App() {
   const { isDark } = useThemeStore();
@@ -78,7 +83,6 @@ function App() {
 
         <div
           className={`min-h-screen transition-colors duration-300 ${isDark
-            // ... existing code ...
             ? 'bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 text-white'
             : 'bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 text-gray-900'
             }`}
@@ -88,40 +92,40 @@ function App() {
             className="pointer-events-none fixed inset-0 -z-10"
             aria-hidden="true"
           />
-          <Suspense fallback={<RouteSkeleton />}>
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
+          {/* <Suspense fallback={<RouteSkeleton />}> */}
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
 
-              {/* Public demo routes (explicitly separated from real journeys) */}
-              <Route element={<DemoLayout />}>
-                <Route path="journeys/demo" element={<JourneyDemo />} />
-                <Route path="journeys/demo/:journeyId" element={<JourneyDemo />} />
-              </Route>
+            {/* Public demo routes (explicitly separated from real journeys) */}
+            <Route element={<DemoLayout />}>
+              <Route path="journeys/demo" element={<JourneyDemo />} />
+              <Route path="journeys/demo/:journeyId" element={<JourneyDemo />} />
+            </Route>
 
-              {/* Protected routes without wallet stack (lighter initial load) */}
-              <Route element={<ProtectedLayout />}>
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path="playground" element={<Playground />} />
-                <Route path="resources" element={<Resources />} />
-                <Route path="support" element={<Support />} />
-                <Route path="zyno" element={<Zyno />} />
-                <Route path="guide" element={<GuidePage />} />
-              </Route>
+            {/* Protected routes without wallet stack (lighter initial load) */}
+            <Route element={<ProtectedLayout />}>
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="playground" element={<Playground />} />
+              <Route path="resources" element={<Resources />} />
+              <Route path="support" element={<Support />} />
+              <Route path="zyno" element={<Zyno />} />
+              <Route path="guide" element={<GuidePage />} />
+            </Route>
 
-              {/* Protected routes that need wallet/NFT features */}
-              <Route element={<WalletProtectedLayout />}>
-                <Route path="debug/mint" element={<DebugMint />} />
-                <Route path="journeys" element={<Journey />} />
-                <Route path="journeys/:journeyId" element={<Journey />} />
-                <Route path="journeys/completed" element={<JourneyCompleted />} />
-                <Route path="dao" element={<Dao />} />
-              </Route>
+            {/* Protected routes that need wallet/NFT features */}
+            <Route element={<WalletProtectedLayout />}>
+              <Route path="debug/mint" element={<DebugMint />} />
+              <Route path="journeys" element={<Journey />} />
+              <Route path="journeys/:journeyId" element={<Journey />} />
+              <Route path="journeys/completed" element={<JourneyCompleted />} />
+              <Route path="dao" element={<Dao />} />
+            </Route>
 
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Suspense>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+          {/* </Suspense> */}
         </div>
       </TutorialProvider>
     </AuthProvider>

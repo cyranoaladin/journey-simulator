@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -100,7 +106,7 @@ describe('NFT Integration in JourneyWorkspace', () => {
                         title: 'Ecosystem Activation',
                         description: 'Phase 1 Description',
                         xpReward: 100,
-                        nftReward: 'Proof-of-Skill™: Activation',
+                        nftReward: 'Proof-of-Skill: Activation',
                         requirements: [],
                         tools: [],
                         outcomes: [],

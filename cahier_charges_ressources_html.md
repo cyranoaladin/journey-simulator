@@ -1,3 +1,9 @@
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
+<!-- Production Ready - 2026 | Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA -->
+
 Cahier des Charges : Module "High-Fidelity Artifacts" (MVP)
 1. Contexte et Objectif
 L'objectif est de démontrer la valeur ajoutée de la plateforme : la production de livrables concrets (Artifacts). Au lieu de simples réponses textuelles, l'utilisateur recevra des documents interactifs (HTML) simulés, produits par les agents spécialisés (CFO, Architect, Growth, Marketing).

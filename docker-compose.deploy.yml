@@ -12,6 +12,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3002
+      EXECUTION_ENABLED: "true"
       MONGO_URI: mongodb://mfai-mongo:27017/journey
       API_BASE_URL: https://journey.mfai.app/api
       SKIP_NPM_INSTALL: "true"
@@ -32,6 +33,8 @@ services:
       mfai-mongo:
         condition: service_healthy
     restart: always
+    networks:
+      - mfai-net
 
   mfai-mongo:
     container_name: mfai-mongo
@@ -53,6 +56,8 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+    networks:
+      - mfai-net
 
   mfai-postgres:
     container_name: mfai-postgres
@@ -78,6 +83,8 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+    networks:
+      - mfai-net
 
   mfai-web:
     container_name: mfai-web
@@ -97,7 +104,59 @@ services:
     depends_on:
       - mfai-api
     restart: always
+    networks:
+      - mfai-net
+
+  mfai-redis:
+    container_name: mfai-redis
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+    volumes:
+      - mfai-redis-data:/data
+    restart: always
+    networks:
+      - mfai-net
+
+  mfai-web-api:
+    container_name: mfai-web-api
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://prisma:prisma@mfai-postgres:5432/prisma?schema=public
+      REDIS_URL: redis://mfai-redis:6379
+      ADMIN_API_KEY: change-me-dev-only
+      SIMULATOR_BASE_URL: http://mfai-web/
+      ORIGINS: http://mfai-web,http://localhost:3003
+    ports:
+      - "3001:3000"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+    depends_on:
+      mfai-postgres:
+        condition: service_healthy
+      mfai-redis:
+        condition: service_started
+    restart: always
+    networks:
+      - mfai-net
 
 volumes:
   mfai-mongo-data:
   mfai-postgres-data:
+  mfai-redis-data:
+
+networks:
+  mfai-net:
+    driver: bridge

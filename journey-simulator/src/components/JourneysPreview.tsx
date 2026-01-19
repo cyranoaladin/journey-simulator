@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import JourneyCard from './Journey/JourneyCard'
@@ -8,14 +14,14 @@ const supportHighlights = [
     title: 'Orchestrated Learning',
     description: 'Zyno and the protocol agent mesh coordinate missions, resources, and feedback loops so every builder compounds faster.',
     bullets: [
-      'Adaptive missions sequenced by the Cognitive Activation Protocol™',
+      'Adaptive missions sequenced by the Cognitive Activation Protocol',
       'Real-time agent collaboration for strategy, code, and governance',
       'Proof signals that unlock deeper staking and DAO missions'
     ]
   },
   {
     title: 'Proof Becomes Capital',
-    description: 'Each completed phase mints verifiable Proof-of-Skill™ credentials that level up access to talent, liquidity, and networked capital.',
+    description: 'Each completed phase mints verifiable Proof-of-Skill credentials that level up access to talent, liquidity, and networked capital.',
     bullets: [
       'Mint NFTs that certify milestones across Solana, DePIN, and DeFi tracks',
       'Stake MFAI to access premium missions and sovereign capital pools',
@@ -43,7 +49,7 @@ const JourneysPreview = () => {
             Chart Your Mission Trajectory
           </h2>
           <p className="text-lg md:text-xl opacity-80 leading-relaxed mb-4">
-            Choose the journey that matches your ambition. Each pathway is a curated stack of phases that transform prototype energy into verifiable Proof-of-Skill™ capital.
+            Choose the journey that matches your ambition. Each pathway is a curated stack of phases that transform prototype energy into verifiable Proof-of-Skill capital.
           </p>
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -93,7 +99,7 @@ const JourneysPreview = () => {
               onClick={() => navigate('/journeys')}
               className="btn-secondary"
             >
-              View detailed roadmap →
+              View detailed roadmap 
             </motion.button>
           </div>
 

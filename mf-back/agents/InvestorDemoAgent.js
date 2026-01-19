@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const { mkFinding, mkAction, estimateConfidence, safeRun } = require('./agentUtils');
 
 class InvestorDemoAgent {
@@ -34,8 +40,8 @@ class InvestorDemoAgent {
         ? 'Investor pitch pack drafted'
         : 'Investor pitch pack drafted with limited input';
 
-      const assumptions = inputPresent ? [] : ['Input succinct, compléter ICP/metrics pour affiner'];
-      const limits = ['Simulation only, aucun envoi réel', 'Données financières non vérifiées'];
+      const assumptions = inputPresent ? [] : ['Brief input, complete ICP/metrics to refine'];
+      const limits = ['Simulation only, no real dispatch', 'Financial data unverified'];
 
       return {
         status,

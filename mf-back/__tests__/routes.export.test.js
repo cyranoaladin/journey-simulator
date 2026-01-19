@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 // Tests run stateless bearer flows with CSRF parity middleware.
 const express = require('express');
 const request = require('supertest');
@@ -27,7 +33,7 @@ describe('export routes', () => {
     aepo: 78,
     aecoPhase: 'launch_dao',
     agents: ['DAOArchitect', 'ComplianceExpert'],
-    generatedText: 'DAOArchitect → Validated governance model.\nComplianceExpert → Checklist prête.',
+    generatedText: 'DAOArchitect → Validated governance model.\nComplianceExpert → Checklist prete.',
     actions: ['Publier le whitepaper', 'Programmer vote communautaire']
   };
 

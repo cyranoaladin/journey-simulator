@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { render, screen } from '@testing-library/react';
 import { JourneyNextActionsPanel } from '../JourneyNextActionsPanel';
 import { describe, it, expect, vi } from 'vitest';

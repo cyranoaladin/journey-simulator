@@ -1,0 +1,5 @@
+=== Zero-Byte File Check ===
+Found 1 zero-byte file(s):
+  - zero_byte_files.txt
+
+ZERO_BYTE_FILES_FOUND=1

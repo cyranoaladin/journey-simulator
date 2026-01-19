@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import type { PublicKey } from '@solana/web3.js';
 import { logger } from './logger';
 import { tokenStore } from './tokenStore';
@@ -100,14 +106,14 @@ const shouldMockMintRequests = (error?: unknown): boolean => {
   return false
 }
 
-// Helper pour reconstruire l’URL de base depuis le frontend
+// Helper pour reconstruire lURL de base depuis le frontend
 function getWebBaseUrl(): string {
   // In Vite, we use import.meta.env.VITE_SOLANA_API_BASE_URL
   // Default monorepo setup exposes mint API on http://127.0.0.1:3001/api/mint/
   return import.meta.env.VITE_SOLANA_API_BASE_URL || 'http://127.0.0.1:3001';
 }
 
-// Mint NFT (Proof-of-Skill™)
+// Mint NFT (Proof-of-Skill)
 export const mintProofOfSkill = async (
   wallet: any,
   metadata: ProofMetadata

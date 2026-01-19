@@ -1,16 +1,22 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const { applyRagPolicy } = require('../ragPolicy');
 
 // These functions are defined in zynoVerticalSlice.js - we need to pass them as parameters
 // For now, we'll keep the service methods that don't depend on them
 
 /**
- * Service de vérification logique pour l'orchestration
- * Réduit la complexité cognitive en isolant la logique de détection et de scoring
+ * Logic verification service for orchestration
+ * Reduces cognitive complexity by isolating detection and scoring logic
  */
 class LogicCheckService {
   /**
-   * Calcule les scores pour les runs d'agents
-   * Note: computeScores doit être passé en paramètre depuis zynoVerticalSlice.js
+   * Calculates scores for agent runs
+   * Note: computeScores must be passed as a parameter from zynoVerticalSlice.js
    */
   static computeScoresForRuns(runs, registryIndex, computeScoresFn) {
     return runs.map((r) => {
@@ -30,7 +36,7 @@ class LogicCheckService {
   }
 
   /**
-   * Calcule le score d'un run individuel (Restored)
+   * Calculates the score for an individual run (Restored)
    */
   static computeScore(run, learningData = {}, meta = {}) {
     let score = 0;
@@ -49,22 +55,22 @@ class LogicCheckService {
   }
 
   /**
-   * Applique la politique RAG aux runs
+   * Applies RAG policy to runs
    */
   static applyRagPolicyToRuns(runsWithScores) {
     return applyRagPolicy(applyRagPolicy(runsWithScores));
   }
 
   /**
-   * Détecte les contradictions entre les runs
-   * Note: detectContradictions doit être passé en paramètre depuis zynoVerticalSlice.js
+   * Detects contradictions between runs
+   * Note: detectContradictions must be passed as a parameter from zynoVerticalSlice.js
    */
   static detectContradictionsInRuns(runsWithScores, detectContradictionsFn) {
     return detectContradictionsFn(runsWithScores);
   }
 
   /**
-   * Calcule le statut global à partir des runs
+   * Calculates overall status from runs
    */
   static computeOverallStatus(runsWithScores) {
     const severity = { FAIL: 3, TIMEOUT: 2, WARN: 1, OK: 0 };
@@ -72,7 +78,7 @@ class LogicCheckService {
     const hasWarn = runsWithScores.some((r) => r.status === 'WARN');
     const hasOk = runsWithScores.some((r) => r.status === 'OK');
 
-    // Si aucun FAIL/TIMEOUT mais au moins un WARN, retourner WARN même s'il y a des OK
+    // If no FAIL/TIMEOUT but at least one WARN, return WARN even if there are OKs
     if (!hasFailOrTimeout && hasWarn) {
       return 'WARN';
     }
@@ -89,7 +95,7 @@ class LogicCheckService {
   }
 
   /**
-   * Extrait les top findings des runs
+   * Extracts top findings from runs
    */
   static extractTopFindings(runsWithScores, limit = 5) {
     return runsWithScores
@@ -104,7 +110,7 @@ class LogicCheckService {
   }
 
   /**
-   * Extrait les actions recommandées des runs
+   * Extracts recommended actions from runs
    */
   static extractRecommendedActions(runsWithScores, limit = 10) {
     return runsWithScores
@@ -121,7 +127,7 @@ class LogicCheckService {
   }
 
   /**
-   * Calcule la confiance à partir des scores
+   * Calculates confidence from scores
    */
   static computeConfidence(runsWithScores) {
     const confs = runsWithScores.map((r) => (typeof r.confidence === 'number' ? r.confidence : null)).filter((v) => v !== null);
@@ -132,14 +138,14 @@ class LogicCheckService {
   }
 
   /**
-   * Collecte les actions de tous les runs
+   * Collects actions from all runs
    */
   static collectActions(runsWithScores) {
     return runsWithScores.flatMap((r) => (Array.isArray(r.actions) ? r.actions : []));
   }
 
   /**
-   * Génère un résumé textuel des runs
+   * Generates a textual summary of runs
    */
   static generateSummary(runsWithScores) {
     return runsWithScores

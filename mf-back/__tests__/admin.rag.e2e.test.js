@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 const request = require('supertest');
 const fs = require('node:fs');
 const os = require('node:os');
@@ -60,7 +66,7 @@ describe('Admin RAG routes end-to-end', () => {
 
     process.env.ADMIN_API_KEY = 'secret';
     process.env.RAG_DATA_PATH = tempDocsDir;
-    process.env.MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost/test-e2e';
+    process.env.MONGO_URI = 'mongodb://127.0.0.1:27018/test-e2e';
 
     // Re-require after env vars are set to ensure mocks are applied
     jest.resetModules();

@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 process.env.LLM_MODEL_NAME = 'gpt-4o';
 // Force local RAG by unsetting remote URL (simulating fallback or pure local mode)
 // or we let it fail. Let's unset it to be clean and fast.
@@ -23,7 +29,7 @@ async function runE2ETest() {
 
     // 1. RAG CONNECTIVITY & PRECISION
     console.log('\n[1] Testing RAG Layer...');
-    const query = "Spécificités du calcul des frais de priorité sur Solana v1.17";
+    const query = "Specifics of priority fee calculation on Solana v1.17";
 
     const ragResult = await rag.search({
         query: query,
@@ -58,12 +64,12 @@ async function runE2ETest() {
     console.log('\n[2] Testing LLM Bridge (Context Injection)...');
 
     const contextString = ragResult.chunks.map(c => c.text).join('\n\n');
-    const systemPrompt = `Tu es l'Orchestrateur MFAI. Utilise UNIQUEMENT les informations fournies dans le contexte ci-dessous pour répondre. Si l'information est absente, indique-le.
+    const systemPrompt = `You are the MFAI Orchestrator. Use ONLY the information provided in the context below to answer. If the information is missing, state it.
   
   CONTEXTE:
   ${contextString}`;
 
-    const userPrompt = `Quelle est la règle MFAI concernant les frais de priorité ? Réponds au format structuré demandé.`;
+    const userPrompt = `What is the MFAI rule regarding priority fees? Answer in the requested structured format.`;
 
     const llmResponse = await llm.generate({
         prompt: { system: systemPrompt, user: userPrompt },

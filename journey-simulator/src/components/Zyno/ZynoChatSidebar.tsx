@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { ArrowUpRight, MessageCircle, Sparkles, PanelRightClose, PanelRightOpen, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useJourneyStore } from '../../store/journeyStore'
@@ -38,7 +44,7 @@ const ZynoChatSidebar = ({ variant = 'docked', onClose }: ZynoSidebarProps) => {
         className={clsx('mb-6 self-start rounded-lg p-2 text-white/50 transition-colors hover:bg-white/10 hover:text-white', {
           'pointer-events-none opacity-40': isOverlay,
         })}
-        title={expanded ? 'Réduire le panneau' : 'Agrandir le panneau'}
+        title={expanded ? 'Minimize panel' : 'Expand panel'}
         disabled={isOverlay}
       >
         {expanded ? <PanelRightClose size={20} /> : <PanelRightOpen size={20} />}
@@ -62,7 +68,7 @@ const ZynoChatSidebar = ({ variant = 'docked', onClose }: ZynoSidebarProps) => {
         {expanded && (
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-white/50">Zyno Assist</p>
-            <h3 className="font-space text-lg font-semibold">AI Co-Founder™ on standby</h3>
+            <h3 className="font-space text-lg font-semibold">AI Co-Founder on standby</h3>
           </div>
         )}
       </div>
@@ -75,7 +81,7 @@ const ZynoChatSidebar = ({ variant = 'docked', onClose }: ZynoSidebarProps) => {
               <span className="font-mono text-base text-white">{userProgress.totalXP}</span>
             </div>
             <div className="flex items-center justify-between text-sm text-white/70">
-              <span>Proof-of-Skill™ NFTs</span>
+              <span>Proof-of-Skill NFTs</span>
               <span className="font-mono text-base text-white">{userProgress.nfts.length}</span>
             </div>
             <div className="flex items-center justify-between text-sm text-white/70">

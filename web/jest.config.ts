@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import nextJest from 'next/jest'
 
 const createJestConfig = nextJest({ dir: './' })
@@ -17,6 +23,7 @@ const customJestConfig = {
   resetMocks: false,
   restoreMocks: true,
   testPathIgnorePatterns: ['/node_modules/', '/e2e/'],
+  transformIgnorePatterns: [],
   collectCoverageFrom: [
     'app/**/*.{ts,tsx}',
     'src/**/*.{ts,tsx}',

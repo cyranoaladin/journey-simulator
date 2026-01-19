@@ -1,3 +1,9 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
 import { motion } from 'framer-motion';
 import { Lock, TrendingUp, X } from 'lucide-react';
 import { useState } from 'react';
@@ -16,12 +22,12 @@ const StakingModal: React.FC<StakingModalProps> = ({
   currentStaked,
   onStake
 }) => {
-  const [stakeAmount, setStakeAmount] = useState('');
+  const [stakeAmount, setStakeAmount] = useState(0);
   const [isStaking, setIsStaking] = useState(false);
   const { updateStaking } = useJourneyStore();
 
   const handleStake = async () => {
-    const amount = Number.parseFloat(stakeAmount);
+    const amount = stakeAmount;
     if (amount <= 0 || amount > availableAmount) return;
 
     setIsStaking(true);
@@ -48,7 +54,7 @@ const StakingModal: React.FC<StakingModalProps> = ({
     return { dailyReward, monthlyReward, yearlyReward };
   };
 
-  const rewards = calculateRewards(Number.parseFloat(stakeAmount) || 0);
+  const rewards = calculateRewards(stakeAmount);
 
   return (
     <motion.div
@@ -69,7 +75,7 @@ const StakingModal: React.FC<StakingModalProps> = ({
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-2">
             <Lock className="text-accent-gold" size={24} />
-            <h2 className="text-xl font-space font-bold">Cognitive Lock™</h2>
+            <h2 className="text-xl font-space font-bold">Cognitive Lock</h2>
           </div>
           <button
             onClick={onClose}
@@ -87,7 +93,7 @@ const StakingModal: React.FC<StakingModalProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <div className="text-sm opacity-70">Staked</div>
-              <div className="text-lg font-bold text-accent-gold">{currentStaked.toFixed(2)} $MFAI</div>
+              <div className="text-lg font-bold text-accent-gold text-glow transition-all duration-300 transform hover:scale-105">{currentStaked.toFixed(2)} $MFAI</div>
             </div>
             <div>
               <div className="text-sm opacity-70">APY</div>
@@ -100,36 +106,36 @@ const StakingModal: React.FC<StakingModalProps> = ({
         <div className="mb-6">
           <label htmlFor="stake-amount-input" className="block text-sm font-medium mb-2">Amount to stake</label>
           <div className="relative">
-            <input
-              id="stake-amount-input"
-              type="number"
-              value={stakeAmount}
-              onChange={(e) => setStakeAmount(e.target.value)}
-              placeholder="0.00"
-              className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 pr-16 focus:outline-none focus:border-primary-400"
-              max={availableAmount}
-              step="0.1"
-              aria-describedby="stake-amount-hint"
-            />
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm opacity-70">
-              $MFAI
+            <div className="flex justify-between items-center mb-2">
+                <span className="font-bold text-lg text-white">{stakeAmount.toFixed(2)} $MFAI</span>
+                <button
+                    type="button"
+                    onClick={() => setStakeAmount(availableAmount)}
+                    className="text-primary-400 hover:text-primary-300 text-xs"
+                    aria-label="Set maximum available amount"
+                    > 
+                    Max
+                </button>
             </div>
+            <input
+                data-testid="staking-slider"
+                id="stake-amount-input"
+                type="range"
+                value={stakeAmount}
+                onChange={(e) => setStakeAmount(Number.parseFloat(e.target.value))}
+                min={0}
+                max={availableAmount}
+                step={1}
+                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+            />
           </div>
           <div className="flex justify-between text-xs mt-2">
             <span id="stake-amount-hint" className="opacity-70">Available: {availableAmount.toFixed(2)} $MFAI</span>
-            <button
-              type="button"
-              onClick={() => setStakeAmount(availableAmount.toString())}
-              className="text-primary-400 hover:text-primary-300"
-              aria-label="Set maximum available amount"
-            >
-              Max
-            </button>
           </div>
         </div>
 
         {/* Rewards Preview */}
-        {Number.parseFloat(stakeAmount) > 0 && (
+        {stakeAmount > 0 && (
           <div className="bg-gradient-primary/20 border border-primary-500/30 rounded-lg p-4 mb-6">
             <h3 className="font-semibold mb-3 flex items-center">
               <TrendingUp size={16} className="mr-2" />
@@ -158,7 +164,7 @@ const StakingModal: React.FC<StakingModalProps> = ({
           <ul className="space-y-2 text-sm">
             <li className="flex items-center space-x-2">
               <div className="w-1 h-1 bg-primary-500 rounded-full" />
-              <span>Automatic Neuro-Dividends™</span>
+              <span>Automatic Neuro-Dividends</span>
             </li>
             <li className="flex items-center space-x-2">
               <div className="w-1 h-1 bg-primary-500 rounded-full" />
@@ -182,9 +188,8 @@ const StakingModal: React.FC<StakingModalProps> = ({
           onClick={handleStake}
           disabled={
             isStaking
-            || !stakeAmount
-            || Number.parseFloat(stakeAmount) <= 0
-            || Number.parseFloat(stakeAmount) > availableAmount
+            || stakeAmount <= 0
+            || stakeAmount > availableAmount
           }
           className="w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 bg-gradient-primary text-white disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -196,7 +201,7 @@ const StakingModal: React.FC<StakingModalProps> = ({
           ) : (
             <>
               <Lock size={16} />
-              <span>Stake {stakeAmount || '0'} $MFAI</span>
+              <span>Stake {stakeAmount.toFixed(2)} $MFAI</span>
             </>
           )}
         </motion.button>
