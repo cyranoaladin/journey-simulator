@@ -14,7 +14,9 @@ This workflow verifies that the "Load Demo State" functionality works correctly 
    Run a curl command to verify the backend returns the `progress` object.
    
    ```bash
-   curl -X POST http://localhost:3002/journey/load-demo -H "Content-Type: application/json" -d '{"personaId": "capital-foundry"}' | grep "progress"
+   API_PORT=${API_PORT:-3005}
+   API_BASE_URL=${API_BASE_URL:-http://127.0.0.1:${API_PORT}}
+   curl -X POST "${API_BASE_URL}/journey/load-demo" -H "Content-Type: application/json" -d '{"personaId": "capital-foundry"}' | grep "progress"
    ```
 
 2. Run E2E Tests

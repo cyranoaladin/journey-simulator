@@ -546,7 +546,6 @@ function Mission({ block }: { block: MissionBlock; }) {
   const demoState = useJourneyStore((s) => s.demoState);
   // const submitDemoInteraction = useJourneyStore((s) => s.submitDemoInteraction); // UNUSED
   const isDemoMode = demoState?.status === 'WAITING_FOR_INTERACTION';
-  console.log(`[MissionBlock] Rendering. Status: ${demoState?.status} | isDemoMode: ${isDemoMode}`);
 
   const onSubmit = async () => {
     try {
@@ -597,6 +596,16 @@ function Mission({ block }: { block: MissionBlock; }) {
     }
   };
 
+  const getButtonLabel = () => {
+    if (submitting) return "Processing...";
+    switch (block.mission_type) {
+      case 'staking': return "Confirm Staking (Simulated)";
+      case 'dao_vote': return "Cast Vote (Simulated)";
+      case 'deliverable': return "Complete & Mint Badge";
+      default: return "Validate Action (Simulated)";
+    }
+  };
+
   const renderSubmitButton = () => {
     if (isDemoMode) {
       return (
@@ -606,7 +615,7 @@ function Mission({ block }: { block: MissionBlock; }) {
           disabled={submitting}
           onClick={onSubmit}
         >
-          {submitting ? "Simulating Validation..." : "Validate Action (Simulated)"}
+          {getButtonLabel()}
         </button>
       );
     }
@@ -1475,7 +1484,6 @@ export default function UIBlocksRenderer({ response }: { response: JourneyStepRe
       <AnimatePresence>
         {blocksToRender.map((b, index) => {
           logger.debug('Rendering block:', b);
-          console.log('[UIBlocksRenderer] Rendering block kind:', b.kind); // E2E Debug
           // Simplify nested template literal
           const blockId = b.id || "";
           const blockKind = b.kind || "block";

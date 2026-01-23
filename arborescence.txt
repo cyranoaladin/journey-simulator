@@ -1,0 +1,1894 @@
+.
+├── .agent
+│   ├── memory
+│   │   └── agent_memory.json
+│   ├── rules
+│   │   ├── architect.glob.md
+│   │   ├── compliance.sentinel.md
+│   │   ├── context-optimization.global.md
+│   │   ├── defi.glob.md
+│   │   ├── model-hybrid.strategy.md
+│   │   ├── observability.log-sleuth.md
+│   │   ├── security.glob.md
+│   │   ├── self-healing.global.md
+│   │   ├── sovereign-audit.global.md
+│   │   ├── swarm-orchestration.manager.md
+│   │   └── visual-validation.glassmorphism.md
+│   ├── skills
+│   │   ├── creative-studio
+│   │   │   └── SKILL.md
+│   │   ├── defi-expert
+│   │   │   └── SKILL.md
+│   │   ├── depin-builder
+│   │   │   └── SKILL.md
+│   │   ├── impact-governance
+│   │   │   └── SKILL.md
+│   │   ├── security-sentinel
+│   │   │   └── SKILL.md
+│   │   └── solana-architect
+│   │       └── SKILL.md
+│   └── workflows
+│       ├── clean-slate.md
+│       ├── debug-agent.md
+│       ├── generate-protocol-paper.md
+│       ├── seed-sovereign.md
+│       ├── ship-it.md
+│       ├── sovereign-status.md
+│       ├── verify-compliance.md
+│       └── verify_demo_mode.md
+├── .antigravity
+│   ├── rules
+│   │   ├── compliance.sentinel.global.md
+│   │   ├── dependency-shield.global.md
+│   │   └── security-vault.global.md
+│   ├── skills
+│   │   ├── Log-Sleuth
+│   │   │   └── SKILL.md
+│   │   ├── Persistence-Guard
+│   │   │   └── SKILL.md
+│   │   ├── sovereign-maintenance
+│   │   │   └── SKILL.md
+│   │   ├── Web3-Solana-Sentinel
+│   │   │   └── SKILL.md
+│   │   └── Zyno-Architect
+│   │       └── SKILL.md
+│   ├── workflows
+│   │   ├── Audit-Commander.md
+│   │   ├── Persona-Switch.md
+│   │   ├── Testing-Pyramid.md
+│   │   └── UX-Optimizer.md
+│   └── workspace-context.json
+├── arborescence.txt
+├── CHANGELOG.md
+├── .context
+│   ├── AUDIT.md
+│   ├── MANUAL.md
+│   ├── PROTOCOL_PAPER_V1.md
+│   ├── README.md
+│   ├── UI_GUIDELINES.md
+│   └── VIBE_PROTOCOLS.md
+├── CONTRIBUTING.md
+├── data
+│   ├── mongo
+│   │   ├── collection-0-5174646107239876870.wt
+│   │   ├── collection-0-5710788875825242200.wt
+│   │   ├── collection-0--5772416267169226837.wt
+│   │   ├── collection-0-5967935876307077262.wt
+│   │   ├── collection-0-6441465989614719915.wt
+│   │   ├── collection-0--7690243026975506161.wt
+│   │   ├── collection-0-9010932960161614355.wt
+│   │   ├── collection-103-3450019116859368270.wt
+│   │   ├── collection-10-9010932960161614355.wt
+│   │   ├── collection-11-9010932960161614355.wt
+│   │   ├── collection-12-9010932960161614355.wt
+│   │   ├── collection-13-9010932960161614355.wt
+│   │   ├── collection-1-5174646107239876870.wt
+│   │   ├── collection-1--5772416267169226837.wt
+│   │   ├── collection-2-5174646107239876870.wt
+│   │   ├── collection-2--5772416267169226837.wt
+│   │   ├── collection-2-6441465989614719915.wt
+│   │   ├── collection-2-9010932960161614355.wt
+│   │   ├── collection-3-5174646107239876870.wt
+│   │   ├── collection-3--5772416267169226837.wt
+│   │   ├── collection-4-5174646107239876870.wt
+│   │   ├── collection-4--5772416267169226837.wt
+│   │   ├── collection-4-6441465989614719915.wt
+│   │   ├── collection-4-9010932960161614355.wt
+│   │   ├── collection-5-5174646107239876870.wt
+│   │   ├── collection-5--5772416267169226837.wt
+│   │   ├── collection-6-5174646107239876870.wt
+│   │   ├── collection-6--5772416267169226837.wt
+│   │   ├── collection-7-5174646107239876870.wt
+│   │   ├── collection-7--5772416267169226837.wt
+│   │   ├── collection-7-9010932960161614355.wt
+│   │   ├── collection-80-5710788875825242200.wt
+│   │   ├── collection-81-5710788875825242200.wt
+│   │   ├── collection-82-5710788875825242200.wt
+│   │   ├── collection-83-5710788875825242200.wt
+│   │   ├── collection-84-5710788875825242200.wt
+│   │   ├── collection-85-5710788875825242200.wt
+│   │   ├── collection-8-9010932960161614355.wt
+│   │   ├── collection-9-9010932960161614355.wt
+│   │   ├── diagnostic.data  [error opening dir]
+│   │   ├── index-0-566671997062545081.wt
+│   │   ├── index-100-5710788875825242200.wt
+│   │   ├── index-101-5710788875825242200.wt
+│   │   ├── index-102-5710788875825242200.wt
+│   │   ├── index-103-5710788875825242200.wt
+│   │   ├── index-104-3450019116859368270.wt
+│   │   ├── index-104-5710788875825242200.wt
+│   │   ├── index-10-5174646107239876870.wt
+│   │   ├── index-105-3450019116859368270.wt
+│   │   ├── index-105-5710788875825242200.wt
+│   │   ├── index-10--5772416267169226837.wt
+│   │   ├── index-10-5967935876307077262.wt
+│   │   ├── index-106-5710788875825242200.wt
+│   │   ├── index-107-5710788875825242200.wt
+│   │   ├── index-108-5710788875825242200.wt
+│   │   ├── index-109-5710788875825242200.wt
+│   │   ├── index-11-5174646107239876870.wt
+│   │   ├── index-11--5772416267169226837.wt
+│   │   ├── index-11-5967935876307077262.wt
+│   │   ├── index-12-5174646107239876870.wt
+│   │   ├── index-12--5772416267169226837.wt
+│   │   ├── index-12-5967935876307077262.wt
+│   │   ├── index-13-5174646107239876870.wt
+│   │   ├── index-13--5772416267169226837.wt
+│   │   ├── index-14-5174646107239876870.wt
+│   │   ├── index-14--5772416267169226837.wt
+│   │   ├── index-14-9010932960161614355.wt
+│   │   ├── index-15-5174646107239876870.wt
+│   │   ├── index-15--5772416267169226837.wt
+│   │   ├── index-15-9010932960161614355.wt
+│   │   ├── index-1-5967935876307077262.wt
+│   │   ├── index-1-6441465989614719915.wt
+│   │   ├── index-16-5174646107239876870.wt
+│   │   ├── index-16--5772416267169226837.wt
+│   │   ├── index-16-9010932960161614355.wt
+│   │   ├── index-17-5174646107239876870.wt
+│   │   ├── index-17--5772416267169226837.wt
+│   │   ├── index-1--7690243026975506161.wt
+│   │   ├── index-17-9010932960161614355.wt
+│   │   ├── index-18-5174646107239876870.wt
+│   │   ├── index-18--5772416267169226837.wt
+│   │   ├── index-18-9010932960161614355.wt
+│   │   ├── index-1-9010932960161614355.wt
+│   │   ├── index-19-5174646107239876870.wt
+│   │   ├── index-19--5772416267169226837.wt
+│   │   ├── index-19-9010932960161614355.wt
+│   │   ├── index-20-5174646107239876870.wt
+│   │   ├── index-20--5772416267169226837.wt
+│   │   ├── index-20-9010932960161614355.wt
+│   │   ├── index-21-5174646107239876870.wt
+│   │   ├── index-21--5772416267169226837.wt
+│   │   ├── index-21-9010932960161614355.wt
+│   │   ├── index-22-5174646107239876870.wt
+│   │   ├── index-22--5772416267169226837.wt
+│   │   ├── index-22-9010932960161614355.wt
+│   │   ├── index-23-5174646107239876870.wt
+│   │   ├── index-23--5772416267169226837.wt
+│   │   ├── index-23-9010932960161614355.wt
+│   │   ├── index-24-5174646107239876870.wt
+│   │   ├── index-24--5772416267169226837.wt
+│   │   ├── index-24-9010932960161614355.wt
+│   │   ├── index-25-5174646107239876870.wt
+│   │   ├── index-25--5772416267169226837.wt
+│   │   ├── index-25-9010932960161614355.wt
+│   │   ├── index-2-5967935876307077262.wt
+│   │   ├── index-26-5174646107239876870.wt
+│   │   ├── index-26--5772416267169226837.wt
+│   │   ├── index-26-9010932960161614355.wt
+│   │   ├── index-27-5174646107239876870.wt
+│   │   ├── index-27--5772416267169226837.wt
+│   │   ├── index-2--7690243026975506161.wt
+│   │   ├── index-28-5174646107239876870.wt
+│   │   ├── index-28--5772416267169226837.wt
+│   │   ├── index-29-5174646107239876870.wt
+│   │   ├── index-29--5772416267169226837.wt
+│   │   ├── index-30-5174646107239876870.wt
+│   │   ├── index-30--5772416267169226837.wt
+│   │   ├── index-31-5174646107239876870.wt
+│   │   ├── index-31--5772416267169226837.wt
+│   │   ├── index-32-5174646107239876870.wt
+│   │   ├── index-32--5772416267169226837.wt
+│   │   ├── index-3-5967935876307077262.wt
+│   │   ├── index-3-6441465989614719915.wt
+│   │   ├── index-3--7690243026975506161.wt
+│   │   ├── index-3-9010932960161614355.wt
+│   │   ├── index-4-5967935876307077262.wt
+│   │   ├── index-4--7690243026975506161.wt
+│   │   ├── index-5-5967935876307077262.wt
+│   │   ├── index-5-6441465989614719915.wt
+│   │   ├── index-5-9010932960161614355.wt
+│   │   ├── index-6-5967935876307077262.wt
+│   │   ├── index-6-6441465989614719915.wt
+│   │   ├── index-6-9010932960161614355.wt
+│   │   ├── index-7-5967935876307077262.wt
+│   │   ├── index-8-5174646107239876870.wt
+│   │   ├── index-8-5710788875825242200.wt
+│   │   ├── index-8--5772416267169226837.wt
+│   │   ├── index-8-5967935876307077262.wt
+│   │   ├── index-86-5710788875825242200.wt
+│   │   ├── index-87-5710788875825242200.wt
+│   │   ├── index-88-5710788875825242200.wt
+│   │   ├── index-89-5710788875825242200.wt
+│   │   ├── index-90-5710788875825242200.wt
+│   │   ├── index-91-5710788875825242200.wt
+│   │   ├── index-92-5710788875825242200.wt
+│   │   ├── index-93-5710788875825242200.wt
+│   │   ├── index-94-5710788875825242200.wt
+│   │   ├── index-9-5174646107239876870.wt
+│   │   ├── index-95-5710788875825242200.wt
+│   │   ├── index-9--5772416267169226837.wt
+│   │   ├── index-9-5967935876307077262.wt
+│   │   ├── index-96-5710788875825242200.wt
+│   │   ├── index-97-5710788875825242200.wt
+│   │   ├── index-98-5710788875825242200.wt
+│   │   ├── index-99-5710788875825242200.wt
+│   │   ├── journal  [error opening dir]
+│   │   ├── _mdb_catalog.wt
+│   │   ├── _mdb_catalog.wt.1
+│   │   ├── .mongodb  [error opening dir]
+│   │   ├── mongod.lock
+│   │   ├── sizeStorer.wt
+│   │   ├── sizeStorer.wt.1
+│   │   ├── storage.bson
+│   │   ├── WiredTiger
+│   │   ├── WiredTigerHS.wt
+│   │   ├── WiredTiger.lock
+│   │   ├── WiredTiger.turtle
+│   │   ├── WiredTiger.wt
+│   │   └── WiredTiger.wt.1
+│   └── postgres  [error opening dir]
+├── .deploy.env.bak_20260103_015403
+├── .deploy.env.example
+├── docker-compose.audit.yml
+├── docker-compose.deploy.yml
+├── docker-compose.override.yml
+├── docker-compose.prod.yml
+├── docker-compose.yml
+├── docs
+│   ├── 00_HOME.md
+│   ├── acceptance
+│   │   ├── checklist.md
+│   │   └── validation_plan.md
+│   ├── AGENT_RUNS.md
+│   ├── agents
+│   │   ├── AGENT_COVERAGE.md
+│   │   └── PLANS_ACTIONS.md
+│   ├── ANALYSIS_S2.1.md
+│   ├── API_CONTRACT_MF_BACK.md
+│   ├── ARCHITECTURE_DATA.md
+│   ├── ARCHITECTURE_DIAGRAMS.md
+│   ├── ARCHITECTURE.md
+│   ├── architecture_multi_agents.md
+│   ├── archive
+│   │   ├── audit.md
+│   │   ├── cahier_charges_agents.md
+│   │   ├── cahier_charges_demo_artefacts.md
+│   │   ├── cahier_charges_high_fidelity_simulation.md
+│   │   ├── cahier_charges_ressources_html.md
+│   │   ├── CERTIFICATION.md
+│   │   ├── checklist.md
+│   │   ├── COMPREHENSIVE_SONAR_AUDIT.md
+│   │   ├── contributing.md
+│   │   ├── DEPLOY.md
+│   │   ├── DEPLOYMENT_INSTRUCTIONS.md
+│   │   ├── DEPLOY_SERVER.md
+│   │   ├── FINAL_COMPLETE_AUDIT.md
+│   │   ├── FINAL_MASTERY_REPORT.md
+│   │   ├── FULL_AUDIT_REPORT.md
+│   │   ├── FULL_STACK_ALIGNMENT_REPORT.md
+│   │   ├── GUIDE_PLATFORM.md
+│   │   ├── Intégration Realms pour la DAO.md
+│   │   ├── MVP_STATUS.md
+│   │   ├── PROJECT_KNOWLEDGE_BASE.md
+│   │   ├── README.qa.md
+│   │   ├── RELEASE_CANDIDATE_V1.0.md
+│   │   ├── RELEASE_SUMMARY.md
+│   │   ├── RESUME_REVUE_FINALE.md
+│   │   ├── REVUE_CODE_AUDIT.md
+│   │   ├── task.md
+│   │   ├── TEST_PLAN.md
+│   │   ├── TODO_CLEANUP.md
+│   │   ├── WORKFLOW_MATRIX.md
+│   │   └── ZERO_DEFECT_DEPLOYMENT_REPORT.md
+│   ├── audit
+│   │   ├── archive
+│   │   │   ├── AMELIORATIONS_APPLIQUEES.md
+│   │   │   ├── audit_11_12_25.md
+│   │   │   ├── SYNTHESE_AUDIT_CORRECTIONS.md
+│   │   │   └── VERIFICATION_FINALE_AUDIT.md
+│   │   ├── AUDIT_FINDINGS.md
+│   │   ├── AUDITOR_STATEMENT.md
+│   │   ├── audit_report.md
+│   │   ├── EVIDENCE_MAP.md
+│   │   ├── ISO_DORA_EVIDENCE.md
+│   │   ├── PRE_AUDIT_ISO27001_DORA.md
+│   │   └── SOC2_SIMULATED_AUDIT.md
+│   ├── AUTH_FLOWS.md
+│   ├── cicd
+│   │   ├── pipeline.md
+│   │   └── rollback.md
+│   ├── CONTRIBUTEURS.md
+│   ├── dataroom
+│   │   ├── INDEX.md
+│   │   └── INVESTOR_SUMMARY.md
+│   ├── demo
+│   │   ├── fallbacks.md
+│   │   └── script.md
+│   ├── demo_script.md
+│   ├── DEPENDENCIES_JOURNEY_SIMULATOR.md
+│   ├── GOLDEN_PATH_DEMO.md
+│   ├── HEALTHCHECK.md
+│   ├── idl
+│   │   └── solana_devnet_flow.md
+│   ├── INVESTOR_DEMO_FLOW.md
+│   ├── journey_mfai_back_front.code-workspace
+│   ├── journeys
+│   │   └── JOURNEY_AGENT_MAP.md
+│   ├── JOURNEY_STATE_MACHINE.md
+│   ├── legal
+│   │   ├── INVESTOR_TECH_LEGAL_APPENDIX.md
+│   │   └── SAAS_CONTRACT_APPENDIX.md
+│   ├── MAINTENANCE.md
+│   ├── MCP_RUNBOOK_FR.md
+│   ├── MCP_SETUP_FR.md
+│   ├── MOBILE_WALLET_TESTING.md
+│   ├── MONOREPO_DX.md
+│   ├── next_steps_ui_rework.md
+│   ├── observability
+│   │   ├── grafana
+│   │   │   ├── GRAFANA_DASHBOARD.json
+│   │   │   └── README.md
+│   │   ├── metrics.md
+│   │   └── METRICS_MODEL.md
+│   ├── onboarding
+│   │   └── quickstart.md
+│   ├── openapi
+│   │   ├── journey-simulator.yaml
+│   │   ├── mf-back.openapi.yaml
+│   │   └── preview.html
+│   ├── ops
+│   │   ├── DEPLOY_HARDENING.md
+│   │   ├── ENV_VARIABLES_CHECKLIST.md
+│   │   ├── FINAL_RELEASE_REPORT.md
+│   │   ├── GO_LIVE_CHECKLIST.md
+│   │   ├── INCIDENT_MATRIX.md
+│   │   └── RUNBOOK_PROD.md
+│   ├── PLATFORM_DEEP_DIVE_FR.md
+│   ├── process
+│   │   └── DoR_DoD.md
+│   ├── product
+│   │   ├── cahier_TOC.md
+│   │   └── vision_mvp_personas_stories.md
+│   ├── prompts
+│   │   ├── evaluator.md
+│   │   └── zyno.md
+│   ├── QUALITY_EVIDENCE.md
+│   ├── releases
+│   │   ├── CHANGELOG.md
+│   │   ├── RELEASE_CHECKLIST.md
+│   │   └── RELEASE_v1.0.md
+│   ├── risk_register.md
+│   ├── roadmap
+│   │   └── vNext.md
+│   ├── S2.2_DELIVERY.md
+│   ├── S2.3_DELIVERY.md
+│   ├── S2.4_DELIVERY.md
+│   ├── schemas
+│   │   └── README.md
+│   ├── security
+│   │   ├── CHECKLISTS_SECURITY.md
+│   │   ├── compliance_check.md
+│   │   ├── COMPLIANCE_TRACEABILITY.md
+│   │   ├── hardening.md
+│   │   └── LEGAL_COMPLIANCE_CHECKLIST.md
+│   ├── SECURITY.md
+│   ├── solana_spec.md
+│   ├── _source_of_truth
+│   │   ├── README.md
+│   │   ├── RUNTIME_REALITY.md
+│   │   └── S0_SMOKE_RUNBOOK.md
+│   ├── system_blueprint.md
+│   ├── testing
+│   │   ├── CHAOS_PLAN.md
+│   │   ├── LOAD_TEST_PLAN.md
+│   │   └── RESILIENCE_REPORT.md
+│   ├── ui-ux
+│   │   ├── CAHIER_CHARGES_UI_UX.md
+│   │   ├── diagrams
+│   │   │   ├── ab_toasts.mmd
+│   │   │   ├── erreur_rollback.mmd
+│   │   │   ├── escalade_alertes.mmd
+│   │   │   ├── exports
+│   │   │   │   ├── ab_toasts.png
+│   │   │   │   ├── erreur_rollback.png
+│   │   │   │   ├── escalade_alertes.png
+│   │   │   │   ├── flux_principal.png
+│   │   │   │   ├── hierarchie_composants.png
+│   │   │   │   ├── persona_journey_blocks.png
+│   │   │   │   ├── slo_alertes.png
+│   │   │   │   ├── ui_trinity.png
+│   │   │   │   └── web3_flow.png
+│   │   │   ├── flux_principal.mmd
+│   │   │   ├── hierarchie_composants.mmd
+│   │   │   ├── persona_journey_blocks.mmd
+│   │   │   ├── slo_alertes.mmd
+│   │   │   ├── ui_trinity.mmd
+│   │   │   └── web3_flow.mmd
+│   │   ├── MERMAIDCHART_GUIDE.md
+│   │   ├── README.md
+│   │   ├── UI_UX_AUDIT_REPORT_V2.md
+│   │   ├── UI_UX_COMPONENT_LIBRARY.md
+│   │   ├── UI_UX_DESIGN_GUIDE.md
+│   │   ├── UI_UX_DIAGRAMS.md
+│   │   ├── UI_UX_INDEX.md
+│   │   ├── UI_UX_QUICK_START.md
+│   │   ├── UI_UX_TECHNICAL_REFERENCE.md
+│   │   └── UI_UX_USER_FLOWS.md
+│   ├── WEB3_INTEGRATION.md
+│   └── zyno_interaction_improvement.md
+├── ecosystem.config.cjs
+├── .env
+├── env.example
+├── .eslintignore
+├── .github
+│   ├── copilot-instructions.md
+│   ├── dependabot.yml
+│   ├── ISSUE_TEMPLATE.md
+│   ├── pull_request_template.md
+│   ├── PULL_REQUEST_TEMPLATE.md
+│   └── workflows
+│       ├── backend-tests.yml
+│       ├── ci.yml
+│       ├── e2e-nightly.yml
+│       ├── mcp-selftest.yml
+│       ├── release.yml
+│       ├── test-agents.yml
+│       └── verify.yml
+├── .gitignore
+├── .hintrc
+├── .husky
+│   ├── _
+│   │   ├── applypatch-msg
+│   │   ├── commit-msg
+│   │   ├── .gitignore
+│   │   ├── h
+│   │   ├── husky.sh
+│   │   ├── post-applypatch
+│   │   ├── post-checkout
+│   │   ├── post-commit
+│   │   ├── post-merge
+│   │   ├── post-rewrite
+│   │   ├── pre-applypatch
+│   │   ├── pre-auto-gc
+│   │   ├── pre-commit
+│   │   ├── pre-merge-commit
+│   │   ├── prepare-commit-msg
+│   │   ├── pre-push
+│   │   └── pre-rebase
+│   └── pre-commit
+├── journey-simulator
+│   ├── components.json
+│   ├── cypress
+│   │   ├── e2e
+│   │   │   └── navigation.cy.js
+│   │   └── support
+│   │       ├── commands.js
+│   │       └── index.js
+│   ├── cypress.config.js
+│   ├── Dockerfile
+│   ├── .dockerignore
+│   ├── docs
+│   │   ├── agents
+│   │   │   └── prompts
+│   │   │       ├── compliance.md
+│   │   │       ├── data.md
+│   │   │       ├── evaluator.md
+│   │   │       ├── onchain.md
+│   │   │       ├── orchestrator_zyno.md
+│   │   │       └── simulation.md
+│   │   ├── blockchain_integration_plan.md
+│   │   ├── BUG_FIXES_2026-01-20.md
+│   │   ├── community_voice_to_synaptic_strategy.md
+│   │   ├── Content_Maker_to_Cognitive_Publisher.md
+│   │   ├── contenu_parcours.md
+│   │   ├── diagrams
+│   │   │   ├── c4_context.mmd
+│   │   │   ├── seq_login_siws.mmd
+│   │   │   ├── seq_mint.mmd
+│   │   │   └── seq_simulation.mmd
+│   │   ├── From_Project_Manager_to_Mission_Commander.md
+│   │   ├── JOURNEY_COMPLETION_REPORT.md
+│   │   ├── mfai_mvp_spec_english_final.pdf
+│   │   ├── openapi
+│   │   │   └── journey-simulator.yaml
+│   │   ├── project_documentation.md
+│   │   ├── protocol_paper_en.md
+│   │   ├── protocol_paper_en.pdf
+│   │   ├── RECONSTRUCTION_REPORT.md
+│   │   ├── schemas
+│   │   │   ├── Event.schema.json
+│   │   │   ├── Journey.schema.json
+│   │   │   ├── JourneyStepResponse.schema.json
+│   │   │   └── SimulationRun.schema.json
+│   │   ├── security_headers.md
+│   │   ├── solana
+│   │   │   └── idl
+│   │   │       └── journey_simulator.json
+│   │   ├── system_blueprint.md
+│   │   ├── TESTING_REPORT_FINAL.md
+│   │   ├── ui-ux
+│   │   │   ├── checklist.md
+│   │   │   ├── components.md
+│   │   │   └── guide.md
+│   │   ├── web2_to_web3.md
+│   │   └── web3_explorer_to_protocol_architect.md
+│   ├── env.example
+│   ├── .eslintignore
+│   ├── .eslintrc.cjs
+│   ├── FROZEN_README.md
+│   ├── .github
+│   │   └── workflows
+│   │       ├── ci.yml
+│   │       └── release.yml
+│   ├── .gitignore
+│   ├── global-setup.ts
+│   ├── index.html
+│   ├── integration_guide_journey.md
+│   ├── LICENSE
+│   ├── nginx.conf
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── playwright.config.ts
+│   ├── playwright.prod.config.ts
+│   ├── postcss.config.js
+│   ├── public
+│   │   ├── assets
+│   │   │   └── badges
+│   │   │       ├── cognitive_master.png
+│   │   │       ├── identity_artifact.png
+│   │   │       ├── phase_1.png
+│   │   │       ├── phase_2.png
+│   │   │       ├── phase_3.png
+│   │   │       ├── phase_4.png
+│   │   │       ├── phase_5.png
+│   │   │       ├── phase_6.png
+│   │   │       └── veteran_master.png
+│   │   ├── documents
+│   │   │   ├── dao-launch-starter-kit.html
+│   │   │   ├── mfai-protocol-whitepaper-en.html
+│   │   │   ├── mfai-system-blueprint.html
+│   │   │   ├── mission-feedback-loops.html
+│   │   │   ├── pitch-deck-narrative-framework.html
+│   │   │   ├── rag-ingestion-playbook.html
+│   │   │   ├── token-strategy-sprint-template.html
+│   │   │   └── web2-to-web3-activation-guide.html
+│   │   ├── generated
+│   │   │   ├── business_model.html
+│   │   │   ├── investor_memo.html
+│   │   │   ├── litepaper_sim.html
+│   │   │   ├── migration_blueprint.html
+│   │   │   ├── neural_swarm.html
+│   │   │   ├── pitch_deck_slide.html
+│   │   │   ├── rwa_property_sim.html
+│   │   │   ├── soulbound_cert.html
+│   │   │   └── tokenomics_sim.html
+│   │   ├── images
+│   │   │   ├── activation_loop.svg
+│   │   │   ├── AECO_AEPO.png
+│   │   │   ├── certificates
+│   │   │   │   ├── capital-foundry.png
+│   │   │   │   ├── cognitive-activation-hub.png
+│   │   │   │   ├── experience-studio.png
+│   │   │   │   ├── impact-engine.png
+│   │   │   │   ├── resilience-master.png
+│   │   │   │   └── system-architect.png
+│   │   │   ├── coming_soon.png
+│   │   │   ├── Developer_use_cases.png
+│   │   │   ├── Developer_use_cases_products.png
+│   │   │   ├── Investor_testimonials.png
+│   │   │   ├── logo_mfai.png
+│   │   │   ├── nfts
+│   │   │   │   ├── capital-foundry
+│   │   │   │   │   ├── capital-discovery.png
+│   │   │   │   │   ├── capital-launchpad.png
+│   │   │   │   │   ├── launch-collaterize.png
+│   │   │   │   │   ├── oracle-integration.png
+│   │   │   │   │   ├── program-forge.png
+│   │   │   │   │   └── risk-command.png
+│   │   │   │   ├── cognitive-activation-hub
+│   │   │   │   │   ├── Cognition_Ignition.png
+│   │   │   │   │   ├── cognitive-orientation.png
+│   │   │   │   │   ├── ecosystem-engagement.png
+│   │   │   │   │   ├── identity-proofing.png
+│   │   │   │   │   ├── launch_collaterize.png
+│   │   │   │   │   ├── solana-fluency.png
+│   │   │   │   │   └── token-design-lab.png
+│   │   │   │   ├── experience-studio
+│   │   │   │   │   ├── experience-discovery.png
+│   │   │   │   │   ├── experience-launch.png
+│   │   │   │   │   ├── gameplay-lab.png
+│   │   │   │   │   ├── launch-collaterize.png
+│   │   │   │   │   ├── nft-systems-lab.png
+│   │   │   │   │   └── ux-elevation.png
+│   │   │   │   ├── impact-engine
+│   │   │   │   │   ├── dao-design.png
+│   │   │   │   │   ├── identity-reputation.png
+│   │   │   │   │   ├── impact-charter.png
+│   │   │   │   │   ├── launch-collaterize.png
+│   │   │   │   │   ├── philanthropy-protocols.png
+│   │   │   │   │   └── synaptic-impact.png
+│   │   │   │   ├── resilience-master
+│   │   │   │   │   ├── defense-systems.png
+│   │   │   │   │   ├── exploit-hunt.png
+│   │   │   │   │   ├── incident-response.png
+│   │   │   │   │   ├── launch-collaterize.png
+│   │   │   │   │   ├── redblue-evolution.png
+│   │   │   │   │   └── security-baseline.png
+│   │   │   │   └── system-architect
+│   │   │   │       ├── architecture-scan.png
+│   │   │   │       ├── depin-studio.png
+│   │   │   │       ├── launch-collaterize.png
+│   │   │   │       ├── onchain-ai.png
+│   │   │   │       ├── synaptic-rollout.png
+│   │   │   │       └── systems-hardening.png
+│   │   │   ├── Smart_contract_audit_badge.png
+│   │   │   ├── solana.svg
+│   │   │   └── zyno
+│   │   │       ├── agent_avatar.svg
+│   │   │       └── zyno_avatar.svg
+│   │   ├── knowledge-vault
+│   │   │   ├── dao-launch-starter-kit.pdf
+│   │   │   ├── mfai-protocol-whitepaper-en.pdf
+│   │   │   ├── mfai-system-blueprint.pdf
+│   │   │   ├── mission-feedback-loops.pdf
+│   │   │   ├── rag-ingestion-playbook.pdf
+│   │   │   └── web2-to-web3-activation-guide.pdf
+│   │   ├── manifest.json
+│   │   ├── neural_swarm.html
+│   │   ├── playground
+│   │   │   └── index.html
+│   │   ├── polyfills-init.js
+│   │   ├── sw.js
+│   │   └── vendor
+│   │       └── README.md
+│   ├── README.md
+│   ├── scripts
+│   │   ├── generate-api-surface.mjs
+│   │   ├── generate-file-index.mjs
+│   │   ├── generate-phases-table.mjs
+│   │   ├── simulate-demo-flow.ts
+│   │   ├── smoke-test.sh
+│   │   └── update-readme-autogen.mjs
+│   ├── src
+│   │   ├── api
+│   │   │   ├── agentRuns.ts
+│   │   │   ├── mf-back-client.ts
+│   │   │   ├── mf-back.ts
+│   │   │   └── zyno.ts
+│   │   ├── App.tsx
+│   │   ├── assets
+│   │   │   ├── lottie
+│   │   │   │   └── galaxy-reactive.json
+│   │   │   └── svg
+│   │   │       ├── dao-launchpad.svg
+│   │   │       ├── feedback-stars.svg
+│   │   │       ├── mission-flow.svg
+│   │   │       └── multi-agents.svg
+│   │   ├── components
+│   │   │   ├── AccessPassHolders.tsx
+│   │   │   ├── Admin
+│   │   │   │   └── AgentHealthCommandCenter.tsx
+│   │   │   ├── AgentActivityFeed.tsx
+│   │   │   ├── AgentDeliverables.tsx
+│   │   │   ├── Artifacts
+│   │   │   │   ├── ArtifactCard.tsx
+│   │   │   │   ├── ArtifactModal.tsx
+│   │   │   │   ├── NeuralOverlay.tsx
+│   │   │   │   └── ProjectAssets.tsx
+│   │   │   ├── CertificateModal.tsx
+│   │   │   ├── CodeAuditor.tsx
+│   │   │   ├── Dao
+│   │   │   │   └── DaoDashboard.tsx
+│   │   │   ├── DAOVoteModal.tsx
+│   │   │   ├── DebugLogger.tsx
+│   │   │   ├── DeFi
+│   │   │   │   └── BondingCurveVisualizer.tsx
+│   │   │   ├── Governance
+│   │   │   │   └── GovernanceDashboard.tsx
+│   │   │   ├── HeroSection.tsx
+│   │   │   ├── Journey
+│   │   │   │   ├── AgentActivityFeed.tsx
+│   │   │   │   ├── AgentHealthCommandCenter.tsx
+│   │   │   │   ├── charts
+│   │   │   │   │   └── RadarChart.tsx
+│   │   │   │   ├── ConfettiBackground.tsx
+│   │   │   │   ├── effects
+│   │   │   │   │   └── MasteryConfetti.tsx
+│   │   │   │   ├── InvestorDemoMode.tsx
+│   │   │   │   ├── JourneyCard.tsx
+│   │   │   │   ├── JourneyDashboard.tsx
+│   │   │   │   ├── JourneyDemoMode.tsx
+│   │   │   │   ├── JourneyNextActionsPanel.tsx
+│   │   │   │   ├── JourneyOverviewHeader.tsx
+│   │   │   │   ├── JourneyProgressBar.tsx
+│   │   │   │   ├── JourneySimulationMode.tsx
+│   │   │   │   ├── journey-simulator.code-workspace
+│   │   │   │   ├── JourneyTimeline.tsx
+│   │   │   │   ├── JourneyWorkspace.tsx
+│   │   │   │   ├── LaunchCollaterizePhase.tsx
+│   │   │   │   ├── LiveCommunicationThread.tsx
+│   │   │   │   ├── LiveSolanaPulse.tsx
+│   │   │   │   ├── MasteryGraduation.tsx
+│   │   │   │   ├── MintMission.tsx
+│   │   │   │   ├── PhaseDetails.tsx
+│   │   │   │   ├── PhaseInteractionBlock.tsx
+│   │   │   │   ├── PhaseSection.tsx
+│   │   │   │   ├── __tests__
+│   │   │   │   │   ├── JourneyCard.test.tsx
+│   │   │   │   │   ├── JourneyNextActionsPanel.test.tsx
+│   │   │   │   │   ├── JourneyProgressBar.test.tsx
+│   │   │   │   │   ├── JourneyTimeline.test.tsx
+│   │   │   │   │   ├── JourneyWorkspace.test.tsx
+│   │   │   │   │   └── NFTIntegration.test.tsx
+│   │   │   │   ├── XPTracker.tsx
+│   │   │   │   ├── ZynoBox.tsx
+│   │   │   │   ├── ZynoChat.tsx
+│   │   │   │   └── ZynoSignalSidebar.tsx
+│   │   │   ├── JourneyCompletedPage.tsx
+│   │   │   ├── JourneysPage.tsx
+│   │   │   ├── JourneysPreview.tsx
+│   │   │   ├── layout
+│   │   │   │   ├── Footer.tsx
+│   │   │   │   ├── Header.tsx
+│   │   │   │   ├── Layout.tsx
+│   │   │   │   ├── Main.tsx
+│   │   │   │   └── Sidebar.tsx
+│   │   │   ├── Layout
+│   │   │   │   └── JourneyLayout.tsx
+│   │   │   ├── LoginPage.tsx
+│   │   │   ├── MarketLaunchpad.tsx
+│   │   │   ├── MentalModelMapper.tsx
+│   │   │   ├── MintCelebrationBanner.tsx
+│   │   │   ├── Missions
+│   │   │   │   └── MarketLaunchpad.tsx
+│   │   │   ├── navigation
+│   │   │   │   ├── MainNavigation.tsx
+│   │   │   │   └── UserMetricsPanel.tsx
+│   │   │   ├── NFTMintingModal.tsx
+│   │   │   ├── NFTMintingTutorial.tsx
+│   │   │   ├── NFTProofModal.tsx
+│   │   │   ├── NodeAttestationSim.tsx
+│   │   │   ├── onboarding
+│   │   │   │   └── OnboardingFlow.tsx
+│   │   │   ├── PlaygroundPage.tsx
+│   │   │   ├── ProofCertificationsBoard.tsx
+│   │   │   ├── ProtectedRoute.tsx
+│   │   │   ├── RegisterPage.tsx
+│   │   │   ├── ResetProgressButton.tsx
+│   │   │   ├── Resources
+│   │   │   │   └── ResourceHub.tsx
+│   │   │   ├── shared
+│   │   │   │   ├── BackToTopButton.tsx
+│   │   │   │   ├── Button.tsx
+│   │   │   │   ├── ContextualTutorial.tsx
+│   │   │   │   ├── EmptyState.tsx
+│   │   │   │   ├── InfoBadge.tsx
+│   │   │   │   ├── JourneyModal.tsx
+│   │   │   │   ├── LazyConfetti.tsx
+│   │   │   │   ├── LazyLoadList.tsx
+│   │   │   │   ├── MessageDisplay.tsx
+│   │   │   │   ├── Skeleton.tsx
+│   │   │   │   ├── VaultSyncAnimation.tsx
+│   │   │   │   ├── WalletConnectionBanner.tsx
+│   │   │   │   └── ZynoAssistant.tsx
+│   │   │   ├── Shared
+│   │   │   │   ├── AgentIconRegistry.tsx
+│   │   │   │   └── Odometer.tsx
+│   │   │   ├── ShareModal.tsx
+│   │   │   ├── SkillchainBanner.tsx
+│   │   │   ├── SkillchainCard.css
+│   │   │   ├── SkillchainCard.tsx
+│   │   │   ├── StakingModal.tsx
+│   │   │   ├── Support
+│   │   │   │   └── SupportCenter.tsx
+│   │   │   ├── __tests__
+│   │   │   │   ├── NFTMintingModal.test.tsx
+│   │   │   │   ├── UIBlocksRenderer.test.tsx
+│   │   │   │   └── WalletButton.test.tsx
+│   │   │   ├── UIBlocks
+│   │   │   │   ├── IndicatorBlock.tsx
+│   │   │   │   ├── InteractiveTemplateBlock.tsx
+│   │   │   │   ├── NarrativeChoiceBlock.tsx
+│   │   │   │   └── UIBlocksRenderer.tsx
+│   │   │   ├── wallet
+│   │   │   │   └── LazyWalletMultiButton.tsx
+│   │   │   ├── WalletButton.tsx
+│   │   │   ├── WalletConnectionGuide.tsx
+│   │   │   ├── WalletFaucetButton.tsx
+│   │   │   ├── WalletStatusDisplay.tsx
+│   │   │   └── Zyno
+│   │   │       ├── agent-card.tsx
+│   │   │       ├── AgentFeedbackForm.tsx
+│   │   │       ├── AgentFeedbackModal.tsx
+│   │   │       ├── AgentLogViewer.tsx
+│   │   │       ├── AgentScoreboardContext.tsx
+│   │   │       ├── DashboardZyno.tsx
+│   │   │       ├── LiveSolanaPulse.tsx
+│   │   │       ├── MissionFeedbackSummary.stories.tsx
+│   │   │       ├── MissionFeedbackSummary.tsx
+│   │   │       ├── ResourceUploader.tsx
+│   │   │       ├── __tests__
+│   │   │       │   ├── AgentFeedbackModal.test.tsx
+│   │   │       │   └── ZynoConsole.test.tsx
+│   │   │       ├── types.ts
+│   │   │       ├── ZynoAgentScoreboard.tsx
+│   │   │       ├── ZynoChatSidebar.tsx
+│   │   │       ├── ZynoConsole.tsx
+│   │   │       ├── ZynoDAOAdminPanel.tsx
+│   │   │       ├── ZynoDecisionPanel.tsx
+│   │   │       └── ZynoMissionFlow.tsx
+│   │   ├── config
+│   │   │   ├── demoScenarios.ts
+│   │   │   └── journeyPhases.ts
+│   │   ├── content
+│   │   │   └── aepoAeco.ts
+│   │   ├── contexts
+│   │   │   ├── AuthContext.tsx
+│   │   │   ├── __tests__
+│   │   │   │   └── WalletContext.test.tsx
+│   │   │   ├── TutorialContext.tsx
+│   │   │   ├── WalletContext.tsx
+│   │   │   └── WorkspaceLayoutContext.tsx
+│   │   ├── data
+│   │   │   ├── artifacts.json
+│   │   │   ├── holders.ts
+│   │   │   ├── personas.ts
+│   │   │   ├── personas.ts.backup
+│   │   │   ├── proofsData.ts
+│   │   │   ├── resources.ts
+│   │   │   ├── sample_mission_feedback.json
+│   │   │   └── zynoReactions.ts
+│   │   ├── hooks
+│   │   │   ├── useArtifacts.ts
+│   │   │   ├── useDemoEngine.ts
+│   │   │   ├── useOptimizedLoading.ts
+│   │   │   └── usePhaseData.ts
+│   │   ├── index.css
+│   │   ├── lib
+│   │   │   ├── solana-config.ts
+│   │   │   └── walletAuth.ts
+│   │   ├── main.tsx
+│   │   ├── pages
+│   │   │   ├── Dao.tsx
+│   │   │   ├── Dashboard.tsx
+│   │   │   ├── DebugMint.tsx
+│   │   │   ├── FavoritesPage.tsx
+│   │   │   ├── GuidePage.tsx
+│   │   │   ├── HomePage.tsx
+│   │   │   ├── JourneyCompleted.tsx
+│   │   │   ├── JourneyDemo.tsx
+│   │   │   ├── Journey.tsx
+│   │   │   ├── Playground.tsx
+│   │   │   ├── Resources.tsx
+│   │   │   ├── Support.tsx
+│   │   │   └── Zyno.tsx
+│   │   ├── service-worker.js
+│   │   ├── shims
+│   │   │   └── empty.ts
+│   │   ├── store
+│   │   │   ├── demoSequencer.ts
+│   │   │   ├── demoSequencer.ts.backup
+│   │   │   ├── favoritesStore.ts
+│   │   │   ├── journeyStore.ts
+│   │   │   ├── journeyStore.ts.backup
+│   │   │   ├── __tests__
+│   │   │   │   ├── demoIntegrity.test.ts
+│   │   │   │   ├── demoSequencer.comprehensive.test.ts
+│   │   │   │   ├── demoSequencer.verify.test.ts
+│   │   │   │   ├── journeyStore.comprehensive.test.ts
+│   │   │   │   ├── journeyStore.test.ts
+│   │   │   │   └── journeyStore.wallet.test.ts
+│   │   │   └── themeStore.ts
+│   │   ├── test
+│   │   │   ├── Journey.deep-linking.test.tsx
+│   │   │   ├── journey.e2e.test.tsx
+│   │   │   └── setup.ts
+│   │   ├── types
+│   │   │   ├── artifact.ts
+│   │   │   ├── journey.ts
+│   │   │   └── uiBlocks.ts
+│   │   ├── utils
+│   │   │   ├── apiDemoHandlers.ts
+│   │   │   ├── apiMiddleware.ts
+│   │   │   ├── api-modules
+│   │   │   │   ├── auth.ts
+│   │   │   │   ├── base.ts
+│   │   │   │   ├── demo.ts
+│   │   │   │   ├── journey.ts
+│   │   │   │   ├── offline-fallback.ts
+│   │   │   │   ├── resources.ts
+│   │   │   │   └── web3.ts
+│   │   │   ├── api.ts
+│   │   │   ├── blockchain.ts
+│   │   │   ├── demoSession.ts
+│   │   │   ├── exportToPDF.ts
+│   │   │   ├── generateStableKey.ts
+│   │   │   ├── ignoreExtensionErrors.ts
+│   │   │   ├── journeySignals.ts
+│   │   │   ├── logger.ts
+│   │   │   ├── particles.ts
+│   │   │   ├── personaStyles.ts
+│   │   │   ├── progress.ts
+│   │   │   ├── renderHighlightedText.tsx
+│   │   │   ├── sanitizeHeaders.ts
+│   │   │   ├── sendToNotion.ts
+│   │   │   ├── solanaWeb3.ts
+│   │   │   ├── __tests__
+│   │   │   │   ├── ignoreExtensionErrors.test.ts
+│   │   │   │   └── sanitizeHeaders.test.ts
+│   │   │   └── tokenStore.ts
+│   │   └── vite-env.d.ts
+│   ├── .storybook
+│   │   ├── main.ts
+│   │   └── preview.ts
+│   ├── tailwind.config.js
+│   ├── tests
+│   │   ├── e2e
+│   │   │   ├── 00-preflight
+│   │   │   │   └── runmode-guard-violation.spec.ts
+│   │   │   ├── 01-navigation
+│   │   │   │   ├── comprehensive-menu.spec.ts
+│   │   │   │   ├── error-pages.spec.ts
+│   │   │   │   ├── header-navigation.spec.ts
+│   │   │   │   └── mode-persistence.spec.ts
+│   │   │   ├── 02-agent-core
+│   │   │   │   ├── phase-1-discovery.spec.ts
+│   │   │   │   ├── phase-2-strategy.spec.ts
+│   │   │   │   └── zyno-interaction.spec.ts
+│   │   │   ├── 02-visual-regression
+│   │   │   │   ├── console-guard.spec.ts
+│   │   │   │   ├── layout-trinity.spec.ts
+│   │   │   │   └── screenshots-desktop.spec.ts
+│   │   │   ├── 03-agent-workflows
+│   │   │   │   └── resource-production.spec.ts
+│   │   │   ├── 03-user-workflows
+│   │   │   │   ├── journey-completion.spec.ts
+│   │   │   │   ├── persona-onboarding.spec.ts
+│   │   │   │   ├── phase-progression.spec.ts
+│   │   │   │   ├── rbac-enforcement.spec.ts
+│   │   │   │   └── resource-unlock.spec.ts
+│   │   │   ├── 03-web3-simulation
+│   │   │   │   ├── dao-voting.spec.ts
+│   │   │   │   └── nft-minting.spec.ts
+│   │   │   ├── 04-agents
+│   │   │   │   ├── resource-production.spec.ts
+│   │   │   │   └── zyno-persistence.spec.ts
+│   │   │   ├── 04-dashboard-intel
+│   │   │   │   ├── resource-rendering.spec.ts
+│   │   │   │   └── zyno-chat-scroll.spec.ts
+│   │   │   ├── 04-data-validation
+│   │   │   │   ├── rag-upload.spec.ts
+│   │   │   │   └── request-smoke.spec.ts
+│   │   │   ├── 05-agents-orchestration
+│   │   │   │   ├── agent-contracts.spec.ts
+│   │   │   │   ├── agent-sweep.spec.ts
+│   │   │   │   ├── features-validation.spec.ts
+│   │   │   │   ├── intent-routing.spec.ts
+│   │   │   │   ├── multi-user-isolation.spec.ts
+│   │   │   │   ├── orchestrator-resilience.spec.ts
+│   │   │   │   ├── rag-llm-proof.spec.ts
+│   │   │   │   └── veteran-flow.spec.ts
+│   │   │   ├── 06-web3-persistence.spec.ts
+│   │   │   ├── 0X-web3-simulation-only
+│   │   │   │   └── connect-only.spec.ts
+│   │   │   ├── 99-english-compliance
+│   │   │   │   └── ui-runtime.spec.ts
+│   │   │   ├── 99-gauntlet
+│   │   │   │   └── gauntlet.spec.ts
+│   │   │   ├── debug_crash.spec.ts
+│   │   │   ├── debug-demo-flow.spec.ts
+│   │   │   ├── demo-interactive-integrity.spec.ts
+│   │   │   ├── final-demo-verification.spec.ts
+│   │   │   ├── fixtures
+│   │   │   │   ├── realModeTest.ts
+│   │   │   │   └── test-data.ts
+│   │   │   ├── helpers
+│   │   │   │   ├── authStates.ts
+│   │   │   │   ├── console-guard.ts
+│   │   │   │   ├── hardening.ts
+│   │   │   │   ├── layout.ts
+│   │   │   │   ├── progression.ts
+│   │   │   │   ├── rbac.ts
+│   │   │   │   ├── timeline.ts
+│   │   │   │   └── ui-security.ts
+│   │   │   ├── interaction-gate.spec.ts
+│   │   │   ├── README.md
+│   │   │   ├── _support
+│   │   │   │   ├── fixtures.ts
+│   │   │   │   └── route-tracker.ts
+│   │   │   └── utils
+│   │   │       ├── journeyMocks.ts
+│   │   │       ├── navigation-helpers.ts
+│   │   │       ├── pageStability.ts
+│   │   │       └── uiActions.ts
+│   │   └── e2e-report
+│   │       ├── data
+│   │       │   ├── a8f22a6bf8233e3768ac8462282b1f102e1ca04b.md
+│   │       │   ├── ab1997886c2441314b1bd2dc9b901a03ea109ad8.png
+│   │       │   └── de4213a6792994d386486a76ed1d5150f62c9a97.webm
+│   │       └── index.html
+│   ├── todo_refonte_frontend_zyno.md
+│   ├── tsconfig.e2e.json
+│   ├── tsconfig.json
+│   ├── tsconfig.node.json
+│   ├── vite.config.ts
+│   ├── vitest.config.ts
+│   └── .vscode
+│       ├── settings.json
+│       └── tasks.json
+├── LICENSE
+├── Makefile
+├── mcp.json
+├── mf-back
+│   ├── data
+│   │   ├── artifacts.json
+│   │   ├── daoConfig.json
+│   │   ├── daoState.js
+│   │   ├── demo-states
+│   │   │   ├── capital-foundry.json
+│   │   │   ├── cognitive-activation-hub.json
+│   │   │   ├── experience-studio.json
+│   │   │   ├── impact-engine.json
+│   │   │   ├── resilience-master.json
+│   │   │   └── system-architect.json
+│   │   ├── parcours_templates
+│   │   │   ├── dao_track.json
+│   │   │   ├── demo_day_track.json
+│   │   │   ├── experience-studio_track.json
+│   │   │   ├── foundry_track.json
+│   │   │   ├── hub_track.json
+│   │   │   ├── impact_track.json
+│   │   │   ├── nft_track.json
+│   │   │   ├── pitch_track.json
+│   │   │   ├── resilience_track.json
+│   │   │   ├── system-architect_track.json
+│   │   │   └── web3legal_track.json
+│   │   ├── parcoursTemplates.js
+│   │   └── rag-documents
+│   │       ├── defi-yield-strategies.md
+│   │       ├── hub-solana-mental-models.md
+│   │       ├── nft_guide.txt
+│   │       ├── pitchdeck_template.txt
+│   │       ├── rag-test-document-txt.txt
+│   │       ├── regulation_web_3.txt
+│   │       ├── rwa_overview.txt
+│   │       ├── security-post-mortems.md
+│   │       ├── solana_rpc.txt
+│   │       └── tokenomics_model.txt
+│   ├── docker-entrypoint.sh
+│   ├── Dockerfile
+│   ├── .dockerignore
+│   ├── docs
+│   │   ├── backend-architecture.md
+│   │   └── knowledge_base
+│   │       └── solana_fees.md
+│   ├── .env
+│   ├── env.development.example
+│   ├── env.example
+│   ├── .env.production
+│   ├── env.production.example
+│   ├── __fixtures__
+│   │   └── golden
+│   │       ├── composite_intent.json
+│   │       ├── cost_block.json
+│   │       ├── demo_mode.json
+│   │       ├── preset_audit_dao.json
+│   │       ├── quota_warn.json
+│   │       ├── simple_intent.json
+│   │       └── web3_block.json
+│   ├── FROZEN_README.md
+│   ├── .gitignore
+│   ├── logs
+│   │   └── agent_feedback.json
+│   ├── nodemon.json
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── prisma
+│   │   └── schema.prisma
+│   ├── README.md
+│   ├── scripts
+│   │   ├── agent_mapping_final.md
+│   │   ├── audit-agents-config.js
+│   │   ├── check-rag-connection.js
+│   │   ├── clear-agent-cache.js
+│   │   ├── memory-test-get.js
+│   │   ├── memory-test-set.js
+│   │   ├── phase5_agent_sweep_full.js
+│   │   ├── phase5_agent_sweep_mini.js
+│   │   ├── phase5_list_models.js
+│   │   ├── phase5_llm_real.js
+│   │   ├── phase5_observability_check.js
+│   │   ├── prove-nft-agent.js
+│   │   ├── rag_upload.js
+│   │   ├── seed-test-user.js
+│   │   ├── stress-test-orchestrator.js
+│   │   ├── test-chain-of-truth.js
+│   │   ├── test-conflict-growth.js
+│   │   ├── test-e2e-pipeline.js
+│   │   ├── test-tokenomics-validation.js
+│   │   ├── test-zyno-transition.js
+│   │   ├── verify-consumability.js
+│   │   ├── verify-journey-flow.js
+│   │   └── verify-tokenomics.js
+│   ├── src
+│   │   ├── agents
+│   │   │   ├── agentContract.js
+│   │   │   ├── AgentFactory.js
+│   │   │   ├── agent_template.js
+│   │   │   ├── agentUtils.js
+│   │   │   ├── AnalyticsAgent.js
+│   │   │   ├── APIContractAgent.js
+│   │   │   ├── ArchitectAgent.ts
+│   │   │   ├── AuditAgent.js
+│   │   │   ├── BaseAgent.ts
+│   │   │   ├── BuilderAgent.js
+│   │   │   ├── CFOAgent.ts
+│   │   │   ├── CoachAgent.js
+│   │   │   ├── CommunityAgent.js
+│   │   │   ├── ComplianceAgent.js
+│   │   │   ├── CurriculumAgent.js
+│   │   │   ├── DAOAgent.js
+│   │   │   ├── DataIntegrityAgent.js
+│   │   │   ├── DeFiAgent.js
+│   │   │   ├── DesignAgent.js
+│   │   │   ├── DevAgent.js
+│   │   │   ├── DevOpsAgent.js
+│   │   │   ├── EducationAgent.js
+│   │   │   ├── EngineerAgent.ts
+│   │   │   ├── EvaluationAgent.js
+│   │   │   ├── extended
+│   │   │   │   └── registry-extra.js
+│   │   │   ├── GovernanceAgent.js
+│   │   │   ├── GovernanceDAOAgent.js
+│   │   │   ├── GrowthAgent.js
+│   │   │   ├── GuideAgent.js
+│   │   │   ├── HubAgent.js
+│   │   │   ├── InvestorAgent.js
+│   │   │   ├── InvestorDemoAgent.js
+│   │   │   ├── JourneyDesignAgent.js
+│   │   │   ├── LaunchpadAgent.js
+│   │   │   ├── MarketplaceAgent.js
+│   │   │   ├── MintingAgent.js
+│   │   │   ├── NFTAgent.js
+│   │   │   ├── ObservabilityAgent.js
+│   │   │   ├── OnboardingAgent.js
+│   │   │   ├── PerformanceAgent.js
+│   │   │   ├── PitchAgent.js
+│   │   │   ├── ProductAgent.js
+│   │   │   ├── ProductSpecAgent.js
+│   │   │   ├── prompts.js
+│   │   │   ├── ProtocolAgent.js
+│   │   │   ├── QAPlaywrightAgent.js
+│   │   │   ├── RAGOpsAgent.js
+│   │   │   ├── ReflectionAgent.js
+│   │   │   ├── registry.js
+│   │   │   ├── RiskFraudAgent.js
+│   │   │   ├── SecurityAgent.js
+│   │   │   ├── SecurityAuditAgent.js
+│   │   │   ├── SolanaAnchorAgent.js
+│   │   │   ├── telemetryUtils.js
+│   │   │   ├── TokenAgent.js
+│   │   │   ├── TokenomicsAgent.js
+│   │   │   ├── UXWritingAgent.js
+│   │   │   ├── WalletAuthAgent.js
+│   │   │   ├── Web3LegalAgent.js
+│   │   │   └── ZynoAgent.js
+│   │   ├── app.ts
+│   │   ├── config
+│   │   │   └── database.ts
+│   │   ├── constants
+│   │   │   └── project_schemas.js
+│   │   ├── controllers
+│   │   │   ├── agent.controller.ts
+│   │   │   ├── auth.controller.ts
+│   │   │   ├── health.controller.ts
+│   │   │   └── user.controller.ts
+│   │   ├── llm
+│   │   │   └── OpenAIClient.ts
+│   │   ├── metrics
+│   │   │   └── computeAEPO.js
+│   │   ├── middleware
+│   │   │   ├── auth.ts
+│   │   │   └── errorHandler.ts
+│   │   ├── orchestration
+│   │   │   ├── actionToolMapper.js
+│   │   │   ├── agentProtocol.js
+│   │   │   ├── agentsRegistry.js
+│   │   │   ├── alertingEngine.js
+│   │   │   ├── artifactStore.js
+│   │   │   ├── auditTrailStore.js
+│   │   │   ├── circuitBreaker.js
+│   │   │   ├── concurrencyManager.js
+│   │   │   ├── costModel.js
+│   │   │   ├── degradationPolicy.js
+│   │   │   ├── executionEngine.js
+│   │   │   ├── executionGate.js
+│   │   │   ├── idempotencyStore.js
+│   │   │   ├── intentRouter.js
+│   │   │   ├── journey-tasks.json
+│   │   │   ├── killSwitch.js
+│   │   │   ├── llmCache.js
+│   │   │   ├── llmClient.js
+│   │   │   ├── memoryStore.js
+│   │   │   ├── metricsStore.js
+│   │   │   ├── presets
+│   │   │   │   ├── audit-dao.json
+│   │   │   │   ├── investor-diligence.json
+│   │   │   │   └── product-onboarding.json
+│   │   │   ├── productionGuards.js
+│   │   │   ├── ragClient.js
+│   │   │   ├── ragPolicy.js
+│   │   │   ├── runtimeMode.js
+│   │   │   ├── secretsPolicy.js
+│   │   │   ├── services
+│   │   │   │   ├── executionService.js
+│   │   │   │   ├── logicCheckService.js
+│   │   │   │   ├── ragService.js
+│   │   │   │   ├── scoringService.js
+│   │   │   │   └── validationService.js
+│   │   │   ├── sloExporter.js
+│   │   │   ├── sloRegistry.js
+│   │   │   ├── specializedValidators.js
+│   │   │   ├── telemetryAdapter.js
+│   │   │   ├── tenantQuotaRegistry.js
+│   │   │   ├── timelineSanitizer.js
+│   │   │   ├── timeoutGuard.js
+│   │   │   ├── toolsRegistry.js
+│   │   │   ├── vsliceSchema.js
+│   │   │   ├── web3Guards.js
+│   │   │   ├── web3Pipeline.js
+│   │   │   ├── workflowMap.js
+│   │   │   ├── zynoOrchestrator.js
+│   │   │   └── zynoVerticalSlice.js
+│   │   ├── rag
+│   │   │   ├── rag_client.js
+│   │   │   └── ragClient.js
+│   │   ├── routes
+│   │   │   ├── agent.routes.ts
+│   │   │   ├── auth.routes.ts
+│   │   │   ├── health.routes.ts
+│   │   │   ├── index.routes.ts
+│   │   │   └── user.routes.ts
+│   │   ├── scripts
+│   │   │   ├── audit-db-integrity.ts
+│   │   │   ├── test-agent-init.ts
+│   │   │   └── test-real-llm.ts
+│   │   ├── services
+│   │   │   ├── AgentMemoryService.ts
+│   │   │   └── agent_memory.ts
+│   │   ├── types
+│   │   │   └── express.d.ts
+│   │   └── utils
+│   │       ├── aepoAeco.js
+│   │       ├── agent-idempotence.js
+│   │       ├── computeAEPO.js
+│   │       ├── llmLogger.js
+│   │       ├── logger.js
+│   │       ├── openaiClient.js
+│   │       ├── resourceValidator.js
+│   │       └── solana.js
+│   ├── test-dao-backend.sh
+│   ├── test-demo-mode.sh
+│   ├── tests
+│   │   ├── admin.rag.e2e.test.js
+│   │   ├── agent-idempotence.test.js
+│   │   ├── agent-runs.test.js
+│   │   ├── agents
+│   │   │   └── agentsImpl.e2e-lite.test.js
+│   │   ├── agents.test.js
+│   │   ├── baseAgent_resilience.test.js
+│   │   ├── cache-key.test.js
+│   │   ├── controllers.spec.js
+│   │   ├── demoMission.test.js
+│   │   ├── e2e
+│   │   │   ├── orchestration.e2e.test.js
+│   │   │   └── orchestrator_with_feedback.test.js
+│   │   ├── exec
+│   │   │   ├── actionToolMapper.test.js
+│   │   │   └── toolsRegistry.test.js
+│   │   ├── feedback.test.js
+│   │   ├── fixtures
+│   │   │   └── demo_mission.json
+│   │   ├── full_pipeline_resilience.test.js
+│   │   ├── golden
+│   │   │   └── goldenOutputs.test.js
+│   │   ├── growth_tokenomics_conflict.test.js
+│   │   ├── integration
+│   │   │   ├── multiAgentFeedback.test.js
+│   │   │   └── resourceValidator.integration.test.js
+│   │   ├── intentRouter.test.js
+│   │   ├── journeyController.step.test.js
+│   │   ├── journey-metrics.test.js
+│   │   ├── journey-state.test.js
+│   │   ├── manual_rag.test.js
+│   │   ├── memory_persistence.test.js
+│   │   ├── orchestrator_history_window.test.js
+│   │   ├── parcoursTemplates.test.js
+│   │   ├── ragClient.fallback.integration.test.js
+│   │   ├── ragClient.remote.test.js
+│   │   ├── ragClient.test.js
+│   │   ├── ragops_strict_grounding.test.js
+│   │   ├── registry.test.js
+│   │   ├── reproduce_quiz_error.js
+│   │   ├── routes.admin.test.js
+│   │   ├── routes.dao.test.js
+│   │   ├── routes.export.test.js
+│   │   ├── routes.orchestration.test.js
+│   │   ├── routes.supertest.spec.js
+│   │   ├── runtimeMode.test.js
+│   │   ├── s2_api.test.js
+│   │   ├── s2_evaluation.test.js
+│   │   ├── s2_logic.test.js
+│   │   ├── s2_models.test.js
+│   │   ├── setup.js
+│   │   ├── sloExporter.test.js
+│   │   ├── unit
+│   │   │   ├── BaseAgent.test.js
+│   │   │   ├── computeAEPO.test.js
+│   │   │   ├── consortium_simulation.test.js
+│   │   │   ├── journeyController.test.js
+│   │   │   ├── nft_verification.test.js
+│   │   │   ├── orchestrator_collision.test.js
+│   │   │   ├── phase4-contracts.test.js
+│   │   │   ├── phase5_rag_contract.test.js
+│   │   │   ├── phase6_llm_failure.test.js
+│   │   │   ├── phase6_rag_failure.test.js
+│   │   │   ├── phase6_rate_limit.test.js
+│   │   │   ├── phase6_timeout.test.js
+│   │   │   ├── phaseTestnetV0_onchain_disabled.test.js
+│   │   │   ├── phaseTestnetV0_web3_agents_sim_only.test.js
+│   │   │   ├── resourceValidator.test.js
+│   │   │   └── specializedValidators.test.js
+│   │   ├── user-guardrails.test.js
+│   │   ├── verify_phase_mapping.js
+│   │   ├── verticalSliceOrchestration.test.js
+│   │   ├── wallet-auth.test.js
+│   │   ├── web3
+│   │   │   └── web3Pipeline.test.js
+│   │   ├── workflows
+│   │   │   └── workflowPhases.test.js
+│   │   └── zynoOrchestrator.test.js
+│   ├── tools
+│   │   ├── audit_bonding_curve_stress.js
+│   │   └── audit_reward_mechanics.js
+│   └── tsconfig.json
+├── package.json
+├── package-lock.json
+├── scripts
+│   ├── audit_compliance.sh
+│   ├── audit_server.sh
+│   ├── check-env-vars.js
+│   ├── check-liveness.sh
+│   ├── ci-verify.sh
+│   ├── collaterize-handshake.js
+│   ├── compliance
+│   │   └── check-compliance.js
+│   ├── db-seed-demo.js
+│   ├── deep-audit.js
+│   ├── deploy_docker.sh
+│   ├── deploy_pm2.sh
+│   ├── deploy_rc_v1.0.sh
+│   ├── deploy.sh
+│   ├── dump_project.sh
+│   ├── extract_error.py
+│   ├── extract_mfai_audit.py
+│   ├── fix-r1.js
+│   ├── full_stack_smoke.sh
+│   ├── generate_agent_inventory.js
+│   ├── generate_full_mfai_audit.py
+│   ├── generate_matrix.js
+│   ├── generate-protocol-paper.js
+│   ├── generate_tree.sh
+│   ├── launch-sovereign.sh
+│   ├── local-clean.sh
+│   ├── local-restart-prod.sh
+│   ├── local-verify.sh
+│   ├── mcp-selftest.mjs
+│   ├── mfai_full_audit_orchestrator.py
+│   ├── mfai_integrity_check.py
+│   ├── orchestration-diagnose.js
+│   ├── performance-check.js
+│   ├── pre-flight-check.sh
+│   ├── prod-local-down.sh
+│   ├── prod-local-up.sh
+│   ├── proof_lead10_r01.sh
+│   ├── proof_lead11.sh
+│   ├── qa-runner.js
+│   ├── rag-contract-test.js
+│   ├── release
+│   │   ├── go-live.js
+│   │   ├── preflight.js
+│   │   ├── rollback.js
+│   │   ├── smoke-e2e.js
+│   │   └── smoke.js
+│   ├── relentless-precision-scan.sh
+│   ├── repro-orchestration.js
+│   ├── repro_orchestration_real.js
+│   ├── rseries-check.js
+│   ├── run-3-matrix-telemetry.sh
+│   ├── run-mfai-flow.sh
+│   ├── runs-memory-audit.js
+│   ├── run-with-backend-telemetry.js
+│   ├── s0_smoke_server.sh
+│   ├── sign_project.py
+│   ├── smoke-test-final.js
+│   ├── sovereign-snapshot.sh
+│   ├── sovereign-up.sh
+│   ├── start_stack.sh
+│   ├── test_import.js
+│   ├── testing
+│   │   ├── simulate-chaos.js
+│   │   └── simulate-load.js
+│   ├── verify-production.sh
+│   ├── verify-server-env.sh
+│   └── write-integrity-check.js
+├── .secrets-backup
+│   ├── docs-.env.example
+│   ├── .env
+│   ├── .env.example
+│   ├── .env.local
+│   ├── .env.production
+│   └── web.env.example
+├── .serena
+│   ├── .gitignore
+│   ├── memories
+│   │   ├── audit-2025-11-16.md
+│   │   └── react-peer-warning.md
+│   └── project.yml
+├── sonar-project.properties
+├── start.sh
+├── tools
+│   ├── audit_csrf_strict.js
+│   ├── audit_memory_growth.js
+│   ├── audit_router_ambiguity.js
+│   ├── audit_tokenomics_resilience.js
+│   ├── audit_tokenomics_stress.js
+│   ├── mcp
+│   │   ├── fetch-server.mjs
+│   │   ├── filesystem-ro.mjs
+│   │   └── git-server.mjs
+│   ├── produce_evidence.js
+│   ├── produce_supreme_evidence.js
+│   ├── security_probe.js
+│   ├── system-health.js
+│   └── verify_memory_depth.js
+├── ui-e2e
+│   └── index.html
+├── .vscode
+│   ├── settings.json
+│   └── tasks.json
+└── web
+    ├── app
+    │   ├── api
+    │   │   ├── agents
+    │   │   │   └── logs
+    │   │   │       └── route.ts
+    │   │   ├── ai
+    │   │   │   └── echo
+    │   │   │       └── route.ts
+    │   │   ├── auth
+    │   │   │   ├── nonce
+    │   │   │   │   └── route.ts
+    │   │   │   ├── siws
+    │   │   │   │   ├── challenge
+    │   │   │   │   │   └── route.ts
+    │   │   │   │   └── verify
+    │   │   │   │       └── route.ts
+    │   │   │   └── verify
+    │   │   │       └── route.ts
+    │   │   ├── dao
+    │   │   │   └── vote
+    │   │   │       └── simulate
+    │   │   │           └── route.ts
+    │   │   ├── health
+    │   │   │   └── route.ts
+    │   │   ├── healthz
+    │   │   │   └── route.ts
+    │   │   ├── integrations
+    │   │   │   └── collaterize
+    │   │   │       └── simulate
+    │   │   │           └── route.ts
+    │   │   ├── journeys
+    │   │   │   ├── audit
+    │   │   │   │   └── route.ts
+    │   │   │   ├── [id]
+    │   │   │   │   ├── state
+    │   │   │   │   │   └── route.ts
+    │   │   │   │   ├── step
+    │   │   │   │   │   └── route.ts
+    │   │   │   │   └── submit
+    │   │   │   │       └── route.ts
+    │   │   │   └── route.ts
+    │   │   ├── metadata
+    │   │   │   ├── pass
+    │   │   │   │   └── route.ts
+    │   │   │   └── proof-of-skill
+    │   │   │       └── route.ts
+    │   │   ├── metrics
+    │   │   │   └── route.ts
+    │   │   ├── mint
+    │   │   │   ├── execute
+    │   │   │   │   └── route.ts
+    │   │   │   ├── last
+    │   │   │   │   └── route.ts
+    │   │   │   ├── simulate
+    │   │   │   │   └── route.ts
+    │   │   │   └── status
+    │   │   │       └── route.ts
+    │   │   ├── pass
+    │   │   │   └── check
+    │   │   │       └── route.ts
+    │   │   ├── rag
+    │   │   │   ├── doc
+    │   │   │   │   └── route.ts
+    │   │   │   ├── ingest
+    │   │   │   │   └── route.ts
+    │   │   │   ├── ingest-batch
+    │   │   │   │   └── route.ts
+    │   │   │   ├── query
+    │   │   │   │   └── route.ts
+    │   │   │   └── search
+    │   │   │       └── route.ts
+    │   │   ├── stake
+    │   │   │   └── simulate
+    │   │   │       └── route.ts
+    │   │   └── tx
+    │   │       └── prepare
+    │   │           └── route.ts
+    │   ├── global-error.tsx
+    │   ├── globals.css
+    │   ├── instrumentation.ts
+    │   ├── journey
+    │   │   └── user-progress
+    │   │       └── route.ts
+    │   ├── layout.tsx
+    │   ├── page.tsx
+    │   └── user
+    │       ├── login
+    │       │   └── route.ts
+    │       ├── logout
+    │       │   └── route.ts
+    │       ├── profile
+    │       │   └── route.ts
+    │       ├── refresh
+    │       │   └── route.ts
+    │       └── register
+    │           └── route.ts
+    ├── cache
+    │   └── config.json
+    ├── CHANGELOG.md
+    ├── coverage
+    │   ├── clover.xml
+    │   ├── coverage-final.json
+    │   ├── lcov.info
+    │   └── lcov-report
+    │       ├── app
+    │       │   ├── api
+    │       │   │   ├── agents
+    │       │   │   │   └── logs
+    │       │   │   │       ├── index.html
+    │       │   │   │       └── route.ts.html
+    │       │   │   ├── ai
+    │       │   │   │   └── echo
+    │       │   │   │       ├── index.html
+    │       │   │   │       └── route.ts.html
+    │       │   │   ├── auth
+    │       │   │   │   ├── nonce
+    │       │   │   │   │   ├── index.html
+    │       │   │   │   │   └── route.ts.html
+    │       │   │   │   ├── siws
+    │       │   │   │   │   ├── challenge
+    │       │   │   │   │   │   ├── index.html
+    │       │   │   │   │   │   └── route.ts.html
+    │       │   │   │   │   └── verify
+    │       │   │   │   │       ├── index.html
+    │       │   │   │   │       └── route.ts.html
+    │       │   │   │   └── verify
+    │       │   │   │       ├── index.html
+    │       │   │   │       └── route.ts.html
+    │       │   │   ├── dao
+    │       │   │   │   └── vote
+    │       │   │   │       └── simulate
+    │       │   │   │           ├── index.html
+    │       │   │   │           └── route.ts.html
+    │       │   │   ├── health
+    │       │   │   │   ├── index.html
+    │       │   │   │   └── route.ts.html
+    │       │   │   ├── healthz
+    │       │   │   │   ├── index.html
+    │       │   │   │   └── route.ts.html
+    │       │   │   ├── integrations
+    │       │   │   │   └── collaterize
+    │       │   │   │       └── simulate
+    │       │   │   │           ├── index.html
+    │       │   │   │           └── route.ts.html
+    │       │   │   ├── journeys
+    │       │   │   │   ├── audit
+    │       │   │   │   │   ├── index.html
+    │       │   │   │   │   └── route.ts.html
+    │       │   │   │   ├── [id]
+    │       │   │   │   │   ├── state
+    │       │   │   │   │   │   ├── index.html
+    │       │   │   │   │   │   └── route.ts.html
+    │       │   │   │   │   ├── step
+    │       │   │   │   │   │   ├── index.html
+    │       │   │   │   │   │   └── route.ts.html
+    │       │   │   │   │   └── submit
+    │       │   │   │   │       ├── index.html
+    │       │   │   │   │       └── route.ts.html
+    │       │   │   │   ├── index.html
+    │       │   │   │   └── route.ts.html
+    │       │   │   ├── metadata
+    │       │   │   │   ├── pass
+    │       │   │   │   │   ├── index.html
+    │       │   │   │   │   └── route.ts.html
+    │       │   │   │   └── proof-of-skill
+    │       │   │   │       ├── index.html
+    │       │   │   │       └── route.ts.html
+    │       │   │   ├── metrics
+    │       │   │   │   ├── index.html
+    │       │   │   │   └── route.ts.html
+    │       │   │   ├── mint
+    │       │   │   │   ├── execute
+    │       │   │   │   │   ├── index.html
+    │       │   │   │   │   └── route.ts.html
+    │       │   │   │   ├── last
+    │       │   │   │   │   ├── index.html
+    │       │   │   │   │   └── route.ts.html
+    │       │   │   │   ├── simulate
+    │       │   │   │   │   ├── index.html
+    │       │   │   │   │   └── route.ts.html
+    │       │   │   │   └── status
+    │       │   │   │       ├── index.html
+    │       │   │   │       └── route.ts.html
+    │       │   │   ├── pass
+    │       │   │   │   └── check
+    │       │   │   │       ├── index.html
+    │       │   │   │       └── route.ts.html
+    │       │   │   ├── rag
+    │       │   │   │   ├── doc
+    │       │   │   │   │   ├── index.html
+    │       │   │   │   │   └── route.ts.html
+    │       │   │   │   ├── ingest
+    │       │   │   │   │   ├── index.html
+    │       │   │   │   │   └── route.ts.html
+    │       │   │   │   ├── ingest-batch
+    │       │   │   │   │   ├── index.html
+    │       │   │   │   │   └── route.ts.html
+    │       │   │   │   ├── query
+    │       │   │   │   │   ├── index.html
+    │       │   │   │   │   └── route.ts.html
+    │       │   │   │   └── search
+    │       │   │   │       ├── index.html
+    │       │   │   │       └── route.ts.html
+    │       │   │   ├── stake
+    │       │   │   │   └── simulate
+    │       │   │   │       ├── index.html
+    │       │   │   │       └── route.ts.html
+    │       │   │   └── tx
+    │       │   │       └── prepare
+    │       │   │           ├── index.html
+    │       │   │           └── route.ts.html
+    │       │   ├── global-error.tsx.html
+    │       │   ├── index.html
+    │       │   ├── instrumentation.ts.html
+    │       │   ├── journey
+    │       │   │   └── user-progress
+    │       │   │       ├── index.html
+    │       │   │       └── route.ts.html
+    │       │   ├── layout.tsx.html
+    │       │   ├── page.tsx.html
+    │       │   └── user
+    │       │       ├── login
+    │       │       │   ├── index.html
+    │       │       │   └── route.ts.html
+    │       │       ├── logout
+    │       │       │   ├── index.html
+    │       │       │   └── route.ts.html
+    │       │       ├── profile
+    │       │       │   ├── index.html
+    │       │       │   └── route.ts.html
+    │       │       ├── refresh
+    │       │       │   ├── index.html
+    │       │       │   └── route.ts.html
+    │       │       └── register
+    │       │           ├── index.html
+    │       │           └── route.ts.html
+    │       ├── base.css
+    │       ├── block-navigation.js
+    │       ├── favicon.png
+    │       ├── index.html
+    │       ├── prettify.css
+    │       ├── prettify.js
+    │       ├── sort-arrow-sprite.png
+    │       ├── sorter.js
+    │       └── src
+    │           ├── components
+    │           │   ├── Artifacts
+    │           │   │   ├── ArtifactModal.tsx.html
+    │           │   │   ├── index.html
+    │           │   │   └── NeuralOverlay.tsx.html
+    │           │   ├── AuthProvider.tsx.html
+    │           │   ├── index.html
+    │           │   ├── Journey
+    │           │   │   ├── index.html
+    │           │   │   └── UIBlocksRenderer.tsx.html
+    │           │   └── WalletProvider.tsx.html
+    │           ├── hooks
+    │           │   ├── index.html
+    │           │   └── useAuth.ts.html
+    │           ├── infra
+    │           │   ├── index.html
+    │           │   └── openaiConfig.ts.html
+    │           ├── lib
+    │           │   ├── index.html
+    │           │   ├── prisma.ts.html
+    │           │   └── solana
+    │           │       ├── checkPassOnChain.ts.html
+    │           │       └── index.html
+    │           ├── mocks
+    │           │   ├── handlers.ts.html
+    │           │   ├── index.html
+    │           │   └── server.ts.html
+    │           ├── server
+    │           │   ├── db.ts.html
+    │           │   ├── demoArtifacts.ts.html
+    │           │   ├── embeddings.ts.html
+    │           │   ├── index.html
+    │           │   ├── journeyStepResponse.schema.ts.html
+    │           │   ├── logger.ts.html
+    │           │   ├── metrics.ts.html
+    │           │   ├── queue.ts.html
+    │           │   ├── ragStore.ts.html
+    │           │   ├── rateLimit.ts.html
+    │           │   ├── redis.ts.html
+    │           │   ├── signer.ts.html
+    │           │   ├── siwsStore.ts.html
+    │           │   ├── state.ts.html
+    │           │   └── zyno.ts.html
+    │           └── workers
+    │               ├── index.html
+    │               └── mintWorker.ts.html
+    ├── deploy
+    │   ├── nginx
+    │   │   └── next.conf.sample
+    │   └── systemd
+    │       └── journey-web.service
+    ├── Dockerfile
+    ├── .dockerignore
+    ├── e2e
+    │   └── basic.spec.ts
+    ├── .env
+    ├── env.example
+    ├── .eslintrc.json
+    ├── .github
+    │   └── workflows
+    │       └── ci.yml
+    ├── .gitignore
+    ├── jest.config.ts
+    ├── jest.setup.ts
+    ├── middleware.ts
+    ├── minter.json
+    ├── next.config.mjs
+    ├── next-env.d.ts
+    ├── .nvmrc
+    ├── package.json
+    ├── package-lock.json
+    ├── packages
+    │   └── agents
+    │       ├── orchestrator
+    │       │   └── index.ts
+    │       ├── patterns
+    │       │   └── safety.ts
+    │       └── tools
+    │           └── solana.ts
+    ├── playwright.config.ts
+    ├── postcss.config.js
+    ├── .prettierrc
+    ├── prisma
+    │   ├── migrations
+    │   │   ├── 20251118155543_add_agentlog_user_idx
+    │   │   │   └── migration.sql
+    │   │   └── migration_lock.toml
+    │   ├── schema.prisma
+    │   └── seed.ts
+    ├── public
+    │   ├── grid.svg
+    │   └── openapi.yaml
+    ├── README.md
+    ├── scripts
+    │   ├── check-minter-balance.ts
+    │   ├── check-minter-status.ts
+    │   ├── gen-minter.ts
+    │   └── run-mint-worker.ts
+    ├── sentry.client.config.ts
+    ├── server
+    │   ├── metrics.ts
+    │   └── signer.ts
+    ├── src
+    │   ├── components
+    │   │   ├── Artifacts
+    │   │   │   ├── ArtifactModal.tsx
+    │   │   │   └── NeuralOverlay.tsx
+    │   │   ├── AuthProvider.tsx
+    │   │   ├── Journey
+    │   │   │   └── UIBlocksRenderer.tsx
+    │   │   └── WalletProvider.tsx
+    │   ├── data
+    │   │   └── artifacts.json
+    │   ├── hooks
+    │   │   └── useAuth.ts
+    │   ├── infra
+    │   │   └── openaiConfig.ts
+    │   ├── lib
+    │   │   ├── prisma.ts
+    │   │   └── solana
+    │   │       └── checkPassOnChain.ts
+    │   ├── mocks
+    │   │   ├── handlers.ts
+    │   │   ├── msw.js
+    │   │   ├── msw-node.js
+    │   │   ├── server.ts
+    │   │   ├── setup.ts
+    │   │   └── until-async.js
+    │   ├── server
+    │   │   ├── db.ts
+    │   │   ├── demoArtifacts.ts
+    │   │   ├── embeddings.ts
+    │   │   ├── journeyStepResponse.schema.ts
+    │   │   ├── logger.ts
+    │   │   ├── metrics.ts
+    │   │   ├── queue.ts
+    │   │   ├── ragStore.ts
+    │   │   ├── rateLimit.ts
+    │   │   ├── redis.ts
+    │   │   ├── signer.ts
+    │   │   ├── siwsStore.ts
+    │   │   ├── state.ts
+    │   │   └── zyno.ts
+    │   ├── __tests__
+    │   │   ├── agents.orchestrator.test.ts
+    │   │   ├── api.ai.echo.test.ts
+    │   │   ├── api.collaterize.logic.test.ts
+    │   │   ├── api.health.test.ts
+    │   │   ├── api.journeys.state.logs.test.ts
+    │   │   ├── api.journeys.step.actionId.test.ts
+    │   │   ├── api.journeys.step.audit.test.ts
+    │   │   ├── api.journeys.step.bad.test.ts
+    │   │   ├── api.journeys.step.llm.test.ts
+    │   │   ├── api.journeys.step.replay.test.ts
+    │   │   ├── api.journeys.submit.test.ts
+    │   │   ├── api.journeys.test.ts
+    │   │   ├── api.metrics.test.ts
+    │   │   ├── api.mint.execute.error.test.ts
+    │   │   ├── api.mint.test.ts
+    │   │   ├── api.misc.coverage.test.ts
+    │   │   ├── api.rag.batch.test.ts
+    │   │   ├── api.rag.test.ts
+    │   │   ├── api.siws.redis.test.ts
+    │   │   ├── api.tx.prepare.test.ts
+    │   │   ├── embeddings.test.ts
+    │   │   ├── walletProvider.test.tsx
+    │   │   └── worker.mint.test.ts
+    │   └── workers
+    │       └── mintWorker.ts
+    ├── .swc
+    │   └── plugins
+    │       └── v7_linux_x86_64_0.106.15
+    ├── tailwind.config.ts
+    └── tsconfig.json
+
+374 directories, 1518 files

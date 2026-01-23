@@ -10,7 +10,7 @@ services:
     restart: always
     environment:
       - NODE_ENV=production
-      - MONGO_URI=mongodb://mongo:27017/journey
+      - DATABASE_URL=postgresql://mfai:mfai_secure_2024@postgres:5432/mfai_db?schema=public
       - PORT=3002
     env_file:
       - ./mf-back/.env
@@ -20,7 +20,8 @@ services:
       - ./mf-back:/usr/src/app
       - /usr/src/app/node_modules
     depends_on:
-      - mongo
+      postgres:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -37,17 +38,26 @@ services:
       timeout: 10s
       retries: 3
 
-  # --- Memory Persistence ---
-  mongo:
-    image: mongo:6.0
-    container_name: mfai_memory_bank
+  # --- PostgreSQL Database (Unified Stack) ---
+  postgres:
+    image: postgres:16-alpine
+    container_name: mfai_postgres
     restart: always
+    environment:
+      POSTGRES_USER: mfai
+      POSTGRES_PASSWORD: mfai_secure_2024
+      POSTGRES_DB: mfai_db
     ports:
-      - "27018:27017"
+      - "5433:5432"
     volumes:
-      - mfai_data:/data/db
+      - mfai_postgres_data:/var/lib/postgresql/data
     networks:
       - mfai_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mfai -d mfai_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     deploy:
       resources:
         limits:
@@ -65,6 +75,10 @@ services:
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=http://localhost:3002
+      - DATABASE_URL=postgresql://mfai:mfai_secure_2024@postgres:5432/mfai_db?schema=public
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - mfai_net
 
@@ -73,4 +87,4 @@ networks:
     driver: bridge
 
 volumes:
-  mfai_data:
+  mfai_postgres_data:

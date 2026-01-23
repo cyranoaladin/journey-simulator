@@ -5,6 +5,8 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 SMOKE_BEARER="${SMOKE_BEARER:-demo-token}"
 SMOKE_PERSONA="${SMOKE_PERSONA:-cognitive-activation-hub}"
+API_PORT="${API_PORT:-3005}"
+API_BASE_URL="${API_BASE_URL:-http://127.0.0.1:${API_PORT}}"
 
 cleanup() {
   docker compose down >/dev/null 2>&1 || true
@@ -33,18 +35,18 @@ wait_for() {
 printf 'Starting docker compose stack…\n'
 docker compose up -d
 
-wait_for "http://127.0.0.1:3002/healthz" "API health"
-wait_for "http://127.0.0.1:3002/readyz" "API readiness"
+wait_for "${API_BASE_URL}/healthz" "API health"
+wait_for "${API_BASE_URL}/readyz" "API readiness"
 wait_for "http://127.0.0.1:3003" "Frontend shell" 40 3
 
 printf 'Running API smoke probes…\n'
-curl -fsS -X POST http://127.0.0.1:3002/auth/verify \
+curl -fsS -X POST "${API_BASE_URL}/auth/verify" \
   -H "Content-Type: application/json" \
   -d "{\"token\": \"${SMOKE_BEARER}\"}" \
   | tee /tmp/smoke_auth_verify.json >/dev/null
-curl -fsS http://127.0.0.1:3002/journey/all-journey >/dev/null
+curl -fsS "${API_BASE_URL}/journey/all-journey" >/dev/null
 demo_payload=$(printf '{"personaId":"%s"}' "$SMOKE_PERSONA")
-curl -fsS -X POST http://127.0.0.1:3002/journey/load-demo \
+curl -fsS -X POST "${API_BASE_URL}/journey/load-demo" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${SMOKE_BEARER}" \
   -d "$demo_payload" >/dev/null

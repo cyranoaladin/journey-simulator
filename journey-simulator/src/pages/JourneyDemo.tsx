@@ -49,6 +49,17 @@ const JourneyDemo = () => {
     );
   }
 
+  // Hard separation: real authenticated users should not access demo routes
+  // Redirect them to real journey routes instead
+  if (!isDemoSession() && !isLoading) {
+    return (
+      <Navigate
+        to={journeyId ? `/journeys/${journeyId}` : '/journeys'}
+        replace
+      />
+    );
+  }
+
   // If user navigated to /journeys/demo/:id without a valid persona id, return to demo landing.
   if (journeyId && !personaFromUrl) {
     return <Navigate to="/journeys/demo" replace />;

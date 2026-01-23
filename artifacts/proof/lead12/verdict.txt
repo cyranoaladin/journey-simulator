@@ -1,1 +1,0 @@
-FAIL_BLOCKING: proof script did not complete (exit=143). Fix the hang and rerun.

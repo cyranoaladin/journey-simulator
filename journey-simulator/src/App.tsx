@@ -6,6 +6,7 @@
 
 import { useEffect, lazy } from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import { useThemeStore } from './store/themeStore';
 import { WalletContextProvider } from './contexts/WalletContext';
 import { AuthProvider } from './contexts/AuthContext';
@@ -47,10 +48,13 @@ const WalletProtectedLayout = () => (
 );
 
 // Public demo flow: no real auth required; demo page will bootstrap a demo session.
+// Wrapped with WalletContextProvider to enable wallet connection in demo mode
 const DemoLayout = () => (
-  <Layout enableWallet={false}>
-    <Outlet />
-  </Layout>
+  <WalletContextProvider>
+    <Layout enableWallet={true}>
+      <Outlet />
+    </Layout>
+  </WalletContextProvider>
 );
 
 const DebugMint = lazy(() => import('./pages/DebugMint'));
@@ -127,6 +131,14 @@ function App() {
           </Routes>
           {/* </Suspense> */}
         </div>
+        <Toaster 
+          position="bottom-right" 
+          richColors 
+          theme="dark"
+          toastOptions={{
+            style: { background: '#1a1a2e', border: '1px solid rgba(255,255,255,0.1)' }
+          }}
+        />
       </TutorialProvider>
     </AuthProvider>
   );

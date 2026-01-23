@@ -86,7 +86,6 @@ export default function ZynoChat({ className = '', externalMessages }: ZynoChatP
       if (!response.ok) throw new Error(`Error: ${response.status}`);
 
       const data = await response.json();
-      console.log('[ZynoChat] Response received', { agent_actions: data.agent_actions?.length }); // E2E Debug
 
       const newMessages: Array<{ role: string, content: string, source?: string, timestamp: Date; }> = [];
 

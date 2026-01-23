@@ -1,0 +1,497 @@
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Module: Context-Aware Demo Sequencer V3
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
+
+import { personas } from '../data/personas';
+import type { Mode, Tone, JourneyStepResponse, UIBlock, AgentAction } from '../types/uiBlocks';
+
+// --- HELPER: CONTEXT EXTRACTION ---
+
+const getPhaseContext = (personaId: string, phaseId: string) => {
+    const persona = personas.find(p => p.id === personaId);
+    if (!persona) throw new Error(`Unknown persona: ${personaId}`);
+
+    const phaseIndex = persona.phases.findIndex(p => p.id === phaseId);
+    const phase = persona.phases[phaseIndex];
+
+    if (!phase) throw new Error(`Unknown phase: ${phaseId} for persona ${personaId}`);
+
+    return {
+        title: phase.title,
+        stakingRequired: (phase as any).stakingRequired || 0,
+        daoVoteRequired: (phase as any).daoVoteRequired || false,
+        isCollaterize: phaseId.includes('collaterize') || phaseIndex === 5,
+        isLaunch: phaseId.includes('launch') || phaseId.includes('market') || phaseIndex === 4,
+        phaseIndex,
+        personaTitle: persona.title
+    };
+};
+
+const createStep = (
+    title: string,
+    blocks: UIBlock[],
+    actions: AgentAction[],
+    meta: any,
+    nextStateDelta: number = 50
+): JourneyStepResponse => ({
+    metadata: {
+        ...meta,
+        title,
+        summary: `Sequence step for ${title}` 
+    },
+    ui_blocks: blocks,
+    agent_actions: actions,
+    next_state: {
+        phase_id: meta.phase_id,
+        completed_missions: [],
+        xp_delta: nextStateDelta
+    }
+});
+
+// --- GENERATORS SPECIFIQUES (HOOKS) ---
+
+const generateOrientationPhase = (phaseId: string, trackId: string, context: any) => {
+    const meta = { persona_id: trackId, journey_track: trackId, phase_id: phaseId, mode: 'discovery' as Mode, tone: 'pedagogical' as Tone, language: 'en' as const };
+
+    return [
+        createStep('Protocol Handshake', [
+            {
+                kind: 'text_block',
+                id: `${phaseId}-intro`,
+                title: `${context.personaTitle} Orientation`,
+                body_markdown: `Welcome to the **${context.personaTitle}** track.\n\nZyno has initialized your learning path. We will begin by establishing the cognitive baseline for this role.` 
+            },
+            {
+                kind: 'resource_block',
+                id: `${phaseId}-res`,
+                title: 'Core Doctrine',
+                resources: [
+                    { id: 'res-manifesto', label: `${context.personaTitle} Manifesto`, resource_type: 'article' as const, url: '#', agent_owner: 'Zyno' },
+                    { id: 'res-map', label: 'Ecosystem Topology', resource_type: 'article' as const, url: '#', agent_owner: 'ArchitectAgent' }
+                ]
+            }
+        ], [
+            { agent_name: 'Zyno', action: 'initialize_track', reason: 'User enrolled in track.', parameters: { track: trackId } },
+            { agent_name: 'ArchitectAgent', action: 'map_topology', reason: 'Topology visualized.', parameters: {} }
+        ], meta),
+
+        createStep('Knowledge Verification', [
+            {
+                kind: 'mission_block',
+                id: `${phaseId}-quiz`,
+                title: 'Baseline Check',
+                description: 'Confirm understanding of the core principles.',
+                mission_type: 'deliverable',
+                expected_input_type: 'choice' as const,
+                xp_reward: 100
+            }
+        ], [
+            { agent_name: 'Zyno', action: 'verify_knowledge', reason: 'Baseline established.', parameters: {} }
+        ], meta)
+    ];
+};
+
+const generateStakingPhase = (phaseId: string, trackId: string, context: { stakingRequired: number; personaTitle: string }) => {
+    const meta = { persona_id: trackId, journey_track: trackId, phase_id: phaseId, mode: 'builder' as Mode, tone: 'pedagogical' as Tone, language: 'en' as const };
+    const requiredAmount = context.stakingRequired;
+
+    return [
+        createStep('Liquidity Analysis', [
+            {
+                kind: 'text_block',
+                id: `${phaseId}-anal`,
+                title: 'Capital Requirements',
+                body_markdown: `This phase requires active skin-in-the-game.\n\n**Requirement:** Stake **${requiredAmount} MFAI** to unlock the Foundry modules.` 
+            },
+            {
+                kind: 'bonding_curve_block',
+                id: `${phaseId}-curve`,
+                title: 'MFAI Bonding Curve',
+                description: 'Staking curve visualization',
+                curveType: 'exponential' as const,
+                data: { currentSupply: 5000000, maxSupply: 10000000, reserveRatio: 0.5, basePrice: 1.2 }
+            }
+        ], [
+            { agent_name: 'DeFiAgent', action: 'calculate_apy', reason: 'Current APY: 12.5%', parameters: { apy: 0.125 } },
+            { agent_name: 'RiskAgent', action: 'assess_volatility', reason: 'Volatility acceptable for entry.', parameters: {} }
+        ], meta),
+
+        createStep('Capital Commitment', [
+             {
+                kind: 'text_block',
+                id: `${phaseId}-instr`,
+                title: 'Execute Stake',
+                body_markdown: 'Please confirm your transaction via the secure modal.'
+            },
+            {
+                kind: 'mission_block',
+                id: `${phaseId}-stake-mission`,
+                title: 'Secure Network Position',
+                description: `Stake ${requiredAmount} MFAI tokens to proceed.`,
+                mission_type: 'staking',
+                expected_input_type: 'choice' as const,
+                xp_reward: 250
+            }
+        ], [
+            { agent_name: 'Zyno', action: 'await_tx', reason: 'Waiting for signature...', parameters: {} }
+        ], meta)
+    ];
+};
+
+const generateGovernancePhase = (phaseId: string, trackId: string, _context: any) => {
+    const meta = { persona_id: trackId, journey_track: trackId, phase_id: phaseId, mode: 'builder' as Mode, tone: 'critical' as Tone, language: 'en' as const };
+
+    return [
+        createStep('Proposal Review', [
+            {
+                kind: 'text_block',
+                id: `${phaseId}-prop`,
+                title: 'Active Governance Signal',
+                body_markdown: 'A critical security parameter update has been proposed. Your vote is required to reach quorum.'
+            },
+            {
+                kind: 'resource_block',
+                id: `${phaseId}-res-gov`,
+                title: 'Proposal Artifacts',
+                resources: [
+                    { id: 'gov-audit', label: 'Security Audit Report', resource_type: 'article' as const, url: '#', agent_owner: 'SecurityMasterAgent' }
+                ]
+            }
+        ], [
+            { agent_name: 'GovernanceAgent', action: 'fetch_quorum', reason: 'Quorum at 85%. Your vote matters.', parameters: {} },
+            { agent_name: 'SecurityMasterAgent', action: 'endorse', reason: 'I recommend voting APPROVE based on audit findings.', parameters: {} }
+        ], meta),
+
+        createStep('Cast Vote', [
+             {
+                kind: 'dao_dashboard_block',
+                id: `${phaseId}-dao`,
+                title: 'Security Council Vote',
+                votingPower: 100,
+                proposals: [
+                    { id: 'prop-1', title: 'Update Multisig Threshold', description: 'Update the threshold', status: 'active' as const, votesFor: 150000, votesAgainst: 2000, endDate: '2026-02-01' }
+                ]
+            },
+            {
+                kind: 'mission_block',
+                id: `${phaseId}-vote-mission`,
+                title: 'Participate in Governance',
+                description: 'Cast your on-chain vote to ratify the protocol update.',
+                mission_type: 'dao_vote',
+                expected_input_type: 'choice' as const,
+                xp_reward: 300
+            }
+        ], [
+            { agent_name: 'Zyno', action: 'monitor_mempool', reason: 'Monitoring vote transaction.', parameters: {} }
+        ], meta)
+    ];
+};
+
+const generateLaunchPhase = (phaseId: string, trackId: string, _context: any) => {
+    const meta = { persona_id: trackId, journey_track: trackId, phase_id: phaseId, mode: 'builder' as Mode, tone: 'investor_pitch' as Tone, language: 'en' as const };
+
+    return [
+        createStep('Go-to-Market Prep', [
+            {
+                kind: 'text_block',
+                id: `${phaseId}-gtm`,
+                title: 'TGE Readiness',
+                body_markdown: 'All systems go. Liquidity pools are calibrated. Marketing vectors aligned.'
+            },
+            {
+                kind: 'resource_block',
+                id: `${phaseId}-res-launch`,
+                title: 'Launchpad Assets',
+                resources: [
+                    { id: 'tick-economics', label: 'Tokenomics Final Draft', resource_type: 'article' as const, url: '#', agent_owner: 'DeFiAgent' }
+                ]
+            }
+        ], [
+            { agent_name: 'LaunchAgent', action: 'check_liquidity', reason: 'Liquidity depth sufficient.', parameters: {} },
+            { agent_name: 'MarketingAgent', action: 'deploy_campaign', reason: 'Social signals active.', parameters: {} }
+        ], meta),
+
+        createStep('Token Generation Event', [
+             {
+                kind: 'market_launchpad_block',
+                id: `${phaseId}-launchpad`,
+                title: 'Fair Launch Execution',
+                protocolName: 'MFAI Demo Protocol',
+                ticker: 'MFAI',
+                launchUrl: '#',
+                initialProgress: 0
+            },
+            {
+                kind: 'mission_block',
+                id: `${phaseId}-launch-mission`,
+                title: 'Ignite Mainnet',
+                description: 'Deploy the liquidity pool and enable trading.',
+                mission_type: 'deliverable',
+                expected_input_type: 'choice' as const,
+                xp_reward: 1000,
+                nft_reward_id: 'launch-mastery'
+            }
+        ], [
+            { agent_name: 'Zyno', action: 'execute_tge', reason: 'Deploying contracts...', parameters: {} }
+        ], meta)
+    ];
+};
+
+const generateCollaterizePhase = (phaseId: string, trackId: string, _context: any) => {
+    const meta = { persona_id: trackId, journey_track: trackId, phase_id: phaseId, mode: 'builder' as Mode, tone: 'pedagogical' as Tone, language: 'en' as const };
+
+    return [
+        createStep('Network Ascension', [
+            {
+                kind: 'text_block',
+                id: `${phaseId}-ascension`,
+                title: 'Collaterize Network Invitation',
+                body_markdown: 'You have proven your worth. The **Collaterize** network invites you to join the Veteran tier.'
+            },
+            {
+                kind: 'resource_block',
+                id: `${phaseId}-res-network`,
+                title: 'Network Resources',
+                resources: [
+                    { id: 'network-guide', label: 'Collaterize Network Guide', resource_type: 'article' as const, url: '#', agent_owner: 'CollaterizeAgent' }
+                ]
+            }
+        ], [
+            { agent_name: 'CollaterizeAgent', action: 'verify_credentials', reason: 'All proofs validated.', parameters: {} }
+        ], meta),
+
+        createStep('Veteran Status', [
+            {
+                kind: 'mission_block',
+                id: `${phaseId}-veteran-mission`,
+                title: 'Claim Veteran Badge',
+                description: 'Mint your soulbound Veteran status to access the inner circle.',
+                mission_type: 'deliverable',
+                expected_input_type: 'choice' as const,
+                xp_reward: 5000,
+                nft_reward_id: 'veteran-status'
+            }
+        ], [
+            { agent_name: 'Zyno', action: 'conclude_journey', reason: 'Simulation Complete.', parameters: {} }
+        ], meta)
+    ];
+};
+
+const generateIdentityPhase = (phaseId: string, trackId: string, _context: any) => {
+    const meta = { persona_id: trackId, journey_track: trackId, phase_id: phaseId, mode: 'builder' as Mode, tone: 'pedagogical' as Tone, language: 'en' as const };
+    
+    return [
+        createStep('Identity Synthesis', [
+            { kind: 'text_block', id: `${phaseId}-id`, title: 'Persona Design', body_markdown: 'Crafting your on-chain reputation and visual identity.' }
+        ], [{ agent_name: 'DesignAgent', action: 'generate_svg', reason: 'Generating asset...', parameters: {} }], meta),
+        
+        createStep('Artifact Minting', [
+            {
+                kind: 'mission_block',
+                id: `${phaseId}-mint`,
+                title: 'Mint Identity Artifact',
+                description: 'Solidify your design on the blockchain.',
+                mission_type: 'deliverable',
+                expected_input_type: 'choice' as const,
+                xp_reward: 200,
+                nft_reward_id: 'identity-artifact'
+            }
+        ], [{ agent_name: 'Zyno', action: 'prepare_mint', reason: 'Mint ready.', parameters: {} }], meta)
+    ];
+};
+
+const generateDebugSequence = (phaseId: string, trackId: string, context: any) => {
+    const meta = {
+        persona_id: trackId,
+        journey_track: trackId,
+        phase_id: phaseId,
+        mode: 'discovery' as Mode,
+        tone: 'pedagogical' as Tone,
+        language: 'en' as const
+    };
+
+    return [
+        createStep('UI Block Validation Suite', [
+            // 1. TEXT BLOCK - Rich Markdown
+            {
+                kind: 'text_block',
+                id: `${phaseId}-text`,
+                title: 'Debug Mode: Rendering Engine Test',
+                body_markdown: `
+# Welcome to Debug Mode
+
+This sequence validates the **UIBlocksRenderer** engine.
+
+## Test Objectives
+- Verify Markdown rendering (bold, italic, lists)
+- Check component isolation
+- Validate state management
+
+### Supported Features
+1. **Typography**: Headers, paragraphs, emphasis
+2. **Lists**: Ordered and unordered
+3. **Links**: [Documentation](#) (mock)
+4. **Code**: \`inline code\` and blocks
+
+\`\`\`typescript
+const test = "Block rendering works!";
+console.log(test);
+\`\`\`
+
+> **Note**: This is a blockquote for visual validation.
+
+---
+
+Continue to the checklist below to verify interactivity.
+                `.trim()
+            },
+
+            // 2. CHECKLIST BLOCK - Interactive Tasks
+            {
+                kind: 'checklist_block',
+                id: `${phaseId}-checklist`,
+                title: 'Rendering Validation Checklist',
+                items: [
+                    {
+                        label: 'Text block renders with proper Markdown formatting',
+                        checked: false
+                    },
+                    {
+                        label: 'Checklist items are interactive (can be toggled)',
+                        checked: false
+                    }
+                ]
+            },
+
+            // 3. INDICATOR BLOCK - Data Visualization
+            {
+                kind: 'indicator_block',
+                id: `${phaseId}-indicators`,
+                title: 'Component Health Metrics',
+                type: 'gauge' as const,
+                indicators: [
+                    {
+                        name: 'Rendering Performance',
+                        value: 95,
+                        max: 100,
+                        color: '#22d3ee' // accent-cyan
+                    },
+                    {
+                        name: 'State Sync',
+                        value: 100,
+                        max: 100,
+                        color: '#10b981' // green
+                    },
+                    {
+                        name: 'Memory Usage',
+                        value: 42,
+                        max: 100,
+                        color: '#fbbf24' // yellow
+                    }
+                ]
+            },
+
+            // 4. MISSION BLOCK - Deliverable Submission
+            {
+                kind: 'mission_block',
+                id: `${phaseId}-mission`,
+                title: 'Debug Validation Mission',
+                description: 'Confirm that all UI blocks rendered correctly. Submit your validation status below.',
+                mission_type: 'deliverable',
+                expected_input_type: 'markdown_document' as const,
+                xp_reward: 250,
+                nft_reward_id: 'debug-validator-badge',
+                is_mandatory: true
+            }
+        ], [
+            // Agent Actions (appear in ZynoChat)
+            {
+                agent_name: 'DebugAgent',
+                action: 'initialize_test_suite',
+                reason: 'Rendering engine initialized. Monitoring component lifecycle.',
+                parameters: { test_mode: 'ui_validation', blocks_count: 4 }
+            },
+            {
+                agent_name: 'Zyno',
+                action: 'observe',
+                reason: 'All blocks loaded successfully. Proceed with validation checks.',
+                parameters: {}
+            }
+        ], meta, 250)
+    ];
+};
+
+// --- ROUTEUR PRINCIPAL (CONTEXT AWARE) ---
+
+export const getDemoSequence = (phaseId: string, trackId: string): JourneyStepResponse[] => {
+    try {
+        // --- DEBUG TRAP (PRIORITY 0 - BYPASS CONTEXT) ---
+        if (phaseId === 'debug-ui') {
+            console.log('⚡ DEBUG TRAP ACTIVATED: Loading debug sequence');
+            return generateDebugSequence(phaseId, trackId, {});
+        }
+
+        const context = getPhaseContext(trackId, phaseId);
+
+        console.log(`[DemoSequencer] Routing ${trackId}/${phaseId}:`, {
+            phaseIndex: context.phaseIndex,
+            stakingRequired: context.stakingRequired,
+            daoVoteRequired: context.daoVoteRequired,
+            isCollaterize: context.isCollaterize,
+            isLaunch: context.isLaunch,
+        });
+
+
+        // ROUTING PAR PRIORITÉ MÉTIER (Business Rules)
+        
+        // 1. COLLATERIZE (Toujours la dernière phase ou ID spécifique)
+        if (context.isCollaterize) {
+            return generateCollaterizePhase(phaseId, trackId, context);
+        }
+
+        // 2. DAO VOTE (Si le flag est activé dans personas.ts)
+        if (context.daoVoteRequired) {
+            return generateGovernancePhase(phaseId, trackId, context);
+        }
+
+        // 3. STAKING (Si un montant est requis)
+        if (context.stakingRequired > 0) {
+            return generateStakingPhase(phaseId, trackId, context);
+        }
+
+        // 4. LAUNCH (Phases de marché)
+        if (context.isLaunch) {
+            return generateLaunchPhase(phaseId, trackId, context);
+        }
+
+        // 5. ORIENTATION (Phase 1)
+        if (context.phaseIndex === 0) {
+            return generateOrientationPhase(phaseId, trackId, context);
+        }
+
+        // 6. IDENTITY / DESIGN (Par défaut pour Phase 4 si pas d'autre règle)
+        if (context.phaseIndex === 3) {
+            return generateIdentityPhase(phaseId, trackId, context);
+        }
+
+        // FALLBACK: Phase Standard générique (mais typée)
+        const meta = { persona_id: trackId, journey_track: trackId, phase_id: phaseId, mode: 'discovery' as Mode, tone: 'pedagogical' as Tone, language: 'en' as const };
+        return [
+            createStep(`${context.title} - Deep Dive`, [
+                { kind: 'text_block', id: `${phaseId}-std`, title: context.title, body_markdown: `Exploring advanced concepts of **${context.title}**.` },
+                { kind: 'resource_block', id: `${phaseId}-res`, title: 'Resources', resources: [{ id: 'std-1', label: 'Technical Specification', resource_type: 'article' as const, url: '#', agent_owner: 'Zyno' }] }
+            ], [{ agent_name: 'Zyno', action: 'facilitate', reason: 'Guiding session.', parameters: {} }], meta),
+            createStep(`${context.title} - Validation`, [
+                { kind: 'mission_block', id: `${phaseId}-mission`, title: 'Knowledge Check', description: 'Validate your learning.', mission_type: 'deliverable', expected_input_type: 'choice' as const, xp_reward: 150, nft_reward_id: `${phaseId}-badge` }
+            ], [{ agent_name: 'ValidationAgent', action: 'verify', reason: 'Checking...', parameters: {} }], meta)
+        ];
+
+    } catch (error) {
+        console.error(`[DemoSequencer] Error generating sequence for ${trackId}/${phaseId}`, error);
+        // Emergency Fallback
+        return [];
+    }
+};

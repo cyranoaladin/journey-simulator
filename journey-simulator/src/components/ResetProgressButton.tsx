@@ -5,28 +5,59 @@
  */
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { RefreshCw, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useJourneyStore } from '../store/journeyStore';
+import { toast } from 'sonner';
 
 interface ResetProgressButtonProps {
   className?: string;
 }
 
 const ResetProgressButton: React.FC<ResetProgressButtonProps> = ({ className = '' }) => {
-  const { resetProgress } = useJourneyStore();
+  const { resetProgress, resetDemoCache } = useJourneyStore();
+  const navigate = useNavigate();
   const [showConfirm, setShowConfirm] = useState(false);
   const [resetComplete, setResetComplete] = useState(false);
 
   const handleReset = async () => {
-    await resetProgress();
-    setShowConfirm(false);
-    setResetComplete(true);
-    
-    // Hide success message after 3 seconds
-    setTimeout(() => {
-      setResetComplete(false);
-    }, 3000);
+    try {
+      // 1. Reset demo cache first (clears all demo-related state)
+      resetDemoCache();
+      
+      // 2. Then reset general progress
+      await resetProgress();
+      
+      // 3. Force clear any remaining localStorage
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem('mfai-journey-storage');
+        window.localStorage.removeItem('demo_active_persona');
+        window.localStorage.removeItem('demo_mock_db');
+        window.localStorage.removeItem('demo_artifacts');
+        window.localStorage.removeItem('demo_history');
+        window.sessionStorage.clear();
+      }
+      
+      setShowConfirm(false);
+      setResetComplete(true);
+      
+      toast.success('Reset complete!', { 
+        description: 'All progress cleared. Redirecting...' 
+      });
+      
+      // 4. Navigate to home after a short delay
+      setTimeout(() => {
+        setResetComplete(false);
+        navigate('/', { replace: true });
+        // Force page reload to ensure clean state
+        window.location.reload();
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Reset failed:', error);
+      toast.error('Reset failed', { description: 'Please try again.' });
+    }
   };
 
   const renderInitial = (

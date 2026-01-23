@@ -1,5 +1,0 @@
-http://127.0.0.1:3000/
-http://127.0.0.1:3000/auth/login
-http://127.0.0.1:3000/dao
-http://127.0.0.1:3000/journeys
-http://localhost:3000/

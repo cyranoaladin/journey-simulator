@@ -1,1 +1,0 @@
--rw-rw-r-- 1 alaeddine alaeddine 525 déc.  27 08:52 sonar-project.properties

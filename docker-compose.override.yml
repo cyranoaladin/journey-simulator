@@ -1,4 +1,2 @@
-services:
-  mongo:
-    ports:
-      - "27018:27017"
+# MongoDB removed - migrated to PostgreSQL
+services: {}

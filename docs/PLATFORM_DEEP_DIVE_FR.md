@@ -67,7 +67,7 @@ Money Factory AI est un **simulateur de parcours** (journeys) Web3/AI orienté *
 
 - Tech : Node.js + Express + MongoDB (Mongoose) + JWT.
 - Rôle : backend métier du simulateur : users, progress, routes journey, orchestration (Zyno), RAG, DAO simulation, feedback/logs.
-- Port local “prod-like” : **3002**.
+- Port local “prod-like” : **configurable via `PORT` (mf-back/.env, actuellement 3005)**.
 - Source clé : `mf-back/`
 
 **C) `web` (Next.js API + Prisma + Postgres + Redis)**
@@ -94,7 +94,7 @@ Services attendus :
 
 - `journey-simulator` : <http://127.0.0.1:3003>
 - `web` : <http://127.0.0.1:3001> (API)
-- `mf-back` : <http://127.0.0.1:3002>
+- `mf-back` : `http://127.0.0.1:${PORT}` (PORT configurable, cf. `mf-back/.env`)
 - MongoDB : 27017 (docker)
 - Postgres : 5435 (docker)
 - Redis : 6379 (local ou container)
@@ -105,9 +105,9 @@ OpenAPI : `docs/openapi/mf-back.openapi.yaml`, `docs/openapi/journey-simulator.y
 
 ### 2.4 Cartographie API (surface fonctionnelle)
 
-#### 2.4.1 `mf-back` (Express, port 3002) — “métier simulator”
+#### 2.4.1 `mf-back` (Express, port configurable) — “métier simulator”
 
-> Base URL typique (local) : `http://127.0.0.1:3002`
+> Base URL typique (local) : `http://127.0.0.1:${PORT}` (PORT configurable)
 
 Routes (groupes principaux, non exhaustifs) :
 

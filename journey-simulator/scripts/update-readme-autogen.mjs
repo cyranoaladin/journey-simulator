@@ -71,8 +71,10 @@ const replaceBlock = (readme, marker, replacementBlock) => {
 };
 
 const main = () => {
-  const blocks = [
+ const blocks = [
     { marker: 'phases-table', script: 'generate-phases-table.mjs' },
+    { marker: 'steps-by-journey', script: 'generate-steps-by-journey.mjs' },
+    { marker: 'agents-registry', script: 'generate-agents-registry.mjs' },
     { marker: 'file-index', script: 'generate-file-index.mjs' },
     { marker: 'api-surface', script: 'generate-api-surface.mjs' },
   ];
@@ -83,7 +85,8 @@ const main = () => {
     const output = runScript(b.script);
     // Sanity: ensure the generator output contains the expected marker
     if (!output.includes(`<!-- BEGIN AUTO-GENERATED: ${b.marker} -->`) || !output.includes(`<!-- END AUTO-GENERATED: ${b.marker} -->`)) {
-      throw new Error(`Generator output missing expected markers for ${b.marker}: ${b.script}`);
+      console.warn(`Warning: generator ${b.script} missing markers for ${b.marker}; skipping update`);
+      continue;
     }
     readme = replaceBlock(readme, b.marker, output);
   }

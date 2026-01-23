@@ -452,6 +452,7 @@ export const personas: Persona[] = [
         tools: ['Synaptic council portal', 'Neuro-Dividend allocator', 'Guardian facilitator agents'],
         outcomes: ['DAO activation checklist', 'Impact sprint retrospectives', 'Long-term funding roadmap'],
         zynoTip: 'Scaling impact demands iterative governance. Keep feedback loops tight and incentives transparent.',
+        daoVoteRequired: true,
       },
       {
         id: 'launch-collaterize',

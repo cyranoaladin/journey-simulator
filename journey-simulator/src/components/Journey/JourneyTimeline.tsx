@@ -60,9 +60,10 @@ const getDescriptionClass = (isActive: boolean) => (isActive ? 'text-white/80' :
 export default function JourneyTimeline({ phases, currentPhase, onPhaseChange }: JourneyTimelineProps) {
   const totalPhases = phases.length;
   const activeIndex = totalPhases === 0 ? 0 : Math.min(currentPhase, totalPhases - 1);
-  const completedCount = Math.min(currentPhase, totalPhases);
-  const progressPercent = totalPhases === 0 ? 0 : Math.round((completedCount / totalPhases) * 100);
-  const progressAriaLabel = `Journey progress: ${completedCount} of ${totalPhases} phases completed`;
+  // Completed = phases before the active one
+  const completedCount = activeIndex;
+  // Show partial progress for the active phase (add 0.5 for "in progress")
+  const progressPercent = totalPhases === 0 ? 0 : Math.round(((completedCount + 0.5) / totalPhases) * 100);
 
   if (totalPhases === 0) {
     return (
@@ -176,14 +177,14 @@ export default function JourneyTimeline({ phases, currentPhase, onPhaseChange }:
       <div className="rounded-xl border border-white/10 bg-white/5 p-4">
         <div className="flex items-center justify-between text-xs text-white/50">
           <span>Progress</span>
-          <span className="font-semibold text-white/80">{completedCount}/{totalPhases}</span>
+          <span className="font-semibold text-white/80">{completedCount}/{totalPhases} completed</span>
         </div>
-        <progress
-          className="timeline-progress mt-2"
-          value={completedCount}
-          max={totalPhases}
-          aria-label={progressAriaLabel}
-        />
+        <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-white/10">
+          <div 
+            className="h-full bg-gradient-to-r from-accent-cyan to-accent-blue transition-all duration-500"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
       </div>
     </div>
   );

@@ -21,16 +21,21 @@
 - [Guide de lecture (réel vs simulation)](#guide-reel-vs-simulation)
 - [Workflows utilisateurs (end-to-end)](#workflows-utilisateurs)
 - [Zyno (orchestrateur) & Agents (backend)](#zyno-orchestrateur-agents)
+- [Pipeline d’orchestration Zyno (LLM/RAG/exécution)](#pipeline-orchestration)
+- [Inventaire complet des agents (généré)](#agents-registry)
 - [RAG (Retrieval-Augmented Generation)](#rag)
 - [API (contrats, endpoints, auth)](#api)
-- [Données & bases (MongoDB, Postgres/Prisma)](#donnees-et-bases)
+- [Données & bases (Postgres/Prisma)](#donnees-et-bases)
 - [Scores AEPO / AECO / Alignment (ce qui est calculé)](#scores-aepo-aeco-alignment)
 - [Mode Démo / Investor Mode (mock vs réel)](#mode-demo)
 - [Modèle de parcours (Personas & Phases)](#modele-parcours)
 - [Détail phase par phase (généré)](#detail-phase-par-phase)
+- [Détail des steps par parcours (généré)](#detail-steps-par-parcours)
 - [Index complet des fichiers (auto-généré)](#file-index)
 - [API surface index (auto-généré)](#api-surface-index)
 - [UI Blocks, ressources & documents](#ui-blocks)
+- [UI Blocks renderer & interactions](#ui-blocks-renderer)
+- [Frontend & affichages (pages principales)](#frontend-affichages)
 - [Consoles & Debug (ZynoConsole, healthz/readyz, logs)](#debug-consoles)
 - [Overview](#overview)
 - [Quick Start](#quick-start)
@@ -103,12 +108,24 @@ npm run generate:phases-table
 # ou (depuis la racine)
 node journey-simulator/scripts/generate-phases-table.mjs
 
-# (2) Index complet des fichiers (scan monorepo)
+# (2) Détail des steps par parcours (demoSequencer)
+# - source: journey-simulator/src/store/demoSequencer.ts
+npm run generate:steps-by-journey
+# ou (depuis la racine)
+node journey-simulator/scripts/generate-steps-by-journey.mjs
+
+# (3) Inventaire des agents (registry mf-back)
+# - source: mf-back/src/agents/registry.js (+ extended)
+npm run generate:agents-registry
+# ou (depuis la racine)
+node journey-simulator/scripts/generate-agents-registry.mjs
+
+# (4) Index complet des fichiers (scan monorepo)
 npm run generate:file-index
 # ou (depuis la racine)
 node journey-simulator/scripts/generate-file-index.mjs
 
-# (3) API surface index (routes frontend + endpoints backend)
+# (5) API surface index (routes frontend + endpoints backend)
 npm run generate:api-surface
 # ou (depuis la racine)
 node journey-simulator/scripts/generate-api-surface.mjs
@@ -117,6 +134,8 @@ node journey-simulator/scripts/generate-api-surface.mjs
 Ce script met à jour automatiquement :
 
 - **Détail phase par phase** (source: `src/data/personas.ts`) → `npm run generate:phases-table`
+- **Détail des steps par parcours** (source: `src/store/demoSequencer.ts`) → `npm run generate:steps-by-journey`
+- **Inventaire des agents** (source: `mf-back/src/agents/registry.js`) → `npm run generate:agents-registry`
 - **Index complet des fichiers** (scan monorepo) → `npm run generate:file-index`
 - **API surface index** (routes frontend + endpoints backend) → `npm run generate:api-surface`
 
@@ -128,7 +147,7 @@ Ce script met à jour automatiquement :
 
 Ce dépôt est un **monorepo full-stack**. Le dossier `journey-simulator/` (ce README) décrit surtout l’expérience **frontend** (React/Vite). Mais, dans la pratique, la plateforme s’appuie aussi sur :
 
-- `mf-back/` : **API Express + MongoDB** + **orchestration multi-agents Zyno** + **RAG** (ingestion/retrieval) + endpoints admin.
+- `mf-back/` : **API Express + Prisma/Postgres** + **orchestration multi-agents Zyno** + **RAG** (ingestion/retrieval) + endpoints admin.
 - `web/` : une couche **web/Prisma/Postgres** utilisée par certains scripts/tests/CI (ex: table `MintLog`) et des services “site”.
 
 ### Carte “réel vs placeholder” (ce qui tourne réellement)
@@ -136,17 +155,17 @@ Ce dépôt est un **monorepo full-stack**. Le dossier `journey-simulator/` (ce R
 | Domaine | Réel (implémenté et utilisé) | Simulation / placeholder (MVP) |
 |---|---|---|
 | Auth | JWT + refresh token + endpoints `mf-back` (`/user/*`) ; **demo-login** via token local | Certaines valeurs user “demo” fictives (email, wallet, role) |
-| Progression | Stockage côté backend (Mongo) + état UI Zustand | En **mode démo**, persistence en `localStorage` (datastore mock) |
-| Zyno / Agents | Orchestrateur backend (`mf-back/orchestration/zynoOrchestrator.js`) + agents (registry) + logs Mongo | Certains “agents” peuvent retourner des textes/structures de démonstration selon config |
-| RAG | Client RAG backend (`mf-back/rag/ragClient.js`) ; upload admin `POST /admin/rag/upload` | Fallback local sur fichiers `.md/.txt` en cas d’échec réseau |
+| Progression | Stockage côté backend (Prisma/Postgres selon stack) + état UI Zustand | En **mode démo**, persistence en `localStorage` (datastore mock) |
+| Zyno / Agents | Orchestrateur backend (`mf-back/src/orchestration/zynoVerticalSlice.js`) + registry agents (`mf-back/src/agents/registry.js`) + logs | Certains “agents” peuvent retourner des textes/structures de démonstration selon config |
+| RAG | Clients RAG (`mf-back/src/rag/ragClient.js` + `mf-back/src/orchestration/ragClient.js`) | Fallback local sur fichiers `.md/.txt` en cas d’échec réseau |
 | UI Blocks | Renderer robuste (tolérant aux arrays manquants) + mapping `kind → composant` | Certaines briques/blocks sont “design-first” (contenu fictif selon la persona/phase) |
 | Blockchain (Solana) | Wallet connect (adapters) + utilitaires | Beaucoup de “transactions” sont simulées en UI (selon le mode) |
 | DAO / staking | UI + endpoints (selon stack) | Plusieurs métriques/retours peuvent être “mockés” pour démo investisseur |
 
 ### Fichiers “source de vérité” (à lire pour comprendre)
 
-- **API + orchestration Zyno** : `mf-back/routes/zyno-routes.js`, `mf-back/orchestration/zynoOrchestrator.js`
-- **RAG** : `mf-back/rag/ragClient.js`, `mf-back/routes/rag-routes.js`
+- **API + orchestration Zyno** : `mf-back/src/orchestration/zynoVerticalSlice.js`, `mf-back/src/orchestration/intentRouter.js`, `mf-back/src/agents/registry.js`
+- **RAG** : `mf-back/src/rag/ragClient.js`, `mf-back/src/orchestration/ragClient.js`
 - **Mode Démo (mock d’API)** : `journey-simulator/src/utils/api.ts`, `journey-simulator/src/contexts/AuthContext.tsx`, `journey-simulator/src/store/journeyStore.ts`
 - **Scores / signaux** : `journey-simulator/src/utils/journeySignals.ts`, définitions `journey-simulator/src/content/aepoAeco.ts`
 - **Contrats d’API typés** : `journey-simulator/src/api/mf-back-client.ts`
@@ -186,9 +205,9 @@ Cette section décrit les parcours **réels** côté UI et les appels API typiqu
 
 ### 4) Admin / opérateur (RAG & logs)
 
-1. Upload de documents RAG (protégé par `ADMIN_API_KEY`) : `POST /admin/rag/upload`
-2. Lecture de documents : `GET /admin/rag/documents`
-3. Analyse d’orchestrations / logs agents : endpoints “orchestration/logs” (Mongo).
+1. Upload de documents RAG (protégé par `ADMIN_API_KEY`) : `POST /admin/rag/upload` (si routes activées)
+2. Lecture de documents : `GET /admin/rag/documents` (si routes activées)
+3. Analyse d’orchestrations / logs agents : `GET /api/agents/*` + logs Prisma
 
 ---
 
@@ -200,29 +219,29 @@ Cette section documente le **backend Zyno** : orchestration multi-agents, logiqu
 
 ### Vue d’ensemble
 
-Zyno est un orchestrateur multi-agents côté backend (`mf-back`) qui :
+Zyno est un orchestrateur multi-agents côté backend (`mf-back/src/orchestration`) qui :
 
-1. **Détecte l’intention** de l’utilisateur (`detectIntent(userInput)`).
-2. **Mappe l’intention → liste d’agents** (`mapIntentToAgents(intent)`).
-3. **Détermine un mode d’exécution** (`determineExecutionMode(intent)`).
-4. **Charge un template de parcours** (“parcoursTemplate”) selon l’intention.
-5. **Exécute les agents** et produit :
-   - `results`: un dictionnaire `agentName → payload`
-   - `timeline`: la séquence d’exécution (pour audit/UX)
-   - `currentStep`: dernier step
+1. **Valide/normalise** la requête (`ValidationService`, schémas vslice).
+2. **Résout le contexte de parcours** (journey/phase, artefacts).
+3. **Route les intentions** (intentRouter + workflowMap).
+4. **Décide du RAG** et récupère des contextes si nécessaires.
+5. **Exécute les agents** sélectionnés via LLM (pool d’agents).
+6. **Synthétise** résultats, scores et actions.
+7. **Prépare un plan d’exécution** (tools + gate) en dry-run par défaut.
+8. **Journalise** (auditTrail/memory/metrics) pour observabilité.
 
-### Endpoint principal
+### Endpoints exposés (backend)
 
-- `POST /orchestration` (voir `mf-back/routes/zyno-routes.js`)
-  - input : `{ input, userId, journey, phase, objective }`
-  - output : `{ executedAgents, intent, mode, parcoursTemplate, results, timeline, meta.orchestration }`
+- `POST /api/agents/interact` : interaction Zyno console (session-based).
+- `GET /api/agents/types` / `GET /api/agents/session/:id` / `GET /api/agents/project/:id/sessions`.
+- `POST /journey/load-demo` : bootstrap démo (backend).
+- `GET /healthz` / `GET /readyz` / `GET /api/health`.
+- **Attendus par le frontend** : `POST /journey/:id/step` et `POST /journey/:id/submit` (voir `journey-simulator/src/utils/api-modules/journey.ts`). Ces endpoints sont fournis par l’orchestrateur en environnement complet ; en local, le simulateur bascule souvent en mode démo.
 
-### Logs & mémoire (MongoDB)
+### Logs & mémoire (in-memory + Prisma)
 
-Après exécution, le backend persiste :
-
-- **Agent logs** (ex: modèle `agentFeedbackLog`) : prompt, réponse, sources RAG, métriques, feedback, etc.
-- **Mémoire d’agent / utilisateur** (ex: `agent_memory`) : derniers steps / intent / timeline.
+- **Orchestration vslice** : `auditTrailStore`, `memoryStore`, `metricsStore` (in-memory, TTL).
+- **Sessions agents** : `AgentMemoryService` (Prisma/Postgres) stocke messages, états et logs d’actions.
 
 ### AEPO “backend” (important : définition MVP)
 
@@ -233,35 +252,140 @@ Dans `mf-back`, “AEPO” apparaît aussi comme **signal d’exécution par age
 
 Ce “AEPO backend” est donc **une métrique qualité d’exécution** (MVP), à ne pas confondre avec la couche “AEPO/AECO” présentée au niveau produit (roadmap solo vs cohort).
 
+### Pipeline d’orchestration Zyno (LLM/RAG/exécution)
+
+<a id="pipeline-orchestration"></a>
+
+Flux réel (voir `mf-back/src/orchestration/zynoVerticalSlice.js`) :
+
+1. **Init & validation** : normalisation, warnings, presets, `ops` runtime.
+2. **Mode** : `demo` / `simulation` / `real` via `inferRequestedMode()`.
+3. **Sécurité & circuit breakers** : `secretsPolicy`, `circuitBreaker` (LLM/RAG).
+4. **Concurrency** : `concurrencyManager.acquire()` + load-shedding.
+5. **Intents** : combine `req.intent` + `workflowMap` (journeyType/phase), dédupe & ordre par priorité.
+6. **Sélection agents** : registry + overrides `AGENT_*_ENABLED`.
+7. **RAG** : `ragService` → remote si autorisé, fallback local / disabled si nécessaire.
+8. **LLM run** : exécution agent pool, budget/tokens/timeouts (`BUDGETS` par env).
+9. **Scoring & synthèse** : `LogicCheckService`, `scoringService`, action plan dédupliqué.
+10. **Execution plan** : mapping actions → tools (`actionToolMapper` + `toolsRegistry`).
+11. **Execution gate** : `executionGate` (HITL) + `executionEngine` (DRY_RUN/REAL/SHADOW).
+12. **Persist & audit** : `metricsStore`, `auditTrailStore`, `memoryStore`, `artifactStore`.
+
+### Contrat d’agent (interface)
+
+Source: `mf-back/src/agents/agentContract.js` (contrat canonique).
+
+- **Input normalisé** : `traceId`, `runId`, `intentNormalized`, `input`, `ragContext`, `constraints`.
+- **Output** : `{ agentId, status, summary, details?, actions?, citations?, metrics?, errors? }`.
+- **Statuts** : `OK | WARN | FAIL | TIMEOUT` (utilisés dans le scoring).
+
+### LLM clients (backend)
+
+- **LLMClient orchestration** : `mf-back/src/orchestration/llmClient.js` (cache, mock si pas de clé, support `OPENAI_API_KEY`).
+- **OpenAIClient (TS)** : `mf-back/src/llm/OpenAIClient.ts` (utilisé par `BaseAgent.ts` et `agent.controller`).
+
+### Inventaire complet des agents (généré)
+
+<a id="agents-registry"></a>
+
+Source: `mf-back/src/agents/registry.js` (+ `mf-back/src/agents/extended/registry-extra.js`).
+
+> Note : la registry concatène `core` + `extended` puis trie par priorité sans déduplication. `registryIndex` utilise la **dernière** occurrence d’un `agentId` si doublon.
+
+<!-- BEGIN AUTO-GENERATED: agents-registry -->
+| Agent ID | Domain | Intents | Capabilities | requiresRag | enabled | priority | model | maxTokens | timeoutMs |
+|---|---|---|---|---:|---:|---:|---|---:|---:|
+| `GuideAgent` | cognitive | `guide`, `help` | `orientation`, `help` | false | true | 99 | gpt-4o | 600 | 6000 |
+| `EducationAgent` | cognitive | `education`, `explain` | `teaching`, `explaining` | false | true | 98 | gpt-4o | 600 | 6000 |
+| `ReflectionAgent` | cognitive | `reflection` | `analysis`, `meta` | false | true | 97 | gpt-4o | 600 | 6000 |
+| `CoachAgent` | cognitive | `coach` | `strategy`, `advice` | true | true | 96 | gpt-4o | 600 | 6000 |
+| `SecurityAuditAgent` | security | `security_audit`, `default` | `audit`, `risk`, `compliance` | true | true | 95 | gpt-4o | 600 | 6000 |
+| `AuditAgent` | audit | `audit` | `code_quality`, `security` | true | true | 94 | gpt-4o | 600 | 6000 |
+| `SecurityAgent` | security | `security_attack` | `red_team`, `exploits` | true | true | 94 | gpt-4o | 600 | 6000 |
+| `ProductSpecAgent` | product | `product_spec`, `default` | `spec`, `flows`, `acceptance` | true | true | 90 | gpt-4o | 600 | 6000 |
+| `ProductAgent` | product | `product` | `discovery`, `strategy` | false | true | 89 | gpt-4o | 600 | 6000 |
+| `BuilderAgent` | architecture | `builder`, `architecture` | `system_design`, `stack` | true | true | 89 | gpt-4o | 600 | 6000 |
+| `JourneyDesignAgent` | journey | `journey_design` | `design`, `mapping` | false | true | 88 | gpt-4o | 600 | 6000 |
+| `ProtocolAgent` | protocol | `protocol`, `standards` | `standards`, `token_2022` | true | true | 88 | gpt-4o | 600 | 6000 |
+| `DevAgent` | development | `dev`, `code` | `code`, `implementation` | false | true | 88 | gpt-4o | 600 | 6000 |
+| `EvaluationAgent` | quality | `evaluation` | `evaluation`, `rubric` | false | true | 87 | gpt-4o | 600 | 6000 |
+| `RAGOpsAgent` | rag | `rag_ops` | `ingest`, `search` | false | true | 86 | gpt-4o | 600 | 6000 |
+| `DataIntegrityAgent` | data | `data_integrity` | `integrity`, `validation` | false | true | 85 | gpt-4o | 600 | 6000 |
+| `OnboardingAgent` | ux | `onboarding` | `onboarding`, `flows` | false | true | 85 | gpt-4o | 600 | 6000 |
+| `DesignAgent` | design | `design`, `visuals` | `visuals`, `ux` | false | true | 85 | gpt-4o | 600 | 6000 |
+| `APIContractAgent` | api | `api_contract` | `contracts`, `schemas` | false | true | 84 | gpt-4o | 600 | 6000 |
+| `TokenAgent` | tokenomics | `token_design` | `utility`, `mapping` | false | true | 84 | gpt-4o | 600 | 6000 |
+| `NFTAgent` | nft | `nft_design` | `metadata`, `strategy` | false | true | 84 | gpt-4o | 600 | 6000 |
+| `DAOAgent` | dao | `dao_tooling` | `tooling`, `structure` | false | true | 84 | gpt-4o | 600 | 6000 |
+| `TokenomicsAgent` | tokenomics | `tokenomics` | `economy`, `supply` | false | true | 83 | gpt-4o | 600 | 6000 |
+| `Web3LegalAgent` | legal | `legal` | `legal`, `mica` | true | true | 83 | gpt-4o | 600 | 6000 |
+| `GovernanceDAOAgent` | governance | `governance_dao` | `dao`, `voting` | true | true | 82 | gpt-4o | 600 | 6000 |
+| `PitchAgent` | investor | `pitch` | `pitch`, `deck` | false | true | 82 | gpt-4o | 600 | 6000 |
+| `GrowthAgent` | growth | `growth` | `growth`, `marketing` | false | true | 81 | gpt-4o | 600 | 6000 |
+| `GovernanceAgent` | governance | `governance` | `strategy`, `policy` | false | true | 81 | gpt-4o | 600 | 6000 |
+| `InvestorDemoAgent` | investor | `investor_demo` | `demo`, `pitch` | false | true | 80 | gpt-4o | 600 | 6000 |
+| `CommunityAgent` | growth | `community` | `community`, `engagement` | false | true | 80 | gpt-4o | 600 | 6000 |
+| `InvestorAgent` | investor | `investor_fundraise` | `fundraise`, `pitch` | false | true | 79 | gpt-4o | 600 | 6000 |
+| `UXWritingAgent` | ux | `ux_writing` | `ux_writing` | true | true | 79 | gpt-4o | 600 | 6000 |
+| `QAPlaywrightAgent` | qa | `qa_playwright` | `e2e`, `playwright` | false | true | 78 | gpt-4o | 600 | 6000 |
+| `LaunchpadAgent` | investor | `launchpad` | `incubation`, `launch` | false | true | 78 | gpt-4o | 600 | 6000 |
+| `DevOpsAgent` | devops | `devops` | `ci_cd`, `infra` | false | true | 77 | gpt-4o | 600 | 6000 |
+| `ObservabilityAgent` | observability | `observability` | `logs`, `metrics`, `tracing` | false | true | 76 | gpt-4o | 600 | 6000 |
+| `ComplianceAgent` | compliance | `compliance` | `policy`, `regulation` | true | true | 75 | gpt-4o | 600 | 6000 |
+| `RiskFraudAgent` | risk | `risk_fraud` | `fraud`, `risk` | true | false | 74 | gpt-4o | 600 | 6000 |
+| `CurriculumAgent` | education | `curriculum` | `curriculum`, `learning_path` | false | true | 73 | gpt-4o | 600 | 6000 |
+| `MarketplaceAgent` | marketplace | `marketplace` | `listing`, `pricing` | false | true | 72 | gpt-4o | 600 | 6000 |
+| `AnalyticsAgent` | analytics | `analytics` | `analytics`, `insights` | false | true | 71 | gpt-4o | 600 | 6000 |
+| `PerformanceAgent` | performance | `performance` | `perf`, `optimization` | false | true | 70 | gpt-4o | 600 | 6000 |
+| `WalletAuthAgent` | auth | `wallet_auth` | `wallet`, `auth` | false | true | 69 | gpt-4o | 600 | 6000 |
+| `SolanaAnchorAgent` | blockchain | `solana_anchor` | `anchor`, `solana` | false | true | 68 | gpt-4o | 600 | 6000 |
+| `MintingAgent` | mint | `minting` | `mint`, `nft` | false | true | 67 | gpt-4o | 600 | 6000 |
+<!-- END AUTO-GENERATED: agents-registry -->
+
+
+
 ---
 
 ## 📚 RAG (Retrieval-Augmented Generation)
 
 <a id="rag"></a>
 
-Le RAG est implémenté côté backend (`mf-back`) via un client HTTP + fallback local.
+Le RAG est implémenté côté backend (`mf-back`) via **deux clients** (orchestration vs agents) + fallback local.
 
 ### Composants
 
-- **Client** : `mf-back/rag/ragClient.js`
+- **Client agents (legacy + BaseAgent)** : `mf-back/src/rag/ragClient.js`
   - `getRagSnippets(...)` : recherche des extraits (snippets) pour enrichir le contexte agent/LLM
   - `ingestDocument(...)` / `ingestDocumentsIfNeeded(...)` : ingestion
-- **Routes admin** : `mf-back/routes/rag-routes.js`
+- **Client orchestration** : `mf-back/src/orchestration/ragClient.js`
+  - `search(...)` : recherche concise de contextes, attachée à `zynoVerticalSlice`
+- **Routes admin** : (si activées) `mf-back/src/routes` + contrôleurs RAG (upload/liste)
   - `POST /admin/rag/upload` (upload d’un document ; nécessite `ADMIN_API_KEY`)
   - `GET /admin/rag/documents` (liste)
 
 ### Variables d’environnement (backend)
 
-- `RAG_SEARCH_URL` (défaut: `http://localhost:8000/kb/search`)
-- `RAG_INGEST_URL` (défaut: `http://localhost:8000/kb/ingest`)
+- `RAG_BASE_URL` (défaut: `http://localhost:8000`)
+- `RAG_SEARCH_URL` (défaut: `${RAG_BASE_URL}/kb/search`)
+- `RAG_INGEST_URL` (défaut: `${RAG_BASE_URL}/kb/ingest`)
 - `RAG_API_KEY` (clé d’accès au service RAG)
 - `RAG_COLLECTION` (défaut: `mfai-knowledge`)
-- `RAG_DATA_PATH` (fallback local, défaut: `mf-back/data/rag-documents`)
+- `RAG_DATA_PATH` (fallback local, défaut: `mf-back/src/data/rag-documents`)
+- `RAG_MAX_TOPK` (cap des résultats, défaut: `10`)
+- `STRICT_RAG_MODE=true` (désactive le fallback local)
 - `ADMIN_API_KEY` (protection upload admin)
+
+> Note : le repo contient aussi `mf-back/data/rag-documents` (hors `src/`). Si tu veux réutiliser ces fichiers, configure `RAG_DATA_PATH` explicitement.
 
 ### Fallback (quand le RAG distant est indisponible)
 
-Si la recherche HTTP échoue, le backend lit des fichiers `.md/.txt` depuis `RAG_DATA_PATH` et renvoie des “snippets” de secours. C’est **volontaire** pour garder une démo fonctionnelle sans dépendance externe.
+Si la recherche HTTP échoue, le backend lit des fichiers `.md/.txt` depuis `RAG_DATA_PATH` et renvoie des “snippets” de secours. En `demo mode`, l’orchestrateur force un RAG local (chunks vides) pour éviter la dépendance réseau.
+
+### Interaction RAG ↔ LLM ↔ Agents
+
+- **Orchestration** : `ragService` décide d’activer le RAG selon `requiresRag` des agents sélectionnés ; les snippets sont injectés dans le prompt.
+- **Agents BaseAgent** : `getRagSnippets()` alimente `ragContext` et est concaténé dans le prompt utilisateur (domain = `trackId`).
+- **LLM** : `LLMClient` (orchestration) et `OpenAIClient` (TS) gèrent cache, mock, et timeouts.
 
 ---
 
@@ -302,7 +426,13 @@ Progression :
 
 IA / exécution de steps :
 
-- l’app traite certaines routes “step/submit” comme **appels IA réels même en mode démo** (voir `isAIAgentCall` dans `journey-simulator/src/utils/api.ts`).
+- l’app traite certaines routes “step/submit” comme **appels IA réels même en mode démo** (voir `executeDemoRequest` dans `journey-simulator/src/utils/api-modules/base.ts`).
+
+Zyno Console / agents :
+
+- `POST /api/agents/interact`
+- `GET /api/agents/types`
+- `GET /api/agents/session/:sessionId`
 
 ### Contrats typés (recommandé pour audit)
 
@@ -311,19 +441,19 @@ IA / exécution de steps :
 
 ---
 
-## 🗄️ Données & bases (MongoDB, Postgres/Prisma)
+## 🗄️ Données & bases (Postgres/Prisma)
 
 <a id="donnees-et-bases"></a>
 
-Cette section clarifie **où vivent les données** selon les sous-systèmes (journeys/agents vs autres modules du monorepo) afin d’éviter les confusions “Mongo vs Postgres”.
+Cette section clarifie **où vivent les données** selon les sous-systèmes (agents vs autres modules du monorepo).
 
-### MongoDB (stack principale “Journey + Agents”)
+### Postgres/Prisma (stack principale agents)
 
-`mf-back` utilise MongoDB pour :
+`mf-back` s’appuie sur Prisma/Postgres pour :
 
-- la progression utilisateur “journey”
-- la mémoire
-- les logs d’agents (audit, timeline, sources RAG)
+- sessions d’agents & mémoire (`AgentMemoryService`)
+- logs d’actions agents (`agentLog`)
+- entités `project/user` nécessaires aux interactions `/api/agents/*`
 
 ### Postgres/Prisma (autres modules / CI)
 
@@ -385,6 +515,14 @@ Dans `journey-simulator/src/utils/api.ts`, `request()` :
 
 Le mode démo stocke un “mini-dataset” en `localStorage` (clé `demo_mock_db`) : XP, tokens, phases complétées, “NFTs” fictifs.
 
+### Mécanisme technique (frontend)
+
+- **Run mode** : `journeyStore.setRunMode()` persiste `mfai-run-mode` (demo/simulation/real) et envoie `x-run-mode` au backend.
+- **Tokens démo** : `accessToken=demo-token` + `refresh=demo-refresh-token` (fournis par `DemoStateManager`).
+- **Mock API** : `executeDemoRequest()` intercepte les requêtes non-AI ; la DB mock est gérée par `DemoStateManager` (`demo_mock_db`, `demo_active_persona`).
+- **Séquenceur** : `demoSequencer.ts` génère les steps ; `startDemoPhase()` + `tickDemo()` jouent le scénario par phase.
+- **Interactions** : si un block est interactif (mission, quiz, bonding curve, launchpad), le demo passe en `WAITING_FOR_INTERACTION` et attend `submitDemoInteraction()`.
+
 ---
 
 ## 🧬 Modèle de parcours (Personas & Phases)
@@ -445,11 +583,11 @@ Commande: `node journey-simulator/scripts/generate-phases-table.mjs`
 
 | # | phase.id | Titre | Mission (résumé) | XP | $MFAI | NFT reward | stakingRequired | daoVoteRequired |
 |---:|---|---|---|---:|---:|---|---:|---|
-1 | `cognitive-orientation` | Cognition Ignition | Complete the Web3 paradigm deep-dive, map legacy vs. decentralized architecture, and articulate your mission statement. | 60 | 6 | Proof-of-Skill™: Web3 Orientation | — | — |
+1 | `cognitive-orientation` | Cognition Ignition | Complete the Web3 paradigm deep-dive, map legacy vs. decentralized architecture, and articulate your mission statement. | 60 | 6 | Proof-of-Skill: Web3 Orientation | — | — |
 2 | `solana-fluency` | Solana Systems Lab | Complete validator walk-throughs, inspect transaction flows, and prototype a Solana interaction in the playground. | 80 | 8 | Solana Fluency Patch | 50 | — |
 3 | `token-design-lab` | Token Design Studio | Model a token incentive map, stress-test governance edge cases, and publish a protocol impact canvas. | 90 | 9 | Tokenomics Architect Badge | — | ✅ |
 4 | `identity-proofing` | Identity & Security Forge | Harden your wallet stack, evaluate custody trade-offs, and design a DeID onboarding flow. | 100 | 10 | Sovereign Identity Seal | — | — |
-5 | `ecosystem-engagement` | Ecosystem Activation | Ship a community contribution, present your activation brief to peers, and initiate DAO participation. | 120 | 12 | Proof-of-Skill™: Activation | — | — |
+5 | `ecosystem-engagement` | Ecosystem Activation | Ship a community contribution, present your activation brief to peers, and initiate DAO participation. | 120 | 12 | Proof-of-Skill: Activation | — | — |
 6 | `launch-collaterize` | Launch via Collaterize | Run the Collaterize simulation, analyze your eligibility score, and review the launch plan. | 200 | 20 | Collaterize Launch Badge | — | — |
 
 ### Persona: The Capital Foundry (`capital-foundry`)
@@ -459,7 +597,7 @@ Commande: `node journey-simulator/scripts/generate-phases-table.mjs`
 1 | `capital-discovery` | Protocol Discovery Sprint | Benchmark leading Solana protocols, analyze composability patterns, and publish an opportunity matrix. | 80 | 8 | DeFi Recon Marker | — | — |
 2 | `program-forge` | Program Forge Lab | Ship a core lending or AMM module, integrate deterministic tests, and validate with fuzzing harnesses. | 110 | 11 | Anchor Mastery Crest | — | — |
 3 | `oracle-integration` | Oracle & Liquidity Mesh | Integrate oracle feeds, simulate liquidity shocks, and design cross-chain contingency flows. | 120 | 12 | Liquidity Architect Token | — | — |
-4 | `risk-command` | Risk Command Center | Define circuit breakers, craft adaptive fee policies, and build DAO-ready reporting dashboards. | 130 | 13 | Proof-of-Yield™ Sentinel | 75 | — |
+4 | `risk-command` | Risk Command Center | Define circuit breakers, craft adaptive fee policies, and build DAO-ready reporting dashboards. | 130 | 13 | Proof-of-Yield Sentinel | 75 | — |
 5 | `capital-launchpad` | Launch & Scale Deck | Complete economic audit, pitch to Sovereign Builders Network, and finalize Synaptic DAO deployment vote. | 150 | 15 | Neuro-Dividend Initiator | — | ✅ |
 6 | `launch-collaterize` | Launch via Collaterize | Run the Collaterize simulation, analyze your eligibility score, and review the launch plan. | 200 | 20 | Collaterize Launch Badge | — | — |
 
@@ -493,7 +631,7 @@ Commande: `node journey-simulator/scripts/generate-phases-table.mjs`
 2 | `dao-design` | DAO Design Workshop | Prototype DAO constitution, test voting simulations, and model contribution-based rewards. | 110 | 11 | Synaptic Governance Badge | — | — |
 3 | `philanthropy-protocols` | Transparent Funding Protocols | Implement transparent treasury dashboards, launch grant proposal flows, and publish impact metrics. | 125 | 12 | Public Goods Laureate | — | — |
 4 | `identity-reputation` | Identity & Reputation Mesh | Design soulbound credentials, integrate reputation oracles, and set moderation pathways. | 135 | 13 | Social Proof Seal | — | — |
-5 | `synaptic-impact` | Synaptic Impact Launch | Present to Synaptic Governance, initiate Neuro-Dividend rewards, and launch a community impact sprint. | 150 | 15 | Impact Engine Proof | — | — |
+5 | `synaptic-impact` | Synaptic Impact Launch | Present to Synaptic Governance, initiate Neuro-Dividend rewards, and launch a community impact sprint. | 150 | 15 | Impact Engine Proof | — | ✅ |
 6 | `launch-collaterize` | Launch via Collaterize | Run the Collaterize simulation, analyze your eligibility score, and review the launch plan. | 200 | 20 | Collaterize Launch Badge | — | — |
 
 ### Persona: The Resilience Master (`resilience-master`)
@@ -507,7 +645,305 @@ Commande: `node journey-simulator/scripts/generate-phases-table.mjs`
 5 | `redblue-evolution` | Red/Blue Evolution | Lead live incident simulations, publish monthly threat intel, and activate Neuro-Dividends for vulnerability burns. | 170 | 17 | Resilience Master Seal | — | — |
 6 | `launch-collaterize` | Launch via Collaterize | Run the Collaterize simulation, analyze your eligibility score, and review the launch plan. | 200 | 20 | Collaterize Launch Badge | — | — |
 
+### Persona: E2E Test Persona (`e2e-persona`)
+
+| # | phase.id | Titre | Mission (résumé) | XP | $MFAI | NFT reward | stakingRequired | daoVoteRequired |
+|---:|---|---|---|---:|---:|---|---:|---|
+1 | `discovery` | Discovery | Analyze market trends | 10 | 1 | Test NFT 1 | — | — |
+2 | `strategy` | Strategy | Strategize | 10 | 1 | Test NFT 2 | — | — |
+3 | `plan` | Plan Generation | Plan | 10 | 1 | Test NFT 3 | — | — |
+
 <!-- END AUTO-GENERATED: phases-table -->
+
+
+
+---
+
+## 🧩 Détail des steps par parcours (généré)
+
+<a id="detail-steps-par-parcours"></a>
+
+Ce bloc est généré depuis `journey-simulator/src/store/demoSequencer.ts` (séquences) et `journey-simulator/src/data/personas.ts` (personas). Il documente **les étapes réellement jouées en mode démo** (ordre, UI blocks, agent actions). En mode réel, ces steps sont produits par l’orchestrateur via `/journey/:id/step`.
+
+> Note : les `agent_actions` du séquenceur démo sont des **labels UX** et ne correspondent pas toujours à un agent backend enregistré (ex: `FinanceAgent`, `RiskAgent`, `CollaterizeAgent`).
+
+<!-- BEGIN AUTO-GENERATED: steps-by-journey -->
+### Persona: The Cognitive Activation Hub (`cognitive-activation-hub`)
+
+#### Phase: `cognitive-orientation`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Neural Handshake: Initiation | Establish cryptographic sovereignty with Ed25519 signature | `text_block`, `resource_block` | `GuideAgent`
+2 | Wallet Connection & Ed25519 Init | Connect wallet and complete signature challenge | `mission_block`, `checklist_block` | `Web3LegalAgent`
+
+#### Phase: `solana-fluency`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Memory Forge: PDA Introduction | Understanding Program Derived Addresses | `text_block`, `diagram_block` | `HubAgent`
+2 | PDA Canonical Bump Search | Derive canonical bump seed for program-derived address | `mission_block`, `resource_block`, `checklist_block` | `HubAgent`
+
+#### Phase: `token-design-lab`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Parallel Logic: Sealevel Runtime | Optimize execution via account locking | `text_block`, `indicator_block` | `HubAgent`
+2 | Sealevel Optimization Simulation | Reorder instructions to minimize contention | `mission_block`, `resource_block` | `HubAgent`
+
+#### Phase: `identity-proofing`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Hub Graduation: Final Assessment | Defend your architectural choices | `text_block`, `mission_block`, `evaluation_block` | `ZynoAgent`
+
+#### Phase: `ecosystem-engagement`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Ecosystem Activation: Apply Your Knowledge | Convert insight into real-world contributions | `text_block`, `resource_block` | `CommunityAgent`
+2 | Ship Your Activation Brief | Document and present your contribution plan | `mission_block`, `checklist_block`, `action_suggestions_block` | `CommunityAgent`
+3 | DAO Governance Initiation | Participate in decentralized governance | `text_block`, `mission_block` | `GovernanceAgent`
+
+#### Phase: `launch-collaterize`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Launch Simulation: Introduction | Understand the Collaterize launch platform | `text_block`, `diagram_block` | `CollaterizeAgent`
+2 | Run Collaterize Simulation | Execute comprehensive launch assessment | `mission_block`, `checklist_block`, `indicator_block` | `CollaterizeAgent`
+3 | Launch Assessment Results | Review eligibility score and launch plan | `evaluation_block`, `text_block`, `resource_block` | `ZynoAgent`
+
+
+### Persona: The Capital Foundry (`capital-foundry`)
+
+#### Phase: `capital-discovery`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | DeFi Landscape Analysis | Audit Solana DeFi protocols and identify opportunities | `text_block`, `resource_block`, `mission_block` | `FinanceAgent`
+
+#### Phase: `program-forge`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Program Forge Lab | Build Solana programs with Anchor | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `oracle-integration`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Oracle & Liquidity Mesh | Integrate oracle feeds | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `risk-command`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Risk Command Center | Operationalize risk analytics with staking commitment | `text_block`, `bonding_curve_block`, `mission_block` | `RiskAgent`
+
+#### Phase: `capital-launchpad`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Launch & Scale Deck | Prepare for production | `text_block`, `dao_dashboard_block`, `mission_block` | `GovernanceAgent`
+
+#### Phase: `launch-collaterize`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Launch Simulation: Introduction | Understand the Collaterize launch platform | `text_block`, `diagram_block` | `CollaterizeAgent`
+2 | Run Collaterize Simulation | Execute comprehensive launch assessment | `mission_block`, `checklist_block`, `indicator_block` | `CollaterizeAgent`
+3 | Launch Assessment Results | Review eligibility score and launch plan | `evaluation_block`, `text_block`, `resource_block` | `ZynoAgent`
+
+
+### Persona: The System Architect (`system-architect`)
+
+#### Phase: `architecture-scan`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Topology Reconnaissance | Map decentralized infrastructure | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `depin-studio`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | DePIN Studio | Prototype decentralized physical infrastructure | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `onchain-ai`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | On-Chain Intelligence Lab | Fuse AI with verifiable execution | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `systems-hardening`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Systems Hardening Forge | Strengthen infrastructure | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `synaptic-rollout`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Synaptic Rollout | Orchestrate deployment | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `launch-collaterize`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Launch Simulation: Introduction | Understand the Collaterize launch platform | `text_block`, `diagram_block` | `CollaterizeAgent`
+2 | Run Collaterize Simulation | Execute comprehensive launch assessment | `mission_block`, `checklist_block`, `indicator_block` | `CollaterizeAgent`
+3 | Launch Assessment Results | Review eligibility score and launch plan | `evaluation_block`, `text_block`, `resource_block` | `ZynoAgent`
+
+
+### Persona: The Experience Studio (`experience-studio`)
+
+#### Phase: `experience-discovery`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Experience Discovery | Research cultural signals | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `nft-systems-lab`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | NFT Systems Lab | Engineer NFT economies | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `gameplay-lab`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Gameplay & Mechanics Forge | Integrate tokenized mechanics | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `ux-elevation`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | UX Elevation Studio | Polish interface flows | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `experience-launch`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Launch & Community Resonance | Deliver your experience | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `launch-collaterize`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Launch Simulation: Introduction | Understand the Collaterize launch platform | `text_block`, `diagram_block` | `CollaterizeAgent`
+2 | Run Collaterize Simulation | Execute comprehensive launch assessment | `mission_block`, `checklist_block`, `indicator_block` | `CollaterizeAgent`
+3 | Launch Assessment Results | Review eligibility score and launch plan | `evaluation_block`, `text_block`, `resource_block` | `ZynoAgent`
+
+
+### Persona: The Impact Engine (`impact-engine`)
+
+#### Phase: `impact-charter`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Mission Charter Lab | Define purpose and stakeholders | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `dao-design`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | DAO Design Workshop | Engineer equitable governance | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `philanthropy-protocols`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Transparent Funding Protocols | Construct philanthropy flows | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `identity-reputation`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Identity & Reputation Mesh | Deploy token-gated participation | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `synaptic-impact`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Synaptic Impact Launch | Activate your DAO | `text_block`, `dao_dashboard_block`, `mission_block` | `GovernanceAgent`
+
+#### Phase: `launch-collaterize`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Launch Simulation: Introduction | Understand the Collaterize launch platform | `text_block`, `diagram_block` | `CollaterizeAgent`
+2 | Run Collaterize Simulation | Execute comprehensive launch assessment | `mission_block`, `checklist_block`, `indicator_block` | `CollaterizeAgent`
+3 | Launch Assessment Results | Review eligibility score and launch plan | `evaluation_block`, `text_block`, `resource_block` | `ZynoAgent`
+
+
+### Persona: The Resilience Master (`resilience-master`)
+
+#### Phase: `security-baseline`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Security Baseline Forge | Build auditing muscle memory | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `exploit-hunt`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Exploit Hunter Arena | Hone offensive security skills | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `defense-systems`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Defense Systems Orchestrator | Engineer runtime protections | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `incident-response`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | On-Chain Incident Command | Master forensic triage | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `redblue-evolution`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Red/Blue Evolution | Institutionalize security culture | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `launch-collaterize`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Launch Simulation: Introduction | Understand the Collaterize launch platform | `text_block`, `diagram_block` | `CollaterizeAgent`
+2 | Run Collaterize Simulation | Execute comprehensive launch assessment | `mission_block`, `checklist_block`, `indicator_block` | `CollaterizeAgent`
+3 | Launch Assessment Results | Review eligibility score and launch plan | `evaluation_block`, `text_block`, `resource_block` | `ZynoAgent`
+
+
+### Persona: E2E Test Persona (`e2e-persona`)
+
+#### Phase: `discovery`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Discovery | Discovery Phase | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `strategy`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Strategy | Strategy Phase | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+#### Phase: `plan`
+
+| # | Step title | Summary | UI blocks | Agent actions |
+|---:|---|---|---|---|
+1 | Plan Generation | Plan Phase | `text_block`, `mission_block`, `resource_block` | `GuideAgent`
+
+
+<!-- END AUTO-GENERATED: steps-by-journey -->
+
+
+
 
 ---
 
@@ -529,17 +965,62 @@ Le cœur “LLM → UI” du simulateur passe par un format de réponse structur
 
 ### Kinds de blocs (catalogue)
 
-Le renderer gère (selon versions) :
+Types **définis** (schema `UIBlock`) :
 
 - `text_block`, `checklist_block`, `quiz_block`, `mission_block`
 - `resource_block`, `document_block`, `evaluation_block`
 - `action_suggestions_block`, `xp_block`, `diagram_block`
 - `dao_dashboard_block`, `project_selection_block`, `narrative_choice_block`
-- `indicator_block`, `interactive_template_block`
+- `indicator_block`, `interactive_template_block`, `hint_block`
+- `bonding_curve_block`, `code_auditor_block`, `market_launchpad_block`
+
+Types **rendus** par `UIBlocksRenderer` (actuel) :
+
+- `text_block`, `checklist_block`, `quiz_block`, `mission_block`
+- `resource_block`, `document_block`, `evaluation_block`
+- `action_suggestions_block`, `xp_block`, `diagram_block`
+- `dao_dashboard_block`, `bonding_curve_block`, `code_auditor_block`, `market_launchpad_block`
+
+Types **déclarés mais non branchés** dans le renderer principal :
+
+- `indicator_block`, `narrative_choice_block`, `interactive_template_block`, `project_selection_block`, `hint_block`
 
 ### Ressources (ResourceBlock)
 
-Un `resource_block` expose typiquement `resources[]` (ex: liens, flashcards) ; l’UI peut activer des actions comme copier un deck, ouvrir une ressource, ou afficher un fallback “No resources available”.
+Un `resource_block` expose typiquement `resources[]` (ex: liens, flashcards) ; l’UI peut :
+
+- ouvrir un lien HTTP,
+- afficher un toast “deliverable” (avec copie clipboard) si l’URL est absente,
+- agréger ces ressources via `AgentDeliverables` (sidebar & feed).
+
+## 🧩 UI Blocks renderer & interactions
+
+<a id="ui-blocks-renderer"></a>
+
+Points clés (frontend) :
+
+- **Fallback offline** : si `ui_blocks` est vide → rendu des blocs `FALLBACK_BLOCKS`.
+- **Streaming & rich content** : markdown simple, Mermaid lazy-load, KaTeX lazy-load.
+- **Sources & reasoning** : `SourceBadges` filtre les sources (score ≥ 0.6), badge “UNVERIFIED_LOCAL” si fallback local ; `ThoughtProcess` affiche le raisonnement quand présent.
+- **Actions utilisateur** :
+  - `ActionSuggestionsBlock` → `POST /journey/:id/step` (chainage d’actions).
+  - `MissionBlock` / `QuizBlock` → `api.submitMission()` (via `/journey/:id/submit`) puis mise à jour `lastStep` + XP.
+- **Mode démo** : `submitDemoInteraction()` intercepte les validations et gère l’état `WAITING_FOR_INTERACTION`.
+
+## 🖥️ Frontend & affichages (pages principales)
+
+<a id="frontend-affichages"></a>
+
+Routes UI (voir `journey-simulator/src/App.tsx`) :
+
+- `/` : HomePage (hero + personas + CTA).
+- `/journeys` & `/journeys/:journeyId` : Journey workspace (layout + UI blocks).
+- `/journeys/demo` & `/journeys/demo/:journeyId` : demo (séquenceur).
+- `/dashboard`, `/dao`, `/resources`, `/support`, `/playground`.
+- `/zyno` : ZynoConsole.
+- `/guide` : guide d’architecture (AEPO/AECO/Execution Gate).
+- `/debug/mint` : debug minting (wallet).
+- `/journeys/completed` : écran de fin de parcours.
 
 ---
 
@@ -553,8 +1034,8 @@ Le simulateur embarque une console “investor/dev” pour observer Zyno et l’
 
 - `journey-simulator/src/components/Zyno/ZynoConsole.tsx`
   - **health checks** : ping périodique `GET /healthz` et `GET /readyz`
-  - **orchestration** : `POST /orchestration` (timeout 10s côté UI) avec `{ input, userId }`
-  - **résumé mission** : construit un `MissionSummary` depuis la timeline (moyenne des scores AEPO agent)
+  - **orchestration** : `POST /api/agents/interact` via `zynoApi` (`journey-simulator/src/api/zyno.ts`)
+  - **résumé mission** : rendu depuis `sample_mission_feedback.json` + timeline simulée
   - **outils** : viewer de logs agents, flow de mission, upload de ressources (RAG)
 
 ### DAO console (front)
@@ -570,18 +1051,17 @@ Le simulateur embarque une console “investor/dev” pour observer Zyno et l’
 
 ---
 
-## 🧠 Orchestration agentique (R2.x — résumé)
+## 🧠 Orchestration agentique (résumé opérationnel)
 
-- Intent router + registry enrichi : sélection déterministe d’agents (sécurité/produit), scoring pondéré par `confidenceWeight` + `learningScore`.
-- Arbitrage Zyno : contradictions détectées, décision structurée (`overallStatus`, `topFindings`, `recommendedActions`, `actionPlan` dédupliqué).
-- Mémoire & apprentissage : mémoire TTL/FIFO (in-memory), ajustement de confiance via historique (OK/FAIL/TIMEOUT/contradictions).
-- Tooling & executionPlan : mapping actions → tools (`enable_checklist` seul tool autorisé en exécution réelle, autres en dry-run/skipped).
-- Execution Gate (HITL) : gate PENDING/APPROVED/REJECTED/EXPIRED requis avant toute exécution réelle.
-- Execution Engine :
+- **Intent router + registry** : sélection d’agents par intents normalisés (`intentRouter`), ordre par priorité.
+- **Scoring & synthèse** : `LogicCheckService` + `scoringService` → `overallStatus`, `topFindings`, `recommendedActions`.
+- **Tools & executionPlan** : mapping actions → tools (`actionToolMapper` → `toolsRegistry`).
+- **Execution Gate (HITL)** : gate `PENDING/APPROVED/REJECTED` requis pour outils `requiresConfirmation`.
+- **Execution Engine** :
   - Mode par défaut : `DRY_RUN` (SIMULATED), aucun side-effect.
-  - Mode réel (opt-in) : uniquement si `EXECUTION_ENABLED=true` **et** gate `APPROVED`, un seul tool exécuté, les autres `SKIPPED_REAL_EXECUTION`; fallback automatique en dry-run si blocage.
-- Observabilité : logs structurés avec `traceId`, statut des steps (SIMULATED/EXECUTED/SKIPPED), réponse toujours structurée (pas de throw).
-- Variables env : `EXECUTION_ENABLED` (par défaut false) pour autoriser le mode réel ; ne l’activer qu’avec un gate approuvé.
+  - Mode réel : uniquement si `EXECUTION_ENABLED=true` **et** gate approuvé ; sinon fallback en dry-run.
+  - `REAL_EXECUTION_MODE=shadow` : compare dry-run vs real-simulated.
+- **Observabilité** : logs structurés par `traceId`, métriques et alertes (SLO).
 
 ## 🚀 Quick Start
 
@@ -607,8 +1087,8 @@ npm install
 # Install backend dependencies
 npm install --prefix ../mf-back
 
-# Start backend API (requires MongoDB running locally)
-JWT_SECRET=dev-secret MONGO_URI="mongodb://127.0.0.1:27017/mfai" npm run dev --prefix ../mf-back
+# Start backend API (requires PostgreSQL running locally)
+DATABASE_URL="postgresql://mfai:mfai_secure_2024@localhost:5432/mfai_db?schema=public" JWT_SECRET=dev-secret npm run dev --prefix ../mf-back
 
 # Start frontend development server
 npm run dev
@@ -728,10 +1208,10 @@ App
       |
       v
 +---------------------------------------------+
-|               Agents (17)                   |
+|               Agents (registry)             |
 | - BuilderAgent, CoachAgent, DAOAgent, etc.  |
-| - Tous héritent de AgentTemplate            |
-| - Appellent RAG + LLM via helpers           |
+| - Appels LLM via LLMClient/OpenAIClient     |
+| - RAG optionnel par agent                   |
 +------------------+--------------------------+
                      |
                      v
@@ -748,11 +1228,11 @@ App
 
                |
                v
-+-----------------------------------+
-| Base MongoDB (Logs & Mémoire)     |
-| - agentFeedbackLog                |
-| - journeyHistory / memoryProfile |
-+-----------------------------------+
++----------------------------------------+
+| Prisma/Postgres + stores in-memory     |
+| - agent sessions/logs (Prisma)         |
+| - auditTrail/memory (in-memory TTL)    |
++----------------------------------------+
 
 Éléments clés :
 
@@ -1057,57 +1537,45 @@ La protection est assurée par :
 
 ### Backend (`mf-back/`)
 
-Le backend est une API Express + MongoDB qui sert :
+Le backend runtime actuel est une API Express **TypeScript** (`mf-back/src`) avec Prisma/Postgres (agents). Le dossier `mf-back/dist` contient le build JS (legacy/compat).
 
 - l’authentification (`/user/*`)
-- la progression journey (`/journey/*`)
-- l’orchestration Zyno (`/orchestration`)
+- la progression journey (démo via `/journey/*`)
+- l’interaction agents (`/api/agents/*`)
 - la DAO (`/dao/*`)
-- le RAG admin (`/admin/rag/*`) et d’autres endpoints auxiliaires.
+- le RAG admin (`/admin/rag/*`, si activé).
 
 #### Entrypoints & câblage
 
-- `mf-back/app.js` : configuration Express, connection Mongo, et **mount** des routes :
-  - `/auth` → `routes/auth-routes.js`
-  - `/journey` → `routes/journey-routes.js`
-  - `/orchestration` → `routes/zyno-routes.js`
-  - `/dao` → `routes/dao-routes.js`
-  - `/demo` → `routes/demo-routes.js`
-  - `/user` → `routes/user-routes.js`
-  - `/healthz`, `/readyz` probes.
-- `mf-back/server.js` + `mf-back/bin/www` : démarrage serveur (selon environnement).
+- `mf-back/src/app.ts` : Express app + middlewares + **mount** routes.
+- `mf-back/src/server.ts` : démarrage serveur (dev/prod).
+- `mf-back/dist/*` : build JS si `npm run build` (peut contenir des routes legacy).
 
 #### Routes (fichiers)
 
-Fichiers de routes (tous dans `mf-back/routes/`) :
+Fichiers de routes (dans `mf-back/src/routes/`) :
 
-- `auth-routes.js`, `user-routes.js`
-- `journey-routes.js`, `journeyLaunchRoutes.js`
-- `zyno-routes.js` (orchestration)
-- `dao-routes.js`
-- `rag-routes.js`
-- `favorites.js`, `feedback.js`
-- `agent-routes.js`, `analytics-routes.js`, `export-routes.js`, `demo-routes.js`, `solana-routes.js`, `cours-routes.js`, `health-routes.js`
+- `auth.routes.ts`, `user.routes.ts`
+- `journey.routes.ts` (demo endpoints)
+- `agent.routes.ts`
+- `health.routes.ts`, `index.routes.ts`
 
 #### Controllers / Models / Services
 
-- `mf-back/controllers/*.js` : logique métier (journey, user, dao, analytics, demo, agent runs, metrics).
-- `mf-back/models/*.js` : schémas Mongo (User, Journeys, Agent logs, DAO proposals, favorites, submissions…).
-- `mf-back/services/*.js` : services transverses (state, metrics, collaterize simulation).
-- `mf-back/middleware/*.js` : auth + feature flags.
+- `mf-back/src/controllers/*.ts` : logique métier (auth, agent, health).
+- `mf-back/src/services/*.ts` : mémoire agents, logs Prisma, etc.
+- `mf-back/prisma/` : schémas DB.
 
 #### Orchestration & agents
 
-- `mf-back/orchestration/zynoOrchestrator.js` : orchestration (detect intent → map agents → exécuter → timeline/results).
-- `mf-back/orchestration/agentsRegistry.js` : registry/resolve des agents.
-- `mf-back/agents/*.js` : catalogue d’agents (Builder, Growth, Tokenomics, Security, Legal, DAO, etc.).
-- `mf-back/llm/*.js` et `mf-back/utils/openaiClient.js` : appels LLM (OpenAI/GPT-5, etc.) + logging.
+- `mf-back/src/orchestration/*` : pipeline Zyno (intent → agents → scoring → execution).
+- `mf-back/src/agents/*` : catalogue d’agents.
+- `mf-back/src/orchestration/llmClient.js` + `mf-back/src/llm/OpenAIClient.ts` : appels LLM.
 
 #### RAG
 
-- `mf-back/rag/ragClient.js` et/ou `mf-back/rag/rag_client.js` : client RAG HTTP + fallback.
-- `mf-back/routes/rag-routes.js` : upload admin + listing documents.
-- `mf-back/scripts/check-rag-connection.js` : check connectivité RAG.
+- `mf-back/src/rag/ragClient.js` : client RAG HTTP + fallback.
+- `mf-back/src/orchestration/ragClient.js` : RAG orchestration.
 
 ### Infra / CI / déploiement (monorepo)
 
@@ -1143,200 +1611,295 @@ npm run generate:file-index
 Commande: `node journey-simulator/scripts/generate-file-index.mjs`
 
 <details>
-<summary><strong>journey-simulator/src (frontend)</strong> (159)</summary>
+<summary><strong>journey-simulator/src (frontend)</strong> (216)</summary>
 
-- `journey-simulator/src/api/agentRuns.ts` — Client typé / wrappers API mf-back.
-- `journey-simulator/src/api/mf-back-client.ts` — Client typé / wrappers API mf-back. Note: This file was auto-generated by openapi-typescript. Do not make direct changes to the file. / export interface paths { "/user/wallet-challen
-- `journey-simulator/src/api/mf-back.ts` — Client typé / wrappers API mf-back.
-- `journey-simulator/src/App.tsx` — Routeur (React Router) + providers + layout.
+- `journey-simulator/src/api/agentRuns.ts` — Client typé / wrappers API mf-back. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/api/mf-back-client.ts` — Client typé / wrappers API mf-back. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / Th
+- `journey-simulator/src/api/mf-back.ts` — Client typé / wrappers API mf-back. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/api/zyno.ts` — Client typé / wrappers API mf-back. Note: Zyno API Client - Connects to mf-back /api/agents/interact Project: Money Factory AI (MFAI) / import { tokenStore } from '../utils/tokenStor
+- `journey-simulator/src/App.tsx` — Routeur (React Router) + providers + layout. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
 - `journey-simulator/src/assets/lottie/galaxy-reactive.json` — Fichier du monorepo (voir chemin).
 - `journey-simulator/src/assets/svg/dao-launchpad.svg` — Fichier du monorepo (voir chemin).
 - `journey-simulator/src/assets/svg/feedback-stars.svg` — Fichier du monorepo (voir chemin).
 - `journey-simulator/src/assets/svg/mission-flow.svg` — Fichier du monorepo (voir chemin).
 - `journey-simulator/src/assets/svg/multi-agents.svg` — Fichier du monorepo (voir chemin).
-- `journey-simulator/src/components/__tests__/NFTMintingModal.test.tsx` — Composant React UI.
-- `journey-simulator/src/components/__tests__/UIBlocksRenderer.test.tsx` — Composant React UI.
-- `journey-simulator/src/components/__tests__/WalletButton.test.tsx` — Composant React UI.
-- `journey-simulator/src/components/AccessPassHolders.tsx` — Composant React UI.
-- `journey-simulator/src/components/AgentActivityFeed.tsx` — Composant React UI.
-- `journey-simulator/src/components/Artifacts/ArtifactCard.tsx` — Composant React UI.
-- `journey-simulator/src/components/Artifacts/ArtifactModal.tsx` — Composant React UI.
-- `journey-simulator/src/components/Artifacts/NeuralOverlay.tsx` — Composant React UI.
-- `journey-simulator/src/components/Artifacts/ProjectAssets.tsx` — Composant React UI.
-- `journey-simulator/src/components/CertificationModal.tsx` — Composant React UI.
-- `journey-simulator/src/components/Dao/DaoDashboard.tsx` — Composant React UI.
-- `journey-simulator/src/components/DAOVoteModal.tsx` — Composant React UI.
-- `journey-simulator/src/components/DebugLogger.tsx` — Composant React UI.
-- `journey-simulator/src/components/Governance/GovernanceDashboard.tsx` — Composant React UI.
-- `journey-simulator/src/components/HeroSection.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/__tests__/JourneyCard.test.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/__tests__/JourneyNextActionsPanel.test.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/__tests__/JourneyProgressBar.test.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/__tests__/JourneyTimeline.test.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/__tests__/JourneyWorkspace.test.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/__tests__/NFTIntegration.test.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/AgentActivityFeed.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/InvestorDemoMode.tsx` — Composant React UI.
+- `journey-simulator/src/components/__tests__/NFTMintingModal.test.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/__tests__/UIBlocksRenderer.test.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/__tests__/WalletButton.test.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/AccessPassHolders.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Admin/AgentHealthCommandCenter.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA Glob
+- `journey-simulator/src/components/AgentActivityFeed.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/AgentDeliverables.tsx` — Composant React UI.
+- `journey-simulator/src/components/Artifacts/ArtifactCard.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Artifacts/ArtifactModal.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Artifacts/NeuralOverlay.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Artifacts/ProjectAssets.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/CertificateModal.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/CodeAuditor.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Dao/DaoDashboard.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/DAOVoteModal.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/DebugLogger.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/DeFi/BondingCurveVisualizer.tsx` — Composant React UI.
+- `journey-simulator/src/components/Governance/GovernanceDashboard.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/HeroSection.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/__tests__/JourneyCard.test.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/__tests__/JourneyNextActionsPanel.test.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/__tests__/JourneyProgressBar.test.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/__tests__/JourneyTimeline.test.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/__tests__/JourneyWorkspace.test.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/__tests__/NFTIntegration.test.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/AgentActivityFeed.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/AgentHealthCommandCenter.tsx` — Composant React UI.
+- `journey-simulator/src/components/Journey/charts/RadarChart.tsx` — Composant React UI.
+- `journey-simulator/src/components/Journey/ConfettiBackground.tsx` — Composant React UI. Note: Confetti Background Component (Lazy Loaded) Separated for performance optimization / import { motion } from 'framer-motion'; export default 
+- `journey-simulator/src/components/Journey/effects/MasteryConfetti.tsx` — Composant React UI.
+- `journey-simulator/src/components/Journey/InvestorDemoMode.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
 - `journey-simulator/src/components/Journey/journey-simulator.code-workspace` — Composant React UI.
-- `journey-simulator/src/components/Journey/JourneyCard.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/JourneyDashboard.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/JourneyNextActionsPanel.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/JourneyOverviewHeader.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/JourneyProgressBar.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/JourneyTimeline.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/JourneyWorkspace.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/LaunchCollaterizePhase.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/PhaseDetails.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/PhaseInteractionBlock.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/PhaseSection.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/XPTracker.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/ZynoBox.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/ZynoChat.tsx` — Composant React UI.
-- `journey-simulator/src/components/Journey/ZynoSignalSidebar.tsx` — Composant React UI.
-- `journey-simulator/src/components/JourneyCompletedPage.tsx` — Composant React UI.
-- `journey-simulator/src/components/JourneysPage.tsx` — Composant React UI.
-- `journey-simulator/src/components/JourneysPreview.tsx` — Composant React UI.
-- `journey-simulator/src/components/layout/Footer.tsx` — Composant React UI.
-- `journey-simulator/src/components/layout/Header.tsx` — Composant React UI.
-- `journey-simulator/src/components/Layout/JourneyLayout.tsx` — Composant React UI.
-- `journey-simulator/src/components/layout/Layout.tsx` — Composant React UI.
-- `journey-simulator/src/components/layout/Main.tsx` — Composant React UI.
-- `journey-simulator/src/components/layout/Sidebar.tsx` — Composant React UI.
-- `journey-simulator/src/components/LoginPage.tsx` — Composant React UI.
-- `journey-simulator/src/components/MintCelebrationBanner.tsx` — Composant React UI.
-- `journey-simulator/src/components/navigation/MainNavigation.tsx` — Composant React UI.
-- `journey-simulator/src/components/navigation/UserMetricsPanel.tsx` — Composant React UI.
-- `journey-simulator/src/components/NFTMintingModal.tsx` — Composant React UI.
-- `journey-simulator/src/components/NFTMintingTutorial.tsx` — Composant React UI.
-- `journey-simulator/src/components/NFTProofModal.tsx` — Composant React UI.
-- `journey-simulator/src/components/onboarding/OnboardingFlow.tsx` — Composant React UI.
-- `journey-simulator/src/components/PlaygroundPage.tsx` — Composant React UI.
-- `journey-simulator/src/components/ProofCertificationsBoard.tsx` — Composant React UI.
-- `journey-simulator/src/components/ProtectedRoute.tsx` — Composant React UI.
-- `journey-simulator/src/components/RegisterPage.tsx` — Composant React UI.
-- `journey-simulator/src/components/ResetProgressButton.tsx` — Composant React UI.
-- `journey-simulator/src/components/Resources/ResourceHub.tsx` — Composant React UI.
-- `journey-simulator/src/components/shared/BackToTopButton.tsx` — Composant React UI.
-- `journey-simulator/src/components/shared/Button.tsx` — Composant React UI.
-- `journey-simulator/src/components/shared/ContextualTutorial.tsx` — Composant React UI.
-- `journey-simulator/src/components/shared/JourneyModal.tsx` — Composant React UI.
-- `journey-simulator/src/components/shared/LazyLoadList.tsx` — Composant React UI.
-- `journey-simulator/src/components/shared/MessageDisplay.tsx` — Composant React UI.
-- `journey-simulator/src/components/shared/Skeleton.tsx` — Composant React UI.
-- `journey-simulator/src/components/shared/WalletConnectionBanner.tsx` — Composant React UI.
-- `journey-simulator/src/components/shared/ZynoAssistant.tsx` — Composant React UI.
-- `journey-simulator/src/components/ShareModal.tsx` — Composant React UI.
-- `journey-simulator/src/components/SkillchainBanner.tsx` — Composant React UI.
-- `journey-simulator/src/components/SkillchainCard.css` — Composant React UI.
-- `journey-simulator/src/components/SkillchainCard.tsx` — Composant React UI.
-- `journey-simulator/src/components/StakingModal.tsx` — Composant React UI.
-- `journey-simulator/src/components/Support/SupportCenter.tsx` — Composant React UI.
-- `journey-simulator/src/components/UIBlocks/IndicatorBlock.tsx` — Renderer UI Blocks (LLM → UI).
-- `journey-simulator/src/components/UIBlocks/InteractiveTemplateBlock.tsx` — Renderer UI Blocks (LLM → UI).
-- `journey-simulator/src/components/UIBlocks/NarrativeChoiceBlock.tsx` — Renderer UI Blocks (LLM → UI).
-- `journey-simulator/src/components/UIBlocks/UIBlocksRenderer.tsx` — Renderer UI Blocks (LLM → UI).
-- `journey-simulator/src/components/wallet/LazyWalletMultiButton.tsx` — Composant React UI.
-- `journey-simulator/src/components/WalletButton.tsx` — Composant React UI.
-- `journey-simulator/src/components/WalletConnectionGuide.tsx` — Composant React UI.
-- `journey-simulator/src/components/WalletFaucetButton.tsx` — Composant React UI.
-- `journey-simulator/src/components/WalletStatusDisplay.tsx` — Composant React UI.
-- `journey-simulator/src/components/Zyno/__tests__/AgentFeedbackModal.test.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards).
-- `journey-simulator/src/components/Zyno/__tests__/ZynoConsole.test.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards).
-- `journey-simulator/src/components/Zyno/agent-card.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards).
-- `journey-simulator/src/components/Zyno/AgentFeedbackForm.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards).
-- `journey-simulator/src/components/Zyno/AgentFeedbackModal.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards).
-- `journey-simulator/src/components/Zyno/AgentLogViewer.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards).
-- `journey-simulator/src/components/Zyno/AgentScoreboardContext.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards).
-- `journey-simulator/src/components/Zyno/DashboardZyno.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards).
-- `journey-simulator/src/components/Zyno/MissionFeedbackSummary.stories.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards).
-- `journey-simulator/src/components/Zyno/MissionFeedbackSummary.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards).
-- `journey-simulator/src/components/Zyno/ResourceUploader.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards).
-- `journey-simulator/src/components/Zyno/types.ts` — Console Zyno (orchestration, logs, RAG admin, dashboards).
-- `journey-simulator/src/components/Zyno/ZynoAgentScoreboard.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards).
-- `journey-simulator/src/components/Zyno/ZynoChatSidebar.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards).
-- `journey-simulator/src/components/Zyno/ZynoConsole.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards).
-- `journey-simulator/src/components/Zyno/ZynoDAOAdminPanel.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards).
-- `journey-simulator/src/components/Zyno/ZynoDecisionPanel.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards).
-- `journey-simulator/src/components/Zyno/ZynoMissionFlow.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards).
-- `journey-simulator/src/config/journeyPhases.ts` — Fichier du monorepo (voir chemin).
-- `journey-simulator/src/content/aepoAeco.ts` — Fichier du monorepo (voir chemin).
-- `journey-simulator/src/contexts/__tests__/WalletContext.test.tsx` — Context React (auth, wallet, tutoriel, layout).
-- `journey-simulator/src/contexts/AuthContext.tsx` — Context React (auth, wallet, tutoriel, layout).
-- `journey-simulator/src/contexts/TutorialContext.tsx` — Context React (auth, wallet, tutoriel, layout).
-- `journey-simulator/src/contexts/WalletContext.tsx` — Context React (auth, wallet, tutoriel, layout).
-- `journey-simulator/src/contexts/WorkspaceLayoutContext.tsx` — Context React (auth, wallet, tutoriel, layout).
-- `journey-simulator/src/hooks/useArtifacts.ts` — Fichier du monorepo (voir chemin).
-- `journey-simulator/src/hooks/useOptimizedLoading.ts` — Fichier du monorepo (voir chemin).
-- `journey-simulator/src/index.css` — Fichier du monorepo (voir chemin).
-- `journey-simulator/src/lib/solana-config.ts` — Fichier du monorepo (voir chemin). Note: Shared Solana Configuration Module Centralizes wallet configuration, RPC endpoints, and network settings Used by both journey-simulator (fro
-- `journey-simulator/src/lib/walletAuth.ts` — Fichier du monorepo (voir chemin).
-- `journey-simulator/src/main.tsx` — Entrypoint React + BrowserRouter + polyfills.
-- `journey-simulator/src/pages/Dao.tsx` — Page (route) React Router.
-- `journey-simulator/src/pages/Dashboard.tsx` — Page (route) React Router.
-- `journey-simulator/src/pages/DebugMint.tsx` — Page (route) React Router.
-- `journey-simulator/src/pages/FavoritesPage.tsx` — Page (route) React Router.
-- `journey-simulator/src/pages/GuidePage.tsx` — Page (route) React Router.
-- `journey-simulator/src/pages/HomePage.tsx` — Page (route) React Router.
-- `journey-simulator/src/pages/Journey.tsx` — Page (route) React Router.
-- `journey-simulator/src/pages/JourneyCompleted.tsx` — Page (route) React Router.
-- `journey-simulator/src/pages/Playground.tsx` — Page (route) React Router.
-- `journey-simulator/src/pages/Resources.tsx` — Page (route) React Router.
-- `journey-simulator/src/pages/Support.tsx` — Page (route) React Router.
-- `journey-simulator/src/pages/Zyno.tsx` — Page (route) React Router.
-- `journey-simulator/src/service-worker.js` — Fichier du monorepo (voir chemin). Note: src/service-worker.js - Service Worker for offline caching
-- `journey-simulator/src/store/__tests__/journeyStore.test.ts` — Store Zustand (state management). Note: src/store/**tests**/journeyStore.test.ts
-- `journey-simulator/src/store/__tests__/journeyStore.wallet.test.ts` — Store Zustand (state management).
-- `journey-simulator/src/store/favoritesStore.ts` — Store Zustand (state management).
-- `journey-simulator/src/store/journeyStore.ts` — Store Zustand (state management).
-- `journey-simulator/src/store/themeStore.ts` — Store Zustand (state management).
-- `journey-simulator/src/test-favorites-store.ts` — Fichier du monorepo (voir chemin). Note: Test simple pour vérifier que le store fonctionne
-- `journey-simulator/src/test/Journey.deep-linking.test.tsx` — Fichier du monorepo (voir chemin).
-- `journey-simulator/src/test/setup.ts` — Fichier du monorepo (voir chemin).
-- `journey-simulator/src/types/artifact.ts` — Types TypeScript (contrats UI/Domain).
-- `journey-simulator/src/types/journey.ts` — Types TypeScript (contrats UI/Domain).
-- `journey-simulator/src/types/personas.ts` — Types TypeScript (contrats UI/Domain).
-- `journey-simulator/src/types/uiBlocks.ts` — Types TypeScript (contrats UI/Domain).
-- `journey-simulator/src/utils/api.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: API base URL - configurable via environment variable for different deployments.
-- `journey-simulator/src/utils/blockchain.ts` — Utilitaire (API client, scores, export, blockchain, etc.).
-- `journey-simulator/src/utils/exportToPDF.ts` — Utilitaire (API client, scores, export, blockchain, etc.).
-- `journey-simulator/src/utils/journeySignals.ts` — Utilitaire (API client, scores, export, blockchain, etc.).
-- `journey-simulator/src/utils/particles.ts` — Utilitaire (API client, scores, export, blockchain, etc.).
-- `journey-simulator/src/utils/progress.ts` — Utilitaire (API client, scores, export, blockchain, etc.).
-- `journey-simulator/src/utils/sendToNotion.ts` — Utilitaire (API client, scores, export, blockchain, etc.).
-- `journey-simulator/src/vite-env.d.ts` — Fichier du monorepo (voir chemin). Note: / <reference types="vite/client" />
+- `journey-simulator/src/components/Journey/JourneyCard.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/JourneyDashboard.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/JourneyDemoMode.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/JourneyNextActionsPanel.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/JourneyOverviewHeader.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/JourneyProgressBar.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/JourneySimulationMode.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/JourneyTimeline.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/JourneyWorkspace.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/LaunchCollaterizePhase.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/LiveCommunicationThread.tsx` — Composant React UI.
+- `journey-simulator/src/components/Journey/LiveSolanaPulse.tsx` — Composant React UI.
+- `journey-simulator/src/components/Journey/MasteryGraduation.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA Mast
+- `journey-simulator/src/components/Journey/MintMission.tsx` — Composant React UI.
+- `journey-simulator/src/components/Journey/PhaseDetails.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/PhaseInteractionBlock.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/PhaseSection.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/XPTracker.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/ZynoBox.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/ZynoChat.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Journey/ZynoSignalSidebar.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/JourneyCompletedPage.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/JourneysPage.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/JourneysPreview.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/layout/Footer.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/layout/Header.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Layout/JourneyLayout.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/layout/Layout.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/layout/Main.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/layout/Sidebar.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/LoginPage.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/MarketLaunchpad.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/MentalModelMapper.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/MintCelebrationBanner.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Missions/MarketLaunchpad.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/navigation/MainNavigation.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/navigation/UserMetricsPanel.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/NFTMintingModal.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/NFTMintingTutorial.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/NFTProofModal.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/NodeAttestationSim.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/onboarding/OnboardingFlow.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/PlaygroundPage.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/ProofCertificationsBoard.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/ProtectedRoute.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/RegisterPage.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/ResetProgressButton.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Resources/ResourceHub.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Shared/AgentIconRegistry.tsx` — Composant React UI.
+- `journey-simulator/src/components/shared/BackToTopButton.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/shared/Button.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/shared/ContextualTutorial.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/shared/EmptyState.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/shared/InfoBadge.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/shared/JourneyModal.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/shared/LazyConfetti.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/shared/LazyLoadList.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/shared/MessageDisplay.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Shared/Odometer.tsx` — Composant React UI.
+- `journey-simulator/src/components/shared/Skeleton.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/shared/VaultSyncAnimation.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA Vaul
+- `journey-simulator/src/components/shared/WalletConnectionBanner.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/shared/ZynoAssistant.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/ShareModal.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/SkillchainBanner.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/SkillchainCard.css` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / .p
+- `journey-simulator/src/components/SkillchainCard.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/StakingModal.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Support/SupportCenter.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/UIBlocks/IndicatorBlock.tsx` — Renderer UI Blocks (LLM → UI). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/UIBlocks/InteractiveTemplateBlock.tsx` — Renderer UI Blocks (LLM → UI). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/UIBlocks/NarrativeChoiceBlock.tsx` — Renderer UI Blocks (LLM → UI). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/UIBlocks/UIBlocksRenderer.tsx` — Renderer UI Blocks (LLM → UI). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/wallet/LazyWalletMultiButton.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/WalletButton.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/WalletConnectionGuide.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/WalletFaucetButton.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/WalletStatusDisplay.tsx` — Composant React UI. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Zyno/__tests__/AgentFeedbackModal.test.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Zyno/__tests__/ZynoConsole.test.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Zyno/agent-card.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Zyno/AgentFeedbackForm.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Zyno/AgentFeedbackModal.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Zyno/AgentLogViewer.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Zyno/AgentScoreboardContext.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Zyno/DashboardZyno.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Zyno/LiveSolanaPulse.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA Live
+- `journey-simulator/src/components/Zyno/MissionFeedbackSummary.stories.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Zyno/MissionFeedbackSummary.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Zyno/ResourceUploader.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Zyno/types.ts` — Console Zyno (orchestration, logs, RAG admin, dashboards). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / ex
+- `journey-simulator/src/components/Zyno/ZynoAgentScoreboard.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Zyno/ZynoChatSidebar.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Zyno/ZynoConsole.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Zyno/ZynoDAOAdminPanel.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Zyno/ZynoDecisionPanel.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/components/Zyno/ZynoMissionFlow.tsx` — Console Zyno (orchestration, logs, RAG admin, dashboards). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/config/demoScenarios.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / ex
+- `journey-simulator/src/config/journeyPhases.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/content/aepoAeco.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / ex
+- `journey-simulator/src/contexts/__tests__/WalletContext.test.tsx` — Context React (auth, wallet, tutoriel, layout). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/contexts/AuthContext.tsx` — Context React (auth, wallet, tutoriel, layout). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/contexts/TutorialContext.tsx` — Context React (auth, wallet, tutoriel, layout). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/contexts/WalletContext.tsx` — Context React (auth, wallet, tutoriel, layout). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/contexts/WorkspaceLayoutContext.tsx` — Context React (auth, wallet, tutoriel, layout). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/hooks/useArtifacts.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/hooks/useDemoEngine.ts` — Fichier du monorepo (voir chemin). Note: useDemoEngine - Encapsulates the demo mode timing logic This hook manages the demo sequencer's heartbeat (tick loop). It ensures proper clea
+- `journey-simulator/src/hooks/useOptimizedLoading.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/hooks/usePhaseData.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/index.css` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / @i
+- `journey-simulator/src/lib/solana-config.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / Sh
+- `journey-simulator/src/lib/walletAuth.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/main.tsx` — Entrypoint React + BrowserRouter + polyfills. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / /*
+- `journey-simulator/src/pages/Dao.tsx` — Page (route) React Router. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/pages/Dashboard.tsx` — Page (route) React Router. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/pages/DebugMint.tsx` — Page (route) React Router. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/pages/FavoritesPage.tsx` — Page (route) React Router. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/pages/GuidePage.tsx` — Page (route) React Router. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/pages/HomePage.tsx` — Page (route) React Router. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/pages/Journey.tsx` — Page (route) React Router. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/pages/JourneyCompleted.tsx` — Page (route) React Router. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/pages/JourneyDemo.tsx` — Page (route) React Router. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/pages/Playground.tsx` — Page (route) React Router. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/pages/Resources.tsx` — Page (route) React Router. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/pages/Support.tsx` — Page (route) React Router. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/pages/Zyno.tsx` — Page (route) React Router. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/service-worker.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `journey-simulator/src/shims/empty.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `journey-simulator/src/store/__tests__/demoIntegrity.test.ts` — Store Zustand (state management). Note: Demo Scenario Integrity Test Suite Validates that all demo scenarios generate valid, non-empty sequences with properly structured UIBlocks t
+- `journey-simulator/src/store/__tests__/demoSequencer.comprehensive.test.ts` — Store Zustand (state management). Note: Comprehensive DemoSequencer Tests Tests all 6 personas and all phases for completeness and validity / import { describe, it, expect } from '
+- `journey-simulator/src/store/__tests__/demoSequencer.verify.test.ts` — Store Zustand (state management). Note: FORMAL VERIFICATION TEST - demoSequencer Business Rules QA Audit: Capital Foundry, Impact Engine, Collaterize / import { describe, it, expec
+- `journey-simulator/src/store/__tests__/journeyStore.comprehensive.test.ts` — Store Zustand (state management). Note: Comprehensive JourneyStore Tests Tests phase progression, state management, and demo functionality / import { describe, it, expect, beforeEa
+- `journey-simulator/src/store/__tests__/journeyStore.test.ts` — Store Zustand (state management). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `journey-simulator/src/store/__tests__/journeyStore.wallet.test.ts` — Store Zustand (state management). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/store/demoSequencer.ts` — Store Zustand (state management). Note: Project: Money Factory AI (MFAI) Module: Demo Sequencer V2 - Reconstruction Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOU
+- `journey-simulator/src/store/demoSequencer.ts.backup` — Store Zustand (state management). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Module: Context-Aware Demo Sequencer V3 Contributors: Alaeddine BEN RHOUMA,
+- `journey-simulator/src/store/favoritesStore.ts` — Store Zustand (state management). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/store/journeyStore.ts` — Store Zustand (state management). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/store/journeyStore.ts.backup` — Store Zustand (state management). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/store/themeStore.ts` — Store Zustand (state management). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/test/Journey.deep-linking.test.tsx` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/test/journey.e2e.test.tsx` — Fichier du monorepo (voir chemin). Note: End-to-End Journey Tests Tests complete user flows through persona journeys / import { describe, it, expect, beforeEach, vi } from 'vitest';
+- `journey-simulator/src/test/setup.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/types/artifact.ts` — Types TypeScript (contrats UI/Domain). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / ex
+- `journey-simulator/src/types/journey.ts` — Types TypeScript (contrats UI/Domain). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / ex
+- `journey-simulator/src/types/uiBlocks.ts` — Types TypeScript (contrats UI/Domain). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / ex
+- `journey-simulator/src/utils/__tests__/ignoreExtensionErrors.test.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/utils/__tests__/sanitizeHeaders.test.ts` — Utilitaire (API client, scores, export, blockchain, etc.).
+- `journey-simulator/src/utils/api-modules/auth.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Module: Authentication API Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / import 
+- `journey-simulator/src/utils/api-modules/base.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Module: API Base & Core Networking Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA /
+- `journey-simulator/src/utils/api-modules/demo.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `journey-simulator/src/utils/api-modules/journey.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Module: Journey & Agent API Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / Projec
+- `journey-simulator/src/utils/api-modules/offline-fallback.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Module: Offline Fallback Logic Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / typ
+- `journey-simulator/src/utils/api-modules/resources.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/utils/api-modules/web3.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `journey-simulator/src/utils/api.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/utils/apiDemoHandlers.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / De
+- `journey-simulator/src/utils/apiMiddleware.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / Mi
+- `journey-simulator/src/utils/blockchain.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/utils/demoSession.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/utils/exportToPDF.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / ex
+- `journey-simulator/src/utils/generateStableKey.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / Ge
+- `journey-simulator/src/utils/ignoreExtensionErrors.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `journey-simulator/src/utils/journeySignals.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/utils/logger.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / ty
+- `journey-simulator/src/utils/particles.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / de
+- `journey-simulator/src/utils/personaStyles.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / Sh
+- `journey-simulator/src/utils/progress.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / ex
+- `journey-simulator/src/utils/renderHighlightedText.tsx` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/src/utils/sanitizeHeaders.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Sanitize HTTP headers to prevent secret leakage in logs. Supports:  - Record<string, string | string[] | null | undefined>  - Web Headers (H
+- `journey-simulator/src/utils/sendToNotion.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / ex
+- `journey-simulator/src/utils/solanaWeb3.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / ty
+- `journey-simulator/src/utils/tokenStore.ts` — Utilitaire (API client, scores, export, blockchain, etc.). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / ty
+- `journey-simulator/src/vite-env.d.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
 
 </details>
 
 <details>
-<summary><strong>journey-simulator/tests (Playwright E2E)</strong> (22)</summary>
+<summary><strong>journey-simulator/tests (Playwright E2E)</strong> (60)</summary>
 
 - `journey-simulator/tests/e2e-report/index.html` — Tests Playwright (E2E).
-- `journey-simulator/tests/e2e/action-suggestions.spec.ts` — Tests Playwright (E2E).
-- `journey-simulator/tests/e2e/builder-journey.spec.ts` — Tests Playwright (E2E).
-- `journey-simulator/tests/e2e/dao-governance.spec.ts` — Tests Playwright (E2E).
-- `journey-simulator/tests/e2e/deep-linking.spec.ts` — Tests Playwright (E2E).
-- `journey-simulator/tests/e2e/demo-artifacts.spec.ts` — Tests Playwright (E2E).
-- `journey-simulator/tests/e2e/demo-mode.spec.ts` — Tests Playwright (E2E).
-- `journey-simulator/tests/e2e/full-journey.spec.ts` — Tests Playwright (E2E).
-- `journey-simulator/tests/e2e/growth-agent.spec.ts` — Tests Playwright (E2E).
-- `journey-simulator/tests/e2e/investor-demo-flow.spec.ts` — Tests Playwright (E2E).
-- `journey-simulator/tests/e2e/investor-demo.spec.ts` — Tests Playwright (E2E).
-- `journey-simulator/tests/e2e/journey-flow.spec.ts` — Tests Playwright (E2E).
-- `journey-simulator/tests/e2e/journey-navigation-workflow.spec.ts` — Tests Playwright (E2E).
-- `journey-simulator/tests/e2e/login-success.spec.ts` — Tests Playwright (E2E).
-- `journey-simulator/tests/e2e/login.spec.ts` — Tests Playwright (E2E).
-- `journey-simulator/tests/e2e/mint-debug.spec.ts` — Tests Playwright (E2E).
-- `journey-simulator/tests/e2e/resource-validation.spec.ts` — Tests Playwright (E2E).
-- `journey-simulator/tests/e2e/submit-mission.spec.ts` — Tests Playwright (E2E).
-- `journey-simulator/tests/e2e/utils/journeyMocks.ts` — Tests Playwright (E2E).
-- `journey-simulator/tests/e2e/utils/pageStability.ts` — Tests Playwright (E2E).
-- `journey-simulator/tests/e2e/ux-enhancement.spec.ts` — Tests Playwright (E2E).
-- `journey-simulator/tests/e2e/wallet-modal.spec.ts` — Tests Playwright (E2E).
+- `journey-simulator/tests/e2e/_support/fixtures.ts` — Tests Playwright (E2E).
+- `journey-simulator/tests/e2e/_support/route-tracker.ts` — Tests Playwright (E2E).
+- `journey-simulator/tests/e2e/00-preflight/runmode-guard-violation.spec.ts` — Tests Playwright (E2E). Note: Preuve C: Fail-Fast Guard Violation Test This test verifies that the E2E guard correctly crashes when: - __E2E_RUN_MODE_GUARD__ = 'real' (se
+- `journey-simulator/tests/e2e/01-navigation/comprehensive-menu.spec.ts` — Tests Playwright (E2E). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/tests/e2e/01-navigation/error-pages.spec.ts` — Tests Playwright (E2E). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/tests/e2e/01-navigation/header-navigation.spec.ts` — Tests Playwright (E2E). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/tests/e2e/01-navigation/mode-persistence.spec.ts` — Tests Playwright (E2E). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/tests/e2e/02-agent-core/phase-1-discovery.spec.ts` — Tests Playwright (E2E). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/tests/e2e/02-agent-core/phase-2-strategy.spec.ts` — Tests Playwright (E2E). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/tests/e2e/02-agent-core/zyno-interaction.spec.ts` — Tests Playwright (E2E). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/tests/e2e/02-visual-regression/console-guard.spec.ts` — Tests Playwright (E2E). Note: Phase 2 — UX/UI Desktop: Console Guard (Runtime Error Detection) Validates zero unhandled console.error and page errors / import { test, exp
+- `journey-simulator/tests/e2e/02-visual-regression/layout-trinity.spec.ts` — Tests Playwright (E2E). Note: Phase 2 — UX/UI Desktop: Trinity Layout Validation Validates Navigator, Zyno Pulse, and Central Stage layout invariants / import { test, exp
+- `journey-simulator/tests/e2e/02-visual-regression/screenshots-desktop.spec.ts` — Tests Playwright (E2E). Note: Phase 2 — UX/UI Desktop: Screenshots (Visual Proofs) Captures screenshots at key states with zero-secrets validation / import { test, expect
+- `journey-simulator/tests/e2e/03-agent-workflows/resource-production.spec.ts` — Tests Playwright (E2E). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/tests/e2e/03-user-workflows/journey-completion.spec.ts` — Tests Playwright (E2E). Note: Phase 3 — Journey Completion Test Validates journey completion state and rewards / import { test, expect } from '../fixtures/realModeTest'; 
+- `journey-simulator/tests/e2e/03-user-workflows/persona-onboarding.spec.ts` — Tests Playwright (E2E). Note: Phase 3 — Persona Onboarding Test Validates each persona can onboard and access journey workspace / import { test, expect } from '../fixture
+- `journey-simulator/tests/e2e/03-user-workflows/phase-progression.spec.ts` — Tests Playwright (E2E). Note: Phase 3 — Phase Progression Test Validates journey phase transitions and state persistence / import { test, expect } from '../fixtures/realM
+- `journey-simulator/tests/e2e/03-user-workflows/rbac-enforcement.spec.ts` — Tests Playwright (E2E). Note: Phase 3 — RBAC Enforcement Test Validates UI and API access control for unauthorized actions / import { test, expect } from '../fixtures/rea
+- `journey-simulator/tests/e2e/03-user-workflows/resource-unlock.spec.ts` — Tests Playwright (E2E). Note: Phase 3 — Resource Unlock Test Validates resources are locked before and unlocked after phase completion / import { test, expect } from '@pl
+- `journey-simulator/tests/e2e/03-web3-simulation/dao-voting.spec.ts` — Tests Playwright (E2E). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/tests/e2e/03-web3-simulation/nft-minting.spec.ts` — Tests Playwright (E2E). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/tests/e2e/04-agents/resource-production.spec.ts` — Tests Playwright (E2E). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / Sp
+- `journey-simulator/tests/e2e/04-agents/zyno-persistence.spec.ts` — Tests Playwright (E2E). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/tests/e2e/04-dashboard-intel/resource-rendering.spec.ts` — Tests Playwright (E2E). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/tests/e2e/04-dashboard-intel/zyno-chat-scroll.spec.ts` — Tests Playwright (E2E). Note: Phase 2 — UX/UI Desktop: Zyno Chat Scroll & Pagination Validates chat functionality, scroll behavior, and history persistence Language: Engl
+- `journey-simulator/tests/e2e/04-data-validation/rag-upload.spec.ts` — Tests Playwright (E2E).
+- `journey-simulator/tests/e2e/04-data-validation/request-smoke.spec.ts` — Tests Playwright (E2E). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/tests/e2e/05-agents-orchestration/agent-contracts.spec.ts` — Tests Playwright (E2E). Note: Phase 4 — Agent Contracts Test Validates each agent's I/O contract compliance / import { test, expect } from '../fixtures/realModeTest'; imp
+- `journey-simulator/tests/e2e/05-agents-orchestration/agent-sweep.spec.ts` — Tests Playwright (E2E). Note: Phase 4 — Exhaustive Agent Sweep Invokes ALL 45+ agents from inventory / import { test, expect } from '../fixtures/realModeTest'; import { m
+- `journey-simulator/tests/e2e/05-agents-orchestration/features-validation.spec.ts` — Tests Playwright (E2E).
+- `journey-simulator/tests/e2e/05-agents-orchestration/intent-routing.spec.ts` — Tests Playwright (E2E). Note: Phase 4 — Intent Routing Test (FIXED - Tier 1) Validates orchestrator routes explicit intents to expected agents Uses correct intent format 
+- `journey-simulator/tests/e2e/05-agents-orchestration/multi-user-isolation.spec.ts` — Tests Playwright (E2E). Note: Phase 4 — Multi-User Isolation Test (FIXED) Validates user data isolation in orchestration Uses distinct auth states for userA and userB / i
+- `journey-simulator/tests/e2e/05-agents-orchestration/orchestrator-resilience.spec.ts` — Tests Playwright (E2E). Note: Phase 4 — Orchestrator Resilience Test Validates orchestrator handles edge cases without silent crashes / import { test, expect } from '../f
+- `journey-simulator/tests/e2e/05-agents-orchestration/rag-llm-proof.spec.ts` — Tests Playwright (E2E). Note: Phase 4 — RAG + LLM Deep Proof Captures verifiable evidence of retrieval and generative execution / import { test, expect } from '../fixture
+- `journey-simulator/tests/e2e/05-agents-orchestration/veteran-flow.spec.ts` — Tests Playwright (E2E).
+- `journey-simulator/tests/e2e/06-web3-persistence.spec.ts` — Tests Playwright (E2E).
+- `journey-simulator/tests/e2e/0X-web3-simulation-only/connect-only.spec.ts` — Tests Playwright (E2E).
+- `journey-simulator/tests/e2e/99-english-compliance/ui-runtime.spec.ts` — Tests Playwright (E2E).
+- `journey-simulator/tests/e2e/99-gauntlet/gauntlet.spec.ts` — Tests Playwright (E2E).
+- `journey-simulator/tests/e2e/debug_crash.spec.ts` — Tests Playwright (E2E).
+- `journey-simulator/tests/e2e/debug-demo-flow.spec.ts` — Tests Playwright (E2E).
+- `journey-simulator/tests/e2e/demo-interactive-integrity.spec.ts` — Tests Playwright (E2E).
+- `journey-simulator/tests/e2e/final-demo-verification.spec.ts` — Tests Playwright (E2E).
+- `journey-simulator/tests/e2e/fixtures/realModeTest.ts` — Tests Playwright (E2E). Note: Shared Playwright test fixture enforcing real-mode executions and unified auth. Ensures all tests run with the storage state produced by glo
+- `journey-simulator/tests/e2e/fixtures/test-data.ts` — Tests Playwright (E2E). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / Te
+- `journey-simulator/tests/e2e/helpers/authStates.ts` — Tests Playwright (E2E). Note: Phase 4 — Auth States Helper Creates distinct auth states for multi-user isolation testing / import * as path from 'path'; import * as fs fr
+- `journey-simulator/tests/e2e/helpers/console-guard.ts` — Tests Playwright (E2E). Note: Console guard helper for Phase 2 UX/UI tests Captures and validates console errors and page errors at runtime / import type { Page, ConsoleM
+- `journey-simulator/tests/e2e/helpers/hardening.ts` — Tests Playwright (E2E).
+- `journey-simulator/tests/e2e/helpers/layout.ts` — Tests Playwright (E2E). Note: Layout validation helpers for Phase 2 UX/UI tests Provides utilities for checking dimensions, overlap, and viewport constraints / export int
+- `journey-simulator/tests/e2e/helpers/progression.ts` — Tests Playwright (E2E). Note: Phase 3 — Progression Helper Exports sanitized progression data without secrets / import { Page } from '../_support/fixtures'; import * as f
+- `journey-simulator/tests/e2e/helpers/rbac.ts` — Tests Playwright (E2E). Note: Phase 3 — RBAC Helper Validates UI and API access control enforcement / import { Page, expect, APIRequestContext } from '../_support/fixture
+- `journey-simulator/tests/e2e/helpers/timeline.ts` — Tests Playwright (E2E). Note: Phase 4 — Timeline Helper Generates sanitized timeline evidence for agent orchestration / import * as fs from 'fs'; import * as path from 'p
+- `journey-simulator/tests/e2e/helpers/ui-security.ts` — Tests Playwright (E2E). Note: UI security helper for Phase 2 UX/UI tests Validates that no tokens/secrets are rendered in the UI Complements zero-secrets policy for scree
+- `journey-simulator/tests/e2e/interaction-gate.spec.ts` — Tests Playwright (E2E).
+- `journey-simulator/tests/e2e/README.md` — Tests Playwright (E2E).
+- `journey-simulator/tests/e2e/utils/journeyMocks.ts` — Tests Playwright (E2E). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/tests/e2e/utils/navigation-helpers.ts` — Tests Playwright (E2E). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/tests/e2e/utils/pageStability.ts` — Tests Playwright (E2E). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/tests/e2e/utils/uiActions.ts` — Tests Playwright (E2E). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
 
 </details>
 
 <details>
-<summary><strong>journey-simulator/docs (docs)</strong> (33)</summary>
+<summary><strong>journey-simulator/docs (docs)</strong> (36)</summary>
 
 - `journey-simulator/docs/agents/prompts/compliance.md` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/agents/prompts/data.md` — Documentation (diagrammes, schémas, specs).
@@ -1345,8 +1908,7 @@ Commande: `node journey-simulator/scripts/generate-file-index.mjs`
 - `journey-simulator/docs/agents/prompts/orchestrator_zyno.md` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/agents/prompts/simulation.md` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/blockchain_integration_plan.md` — Documentation (diagrammes, schémas, specs).
-- `journey-simulator/docs/cahier_charges_parcours_react.md` — Documentation (diagrammes, schémas, specs).
-- `journey-simulator/docs/cahier_charges.md` — Documentation (diagrammes, schémas, specs).
+- `journey-simulator/docs/BUG_FIXES_2026-01-20.md` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/community_voice_to_synaptic_strategy.md` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/Content_Maker_to_Cognitive_Publisher.md` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/contenu_parcours.md` — Documentation (diagrammes, schémas, specs).
@@ -1355,17 +1917,21 @@ Commande: `node journey-simulator/scripts/generate-file-index.mjs`
 - `journey-simulator/docs/diagrams/seq_mint.mmd` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/diagrams/seq_simulation.mmd` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/From_Project_Manager_to_Mission_Commander.md` — Documentation (diagrammes, schémas, specs).
+- `journey-simulator/docs/JOURNEY_COMPLETION_REPORT.md` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/mfai_mvp_spec_english_final.pdf` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/openapi/journey-simulator.yaml` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/project_documentation.md` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/protocol_paper_en.md` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/protocol_paper_en.pdf` — Documentation (diagrammes, schémas, specs).
+- `journey-simulator/docs/RECONSTRUCTION_REPORT.md` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/schemas/Event.schema.json` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/schemas/Journey.schema.json` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/schemas/JourneyStepResponse.schema.json` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/schemas/SimulationRun.schema.json` — Documentation (diagrammes, schémas, specs).
+- `journey-simulator/docs/security_headers.md` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/solana/idl/journey_simulator.json` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/system_blueprint.md` — Documentation (diagrammes, schémas, specs).
+- `journey-simulator/docs/TESTING_REPORT_FINAL.md` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/ui-ux/checklist.md` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/ui-ux/components.md` — Documentation (diagrammes, schémas, specs).
 - `journey-simulator/docs/ui-ux/guide.md` — Documentation (diagrammes, schémas, specs).
@@ -1375,8 +1941,17 @@ Commande: `node journey-simulator/scripts/generate-file-index.mjs`
 </details>
 
 <details>
-<summary><strong>journey-simulator/public (assets)</strong> (84)</summary>
+<summary><strong>journey-simulator/public (assets)</strong> (92)</summary>
 
+- `journey-simulator/public/assets/badges/cognitive_master.png` — Assets statiques servis par Vite/Nginx.
+- `journey-simulator/public/assets/badges/identity_artifact.png` — Assets statiques servis par Vite/Nginx.
+- `journey-simulator/public/assets/badges/phase_1.png` — Assets statiques servis par Vite/Nginx.
+- `journey-simulator/public/assets/badges/phase_2.png` — Assets statiques servis par Vite/Nginx.
+- `journey-simulator/public/assets/badges/phase_3.png` — Assets statiques servis par Vite/Nginx.
+- `journey-simulator/public/assets/badges/phase_4.png` — Assets statiques servis par Vite/Nginx.
+- `journey-simulator/public/assets/badges/phase_5.png` — Assets statiques servis par Vite/Nginx.
+- `journey-simulator/public/assets/badges/phase_6.png` — Assets statiques servis par Vite/Nginx.
+- `journey-simulator/public/assets/badges/veteran_master.png` — Assets statiques servis par Vite/Nginx.
 - `journey-simulator/public/documents/dao-launch-starter-kit.html` — Assets statiques servis par Vite/Nginx.
 - `journey-simulator/public/documents/mfai-protocol-whitepaper-en.html` — Assets statiques servis par Vite/Nginx.
 - `journey-simulator/public/documents/mfai-system-blueprint.html` — Assets statiques servis par Vite/Nginx.
@@ -1385,7 +1960,6 @@ Commande: `node journey-simulator/scripts/generate-file-index.mjs`
 - `journey-simulator/public/documents/rag-ingestion-playbook.html` — Assets statiques servis par Vite/Nginx.
 - `journey-simulator/public/documents/token-strategy-sprint-template.html` — Assets statiques servis par Vite/Nginx.
 - `journey-simulator/public/documents/web2-to-web3-activation-guide.html` — Assets statiques servis par Vite/Nginx.
-- `journey-simulator/public/favicon.ico` — Assets statiques servis par Vite/Nginx.
 - `journey-simulator/public/generated/business_model.html` — Assets statiques servis par Vite/Nginx.
 - `journey-simulator/public/generated/investor_memo.html` — Assets statiques servis par Vite/Nginx.
 - `journey-simulator/public/generated/litepaper_sim.html` — Assets statiques servis par Vite/Nginx.
@@ -1453,180 +2027,113 @@ Commande: `node journey-simulator/scripts/generate-file-index.mjs`
 - `journey-simulator/public/knowledge-vault/mfai-protocol-whitepaper-en.pdf` — Assets statiques servis par Vite/Nginx.
 - `journey-simulator/public/knowledge-vault/mfai-system-blueprint.pdf` — Assets statiques servis par Vite/Nginx.
 - `journey-simulator/public/knowledge-vault/mission-feedback-loops.pdf` — Assets statiques servis par Vite/Nginx.
-- `journey-simulator/public/knowledge-vault/pitch-deck-narrative-framework.pptx` — Assets statiques servis par Vite/Nginx.
 - `journey-simulator/public/knowledge-vault/rag-ingestion-playbook.pdf` — Assets statiques servis par Vite/Nginx.
-- `journey-simulator/public/knowledge-vault/token-strategy-sprint-template.zip` — Assets statiques servis par Vite/Nginx.
 - `journey-simulator/public/knowledge-vault/web2-to-web3-activation-guide.pdf` — Assets statiques servis par Vite/Nginx.
 - `journey-simulator/public/manifest.json` — Assets statiques servis par Vite/Nginx.
+- `journey-simulator/public/neural_swarm.html` — Assets statiques servis par Vite/Nginx.
 - `journey-simulator/public/playground/index.html` — Assets statiques servis par Vite/Nginx.
-- `journey-simulator/public/polyfills-init.js` — Assets statiques servis par Vite/Nginx. Note: Critical polyfills that MUST load before any other code
-- `journey-simulator/public/sw.js` — Assets statiques servis par Vite/Nginx. Note: Service Worker désactivé pour les tests
+- `journey-simulator/public/polyfills-init.js` — Assets statiques servis par Vite/Nginx. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `journey-simulator/public/sw.js` — Assets statiques servis par Vite/Nginx. Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `journey-simulator/public/vendor/README.md` — Assets statiques servis par Vite/Nginx.
 
 </details>
 
 <details>
-<summary><strong>mf-back/routes (Express routes)</strong> (17)</summary>
+<summary><strong>mf-back/routes (Express routes)</strong> (0)</summary>
 
-- `mf-back/routes/agent-routes.js` — Routes Express (endpoints HTTP).
-- `mf-back/routes/analytics-routes.js` — Routes Express (endpoints HTTP).
-- `mf-back/routes/auth-routes.js` — Routes Express (endpoints HTTP).
-- `mf-back/routes/cours-routes.js` — Routes Express (endpoints HTTP).
-- `mf-back/routes/dao-routes.js` — Routes Express (endpoints HTTP).
-- `mf-back/routes/demo-routes.js` — Routes Express (endpoints HTTP).
-- `mf-back/routes/export-routes.js` — Routes Express (endpoints HTTP).
-- `mf-back/routes/favorites.js` — Routes Express (endpoints HTTP).
-- `mf-back/routes/feedback.js` — Routes Express (endpoints HTTP).
-- `mf-back/routes/health-routes.js` — Routes Express (endpoints HTTP).
-- `mf-back/routes/index.js` — Routes Express (endpoints HTTP).
-- `mf-back/routes/journey-routes.js` — Routes Express (endpoints HTTP).
-- `mf-back/routes/journeyLaunchRoutes.js` — Routes Express (endpoints HTTP).
-- `mf-back/routes/rag-routes.js` — Routes Express (endpoints HTTP).
-- `mf-back/routes/solana-routes.js` — Routes Express (endpoints HTTP).
-- `mf-back/routes/user-routes.js` — Routes Express (endpoints HTTP).
-- `mf-back/routes/zyno-routes.js` — Routes Express (endpoints HTTP).
 
 </details>
 
 <details>
-<summary><strong>mf-back/controllers (business logic)</strong> (8)</summary>
+<summary><strong>mf-back/controllers (business logic)</strong> (0)</summary>
 
-- `mf-back/controllers/agent-run-controller.js` — Controllers (logique métier des endpoints).
-- `mf-back/controllers/analytics-controller.js` — Controllers (logique métier des endpoints).
-- `mf-back/controllers/cours-controller.js` — Controllers (logique métier des endpoints).
-- `mf-back/controllers/dao-controller.js` — Controllers (logique métier des endpoints).
-- `mf-back/controllers/demo-controller.js` — Controllers (logique métier des endpoints).
-- `mf-back/controllers/journey-controller.js` — Controllers (logique métier des endpoints). Note: Stub for demo mode route to fix test errors
-- `mf-back/controllers/journey-metrics-controller.js` — Controllers (logique métier des endpoints).
-- `mf-back/controllers/user-controller.js` — Controllers (logique métier des endpoints).
 
 </details>
 
 <details>
-<summary><strong>mf-back/models (Mongo schemas)</strong> (9)</summary>
+<summary><strong>mf-back/models (Mongo schemas)</strong> (0)</summary>
 
-- `mf-back/models/agent-run.js` — Models MongoDB (Mongoose schemas).
-- `mf-back/models/agentFeedbackLog.js` — Models MongoDB (Mongoose schemas). Note: 📦 agentFeedbackLog.js — Mongoose model to log agent executions
-- `mf-back/models/cours.js` — Models MongoDB (Mongoose schemas).
-- `mf-back/models/DaoProposal.js` — Models MongoDB (Mongoose schemas).
-- `mf-back/models/FavoriteResource.js` — Models MongoDB (Mongoose schemas).
-- `mf-back/models/Journeys.js` — Models MongoDB (Mongoose schemas).
-- `mf-back/models/MissionSubmission.js` — Models MongoDB (Mongoose schemas).
-- `mf-back/models/user.js` — Models MongoDB (Mongoose schemas).
-- `mf-back/models/userCoursProgress.js` — Models MongoDB (Mongoose schemas).
 
 </details>
 
 <details>
-<summary><strong>mf-back/services (services)</strong> (3)</summary>
+<summary><strong>mf-back/services (services)</strong> (0)</summary>
 
-- `mf-back/services/collaterizeSimService.js` — Services (state, métriques, simulation).
-- `mf-back/services/journey-metrics-service.js` — Services (state, métriques, simulation).
-- `mf-back/services/journey-state-service.js` — Services (state, métriques, simulation).
 
 </details>
 
 <details>
-<summary><strong>mf-back/orchestration (Zyno orchestration)</strong> (3)</summary>
+<summary><strong>mf-back/orchestration (Zyno orchestration)</strong> (0)</summary>
 
-- `mf-back/orchestration/agentsRegistry.js` — Orchestration Zyno (intent → agents → timeline).
-- `mf-back/orchestration/journey-tasks.json` — Orchestration Zyno (intent → agents → timeline).
-- `mf-back/orchestration/zynoOrchestrator.js` — Orchestration Zyno (intent → agents → timeline). Note: 🔁 Zyno Orchestrator (full logic)
 
 </details>
 
 <details>
-<summary><strong>mf-back/agents (agents catalog)</strong> (28)</summary>
+<summary><strong>mf-back/agents (agents catalog)</strong> (0)</summary>
 
-- `mf-back/agents/agent_template.js` — Agent IA (spécialisé). Note: 📄 agents/AgentTemplate.js
-- `mf-back/agents/AgentFactory.js` — Agent IA (spécialisé).
-- `mf-back/agents/AuditAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/BaseAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/BuilderAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/CoachAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/CommunityAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/DAOAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/DesignAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/DevAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/EducationAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/GovernanceAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/GrowthAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/GuideAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/InvestorAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/LaunchpadAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/NFTAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/OnboardingAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/PitchAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/ProductAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/ProtocolAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/ReflectionAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/SecurityAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/telemetryUtils.js` — Agent IA (spécialisé).
-- `mf-back/agents/TokenAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/TokenomicsAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/Web3LegalAgent.js` — Agent IA (spécialisé).
-- `mf-back/agents/ZynoAgent.js` — Agent IA (spécialisé).
 
 </details>
 
 <details>
-<summary><strong>mf-back/rag (RAG clients)</strong> (2)</summary>
+<summary><strong>mf-back/rag (RAG clients)</strong> (0)</summary>
 
-- `mf-back/rag/rag_client.js` — Client RAG (search/ingest + fallback). Note: 📄 rag/ragClient.js
-- `mf-back/rag/ragClient.js` — Client RAG (search/ingest + fallback). Note: 📄 rag/ragClient.js
 
 </details>
 
 <details>
-<summary><strong>mf-back/middleware (middlewares)</strong> (2)</summary>
+<summary><strong>mf-back/middleware (middlewares)</strong> (0)</summary>
 
-- `mf-back/middleware/auth.js` — Middleware (auth, feature flags).
-- `mf-back/middleware/featureFlags.js` — Middleware (auth, feature flags). Note: Feature flag middleware for gradual feature rollout
 
 </details>
 
 <details>
-<summary><strong>mf-back/llm (LLM integration)</strong> (2)</summary>
+<summary><strong>mf-back/llm (LLM integration)</strong> (0)</summary>
 
-- `mf-back/llm/callGpt5.js` — Intégration LLM (OpenAI/GPT-5, etc.).
-- `mf-back/llm/openaiClient.js` — Intégration LLM (OpenAI/GPT-5, etc.).
 
 </details>
 
 <details>
-<summary><strong>mf-back/scripts (utility scripts)</strong> (3)</summary>
+<summary><strong>mf-back/scripts (utility scripts)</strong> (23)</summary>
 
-- `mf-back/scripts/check-rag-connection.js` — Scripts utilitaires backend (RAG, verify flow).
-- `mf-back/scripts/rag_upload.js` — Scripts utilitaires backend (RAG, verify flow).
-- `mf-back/scripts/verify-journey-flow.js` — Scripts utilitaires backend (RAG, verify flow).
+- `mf-back/scripts/agent_mapping_final.md` — Scripts utilitaires backend (RAG, verify flow).
+- `mf-back/scripts/audit-agents-config.js` — Scripts utilitaires backend (RAG, verify flow). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/scripts/check-rag-connection.js` — Scripts utilitaires backend (RAG, verify flow). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/scripts/clear-agent-cache.js` — Scripts utilitaires backend (RAG, verify flow).
+- `mf-back/scripts/memory-test-get.js` — Scripts utilitaires backend (RAG, verify flow). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / pr
+- `mf-back/scripts/memory-test-set.js` — Scripts utilitaires backend (RAG, verify flow). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / pr
+- `mf-back/scripts/phase5_agent_sweep_full.js` — Scripts utilitaires backend (RAG, verify flow).
+- `mf-back/scripts/phase5_agent_sweep_mini.js` — Scripts utilitaires backend (RAG, verify flow).
+- `mf-back/scripts/phase5_list_models.js` — Scripts utilitaires backend (RAG, verify flow).
+- `mf-back/scripts/phase5_llm_real.js` — Scripts utilitaires backend (RAG, verify flow).
+- `mf-back/scripts/phase5_observability_check.js` — Scripts utilitaires backend (RAG, verify flow).
+- `mf-back/scripts/prove-nft-agent.js` — Scripts utilitaires backend (RAG, verify flow). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / pr
+- `mf-back/scripts/rag_upload.js` — Scripts utilitaires backend (RAG, verify flow). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / #!
+- `mf-back/scripts/seed-test-user.js` — Scripts utilitaires backend (RAG, verify flow). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/scripts/stress-test-orchestrator.js` — Scripts utilitaires backend (RAG, verify flow). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/scripts/test-chain-of-truth.js` — Scripts utilitaires backend (RAG, verify flow). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / pr
+- `mf-back/scripts/test-conflict-growth.js` — Scripts utilitaires backend (RAG, verify flow). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / pr
+- `mf-back/scripts/test-e2e-pipeline.js` — Scripts utilitaires backend (RAG, verify flow). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / pr
+- `mf-back/scripts/test-tokenomics-validation.js` — Scripts utilitaires backend (RAG, verify flow). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / pr
+- `mf-back/scripts/test-zyno-transition.js` — Scripts utilitaires backend (RAG, verify flow). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / pr
+- `mf-back/scripts/verify-consumability.js` — Scripts utilitaires backend (RAG, verify flow). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / pr
+- `mf-back/scripts/verify-journey-flow.js` — Scripts utilitaires backend (RAG, verify flow). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/scripts/verify-tokenomics.js` — Scripts utilitaires backend (RAG, verify flow). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
 
 </details>
 
 <details>
-<summary><strong>mf-back/__tests__ (backend tests)</strong> (14)</summary>
+<summary><strong>mf-back/__tests__ (backend tests)</strong> (0)</summary>
 
-- `mf-back/__tests__/admin.rag.e2e.test.js` — Tests backend.
-- `mf-back/__tests__/agents.test.js` — Tests backend.
-- `mf-back/__tests__/demoMission.test.js` — Tests backend.
-- `mf-back/__tests__/fixtures/demo_mission.json` — Tests backend.
-- `mf-back/__tests__/journeyController.step.test.js` — Tests backend.
-- `mf-back/__tests__/parcoursTemplates.test.js` — Tests backend.
-- `mf-back/__tests__/ragClient.fallback.integration.test.js` — Tests backend.
-- `mf-back/__tests__/ragClient.remote.test.js` — Tests backend.
-- `mf-back/__tests__/ragClient.test.js` — Tests backend.
-- `mf-back/__tests__/routes.admin.test.js` — Tests backend.
-- `mf-back/__tests__/routes.dao.test.js` — Tests backend.
-- `mf-back/__tests__/routes.export.test.js` — Tests backend.
-- `mf-back/__tests__/routes.orchestration.test.js` — Tests backend.
-- `mf-back/__tests__/zynoOrchestrator.test.js` — Tests backend.
 
 </details>
 
 <details>
-<summary><strong>.github/workflows (CI/CD)</strong> (6)</summary>
+<summary><strong>.github/workflows (CI/CD)</strong> (7)</summary>
 
 - `.github/workflows/backend-tests.yml` — CI/CD (GitHub Actions).
 - `.github/workflows/ci.yml` — CI/CD (GitHub Actions).
 - `.github/workflows/e2e-nightly.yml` — CI/CD (GitHub Actions).
+- `.github/workflows/mcp-selftest.yml` — CI/CD (GitHub Actions).
 - `.github/workflows/release.yml` — CI/CD (GitHub Actions).
 - `.github/workflows/test-agents.yml` — CI/CD (GitHub Actions).
 - `.github/workflows/verify.yml` — CI/CD (GitHub Actions).
@@ -1634,31 +2141,152 @@ Commande: `node journey-simulator/scripts/generate-file-index.mjs`
 </details>
 
 <details>
-<summary><strong>scripts (monorepo scripts)</strong> (7)</summary>
+<summary><strong>scripts (monorepo scripts)</strong> (64)</summary>
 
+- `scripts/audit_compliance.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/audit_server.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/check-env-vars.js` — Scripts monorepo (verify, smoke, deploy). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / #!
+- `scripts/check-liveness.sh` — Scripts monorepo (verify, smoke, deploy).
 - `scripts/ci-verify.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/collaterize-handshake.js` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/compliance/check-compliance.js` — Scripts monorepo (verify, smoke, deploy). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / #!
+- `scripts/db-seed-demo.js` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/deep-audit.js` — Scripts monorepo (verify, smoke, deploy).
 - `scripts/deploy_docker.sh` — Scripts monorepo (verify, smoke, deploy).
 - `scripts/deploy_pm2.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/deploy_rc_v1.0.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/deploy.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/dump_project.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/extract_error.py` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/extract_mfai_audit.py` — Scripts monorepo (verify, smoke, deploy). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `scripts/fix-r1.js` — Scripts monorepo (verify, smoke, deploy).
 - `scripts/full_stack_smoke.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/generate_agent_inventory.js` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/generate_full_mfai_audit.py` — Scripts monorepo (verify, smoke, deploy). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `scripts/generate_matrix.js` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/generate_tree.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/generate-protocol-paper.js` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/launch-sovereign.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/local-clean.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/local-restart-prod.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/local-verify.sh` — Scripts monorepo (verify, smoke, deploy).
 - `scripts/mcp-selftest.mjs` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/mfai_full_audit_orchestrator.py` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/mfai_integrity_check.py` — Scripts monorepo (verify, smoke, deploy). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `scripts/orchestration-diagnose.js` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/performance-check.js` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/pre-flight-check.sh` — Scripts monorepo (verify, smoke, deploy).
 - `scripts/prod-local-down.sh` — Scripts monorepo (verify, smoke, deploy).
 - `scripts/prod-local-up.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/proof_lead10_r01.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/proof_lead11.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/qa-runner.js` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/rag-contract-test.js` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/release/go-live.js` — Scripts monorepo (verify, smoke, deploy). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / #!
+- `scripts/release/preflight.js` — Scripts monorepo (verify, smoke, deploy). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / #!
+- `scripts/release/rollback.js` — Scripts monorepo (verify, smoke, deploy). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / #!
+- `scripts/release/smoke-e2e.js` — Scripts monorepo (verify, smoke, deploy). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / #!
+- `scripts/release/smoke.js` — Scripts monorepo (verify, smoke, deploy). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / #!
+- `scripts/relentless-precision-scan.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/repro_orchestration_real.js` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/repro-orchestration.js` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/rseries-check.js` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/run-3-matrix-telemetry.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/run-mfai-flow.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/run-with-backend-telemetry.js` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/runs-memory-audit.js` — Scripts monorepo (verify, smoke, deploy). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `scripts/s0_smoke_server.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/sign_project.py` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/smoke-test-final.js` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/sovereign-snapshot.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/sovereign-up.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/start_stack.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/test_import.js` — Scripts monorepo (verify, smoke, deploy). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `scripts/testing/simulate-chaos.js` — Scripts monorepo (verify, smoke, deploy). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / #!
+- `scripts/testing/simulate-load.js` — Scripts monorepo (verify, smoke, deploy). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / #!
+- `scripts/verify-production.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/verify-server-env.sh` — Scripts monorepo (verify, smoke, deploy).
+- `scripts/write-integrity-check.js` — Scripts monorepo (verify, smoke, deploy).
 
 </details>
 
 <details>
-<summary><strong>Autres fichiers (root / infra / configs)</strong> (412)</summary>
+<summary><strong>Autres fichiers (root / infra / configs)</strong> (696)</summary>
 
+- `.agent/memory/agent_memory.json` — Fichier du monorepo (voir chemin).
+- `.agent/rules/architect.glob.md` — Fichier du monorepo (voir chemin).
+- `.agent/rules/compliance.sentinel.md` — Fichier du monorepo (voir chemin).
+- `.agent/rules/context-optimization.global.md` — Fichier du monorepo (voir chemin).
+- `.agent/rules/defi.glob.md` — Fichier du monorepo (voir chemin).
+- `.agent/rules/model-hybrid.strategy.md` — Fichier du monorepo (voir chemin).
+- `.agent/rules/observability.log-sleuth.md` — Fichier du monorepo (voir chemin).
+- `.agent/rules/security.glob.md` — Fichier du monorepo (voir chemin).
+- `.agent/rules/self-healing.global.md` — Fichier du monorepo (voir chemin).
+- `.agent/rules/sovereign-audit.global.md` — Fichier du monorepo (voir chemin).
+- `.agent/rules/swarm-orchestration.manager.md` — Fichier du monorepo (voir chemin).
+- `.agent/rules/visual-validation.glassmorphism.md` — Fichier du monorepo (voir chemin).
+- `.agent/skills/creative-studio/SKILL.md` — Fichier du monorepo (voir chemin).
+- `.agent/skills/defi-expert/SKILL.md` — Fichier du monorepo (voir chemin).
+- `.agent/skills/depin-builder/SKILL.md` — Fichier du monorepo (voir chemin).
+- `.agent/skills/impact-governance/SKILL.md` — Fichier du monorepo (voir chemin).
+- `.agent/skills/security-sentinel/SKILL.md` — Fichier du monorepo (voir chemin).
+- `.agent/skills/solana-architect/SKILL.md` — Fichier du monorepo (voir chemin).
+- `.agent/workflows/clean-slate.md` — Fichier du monorepo (voir chemin).
+- `.agent/workflows/debug-agent.md` — Fichier du monorepo (voir chemin).
+- `.agent/workflows/generate-protocol-paper.md` — Fichier du monorepo (voir chemin).
+- `.agent/workflows/seed-sovereign.md` — Fichier du monorepo (voir chemin).
+- `.agent/workflows/ship-it.md` — Fichier du monorepo (voir chemin).
+- `.agent/workflows/sovereign-status.md` — Fichier du monorepo (voir chemin).
 - `.agent/workflows/verify_demo_mode.md` — Fichier du monorepo (voir chemin).
-- `.deploy.env` — Fichier du monorepo (voir chemin).
+- `.agent/workflows/verify-compliance.md` — Fichier du monorepo (voir chemin).
+- `.antigravity/rules/compliance.sentinel.global.md` — Fichier du monorepo (voir chemin).
+- `.antigravity/rules/dependency-shield.global.md` — Fichier du monorepo (voir chemin).
+- `.antigravity/rules/security-vault.global.md` — Fichier du monorepo (voir chemin).
+- `.antigravity/skills/Log-Sleuth/SKILL.md` — Fichier du monorepo (voir chemin).
+- `.antigravity/skills/Persistence-Guard/SKILL.md` — Fichier du monorepo (voir chemin).
+- `.antigravity/skills/sovereign-maintenance/SKILL.md` — Fichier du monorepo (voir chemin).
+- `.antigravity/skills/Web3-Solana-Sentinel/SKILL.md` — Fichier du monorepo (voir chemin).
+- `.antigravity/skills/Zyno-Architect/SKILL.md` — Fichier du monorepo (voir chemin).
+- `.antigravity/workflows/Audit-Commander.md` — Fichier du monorepo (voir chemin).
+- `.antigravity/workflows/Persona-Switch.md` — Fichier du monorepo (voir chemin).
+- `.antigravity/workflows/Testing-Pyramid.md` — Fichier du monorepo (voir chemin).
+- `.antigravity/workflows/UX-Optimizer.md` — Fichier du monorepo (voir chemin).
+- `.antigravity/workspace-context.json` — Fichier du monorepo (voir chemin).
+- `.context/AUDIT.md` — Fichier du monorepo (voir chemin).
+- `.context/MANUAL.md` — Fichier du monorepo (voir chemin).
+- `.context/PROTOCOL_PAPER_V1.md` — Fichier du monorepo (voir chemin).
+- `.context/README.md` — Fichier du monorepo (voir chemin).
+- `.context/UI_GUIDELINES.md` — Fichier du monorepo (voir chemin).
+- `.context/VIBE_PROTOCOLS.md` — Fichier du monorepo (voir chemin).
+- `.deploy.env.bak_20260103_015403` — Fichier du monorepo (voir chemin).
 - `.deploy.env.example` — Fichier du monorepo (voir chemin).
+- `.env` — Fichier du monorepo (voir chemin).
 - `.eslintignore` — Fichier du monorepo (voir chemin).
+- `.github/copilot-instructions.md` — Fichier du monorepo (voir chemin).
 - `.github/dependabot.yml` — Fichier du monorepo (voir chemin).
 - `.github/ISSUE_TEMPLATE.md` — Fichier du monorepo (voir chemin).
 - `.github/pull_request_template.md` — Fichier du monorepo (voir chemin).
 - `.github/PULL_REQUEST_TEMPLATE.md` — Fichier du monorepo (voir chemin).
 - `.gitignore` — Fichier du monorepo (voir chemin).
 - `.hintrc` — Fichier du monorepo (voir chemin).
+- `.husky/_/.gitignore` — Fichier du monorepo (voir chemin).
+- `.husky/_/applypatch-msg` — Fichier du monorepo (voir chemin).
+- `.husky/_/commit-msg` — Fichier du monorepo (voir chemin).
+- `.husky/_/h` — Fichier du monorepo (voir chemin).
+- `.husky/_/husky.sh` — Fichier du monorepo (voir chemin).
+- `.husky/_/post-applypatch` — Fichier du monorepo (voir chemin).
+- `.husky/_/post-checkout` — Fichier du monorepo (voir chemin).
+- `.husky/_/post-commit` — Fichier du monorepo (voir chemin).
+- `.husky/_/post-merge` — Fichier du monorepo (voir chemin).
+- `.husky/_/post-rewrite` — Fichier du monorepo (voir chemin).
+- `.husky/_/pre-applypatch` — Fichier du monorepo (voir chemin).
+- `.husky/_/pre-auto-gc` — Fichier du monorepo (voir chemin).
+- `.husky/_/pre-commit` — Fichier du monorepo (voir chemin).
+- `.husky/_/pre-merge-commit` — Fichier du monorepo (voir chemin).
+- `.husky/_/pre-push` — Fichier du monorepo (voir chemin).
+- `.husky/_/pre-rebase` — Fichier du monorepo (voir chemin).
+- `.husky/_/prepare-commit-msg` — Fichier du monorepo (voir chemin).
+- `.husky/pre-commit` — Fichier du monorepo (voir chemin).
 - `.secrets-backup/.env` — Fichier du monorepo (voir chemin).
 - `.secrets-backup/.env.example` — Fichier du monorepo (voir chemin).
 - `.secrets-backup/.env.local` — Fichier du monorepo (voir chemin).
@@ -1670,352 +2298,623 @@ Commande: `node journey-simulator/scripts/generate-file-index.mjs`
 - `.serena/memories/react-peer-warning.md` — Fichier du monorepo (voir chemin).
 - `.serena/project.yml` — Fichier du monorepo (voir chemin).
 - `.vscode/settings.json` — Fichier du monorepo (voir chemin).
-- `audit_compliance.sh` — Fichier du monorepo (voir chemin).
-- `audit.md` — Fichier du monorepo (voir chemin).
-- `cahier_charges_agents.md` — Fichier du monorepo (voir chemin).
-- `cahier_charges_demo_artefacts.md` — Fichier du monorepo (voir chemin).
-- `cahier_charges_high_fidelity_simulation.md` — Fichier du monorepo (voir chemin).
-- `cahier_charges_ressources_html.md` — Fichier du monorepo (voir chemin).
+- `.vscode/tasks.json` — Fichier du monorepo (voir chemin).
+- `arborescence.txt` — Fichier du monorepo (voir chemin).
 - `CHANGELOG.md` — Fichier du monorepo (voir chemin).
-- `checklist.md` — Fichier du monorepo (voir chemin).
-- `contributing.md` — Fichier du monorepo (voir chemin).
 - `CONTRIBUTING.md` — Fichier du monorepo (voir chemin).
-- `DEPLOY_SERVER.md` — Fichier du monorepo (voir chemin).
-- `DEPLOY.md` — Fichier du monorepo (voir chemin).
-- `deploy.sh` — Fichier du monorepo (voir chemin).
-- `DEPLOYMENT_INSTRUCTIONS.md` — Fichier du monorepo (voir chemin).
-- `docker_output.log` — Fichier du monorepo (voir chemin).
+- `DEMO_QUICKSTART.md` — Fichier du monorepo (voir chemin).
+- `docker-compose.audit.yml` — Docker Compose (dev/prod).
 - `docker-compose.deploy.yml` — Docker Compose (dev/prod).
+- `docker-compose.override.yml` — Docker Compose (dev/prod).
 - `docker-compose.prod.yml` — Docker Compose (dev/prod).
 - `docker-compose.yml` — Docker Compose (dev/prod).
+- `docs/_source_of_truth/README.md` — Fichier du monorepo (voir chemin).
+- `docs/_source_of_truth/RUNTIME_REALITY.md` — Fichier du monorepo (voir chemin).
+- `docs/_source_of_truth/S0_SMOKE_RUNBOOK.md` — Fichier du monorepo (voir chemin).
+- `docs/00_HOME.md` — Fichier du monorepo (voir chemin).
 - `docs/acceptance/checklist.md` — Fichier du monorepo (voir chemin).
 - `docs/acceptance/validation_plan.md` — Fichier du monorepo (voir chemin).
 - `docs/AGENT_RUNS.md` — Fichier du monorepo (voir chemin).
+- `docs/agents/AGENT_COVERAGE.md` — Fichier du monorepo (voir chemin).
+- `docs/agents/PLANS_ACTIONS.md` — Fichier du monorepo (voir chemin).
+- `docs/ANALYSIS_S2.1.md` — Fichier du monorepo (voir chemin).
 - `docs/API_CONTRACT_MF_BACK.md` — Fichier du monorepo (voir chemin).
 - `docs/ARCHITECTURE_DATA.md` — Fichier du monorepo (voir chemin).
+- `docs/ARCHITECTURE_DIAGRAMS.md` — Fichier du monorepo (voir chemin).
 - `docs/architecture_multi_agents.md` — Fichier du monorepo (voir chemin).
 - `docs/ARCHITECTURE.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/audit.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/cahier_charges_agents.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/cahier_charges_demo_artefacts.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/cahier_charges_high_fidelity_simulation.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/cahier_charges_ressources_html.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/CERTIFICATION.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/checklist.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/COMPREHENSIVE_SONAR_AUDIT.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/contributing.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/DEPLOY_SERVER.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/DEPLOY.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/DEPLOYMENT_INSTRUCTIONS.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/FINAL_COMPLETE_AUDIT.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/FINAL_MASTERY_REPORT.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/FULL_AUDIT_REPORT.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/FULL_STACK_ALIGNMENT_REPORT.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/GUIDE_PLATFORM.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/Intégration Realms pour la DAO.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/MVP_STATUS.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/PROJECT_KNOWLEDGE_BASE.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/README.qa.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/RELEASE_CANDIDATE_V1.0.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/RELEASE_SUMMARY.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/RESUME_REVUE_FINALE.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/REVUE_CODE_AUDIT.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/task.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/TEST_PLAN.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/TODO_CLEANUP.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/WORKFLOW_MATRIX.md` — Fichier du monorepo (voir chemin).
+- `docs/archive/ZERO_DEFECT_DEPLOYMENT_REPORT.md` — Fichier du monorepo (voir chemin).
 - `docs/audit/archive/AMELIORATIONS_APPLIQUEES.md` — Fichier du monorepo (voir chemin).
 - `docs/audit/archive/audit_11_12_25.md` — Fichier du monorepo (voir chemin).
 - `docs/audit/archive/SYNTHESE_AUDIT_CORRECTIONS.md` — Fichier du monorepo (voir chemin).
 - `docs/audit/archive/VERIFICATION_FINALE_AUDIT.md` — Fichier du monorepo (voir chemin).
+- `docs/audit/AUDIT_FINDINGS.md` — Fichier du monorepo (voir chemin).
 - `docs/audit/audit_report.md` — Fichier du monorepo (voir chemin).
+- `docs/audit/AUDITOR_STATEMENT.md` — Fichier du monorepo (voir chemin).
+- `docs/audit/EVIDENCE_MAP.md` — Fichier du monorepo (voir chemin).
+- `docs/audit/ISO_DORA_EVIDENCE.md` — Fichier du monorepo (voir chemin).
+- `docs/audit/PRE_AUDIT_ISO27001_DORA.md` — Fichier du monorepo (voir chemin).
+- `docs/audit/SOC2_SIMULATED_AUDIT.md` — Fichier du monorepo (voir chemin).
 - `docs/AUTH_FLOWS.md` — Fichier du monorepo (voir chemin).
 - `docs/cicd/pipeline.md` — Fichier du monorepo (voir chemin).
 - `docs/cicd/rollback.md` — Fichier du monorepo (voir chemin).
+- `docs/CONTRIBUTEURS.md` — Fichier du monorepo (voir chemin).
+- `docs/dataroom/INDEX.md` — Fichier du monorepo (voir chemin).
+- `docs/dataroom/INVESTOR_SUMMARY.md` — Fichier du monorepo (voir chemin).
 - `docs/demo_script.md` — Fichier du monorepo (voir chemin).
 - `docs/demo/fallbacks.md` — Fichier du monorepo (voir chemin).
 - `docs/demo/script.md` — Fichier du monorepo (voir chemin).
 - `docs/DEPENDENCIES_JOURNEY_SIMULATOR.md` — Fichier du monorepo (voir chemin).
+- `docs/GOLDEN_PATH_DEMO.md` — Fichier du monorepo (voir chemin).
 - `docs/HEALTHCHECK.md` — Fichier du monorepo (voir chemin).
 - `docs/idl/solana_devnet_flow.md` — Fichier du monorepo (voir chemin).
 - `docs/INVESTOR_DEMO_FLOW.md` — Fichier du monorepo (voir chemin).
 - `docs/journey_mfai_back_front.code-workspace` — Fichier du monorepo (voir chemin).
 - `docs/JOURNEY_STATE_MACHINE.md` — Fichier du monorepo (voir chemin).
+- `docs/journeys/JOURNEY_AGENT_MAP.md` — Fichier du monorepo (voir chemin).
+- `docs/legal/INVESTOR_TECH_LEGAL_APPENDIX.md` — Fichier du monorepo (voir chemin).
+- `docs/legal/SAAS_CONTRACT_APPENDIX.md` — Fichier du monorepo (voir chemin).
+- `docs/MAINTENANCE.md` — Fichier du monorepo (voir chemin).
 - `docs/MCP_RUNBOOK_FR.md` — Fichier du monorepo (voir chemin).
 - `docs/MCP_SETUP_FR.md` — Fichier du monorepo (voir chemin).
 - `docs/MOBILE_WALLET_TESTING.md` — Fichier du monorepo (voir chemin).
 - `docs/MONOREPO_DX.md` — Fichier du monorepo (voir chemin).
 - `docs/next_steps_ui_rework.md` — Fichier du monorepo (voir chemin).
+- `docs/observability/grafana/GRAFANA_DASHBOARD.json` — Fichier du monorepo (voir chemin).
+- `docs/observability/grafana/README.md` — Fichier du monorepo (voir chemin).
+- `docs/observability/METRICS_MODEL.md` — Fichier du monorepo (voir chemin).
 - `docs/observability/metrics.md` — Fichier du monorepo (voir chemin).
 - `docs/onboarding/quickstart.md` — Fichier du monorepo (voir chemin).
 - `docs/openapi/journey-simulator.yaml` — Fichier du monorepo (voir chemin).
 - `docs/openapi/mf-back.openapi.yaml` — Fichier du monorepo (voir chemin).
 - `docs/openapi/preview.html` — Fichier du monorepo (voir chemin).
+- `docs/ops/DEPLOY_HARDENING.md` — Fichier du monorepo (voir chemin).
+- `docs/ops/ENV_VARIABLES_CHECKLIST.md` — Fichier du monorepo (voir chemin).
+- `docs/ops/FINAL_RELEASE_REPORT.md` — Fichier du monorepo (voir chemin).
+- `docs/ops/GO_LIVE_CHECKLIST.md` — Fichier du monorepo (voir chemin).
+- `docs/ops/INCIDENT_MATRIX.md` — Fichier du monorepo (voir chemin).
+- `docs/ops/RUNBOOK_PROD.md` — Fichier du monorepo (voir chemin).
 - `docs/PLATFORM_DEEP_DIVE_FR.md` — Fichier du monorepo (voir chemin).
 - `docs/process/DoR_DoD.md` — Fichier du monorepo (voir chemin).
 - `docs/product/cahier_TOC.md` — Fichier du monorepo (voir chemin).
 - `docs/product/vision_mvp_personas_stories.md` — Fichier du monorepo (voir chemin).
 - `docs/prompts/evaluator.md` — Fichier du monorepo (voir chemin).
 - `docs/prompts/zyno.md` — Fichier du monorepo (voir chemin).
+- `docs/QUALITY_EVIDENCE.md` — Fichier du monorepo (voir chemin).
+- `docs/releases/CHANGELOG.md` — Fichier du monorepo (voir chemin).
+- `docs/releases/RELEASE_CHECKLIST.md` — Fichier du monorepo (voir chemin).
+- `docs/releases/RELEASE_v1.0.md` — Fichier du monorepo (voir chemin).
 - `docs/risk_register.md` — Fichier du monorepo (voir chemin).
 - `docs/roadmap/vNext.md` — Fichier du monorepo (voir chemin).
+- `docs/S2.2_DELIVERY.md` — Fichier du monorepo (voir chemin).
+- `docs/S2.3_DELIVERY.md` — Fichier du monorepo (voir chemin).
+- `docs/S2.4_DELIVERY.md` — Fichier du monorepo (voir chemin).
 - `docs/schemas/README.md` — Fichier du monorepo (voir chemin).
 - `docs/SECURITY.md` — Fichier du monorepo (voir chemin).
+- `docs/security/CHECKLISTS_SECURITY.md` — Fichier du monorepo (voir chemin).
 - `docs/security/compliance_check.md` — Fichier du monorepo (voir chemin).
+- `docs/security/COMPLIANCE_TRACEABILITY.md` — Fichier du monorepo (voir chemin).
 - `docs/security/hardening.md` — Fichier du monorepo (voir chemin).
+- `docs/security/LEGAL_COMPLIANCE_CHECKLIST.md` — Fichier du monorepo (voir chemin).
 - `docs/solana_spec.md` — Fichier du monorepo (voir chemin).
 - `docs/system_blueprint.md` — Fichier du monorepo (voir chemin).
+- `docs/testing/CHAOS_PLAN.md` — Fichier du monorepo (voir chemin).
+- `docs/testing/LOAD_TEST_PLAN.md` — Fichier du monorepo (voir chemin).
+- `docs/testing/RESILIENCE_REPORT.md` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/CAHIER_CHARGES_UI_UX.md` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/diagrams/ab_toasts.mmd` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/diagrams/erreur_rollback.mmd` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/diagrams/escalade_alertes.mmd` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/diagrams/exports/ab_toasts.png` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/diagrams/exports/erreur_rollback.png` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/diagrams/exports/escalade_alertes.png` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/diagrams/exports/flux_principal.png` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/diagrams/exports/hierarchie_composants.png` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/diagrams/exports/persona_journey_blocks.png` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/diagrams/exports/slo_alertes.png` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/diagrams/exports/ui_trinity.png` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/diagrams/exports/web3_flow.png` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/diagrams/flux_principal.mmd` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/diagrams/hierarchie_composants.mmd` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/diagrams/persona_journey_blocks.mmd` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/diagrams/slo_alertes.mmd` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/diagrams/ui_trinity.mmd` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/diagrams/web3_flow.mmd` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/MERMAIDCHART_GUIDE.md` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/README.md` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/UI_UX_AUDIT_REPORT_V2.md` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/UI_UX_COMPONENT_LIBRARY.md` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/UI_UX_DESIGN_GUIDE.md` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/UI_UX_DIAGRAMS.md` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/UI_UX_INDEX.md` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/UI_UX_QUICK_START.md` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/UI_UX_TECHNICAL_REFERENCE.md` — Fichier du monorepo (voir chemin).
+- `docs/ui-ux/UI_UX_USER_FLOWS.md` — Fichier du monorepo (voir chemin).
 - `docs/WEB3_INTEGRATION.md` — Fichier du monorepo (voir chemin).
 - `docs/zyno_interaction_improvement.md` — Fichier du monorepo (voir chemin).
 - `ecosystem.config.cjs` — Fichier du monorepo (voir chemin).
-- `FETCH_HEAD` — Fichier du monorepo (voir chemin).
-- `GUIDE_PLATFORM.md` — Fichier du monorepo (voir chemin).
+- `env.example` — Fichier du monorepo (voir chemin).
 - `journey-simulator/.dockerignore` — Fichier du monorepo (voir chemin).
+- `journey-simulator/.env.local` — Fichier du monorepo (voir chemin).
 - `journey-simulator/.eslintignore` — Fichier du monorepo (voir chemin).
 - `journey-simulator/.eslintrc.cjs` — Fichier du monorepo (voir chemin).
 - `journey-simulator/.github/workflows/ci.yml` — Fichier du monorepo (voir chemin).
 - `journey-simulator/.github/workflows/release.yml` — Fichier du monorepo (voir chemin).
 - `journey-simulator/.gitignore` — Fichier du monorepo (voir chemin).
-- `journey-simulator/.storybook/main.ts` — Fichier du monorepo (voir chemin).
-- `journey-simulator/.storybook/preview.ts` — Fichier du monorepo (voir chemin).
+- `journey-simulator/.storybook/main.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/.storybook/preview.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
 - `journey-simulator/.vscode/settings.json` — Fichier du monorepo (voir chemin).
-- `journey-simulator/cahier_charges_amelioration_front.md` — Fichier du monorepo (voir chemin).
-- `journey-simulator/cypress.config.js` — Fichier du monorepo (voir chemin).
-- `journey-simulator/cypress/e2e/navigation.cy.js` — Tests Cypress (optionnel/legacy).
-- `journey-simulator/cypress/support/commands.js` — Tests Cypress (optionnel/legacy).
-- `journey-simulator/cypress/support/index.js` — Tests Cypress (optionnel/legacy).
-- `journey-simulator/debug_page.html` — Fichier du monorepo (voir chemin).
+- `journey-simulator/.vscode/tasks.json` — Fichier du monorepo (voir chemin).
+- `journey-simulator/components.json` — Fichier du monorepo (voir chemin).
+- `journey-simulator/cypress.config.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `journey-simulator/cypress/e2e/navigation.cy.js` — Tests Cypress (optionnel/legacy). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / de
+- `journey-simulator/cypress/support/commands.js` — Tests Cypress (optionnel/legacy). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / Cy
+- `journey-simulator/cypress/support/index.js` — Tests Cypress (optionnel/legacy). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
 - `journey-simulator/Dockerfile` — Dockerfile (build image).
 - `journey-simulator/env.example` — Fichier du monorepo (voir chemin).
-- `journey-simulator/frontend.log` — Fichier du monorepo (voir chemin).
 - `journey-simulator/FROZEN_README.md` — Fichier du monorepo (voir chemin).
+- `journey-simulator/global-setup.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
 - `journey-simulator/index.html` — Fichier du monorepo (voir chemin).
 - `journey-simulator/integration_guide_journey.md` — Fichier du monorepo (voir chemin).
 - `journey-simulator/LICENSE` — Fichier du monorepo (voir chemin).
 - `journey-simulator/nginx.conf` — Fichier du monorepo (voir chemin).
 - `journey-simulator/package-lock.json` — Fichier du monorepo (voir chemin).
 - `journey-simulator/package.json` — Fichier du monorepo (voir chemin).
-- `journey-simulator/playwright.config.ts` — Fichier du monorepo (voir chemin).
-- `journey-simulator/playwright.prod.config.ts` — Fichier du monorepo (voir chemin).
-- `journey-simulator/postcss.config.js` — Fichier du monorepo (voir chemin).
+- `journey-simulator/playwright.config.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/playwright.prod.config.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/postcss.config.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / ex
 - `journey-simulator/README.md` — Fichier du monorepo (voir chemin).
+- `journey-simulator/scripts/generate-agents-registry.mjs` — Fichier du monorepo (voir chemin).
 - `journey-simulator/scripts/generate-api-surface.mjs` — Fichier du monorepo (voir chemin).
 - `journey-simulator/scripts/generate-file-index.mjs` — Fichier du monorepo (voir chemin).
 - `journey-simulator/scripts/generate-phases-table.mjs` — Fichier du monorepo (voir chemin).
+- `journey-simulator/scripts/generate-steps-by-journey.mjs` — Fichier du monorepo (voir chemin).
+- `journey-simulator/scripts/simulate-demo-flow.ts` — Fichier du monorepo (voir chemin).
+- `journey-simulator/scripts/smoke-test.sh` — Fichier du monorepo (voir chemin).
 - `journey-simulator/scripts/update-readme-autogen.mjs` — Fichier du monorepo (voir chemin).
-- `journey-simulator/server.log` — Fichier du monorepo (voir chemin).
-- `journey-simulator/tailwind.config.js` — Fichier du monorepo (voir chemin).
+- `journey-simulator/tailwind.config.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
 - `journey-simulator/todo_refonte_frontend_zyno.md` — Fichier du monorepo (voir chemin).
+- `journey-simulator/tsconfig.e2e.json` — Fichier du monorepo (voir chemin).
 - `journey-simulator/tsconfig.json` — Fichier du monorepo (voir chemin).
 - `journey-simulator/tsconfig.node.json` — Fichier du monorepo (voir chemin).
-- `journey-simulator/vite.config.ts` — Fichier du monorepo (voir chemin).
-- `journey-simulator/vitest.config.ts` — Fichier du monorepo (voir chemin).
+- `journey-simulator/vite.config.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `journey-simulator/vite.config.ts.timestamp-1768940033633-5982f8f31a674.mjs` — Fichier du monorepo (voir chemin). Note: vite.config.ts
+- `journey-simulator/vitest.config.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
 - `LICENSE` — Fichier du monorepo (voir chemin).
 - `Makefile` — Fichier du monorepo (voir chemin).
 - `mcp.json` — Fichier du monorepo (voir chemin).
+- `mf-back/__fixtures__/golden/composite_intent.json` — Fichier du monorepo (voir chemin).
+- `mf-back/__fixtures__/golden/cost_block.json` — Fichier du monorepo (voir chemin).
+- `mf-back/__fixtures__/golden/demo_mode.json` — Fichier du monorepo (voir chemin).
+- `mf-back/__fixtures__/golden/preset_audit_dao.json` — Fichier du monorepo (voir chemin).
+- `mf-back/__fixtures__/golden/quota_warn.json` — Fichier du monorepo (voir chemin).
+- `mf-back/__fixtures__/golden/simple_intent.json` — Fichier du monorepo (voir chemin).
+- `mf-back/__fixtures__/golden/web3_block.json` — Fichier du monorepo (voir chemin).
 - `mf-back/.dockerignore` — Fichier du monorepo (voir chemin).
+- `mf-back/.env` — Fichier du monorepo (voir chemin).
+- `mf-back/.env.production` — Fichier du monorepo (voir chemin).
 - `mf-back/.gitignore` — Fichier du monorepo (voir chemin).
-- `mf-back/app.js` — Entrypoint Express: middlewares + routes + probes + Mongo.
-- `mf-back/backend_3002.log` — Fichier du monorepo (voir chemin).
-- `mf-back/backend.log` — Fichier du monorepo (voir chemin).
-- `mf-back/bin/www` — Fichier du monorepo (voir chemin).
-- `mf-back/config/dao-config.js` — Fichier du monorepo (voir chemin). Note: DAO Configuration for Journey Simulator
-- `mf-back/config/env.js` — Fichier du monorepo (voir chemin).
-- `mf-back/debug_agent_logs.js` — Fichier du monorepo (voir chemin).
-- `mf-back/debug_gpt5.js` — Fichier du monorepo (voir chemin).
 - `mf-back/docker-entrypoint.sh` — Fichier du monorepo (voir chemin).
 - `mf-back/Dockerfile` — Dockerfile (build image).
 - `mf-back/docs/backend-architecture.md` — Fichier du monorepo (voir chemin).
+- `mf-back/docs/knowledge_base/solana_fees.md` — Fichier du monorepo (voir chemin).
+- `mf-back/env.development.example` — Fichier du monorepo (voir chemin).
 - `mf-back/env.example` — Fichier du monorepo (voir chemin).
 - `mf-back/env.production.example` — Fichier du monorepo (voir chemin).
 - `mf-back/FROZEN_README.md` — Fichier du monorepo (voir chemin).
-- `mf-back/logs/agent_feedback.json` — Fichier du monorepo (voir chemin).
-- `mf-back/memory/agent_memory.js` — Fichier du monorepo (voir chemin). Note: Persistent Agent Memory System with basic file persistence
-- `mf-back/memory/agent_memory.json` — Fichier du monorepo (voir chemin).
-- `mf-back/memory/agent_metrics.js` — Fichier du monorepo (voir chemin). Note: memory/agent_metrics.js
-- `mf-back/memory/agent_metrics.log.json` — Fichier du monorepo (voir chemin).
-- `mf-back/metrics/computeAEPO.js` — Fichier du monorepo (voir chemin).
+- `mf-back/jest.config.cjs` — Fichier du monorepo (voir chemin).
 - `mf-back/nodemon.json` — Fichier du monorepo (voir chemin).
 - `mf-back/package-lock.json` — Fichier du monorepo (voir chemin).
 - `mf-back/package.json` — Fichier du monorepo (voir chemin).
-- `mf-back/public/stylesheets/style.css` — Fichier du monorepo (voir chemin).
+- `mf-back/prisma/schema.prisma` — Fichier du monorepo (voir chemin). Note: schema.prisma - MFAI Unified PostgreSQL Schema
 - `mf-back/README.md` — Fichier du monorepo (voir chemin).
-- `mf-back/run_agent.js` — Fichier du monorepo (voir chemin).
-- `mf-back/server_demo_fix.log` — Fichier du monorepo (voir chemin).
-- `mf-back/server_final_v2.log` — Fichier du monorepo (voir chemin).
-- `mf-back/server_final.log` — Fichier du monorepo (voir chemin).
-- `mf-back/server_fixed_2.log` — Fichier du monorepo (voir chemin).
-- `mf-back/server_fixed.log` — Fichier du monorepo (voir chemin).
-- `mf-back/server.js` — Bootstrap serveur (runtime).
-- `mf-back/server.log` — Fichier du monorepo (voir chemin).
-- `mf-back/server.pid` — Fichier du monorepo (voir chemin).
-- `mf-back/test_openai_structure.js` — Fichier du monorepo (voir chemin).
+- `mf-back/src/__tests__/demoRoutes.test.js` — Fichier du monorepo (voir chemin).
+- `mf-back/src/agents/agent_template.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `mf-back/src/agents/agentContract.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / Ag
+- `mf-back/src/agents/AgentFactory.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/agentUtils.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / fu
+- `mf-back/src/agents/AnalyticsAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/APIContractAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / cl
+- `mf-back/src/agents/ArchitectAgent.ts` — Fichier du monorepo (voir chemin). Note: ArchitectAgent - Technical Architecture Specialist Project: Money Factory AI (MFAI) / import BaseAgent from './BaseAgent'; interface AgentCo
+- `mf-back/src/agents/AuditAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/BaseAgent.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) BaseAgent - TypeScript/Prisma Version Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISS
+- `mf-back/src/agents/BuilderAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/CFOAgent.ts` — Fichier du monorepo (voir chemin). Note: CFOAgent - Financial Strategy & Tokenomics Specialist Project: Money Factory AI (MFAI) / import BaseAgent from './BaseAgent'; interface Agen
+- `mf-back/src/agents/CoachAgent.js` — Fichier du monorepo (voir chemin).
+- `mf-back/src/agents/CommunityAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/ComplianceAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/CurriculumAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/DAOAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/DataIntegrityAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / cl
+- `mf-back/src/agents/DeFiAgent.js` — Fichier du monorepo (voir chemin).
+- `mf-back/src/agents/DesignAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/DevAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/DevOpsAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / cl
+- `mf-back/src/agents/EducationAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/EngineerAgent.ts` — Fichier du monorepo (voir chemin). Note: EngineerAgent - Smart Contract & Backend Engineering Specialist Project: Money Factory AI (MFAI) / import BaseAgent from './BaseAgent'; inte
+- `mf-back/src/agents/EvaluationAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / cl
+- `mf-back/src/agents/extended/registry-extra.js` — Fichier du monorepo (voir chemin).
+- `mf-back/src/agents/GovernanceAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/GovernanceDAOAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/GrowthAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/GuideAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/HubAgent.js` — Fichier du monorepo (voir chemin).
+- `mf-back/src/agents/InvestorAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/InvestorDemoAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/JourneyDesignAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / cl
+- `mf-back/src/agents/LaunchpadAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/MarketplaceAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/MintingAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/NFTAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/ObservabilityAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / cl
+- `mf-back/src/agents/OnboardingAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/PerformanceAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / cl
+- `mf-back/src/agents/PitchAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/ProductAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/ProductSpecAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/prompts.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/ProtocolAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/QAPlaywrightAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/RAGOpsAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / cl
+- `mf-back/src/agents/ReflectionAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/registry.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/RiskFraudAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/SecurityAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/SecurityAuditAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/SolanaAnchorAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/telemetryUtils.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / 'u
+- `mf-back/src/agents/TokenAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/TokenomicsAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/UXWritingAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/WalletAuthAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/Web3LegalAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/agents/ZynoAgent.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/app.ts` — Fichier du monorepo (voir chemin). Note: MFAI Backend - Main Application Entry Point TypeScript/Prisma Professional Architecture / import express, { Application, Request, Response, 
+- `mf-back/src/config/database.ts` — Fichier du monorepo (voir chemin). Note: Prisma Client Singleton Single source of truth for database access / import { PrismaClient } from '@prisma/client'; declare global { var pri
+- `mf-back/src/constants/project_schemas.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/controllers/agent.controller.ts` — Fichier du monorepo (voir chemin). Note: Agent Controller - Express routes for agent interactions Replaces Mongoose-based logic with Prisma/PostgreSQL / import { Request, Response }
+- `mf-back/src/controllers/auth.controller.ts` — Fichier du monorepo (voir chemin). Note: Auth Controller - TypeScript/Prisma / import { Request, Response } from 'express'; import jwt from 'jsonwebtoken'; import { prisma } from '.
+- `mf-back/src/controllers/health.controller.ts` — Fichier du monorepo (voir chemin). Note: Health Controller - TypeScript/Prisma / import { Request, Response } from 'express'; import { prisma } from '../config/database'; export con
+- `mf-back/src/controllers/user.controller.ts` — Fichier du monorepo (voir chemin). Note: User Controller - TypeScript/Prisma / import { Request, Response } from 'express'; import jwt from 'jsonwebtoken'; import crypto from 'crypt
+- `mf-back/src/llm/OpenAIClient.ts` — Fichier du monorepo (voir chemin). Note: OpenAI Client - TypeScript/Production Ready with Fallback Mode Project: Money Factory AI (MFAI) / import OpenAI from 'openai'; // Types expo
+- `mf-back/src/metrics/computeAEPO.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / fu
+- `mf-back/src/middleware/auth.ts` — Fichier du monorepo (voir chemin). Note: Authentication Middleware / import { Request, Response, NextFunction } from 'express'; import jwt from 'jsonwebtoken'; import { prisma } fro
+- `mf-back/src/middleware/errorHandler.ts` — Fichier du monorepo (voir chemin). Note: Global Error Handler Middleware Handles Prisma errors and other exceptions / import { Request, Response, NextFunction } from 'express'; impo
+- `mf-back/src/orchestration/actionToolMapper.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/agentProtocol.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/agentsRegistry.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / mo
+- `mf-back/src/orchestration/alertingEngine.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/artifactStore.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/auditTrailStore.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/circuitBreaker.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/concurrencyManager.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/costModel.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/degradationPolicy.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/executionEngine.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / Dr
+- `mf-back/src/orchestration/executionGate.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/idempotencyStore.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/intentRouter.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/journey-tasks.json` — Fichier du monorepo (voir chemin).
+- `mf-back/src/orchestration/killSwitch.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/llmCache.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/llmClient.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/memoryStore.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / In
+- `mf-back/src/orchestration/metricsStore.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/presets/audit-dao.json` — Fichier du monorepo (voir chemin).
+- `mf-back/src/orchestration/presets/investor-diligence.json` — Fichier du monorepo (voir chemin).
+- `mf-back/src/orchestration/presets/product-onboarding.json` — Fichier du monorepo (voir chemin).
+- `mf-back/src/orchestration/productionGuards.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/ragClient.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/ragPolicy.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/runtimeMode.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/secretsPolicy.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/services/executionService.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/services/logicCheckService.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/services/ragService.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/services/scoringService.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/services/validationService.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/sloExporter.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/sloRegistry.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/specializedValidators.js` — Fichier du monorepo (voir chemin). Note: Specialized Validators for MFAI - Relentless Precision Edition Enforces R3: State Truth & Mathematical Integrity. / const specializedValidat
+- `mf-back/src/orchestration/telemetryAdapter.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / Te
+- `mf-back/src/orchestration/tenantQuotaRegistry.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/timelineSanitizer.js` — Fichier du monorepo (voir chemin).
+- `mf-back/src/orchestration/timeoutGuard.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / Pr
+- `mf-back/src/orchestration/toolsRegistry.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `mf-back/src/orchestration/vsliceSchema.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/web3Guards.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `mf-back/src/orchestration/web3Pipeline.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/orchestration/workflowMap.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `mf-back/src/orchestration/zynoOrchestrator.js` — Fichier du monorepo (voir chemin). Note: 🔁 Zyno Orchestrator (Hardened - Relentless Precision + Sub-Step Engine)
+- `mf-back/src/orchestration/zynoVerticalSlice.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/rag/rag_client.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `mf-back/src/rag/ragClient.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `mf-back/src/routes/agent.routes.ts` — Fichier du monorepo (voir chemin). Note: Agent Routes - Express routes for AI agent interactions Uses Zod for request validation / import { Router, Request, Response, NextFunction }
+- `mf-back/src/routes/auth.routes.ts` — Fichier du monorepo (voir chemin). Note: Auth Routes - TypeScript / import { Router } from 'express'; import * as authController from '../controllers/auth.controller'; const router 
+- `mf-back/src/routes/health.routes.ts` — Fichier du monorepo (voir chemin). Note: Health Routes - TypeScript / import { Router } from 'express'; import * as healthController from '../controllers/health.controller'; const r
+- `mf-back/src/routes/index.routes.ts` — Fichier du monorepo (voir chemin). Note: Index Routes - TypeScript / import { Router, Request, Response } from 'express'; const router = Router(); router.get('/', (_req: Request, re
+- `mf-back/src/routes/journey.routes.ts` — Fichier du monorepo (voir chemin). Note: Journey Routes - Demo endpoints / import { Router, Request, Response } from 'express'; const router = Router(); // Demo bootstrap payload — 
+- `mf-back/src/routes/user.routes.ts` — Fichier du monorepo (voir chemin). Note: User Routes - TypeScript / import { Router } from 'express'; import rateLimit from 'express-rate-limit'; import { protect, adminOnly } from 
+- `mf-back/src/scripts/audit-db-integrity.ts` — Fichier du monorepo (voir chemin). Note: Database Integrity Audit Script Verifies that agent sessions and messages are properly stored Project: Money Factory AI (MFAI) / import { Pr
+- `mf-back/src/scripts/test-agent-init.ts` — Fichier du monorepo (voir chemin). Note: Smoke Test: Agent Initialization Verifies that agents can be loaded without mongoose/models errors / import { PrismaClient } from '@prisma/c
+- `mf-back/src/scripts/test-real-llm.ts` — Fichier du monorepo (voir chemin). Note: Test Real LLM - Validates actual OpenAI integration Project: Money Factory AI (MFAI) / import ArchitectAgent from '../agents/ArchitectAgent'
+- `mf-back/src/server.ts` — Fichier du monorepo (voir chemin). Note: MFAI Backend - Server Entry Point / import { prisma } from './config/database'; import { startServer } from './app'; // Handle graceful shut
+- `mf-back/src/services/agent_memory.ts` — Fichier du monorepo (voir chemin). Note: Agent Memory Service - Prisma Version In-memory + PostgreSQL persistence for agent state / import { PrismaClient } from '@prisma/client'; co
+- `mf-back/src/services/AgentMemoryService.ts` — Fichier du monorepo (voir chemin). Note: AgentMemoryService - Central Brain for MFAI Agents Manages conversation state and context via Prisma/PostgreSQL / import { PrismaClient, Age
+- `mf-back/src/types/express.d.ts` — Fichier du monorepo (voir chemin). Note: Express Request Type Extensions / import { User } from '@prisma/client'; declare global { namespace Express { interface Request { user?: Use
+- `mf-back/src/utils/aepoAeco.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / AE
+- `mf-back/src/utils/agent-idempotence.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Agent Idempotence Utilities - Prisma Version Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BEL
+- `mf-back/src/utils/computeAEPO.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `mf-back/src/utils/llmLogger.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / LL
+- `mf-back/src/utils/logger.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/utils/openaiClient.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/utils/resourceValidator.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/src/utils/solana.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
 - `mf-back/test-dao-backend.sh` — Fichier du monorepo (voir chemin).
-- `mf-back/test-dao-results.log` — Fichier du monorepo (voir chemin).
 - `mf-back/test-demo-mode.sh` — Fichier du monorepo (voir chemin).
-- `mf-back/tests/agent-idempotence.test.js` — Fichier du monorepo (voir chemin).
-- `mf-back/tests/agent-runs.test.js` — Fichier du monorepo (voir chemin).
-- `mf-back/tests/controllers.spec.js` — Fichier du monorepo (voir chemin).
-- `mf-back/tests/e2e/orchestrator_with_feedback.test.js` — Fichier du monorepo (voir chemin).
-- `mf-back/tests/feedback.test.js` — Fichier du monorepo (voir chemin). Note: @file feedback.test.js @description Unit tests for POST /api/feedback endpoint / const request = require('supertest'); const express = requi
-- `mf-back/tests/integration/multiAgentFeedback.test.js` — Fichier du monorepo (voir chemin).
-- `mf-back/tests/integration/resourceValidator.integration.test.js` — Fichier du monorepo (voir chemin).
-- `mf-back/tests/journey-metrics.test.js` — Fichier du monorepo (voir chemin). Note: Define mocks BEFORE requiring the service
-- `mf-back/tests/journey-state.test.js` — Fichier du monorepo (voir chemin).
-- `mf-back/tests/manual_rag.test.js` — Fichier du monorepo (voir chemin).
-- `mf-back/tests/reproduce_quiz_error.js` — Fichier du monorepo (voir chemin).
-- `mf-back/tests/routes.supertest.spec.js` — Fichier du monorepo (voir chemin).
-- `mf-back/tests/unit/BaseAgent.test.js` — Fichier du monorepo (voir chemin).
-- `mf-back/tests/unit/computeAEPO.test.js` — Fichier du monorepo (voir chemin).
-- `mf-back/tests/unit/journeyController.test.js` — Fichier du monorepo (voir chemin).
-- `mf-back/tests/unit/nft_verification.test.js` — Fichier du monorepo (voir chemin).
-- `mf-back/tests/unit/resourceValidator.test.js` — Fichier du monorepo (voir chemin).
-- `mf-back/tests/user-guardrails.test.js` — Fichier du monorepo (voir chemin).
-- `mf-back/tests/verify_phase_mapping.js` — Fichier du monorepo (voir chemin).
-- `mf-back/tests/wallet-auth.test.js` — Fichier du monorepo (voir chemin). Note: Mock env
-- `mf-back/utils/aepoAeco.js` — Fichier du monorepo (voir chemin). Note: AEPO / AECO — Unified definitions for backend logs, API payloads, and documentation. - AEPO (AI-Enhanced Pathway Orchestration): Zyno-driven
-- `mf-back/utils/agent-idempotence.js` — Fichier du monorepo (voir chemin).
-- `mf-back/utils/computeAEPO.js` — Fichier du monorepo (voir chemin). Note: utils/computeAEPO.js (legacy wrapper)
-- `mf-back/utils/llmLogger.js` — Fichier du monorepo (voir chemin). Note: LLM Tracing Logger Structured logging for all LLM/Agent interactions Tracks: userId, journeyId, agent, duration, tokens, success/failure / c
-- `mf-back/utils/openaiClient.js` — Fichier du monorepo (voir chemin).
-- `mf-back/utils/resourceValidator.js` — Fichier du monorepo (voir chemin).
-- `mf-back/utils/solana.js` — Fichier du monorepo (voir chemin).
-- `mf-back/views/error.jade` — Fichier du monorepo (voir chemin).
-- `mf-back/views/error.pug` — Fichier du monorepo (voir chemin).
-- `mf-back/views/index.jade` — Fichier du monorepo (voir chemin).
-- `mf-back/views/index.pug` — Fichier du monorepo (voir chemin).
-- `mf-back/views/layout.jade` — Fichier du monorepo (voir chemin).
-- `mf-back/views/layout.pug` — Fichier du monorepo (voir chemin).
-- `MVP_STATUS.md` — Fichier du monorepo (voir chemin).
+- `mf-back/tests/admin.rag.e2e.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/agent-idempotence.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / je
+- `mf-back/tests/agent-runs.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / pr
+- `mf-back/tests/agents.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / je
+- `mf-back/tests/agents/agentsImpl.e2e-lite.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/baseAgent_resilience.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / je
+- `mf-back/tests/cache-key.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/controllers.spec.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / pr
+- `mf-back/tests/demoMission.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / 'u
+- `mf-back/tests/e2e/orchestration.e2e.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `mf-back/tests/e2e/orchestrator_with_feedback.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/exec/actionToolMapper.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/exec/toolsRegistry.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/feedback.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / @f
+- `mf-back/tests/fixtures/demo_mission.json` — Fichier du monorepo (voir chemin).
+- `mf-back/tests/full_pipeline_resilience.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / je
+- `mf-back/tests/golden/goldenOutputs.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/growth_tokenomics_conflict.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/integration/multiAgentFeedback.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/integration/resourceValidator.integration.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / je
+- `mf-back/tests/intentRouter.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/journey-metrics.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `mf-back/tests/journey-state.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / je
+- `mf-back/tests/journeyController.step.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/manual_rag.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/memory_persistence.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/orchestrator_history_window.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / je
+- `mf-back/tests/parcoursTemplates.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/ragClient.fallback.integration.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/ragClient.remote.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / je
+- `mf-back/tests/ragClient.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/ragops_strict_grounding.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/registry.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/reproduce_quiz_error.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/routes.admin.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `mf-back/tests/routes.dao.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `mf-back/tests/routes.export.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `mf-back/tests/routes.orchestration.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `mf-back/tests/routes.supertest.spec.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / pr
+- `mf-back/tests/runtimeMode.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/s2_api.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/s2_evaluation.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/s2_logic.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/s2_models.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/setup.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / te
+- `mf-back/tests/sloExporter.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/unit/BaseAgent.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/unit/computeAEPO.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/unit/consortium_simulation.test.js` — Fichier du monorepo (voir chemin).
+- `mf-back/tests/unit/journeyController.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/unit/nft_verification.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/unit/orchestrator_collision.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/unit/phase4-contracts.test.js` — Fichier du monorepo (voir chemin). Note: Force production mode to load ALL 45+ agents for Action G verification
+- `mf-back/tests/unit/phase5_rag_contract.test.js` — Fichier du monorepo (voir chemin).
+- `mf-back/tests/unit/phase6_llm_failure.test.js` — Fichier du monorepo (voir chemin).
+- `mf-back/tests/unit/phase6_rag_failure.test.js` — Fichier du monorepo (voir chemin).
+- `mf-back/tests/unit/phase6_rate_limit.test.js` — Fichier du monorepo (voir chemin).
+- `mf-back/tests/unit/phase6_timeout.test.js` — Fichier du monorepo (voir chemin).
+- `mf-back/tests/unit/phaseTestnetV0_onchain_disabled.test.js` — Fichier du monorepo (voir chemin).
+- `mf-back/tests/unit/phaseTestnetV0_web3_agents_sim_only.test.js` — Fichier du monorepo (voir chemin).
+- `mf-back/tests/unit/resourceValidator.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/unit/specializedValidators.test.js` — Fichier du monorepo (voir chemin).
+- `mf-back/tests/user-guardrails.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / je
+- `mf-back/tests/verify_phase_mapping.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/verticalSliceOrchestration.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / le
+- `mf-back/tests/wallet-auth.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `mf-back/tests/web3/web3Pipeline.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/workflows/workflowPhases.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tests/zynoOrchestrator.test.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / re
+- `mf-back/tools/audit_bonding_curve_stress.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / Bo
+- `mf-back/tools/audit_reward_mechanics.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `mf-back/tsconfig.json` — Fichier du monorepo (voir chemin).
 - `package-lock.json` — Fichier du monorepo (voir chemin).
 - `package.json` — Fichier du monorepo (voir chemin).
-- `README.md` — Fichier du monorepo (voir chemin).
-- `start_dev.sh` — Fichier du monorepo (voir chemin).
-- `TEST_PLAN.md` — Fichier du monorepo (voir chemin).
-- `tmp/prod-local/mf-back.log` — Fichier du monorepo (voir chemin).
-- `tmp/prod-local/mf-back.pid` — Fichier du monorepo (voir chemin).
-- `tmp/prod-local/simulator.log` — Fichier du monorepo (voir chemin).
-- `tmp/prod-local/simulator.pid` — Fichier du monorepo (voir chemin).
-- `tmp/prod-local/web.log` — Fichier du monorepo (voir chemin).
-- `tmp/prod-local/web.pid` — Fichier du monorepo (voir chemin).
-- `tmp/prod-local/worker-mint.log` — Fichier du monorepo (voir chemin).
-- `tmp/prod-local/worker-mint.pid` — Fichier du monorepo (voir chemin).
+- `sonar-project.properties` — Fichier du monorepo (voir chemin).
+- `start.sh` — Fichier du monorepo (voir chemin).
+- `tools/audit_csrf_strict.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `tools/audit_memory_growth.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `tools/audit_router_ambiguity.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `tools/audit_tokenomics_resilience.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `tools/audit_tokenomics_stress.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
 - `tools/mcp/fetch-server.mjs` — Fichier du monorepo (voir chemin).
 - `tools/mcp/filesystem-ro.mjs` — Fichier du monorepo (voir chemin).
 - `tools/mcp/git-server.mjs` — Fichier du monorepo (voir chemin).
-- `verify-production.sh` — Fichier du monorepo (voir chemin).
-- `verify-server-env.sh` — Fichier du monorepo (voir chemin).
+- `tools/produce_evidence.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `tools/produce_supreme_evidence.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `tools/security_probe.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `tools/system-health.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / #!
+- `tools/verify_memory_depth.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `tous_les_markdowns.txt` — Fichier du monorepo (voir chemin).
+- `ui-e2e/index.html` — Fichier du monorepo (voir chemin).
 - `web/.dockerignore` — Fichier du monorepo (voir chemin).
+- `web/.env` — Fichier du monorepo (voir chemin).
 - `web/.eslintrc.json` — Fichier du monorepo (voir chemin).
 - `web/.github/workflows/ci.yml` — Fichier du monorepo (voir chemin).
 - `web/.gitignore` — Fichier du monorepo (voir chemin).
 - `web/.nvmrc` — Fichier du monorepo (voir chemin).
 - `web/.prettierrc` — Fichier du monorepo (voir chemin).
-- `web/app/api/agents/logs/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/ai/echo/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/auth/nonce/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/auth/siws/challenge/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/auth/siws/verify/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/auth/verify/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/dao/vote/simulate/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/health/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/healthz/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/integrations/collaterize/simulate/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/journeys/[id]/state/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/journeys/[id]/step/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/journeys/[id]/submit/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/journeys/audit/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/journeys/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/metadata/pass/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/metadata/proof-of-skill/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/metrics/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/mint/execute/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/mint/last/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/mint/simulate/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/mint/status/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/pass/check/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/rag/doc/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/rag/ingest-batch/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/rag/ingest/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/rag/query/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/rag/search/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/stake/simulate/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/api/tx/prepare/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/global-error.tsx` — Fichier du monorepo (voir chemin).
-- `web/app/globals.css` — Fichier du monorepo (voir chemin).
-- `web/app/instrumentation.ts` — Fichier du monorepo (voir chemin).
-- `web/app/journey/user-progress/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/layout.tsx` — Fichier du monorepo (voir chemin).
-- `web/app/page.tsx` — Fichier du monorepo (voir chemin).
-- `web/app/user/login/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/user/logout/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/user/profile/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/user/refresh/route.ts` — Fichier du monorepo (voir chemin).
-- `web/app/user/register/route.ts` — Fichier du monorepo (voir chemin).
+- `web/app/api/agents/logs/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/ai/echo/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/auth/nonce/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/auth/siws/challenge/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/auth/siws/verify/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/auth/verify/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/dao/vote/simulate/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/health/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/healthz/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/integrations/collaterize/simulate/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/journeys/[id]/state/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/journeys/[id]/step/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/journeys/[id]/submit/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/journeys/audit/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/journeys/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/metadata/pass/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/metadata/proof-of-skill/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/metrics/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/mint/execute/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/mint/last/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/mint/simulate/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/mint/status/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/pass/check/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/rag/doc/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/rag/ingest-batch/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/rag/ingest/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/rag/query/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/rag/search/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/stake/simulate/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/api/tx/prepare/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/global-error.tsx` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / 'u
+- `web/app/globals.css` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / @t
+- `web/app/instrumentation.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / ex
+- `web/app/journey/user-progress/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/layout.tsx` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/page.tsx` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / /*
+- `web/app/user/login/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/user/logout/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/user/profile/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/user/refresh/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/app/user/register/route.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/cache/config.json` — Fichier du monorepo (voir chemin).
 - `web/CHANGELOG.md` — Fichier du monorepo (voir chemin).
 - `web/deploy/nginx/next.conf.sample` — Fichier du monorepo (voir chemin).
 - `web/deploy/systemd/journey-web.service` — Fichier du monorepo (voir chemin).
 - `web/Dockerfile` — Dockerfile (build image).
-- `web/e2e/basic.spec.ts` — Fichier du monorepo (voir chemin).
+- `web/e2e/basic.spec.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
 - `web/env.example` — Fichier du monorepo (voir chemin).
-- `web/jest.config.ts` — Fichier du monorepo (voir chemin).
-- `web/jest.setup.ts` — Fichier du monorepo (voir chemin).
-- `web/middleware.ts` — Fichier du monorepo (voir chemin).
+- `web/jest.config.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/jest.setup.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/middleware.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
 - `web/minter.json` — Fichier du monorepo (voir chemin).
 - `web/next-env.d.ts` — Fichier du monorepo (voir chemin). Note: / <reference types="next" />
 - `web/next.config.mjs` — Fichier du monorepo (voir chemin).
 - `web/package-lock.json` — Fichier du monorepo (voir chemin).
 - `web/package.json` — Fichier du monorepo (voir chemin).
-- `web/packages/agents/orchestrator/index.ts` — Fichier du monorepo (voir chemin).
-- `web/packages/agents/patterns/safety.ts` — Fichier du monorepo (voir chemin).
-- `web/packages/agents/tools/solana.ts` — Fichier du monorepo (voir chemin).
-- `web/playwright.config.ts` — Fichier du monorepo (voir chemin).
-- `web/postcss.config.js` — Fichier du monorepo (voir chemin).
+- `web/packages/agents/orchestrator/index.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / ex
+- `web/packages/agents/patterns/safety.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / ex
+- `web/packages/agents/tools/solana.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/playwright.config.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/postcss.config.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
 - `web/prisma/migrations/20251118155543_add_agentlog_user_idx/migration.sql` — Fichier du monorepo (voir chemin).
 - `web/prisma/migrations/migration_lock.toml` — Fichier du monorepo (voir chemin).
-- `web/prisma/schema.prisma` — Fichier du monorepo (voir chemin).
-- `web/prisma/seed.ts` — Fichier du monorepo (voir chemin).
+- `web/prisma/schema.prisma` — Fichier du monorepo (voir chemin). Note: schema.prisma - MFAI Unified PostgreSQL Schema
+- `web/prisma/seed.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
 - `web/public/grid.svg` — Fichier du monorepo (voir chemin).
 - `web/public/openapi.yaml` — Fichier du monorepo (voir chemin).
 - `web/README.md` — Fichier du monorepo (voir chemin).
-- `web/scripts/check-minter-balance.ts` — Fichier du monorepo (voir chemin).
-- `web/scripts/check-minter-status.ts` — Fichier du monorepo (voir chemin).
-- `web/scripts/gen-minter.ts` — Fichier du monorepo (voir chemin).
-- `web/scripts/run-mint-worker.ts` — Fichier du monorepo (voir chemin).
-- `web/sentry.client.config.ts` — Fichier du monorepo (voir chemin).
-- `web/sentry.server.config.ts` — Fichier du monorepo (voir chemin).
-- `web/server/metrics.ts` — Fichier du monorepo (voir chemin). Note: Basic metrics collector for Money Factory AI
-- `web/server/signer.ts` — Fichier du monorepo (voir chemin).
-- `web/src/__tests__/agents.orchestrator.test.ts` — Fichier du monorepo (voir chemin).
-- `web/src/__tests__/api.ai.echo.test.ts` — Fichier du monorepo (voir chemin). Note: import { NextResponse } from 'next/server' describe('API /api/ai/echo', () => { it('POST returns 400 for bad request', async () => { const m
-- `web/src/__tests__/api.collaterize.logic.test.ts` — Fichier du monorepo (voir chemin).
-- `web/src/__tests__/api.health.test.ts` — Fichier du monorepo (voir chemin). Note: import { NextResponse } from 'next/server' describe('API /api/health', () => { it('GET returns ok', async () => { const mod = await import('
-- `web/src/__tests__/api.journeys.state.logs.test.ts` — Fichier du monorepo (voir chemin). Note: import { NextResponse } from 'next/server' describe('API /api/journeys/[id]/state and /api/agents/logs', () => { it('returns 404 when state
-- `web/src/__tests__/api.journeys.step.actionId.test.ts` — Fichier du monorepo (voir chemin). Note: import { NextResponse } from 'next/server' const sampleOut = { metadata: { persona_id: 'demo', journey_track: 'builder', phase_id: 'learn',
-- `web/src/__tests__/api.journeys.step.audit.test.ts` — Fichier du monorepo (voir chemin). Note: import { NextResponse } from 'next/server' describe('API /api/journeys/[id]/step & /api/journeys/audit', () => { it('POST /step returns Jour
-- `web/src/__tests__/api.journeys.step.bad.test.ts` — Fichier du monorepo (voir chemin). Note: describe('API /api/journeys/[id]/step bad request', () => { it('returns 400 when body invalid', async () => { const mod = await import('../.
-- `web/src/__tests__/api.journeys.step.llm.test.ts` — Fichier du monorepo (voir chemin). Note: import { NextResponse } from 'next/server' const sampleOut = { metadata: { persona_id: 'p', journey_track: 't', phase_id: 'ph', language: 'f
-- `web/src/__tests__/api.journeys.step.replay.test.ts` — Fichier du monorepo (voir chemin). Note: import { NextResponse } from 'next/server' describe('API /api/journeys/[id]/step demo replay', () => { it('returns demo step when replay=1',
-- `web/src/__tests__/api.journeys.submit.test.ts` — Fichier du monorepo (voir chemin). Note: import { NextResponse } from 'next/server' // Force module mock before route import when testing LLM path const sampleEval = { metadata: { p
-- `web/src/__tests__/api.journeys.test.ts` — Fichier du monorepo (voir chemin). Note: import { NextResponse } from 'next/server' jest.mock('../server/db', () => ({ prisma: { journey: { findMany: jest.fn(async () => []), create
-- `web/src/__tests__/api.metrics.test.ts` — Fichier du monorepo (voir chemin). Note: import { NextResponse } from 'next/server' describe('API /api/metrics', () => { it('GET returns counters', async () => { const mod = await i
-- `web/src/__tests__/api.mint.execute.error.test.ts` — Fichier du monorepo (voir chemin). Note: jest.mock('../../src/server/queue', () => ({ mintQueue: { add: jest.fn(async () => { throw new Error('Queue error') }), }, })) describe('API
-- `web/src/__tests__/api.mint.test.ts` — Fichier du monorepo (voir chemin). Note: import { NextResponse } from 'next/server' jest.mock('@/server/db', () => ({ prisma: { mintLog: { create: jest.fn(async () => ({ id: 'm1' })
-- `web/src/__tests__/api.misc.coverage.test.ts` — Fichier du monorepo (voir chemin). Note: import { NextResponse } from 'next/server' describe('Misc API coverage', () => { it('GET /api/healthz returns ok', async () => { const mod =
-- `web/src/__tests__/api.rag.batch.test.ts` — Fichier du monorepo (voir chemin). Note: import { NextResponse } from 'next/server' const mockDb = { doc: { create: jest.fn(async (d: any) => ({ id: 'd' + Math.random(), ...d.data }
-- `web/src/__tests__/api.rag.test.ts` — Fichier du monorepo (voir chemin). Note: import { POST as queryPost } from '../../app/api/rag/query/route' import { POST as docPost } from '../../app/api/rag/doc/route' import { POS
-- `web/src/__tests__/api.siws.redis.test.ts` — Fichier du monorepo (voir chemin).
-- `web/src/__tests__/api.tx.prepare.test.ts` — Fichier du monorepo (voir chemin). Note: import { NextResponse } from 'next/server' jest.mock('@solana/web3.js', () => { class PublicKey { constructor(_: string) {} } class Connecti
-- `web/src/__tests__/embeddings.test.ts` — Fichier du monorepo (voir chemin).
-- `web/src/__tests__/walletProvider.test.tsx` — Fichier du monorepo (voir chemin).
-- `web/src/__tests__/worker.mint.test.ts` — Fichier du monorepo (voir chemin).
-- `web/src/components/Artifacts/ArtifactModal.tsx` — Fichier du monorepo (voir chemin).
-- `web/src/components/Artifacts/NeuralOverlay.tsx` — Fichier du monorepo (voir chemin).
-- `web/src/components/AuthProvider.tsx` — Fichier du monorepo (voir chemin).
-- `web/src/components/Journey/UIBlocksRenderer.tsx` — Fichier du monorepo (voir chemin).
-- `web/src/components/WalletProvider.tsx` — Fichier du monorepo (voir chemin).
-- `web/src/hooks/useAuth.ts` — Fichier du monorepo (voir chemin).
-- `web/src/infra/openaiConfig.ts` — Fichier du monorepo (voir chemin).
-- `web/src/lib/prisma.ts` — Fichier du monorepo (voir chemin).
-- `web/src/lib/solana/checkPassOnChain.ts` — Fichier du monorepo (voir chemin). Note: DAS API Response Types
-- `web/src/mocks/handlers.ts` — Fichier du monorepo (voir chemin).
-- `web/src/mocks/msw-node.js` — Fichier du monorepo (voir chemin).
-- `web/src/mocks/msw.js` — Fichier du monorepo (voir chemin).
-- `web/src/mocks/server.ts` — Fichier du monorepo (voir chemin).
-- `web/src/mocks/setup.ts` — Fichier du monorepo (voir chemin).
-- `web/src/mocks/until-async.js` — Fichier du monorepo (voir chemin).
-- `web/src/server/db.ts` — Fichier du monorepo (voir chemin).
-- `web/src/server/demoArtifacts.ts` — Fichier du monorepo (voir chemin).
-- `web/src/server/embeddings.ts` — Fichier du monorepo (voir chemin). Note: Deterministic tiny embedding to avoid external dependencies (for MVP & tests)
-- `web/src/server/journeyStepResponse.schema.ts` — Fichier du monorepo (voir chemin). Note: Minimal schema subset for runtime validation
-- `web/src/server/logger.ts` — Fichier du monorepo (voir chemin).
-- `web/src/server/metrics.ts` — Fichier du monorepo (voir chemin).
-- `web/src/server/queue.ts` — Fichier du monorepo (voir chemin).
-- `web/src/server/ragStore.ts` — Fichier du monorepo (voir chemin).
-- `web/src/server/rateLimit.ts` — Fichier du monorepo (voir chemin).
-- `web/src/server/redis.ts` — Fichier du monorepo (voir chemin).
-- `web/src/server/signer.ts` — Fichier du monorepo (voir chemin). Note: SimSigner interface for future KMS/HSM integration
-- `web/src/server/siwsStore.ts` — Fichier du monorepo (voir chemin).
-- `web/src/server/state.ts` — Fichier du monorepo (voir chemin).
-- `web/src/server/zyno.ts` — Fichier du monorepo (voir chemin).
-- `web/src/workers/mintWorker.ts` — Fichier du monorepo (voir chemin).
-- `web/tailwind.config.ts` — Fichier du monorepo (voir chemin).
+- `web/scripts/check-minter-balance.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/scripts/check-minter-status.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/scripts/gen-minter.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/scripts/run-mint-worker.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `web/sentry.client.config.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/server/metrics.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `web/server/signer.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/__tests__/agents.orchestrator.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/__tests__/api.ai.echo.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/__tests__/api.collaterize.logic.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/__tests__/api.health.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/__tests__/api.journeys.state.logs.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/__tests__/api.journeys.step.actionId.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/__tests__/api.journeys.step.audit.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/__tests__/api.journeys.step.bad.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / de
+- `web/src/__tests__/api.journeys.step.llm.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/__tests__/api.journeys.step.replay.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/__tests__/api.journeys.submit.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/__tests__/api.journeys.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/__tests__/api.metrics.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/__tests__/api.mint.execute.error.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / je
+- `web/src/__tests__/api.mint.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/__tests__/api.misc.coverage.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/__tests__/api.rag.batch.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/__tests__/api.rag.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/__tests__/api.siws.redis.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/__tests__/api.tx.prepare.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/__tests__/embeddings.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/__tests__/walletProvider.test.tsx` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/__tests__/worker.mint.test.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/components/Artifacts/ArtifactModal.tsx` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/components/Artifacts/NeuralOverlay.tsx` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/components/AuthProvider.tsx` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / 'u
+- `web/src/components/Journey/UIBlocksRenderer.tsx` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / 'u
+- `web/src/components/WalletProvider.tsx` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / 'u
+- `web/src/hooks/useAuth.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/infra/openaiConfig.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / ex
+- `web/src/lib/prisma.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/lib/solana/checkPassOnChain.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `web/src/mocks/handlers.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/mocks/msw-node.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / fu
+- `web/src/mocks/msw.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / co
+- `web/src/mocks/server.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/mocks/setup.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/mocks/until-async.js` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / mo
+- `web/src/server/db.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/server/demoArtifacts.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/server/embeddings.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `web/src/server/journeyStepResponse.schema.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `web/src/server/logger.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / ex
+- `web/src/server/metrics.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / /*
+- `web/src/server/queue.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/server/ragStore.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/server/rateLimit.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / /*
+- `web/src/server/redis.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/server/signer.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / //
+- `web/src/server/siwsStore.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/src/server/state.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / ty
+- `web/src/server/zyno.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / ty
+- `web/src/workers/mintWorker.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
+- `web/tailwind.config.ts` — Fichier du monorepo (voir chemin). Note: Project: Money Factory AI (MFAI) Status: Production Ready - 2026 Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA / im
 - `web/tsconfig.json` — Fichier du monorepo (voir chemin).
 
 </details>
 
 <!-- END AUTO-GENERATED: file-index -->
+
+
 
 ---
 
@@ -2045,14 +2944,15 @@ Commande: `node journey-simulator/scripts/generate-api-surface.mjs`
 |---|---|---|
 | `/` | — | `journey-simulator/src/App.tsx` |
 | `/*` | — | `journey-simulator/src/App.tsx` |
-| `/dao` | ✅ | `journey-simulator/src/App.tsx` |
+| `/dao` | — | `journey-simulator/src/App.tsx` |
 | `/dashboard` | ✅ | `journey-simulator/src/App.tsx` |
-| `/debug/mint` | ✅ | `journey-simulator/src/App.tsx` |
+| `/debug/mint` | — | `journey-simulator/src/App.tsx` |
 | `/guide` | ✅ | `journey-simulator/src/App.tsx` |
-| `/journeys` | ✅ | `journey-simulator/src/App.tsx` |
-| `/journeys/:journeyId` | ✅ | `journey-simulator/src/App.tsx` |
-| `/journeys/completed` | ✅ | `journey-simulator/src/App.tsx` |
-| `/journeys/demo` | ✅ | `journey-simulator/src/App.tsx` |
+| `/journeys` | — | `journey-simulator/src/App.tsx` |
+| `/journeys/:journeyId` | — | `journey-simulator/src/App.tsx` |
+| `/journeys/completed` | — | `journey-simulator/src/App.tsx` |
+| `/journeys/demo` | — | `journey-simulator/src/App.tsx` |
+| `/journeys/demo/:journeyId` | — | `journey-simulator/src/App.tsx` |
 | `/login` | — | `journey-simulator/src/App.tsx` |
 | `/playground` | ✅ | `journey-simulator/src/App.tsx` |
 | `/register` | — | `journey-simulator/src/App.tsx` |
@@ -2064,60 +2964,11 @@ Commande: `node journey-simulator/scripts/generate-api-surface.mjs`
 
 | Method | Path | Source (route file) |
 |---|---|---|
-| `GET` | `/` | `mf-back/routes/index.js` |
-| `GET` | `/admin/rag/documents` | `mf-back/routes/rag-routes.js` |
-| `POST` | `/admin/rag/upload` | `mf-back/routes/rag-routes.js` |
-| `POST` | `/auth/connect-wallet` | `mf-back/routes/auth-routes.js` |
-| `POST` | `/auth/login` | `mf-back/routes/auth-routes.js` |
-| `GET` | `/auth/me` | `mf-back/routes/auth-routes.js` |
-| `POST` | `/auth/refresh` | `mf-back/routes/auth-routes.js` |
-| `POST` | `/auth/register` | `mf-back/routes/auth-routes.js` |
-| `POST` | `/auth/verify` | `mf-back/routes/auth-routes.js` |
-| `GET` | `/dao/config` | `mf-back/routes/dao-routes.js` |
-| `GET` | `/dao/proposals` | `mf-back/routes/dao-routes.js` |
-| `POST` | `/dao/proposals` | `mf-back/routes/dao-routes.js` |
-| `POST` | `/dao/proposals/:id/close` | `mf-back/routes/dao-routes.js` |
-| `POST` | `/dao/proposals/:id/vote` | `mf-back/routes/dao-routes.js` |
-| `POST` | `/demo/save` | `mf-back/routes/demo-routes.js` |
-| `GET` | `/demo/state` | `mf-back/routes/demo-routes.js` |
-| `GET` | `/health` | `mf-back/app.js` |
-| `GET` | `/healthz` | `mf-back/app.js` |
-| `GET` | `/journey/:id/metrics` | `mf-back/routes/journey-routes.js` |
-| `POST` | `/journey/:journeyId/step` | `mf-back/routes/journey-routes.js` |
-| `POST` | `/journey/:journeyId/submit` | `mf-back/routes/journey-routes.js` |
-| `POST` | `/journey/add-journey` | `mf-back/routes/journey-routes.js` |
-| `GET` | `/journey/all-journey` | `mf-back/routes/journey-routes.js` |
-| `GET` | `/journey/artifacts` | `mf-back/routes/journey-routes.js` |
-| `POST` | `/journey/complete-phase` | `mf-back/routes/journey-routes.js` |
-| `DELETE` | `/journey/delete/:id` | `mf-back/routes/journey-routes.js` |
-| `POST` | `/journey/load-demo` | `mf-back/routes/journey-routes.js` |
-| `GET` | `/journey/metrics` | `mf-back/routes/journey-routes.js` |
-| `POST` | `/journey/reset-progress` | `mf-back/routes/journey-routes.js` |
-| `GET` | `/journey/schema` | `mf-back/routes/journey-routes.js` |
-| `PUT` | `/journey/update-journey/:id` | `mf-back/routes/journey-routes.js` |
-| `GET` | `/journey/user-journeys` | `mf-back/routes/journey-routes.js` |
-| `GET` | `/journey/user-progress` | `mf-back/routes/journey-routes.js` |
-| `PUT` | `/journey/user-progress` | `mf-back/routes/journey-routes.js` |
-| `GET` | `/orchestration/admin/agent-logs` | `mf-back/routes/zyno-routes.js` |
-| `GET` | `/orchestration/admin/agent-scoreboard` | `mf-back/routes/zyno-routes.js` |
-| `POST` | `/orchestration/orchestration` | `mf-back/routes/zyno-routes.js` |
-| `GET` | `/orchestration/orchestration/current-step` | `mf-back/routes/zyno-routes.js` |
-| `GET` | `/orchestration/orchestration/logs` | `mf-back/routes/zyno-routes.js` |
-| `GET` | `/readyz` | `mf-back/app.js` |
-| `GET` | `/user/all` | `mf-back/routes/user-routes.js` |
-| `DELETE` | `/user/delete-profile` | `mf-back/routes/user-routes.js` |
-| `POST` | `/user/login` | `mf-back/routes/user-routes.js` |
-| `POST` | `/user/login-wallet` | `mf-back/routes/user-routes.js` |
-| `POST` | `/user/logout` | `mf-back/routes/user-routes.js` |
-| `POST` | `/user/nft-certificates` | `mf-back/routes/user-routes.js` |
-| `GET` | `/user/profile` | `mf-back/routes/user-routes.js` |
-| `POST` | `/user/refresh` | `mf-back/routes/user-routes.js` |
-| `POST` | `/user/register` | `mf-back/routes/user-routes.js` |
-| `PUT` | `/user/role/:id` | `mf-back/routes/user-routes.js` |
-| `PUT` | `/user/subscription/:id` | `mf-back/routes/user-routes.js` |
-| `PUT` | `/user/tokens` | `mf-back/routes/user-routes.js` |
-| `PUT` | `/user/update-profile` | `mf-back/routes/user-routes.js` |
-| `POST` | `/user/wallet-challenge` | `mf-back/routes/user-routes.js` |
+| `MOUNT` | `/` | `mf-back/app.js (mount indexRoutes)` |
+| `MOUNT` | `/api/agents` | `mf-back/app.js (mount agentRoutes)` |
+| `MOUNT` | `/auth` | `mf-back/app.js (mount authRoutes)` |
+| `MOUNT` | `/journey` | `mf-back/app.js (mount journeyRoutes)` |
+| `MOUNT` | `/user` | `mf-back/app.js (mount userRoutes)` |
 
 ### Notes (cohérence)
 
@@ -2125,6 +2976,7 @@ Commande: `node journey-simulator/scripts/generate-api-surface.mjs`
 - Si une route semble “doublée” (ex: `/orchestration/orchestration`), cela indique un **mismatch** entre le `mount` et le `router.*("/...")` dans le fichier de routes.
 
 <!-- END AUTO-GENERATED: api-surface -->
+
 
 ## 🧩 Component Architecture
 
@@ -2926,8 +3778,8 @@ In production for this repository, the most reliable approach is to deploy the *
 High-level:
 
 - **Frontend container** serves the SPA and proxies API calls to the backend (Nginx template uses `API_UPSTREAM`).
-- **Backend container** exposes `/user/*`, `/journey/*`, `/orchestration`, `/healthz`, `/readyz`, etc.
-- **MongoDB** stores journeys, agent logs, and memory.
+- **Backend container** exposes `/user/*`, `/journey/*`, `/api/agents/*`, `/healthz`, `/readyz`, etc.
+- **PostgreSQL** stores agents sessions/logs (Prisma) and other backend data.
 
 Typical commands (run from the monorepo root, not inside `journey-simulator/`):
 
@@ -2945,7 +3797,7 @@ docker compose -f docker-compose.prod.yml logs -f --tail=200
 Environment variables:
 
 - Put production secrets in a root `.env` file (do **not** commit it).
-- Backend essentials usually include: `JWT_SECRET`, `MONGO_URI`, `ADMIN_API_KEY`, `OPENAI_API_KEY` (or other LLM key), `RAG_SEARCH_URL`, `RAG_INGEST_URL`, `RAG_API_KEY`, `RAG_COLLECTION`.
+- Backend essentials usually include: `JWT_SECRET`, `DATABASE_URL`, `ADMIN_API_KEY`, `OPENAI_API_KEY` (or other LLM key), `RAG_SEARCH_URL`, `RAG_INGEST_URL`, `RAG_API_KEY`, `RAG_COLLECTION`.
 - Frontend essentials usually include: `VITE_API_BASE_URL` (must be the origin root, without `/api`).
 
 Reverse proxy note:
@@ -3346,7 +4198,7 @@ Remerciements aux technologies et communautés qui rendent possible l’écosyst
 
 *Transforming skills into capital through the Cognitive Activation Protocol™*
 
-*Last updated: January 2024*
+*Last updated: January 23, 2026*
 *Version: 1.0.0*
 
 ---

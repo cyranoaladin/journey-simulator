@@ -1,2 +1,0 @@
-node      2743741 alaeddine   21u  IPv6 24637554      0t0  TCP *:3002 (LISTEN)
-node      2744065 alaeddine   22u  IPv4 24630727      0t0  TCP localhost:4173 (LISTEN)

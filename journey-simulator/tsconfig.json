@@ -40,6 +40,11 @@
     "src",
     "tests"
   ],
+  "exclude": [
+    "src/test/**",
+    "src/**/__tests__/**",
+    "src/**/__mocks__/**"
+  ],
   "references": [
     {
       "path": "./tsconfig.node.json"

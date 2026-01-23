@@ -18,11 +18,14 @@ interface Props {
 
 export const JourneyProgressBar: React.FC<Props> = ({ personaId, currentStepId }) => {
   const phases = getJourneyPhases(personaId);
-  const currentPhaseIndex = phases.findIndex(p => p.id === currentStepId);
+  // Match by both id (phase-1) and originalId (actual phase ID from personas.ts)
+  const currentPhaseIndex = phases.findIndex(p => p.id === currentStepId || p.originalId === currentStepId);
   const activeIndex = currentPhaseIndex === -1 ? 0 : currentPhaseIndex;
   const totalPhases = phases.length;
-  const completedCount = Math.max(0, Math.min(activeIndex, totalPhases));
-  const progressPercent = totalPhases === 0 ? 0 : Math.round((completedCount / totalPhases) * 100);
+  // Completed = phases before the active one
+  const completedCount = activeIndex;
+  // Show partial progress for the active phase (add 0.5 for "in progress")
+  const progressPercent = totalPhases === 0 ? 0 : Math.round(((completedCount + 0.5) / totalPhases) * 100);
 
   const getNodeClasses = (isCompleted: boolean, isCurrent: boolean) => {
     if (isCompleted) {

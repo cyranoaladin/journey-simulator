@@ -25,7 +25,10 @@ type NavItem = {
   external?: string
 }
 
-const NAV_ITEMS: NavItem[] = [{ label: 'Journeys', href: '/journeys', icon: Waypoints }]
+const NAV_ITEMS: NavItem[] = [
+  { label: 'Demo Journey', href: '/journeys/demo', icon: Atom, badge: 'Demo' },
+  { label: 'Real Journey', href: '/journeys', icon: Waypoints, badge: 'Live' }
+]
 
 const MORE_ITEMS: NavItem[] = [
   { label: 'DAO', href: '/dao', icon: Vote, badge: 'Beta' },
@@ -550,23 +553,30 @@ const MainNavigation = ({ enableWallet = false }: MainNavigationProps) => {
       }
     } catch { /* ignore */ }
 
-    // 3. Handle Authentication Side Effects
+    // 3. Handle Authentication Side Effects AND Route Navigation
     if (mode === 'demo') {
       // Switch to demo user if not already
       if (user?.id !== 'demo-user-id') {
         await loginAsDemo();
       }
+      // Navigate to demo journey route
+      navigate('/journeys/demo');
     } else if (mode === 'real') {
       // Requires real authentication
       if (!isAuthenticated || user?.id === 'demo-user-id') {
         // Navigate to login but keep the mode selection
         navigate('/login');
+      } else {
+        // Navigate to real journey route
+        navigate('/journeys');
       }
     } else if (mode === 'simulation') {
       // Simulation can run with demo credentials if not logged in
       if (!isAuthenticated) {
         await loginAsDemo();
       }
+      // Navigate to real journey route (simulation uses same route as real)
+      navigate('/journeys');
     }
   }, [setRunMode, loginAsDemo, isAuthenticated, user, navigate])
 

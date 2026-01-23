@@ -46,7 +46,7 @@ export default defineConfig(({ mode }) => ({
           ...(mode === 'production'
             ? ["script-src 'self'"]
             : ["script-src 'self' 'unsafe-inline' 'unsafe-eval'"]),
-          "connect-src 'self' https: http: ws: wss: http://localhost:3002 http://localhost:3000",
+          "connect-src 'self' https: http: ws: wss: http://localhost:3005 http://localhost:3000",
         ].join('; ');
 
         const cspMeta = `\n<meta http-equiv="Content-Security-Policy" content="${csp}">\n`;
@@ -85,7 +85,15 @@ export default defineConfig(({ mode }) => ({
     hmr: {
       host: '127.0.0.1',
       port: 5173
-    }
+    },
+    // Proxy API requests to backend
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:3005',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   preview: {
     // Prevent browser caching during local preview to avoid stale dist/assets being reused.

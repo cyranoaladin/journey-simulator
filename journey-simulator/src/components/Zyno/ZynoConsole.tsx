@@ -24,13 +24,14 @@ import {
 import AgentLogViewer from './AgentLogViewer';
 import ZynoMissionFlow from './ZynoMissionFlow';
 import MissionFeedbackSummary, { MissionSummary } from './MissionFeedbackSummary';
-import type { OrchestrationResult } from './types';
+import type { OrchestrationResult, AgentResult, AgentTimelineEntry } from './types';
 import sampleMissionSummary from '../../data/sample_mission_feedback.json';
 import ZynoAgentScoreboard from './ZynoAgentScoreboard';
 import ZynoDAOAdminPanel from './ZynoDAOAdminPanel';
 import AgentFeedbackForm from './AgentFeedbackForm';
 import { API_BASE_URL } from '../../utils/api';
 import { logger } from '../../utils/logger';
+import { zynoApi } from '../../api/zyno';
 import { AgentScoreboardProvider } from './AgentScoreboardContext';
 import ResourceUploader from './ResourceUploader';
 import ZynoDecisionPanel from './ZynoDecisionPanel';
@@ -185,37 +186,64 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
     };
   };
 
-  const submitSimulation = async (intent: string, signal: AbortSignal) => {
-    let storedUserId: string | null = null;
-    try {
-      storedUserId = sessionStorage.getItem('userId') || localStorage.getItem('userId');
-    } catch {
-      storedUserId = null;
-    }
-
-    if (!storedUserId) {
-      if (process.env.NODE_ENV === 'test') {
-        storedUserId = 'test-user';
-      } else {
-        throw new Error('Missing userId: please login and try again.');
-      }
-    }
-
-    const response = await fetch(`${API_BASE_URL}/orchestration`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(storedUserId ? { 'x-user-id': storedUserId } : {}),
+  const submitSimulation = async (intent: string, _signal: AbortSignal): Promise<OrchestrationResult> => {
+    // Use the new Zyno API client
+    const zynoResponse = await zynoApi.orchestrate(intent);
+    
+    // Transform ZynoInteractResponse to OrchestrationResult for backward compatibility
+    const payload = zynoResponse.payload;
+    const agentName = zynoResponse.agentType;
+    const isFallback = payload?.status === 'FALLBACK';
+    const now = new Date().toISOString();
+    
+    const agentResult: AgentResult = {
+      agent: agentName,
+      phase: 'interaction',
+      intent,
+      reasoning: payload?.reasoning || zynoResponse.response,
+      ae_summary: payload?.summary || payload?.reasoning || zynoResponse.response,
+      output: zynoResponse.response,
+      feedback: {
+        aepo: isFallback ? 50 : 85,
+        ae_summary: payload?.summary || null,
       },
-      body: JSON.stringify({ input: intent, userId: storedUserId ?? 'demo_user', mode: runMode }),
-      signal,
-    });
+    };
 
-    if (!response.ok) {
-      throw new Error(`Request failed with status ${response.status}`);
-    }
+    const timelineEntry: AgentTimelineEntry = {
+      agent: agentName,
+      phase: 'interaction',
+      intent,
+      status: 'completed',
+      startedAt: now,
+      completedAt: now,
+      durationMs: zynoResponse.latencyMs,
+      prompt: intent,
+      reasoning: payload?.reasoning || zynoResponse.response,
+      action: payload?.actions?.[0] || null,
+      summary: payload?.summary || null,
+      sources: [],
+      feedback: {
+        aepo: isFallback ? 50 : 85,
+      },
+    };
 
-    return response.json() as Promise<OrchestrationResult>;
+    return {
+      intent,
+      mode: runMode,
+      executedAgents: [agentName],
+      agents: [{
+        agentId: agentName,
+        summary: payload?.summary || null,
+        executiveSummary: payload?.reasoning || null,
+        actions: payload?.actions || [],
+      }],
+      results: {
+        [agentName]: agentResult,
+      },
+      timeline: [timelineEntry],
+      currentStep: null,
+      parcoursTemplate: null,
+    };
   };
 
   const handleSimulationSuccess = (
@@ -340,7 +368,6 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
   };
 
   const handleRunSimulation = async (prompt?: string) => {
-    console.log('ZYNO_CLICK_TRIGGERED', prompt, userInput);
     const intent = prompt ?? userInput;
     const trimmed = intent.trim();
     if (!trimmed) {

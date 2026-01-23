@@ -19,7 +19,7 @@ import ZynoSignalSidebar from './ZynoSignalSidebar';
 import ZynoChat from './ZynoChat';
 
 import { DEMO_SCENARIOS } from '../../config/demoScenarios';
-// import { useAutoSimulation } from '../../hooks/useAutoSimulation';
+import { useDemoEngine } from '../../hooks/useDemoEngine';
 import { usePhaseData } from '../../hooks/usePhaseData';
 
 import JourneyCompletedPage from '../JourneyCompletedPage';
@@ -29,8 +29,6 @@ import { useWorkspaceLayout } from '../../contexts/WorkspaceLayoutContext';
 import { useArtifacts } from '../../hooks/useArtifacts';
 import { ArtifactModal } from '../Artifacts/ArtifactModal';
 import { NeuralOverlay } from '../Artifacts/NeuralOverlay';
-import StakingModal from '../StakingModal';
-import DAOVoteModal from '../DAOVoteModal';
 import NFTProofModal from '../NFTProofModal';
 import MarketLaunchpad from '../MarketLaunchpad';
 
@@ -93,25 +91,30 @@ const JourneyDemoMode = ({ onBack: _onBack }: JourneyDemoModeProps) => {
     const {
         demoState,
         setDemoState,
-        tickDemo,
         startDemoPhase,
         completePhase,
         openModal,
         closeModal,
-        modalContent
+        isModalOpen,
+        modalContent,
+        resetDemoCache
     } = useJourneyStore(
         (state) => ({
             demoState: state.demoState,
             setDemoState: state.setDemoState,
-            tickDemo: state.tickDemo,
             startDemoPhase: state.startDemoPhase,
             completePhase: state.completePhase,
             openModal: state.openModal,
             closeModal: state.closeModal,
-            modalContent: state.modalContent
+            isModalOpen: state.isModalOpen,
+            modalContent: state.modalContent,
+            resetDemoCache: state.resetDemoCache
         }),
         shallow
     );
+
+    // Demo Engine Hook - handles all timing/tick logic with proper cleanup
+    const { currentPhaseId: enginePhaseId } = useDemoEngine();
 
     /**
      * Synchronous phase transition handler.
@@ -124,168 +127,123 @@ const JourneyDemoMode = ({ onBack: _onBack }: JourneyDemoModeProps) => {
         setDemoState({ status: 'IDLE', stepIndex: -1 });
     }, [completePhase, closeModal, setDemoState]);
 
-    // Final Validation Logic (The "Final Act")
+    // GUARD: Empty sequence protection - auto-exit if sequence is empty while PLAYING
+    useEffect(() => {
+        const isPlaying = demoState?.status === 'PLAYING';
+        const isEmpty = !demoState?.currentSequence || demoState.currentSequence.length === 0;
+        
+        if (isPlaying && isEmpty) {
+            console.error('[Demo] CRITICAL: Empty sequence detected while PLAYING. Auto-exiting.');
+            toast.error('Simulation Sequence Interrupted', {
+                description: 'Returning to safety. Please try again.',
+            });
+            // Reset to safe state
+            resetDemoCache();
+        }
+    }, [demoState?.status, demoState?.currentSequence, resetDemoCache]);
+
+    // Final Validation Logic (DATA-DRIVEN - No more switch on index)
     useEffect(() => {
         if (demoState?.status === 'WAITING_FOR_FINAL_VALIDATION') {
-            console.log(`[Demo] Reached Final Validation for Index ${activePhaseIndex}`);
+            console.log(`[Demo] Reached Final Validation for Phase: ${activePhase.id} (Index ${activePhaseIndex})`);
 
-            // TRIGGER MAPPING (STRICT INDEX BASED)
+            // Extract phase data for dynamic rendering
+            const phaseTitle = activePhase.title || `Phase ${activePhaseIndex + 1}`;
+            const nftReward = activePhase.nftReward || `${phaseTitle} Badge`;
+            const xpReward = activePhase.xpReward || 100;
+            const isCollaterize = activePhase.id?.includes('collaterize') || activePhaseIndex === 5;
+            const isLaunch = activePhase.id?.includes('launch') && !isCollaterize;
+
             let modalContent = null;
 
-            switch (activePhaseIndex) {
-                case 0: // Phase 1: Orientation
-                    modalContent = (
-                        <div className="max-w-md w-full">
-                            <h2 data-testid="demo-phase-validation-title" className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] text-xl font-space font-bold px-4 py-2 rounded-lg bg-black/60 border border-white/10 backdrop-blur-sm">
-                                Cognitive Activation Badge
-                            </h2>
-                            <NFTProofModal
-                                onClose={() => handlePhaseComplete(activePhaseIndex)}
-                                proofType="Vision"
-                                title="Cognitive Activation Badge"
-                                description="Proof of neural synchronization."
-                                imageUrl="/assets/badges/cognitive_master.png"
-                                xpEarned={100}
-                                phase={activePhase.title}
-                                phaseNumber={1}
-                                onViewSkillchain={() => handlePhaseComplete(activePhaseIndex)}
-                            />
-                        </div>
-                    );
-                    break;
+            // CASE 1: Collaterize Phase (Veteran Status - Final Act)
+            if (isCollaterize) {
+                modalContent = (
+                    <div className="max-w-md w-full">
+                        <h2 data-testid="demo-phase-validation-title" className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] text-xl font-space font-bold px-4 py-2 rounded-lg bg-black/60 border border-white/10 backdrop-blur-sm">
+                            Veteran Status
+                        </h2>
+                        <NFTProofModal
+                            onClose={() => {
+                                handlePhaseComplete(activePhaseIndex);
+                                window.dispatchEvent(new CustomEvent('VETERAN_BADGE_UNLOCKED', { detail: { tier: 'veteran' } }));
+                            }}
+                            proofType="Orchestration"
+                            title="Veteran Status"
+                            description="You have completed the full Journey. Welcome to the Collaterize Network."
+                            imageUrl="/assets/badges/veteran_master.png"
+                            xpEarned={xpReward}
+                            phase={phaseTitle}
+                            phaseNumber={activePhaseIndex + 1}
+                            onViewSkillchain={() => {
+                                handlePhaseComplete(activePhaseIndex);
+                                window.dispatchEvent(new CustomEvent('VETERAN_BADGE_UNLOCKED', { detail: { tier: 'veteran' } }));
+                            }}
+                        />
+                    </div>
+                );
+            }
+            // CASE 2: Launch Phase with Market Launchpad
+            else if (isLaunch) {
+                modalContent = (
+                    <div className="max-w-4xl w-full">
+                        <h2 data-testid="demo-phase-validation-title" className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] text-xl font-space font-bold px-4 py-2 rounded-lg bg-black/60 border border-white/10 backdrop-blur-sm">
+                            {phaseTitle}
+                        </h2>
+                        <MarketLaunchpad
+                            onComplete={() => handlePhaseComplete(activePhaseIndex)}
+                        />
+                    </div>
+                );
+            }
+            // CASE 3: Standard Phase - Generic NFT Badge Mint
+            else {
+                // FIXED: Use persona-specific image path instead of generic phase_X.png
+                const personaId = selectedPersona?.id || 'cognitive-activation-hub';
+                const phaseId = activePhase?.id || `phase-${activePhaseIndex + 1}`;
+                const nftImageUrl = `/images/nfts/${personaId}/${phaseId}.png`;
 
-                case 1: // Phase 2: Foundry
-                    modalContent = (
-                        <div className="max-w-2xl w-full">
-                            <h2 data-testid="demo-phase-validation-title" className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] text-xl font-space font-bold px-4 py-2 rounded-lg bg-black/60 border border-white/10 backdrop-blur-sm">
-                                Foundry Staking
-                            </h2>
-                            <StakingModal
-                                onClose={() => handlePhaseComplete(activePhaseIndex)}
-                                availableAmount={1000}
-                                currentStaked={500}
-                                onStake={(amount) => {
-                                    console.log(`[Demo] Staked: ${amount}`);
-                                    handlePhaseComplete(activePhaseIndex);
-                                }}
-                            />
-                        </div>
-                    );
-                    break;
-
-                case 2: // Phase 3: Resilience (DAO)
-                    modalContent = (
-                        <div className="max-w-2xl w-full">
-                            <h2 data-testid="demo-phase-validation-title" className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] text-xl font-space font-bold px-4 py-2 rounded-lg bg-black/60 border border-white/10 backdrop-blur-sm">
-                                Security Vote
-                            </h2>
-                            <DAOVoteModal
-                                onClose={() => handlePhaseComplete(activePhaseIndex)}
-                                phase={activePhase}
-                                votingPower={100}
-                                onVote={(vote) => {
-                                    console.log(`[Demo] Voted: ${vote}`);
-                                    handlePhaseComplete(activePhaseIndex);
-                                }}
-                            />
-                        </div>
-                    );
-                    break;
-
-                case 3: // Phase 4: Experience / Identity
-                    modalContent = (
-                        <div className="max-w-md w-full">
-                            <h2 data-testid="demo-phase-validation-title" className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] text-xl font-space font-bold px-4 py-2 rounded-lg bg-black/60 border border-white/10 backdrop-blur-sm">
-                                Identity Artifact
-                            </h2>
-                            <NFTProofModal
-                                onClose={() => handlePhaseComplete(activePhaseIndex)}
-                                proofType="Creation"
-                                title="Identity Artifact"
-                                description="Proof of established digital identity."
-                                imageUrl="/assets/badges/identity_artifact.png"
-                                xpEarned={200}
-                                phase={activePhase.title}
-                                phaseNumber={4}
-                                onViewSkillchain={() => handlePhaseComplete(activePhaseIndex)}
-                            />
-                        </div>
-                    );
-                    break;
-
-                case 4: // Phase 5: Launch (Market)
-                    modalContent = (
-                        <div className="max-w-4xl w-full">
-                            <h2 data-testid="demo-phase-validation-title" className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] text-xl font-space font-bold px-4 py-2 rounded-lg bg-black/60 border border-white/10 backdrop-blur-sm">
-                                Mainnet Ignition
-                            </h2>
-                            <MarketLaunchpad
-                                onComplete={() => handlePhaseComplete(activePhaseIndex)}
-                            />
-                        </div>
-                    );
-                    break;
-
-                case 5: // Phase 6: Collaterize (Veteran Status)
-                    modalContent = (
-                        <div className="max-w-md w-full">
-                            <h2 data-testid="demo-phase-validation-title" className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] text-xl font-space font-bold px-4 py-2 rounded-lg bg-black/60 border border-white/10 backdrop-blur-sm">
-                                Veteran Status
-                            </h2>
-                            <NFTProofModal
-                                onClose={() => {
-                                    handlePhaseComplete(activePhaseIndex);
-                                    window.dispatchEvent(new CustomEvent('VETERAN_BADGE_UNLOCKED', { detail: { tier: 'veteran' } }));
-                                }}
-                                proofType="Orchestration"
-                                title="Veteran Status"
-                                description="You have completed the full Journey. Welcome to the Collaterize Network."
-                                imageUrl="/assets/badges/veteran_master.png"
-                                xpEarned={1000}
-                                phase={activePhase.title}
-                                phaseNumber={6}
-                                onViewSkillchain={() => {
-                                    handlePhaseComplete(activePhaseIndex);
-                                    window.dispatchEvent(new CustomEvent('VETERAN_BADGE_UNLOCKED', { detail: { tier: 'veteran' } }));
-                                }}
-                            />
-                        </div>
-                    );
-                    break;
-
-                default:
-                    console.warn(`[Demo] No modal definition for index ${activePhaseIndex}. Completing auto.`);
-                    handlePhaseComplete(activePhaseIndex);
-                    return;
+                modalContent = (
+                    <div className="max-w-md w-full">
+                        <h2 data-testid="demo-phase-validation-title" className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] text-xl font-space font-bold px-4 py-2 rounded-lg bg-black/60 border border-white/10 backdrop-blur-sm">
+                            {nftReward}
+                        </h2>
+                        <NFTProofModal
+                            onClose={() => handlePhaseComplete(activePhaseIndex)}
+                            personaId={personaId}
+                            phaseId={phaseId}
+                            proofType="Skill"
+                            title={nftReward}
+                            description={`Certification for completing ${phaseTitle}.`}
+                            imageUrl={nftImageUrl}
+                            xpEarned={xpReward}
+                            phase={phaseTitle}
+                            phaseNumber={activePhaseIndex + 1}
+                            onViewSkillchain={() => handlePhaseComplete(activePhaseIndex)}
+                        />
+                    </div>
+                );
             }
 
-            if (modalContent) {
+            if (modalContent && !isModalOpen) {
                 openModal(modalContent);
             }
         }
-    }, [demoState?.status, activePhase.id, activePhaseIndex, handlePhaseComplete, openModal, activePhase.title]);
+    }, [demoState?.status, activePhase.id, activePhaseIndex, handlePhaseComplete, openModal, activePhase.title, activePhase.nftReward, activePhase.xpReward, isModalOpen]);
 
-    // TICK LOOP: The Heartbeat of the Demo
-    useEffect(() => {
-        let timer: NodeJS.Timeout;
-        if (demoState?.isActive && demoState?.status === 'PLAYING') {
-            timer = setTimeout(() => {
-                tickDemo();
-            }, demoState.typingDelayMs || 1500);
-        }
-        return () => clearTimeout(timer);
-    }, [demoState?.status, demoState?.stepIndex, tickDemo, demoState?.typingDelayMs, demoState?.isActive]);
-
-    // Start Phase on Mount or Phase Change
+    // Start Phase on Mount or Phase Change (with guard to prevent double-starts)
     useEffect(() => {
         if (!selectedPersona) return;
-        // TRUST THE EFFECT DEPENDENCY: It fires when activePhase.id changes.
-        // We must (re)start the demo sequence for the new phase.
+        // Guard: If we're already playing this phase, don't restart
+        if (enginePhaseId === activePhase.id && demoState?.status !== 'IDLE') {
+            return;
+        }
         startDemoPhase(activePhase.id, selectedPersonaId);
-    }, [activePhase.id, selectedPersonaId, startDemoPhase]);
+    }, [activePhase.id, selectedPersonaId, startDemoPhase, enginePhaseId, selectedPersona]);
+    // NOTE: demoState?.status removed from deps to prevent re-trigger on status change
 
 
-    // Auto-Sim Logic: Unlocking artifacts
+    // Auto-Sim Logic: Unlocking artifacts (notification only, no auto-open modal)
     useEffect(() => {
         if ((lastStep?.ui_blocks?.length ?? 0) > 0) {
             const personaId = selectedPersona?.id || 'web3_builder';
@@ -299,9 +257,10 @@ const JourneyDemoMode = ({ onBack: _onBack }: JourneyDemoModeProps) => {
             ) {
                 setUnlockedArtifacts((prev) => (prev.includes(artifactId) ? prev : [...prev, artifactId]));
                 pendingArtifactIdsRef.current.delete(artifactId);
-                toast.success("New Artifact Generated!");
-                const artifact = artifacts.find(a => a.id === artifactId);
-                if (artifact && demoState?.status === 'PLAYING') setViewingArtifact(artifact);
+                toast.success("New Artifact Generated!", {
+                    description: "Check the sidebar to view your artifacts."
+                });
+                // DO NOT auto-open modal - let user click to view
             }
         }
     }, [artifacts, demoState?.status, lastStep, selectedPersona, unlockedArtifacts, userProgress.completedPhases]);
@@ -366,12 +325,48 @@ const JourneyDemoMode = ({ onBack: _onBack }: JourneyDemoModeProps) => {
     if (activePhaseIndex >= totalPhases) return <JourneyCompletedPage />;
 
     const handleExitDemo = () => {
+        // Nuclear reset: clear everything
+        resetDemoCache();
+        setUnlockedArtifacts([]);
+        pendingArtifactIdsRef.current.clear();
         try {
             tokenStore.clearTokens();
         } catch (error) {
             console.error('Error clearing tokens:', error);
         }
         navigate('/');
+    };
+
+    const handleHardReset = () => {
+        // RESET DEMO: Restart journey from beginning
+        console.log('[Demo] Hard reset initiated - restarting journey from beginning');
+
+        // 1. Clear React component state
+        setUnlockedArtifacts([]);
+        pendingArtifactIdsRef.current.clear();
+        setViewingArtifact(null);
+
+        // 2. Clear demo-specific localStorage keys only
+        if (typeof window !== 'undefined') {
+            window.localStorage.removeItem('mfai-journey-storage');
+            window.localStorage.removeItem('demo_mock_db');
+        }
+
+        // 3. Reset store demo state
+        resetDemoCache();
+
+        // 4. Restart from first phase
+        if (selectedPersona && selectedPersona.phases.length > 0) {
+            const firstPhase = selectedPersona.phases[0];
+            console.log(`[Demo] Restarting from first phase: ${firstPhase.id}`);
+
+            // Small delay to ensure state is clean before restarting
+            setTimeout(() => {
+                startDemoPhase(firstPhase.id, selectedPersonaId);
+            }, 100);
+        } else {
+            console.error('[Demo] No persona or phases available for reset');
+        }
     };
 
     const handleNavigationToggle = () => {
@@ -462,6 +457,13 @@ const JourneyDemoMode = ({ onBack: _onBack }: JourneyDemoModeProps) => {
 
                     <div className="h-4 w-px bg-white/10 mx-1" />
 
+                    <button 
+                        onClick={handleHardReset} 
+                        className="rounded-full border border-red-500/50 text-red-400 px-4 py-1.5 text-xs font-bold hover:bg-red-500/10 transition"
+                        title="Clear demo cache and restart fresh"
+                    >
+                        Reset
+                    </button>
                     <button onClick={handleExitDemo} className="rounded-full bg-white text-black px-4 py-1.5 text-xs font-bold hover:bg-gray-200 transition">Exit</button>
                 </div>
             </header>
@@ -499,14 +501,23 @@ const JourneyDemoMode = ({ onBack: _onBack }: JourneyDemoModeProps) => {
                                 <div className="mt-4">
                                     <div className="mb-1 flex justify-between text-xs uppercase tracking-wider text-accent-cyan">
                                         <span>Simulating {safeActivePhase.title}...</span>
-                                        <span>Step {(demoState.stepIndex || 0) + 1} / {demoState.currentSequence?.length || '?'}</span>
+                                        <span>Phase {activePhaseIndex + 1} / {selectedPersona.phases.length}</span>
                                     </div>
                                     <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/40">
                                         <motion.div
                                             className="h-full bg-accent-cyan"
                                             initial={{ width: 0 }}
                                             animate={{
-                                                width: `${Math.min(100, (((demoState.stepIndex || 0) + 1) / (demoState.currentSequence?.length || 1)) * 100)}%`
+                                                // Progress: completed steps / total. Current step counts as "in progress" (partial)
+                                                // Only show 100% when status is COMPLETED or WAITING_FOR_FINAL_VALIDATION
+                                                width: `${Math.min(100, (() => {
+                                                    const currentStep = demoState.stepIndex || 0;
+                                                    const totalSteps = demoState.currentSequence?.length || 1;
+                                                    const isCompleted = demoState.status === 'COMPLETED' || demoState.status === 'WAITING_FOR_FINAL_VALIDATION';
+                                                    if (isCompleted) return 100;
+                                                    // Show progress as: (completed steps + 0.5 for current) / total
+                                                    return ((currentStep + 0.5) / totalSteps) * 100;
+                                                })())}%`
                                             }}
                                             transition={{ duration: 0.5 }}
                                         />
@@ -523,7 +534,7 @@ const JourneyDemoMode = ({ onBack: _onBack }: JourneyDemoModeProps) => {
                     {/* LEFT: TIMELINE (READ ONLY) */}
                     {showLeftPanel && (
                         <aside className="sticky top-24 h-[calc(100vh-8rem)] overflow-y-auto rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl">
-                            <JourneyTimeline phases={selectedPersona?.phases || []} currentPhase={userProgress.completedPhases.length} />
+                            <JourneyTimeline phases={selectedPersona?.phases || []} currentPhase={activePhaseIndex} />
                         </aside>
                     )}
 

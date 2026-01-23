@@ -45,8 +45,20 @@ const findMonorepoRoot = () => {
 
 const monorepoRoot = findMonorepoRoot();
 const appTsx = path.join(monorepoRoot, 'journey-simulator/src/App.tsx');
-const mfAppJs = path.join(monorepoRoot, 'mf-back/app.js');
-const mfRoutesDir = path.join(monorepoRoot, 'mf-back/routes');
+const mfAppCandidates = [
+  path.join(monorepoRoot, 'mf-back/src/app.ts'),
+  path.join(monorepoRoot, 'mf-back/dist/app.js'),
+  path.join(monorepoRoot, 'mf-back/app.js'),
+];
+const mfAppJs = mfAppCandidates.find((p) => fs.existsSync(p));
+if (!mfAppJs) {
+  throw new Error('Unable to locate mf-back app entrypoint (searching src/app.ts, dist/app.js, app.js)');
+}
+const mfRoutesDir =
+  fs.existsSync(path.join(monorepoRoot, 'mf-back/src/routes')) &&
+  fs.readdirSync(path.join(monorepoRoot, 'mf-back/src/routes')).length > 0
+    ? path.join(monorepoRoot, 'mf-back/src/routes')
+    : path.join(monorepoRoot, 'mf-back/routes');
 
 const read = (p) => fs.readFileSync(p, 'utf8');
 
@@ -119,6 +131,7 @@ const parseBackendMounts = () => {
 };
 
 const listRouteFiles = () => {
+  if (!fs.existsSync(mfRoutesDir)) return [];
   const entries = fs.readdirSync(mfRoutesDir, { withFileTypes: true });
   return entries
     .filter((e) => e.isFile() && e.name.endsWith('.js'))

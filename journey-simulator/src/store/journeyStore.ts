@@ -64,13 +64,15 @@ export interface JourneyState {
   closeModal: () => void;
   demoState: {
     isActive: boolean;
-    status: 'IDLE' | 'PLAYING' | 'PAUSED' | 'WAITING_FOR_INTERACTION' | 'WAITING_FOR_FINAL_VALIDATION' | 'COMPLETED';
+    status: 'IDLE' | 'LOADING' | 'PLAYING' | 'PAUSED' | 'WAITING_FOR_INTERACTION' | 'WAITING_FOR_FINAL_VALIDATION' | 'COMPLETED';
     currentSequence: JourneyStepResponse[];
     stepIndex: number;
     typingDelayMs: number;
     demoHistory: Array<{ role: string; content: string; source?: string; timestamp: Date }>;
     accumulatedActions: import('../types/uiBlocks').AgentAction[];
     accumulatedResources: import('../types/uiBlocks').ResourceItem[];
+    demoSessionId: string;
+    currentPhaseId: string | null;
   };
   setDemoState: (state: Partial<JourneyState['demoState']>) => void;
   startDemoPhase: (phaseId: string, trackId: string) => Promise<void>; // Setup sequence
@@ -105,6 +107,7 @@ export interface JourneyState {
   setUserProgress: (progress: UserProgress) => void;
   setDemoMode: (enabled: boolean) => void;
   setCollaterizeSimulation: (sim: CollaterizeSimulation | undefined) => void;
+  resetDemoCache: () => void;
 }
 
 // Helper: prefer this over `useJourneyStore()` (no selector), to reduce rerenders.
@@ -340,7 +343,10 @@ const buildProgressUpdate = (
   rewards: PhaseResolution
 ) => {
   const updatedPhases = Array.from(new Set([...state.userProgress.completedPhases, phaseIndex])).sort((a, b) => a - b);
-  const nextPhaseIndex = Math.min(updatedPhases.length, Math.max(rewards.phases.length - 1, 0));
+  // Next phase = completed count, capped at last phase index (phases.length - 1)
+  // If all phases completed, stay on last phase
+  const totalPhases = rewards.phases.length;
+  const nextPhaseIndex = Math.min(updatedPhases.length, totalPhases - 1);
 
   const newTotalXP = state.userProgress.totalXP + rewards.xpReward;
   let updatedNFTs = state.userProgress.nfts;
@@ -509,10 +515,12 @@ export const useJourneyStore = createWithEqualityFn<JourneyState>()(
         status: 'IDLE',
         currentSequence: [],
         stepIndex: 0,
-        typingDelayMs: 1500, // Speed of "reading"
+        typingDelayMs: 1500,
         demoHistory: [],
         accumulatedActions: [],
         accumulatedResources: [],
+        demoSessionId: '',
+        currentPhaseId: null,
       },
 
       setDemoState: (partial) => set((state) => ({
@@ -520,39 +528,86 @@ export const useJourneyStore = createWithEqualityFn<JourneyState>()(
       })),
 
       startDemoPhase: async (phaseId, trackId) => {
+        console.log(`[Demo] startDemoPhase CLEAN: ${trackId}/${phaseId}`);
+
+        // STEP 1: Import sequencer V2
         const { getDemoSequence } = await import('./demoSequencer');
-        set((state) => ({
-          isStepLoading: true,
-          // CRITICAL FIX: Ensure any previous modal is forcefully closed to prevent "Ghost Modals"
-          isModalOpen: false,
-          modalContent: null,
+
+        // STEP 2: Generate complete sequence
+        const fullSequence = getDemoSequence(trackId);
+
+        if (!fullSequence || fullSequence.length === 0) {
+          console.error(`[Demo] CRITICAL: Empty sequence for ${trackId}`);
+          set({
+            demoState: {
+              ...get().demoState,
+              isActive: false,
+              status: 'IDLE',
+              currentSequence: [],
+              stepIndex: -1,
+            },
+          });
+          return;
+        }
+
+        console.log(`[Demo] Loaded ${fullSequence.length} steps for ${trackId}`);
+
+        // STEP 3: Find phase start index (filter steps matching phaseId)
+        const phaseSteps = fullSequence.filter((step) => step.metadata.phase_id === phaseId);
+        const phaseStartIndex = fullSequence.findIndex((step) => step.metadata.phase_id === phaseId);
+
+        if (phaseStartIndex === -1) {
+          console.warn(`[Demo] Phase ${phaseId} not found in sequence. Starting from beginning.`);
+        }
+
+        console.log(`[Demo] Phase ${phaseId}: ${phaseSteps.length} steps, starting at index ${phaseStartIndex}`);
+
+        // CRITICAL FIX: Store only phase steps, not full sequence
+        if (phaseSteps.length === 0) {
+          console.error(`[Demo] CRITICAL: No steps found for phase ${phaseId}`);
+          set({
+            demoState: {
+              ...get().demoState,
+              isActive: false,
+              status: 'IDLE',
+              currentSequence: [],
+              stepIndex: -1,
+            },
+          });
+          return;
+        }
+
+        // STEP 4: CLEAN STATE RESET
+        set({
+          // Reset demo state
           demoState: {
-            ...state.demoState,
             isActive: true,
             status: 'PLAYING',
-            currentSequence: [],
-            stepIndex: -1, // Will increment to 0 on first tick
-            demoHistory: [], // Chat history resets per phase for context window
-            // CUMULATIVE MEMORY: NEVER reset accumulated data between phases
-            accumulatedActions: state.demoState.accumulatedActions || [],
-            accumulatedResources: state.demoState.accumulatedResources || [],
-          }
-        }));
-
-        // Mock latency
-        await new Promise(r => setTimeout(r, 600));
-
-        const sequence = getDemoSequence(phaseId, trackId);
-
-        set((state) => ({
+            demoSessionId: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+            currentPhaseId: phaseId,
+            currentSequence: phaseSteps, // FIXED: Only phase steps, not full sequence
+            stepIndex: -1, // FIXED: Start at -1 so first tick gives index 0
+            demoHistory: [],
+            accumulatedActions: [],
+            accumulatedResources: [],
+            typingDelayMs: 1500,
+          },
+          // Reset user progress for demo
+          userProgress: {
+            ...get().userProgress,
+            totalXP: 0,
+            globalXP: 0,
+            mfaiTokens: 0,
+            completedPhases: [],
+            currentSubStep: 0,
+            demoModeEnabled: true,
+          },
+          // Clear previous step
+          lastStep: null,
           isStepLoading: false,
-          demoState: {
-            ...state.demoState,
-            currentSequence: sequence,
-            stepIndex: -1, // Ready for first tick
-            status: 'PLAYING'
-          }
-        }));
+        });
+
+        console.log(`[Demo] State initialized. Ready to tick from step ${phaseStartIndex}`);
       },
 
       tickDemo: () => {
@@ -579,9 +634,15 @@ export const useJourneyStore = createWithEqualityFn<JourneyState>()(
         const interactiveKinds = ['bonding_curve_block', 'mission_block', 'market_launchpad_block', 'quiz_block'];
 
         // CRITICAL FIX: Scan ALL blocks, not just the last one
+        // A mission_block is interactive if it's mandatory OR has an NFT reward
         let isInteractive = false;
         if (step.ui_blocks && step.ui_blocks.length > 0) {
-          isInteractive = step.ui_blocks.some(b => interactiveKinds.includes(b.kind) || (b.kind === 'mission_block' && !!b.nft_reward_id));
+          isInteractive = step.ui_blocks.some(b => {
+            if (b.kind === 'mission_block') {
+              return (b as any).is_mandatory === true || !!(b as any).nft_reward_id;
+            }
+            return interactiveKinds.includes(b.kind);
+          });
         }
 
         // 3. Update State & Sync Progress
@@ -641,24 +702,17 @@ export const useJourneyStore = createWithEqualityFn<JourneyState>()(
         }));
       },
 
-      submitDemoInteraction: async (_action, _payload) => {
-        // Verify valid interaction context
+      submitDemoInteraction: (_action, _payload) => {
         const state = get();
         if (state.demoState.status !== 'WAITING_FOR_INTERACTION') {
           console.warn('[Demo] Interaction ignored - not waiting for one.');
           return;
         }
 
-        // Logic: The simulation only resumes when the submitDemoInteraction is called via a REAL CLICK on the button.
-
-        // Resume
         console.log('[Demo] User Interaction Received. Resuming PLAYING.');
         set((s) => ({
           demoState: { ...s.demoState, status: 'PLAYING' }
         }));
-
-        // Trigger next tick immediately or after short delay
-        setTimeout(() => get().tickDemo(), 100);
       },
 
       ensureApiJourneyId: () => {
@@ -1025,28 +1079,66 @@ export const useJourneyStore = createWithEqualityFn<JourneyState>()(
       })),
 
       resetProgress: async () => {
+        // UNIFIED RESET: Clears BOTH regular progress AND demo state
+        // Generates new demoSessionId to invalidate any running timers
+        const newSessionId = `reset-${Date.now()}`;
+        
+        // 1. Clear demo database
+        resetEntireDemoDatabase();
+        
+        // 2. Reset ALL store state including demoState
         set({
           selectedPersona: null,
           currentPhase: 0,
-          userProgress: { ...initialUserProgress },
+          userProgress: { 
+            ...initialUserProgress,
+            completedPhases: [],
+            totalXP: 0,
+            nfts: [],
+            nftMints: [],
+            mfaiTokens: 0,
+            stakedMfai: 0,
+            votingPower: 0,
+          },
           testnetFeatures: { ...initialTestnetFeatures },
           isModalOpen: false,
           modalContent: null,
+          lastStep: null,
+          apiJourneyId: null,
+          // CRITICAL: Reset demoState with new sessionId
+          demoState: {
+            isActive: false,
+            status: 'IDLE',
+            currentSequence: [],
+            stepIndex: -1,
+            typingDelayMs: 1200,
+            demoHistory: [],
+            accumulatedActions: [],
+            accumulatedResources: [],
+            demoSessionId: newSessionId,
+            currentPhaseId: null,
+          },
         });
 
+        // 3. Clear all localStorage and sessionStorage
         if (typeof window !== 'undefined') {
           try {
             window.localStorage.removeItem('mfai-journey-storage');
+            window.localStorage.removeItem(DEMO_ACTIVE_PERSONA_KEY);
+            window.localStorage.removeItem('demo_artifacts');
+            window.localStorage.removeItem('demo_history');
+            window.sessionStorage.clear();
           } catch (error) {
-            console.error('Failed to clear persisted journey data:', error);
+            console.error('Failed to clear persisted data:', error);
           }
         }
 
+        // 4. Call API reset if authenticated
         const hasAccessToken = typeof window !== 'undefined'
           ? tokenStore.getAccessToken()
           : null;
 
-        if (hasAccessToken) {
+        if (hasAccessToken && hasAccessToken !== 'demo-token') {
           try {
             await api.resetProgress();
           } catch (error) {
@@ -1193,7 +1285,61 @@ export const useJourneyStore = createWithEqualityFn<JourneyState>()(
           ...state.userProgress,
           collaterizeSimulation: sim
         }
-      }))
+      })),
+
+      resetDemoCache: () => {
+        // NUCLEAR RESET: Clear ALL demo-related data
+        
+        // 1. Clear demo database (personas progress)
+        resetEntireDemoDatabase();
+        
+        // 2. Clear all localStorage keys
+        if (typeof window !== 'undefined') {
+          window.localStorage.removeItem(DEMO_ACTIVE_PERSONA_KEY);
+          window.localStorage.removeItem('mfai-journey-storage');
+          // Clear any other potential demo artifacts
+          window.localStorage.removeItem('demo_artifacts');
+          window.localStorage.removeItem('demo_history');
+          window.sessionStorage.clear();
+        }
+        
+        // 3. Generate NEW session ID to invalidate any running timers
+        const newInvalidSessionId = `reset-${Date.now()}`;
+        
+        // 4. Reset ALL store state to initial values
+        set({
+          selectedPersona: null,
+          currentPhase: 0,
+          userProgress: { 
+            ...initialUserProgress,
+            completedPhases: [],
+            totalXP: 0,
+            nfts: [],
+            nftMints: [],
+            mfaiTokens: 0,
+            stakedMfai: 0,
+            votingPower: 0,
+          },
+          lastStep: null,
+          apiJourneyId: null,
+          isModalOpen: false,
+          modalContent: null,
+          demoState: {
+            isActive: false,
+            status: 'IDLE',
+            currentSequence: [],
+            stepIndex: -1,
+            typingDelayMs: 1200,
+            demoHistory: [],
+            accumulatedActions: [],
+            accumulatedResources: [],
+            demoSessionId: newInvalidSessionId, // Invalidates running timers
+            currentPhaseId: null,
+          },
+        });
+        
+        toast.success('Demo reset complete', { description: 'All progress cleared. Select a persona to start fresh.' });
+      }
     }),
     {
       name: 'mfai-journey-storage',

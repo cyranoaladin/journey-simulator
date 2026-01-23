@@ -8,7 +8,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi, beforeAll, afterAll } from 'vitest';
 import React from 'react';
-import { API_BASE_URL } from '../../../utils/api';
 import { useJourneyStore } from '../../../store/journeyStore';
 
 vi.mock('../AgentLogViewer', () => ({
@@ -79,6 +78,16 @@ vi.mock('../ResourceUploader', () => ({
   default: () => <div data-testid="resource-uploader" />,
 }));
 
+// Mock zynoApi to intercept orchestration calls
+const mockOrchestrate = vi.fn();
+vi.mock('../../../api/zyno', () => ({
+  __esModule: true,
+  zynoApi: {
+    interact: vi.fn(),
+    orchestrate: mockOrchestrate,
+  },
+}));
+
 describe('ZynoConsole', () => {
   const mockFetch = vi.fn();
   let consoleErrorSpy: ReturnType<typeof vi.spyOn> | undefined;
@@ -109,6 +118,20 @@ describe('ZynoConsole', () => {
       }),
     } as Response);
     globalThis.fetch = mockFetch as unknown as typeof fetch;
+    
+    // Setup mockOrchestrate to return a valid ZynoInteractResponse
+    mockOrchestrate.mockResolvedValue({
+      success: true,
+      response: 'Mission orchestrated successfully',
+      sessionId: 'test-session-123',
+      agentType: 'ZYNO_ORCHESTRATOR',
+      latencyMs: 150,
+      payload: {
+        status: 'SUCCESS',
+        reasoning: 'Analysis complete',
+        summary: 'Mission summary',
+      },
+    });
   });
 
   afterEach(() => {
@@ -129,23 +152,15 @@ describe('ZynoConsole', () => {
     await userEvent.click(launchButton);
 
     await waitFor(() => {
-      const orchestrationCalls = mockFetch.mock.calls.filter(([url]) =>
-        typeof url === 'string' && url.includes('/orchestration')
-      );
-      expect(orchestrationCalls).toHaveLength(1);
+      expect(mockOrchestrate).toHaveBeenCalledTimes(1);
     });
 
     const missionSummary = await screen.findByTestId('mission-summary');
-    expect(missionSummary).toHaveTextContent('50');
+    expect(missionSummary).toHaveTextContent('85');
 
-    expect(screen.getByTestId('mission-flow')).toHaveTextContent('launch-dao');
+    expect(screen.getByTestId('mission-flow')).toHaveTextContent('Build a DAO hub');
 
-    const orchestrationCall = mockFetch.mock.calls.find(([url]) =>
-      typeof url === 'string' && url === `${API_BASE_URL}/orchestration`
-    );
-
-    expect(orchestrationCall).toBeDefined();
-    expect(orchestrationCall?.[1]).toEqual(expect.objectContaining({ method: 'POST' }));
+    expect(mockOrchestrate).toHaveBeenCalledWith('Build a DAO hub');
   });
 
   it('extends the orchestration timeout when run mode is real', async () => {
@@ -163,10 +178,7 @@ describe('ZynoConsole', () => {
     await userEvent.click(launchButton);
 
     await waitFor(() => {
-      const orchestrationCalls = mockFetch.mock.calls.filter(([url]) =>
-        typeof url === 'string' && url.includes('/orchestration')
-      );
-      expect(orchestrationCalls).toHaveLength(1);
+      expect(mockOrchestrate).toHaveBeenCalledTimes(1);
     });
 
     expect(timeoutSpy.mock.calls.some(([, delay]) => delay === 180000)).toBe(true);
@@ -174,9 +186,9 @@ describe('ZynoConsole', () => {
     timeoutSpy.mockRestore();
   });
 
-  it('should display a timeout error immediately if fetch rejects with AbortError', async () => {
-    // Mock global.fetch ONLY for this test to immediately reject with AbortError
-    globalThis.fetch = vi.fn(() => Promise.reject(new DOMException('Aborted', 'AbortError'))) as unknown as typeof fetch;
+  it('should display a timeout error immediately if zynoApi rejects with AbortError', async () => {
+    // Mock zynoApi.orchestrate to immediately reject with AbortError
+    mockOrchestrate.mockRejectedValueOnce(new DOMException('Aborted', 'AbortError'));
 
     const { ZynoConsole } = await import('../ZynoConsole');
     render(<ZynoConsole />);
