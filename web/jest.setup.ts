@@ -11,6 +11,7 @@ import { Buffer } from 'node:buffer';
 import crypto from 'node:crypto';
 
 if (typeof globalThis.WritableStream === 'undefined') {
+  // @ts-ignore
   ; (globalThis as any).WritableStream = WritableStream
 }
 
@@ -33,7 +34,7 @@ Object.defineProperty(globalThis, 'crypto', {
 if (typeof Request === 'undefined') {
   globalThis.Request = class Request {
     constructor(input: any, init: any) {
-      this.json = async () => (init?.body ? JSON.parse(init.body) : {})
+      this.json = async () => (init?.body ? JSON.parse(init.body as string) : {})
     }
     json() {
       return Promise.resolve({})
@@ -43,11 +44,11 @@ if (typeof Request === 'undefined') {
 if (typeof Response === 'undefined') {
   globalThis.Response = class Response {
     constructor(body?: any, init?: any) {
-      this.status = init?.status || 200
-      this._body = body
+      ; (this as any).status = init?.status || 200
+        ; (this as any)._body = body
     }
     json() {
-      return Promise.resolve(JSON.parse(this._body || '{}'))
+      return Promise.resolve(JSON.parse(((this as any)._body as string) || '{}'))
     }
     static json(data: any, init?: any) {
       return new Response(JSON.stringify(data), init)

@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
           hasActivePass: hasPass,
           lastPassCheck: now,
           user: {
-            create: {}, // Create anonymous user if not exists
+            create: {} as any, // Create anonymous user if not exists
           },
         },
       })

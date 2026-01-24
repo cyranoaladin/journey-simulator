@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
                 chain: 'solana',
               },
             },
-          },
+          } as any, // Cast to any to bypass strict Prisma generated types mismatch during build
           include: {
             wallets: true,
           },
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
       }
 
       return wallet.user
-    })
+    }) as any // Cast explicitly to resolve type inference issue
 
     // 3. Create Session (Cookie)
     const sessionToken = signSession({

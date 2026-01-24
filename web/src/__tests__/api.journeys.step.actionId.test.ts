@@ -28,7 +28,7 @@ const callSpy = jest.fn(async () => ({
 }))
 
 jest.mock('@/server/zyno', () => ({
-  callZynoStep: (...args: any[]) => callSpy(...args),
+  callZynoStep: (...args: any[]) => (callSpy as any)(...args),
 }))
 
 describe('API /api/journeys/[id]/step with actionId', () => {
@@ -56,7 +56,7 @@ describe('API /api/journeys/[id]/step with actionId', () => {
     const res = await POST(req, { params: { id: 'abc' } })
     expect(res.status).toBe(200)
     expect(callSpy).toHaveBeenCalledTimes(1)
-    const arg = callSpy.mock.calls[0][0]
+    const arg = (callSpy.mock.calls as any)[0][0]
     expect(arg).toMatchObject({ actionId: 'go_next', trackId: 'builder', phaseId: 'learn' })
     const json = await (res as NextResponse).json()
     expect(json).toHaveProperty('metadata')

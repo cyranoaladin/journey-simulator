@@ -82,7 +82,7 @@ describe('Misc API coverage', () => {
         used: false,
         expiresAt: Date.now() + 10000,
       })),
-      markSiwsChallengeUsed: jest.fn(async () => {}),
+      markSiwsChallengeUsed: jest.fn(async () => { }),
     }))
 
     jest.doMock('tweetnacl', () => ({
@@ -92,7 +92,7 @@ describe('Misc API coverage', () => {
     // Mock PublicKey to avoid validation error
     jest.doMock('@solana/web3.js', () => ({
       PublicKey: class {
-        constructor() {}
+        constructor() { }
         toBytes() {
           return new Uint8Array()
         }
@@ -192,7 +192,7 @@ describe('Misc API coverage', () => {
 
   it('GET /api/agents/logs with and without journeyId', async () => {
     const { pushAgentLog } = await import('../../src/server/state')
-    await pushAgentLog({ journeyId: 'abc', agent: 'Zyno', action: 'step', details: { d: 1 } })
+    await pushAgentLog({ journeyId: 'abc', agent: 'Zyno', action: 'step', ts: Date.now(), details: { d: 1 } })
     const mod = await import('../../app/api/agents/logs/route')
     const { GET } = mod as any
     const res1 = await GET({ url: 'http://localhost/api/agents/logs?limit=5' } as any)

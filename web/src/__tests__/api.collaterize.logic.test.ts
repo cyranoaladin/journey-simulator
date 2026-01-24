@@ -4,6 +4,7 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
+import { NextResponse } from 'next/server'
 import { POST } from '../../app/api/integrations/collaterize/simulate/route'
 
 // Mock NextResponse

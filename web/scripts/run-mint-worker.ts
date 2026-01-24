@@ -5,7 +5,7 @@
  */
 
 // Worker is initialized on import (mintWorker.ts)
-import '../src/workers/mintWorker.ts'
+import '../src/workers/mintWorker'
 
 async function startWorker() {
   console.log('[worker:mint] Mint worker started')

@@ -13,7 +13,7 @@ export async function GET(req: NextRequest, ctx: { params: { id: string } }) {
   const userIdParam = url.searchParams.get('userId') || undefined
   const state = await getJourneyState(idParam)
   if (!state) return NextResponse.json({ error: 'not_found' }, { status: 404 })
-  if (userIdParam && state.userId && state.userId !== userIdParam) {
+  if (userIdParam && (state as any).userId && (state as any).userId !== userIdParam) {
     return NextResponse.json({ error: 'not_found' }, { status: 404 })
   }
   return NextResponse.json({ id: idParam, ...state })

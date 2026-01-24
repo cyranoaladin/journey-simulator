@@ -51,7 +51,7 @@ function handleCORS(res: NextResponse, origin: string | null) {
 function checkAdminAuth(req: Request): boolean {
   const provided = req.headers.get('x-api-key') || '';
   const expected = process.env.ADMIN_API_KEY || '';
-  return expected && provided === expected;
+  return !!(expected && provided === expected);
 }
 
 // Helper function to handle rate limiting
