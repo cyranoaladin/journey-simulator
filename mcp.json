@@ -83,18 +83,6 @@
       ]
     },
     {
-      "name": "mfai-mongo",
-      "transport": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-mongodb"
-      ],
-      "env": {
-        "MONGODB_CONNECTION_STRING": "mongodb://localhost:27017/mfai-journey"
-      }
-    },
-    {
       "name": "mfai-github",
       "transport": "stdio",
       "command": "npx",
