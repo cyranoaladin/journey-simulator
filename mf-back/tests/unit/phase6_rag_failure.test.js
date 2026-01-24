@@ -8,7 +8,7 @@ describe('Phase 6 B2: RAG Failure Chaos', () => {
         mockSearch = jest.fn();
 
         // Dynamic mock specifically for this isolated run
-        jest.doMock('../../orchestration/ragClient', () => {
+        jest.doMock('../../src/rag/ragClient', () => {
             return {
                 RAGClient: jest.fn().mockImplementation(() => {
                     return {
@@ -18,7 +18,7 @@ describe('Phase 6 B2: RAG Failure Chaos', () => {
             };
         });
 
-        ragService = require('../../orchestration/services/ragService');
+        ragService = require('../../src/orchestration/services/ragService');
     });
 
     test('Should handle RAG Service Down/Timeout gracefully', async () => {
