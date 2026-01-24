@@ -4,6 +4,8 @@ const path = require('path');
 const { loadTemplateForIntent } = require(path.join(__dirname, '../data/parcoursTemplates'));
 const specializedValidators = require('./specializedValidators');
 
+// ✅ Module resolution verified - using absolute path with __dirname
+
 // PERSONA TONES: Restored for track-specific personality
 const PERSONA_TONES = {
   level_1_hub: {
