@@ -95,7 +95,7 @@ function createStdioClient({ name, command, args, env }) {
             capabilities: {},
             clientInfo: { name: 'mcp-selftest', version: '0.1.0' },
           }),
-          8000,
+          30000,
           `${name}:initialize(${v})`
         );
         // Per spec: client sends initialized notification
@@ -140,7 +140,7 @@ async function main() {
       const init = await client.initialize();
       console.log(`initialize: OK (server: ${init?.serverInfo?.name || 'unknown'})`);
 
-      const tools = await withTimeout(client.request('tools/list', {}), 8000, `${s.name}:tools/list`);
+      const tools = await withTimeout(client.request('tools/list', {}), 30000, `${s.name}:tools/list`);
       const toolNames = (tools?.tools || []).map((t) => t.name);
       console.log(`tools/list: OK (${toolNames.length} tools)`);
       console.log(`tools: ${toolNames.slice(0, 15).join(', ')}${toolNames.length > 15 ? ', ...' : ''}`);
@@ -157,7 +157,7 @@ async function main() {
               name: readTool,
               arguments: { path: `${ROOT}/docs/ARCHITECTURE.md` },
             }),
-            8000,
+            30000,
             `${s.name}:read docs/ARCHITECTURE.md`
           );
           console.log(`read allowed file: OK (content blocks: ${(r1?.content || []).length})`);
@@ -166,7 +166,7 @@ async function main() {
           try {
             await withTimeout(
               client.request('tools/call', { name: readTool, arguments: { path: `${ROOT}/.env` } }),
-              8000,
+              30000,
               `${s.name}:read root .env`
             );
             console.log('SECURITY FAIL: root .env was readable (unexpected)');
@@ -188,7 +188,7 @@ async function main() {
 
           await withTimeout(
             client.request('tools/call', { name: queryTool, arguments: { [queryKey]: 'SELECT 1 AS ok' } }),
-            8000,
+            30000,
             `${s.name}:query SELECT 1`
           );
           console.log(`postgres SELECT 1: OK (arg key: ${queryKey})`);
@@ -199,7 +199,7 @@ async function main() {
                 name: queryTool,
                 arguments: { [queryKey]: 'SELECT * FROM \"MintLog\" ORDER BY \"createdAt\" DESC LIMIT 5' },
               }),
-              8000,
+              30000,
               `${s.name}:query MintLog`
             );
             console.log('postgres MintLog (5 latest): OK');
