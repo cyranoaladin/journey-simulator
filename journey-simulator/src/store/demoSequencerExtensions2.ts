@@ -693,7 +693,7 @@ export const createRedBlueEvolutionSequence = (trackId: string): JourneyStepResp
     const meta = {
         persona_id: trackId,
         journey_track: trackId,
-        phase_id: 'red-blue-evolution',
+        phase_id: 'redblue-evolution',
         mode: 'expert' as Mode,
         tone: 'critical' as Tone,
         language: 'en' as const,
@@ -774,7 +774,7 @@ export const createRedBlueEvolutionSequence = (trackId: string): JourneyStepResp
                 },
             ],
             next_state: {
-                phase_id: 'red-blue-evolution',
+                phase_id: 'redblue-evolution',
                 completed_missions: ['redblue-exercise'],
                 xp_delta: 130,
             },

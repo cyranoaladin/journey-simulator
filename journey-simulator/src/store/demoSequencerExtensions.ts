@@ -870,7 +870,7 @@ export const createNFTSystemsLabSequence = (trackId: string): JourneyStepRespons
     const meta = {
         persona_id: trackId,
         journey_track: trackId,
-        phase_id: 'nft-systems',
+        phase_id: 'nft-systems-lab',
         mode: 'builder' as Mode,
         tone: 'pedagogical' as Tone,
         language: 'en' as const,
@@ -926,7 +926,7 @@ export const createNFTSystemsLabSequence = (trackId: string): JourneyStepRespons
                 },
             ],
             next_state: {
-                phase_id: 'nft-systems',
+                phase_id: 'nft-systems-lab',
                 completed_missions: ['nft-design'],
                 xp_delta: 80,
             },
