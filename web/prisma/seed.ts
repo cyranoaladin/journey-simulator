@@ -15,7 +15,11 @@ async function main() {
   const user = await prisma.user.upsert({
     where: { email: 'demo@mfai.local' },
     update: {},
-    create: { email: 'demo@mfai.local', name: 'Demo User', walletAddress: 'demo-wallet-address' } as any,
+    create: {
+      email: 'demo@mfai.local',
+      name: 'Demo User',
+      walletAddress: 'demo-wallet-address',
+    } as any,
   })
 
   // Demo journeys (Projects)

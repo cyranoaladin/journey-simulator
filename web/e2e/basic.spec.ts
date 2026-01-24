@@ -13,7 +13,7 @@ test('health check returns ok', async ({ request }) => {
 })
 
 test('home redirects to simulator', async ({ page }) => {
-  // We expect a redirect. Since 3003 might be down, we just check we are sent there 
+  // We expect a redirect. Since 3003 might be down, we just check we are sent there
   // or that the navigation attempts to go there.
   // Note: page.goto follows redirects. If destination is down, it throws.
   // We catch the error and check the url, or use request.get() which checks status.

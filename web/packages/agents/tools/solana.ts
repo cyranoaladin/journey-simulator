@@ -8,17 +8,17 @@ import { clusterApiUrl, type Cluster } from '@solana/web3.js'
 import bs58 from 'bs58'
 
 import {
-    createAndMint,
-    mplTokenMetadata,
-    TokenStandard,
+  createAndMint,
+  mplTokenMetadata,
+  TokenStandard,
 } from '@metaplex-foundation/mpl-token-metadata'
 import {
-    createSignerFromKeypair,
-    generateSigner,
-    percentAmount,
-    publicKey,
-    signerIdentity,
-    type Umi,
+  createSignerFromKeypair,
+  generateSigner,
+  percentAmount,
+  publicKey,
+  signerIdentity,
+  type Umi,
 } from '@metaplex-foundation/umi'
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults'
 // base58 import removed - using bs58 instead

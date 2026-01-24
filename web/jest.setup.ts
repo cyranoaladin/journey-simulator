@@ -4,22 +4,21 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-import '@testing-library/jest-dom';
-import { TextDecoder, TextEncoder } from 'node:util';
-import { WritableStream } from 'web-streams-ponyfill';
-import { Buffer } from 'node:buffer';
-import crypto from 'node:crypto';
+import '@testing-library/jest-dom'
+import { TextDecoder, TextEncoder } from 'node:util'
+import { WritableStream } from 'web-streams-ponyfill'
+import { Buffer } from 'node:buffer'
+import crypto from 'node:crypto'
 
 if (typeof globalThis.WritableStream === 'undefined') {
   // @ts-ignore
-  ; (globalThis as any).WritableStream = WritableStream
+  ;(globalThis as any).WritableStream = WritableStream
 }
 
 // Polyfill for libs requiring TextEncoder/TextDecoder (e.g., noble)
-; (globalThis as any).TextEncoder = TextEncoder
-  ; (globalThis as any).TextDecoder = TextDecoder as unknown as typeof globalThis.TextDecoder
-
-  ; (globalThis as any).Buffer = Buffer
+;(globalThis as any).TextEncoder = TextEncoder
+;(globalThis as any).TextDecoder = TextDecoder as unknown as typeof globalThis.TextDecoder
+;(globalThis as any).Buffer = Buffer
 
 Object.defineProperty(globalThis, 'crypto', {
   value: {
@@ -28,7 +27,7 @@ Object.defineProperty(globalThis, 'crypto', {
     subtle: crypto.webcrypto.subtle,
   },
   configurable: true,
-});
+})
 
 // Polyfill for Request/Response in Jest environment
 if (typeof Request === 'undefined') {
@@ -44,8 +43,8 @@ if (typeof Request === 'undefined') {
 if (typeof Response === 'undefined') {
   globalThis.Response = class Response {
     constructor(body?: any, init?: any) {
-      ; (this as any).status = init?.status || 200
-        ; (this as any)._body = body
+      ;(this as any).status = init?.status || 200
+      ;(this as any)._body = body
     }
     json() {
       return Promise.resolve(JSON.parse(((this as any)._body as string) || '{}'))
@@ -83,7 +82,7 @@ if (typeof BroadcastChannel === 'undefined') {
       // console.log('BroadcastChannelMock: closed');
     }
   }
-  ; (globalThis as any).BroadcastChannel = BroadcastChannelMock
+  ;(globalThis as any).BroadcastChannel = BroadcastChannelMock
 }
 
 // Ensure tests use in-memory state store and demo fallbacks by default

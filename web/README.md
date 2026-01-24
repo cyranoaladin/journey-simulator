@@ -6,9 +6,9 @@
 
 # Journey Web (Next.js)
 
-*Version*: 0.1.2
-*Dernière mise à jour*: Décembre 2025
-*Stack*: Next.js 14.2.33, React 18.3.1, Prisma 5.22.0, PostgreSQL, Redis 5.10.0, BullMQ 5.65.0, UMI/Metaplex 3.4.0
+_Version_: 0.1.2
+_Dernière mise à jour_: Décembre 2025
+_Stack_: Next.js 14.2.33, React 18.3.1, Prisma 5.22.0, PostgreSQL, Redis 5.10.0, BullMQ 5.65.0, UMI/Metaplex 3.4.0
 
 Premium, secure, browser-first (UI) + strict backend (API) architecture.
 
@@ -216,6 +216,7 @@ Note: In production, use a real secret value (vault/CI secrets), and do not leav
 
 - Specification: `docs/openapi/journey-simulator.yaml`
 - Preview locally (choose one option):
+
   - RapiDoc (web component)
 
     ```bash
