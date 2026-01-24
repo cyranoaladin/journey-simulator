@@ -27,10 +27,11 @@ const templates = {
     },
     launch_nft: {
         content: {
-            mode: 'sequential',
+            mode: 'parallel',
             phases: [
                 { phase_id: 1, agent: 'NFTAgent', narrative_arc: { intro: 'NFT Launchpad initialization.' } },
-                { phase_id: 2, agent: 'NFTAgent', narrative_arc: { intro: 'Metadata validation and upload.' } }
+                { phase_id: 2, agent: 'TokenAgent', narrative_arc: { intro: 'Token utility definition.' } },
+                { phase_id: 3, agent: 'CommunityAgent', narrative_arc: { intro: 'Community engagement strategy.' } }
             ]
         }
     },
