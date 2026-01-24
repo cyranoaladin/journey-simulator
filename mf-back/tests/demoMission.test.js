@@ -27,7 +27,7 @@ jest.mock('../src/utils/openaiClient', () => ({
 }));
 
 const ragClient = require('../src/rag/ragClient');
-const { orchestrateZyno } = require('../src/orchestration/zynoOrchestrator');
+const { orchestrateZyno } = require('@/orchestration/zynoOrchestrator');
 
 const fixturePath = path.join(__dirname, 'fixtures', 'demo_mission.json');
 const missionFixture = JSON.parse(fs.readFileSync(fixturePath, 'utf-8'));
