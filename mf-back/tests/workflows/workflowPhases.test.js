@@ -4,7 +4,7 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-const workflowMap = require('@mocks/orchestration').workflowMap;
+const workflowMap = require('../../src/orchestration/workflowMap');
 
 describe('workflowMap journeys and phases', () => {
   it('covers product_launch journey with ordered phases', () => {

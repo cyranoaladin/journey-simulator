@@ -48,6 +48,20 @@ global.console = {
   error: jest.fn(),
 };
 
+// Global Prisma Mock to avoid "role root does not exist"
+jest.mock('@prisma/client', () => ({
+  PrismaClient: jest.fn().mockImplementation(() => ({
+    $connect: jest.fn(),
+    $disconnect: jest.fn(),
+    $transaction: jest.fn((callback) => callback({ user: { findUnique: jest.fn() } })),
+    user: { findUnique: jest.fn(), create: jest.fn(), upsert: jest.fn() },
+    journey: { create: jest.fn(), findUnique: jest.fn(), findMany: jest.fn() },
+    agentLog: { create: jest.fn(), createMany: jest.fn() },
+    wallet: { findUnique: jest.fn(), upsert: jest.fn() },
+    journeyState: { upsert: jest.fn() }
+  }))
+}));
+
 // Cleanup après chaque test
 afterEach(() => {
   jest.clearAllMocks();
