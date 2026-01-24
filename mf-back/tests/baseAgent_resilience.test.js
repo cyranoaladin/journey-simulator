@@ -4,26 +4,24 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-jest.mock('../src/utils/openaiClient', () => {
+jest.mock('../src/llm/OpenAIClient', () => {
   let callCount = 0;
   return {
-    DEFAULT_LLM_MODEL: 'mock',
-    DEFAULT_LLM_TEMPERATURE: 0,
-    DEFAULT_LLM_MAX_OUTPUT_TOKENS: 100,
-    callGpt5: async ({ messages }) => {
+    DEFAULT_MODEL: 'mock',
+    DEFAULT_TEMPERATURE: 0,
+    DEFAULT_MAX_TOKENS: 100,
+    callLLM: async ({ messages }) => {
       callCount += 1;
       if (callCount === 1) {
-        return { message: { content: '{"status":"ERROR","summary":"bad output"}' } };
+        return { content: '{"status":"ERROR","summary":"bad output"}' }; // callLLM returns { content: string } usually
       }
       return {
-        message: {
-          content: JSON.stringify({
-            status: 'OK',
-            reasoning: 'Auto-corrected after error',
-            summary: 'Fixed',
-            resources: { diagram: { content: 'graph TD; A-->B;' } },
-          }),
-        },
+        content: JSON.stringify({
+          status: 'OK',
+          reasoning: 'Auto-corrected after error',
+          summary: 'Fixed',
+          resources: { diagram: { content: 'graph TD; A-->B;' } },
+        }),
       };
     },
     __reset: () => {
@@ -53,7 +51,7 @@ class TestAgent extends BaseAgent {
 }
 
 describe('BaseAgent resilience with auto-reprompt', () => {
-  const { __reset } = require('../src/utils/openaiClient');
+  const { __reset } = require('../src/llm/OpenAIClient');
 
   beforeEach(() => {
     __reset();
