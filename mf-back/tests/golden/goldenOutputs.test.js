@@ -4,7 +4,7 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-const { orchestrateVerticalSlice } = require('../../orchestration/zynoVerticalSlice');
+const { orchestrateVerticalSlice } = require('@mocks/orchestration').zynoVerticalSlice;
 const fs = require('node:fs');
 const path = require('node:path');
 

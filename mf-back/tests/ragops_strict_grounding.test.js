@@ -4,7 +4,7 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-const RAGOpsAgent = require('../agents/RAGOpsAgent');
+const RAGOpsAgent = require('../src/agents/RAGOpsAgent');
 
 describe('RAGOpsAgent strict grounding', () => {
   it('fails when no RAG citations are provided', async () => {

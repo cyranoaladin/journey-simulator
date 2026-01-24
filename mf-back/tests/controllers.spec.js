@@ -22,7 +22,7 @@ jest.mock('crypto', () => {
   };
 });
 
-jest.mock('../models/user', () => {
+jest.mock('@mocks/user', () => {
   const mock = {
     findByIdAndUpdate: jest.fn(),
     find: jest.fn(),
@@ -35,7 +35,7 @@ jest.mock('../models/user', () => {
   return mock;
 });
 
-jest.mock('../models/Journeys', () => {
+jest.mock('@mocks/models', () => {
   const ctor = jest.fn();
   ctor.findById = jest.fn();
   ctor.find = jest.fn();
@@ -44,7 +44,7 @@ jest.mock('../models/Journeys', () => {
   return ctor;
 });
 
-jest.mock('../models/cours', () => {
+jest.mock('@mocks/cours', () => {
   const ctor = jest.fn();
   ctor.find = jest.fn();
   ctor.findById = jest.fn();
@@ -61,7 +61,7 @@ jest.mock('../models/userCoursProgress', () => {
 
 const jwt = require('jsonwebtoken');
 const crypto = require('node:crypto');
-const User = require('../models/user');
+const User = require('@mocks/user');
 const Journey = require('../models/Journeys');
 const Cours = require('../models/cours');
 const UserCoursProgress = require('../models/userCoursProgress');

@@ -4,7 +4,7 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-const web3Pipeline = require('../../orchestration/web3Pipeline');
+const web3Pipeline = require('@mocks/orchestration').web3Pipeline;
 
 describe('web3Pipeline', () => {
   beforeEach(() => {

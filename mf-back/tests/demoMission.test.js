@@ -9,7 +9,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-jest.mock('../rag/ragClient', () => ({
+jest.mock('../src/rag/ragClient', () => ({
   getRagSnippets: jest.fn().mockResolvedValue([
     { title: 'demo knowledge base', content: 'Guidance for the demo mission.' }
   ]),
@@ -17,7 +17,7 @@ jest.mock('../rag/ragClient', () => ({
   ingestDocumentsIfNeeded: jest.fn().mockResolvedValue([])
 }));
 
-jest.mock('../utils/openaiClient', () => ({
+jest.mock('../src/utils/openaiClient', () => ({
   callGpt5: jest.fn().mockResolvedValue({
     message: { content: JSON.stringify({ global_score: 10, feedback: "Mock feedback", axes: [], reasoning: "Mock reasoning" }) }
   }),
@@ -26,8 +26,8 @@ jest.mock('../utils/openaiClient', () => ({
   DEFAULT_LLM_MAX_OUTPUT_TOKENS: 100
 }));
 
-const ragClient = require('../rag/ragClient');
-const { orchestrateZyno } = require('../orchestration/zynoOrchestrator');
+const ragClient = require('../src/rag/ragClient');
+const { orchestrateZyno } = require('../src/orchestration/zynoOrchestrator');
 
 const fixturePath = path.join(__dirname, 'fixtures', 'demo_mission.json');
 const missionFixture = JSON.parse(fs.readFileSync(fixturePath, 'utf-8'));

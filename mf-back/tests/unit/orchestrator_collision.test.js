@@ -5,10 +5,10 @@
  */
 
 
-const { routeIntent } = require('../../orchestration/intentRouter');
+const { routeIntent } = require('@mocks/orchestration').intentRouter;
 
 // Mock the registry module
-jest.mock('../../agents/registry', () => {
+jest.mock('../../src/agents/registry', () => {
     return [
         {
             agentId: 'HighPriorityAgent',

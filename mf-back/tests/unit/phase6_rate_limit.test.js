@@ -1,9 +1,9 @@
-const { LLMClient } = require('../../orchestration/llmClient');
-jest.mock('../../utils/openaiClient', () => ({
+const { LLMClient } = require('../../src/orchestration/llmClient');
+jest.mock('../../src/utils/openaiClient', () => ({
     callGpt5: jest.fn(),
     DEFAULT_LLM_MODEL: 'gpt-4.1-mini'
 }));
-const { callGpt5 } = require('../../utils/openaiClient');
+const { callGpt5 } = require('../../src/utils/openaiClient');
 
 describe('Phase 6 B3: Rate Limit Chaos (429)', () => {
     let llm;

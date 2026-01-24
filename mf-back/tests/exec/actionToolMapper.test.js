@@ -4,7 +4,7 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-const actionToolMapper = require('../../orchestration/actionToolMapper');
+const actionToolMapper = require('@mocks/orchestration').actionToolMapper;
 
 describe('actionToolMapper', () => {
   describe('mapActionToTool', () => {

@@ -24,6 +24,27 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reportsDirectory: './coverage',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/*.d.ts',
+        '**/*.config.*',
+        '**/test/**',
+        '**/__tests__/**',
+      ],
+      thresholds: {
+        lines: 70,
+        functions: 70,
+        branches: 70,
+        statements: 70,
+      },
     },
+    // Optimisations pour des tests rapides
+    testTimeout: 10000,
+    hookTimeout: 10000,
+    isolate: true,
+    // Pas de bail - exécuter tous les tests
+    bail: 0,
   },
 });

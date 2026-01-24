@@ -31,6 +31,8 @@ import { ArtifactModal } from '../Artifacts/ArtifactModal';
 import { NeuralOverlay } from '../Artifacts/NeuralOverlay';
 import NFTProofModal from '../NFTProofModal';
 import MarketLaunchpad from '../MarketLaunchpad';
+import { StakingModal } from '../Modals/StakingModal';
+import { DaoVoteModal } from '../Modals/DaoVoteModal';
 
 const computeGridTemplate = (focusMode: boolean, leftPanelOpen: boolean, rightPanelOpen: boolean) => {
     if (focusMode) return 'grid-cols-1';
@@ -230,6 +232,76 @@ const JourneyDemoMode = ({ onBack: _onBack }: JourneyDemoModeProps) => {
             }
         }
     }, [demoState?.status, activePhase.id, activePhaseIndex, handlePhaseComplete, openModal, activePhase.title, activePhase.nftReward, activePhase.xpReward, isModalOpen]);
+
+    // Detect Staking Requirement
+    useEffect(() => {
+        const hasStakingRequirement = typeof activePhase.stakingRequired === 'number' && activePhase.stakingRequired > 0;
+        
+        if (hasStakingRequirement && demoState?.status === 'PLAYING' && lastStep) {
+            // Check if current step has a staking mission
+            const hasMissionBlock = lastStep.ui_blocks?.some(
+                (block) => block.kind === 'mission_block' && (block as any).mission_type === 'staking'
+            );
+            
+            if (hasMissionBlock && !isModalOpen) {
+                openModal(
+                    <StakingModal
+                        amount={activePhase.stakingRequired!}
+                        phaseTitle={activePhase.title || `Phase ${activePhaseIndex + 1}`}
+                        phaseDescription={activePhase.description}
+                        currentBalance={userProgress.mfaiTokens}
+                        onStake={() => {
+                            toast.success(`Staked ${activePhase.stakingRequired} $MFAI`);
+                            closeModal();
+                            // Continue demo sequence
+                            const store = useJourneyStore.getState();
+                            if (store.submitDemoInteraction) {
+                                store.submitDemoInteraction('stake', { amount: activePhase.stakingRequired! });
+                            }
+                        }}
+                        onCancel={closeModal}
+                    />
+                );
+            }
+        }
+    }, [activePhase.stakingRequired, demoState?.status, lastStep, isModalOpen, activePhase.title, activePhase.description, activePhaseIndex, userProgress.mfaiTokens, openModal, closeModal]);
+
+    // Detect DAO Vote Requirement
+    useEffect(() => {
+        const hasDaoVoteRequirement = activePhase.daoVoteRequired === true;
+        
+        if (hasDaoVoteRequirement && demoState?.status === 'PLAYING' && lastStep) {
+            // Check if current step has a DAO vote mission
+            const hasDaoMissionBlock = lastStep.ui_blocks?.some(
+                (block) => block.kind === 'mission_block' && (block as any).mission_type === 'dao_vote'
+            );
+            
+            if (hasDaoMissionBlock && !isModalOpen) {
+                openModal(
+                    <DaoVoteModal
+                        proposal={{
+                            title: `${activePhase.title} Approval`,
+                            description: activePhase.description || `Vote to approve ${activePhase.title} for ecosystem deployment`,
+                            votesFor: 0,
+                            votesAgainst: 0,
+                            endDate: '7 days',
+                        }}
+                        votingPower={userProgress.votingPower}
+                        onVote={(vote) => {
+                            toast.success(`Voted ${vote === 'yes' ? 'FOR' : 'AGAINST'} the proposal`);
+                            closeModal();
+                            // Continue demo sequence
+                            const store = useJourneyStore.getState();
+                            if (store.submitDemoInteraction) {
+                                store.submitDemoInteraction('dao_vote', { vote });
+                            }
+                        }}
+                        onCancel={closeModal}
+                    />
+                );
+            }
+        }
+    }, [activePhase.daoVoteRequired, demoState?.status, lastStep, isModalOpen, activePhase.title, activePhase.description, userProgress.votingPower, openModal, closeModal]);
 
     // Start Phase on Mount or Phase Change (with guard to prevent double-starts)
     useEffect(() => {

@@ -1,8 +1,0 @@
-# Regulation and Compliance in Web3
-
-Covered areas:
-- MiCA (EU)
-- SEC & CFTC (US)
-- KYC/AML requirements
-- Legal wrappers for DAOs
-- Token classification frameworks

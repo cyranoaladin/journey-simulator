@@ -5,8 +5,8 @@
  */
 
 const mongoose = require('mongoose');
-const JourneyEngine = require('../services/JourneyEngine');
-const JourneyRun = require('../models/JourneyRun');
+const JourneyEngine = require('@mocks/models').JourneyRun;
+const JourneyRun = require('@mocks/models').JourneyRun;
 const PhaseProgress = require('../models/PhaseProgress');
 const Submission = require('../models/Submission');
 const Evaluation = require('../models/Evaluation');

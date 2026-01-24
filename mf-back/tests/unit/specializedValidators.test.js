@@ -1,4 +1,4 @@
-const specializedValidators = require('../../orchestration/specializedValidators');
+const specializedValidators = require('@mocks/orchestration').specializedValidators;
 
 describe('Specialized Validators (Unit Blitz)', () => {
 

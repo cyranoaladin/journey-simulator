@@ -4,16 +4,16 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-jest.mock('../utils/agent-idempotence', () => ({
+jest.mock('@mocks/utils', () => ({
   findOrCreateAgentRun: jest.fn().mockResolvedValue({ run: null, isNew: true }),
   generateIdempotencyKey: jest.fn().mockReturnValue('idempo'),
 }));
 
-jest.mock('../rag/ragClient', () => ({
+jest.mock('../src/rag/ragClient', () => ({
   getRagSnippets: jest.fn().mockResolvedValue([]),
 }));
 
-jest.mock('../utils/openaiClient', () => {
+jest.mock('../src/utils/openaiClient', () => {
   let callGpt5Mock = jest.fn();
   return {
     DEFAULT_LLM_MODEL: 'mock',
@@ -25,7 +25,7 @@ jest.mock('../utils/openaiClient', () => {
   };
 });
 
-const BaseAgent = require('../agents/BaseAgent');
+const BaseAgent = require('../src/agents/BaseAgent');
 
 class TestAgent extends BaseAgent {
   constructor() {
@@ -38,14 +38,14 @@ class TestAgent extends BaseAgent {
 
 describe('full pipeline resilience', () => {
   beforeEach(() => {
-    const { __setCallImpl, __getCallMock } = require('../utils/openaiClient');
+    const { __setCallImpl, __getCallMock } = require('../src/utils/openaiClient');
     const mock = __getCallMock();
     if (mock?.mockReset) mock.mockReset();
     __setCallImpl(jest.fn());
   });
 
   it('retries on transient OpenAI error (500) then succeeds', async () => {
-    const { __setCallImpl, __getCallMock } = require('../utils/openaiClient');
+    const { __setCallImpl, __getCallMock } = require('../src/utils/openaiClient');
     const mock = __getCallMock();
     mock
       .mockImplementationOnce(() => {
@@ -65,7 +65,7 @@ describe('full pipeline resilience', () => {
   });
 
   it('self-refines when first payload is status ERROR', async () => {
-    const { __setCallImpl, __getCallMock } = require('../utils/openaiClient');
+    const { __setCallImpl, __getCallMock } = require('../src/utils/openaiClient');
     const mock = __getCallMock();
     mock
       .mockResolvedValueOnce({ message: { content: '{"status":"ERROR","summary":"bad"}' } })
@@ -80,7 +80,7 @@ describe('full pipeline resilience', () => {
   });
 
   it('retries when Mermaid content is unsafe then fixes output', async () => {
-    const { __setCallImpl, __getCallMock } = require('../utils/openaiClient');
+    const { __setCallImpl, __getCallMock } = require('../src/utils/openaiClient');
     const mock = __getCallMock();
     mock
       .mockResolvedValueOnce({

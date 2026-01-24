@@ -7,10 +7,10 @@
 // Tests run stateless bearer flows with CSRF parity middleware.
 const express = require('express');
 const request = require('supertest');
-const { csrfGuard } = require('../middleware/csrfGuard');
+const { csrfGuard } = require('@mocks/csrfGuard');
 
 // Mock all orchestration dependencies to prevent module loading errors
-jest.mock('../orchestration/zynoVerticalSlice', () => ({
+jest.mock('@mocks/orchestration', () => ({
   orchestrateVerticalSlice: jest.fn()
 }));
 
@@ -51,8 +51,8 @@ jest.mock('../routes/orchestration-gate', () => {
   return router;
 });
 
-const AgentLog = require('../models/agentFeedbackLog');
-const { orchestrateZyno } = require('../orchestration/zynoOrchestrator');
+const AgentLog = require('@mocks/models').AgentFeedbackLog;
+const { orchestrateZyno } = require('../src/orchestration/zynoOrchestrator');
 const { listTemplates } = require('../data/parcoursTemplates');
 
 describe('Zyno orchestration route', () => {

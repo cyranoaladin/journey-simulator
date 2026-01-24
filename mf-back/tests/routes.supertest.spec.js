@@ -8,7 +8,7 @@ process.env.JWT_SECRET = 'unit-test-secret';
 
 const request = require('supertest');
 const express = require('express');
-const { csrfGuard } = require('../middleware/csrfGuard');
+const { csrfGuard } = require('@mocks/csrfGuard');
 
 jest.mock('dotenv', () => ({
   config: jest.fn(),
@@ -71,7 +71,7 @@ jest.mock('../models/userCoursProgress', () => {
 
 const jwt = require('jsonwebtoken');
 const crypto = require('node:crypto');
-const User = require('../models/user');
+const User = require('@mocks/user');
 const Journey = require('../models/Journeys');
 const Cours = require('../models/cours');
 const UserCoursProgress = require('../models/userCoursProgress');
@@ -80,7 +80,7 @@ const analyticsRouter = require('../routes/analytics-routes');
 const coursRouter = require('../routes/cours-routes');
 const journeyRouter = require('../routes/journey-routes');
 const userRouter = require('../routes/user-routes');
-const auth = require('../middleware/auth');
+const auth = require('../src/middleware/auth');
 
 const createApp = (mountPath, router) => {
   const app = express();

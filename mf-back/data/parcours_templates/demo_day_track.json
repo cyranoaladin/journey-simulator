@@ -1,9 +1,0 @@
-{
-  "track": "Demo Day",
-  "phases": [
-    { "phase": "Setup", "agent": "OnboardingAgent" },
-    { "phase": "Pitch Simulation", "agent": "PitchAgent" },
-    { "phase": "DAO Vote", "agent": "DAOAgent" },
-    { "phase": "Post Mortem", "agent": "ReflectionAgent" }
-  ]
-}

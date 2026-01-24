@@ -42,7 +42,7 @@ describe('Memory persistence into agent context', () => {
   });
 
   it('injects history from agentMemory into orchestrateZyno context', async () => {
-    const { orchestrateZyno } = require('../orchestration/zynoOrchestrator');
+    const { orchestrateZyno } = require('../src/orchestration/zynoOrchestrator');
     const userId = 'memory-user';
     const historyNote = "Le projet s'appelle MFAI-Solana";
     agentMemory.update(userId, { history: [{ note: historyNote }] });

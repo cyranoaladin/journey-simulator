@@ -8,7 +8,7 @@
 const express = require('express');
 const request = require('supertest');
 const path = require('node:path');
-const { csrfGuard } = require('../../middleware/csrfGuard');
+const { csrfGuard } = require('@mocks/csrfGuard');
 
 const orchestrationRouter = require('../../routes/zyno-routes');
 

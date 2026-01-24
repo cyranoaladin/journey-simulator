@@ -1,5 +1,5 @@
-const MintingAgent = require('../../agents/MintingAgent');
-const TokenAgent = require('../../agents/TokenAgent');
+const MintingAgent = require('../../src/agents/MintingAgent');
+const TokenAgent = require('../../src/agents/TokenAgent');
 
 describe('Testnet v0: Web3 Agents Simulation Compliance', () => {
     // This test suite focuses on the CONTENT of the simulation logic, ensuring it allows 'planning' 

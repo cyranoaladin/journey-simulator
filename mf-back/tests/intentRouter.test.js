@@ -4,7 +4,7 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-const { normalizeIntents, selectAgentsForIntents, routeIntent } = require('../orchestration/intentRouter');
+const { normalizeIntents, selectAgentsForIntents, routeIntent } = require('@mocks/orchestration').intentRouter;
 
 describe('Intent Router', () => {
   it('selects security agent for security.audit', () => {

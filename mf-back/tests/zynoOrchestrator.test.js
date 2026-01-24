@@ -6,7 +6,7 @@
 
 require('dotenv').config({ quiet: true });
 
-// jest.mock('../rag/ragClient'); // Removed to use real RAG
+// jest.mock('../src/rag/ragClient'); // Removed to use real RAG
 
 describe('orchestrateZyno', () => {
   beforeEach(() => {
@@ -14,7 +14,7 @@ describe('orchestrateZyno', () => {
   });
 
   it('normalizes agent outputs, including references and AEPO metrics', async () => {
-    const { orchestrateZyno } = require('../orchestration/zynoOrchestrator');
+    const { orchestrateZyno } = require('../src/orchestration/zynoOrchestrator');
 
     const result = await orchestrateZyno('Time to build a working prototype', {
       userId: 'user-3',

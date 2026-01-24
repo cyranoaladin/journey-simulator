@@ -12,15 +12,15 @@
 const request = require('supertest');
 const express = require('express');
 const bodyParser = require('body-parser');
-const { csrfGuard } = require('../middleware/csrfGuard');
+const { csrfGuard } = require('@mocks/csrfGuard');
 
 // Mock of modules used by the route
-jest.mock('../memory/agent_metrics', () => ({
+jest.mock('@mocks/agent_metrics', () => ({
   saveFeedback: jest.fn().mockResolvedValue({ saved: true })
 }));
 
 // Import mock
-const { saveFeedback } = require('../memory/agent_metrics');
+const { saveFeedback } = require('@mocks/agent_metrics');
 
 // Import route
 const feedbackRouter = require('../routes/feedback');

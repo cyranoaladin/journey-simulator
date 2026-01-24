@@ -10,15 +10,15 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const journeyEngineRoutes = require('../routes/journey-engine-routes');
-const { csrfGuard } = require('../middleware/csrfGuard');
+const { csrfGuard } = require('@mocks/csrfGuard');
 
 // Mock RAG to avoid network errors in tests
-jest.mock('../rag/ragClient', () => ({
+jest.mock('../src/rag/ragClient', () => ({
     getRagSnippets: jest.fn().mockResolvedValue([])
 }));
 
 // Mock OpenAI to avoid API calls in tests
-jest.mock('../utils/openaiClient', () => ({
+jest.mock('../src/utils/openaiClient', () => ({
     callGpt5: jest.fn().mockResolvedValue({
         message: { content: '{"test": "mock"}' }
     })

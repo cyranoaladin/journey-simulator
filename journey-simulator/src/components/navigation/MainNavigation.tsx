@@ -121,7 +121,7 @@ const UserAuthButtons = ({ user, navigate, logout }: { user: any, navigate: any,
     <div className="w-px h-6 bg-white/20" />
     {!user ? (
       <>
-        <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} onClick={() => navigate('/login?demo=1')} className="btn-primary flex items-center justify-center">
+        <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} onClick={() => navigate('/journeys/demo')} className="btn-primary flex items-center justify-center">
           <span>Demo Mode</span>
         </motion.button>
         <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} onClick={() => navigate('/login')} className="btn-secondary flex items-center justify-center">
@@ -366,7 +366,7 @@ const MobileMenu = ({
         <div className="mt-6 grid grid-cols-1 gap-3">
           {!user ? (
             <>
-              <button type="button" className="btn-primary w-full" onClick={() => navigate('/login?demo=1')}>
+              <button type="button" className="btn-primary w-full" onClick={() => navigate('/journeys/demo')}>
                 Demo Mode
               </button>
               <button type="button" className="btn-secondary w-full" onClick={() => navigate('/login')}>

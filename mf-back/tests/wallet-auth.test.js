@@ -32,7 +32,7 @@ jest.mock('crypto', () => {
 });
 
 const userController = require('../controllers/user-controller');
-const User = require('../models/user');
+const User = require('@mocks/user');
 const nacl = require('tweetnacl');
 // Fix for bs58 v6 which exports default in CJS
 const bs58 = require('bs58').default || require('bs58');

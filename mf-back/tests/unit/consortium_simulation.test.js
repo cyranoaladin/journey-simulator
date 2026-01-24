@@ -2,7 +2,7 @@ const { orchestrateZyno } = require('../../orchestration/zynoOrchestrator');
 const assert = require('node:assert');
 
 // Mock Agents Registry
-jest.mock('../../orchestration/agentsRegistry', () => {
+jest.mock('@mocks/orchestration', () => {
     const mockRun = (name) => ({
         status: 'VALIDATION_SUCCESS',
         summary: `Mock execution of ${name}`,

@@ -4,7 +4,7 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-jest.mock('../utils/openaiClient', () => {
+jest.mock('../src/utils/openaiClient', () => {
   let callCount = 0;
   return {
     DEFAULT_LLM_MODEL: 'mock',
@@ -32,16 +32,16 @@ jest.mock('../utils/openaiClient', () => {
   };
 });
 
-jest.mock('../utils/agent-idempotence', () => ({
+jest.mock('@mocks/utils', () => ({
   findOrCreateAgentRun: jest.fn().mockResolvedValue({ run: null, isNew: true }),
   generateIdempotencyKey: jest.fn().mockReturnValue('idempo'),
 }));
 
-jest.mock('../rag/ragClient', () => ({
+jest.mock('../src/rag/ragClient', () => ({
   getRagSnippets: jest.fn().mockResolvedValue([]),
 }));
 
-const BaseAgent = require('../agents/BaseAgent');
+const BaseAgent = require('../src/agents/BaseAgent');
 
 class TestAgent extends BaseAgent {
   constructor() {
@@ -53,7 +53,7 @@ class TestAgent extends BaseAgent {
 }
 
 describe('BaseAgent resilience with auto-reprompt', () => {
-  const { __reset } = require('../utils/openaiClient');
+  const { __reset } = require('../src/utils/openaiClient');
 
   beforeEach(() => {
     __reset();

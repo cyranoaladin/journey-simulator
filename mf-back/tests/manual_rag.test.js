@@ -7,7 +7,7 @@
 const BaseAgent = require("../agents/BaseAgent");
 const { callGpt5 } = require("../utils/openaiClient");
 
-jest.mock("../utils/agent-idempotence", () => ({
+jest.mock("@mocks/utils", () => ({
     findOrCreateAgentRun: jest.fn().mockResolvedValue({ run: { status: 'started', save: jest.fn().mockResolvedValue(true) }, isNew: true }),
     generateIdempotencyKey: jest.fn().mockReturnValue('mock-key')
 }));

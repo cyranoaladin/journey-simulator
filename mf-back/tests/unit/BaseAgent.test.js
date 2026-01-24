@@ -11,8 +11,8 @@ const { getRagSnippets } = require("../../rag/ragClient");
 
 // Mock dependencies
 // jest.mock("axios");
-jest.mock("../../rag/ragClient");
-jest.mock("../../utils/openaiClient", () => ({
+jest.mock("../../src/rag/ragClient");
+jest.mock("../../src/utils/openaiClient", () => ({
     callGpt5: jest.fn().mockResolvedValue({
         message: { content: "Mock LLM Response" }
     }),

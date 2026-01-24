@@ -4,7 +4,7 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
@@ -14,14 +14,13 @@ import { logger } from '../utils/logger';
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, loginAsDemo, isAuthenticated, isLoading } = useAuth();
+  const { login, isAuthenticated, isLoading } = useAuth();
   logger.debug("LoginPage: render", { isAuthenticated, isLoading });
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const autoDemoTriggeredRef = useRef(false);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -31,30 +30,8 @@ const LoginPage: React.FC = () => {
     }
   }, [isAuthenticated, navigate, location]);
 
-  // If header "Demo Mode" is clicked, we land on /login?demo=1 and auto-enter demo.
-  useEffect(() => {
-    if (isLoading || isAuthenticated) return;
-    if (autoDemoTriggeredRef.current) return;
-    const params = new URLSearchParams(location.search);
-    const demo = params.get('demo');
-    if (demo !== '1') return;
-
-    autoDemoTriggeredRef.current = true;
-    // fire-and-forget: reuses existing handler (shows loader, sets tokens, redirects)
-    void (async () => {
-      setIsSubmitting(true);
-      setError('');
-      try {
-        const ok = await loginAsDemo();
-        if (!ok) setError('Demo login failed. Please try again.');
-      } catch (err) {
-        logger.error('Demo login failed', err);
-        setError('Demo login failed. Please try again.');
-      } finally {
-        setIsSubmitting(false);
-      }
-    })();
-  }, [isLoading, isAuthenticated, location.search, loginAsDemo]);
+  // Demo mode is now handled via public /journeys/demo route
+  // No auto-demo logic needed here anymore
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,23 +46,6 @@ const LoginPage: React.FC = () => {
     } catch (err) {
       logger.error('Login failed', err);
       setError('Login failed. Please check your connection and try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleDemoLogin = async () => {
-    setIsSubmitting(true);
-    setError('');
-
-    try {
-      const success = await loginAsDemo();
-      if (!success) {
-        setError('Demo login failed. Please try again.');
-      }
-    } catch (err) {
-      logger.error('Demo login failed', err);
-      setError('Demo login failed. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -253,23 +213,16 @@ const LoginPage: React.FC = () => {
                 )}
               </motion.button>
 
-              {/* Demo Login Button */}
+              {/* Demo Mode Button - Redirects to public demo route */}
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 type="button"
-                onClick={handleDemoLogin}
+                onClick={() => navigate('/journeys/demo')}
                 disabled={isSubmitting}
                 className="w-full flex justify-center items-center py-3 px-4 border border-accent-gold/30 rounded-xl text-sm font-medium text-accent-gold bg-accent-gold/10 hover:bg-accent-gold/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-gold/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
               >
-                {isSubmitting ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-accent-gold"></div>
-                    <span>Loading demo...</span>
-                  </div>
-                ) : (
-                  <span>Try Demo Mode</span>
-                )}
+                <span>Try Demo Mode</span>
               </motion.button>
             </div>
 

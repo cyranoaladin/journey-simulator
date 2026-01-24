@@ -60,7 +60,7 @@ jest.mock('../orchestration/journey-tasks.json', () => ({
 }), { virtual: true });
 
 const agentMemory = require('../memory/agent_memory');
-const { orchestrateZyno } = require('../orchestration/zynoOrchestrator');
+const { orchestrateZyno } = require('../src/orchestration/zynoOrchestrator');
 
 describe('orchestrateZyno history window + summary preservation', () => {
   const messages = [
@@ -83,7 +83,7 @@ describe('orchestrateZyno history window + summary preservation', () => {
       await orchestrateZyno(msg, { userId });
     }
 
-    const agentsRegistry = require('../orchestration/agentsRegistry');
+    const agentsRegistry = require('@mocks/orchestration').agentsRegistry;
     const { lastContext, lastPromptTokens } = agentsRegistry.__getMemoryProbeState();
     const fullHistory = agentMemory.get(userId).history;
     const firstPayload = fullHistory.find((h) => h.payload);

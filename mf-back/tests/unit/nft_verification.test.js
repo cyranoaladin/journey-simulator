@@ -5,12 +5,12 @@
  */
 
 const { addNFTCertificate } = require('../../controllers/user-controller');
-const User = require('../../models/user');
+const User = require('@mocks/user');
 const { verifyTransaction } = require('../../utils/solana');
 
 // Mock dependencies
-jest.mock('../../models/user');
-jest.mock('../../utils/solana');
+jest.mock('@mocks/user');
+jest.mock('../../src/utils/solana');
 
 describe('NFT Verification Logic', () => {
     let req, res;

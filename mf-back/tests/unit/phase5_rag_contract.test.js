@@ -1,4 +1,4 @@
-const { RAGClient } = require('../../orchestration/ragClient'); // Import for class reference if needed, but we mock module
+const { RAGClient } = require('../../src/orchestration/ragClient'); // Import for class reference if needed, but we mock module
 
 describe('Phase 5 RAG Contracts (Isolated)', () => {
     let mockSearch;
@@ -12,7 +12,7 @@ describe('Phase 5 RAG Contracts (Isolated)', () => {
     test('Contract: RAG_MAX_TOPK clamp (999 -> 10)', async () => {
         await jest.isolateModules(async () => {
             // Mock RAGClient class
-            jest.doMock('../../orchestration/ragClient', () => {
+            jest.doMock('../../src/orchestration/ragClient', () => {
                 return {
                     RAGClient: jest.fn().mockImplementation(() => ({
                         search: mockSearch.mockResolvedValue({ source: 'mock_remote', chunks: [] })
@@ -21,7 +21,7 @@ describe('Phase 5 RAG Contracts (Isolated)', () => {
             });
 
             // Re-import service to force fresh instantiation with mocked client
-            const { fetchRagContext } = require('../../orchestration/services/ragService');
+            const { fetchRagContext } = require('../../src/orchestration/services/ragService');
 
             const req = { input: 'test', context: { rag: { topK: 999 } } };
             const selected = [{ agentId: 'TestAgent' }];
@@ -41,7 +41,7 @@ describe('Phase 5 RAG Contracts (Isolated)', () => {
 
     test('Contract: Collection Routing', async () => {
         await jest.isolateModules(async () => {
-            jest.doMock('../../orchestration/ragClient', () => {
+            jest.doMock('../../src/orchestration/ragClient', () => {
                 return {
                     RAGClient: jest.fn().mockImplementation(() => ({
                         search: mockSearch.mockResolvedValue({ source: 'mock_remote', chunks: [] })
@@ -49,7 +49,7 @@ describe('Phase 5 RAG Contracts (Isolated)', () => {
                 };
             });
 
-            const { fetchRagContext } = require('../../orchestration/services/ragService');
+            const { fetchRagContext } = require('../../src/orchestration/services/ragService');
 
             const req = { input: 'test' };
             const selected = [{ agentId: 'AgentA' }, { agentId: 'AgentB' }];
@@ -72,7 +72,7 @@ describe('Phase 5 RAG Contracts (Isolated)', () => {
 
     test('Contract: Fallback Tagging on Error', async () => {
         await jest.isolateModules(async () => {
-            jest.doMock('../../orchestration/ragClient', () => {
+            jest.doMock('../../src/orchestration/ragClient', () => {
                 return {
                     RAGClient: jest.fn().mockImplementation(() => ({
                         search: mockSearch.mockRejectedValue(new Error('RAG Down'))
@@ -80,7 +80,7 @@ describe('Phase 5 RAG Contracts (Isolated)', () => {
                 };
             });
 
-            const { fetchRagContext } = require('../../orchestration/services/ragService');
+            const { fetchRagContext } = require('../../src/orchestration/services/ragService');
 
             const req = { input: 'test' };
             const selected = [{ agentId: 'TestAgent' }];

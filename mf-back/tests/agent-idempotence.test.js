@@ -5,16 +5,15 @@
  */
 
 
-jest.mock('../models/agent-run', () => {
-    const mock = {
+jest.mock('@mocks/models', () => ({
+    AgentRun: {
         findOne: jest.fn(),
         create: jest.fn(),
-    };
-    return mock;
-});
+    }
+}));
 
-const AgentRun = require('../models/agent-run');
-const { findOrCreateAgentRun } = require('../utils/agent-idempotence');
+const { AgentRun } = require('@mocks/models');
+const { findOrCreateAgentRun } = require('../src/utils/agent-idempotence');
 
 describe('Agent Idempotence', () => {
     beforeEach(() => {

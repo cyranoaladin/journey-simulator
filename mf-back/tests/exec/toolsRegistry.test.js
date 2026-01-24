@@ -4,7 +4,7 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-const toolsRegistry = require('../../orchestration/toolsRegistry');
+const toolsRegistry = require('@mocks/orchestration').toolsRegistry;
 
 describe('toolsRegistry', () => {
   it('exports all required tools', () => {
@@ -70,7 +70,7 @@ describe('toolsRegistry', () => {
     });
 
     it('simulates mint_token and calls web3Pipeline', () => {
-      const web3Pipeline = require('../../orchestration/web3Pipeline');
+      const web3Pipeline = require('@mocks/orchestration').web3Pipeline;
       web3Pipeline.reset({ tenantId: 'test', runId: 'test-mint' });
       // Setup: proof and anchor must exist
       web3Pipeline.applyAction('proof', { tenantId: 'test', runId: 'test-mint' });
@@ -90,7 +90,7 @@ describe('toolsRegistry', () => {
     });
 
     it('fails mint_token without anchor', () => {
-      const web3Pipeline = require('../../orchestration/web3Pipeline');
+      const web3Pipeline = require('@mocks/orchestration').web3Pipeline;
       web3Pipeline.reset({ tenantId: 'test', runId: 'test-mint-fail' });
 
       const result = toolsRegistry.simulateTool('mint_token', {

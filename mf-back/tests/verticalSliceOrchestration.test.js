@@ -25,13 +25,13 @@ jest.mock('../orchestration/ragClient', () => {
   };
 });
 
-jest.mock('../agents/SecurityAuditAgent', () => {
+jest.mock('../src/agents/SecurityAuditAgent', () => {
   return jest.fn().mockImplementation(() => ({
     run: (...args) => mockSecurityRun(...args),
   }));
 });
 
-jest.mock('../agents/ProductSpecAgent', () => {
+jest.mock('../src/agents/ProductSpecAgent', () => {
   return jest.fn().mockImplementation(() => ({
     run: (...args) => mockProductRun(...args),
   }));
@@ -52,20 +52,20 @@ jest.mock('../orchestration/services/validationService', () => {
   return actual;
 });
 
-const { __mockSearch: ragSearchMock } = require('../orchestration/ragClient');
-const { orchestrateVerticalSlice } = require('../orchestration/zynoVerticalSlice');
-const metricsStore = require('../orchestration/metricsStore');
-const alertingEngine = require('../orchestration/alertingEngine');
-const registry = require('../agents/registry');
-const memoryStore = require('../orchestration/memoryStore');
-const executionGate = require('../orchestration/executionGate');
-const toolsRegistry = require('../orchestration/toolsRegistry');
-const idempotencyStore = require('../orchestration/idempotencyStore');
-const auditTrailStore = require('../orchestration/auditTrailStore');
-const tenantQuotaRegistry = require('../orchestration/tenantQuotaRegistry');
-const llmCache = require('../orchestration/llmCache');
-const circuitBreaker = require('../orchestration/circuitBreaker');
-const concurrencyManager = require('../orchestration/concurrencyManager');
+const { __mockSearch: ragSearchMock } = require('../src/orchestration/ragClient');
+const { orchestrateVerticalSlice } = require('@mocks/orchestration').zynoVerticalSlice;
+const metricsStore = require('../src/orchestration/metricsStore');
+const alertingEngine = require('../src/orchestration/alertingEngine');
+const registry = require('../src/agents/registry');
+const memoryStore = require('../src/orchestration/memoryStore');
+const executionGate = require('../src/orchestration/executionGate');
+const toolsRegistry = require('../src/orchestration/toolsRegistry');
+const idempotencyStore = require('../src/orchestration/idempotencyStore');
+const auditTrailStore = require('../src/orchestration/auditTrailStore');
+const tenantQuotaRegistry = require('../src/orchestration/tenantQuotaRegistry');
+const llmCache = require('../src/orchestration/llmCache');
+const circuitBreaker = require('../src/orchestration/circuitBreaker');
+const concurrencyManager = require('../src/orchestration/concurrencyManager');
 
 describe('Vertical Slice Orchestration', () => {
   beforeAll(() => {
@@ -1295,7 +1295,7 @@ describe('Vertical Slice Orchestration', () => {
   });
 
   it('uses llm cache across runs (cache hit)', async () => {
-    const llmCache = require('../orchestration/llmCache');
+    const llmCache = require('../src/orchestration/llmCache');
     llmCache.reset();
     await orchestrateVerticalSlice({
       traceId: 'trace-cache-1',
@@ -1675,7 +1675,7 @@ describe('Vertical Slice Orchestration', () => {
   });
 
   it('simulates web3 mint token tool and calls web3Pipeline', async () => {
-    const web3Pipeline = require('../orchestration/web3Pipeline');
+    const web3Pipeline = require('../src/orchestration/web3Pipeline');
     const runId = 'run-web3-mint-tool';
     web3Pipeline.reset({ tenantId: 'default', runId });
 

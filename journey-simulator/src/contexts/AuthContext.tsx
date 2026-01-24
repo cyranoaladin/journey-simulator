@@ -211,7 +211,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         logger.warn("Unable to clear userId on logout", storageError);
       }
       await resetProgress();
-      navigate("/auth/login");
+      navigate("/login");
     }
   }, [navigate, resetProgress]);
 

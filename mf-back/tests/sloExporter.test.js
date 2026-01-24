@@ -4,9 +4,9 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-const { exportSloSnapshot } = require('../orchestration/sloExporter');
-const metricsStore = require('../orchestration/metricsStore');
-const alertingEngine = require('../orchestration/alertingEngine');
+const { exportSloSnapshot } = require('../src/orchestration/sloExporter');
+const metricsStore = require('../src/orchestration/metricsStore');
+const alertingEngine = require('../src/orchestration/alertingEngine');
 
 describe('sloExporter', () => {
   beforeEach(() => {

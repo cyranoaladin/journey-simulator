@@ -6,7 +6,7 @@
 
 const mockRun = jest.fn().mockResolvedValue({ payload: { ok: true } });
 
-jest.mock('../agents/ZynoAgent', () => {
+jest.mock('../src/agents/ZynoAgent', () => {
   return class ZynoAgent {
     async run(ctx) {
       return mockRun(ctx);
@@ -14,7 +14,7 @@ jest.mock('../agents/ZynoAgent', () => {
   };
 });
 
-jest.mock('../models/JourneyRun', () => ({
+jest.mock('@mocks/JourneyRun', () => ({
   findOne: jest.fn().mockReturnThis(),
   sort: jest.fn().mockResolvedValue({ interaction_logs: [] }),
   save: jest.fn().mockResolvedValue(true)

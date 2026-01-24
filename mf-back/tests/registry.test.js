@@ -4,7 +4,7 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-const registry = require('../agents/registry');
+const registry = require('../src/agents/registry');
 
 describe('Agent registry', () => {
   const expectedAgentIds = [

@@ -4,7 +4,7 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-const computeAEPO = require('../../metrics/computeAEPO');
+const computeAEPO = require('../../src/metrics/computeAEPO');
 
 describe('computeAEPO', () => {
   it('should return 100 for perfect run', () => {

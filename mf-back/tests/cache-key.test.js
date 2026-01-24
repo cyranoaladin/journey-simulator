@@ -4,7 +4,7 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-const { generateIdempotencyKey } = require('../utils/agent-idempotence');
+const { generateIdempotencyKey } = require('@mocks/utils');
 
 describe('Agent Idempotency Key - Cache Bug Fix', () => {
     describe('Test A — Different prompts generate different keys (MISS expected)', () => {

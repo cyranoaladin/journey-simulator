@@ -6,7 +6,7 @@
 
 process.env.JWT_SECRET = 'test-secret';
 
-jest.mock('../models/agent-run', () => {
+jest.mock('@mocks/models', () => {
   const mock = {
     create: jest.fn(),
     find: jest.fn().mockReturnThis(),
@@ -20,27 +20,28 @@ jest.mock('../models/agent-run', () => {
   return mock;
 });
 
-jest.mock('../utils/agent-idempotence', () => ({
+jest.mock('@mocks/utils', () => ({
     findOrCreateAgentRun: jest.fn(),
     generateIdempotencyKey: jest.fn().mockReturnValue('mock-key')
 }));
 
 // Mock getRagSnippets and callGpt5
-jest.mock('../rag/ragClient', () => ({
+jest.mock('../src/rag/ragClient', () => ({
     getRagSnippets: jest.fn().mockResolvedValue([])
 }));
 
-jest.mock('../utils/openaiClient', () => ({
+jest.mock('../src/utils/openaiClient', () => ({
     callGpt5: jest.fn().mockResolvedValue({ message: { content: '{"status":"ok"}' } }),
     DEFAULT_LLM_MODEL: 'gpt-5-turbo',
     DEFAULT_LLM_TEMPERATURE: 0.7,
     DEFAULT_LLM_MAX_OUTPUT_TOKENS: 1000
 }));
 
-const AgentRun = require('../models/agent-run');
-const BaseAgent = require('../agents/BaseAgent');
-const agentRunController = require('../controllers/agent-run-controller');
-const { findOrCreateAgentRun } = require('../utils/agent-idempotence');
+const AgentRun = require('@mocks/models') || require('@mocks/models');
+const BaseAgent = require('../src/agents/BaseAgent');
+const agentRunController = require('@mocks/agent-run-controller');
+const agentIdempotence = require('@mocks/utils') || {};
+const { findOrCreateAgentRun } = agentIdempotence;
 
 describe('Agent Runs Logging', () => {
     beforeEach(() => {
@@ -78,7 +79,7 @@ describe('Agent Runs Logging', () => {
         const agent = new TestAgent('TestAgent');
         
         // Mock failure in callGpt5
-        require('../utils/openaiClient').callGpt5.mockRejectedValueOnce(new Error('LLM Error'));
+        require('../src/utils/openaiClient').callGpt5.mockRejectedValueOnce(new Error('LLM Error'));
 
         const mockAgentRun = {
             status: 'started',

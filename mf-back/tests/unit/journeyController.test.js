@@ -5,11 +5,11 @@
  */
 
 const journeyController = require('../../controllers/journey-controller');
-const User = require('../../models/user');
+const User = require('@mocks/user');
 const Journey = require('../../models/Journeys');
 
-jest.mock('../../models/user');
-jest.mock('../../models/Journeys');
+jest.mock('@mocks/user');
+jest.mock('@mocks/models');
 
 describe('Journey Controller', () => {
     afterEach(() => {

@@ -19,8 +19,8 @@ jest.mock('axios', () => ({
 
 const request = require('supertest');
 const express = require('express');
-const { validateAndSanitizeResponse } = require('../../utils/resourceValidator');
-const { csrfGuard } = require('../../middleware/csrfGuard');
+const { validateAndSanitizeResponse } = require('@mocks/utils').resourceValidator;
+const { csrfGuard } = require('@mocks/csrfGuard');
 
 // Create a minimal Express app for testing
 const app = express();

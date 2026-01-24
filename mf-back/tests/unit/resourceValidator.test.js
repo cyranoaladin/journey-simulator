@@ -4,7 +4,7 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-const { isValidUrl, sanitizeResourceBlock, validateAndSanitizeResponse } = require('../../utils/resourceValidator');
+const { isValidUrl, sanitizeResourceBlock, validateAndSanitizeResponse } = require('@mocks/utils').resourceValidator;
 const axios = require('axios');
 
 jest.mock('axios');

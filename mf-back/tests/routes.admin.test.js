@@ -10,7 +10,7 @@ const request = require('supertest');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { csrfGuard } = require('../middleware/csrfGuard');
+const { csrfGuard } = require('@mocks/csrfGuard');
 const ORIGINAL_READDIR_SYNC = fs.readdirSync;
 
 jest.mock('../models/agentFeedbackLog', () => ({
@@ -18,13 +18,13 @@ jest.mock('../models/agentFeedbackLog', () => ({
   create: jest.fn().mockResolvedValue({ _id: 'log-1' })
 }));
 
-jest.mock('../rag/ragClient', () => ({
+jest.mock('../src/rag/ragClient', () => ({
   ingestDocument: jest.fn(),
   getRagSnippets: jest.fn().mockResolvedValue([])
 }));
 
 // Mock orchestration dependencies to prevent module loading errors
-jest.mock('../orchestration/zynoVerticalSlice', () => ({
+jest.mock('@mocks/orchestration', () => ({
   orchestrateVerticalSlice: jest.fn()
 }));
 
@@ -85,8 +85,8 @@ describe('admin routes', () => {
     delete process.env.ADMIN_API_KEY;
 
     // Re-require mocked dependencies after reset
-    AgentLog = require('../models/agentFeedbackLog');
-    ({ ingestDocument } = require('../rag/ragClient'));
+    AgentLog = require('@mocks/models').AgentFeedbackLog;
+    ({ ingestDocument } = require('../src/rag/ragClient'));
     ingestDocument.mockReset();
     const multer = require('multer');
     multer.__setFile(undefined);

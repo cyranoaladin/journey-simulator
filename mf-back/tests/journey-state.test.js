@@ -4,7 +4,7 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-jest.mock('../models/Journeys', () => {
+jest.mock('@mocks/Journeys', () => {
     const mock = {
         findById: jest.fn(),
         save: jest.fn(),

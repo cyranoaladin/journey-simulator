@@ -9,7 +9,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 
-jest.mock('../rag/ragClient', () => ({
+jest.mock('../src/rag/ragClient', () => ({
   ingestDocument: jest.fn()
 }));
 
@@ -22,7 +22,7 @@ jest.mock('mongoose', () => {
 });
 
 // Mock orchestration dependencies to prevent module loading errors when app.js loads routes
-jest.mock('../orchestration/vsliceSchema', () => ({
+jest.mock('../src/orchestration/vsliceSchema', () => ({
   validateRequest: jest.fn((payload) => ({
     req: payload || {},
     warnings: []
@@ -33,15 +33,15 @@ jest.mock('../orchestration/vsliceSchema', () => ({
   }))
 }));
 
-jest.mock('../orchestration/zynoVerticalSlice', () => ({
+jest.mock('@mocks/orchestration', () => ({
   orchestrateVerticalSlice: jest.fn()
 }));
 
-jest.mock('../orchestration/zynoOrchestrator', () => ({
+jest.mock('../src/orchestration/zynoOrchestrator', () => ({
   orchestrateZyno: jest.fn()
 }));
 
-jest.mock('../routes/orchestration-gate', () => {
+jest.mock('@mocks/orchestration-gate', () => {
   const express = require('express');
   const router = express.Router();
   router.post('/gate/:gateId/review', (req, res) => {
@@ -70,8 +70,8 @@ describe('Admin RAG routes end-to-end', () => {
 
     // Re-require after env vars are set to ensure mocks are applied
     jest.resetModules();
-    app = require('../app');
-    const ragClient = require('../rag/ragClient');
+    app = require('@mocks/app');
+    const ragClient = require('../src/rag/ragClient');
     ingestDocument = ragClient.ingestDocument;
 
     // Ensure ingestDocument is a mock function
@@ -117,7 +117,7 @@ describe('Admin RAG routes end-to-end', () => {
       process.env.MONGO_URI = originalMongoUri;
     }
 
-    delete require.cache[require.resolve('../app')];
+    delete require.cache[require.resolve('@mocks/app')];
     delete require.cache[require.resolve('../rag/ragClient')];
   });
 

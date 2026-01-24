@@ -5,7 +5,7 @@
  */
 
 const BaseAgent = require("./BaseAgent");
-const { callGpt5Responses } = require("../llm/callGpt5");
+const { callGpt5 } = require("../utils/openaiClient");
 const { validateAndSanitizeResponse } = require("../utils/resourceValidator");
 
 const JOURNEY_STEP_SCHEMA = {
@@ -480,7 +480,7 @@ If the user has recently completed a significant mission, consider including an 
         const userPrompt = this.buildUserPrompt(ctx);
 
         try {
-            const result = await callGpt5Responses({
+            const result = await callGpt5({
                 systemPrompt,
                 userPrompt,
                 responseFormat: JOURNEY_STEP_SCHEMA,

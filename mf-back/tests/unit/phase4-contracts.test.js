@@ -1,9 +1,9 @@
 // Force production mode to load ALL 45+ agents for Action G verification
 process.env.NODE_ENV = 'production';
 
-const registry = require('../../agents/registry');
-const intentRouter = require('../../orchestration/intentRouter');
-const { sanitizeTimeline } = require('../../orchestration/timelineSanitizer');
+const registry = require('../../src/agents/registry');
+const intentRouter = require("@mocks/orchestration").intentRouter;
+const { sanitizeTimeline } = require("../../src/orchestration/timelineSanitizer");
 
 describe('Phase 4: Contract Locking (Unit Tests)', () => {
 

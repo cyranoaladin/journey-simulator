@@ -1,8 +1,0 @@
-# NFT Guide for Creators
-
-This guide provides:
-- How to create and mint NFTs on Solana
-- Metadata standards (Metaplex)
-- Marketplaces (Magic Eden, Tensor)
-- Royalties management
-- Licensing & legal considerations

@@ -4,11 +4,11 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-jest.mock('../rag/ragClient', () => ({
+jest.mock('../src/rag/ragClient', () => ({
   getRagSnippets: jest.fn().mockResolvedValue([{ title: 'playbook', content: 'Use fallback knowledge.' }]),
 }));
 
-jest.mock('../utils/openaiClient', () => ({
+jest.mock('../src/utils/openaiClient', () => ({
   callGpt5: jest.fn(async ({ messages }) => {
     const systemPrompt = messages?.[0]?.content ?? '';
     const agentMatch = systemPrompt.match(/\*\*(\w+)\*\*/);
@@ -27,27 +27,27 @@ jest.mock('../utils/openaiClient', () => ({
   }),
 }));
 
-const { getRagSnippets } = require('../rag/ragClient');
-const { callGpt5 } = require('../utils/openaiClient');
+const { getRagSnippets } = require('../src/rag/ragClient');
+const { callGpt5 } = require('../src/utils/openaiClient');
 
 const agentModules = {
-  AuditAgent: '../agents/AuditAgent',
-  BuilderAgent: '../agents/BuilderAgent',
-  CoachAgent: '../agents/CoachAgent',
-  CommunityAgent: '../agents/CommunityAgent',
-  DAOAgent: '../agents/DAOAgent',
-  DevAgent: '../agents/DevAgent',
-  GrowthAgent: '../agents/GrowthAgent',
-  GuideAgent: '../agents/GuideAgent',
-  InvestorAgent: '../agents/InvestorAgent',
-  LaunchpadAgent: '../agents/LaunchpadAgent',
-  NFTAgent: '../agents/NFTAgent',
-  OnboardingAgent: '../agents/OnboardingAgent',
-  PitchAgent: '../agents/PitchAgent',
-  ProductAgent: '../agents/ProductAgent',
-  ReflectionAgent: '../agents/ReflectionAgent',
-  TokenAgent: '../agents/TokenAgent',
-  Web3LegalAgent: '../agents/Web3LegalAgent',
+  AuditAgent: '../src/agents/AuditAgent',
+  BuilderAgent: '../src/agents/BuilderAgent',
+  CoachAgent: '../src/agents/CoachAgent',
+  CommunityAgent: '../src/agents/CommunityAgent',
+  DAOAgent: '../src/agents/DAOAgent',
+  DevAgent: '../src/agents/DevAgent',
+  GrowthAgent: '../src/agents/GrowthAgent',
+  GuideAgent: '../src/agents/GuideAgent',
+  InvestorAgent: '../src/agents/InvestorAgent',
+  LaunchpadAgent: '../src/agents/LaunchpadAgent',
+  NFTAgent: '../src/agents/NFTAgent',
+  OnboardingAgent: '../src/agents/OnboardingAgent',
+  PitchAgent: '../src/agents/PitchAgent',
+  ProductAgent: '../src/agents/ProductAgent',
+  ReflectionAgent: '../src/agents/ReflectionAgent',
+  TokenAgent: '../src/agents/TokenAgent',
+  Web3LegalAgent: '../src/agents/Web3LegalAgent',
 };
 
 const sharedContext = {

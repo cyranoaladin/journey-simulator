@@ -30,7 +30,7 @@ describe('ragClient remote success paths', () => {
     process.env.RAG_API_KEY = 'remote-key';
     process.env.RAG_COLLECTION = 'remote-collection';
 
-    ragClient = require('../rag/ragClient');
+    ragClient = require('../src/rag/ragClient');
   });
 
   afterEach(() => {

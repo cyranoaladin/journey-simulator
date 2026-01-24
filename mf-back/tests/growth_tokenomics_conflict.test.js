@@ -4,8 +4,8 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-const GrowthAgent = require('../agents/GrowthAgent');
-const TokenomicsAgent = require('../agents/TokenomicsAgent');
+const GrowthAgent = require('../src/agents/GrowthAgent');
+const TokenomicsAgent = require('../src/agents/TokenomicsAgent');
 
 describe('Conflict handling between GrowthAgent and TokenomicsAgent', () => {
   it('GrowthAgent returns RISK_REPORT for absurd market cap vs budget', async () => {

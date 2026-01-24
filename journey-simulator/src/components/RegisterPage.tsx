@@ -8,6 +8,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight, AlertCircle, CheckCircle, Wallet } from 'lucide-react';
+import { PublicKey } from '@solana/web3.js';
 import { useAuth } from '../contexts/AuthContext';
 import { logger } from '../utils/logger';
 
@@ -81,6 +82,15 @@ const RegisterPage: React.FC = () => {
       setError('Wallet address is required');
       return false;
     }
+    
+    // Validate Solana wallet address format
+    try {
+      new PublicKey(formData.wallet_address);
+    } catch {
+      setError('Please enter a valid Solana wallet address (base58 format, 32-44 characters)');
+      return false;
+    }
+    
     if (!formData.persona) {
       setError('Please select your persona');
       return false;

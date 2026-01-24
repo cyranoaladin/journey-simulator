@@ -7,7 +7,7 @@
 // Tests run stateless bearer flows with CSRF parity middleware.
 const express = require('express');
 const request = require('supertest');
-const { csrfGuard } = require('../middleware/csrfGuard');
+const { csrfGuard } = require('@mocks/csrfGuard');
 
 const mockDb = new Map();
 
@@ -71,7 +71,7 @@ describe('dao routes', () => {
     app = express();
     app.use(express.json());
     app.use(csrfGuard);
-    app.use('/dao', require('../routes/dao-routes'));
+    app.use('/dao', require('@mocks/dao-routes'));
   });
 
   afterEach(() => {

@@ -4,12 +4,12 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-const InvestorDemoAgent = require('../../agents/InvestorDemoAgent');
-const QAPlaywrightAgent = require('../../agents/QAPlaywrightAgent');
-const CurriculumAgent = require('../../agents/CurriculumAgent');
-const WalletAuthAgent = require('../../agents/WalletAuthAgent');
-const SolanaAnchorAgent = require('../../agents/SolanaAnchorAgent');
-const MintingAgent = require('../../agents/MintingAgent');
+const InvestorDemoAgent = require('../../src/agents/InvestorDemoAgent');
+const QAPlaywrightAgent = require('../../src/agents/QAPlaywrightAgent');
+const CurriculumAgent = require('../../src/agents/CurriculumAgent');
+const WalletAuthAgent = require('../../src/agents/WalletAuthAgent');
+const SolanaAnchorAgent = require('../../src/agents/SolanaAnchorAgent');
+const MintingAgent = require('../../src/agents/MintingAgent');
 
 const agents = [
   { id: 'InvestorDemoAgent', Cls: InvestorDemoAgent, intent: 'investor_demo' },

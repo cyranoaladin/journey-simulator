@@ -14,10 +14,10 @@ const mockAgentRun = {
     aggregate: jest.fn(),
 };
 
-jest.mock('../models/Journeys', () => mockJourney);
-jest.mock('../models/agent-run', () => mockAgentRun);
+jest.mock('@mocks/Journeys', () => mockJourney);
+jest.mock('@mocks/models', () => mockAgentRun);
 
-const metricsService = require('../services/journey-metrics-service');
+const metricsService = require('../src/services/journey-metrics-service');
 
 describe('Journey Metrics Service', () => {
     beforeEach(() => {

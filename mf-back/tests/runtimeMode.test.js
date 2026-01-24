@@ -8,7 +8,7 @@ const {
   normalizeMode,
   ensureModeAllowed,
   registryCoverage,
-} = require('../orchestration/runtimeMode');
+} = require('../src/orchestration/runtimeMode');
 
 const ORIGINAL_ENV = { ...process.env };
 

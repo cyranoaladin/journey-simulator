@@ -39,6 +39,7 @@ import type {
 import BondingCurveVisualizer from "../DeFi/BondingCurveVisualizer";
 import GovernanceDashboard from "../Governance/GovernanceDashboard";
 import CodeAuditor from "../CodeAuditor";
+import { AgentActionBlock } from "./AgentActionBlock";
 
 // --- Dynamic Imports Infrastructure ---
 import { AgentDeliverables } from "../AgentDeliverables";
@@ -1480,6 +1481,21 @@ export default function UIBlocksRenderer({ response }: { response: JourneyStepRe
     >
       {/* INJECTED AGENT DELIVERABLES */}
       <AgentDeliverables actions={deliverableActions} resources={deliverableResources} />
+
+      {/* AGENT ACTIONS - Display agent_actions from response */}
+      {response?.agent_actions && response.agent_actions.length > 0 && (
+        <div className="space-y-4">
+          {response.agent_actions.map((action, idx) => (
+            <AgentActionBlock
+              key={`agent-action-${idx}`}
+              agent_name={action.agent_name}
+              action={action.action}
+              reason={action.reason}
+              parameters={action.parameters}
+            />
+          ))}
+        </div>
+      )}
 
       <AnimatePresence>
         {blocksToRender.map((b, index) => {

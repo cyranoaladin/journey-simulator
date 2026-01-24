@@ -7,7 +7,7 @@
 // Tests run stateless bearer flows with CSRF parity middleware.
 const express = require('express');
 const request = require('supertest');
-const { csrfGuard } = require('../middleware/csrfGuard');
+const { csrfGuard } = require('@mocks/csrfGuard');
 
 describe('export routes', () => {
   let app;
@@ -19,7 +19,7 @@ describe('export routes', () => {
     app = express();
     app.use(express.json());
     app.use(csrfGuard);
-    app.use('/', require('../routes/export-routes'));
+    app.use('/', require('@mocks/export-routes'));
   });
 
   afterEach(() => {

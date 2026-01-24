@@ -1,14 +1,55 @@
-# ===== MFAI Monorepo .gitignore =====
+# ===== MFAI Monorepo .gitignore (Optimized for Zenflow) =====
 
-# Logs
+# --- 1. Logs & Runtime ---
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 logs/
 *.pid
+nohup.out
+backend.log
 
-# Tests & Coverage
+# --- 2. Zenflow & AI Context (CRITICAL) ---
+# Le "Cerveau" local ne doit pas être commité pour éviter les conflits entre dévs
+.zenflow_context.md
+# On ignore les dossiers de travail temporaires des agents (sauf les workflows)
+.antigravity/
+.serena/
+.cursor/
+.cursorrules
+.gemini/
+
+# --- 3. Data & Storage (CRITICAL) ---
+# Protection absolue de la base de données locale
+data/
+**/dev.db
+**/*.sqlite
+prisma/dev.db
+prisma/*.db
+backups/
+dump/
+tmp/
+
+# --- 4. Environment & Secrets ---
+.env
+.env.*
+!.env.example
+!.env.sample
+.secrets-backup/
+web/minter.json
+
+# --- 5. Node / Build / Dependencies ---
+node_modules/
+dist/
+build/
+.next/
+.next_trash/
+.nyc_output/
+.cache/
+.turbo/
+
+# --- 6. Tests & Coverage ---
 coverage/
 test-results/
 playwright-report/
@@ -20,64 +61,14 @@ cypress/screenshots/
 trace.zip
 video.webm
 
-# Debug reports
+# --- 7. Debug Reports & Temporary Files ---
 suprem_audit_*.txt
 routes_visited*.txt
 e2e_json_counts*.txt
 sha256.txt
 zero_byte_files.txt
 list_tests.txt
-
-# Backups & Dumps
-*.tar.gz
-*.tar
-*.bak
-backups/
-dump/
-tmp/
-
-# Environment
-.env
-.env.*
-!.env.example
-!.env.sample
-.secrets-backup/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-.DS_Store
-Thumbs.db
-.serena/
-.cursor/
-.cursorrules
-.gemini/
-.antigravity/
-
-# Node / Build
-node_modules/
-dist/
-build/
-.next/
-.next_trash/
-.nyc_output/
-.cache/
-.turbo/
-
-# Database
-**/dev.db
-**/*.sqlite
-prisma/dev.db
-prisma/*.db
-
-# Solana secrets
-web/minter.json
-
-# Runtime metrics (do not commit)
 mf-back/memory/agent_metrics.log.json
-
-# Local reporting
 qa-report.md
 task.md
 **/qa-report.md
@@ -86,5 +77,13 @@ task.md
 **/*task_*
 **/*phase*_execution*.log
 **/*files_list*.log
-data/
-node_modules/
+
+# --- 8. IDE & System ---
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+*.tar.gz
+*.tar
+*.bak

@@ -12,6 +12,29 @@
  */
 
 import type { JourneyStepResponse, Mode, Tone } from '../types/uiBlocks';
+import {
+    createArchitectureScanSequence,
+    createDePINStudioSequence,
+    createOnChainAISequence,
+    createSystemsHardeningSequence,
+    createSynapticRolloutSequence,
+    createExperienceDiscoverySequence,
+    createNFTSystemsLabSequence,
+    createGameplayLabSequence,
+    createUXElevationSequence,
+    createExperienceLaunchSequence,
+} from './demoSequencerExtensions';
+import {
+    createImpactCharterSequence,
+    createDAODesignSequence,
+    createPhilanthropyProtocolsSequence,
+    createIdentityReputationSequence,
+    createSecurityBaselineSequence,
+    createExploitHuntSequence,
+    createDefenseSystemsSequence,
+    createIncidentResponseSequence,
+    createRedBlueEvolutionSequence,
+} from './demoSequencerExtensions2';
 
 // ============================================================================
 // TYPES
@@ -970,6 +993,533 @@ Upon completion, you receive the **Collaterize Launch Badge** NFT—proof of com
 };
 
 /**
+ * Capital Foundry Phase 2: Program Forge Lab
+ * Build Solana programs with Anchor/Rust patterns
+ */
+const createProgramForgeSequence = (trackId: string): JourneyStepResponse[] => {
+    const meta = {
+        persona_id: trackId,
+        journey_track: trackId,
+        phase_id: 'program-forge',
+        mode: 'builder' as Mode,
+        tone: 'pedagogical' as Tone,
+        language: 'en' as const,
+    };
+
+    return [
+        // Step 1: Anchor Framework Introduction
+        {
+            metadata: {
+                ...meta,
+                title: 'Anchor Framework Mastery',
+                summary: 'Master Solana program development with Anchor',
+            },
+            ui_blocks: [
+                {
+                    kind: 'text_block',
+                    id: 'anchor-intro',
+                    title: 'The Anchor Framework',
+                    body_markdown: `
+# Anchor: The Solana Development Framework
+
+**Anchor** is the Rust framework that makes Solana program development safe and efficient.
+
+## Core Concepts
+1. **Accounts**: Declare account constraints with macros
+2. **Instructions**: Define program logic with type safety
+3. **Context**: Automatic account validation and deserialization
+4. **Error Handling**: Custom error types with descriptive messages
+
+## Why Anchor?
+- ✅ **Security**: Automatic checks prevent common vulnerabilities
+- ✅ **Productivity**: Reduces boilerplate by 70%
+- ✅ **Testing**: Built-in TypeScript client generation
+- ✅ **IDL**: Automatic interface generation for frontends
+
+## Program Structure
+\`\`\`rust
+#[program]
+pub mod lending_protocol {
+    use super::*;
+    
+    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
+        // Your logic here
+        Ok(())
+    }
+}
+\`\`\`
+                    `.trim(),
+                },
+                {
+                    kind: 'diagram_block',
+                    id: 'anchor-architecture',
+                    title: 'Anchor Program Architecture',
+                    diagram_type: 'mermaid',
+                    content: `
+graph TD
+    A[Client Request] --> B[Anchor IDL]
+    B --> C[Instruction Handler]
+    C --> D[Account Validation]
+    D --> E[Business Logic]
+    E --> F[State Update]
+    F --> G[Return Result]
+                    `.trim(),
+                    caption: 'Anchor request flow with automatic validation',
+                },
+                {
+                    kind: 'resource_block',
+                    id: 'anchor-resources',
+                    title: 'Learning Resources',
+                    resources: [
+                        {
+                            id: 'anchor-book',
+                            label: 'The Anchor Book',
+                            description: 'Official Anchor documentation',
+                            url: 'https://book.anchor-lang.com/',
+                            resource_type: 'article',
+                            agent_owner: 'CapitalAgent',
+                        },
+                        {
+                            id: 'anchor-examples',
+                            label: 'Anchor Program Examples',
+                            description: 'Real-world Anchor programs',
+                            url: 'https://github.com/coral-xyz/anchor/tree/master/tests',
+                            resource_type: 'code_snippet',
+                            agent_owner: 'CapitalAgent',
+                        },
+                        {
+                            id: 'solana-cookbook',
+                            label: 'Solana Cookbook',
+                            description: 'Practical recipes for Solana development',
+                            url: 'https://solanacookbook.com/',
+                            resource_type: 'article',
+                            agent_owner: 'CapitalAgent',
+                        },
+                    ],
+                },
+            ],
+            agent_actions: [
+                {
+                    agent_name: 'CapitalAgent',
+                    action: 'introduce_anchor',
+                    reason: 'Anchor framework fundamentals established. Ready for hands-on development.',
+                    parameters: { specialty: 'DeFi Protocol Development' },
+                },
+            ],
+            next_state: {
+                phase_id: 'program-forge',
+                completed_missions: [],
+                xp_delta: 40,
+            },
+        },
+
+        // Step 2: Build Core Module
+        {
+            metadata: {
+                ...meta,
+                title: 'Build Core Lending Module',
+                summary: 'Implement lending protocol with Anchor',
+            },
+            ui_blocks: [
+                {
+                    kind: 'mission_block',
+                    id: 'lending-module',
+                    title: 'Mission: Implement Lending Core',
+                    description: 'Build a lending protocol module with Anchor. Implement: (1) Initialize pool instruction, (2) Deposit collateral logic, (3) Borrow against collateral, (4) Repayment and liquidation handlers. Include account validation and error handling.',
+                    mission_type: 'code_submission',
+                    expected_input_type: 'code_snippet',
+                    xp_reward: 70,
+                    is_mandatory: true,
+                },
+                {
+                    kind: 'checklist_block',
+                    id: 'lending-checklist',
+                    title: 'Implementation Requirements',
+                    items: [
+                        { label: 'Pool initialization with proper account constraints', checked: false },
+                        { label: 'Collateral deposit with SPL token transfer', checked: false },
+                        { label: 'Borrow logic with collateralization ratio check', checked: false },
+                        { label: 'Repayment and liquidation handlers', checked: false },
+                        { label: 'Custom error types defined', checked: false },
+                        { label: 'Unit tests with >80% coverage', checked: false },
+                    ],
+                },
+                {
+                    kind: 'resource_block',
+                    id: 'lending-resources',
+                    title: 'Code References',
+                    resources: [
+                        {
+                            id: 'lending-template',
+                            label: 'Lending Protocol Template',
+                            description: 'Starter template for lending programs',
+                            url: 'snippet://lending-anchor-template',
+                            resource_type: 'code_snippet',
+                            agent_owner: 'CapitalAgent',
+                        },
+                        {
+                            id: 'spl-token-anchor',
+                            label: 'SPL Token with Anchor',
+                            description: 'Token transfer patterns in Anchor',
+                            url: 'snippet://spl-token-anchor',
+                            resource_type: 'code_snippet',
+                            agent_owner: 'CapitalAgent',
+                        },
+                    ],
+                },
+            ],
+            agent_actions: [
+                {
+                    agent_name: 'CapitalAgent',
+                    action: 'review_lending_module',
+                    reason: 'Lending module submitted. Validating logic, security, and test coverage.',
+                    parameters: {
+                        min_score: 80,
+                        required_keywords: ['initialize', 'deposit', 'borrow', 'liquidate'],
+                        security_checks: ['overflow', 'reentrancy', 'authorization'],
+                    },
+                },
+            ],
+            next_state: {
+                phase_id: 'program-forge',
+                completed_missions: ['lending-module'],
+                xp_delta: 70,
+            },
+        },
+
+        // Step 3: Testing & Optimization
+        {
+            metadata: {
+                ...meta,
+                title: 'Testing & Gas Optimization',
+                summary: 'Validate and optimize program performance',
+            },
+            ui_blocks: [
+                {
+                    kind: 'text_block',
+                    id: 'optimization-intro',
+                    title: 'Performance is Product-Market Fit',
+                    body_markdown: `
+# Optimize Every Compute Unit
+
+In DeFi, **performance = capital efficiency**.
+
+## Optimization Strategies
+1. **Minimize CPI calls**: Cross-program invocations are expensive
+2. **Pack account data**: Reduce storage costs
+3. **Batch operations**: Combine multiple actions when possible
+4. **Use zero-copy**: Avoid unnecessary deserialization
+
+## Compute Unit Budget
+- **Max per transaction**: 1.4M compute units
+- **Target**: <200k for standard operations
+- **Critical**: <500k for complex DeFi interactions
+
+## Testing Checklist
+- ✅ Fuzzing with random inputs
+- ✅ Stress testing with max account sizes
+- ✅ Edge case validation (zero amounts, max values)
+- ✅ Gas profiling for all instructions
+                    `.trim(),
+                },
+                {
+                    kind: 'mission_block',
+                    id: 'optimization-mission',
+                    title: 'Mission: Optimize & Benchmark',
+                    description: 'Run gas profiling on your lending module. Identify the most expensive operations and optimize them. Target: All instructions under 200k compute units. Submit benchmark report with before/after metrics.',
+                    mission_type: 'deliverable',
+                    expected_input_type: 'markdown_document',
+                    xp_reward: 50,
+                    is_mandatory: true,
+                },
+                {
+                    kind: 'indicator_block',
+                    id: 'gas-metrics',
+                    title: 'Target Compute Units',
+                    type: 'bar',
+                    indicators: [
+                        { name: 'Initialize', value: 0, max: 200000, color: '#3b82f6' },
+                        { name: 'Deposit', value: 0, max: 200000, color: '#10b981' },
+                        { name: 'Borrow', value: 0, max: 200000, color: '#f59e0b' },
+                        { name: 'Liquidate', value: 0, max: 200000, color: '#ef4444' },
+                    ],
+                },
+            ],
+            agent_actions: [
+                {
+                    agent_name: 'CapitalAgent',
+                    action: 'validate_optimization',
+                    reason: 'Benchmarks submitted. Validating compute unit efficiency and test coverage.',
+                    parameters: {
+                        max_compute_units: 200000,
+                        required_tests: ['fuzzing', 'stress', 'edge_cases'],
+                    },
+                },
+            ],
+            next_state: {
+                phase_id: 'program-forge',
+                completed_missions: ['lending-module', 'optimization-mission'],
+                xp_delta: 50,
+            },
+        },
+    ];
+};
+
+/**
+ * Capital Foundry Phase 3: Oracle & Liquidity Mesh
+ * Integrate oracle feeds and liquidity management
+ */
+const createOracleIntegrationSequence = (trackId: string): JourneyStepResponse[] => {
+    const meta = {
+        persona_id: trackId,
+        journey_track: trackId,
+        phase_id: 'oracle-integration',
+        mode: 'expert' as Mode,
+        tone: 'critical' as Tone,
+        language: 'en' as const,
+    };
+
+    return [
+        // Step 1: Oracle Architecture
+        {
+            metadata: {
+                ...meta,
+                title: 'Oracle Integration Fundamentals',
+                summary: 'Design resilient oracle and liquidity layers',
+            },
+            ui_blocks: [
+                {
+                    kind: 'text_block',
+                    id: 'oracle-intro',
+                    title: 'Data Truth Feeds Capital Trust',
+                    body_markdown: `
+# Oracle & Liquidity Architecture
+
+**Oracles** are the nervous system of DeFi protocols.
+
+## Oracle Types
+1. **Price Feeds**: Pyth, Switchboard, Chainlink
+2. **Liquidity Oracles**: DEX TWAP, aggregated depth
+3. **Volatility Oracles**: Implied vol, historical metrics
+
+## Integration Patterns
+- **Pull-based**: Protocol fetches latest data on-demand
+- **Push-based**: Oracle updates protocol state automatically
+- **Hybrid**: Combine both for optimal freshness vs cost
+
+## Critical Considerations
+⚠️ **Staleness**: Always check timestamp freshness
+⚠️ **Manipulation**: Use TWAP or median of multiple sources
+⚠️ **Availability**: Implement fallback oracles
+⚠️ **Precision**: Handle decimal places correctly
+
+## Liquidity Management
+- Monitor pool depth across DEXs
+- Implement slippage protection
+- Design cross-chain contingency flows
+                    `.trim(),
+                },
+                {
+                    kind: 'diagram_block',
+                    id: 'oracle-flow',
+                    title: 'Multi-Oracle Architecture',
+                    diagram_type: 'mermaid',
+                    content: `
+graph TD
+    A[DeFi Protocol] --> B{Oracle Aggregator}
+    B --> C[Pyth Network]
+    B --> D[Switchboard]
+    B --> E[DEX TWAP]
+    C --> F[Median Price]
+    D --> F
+    E --> F
+    F --> G{Staleness Check}
+    G -->|Fresh| H[Use Price]
+    G -->|Stale| I[Fallback Oracle]
+                    `.trim(),
+                    caption: 'Resilient multi-source oracle architecture',
+                },
+                {
+                    kind: 'resource_block',
+                    id: 'oracle-resources',
+                    title: 'Oracle Integration Guides',
+                    resources: [
+                        {
+                            id: 'pyth-docs',
+                            label: 'Pyth Network Documentation',
+                            description: 'High-frequency price feeds for Solana',
+                            url: 'https://docs.pyth.network/',
+                            resource_type: 'article',
+                            agent_owner: 'CapitalAgent',
+                        },
+                        {
+                            id: 'switchboard-guide',
+                            label: 'Switchboard Integration',
+                            description: 'Customizable oracle feeds',
+                            url: 'https://docs.switchboard.xyz/',
+                            resource_type: 'article',
+                            agent_owner: 'CapitalAgent',
+                        },
+                    ],
+                },
+            ],
+            agent_actions: [
+                {
+                    agent_name: 'CapitalAgent',
+                    action: 'introduce_oracle_architecture',
+                    reason: 'Oracle fundamentals established. Ready for integration implementation.',
+                    parameters: { specialty: 'Oracle & Liquidity Systems' },
+                },
+            ],
+            next_state: {
+                phase_id: 'oracle-integration',
+                completed_missions: [],
+                xp_delta: 40,
+            },
+        },
+
+        // Step 2: Implement Oracle Integration
+        {
+            metadata: {
+                ...meta,
+                title: 'Implement Multi-Oracle System',
+                summary: 'Build resilient oracle integration with fallbacks',
+            },
+            ui_blocks: [
+                {
+                    kind: 'mission_block',
+                    id: 'oracle-integration',
+                    title: 'Mission: Integrate Oracle Feeds',
+                    description: 'Implement multi-oracle price feed system for your lending protocol. Requirements: (1) Integrate Pyth as primary oracle, (2) Add Switchboard as fallback, (3) Implement staleness checks (max 60s), (4) Calculate median from multiple sources, (5) Handle oracle failures gracefully.',
+                    mission_type: 'code_submission',
+                    expected_input_type: 'code_snippet',
+                    xp_reward: 80,
+                    is_mandatory: true,
+                },
+                {
+                    kind: 'checklist_block',
+                    id: 'oracle-checklist',
+                    title: 'Integration Requirements',
+                    items: [
+                        { label: 'Pyth price feed integration', checked: false },
+                        { label: 'Switchboard fallback configured', checked: false },
+                        { label: 'Staleness validation (<60s)', checked: false },
+                        { label: 'Median calculation from multiple sources', checked: false },
+                        { label: 'Circuit breaker for extreme price moves', checked: false },
+                        { label: 'Comprehensive error handling', checked: false },
+                    ],
+                },
+                {
+                    kind: 'action_suggestions_block',
+                    id: 'oracle-suggestions',
+                    title: 'Testing Scenarios',
+                    suggestions: [
+                        { label: 'Test Stale Data Handling', action_id: 'test-stale-data' },
+                        { label: 'Simulate Oracle Failure', action_id: 'simulate-failure' },
+                        { label: 'Test Price Manipulation', action_id: 'test-manipulation' },
+                        { label: 'Benchmark Latency', action_id: 'benchmark-latency' },
+                    ],
+                },
+            ],
+            agent_actions: [
+                {
+                    agent_name: 'CapitalAgent',
+                    action: 'review_oracle_integration',
+                    reason: 'Oracle integration submitted. Validating resilience and failure handling.',
+                    parameters: {
+                        min_score: 85,
+                        required_checks: ['staleness', 'fallback', 'circuit_breaker'],
+                        max_latency_ms: 100,
+                    },
+                },
+            ],
+            next_state: {
+                phase_id: 'oracle-integration',
+                completed_missions: ['oracle-integration'],
+                xp_delta: 80,
+            },
+        },
+
+        // Step 3: Liquidity Stress Testing
+        {
+            metadata: {
+                ...meta,
+                title: 'Liquidity Shock Simulation',
+                summary: 'Test protocol resilience under extreme conditions',
+            },
+            ui_blocks: [
+                {
+                    kind: 'text_block',
+                    id: 'stress-test-intro',
+                    title: 'Stress Testing is Risk Mitigation',
+                    body_markdown: `
+# Liquidity Stress Testing
+
+Protocols fail when liquidity disappears. **Test before it happens.**
+
+## Stress Test Scenarios
+1. **Flash Crash**: 50% price drop in 1 block
+2. **Liquidity Drain**: 80% pool depth removed
+3. **Oracle Failure**: All price feeds go offline
+4. **Network Congestion**: 10x gas prices, 5s block times
+
+## Expected Behaviors
+- ✅ Circuit breakers trigger at -30% price move
+- ✅ Liquidations execute within 2 blocks
+- ✅ Protocol remains solvent through all scenarios
+- ✅ User funds remain accessible
+
+## Metrics to Monitor
+- Collateralization ratio stability
+- Liquidation efficiency
+- Slippage impact
+- Protocol solvency ratio
+                    `.trim(),
+                },
+                {
+                    kind: 'mission_block',
+                    id: 'stress-test-mission',
+                    title: 'Mission: Run Liquidity Stress Tests',
+                    description: 'Execute comprehensive stress testing suite. Simulate: (1) Flash crash scenario, (2) Liquidity drain, (3) Oracle failure, (4) Network congestion. Document protocol behavior and any vulnerabilities discovered. Submit detailed stress test report.',
+                    mission_type: 'deliverable',
+                    expected_input_type: 'markdown_document',
+                    xp_reward: 60,
+                    is_mandatory: true,
+                },
+                {
+                    kind: 'indicator_block',
+                    id: 'stress-metrics',
+                    title: 'Stress Test Targets',
+                    type: 'bar',
+                    indicators: [
+                        { name: 'Flash Crash Resilience', value: 0, max: 100, color: '#ef4444' },
+                        { name: 'Liquidity Drain Handling', value: 0, max: 100, color: '#f59e0b' },
+                        { name: 'Oracle Failure Recovery', value: 0, max: 100, color: '#3b82f6' },
+                        { name: 'Congestion Tolerance', value: 0, max: 100, color: '#8b5cf6' },
+                    ],
+                },
+            ],
+            agent_actions: [
+                {
+                    agent_name: 'CapitalAgent',
+                    action: 'validate_stress_tests',
+                    reason: 'Stress test report submitted. Analyzing protocol resilience and failure modes.',
+                    parameters: {
+                        required_scenarios: ['flash_crash', 'liquidity_drain', 'oracle_failure', 'congestion'],
+                        min_resilience_score: 80,
+                    },
+                },
+            ],
+            next_state: {
+                phase_id: 'oracle-integration',
+                completed_missions: ['oracle-integration', 'stress-test-mission'],
+                xp_delta: 60,
+            },
+        },
+    ];
+};
+
+/**
  * Capital Foundry Phase 4: Risk Command Center (staking + bonding curve)
  */
 const createRiskCommandSequence = (trackId: string): JourneyStepResponse[] => {
@@ -1272,75 +1822,75 @@ const buildTrackSequence = (trackId: string): JourneyStepResponse[] => {
         return sequence;
     }
 
-    // Capital Foundry - DeFi Protocol Builder (Partial Implementation)
+    // Capital Foundry - DeFi Protocol Builder (Complete Implementation)
     if (trackId === 'capital-foundry') {
         const sequence: JourneyStepResponse[] = [
-            ...createCapitalDiscoverySequence(trackId),    // Phase 1: capital-discovery (1 step)
-            ...createGenericPhaseSequence(trackId, 'program-forge', 'Program Forge Lab', 'Build Solana programs with Anchor'),
-            ...createGenericPhaseSequence(trackId, 'oracle-integration', 'Oracle & Liquidity Mesh', 'Integrate oracle feeds'),
-            ...createRiskCommandSequence(trackId),
+            ...createCapitalDiscoverySequence(trackId),    // Phase 1: capital-discovery
+            ...createProgramForgeSequence(trackId),        // Phase 2: program-forge
+            ...createOracleIntegrationSequence(trackId),   // Phase 3: oracle-integration
+            ...createRiskCommandSequence(trackId),         // Phase 4: risk-command
             ...createDaoVotePhaseSequence(trackId, 'capital-launchpad', 'Launch & Scale Deck', 'Prepare for production'),
-            ...createLaunchCollaterizeSequence(trackId),   // Phase 6: launch-collaterize (3 steps)
+            ...createLaunchCollaterizeSequence(trackId),   // Phase 6: launch-collaterize
         ];
 
         logDebug(`[DemoSequencer V2] Generated ${sequence.length} steps for ${trackId}`);
         return sequence;
     }
 
-    // System Architect - Infrastructure Builder (Partial Implementation)
+    // System Architect - Infrastructure Builder (Complete Implementation)
     if (trackId === 'system-architect') {
         const sequence: JourneyStepResponse[] = [
-            ...createGenericPhaseSequence(trackId, 'architecture-scan', 'Topology Reconnaissance', 'Map decentralized infrastructure'),
-            ...createGenericPhaseSequence(trackId, 'depin-studio', 'DePIN Studio', 'Prototype decentralized physical infrastructure'),
-            ...createGenericPhaseSequence(trackId, 'onchain-ai', 'On-Chain Intelligence Lab', 'Fuse AI with verifiable execution'),
-            ...createGenericPhaseSequence(trackId, 'systems-hardening', 'Systems Hardening Forge', 'Strengthen infrastructure'),
-            ...createGenericPhaseSequence(trackId, 'synaptic-rollout', 'Synaptic Rollout', 'Orchestrate deployment'),
-            ...createLaunchCollaterizeSequence(trackId),
+            ...createArchitectureScanSequence(trackId),      // Phase 1: architecture-scan
+            ...createDePINStudioSequence(trackId),           // Phase 2: depin-studio (staking)
+            ...createOnChainAISequence(trackId),             // Phase 3: onchain-ai
+            ...createSystemsHardeningSequence(trackId),      // Phase 4: systems-hardening
+            ...createSynapticRolloutSequence(trackId),       // Phase 5: synaptic-rollout (DAO vote)
+            ...createLaunchCollaterizeSequence(trackId),     // Phase 6: launch-collaterize
         ];
 
         logDebug(`[DemoSequencer V2] Generated ${sequence.length} steps for ${trackId}`);
         return sequence;
     }
 
-    // Experience Studio - Creator Tech (Partial Implementation)
+    // Experience Studio - Creator Tech (Complete Implementation)
     if (trackId === 'experience-studio') {
         const sequence: JourneyStepResponse[] = [
-            ...createGenericPhaseSequence(trackId, 'experience-discovery', 'Experience Discovery', 'Research cultural signals'),
-            ...createGenericPhaseSequence(trackId, 'nft-systems-lab', 'NFT Systems Lab', 'Engineer NFT economies'),
-            ...createGenericPhaseSequence(trackId, 'gameplay-lab', 'Gameplay & Mechanics Forge', 'Integrate tokenized mechanics'),
-            ...createGenericPhaseSequence(trackId, 'ux-elevation', 'UX Elevation Studio', 'Polish interface flows'),
-            ...createGenericPhaseSequence(trackId, 'experience-launch', 'Launch & Community Resonance', 'Deliver your experience'),
-            ...createLaunchCollaterizeSequence(trackId),
+            ...createExperienceDiscoverySequence(trackId),  // Phase 1: experience-discovery
+            ...createNFTSystemsLabSequence(trackId),        // Phase 2: nft-systems
+            ...createGameplayLabSequence(trackId),          // Phase 3: gameplay-lab
+            ...createUXElevationSequence(trackId),          // Phase 4: ux-elevation
+            ...createExperienceLaunchSequence(trackId),     // Phase 5: experience-launch
+            ...createLaunchCollaterizeSequence(trackId),    // Phase 6: launch-collaterize
         ];
 
         logDebug(`[DemoSequencer V2] Generated ${sequence.length} steps for ${trackId}`);
         return sequence;
     }
 
-    // Impact Engine - Governance & Coordination (Partial Implementation)
+    // Impact Engine - Governance & Coordination (Complete Implementation)
     if (trackId === 'impact-engine') {
         const sequence: JourneyStepResponse[] = [
-            ...createGenericPhaseSequence(trackId, 'impact-charter', 'Mission Charter Lab', 'Define purpose and stakeholders'),
-            ...createGenericPhaseSequence(trackId, 'dao-design', 'DAO Design Workshop', 'Engineer equitable governance'),
-            ...createGenericPhaseSequence(trackId, 'philanthropy-protocols', 'Transparent Funding Protocols', 'Construct philanthropy flows'),
-            ...createGenericPhaseSequence(trackId, 'identity-reputation', 'Identity & Reputation Mesh', 'Deploy token-gated participation'),
-            ...createDaoVotePhaseSequence(trackId, 'synaptic-impact', 'Synaptic Impact Launch', 'Activate your DAO'),
-            ...createLaunchCollaterizeSequence(trackId),
+            ...createImpactCharterSequence(trackId),           // Phase 1: impact-charter
+            ...createDAODesignSequence(trackId),               // Phase 2: dao-design
+            ...createPhilanthropyProtocolsSequence(trackId),   // Phase 3: philanthropy-protocols
+            ...createIdentityReputationSequence(trackId),      // Phase 4: identity-reputation
+            ...createDaoVotePhaseSequence(trackId, 'synaptic-impact', 'Synaptic Impact Launch', 'Present to DAO'),
+            ...createLaunchCollaterizeSequence(trackId),       // Phase 6: launch-collaterize
         ];
 
         logDebug(`[DemoSequencer V2] Generated ${sequence.length} steps for ${trackId}`);
         return sequence;
     }
 
-    // Resilience Master - Security Guardian (Partial Implementation)
+    // Resilience Master - Security Guardian (Complete Implementation)
     if (trackId === 'resilience-master') {
         const sequence: JourneyStepResponse[] = [
-            ...createGenericPhaseSequence(trackId, 'security-baseline', 'Security Baseline Forge', 'Build auditing muscle memory'),
-            ...createGenericPhaseSequence(trackId, 'exploit-hunt', 'Exploit Hunter Arena', 'Hone offensive security skills'),
-            ...createGenericPhaseSequence(trackId, 'defense-systems', 'Defense Systems Orchestrator', 'Engineer runtime protections'),
-            ...createGenericPhaseSequence(trackId, 'incident-response', 'On-Chain Incident Command', 'Master forensic triage'),
-            ...createGenericPhaseSequence(trackId, 'redblue-evolution', 'Red/Blue Evolution', 'Institutionalize security culture'),
-            ...createLaunchCollaterizeSequence(trackId),
+            ...createSecurityBaselineSequence(trackId),      // Phase 1: security-baseline
+            ...createExploitHuntSequence(trackId),           // Phase 2: exploit-hunt
+            ...createDefenseSystemsSequence(trackId),        // Phase 3: defense-systems
+            ...createIncidentResponseSequence(trackId),      // Phase 4: incident-response
+            ...createRedBlueEvolutionSequence(trackId),      // Phase 5: red-blue-evolution
+            ...createLaunchCollaterizeSequence(trackId),     // Phase 6: launch-collaterize
         ];
 
         logDebug(`[DemoSequencer V2] Generated ${sequence.length} steps for ${trackId}`);
