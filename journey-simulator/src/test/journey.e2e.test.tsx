@@ -4,8 +4,6 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
 import { useJourneyStore } from '../store/journeyStore';
 import { personas as PERSONAS } from '../data/personas';
 
@@ -27,7 +25,7 @@ describe('Journey E2E Tests - All Personas', () => {
   });
 
   describe('Complete Journey Flows', () => {
-    const testPersonaJourney = async (personaId: string, personaName: string) => {
+    const testPersonaJourney = async (personaId: string, _personaName: string) => {
       const store = useJourneyStore.getState();
       const persona = PERSONAS.find(p => p.id === personaId);
 
@@ -256,7 +254,7 @@ describe('Journey E2E Tests - All Personas', () => {
   describe('NFT Image Verification', () => {
     PERSONAS.forEach((persona) => {
       it(`should have valid NFT image paths for ${persona.title}`, () => {
-        persona.phases.forEach((phase, index) => {
+        persona.phases.forEach((phase, _index) => {
           const expectedImagePath = `/images/nfts/${persona.id}/${phase.id}.png`;
 
           // We can't actually check if the file exists in a unit test,

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * DRY RUN SIMULATION - Demo Flow Verification
  * Runs the demo engine logic without UI to validate business rules
@@ -67,7 +66,7 @@ console.log(`${GREEN}[OK]${RESET} Sequence generated with ${sequence.length} ste
 
 // Simulation variables
 let stakingDetected = false;
-let daoVoteDetected = false;
+const _daoVoteDetected = false;
 let finalValidationReached = false;
 
 // Simulate each step
@@ -149,7 +148,7 @@ console.log(`${BOLD}${CYAN}                    VERIFICATION REPORT              
 console.log(`${BOLD}${CYAN}═══════════════════════════════════════════════════════════${RESET}\n`);
 
 const phase4Result = stakingDetected;
-const phase5Scenario = (phase as any).daoVoteRequired === true;
+const _phase5Scenario = (phase as any).daoVoteRequired === true;
 const resetResult = demoState.status === 'IDLE' && currentPhase === 0;
 
 console.log(`${phase4Result ? GREEN + '✅' : RED + '❌'}${RESET} Capital Foundry Phase 4 (risk-command): Staking Block Present`);

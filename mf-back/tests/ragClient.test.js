@@ -29,7 +29,7 @@ describe('ragClient resilience', () => {
 
     fs.writeFileSync(path.join(tempDir, 'fallback-guide.txt'), 'This fallback doc helps with DAO launches.', 'utf8');
 
-    delete require.cache[require.resolve('../rag/ragClient')];
+    delete require.cache[require.resolve('../src/rag/ragClient')];
     ragClient = require('../src/rag/ragClient');
     warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
   });

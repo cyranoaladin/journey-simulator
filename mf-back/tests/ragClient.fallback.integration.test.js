@@ -42,7 +42,7 @@ describe('ragClient local fallback scenarios', () => {
 
   it('returns an empty array when the fallback directory does not exist', async () => {
     process.env.RAG_DATA_PATH = path.join(tempDir, 'missing');
-    delete require.cache[require.resolve('../rag/ragClient')];
+    delete require.cache[require.resolve('../src/rag/ragClient')];
     ragClient = require('../src/rag/ragClient');
 
     const results = await ragClient.getRagSnippets('anything');
@@ -51,7 +51,7 @@ describe('ragClient local fallback scenarios', () => {
 
   it('serves locally persisted documents through the fallback search', async () => {
     process.env.RAG_DATA_PATH = tempDir;
-    delete require.cache[require.resolve('../rag/ragClient')];
+    delete require.cache[require.resolve('../src/rag/ragClient')];
     ragClient = require('../src/rag/ragClient');
 
     await ragClient.ingestDocument('Local DAO handbook', {
@@ -70,7 +70,7 @@ describe('ragClient local fallback scenarios', () => {
 
   it('skips remote persistence when no content is provided to ingestDocument', async () => {
     process.env.RAG_DATA_PATH = tempDir;
-    delete require.cache[require.resolve('../rag/ragClient')];
+    delete require.cache[require.resolve('../src/rag/ragClient')];
     ragClient = require('../src/rag/ragClient');
 
     const response = await ragClient.ingestDocument('', { title: 'EmptyDoc', type: 'text/plain' });

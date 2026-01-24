@@ -3,7 +3,7 @@
  * Tests phase progression, state management, and demo functionality
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { useJourneyStore } from '../journeyStore';
 import { personas as PERSONAS } from '../../data/personas';
 
@@ -98,7 +98,7 @@ describe('JourneyStore - Comprehensive Tests', () => {
 
       // Tick until we hit a mission block
       let ticked = 0;
-      let maxTicks = 10;
+      const maxTicks = 10;
 
       while (ticked < maxTicks) {
         const stateBefore = useJourneyStore.getState().demoState.status;
