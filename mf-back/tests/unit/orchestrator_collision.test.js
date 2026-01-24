@@ -5,7 +5,7 @@
  */
 
 
-const { routeIntent } = require('@mocks/orchestration').intentRouter;
+const { routeIntent } = require('../../src/orchestration/intentRouter');
 
 // Mock the registry module
 jest.mock('../../src/agents/registry', () => {

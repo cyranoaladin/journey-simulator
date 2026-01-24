@@ -2,7 +2,7 @@
 process.env.NODE_ENV = 'production';
 
 const registry = require('../../src/agents/registry');
-const intentRouter = require("@mocks/orchestration").intentRouter;
+const intentRouter = require("../../src/orchestration/intentRouter");
 const { sanitizeTimeline } = require("../../src/orchestration/timelineSanitizer");
 
 describe('Phase 4: Contract Locking (Unit Tests)', () => {
