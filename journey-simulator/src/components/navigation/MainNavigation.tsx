@@ -480,6 +480,7 @@ const MainNavigation = ({ enableWallet = false }: MainNavigationProps) => {
     runMode: state.runMode,
     setRunMode: state.setRunMode,
   }))
+  const toggleDemoMode = useJourneyStoreShallow((state) => state.toggleDemoMode)
   const location = useLocation()
   const navigate = useNavigate()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -681,6 +682,24 @@ const MainNavigation = ({ enableWallet = false }: MainNavigationProps) => {
             <div className="hidden lg:flex">
               <UserMetricsPanel />
             </div>
+
+            {/* Demo/Real Mode Toggle */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={toggleDemoMode}
+              className={`hidden lg:flex px-4 py-2 rounded-lg items-center space-x-2 transition-all ${
+                runMode === 'demo'
+                  ? 'bg-yellow-500/20 border border-yellow-500/50 text-yellow-400'
+                  : 'bg-green-500/20 border border-green-500/50 text-green-400'
+              }`}
+            >
+              <Sparkles size={16} />
+              <span className="text-sm font-medium">
+                {runMode === 'demo' ? 'Launch with Zyno (demo)' : 'Launch with Zyno (real)'}
+              </span>
+            </motion.button>
+
 
             {enableWallet ? (
               <WalletButton />

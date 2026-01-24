@@ -6,6 +6,7 @@
 
 import { ReactNode } from 'react';
 import Header from './Header';
+import DemoModeBanner from '../shared/DemoModeBanner';
 import Sidebar from './Sidebar';
 import Main from './Main';
 import Footer from './Footer';
@@ -35,6 +36,7 @@ const LayoutShell = ({ children, enableWallet = true }: LayoutProps) => {
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-[#09081a] via-[#0D0B1F] to-[#0D0B1F] text-slate-100" data-focus-mode={focusMode} data-testid="trinity-layout">
       <Header enableWallet={enableWallet} />
+      <DemoModeBanner />
       <div className="relative flex w-full justify-center">
         <div className="relative flex w-full flex-col pt-[calc(var(--header-height,4rem)+var(--skillchain-banner-offset,0px)+var(--wallet-banner-offset,0px)+1.5rem)]">
           <div className={`relative mx-auto flex w-full max-w-[1600px] gap-6 px-3 pb-16 transition-[padding] duration-300 sm:px-4 lg:px-6 ${focusMode ? 'justify-center gap-0 px-4 sm:px-6 lg:px-8' : ''}`}>

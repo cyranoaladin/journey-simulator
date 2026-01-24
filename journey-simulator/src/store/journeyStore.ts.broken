@@ -54,7 +54,6 @@ export interface JourneyState {
   setCurrentPhase: (phase: number) => void;
   setUiMode: (mode: Mode) => void;
   setRunMode: (mode: RunMode) => void;
-  toggleDemoMode: () => void;
   setUiTone: (tone: Tone) => void;
   setApiJourneyId: (id: string) => void;
   ensureApiJourneyId: () => string;
@@ -504,12 +503,6 @@ export const useJourneyStore = createWithEqualityFn<JourneyState>()(
         }).catch((err) => {
           logger.warn('Failed to notify backend of run mode change', err);
         });
-      },
-
-      toggleDemoMode: () => {
-        const current = get().runMode;
-        const newMode: RunMode = current === 'demo' ? 'real' : 'demo';
-        get().setRunMode(newMode);
       },
       setUiMode: (mode) => set({ uiMode: mode }),
       setUiTone: (tone) => set({ uiTone: tone }),

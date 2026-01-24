@@ -30,7 +30,7 @@ function resolveApiBaseUrl(): string {
         if (normalizedConfigured && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(normalizedConfigured)) {
             return normalizedConfigured;
         }
-        return 'http://127.0.0.1:3005';
+        return 'http://127.0.0.1:3001';
     }
 
     return normalizedConfigured || 'https://journey.mfai.app';
