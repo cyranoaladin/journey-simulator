@@ -1,6 +1,6 @@
 // 🔁 Zyno Orchestrator (Hardened - Relentless Precision + Sub-Step Engine)
 const agentRegistry = require('./agentsRegistry');
-const { loadTemplateForIntent } = require('../../data/parcoursTemplates');
+const { loadTemplateForIntent } = require('../data/parcoursTemplates');
 const specializedValidators = require('./specializedValidators');
 
 // PERSONA TONES: Restored for track-specific personality
