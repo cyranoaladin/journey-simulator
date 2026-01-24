@@ -21,7 +21,7 @@
     "worker:mint": "ts-node --esm scripts/run-mint-worker.ts"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "node --loader ts-node/esm prisma/seed.ts"
   },
   "engines": {
     "node": ">=18.17.0"

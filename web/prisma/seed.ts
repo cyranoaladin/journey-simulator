@@ -15,24 +15,22 @@ async function main() {
   const user = await prisma.user.upsert({
     where: { email: 'demo@mfai.local' },
     update: {},
-    create: { email: 'demo@mfai.local', name: 'Demo User' } as any,
+    create: { email: 'demo@mfai.local', name: 'Demo User', walletAddress: 'demo-wallet-address' } as any,
   })
 
-  // Demo journeys
-  const j1 = await (prisma as any).journey.create({
+  // Demo journeys (Projects)
+  const j1 = await prisma.project.create({
     data: {
-      title: 'Builder – Tokenomics',
-      status: 'active',
-      type: 'MVP_LAUNCH',
-      userId: user.id,
+      name: 'Builder – Tokenomics',
+      status: 'IN_PROGRESS',
+      ownerId: user.id,
     },
   })
-  const j2 = await (prisma as any).journey.create({
+  const j2 = await prisma.project.create({
     data: {
-      title: 'Experience – UX',
-      status: 'planned',
-      type: 'PRODUCT_EXPERIENCE',
-      userId: user.id,
+      name: 'Experience – UX',
+      status: 'DRAFT',
+      ownerId: user.id,
     },
   })
 

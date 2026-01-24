@@ -1,14 +1,14 @@
 [
-    {
-        "missionId": "m-1",
-        "feedback": "Excellent execution of the consensus algorithm.",
-        "score": 95,
-        "reviewer": "System"
-    },
-    {
-        "missionId": "m-2",
-        "feedback": "Latency could be improved in the p2p layer.",
-        "score": 88,
-        "reviewer": "NetworkBot"
-    }
+  {
+    "missionId": "m-1",
+    "feedback": "Excellent execution of the consensus algorithm.",
+    "score": 95,
+    "reviewer": "System"
+  },
+  {
+    "missionId": "m-2",
+    "feedback": "Latency could be improved in the p2p layer.",
+    "score": 88,
+    "reviewer": "NetworkBot"
+  }
 ]

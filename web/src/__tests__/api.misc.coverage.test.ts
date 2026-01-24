@@ -82,7 +82,7 @@ describe('Misc API coverage', () => {
         used: false,
         expiresAt: Date.now() + 10000,
       })),
-      markSiwsChallengeUsed: jest.fn(async () => { }),
+      markSiwsChallengeUsed: jest.fn(async () => {}),
     }))
 
     jest.doMock('tweetnacl', () => ({
@@ -92,7 +92,7 @@ describe('Misc API coverage', () => {
     // Mock PublicKey to avoid validation error
     jest.doMock('@solana/web3.js', () => ({
       PublicKey: class {
-        constructor() { }
+        constructor() {}
         toBytes() {
           return new Uint8Array()
         }
