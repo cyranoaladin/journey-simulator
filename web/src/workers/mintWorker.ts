@@ -6,11 +6,7 @@
 
 import { Worker, Job } from 'bullmq'
 import { redis } from '../server/redis'
-import {
-  executeReward,
-  type RewardSpec,
-  type SimResult,
-} from '../../packages/agents/tools/solana'
+import { executeReward, type RewardSpec, type SimResult } from '../../packages/agents/tools/solana'
 import { log, error as logError } from '../server/logger'
 
 // We need to import the Prisma client dynamically or ensure it's available in the worker context

@@ -192,7 +192,13 @@ describe('Misc API coverage', () => {
 
   it('GET /api/agents/logs with and without journeyId', async () => {
     const { pushAgentLog } = await import('../../src/server/state')
-    await pushAgentLog({ journeyId: 'abc', agent: 'Zyno', action: 'step', ts: Date.now(), details: { d: 1 } })
+    await pushAgentLog({
+      journeyId: 'abc',
+      agent: 'Zyno',
+      action: 'step',
+      ts: Date.now(),
+      details: { d: 1 },
+    })
     const mod = await import('../../app/api/agents/logs/route')
     const { GET } = mod as any
     const res1 = await GET({ url: 'http://localhost/api/agents/logs?limit=5' } as any)

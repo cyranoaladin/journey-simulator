@@ -1,1 +1,1 @@
-declare module 'web-streams-ponyfill';
+declare module 'web-streams-ponyfill'

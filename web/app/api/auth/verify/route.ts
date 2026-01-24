@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
 
     // 2. Find or Create User & Wallet in DB
     // We use a transaction to ensure consistency
-    const user = await prisma.$transaction(async (tx) => {
+    const user = await (prisma.$transaction(async (tx) => {
       // Check if wallet exists
       const wallet = await tx.wallet.findUnique({
         where: { address: walletAddress },
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
       }
 
       return wallet.user
-    }) as any // Cast explicitly to resolve type inference issue
+    }) as any) // Cast explicitly to resolve type inference issue
 
     // 3. Create Session (Cookie)
     const sessionToken = signSession({
