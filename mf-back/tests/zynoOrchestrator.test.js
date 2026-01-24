@@ -14,7 +14,7 @@ describe('orchestrateZyno', () => {
   });
 
   it('normalizes agent outputs, including references and AEPO metrics', async () => {
-    const { orchestrateZyno } = require('@/orchestration/zynoOrchestrator');
+    const { orchestrateZyno } = require('../src/orchestration/zynoOrchestrator');
 
     const result = await orchestrateZyno('Time to build a working prototype', {
       userId: 'user-3',
