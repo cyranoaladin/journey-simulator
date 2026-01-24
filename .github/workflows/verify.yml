@@ -11,17 +11,6 @@ jobs:
     name: Backend tests
     runs-on: ubuntu-latest
     
-    services:
-      mongodb:
-        image: mongo:7
-        ports:
-          - 27017:27017
-        options: >-
-          --health-cmd "mongosh --eval 'db.adminCommand({ping: 1})'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    
     defaults:
       run:
         working-directory: mf-back
@@ -39,8 +28,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Run tests
-        env:
-          MONGO_URI: mongodb://localhost:27017/mfai_test
         run: npm test
 
   frontend:

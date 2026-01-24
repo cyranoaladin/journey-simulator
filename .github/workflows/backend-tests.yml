@@ -13,17 +13,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      mongo:
-        image: mongo:6
-        ports:
-          - 27017:27017
-        options: >-
-          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -42,17 +31,6 @@ jobs:
         working-directory: mf-back
         run: npm ci
 
-      - name: Wait for MongoDB to be ready
-        run: |
-          # Install netcat if not available
-          sudo apt-get update && sudo apt-get install -y netcat-openbsd || true
-          # Wait for MongoDB port to be open (Docker health checks should handle this, but we verify)
-          timeout 30 bash -c 'until nc -z localhost 27017 2>/dev/null; do echo "Waiting for MongoDB..."; sleep 1; done' || true
-          sleep 3  # Give MongoDB a moment to fully initialize
-
       - name: Run backend test suite
         working-directory: mf-back
         run: npm test
-        env:
-          MONGO_URI: mongodb://localhost:27017
-          # Keep SKIP_DB_CONNECTION for tests that don't need DB, but s2_* tests will connect anyway
