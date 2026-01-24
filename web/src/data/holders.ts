@@ -23,3 +23,4 @@ export const holders: Holder[] = [
     status: 'active',
   },
 ]
+// Force prettier sync
