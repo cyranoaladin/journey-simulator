@@ -65,3 +65,24 @@ Object.defineProperty(globalThis, 'crypto', {
 vi.mock('../hooks/useArtifacts', () => ({
 	useArtifacts: () => ({ artifacts: [], loading: false, error: null }),
 }));
+
+// Mock fetch to prevent ECONNREFUSED errors in unit tests
+globalThis.fetch = vi.fn(() =>
+	Promise.resolve({
+		ok: true,
+		status: 200,
+		json: () => Promise.resolve({ success: true, data: {} }),
+		text: () => Promise.resolve(''),
+		blob: () => Promise.resolve(new Blob()),
+		arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+		formData: () => Promise.resolve(new FormData()),
+		clone: () => ({ ok: true, status: 200 }) as Response,
+		headers: new Headers(),
+		redirected: false,
+		statusText: 'OK',
+		type: 'basic' as ResponseType,
+		url: '',
+		bodyUsed: false,
+		body: null,
+	} as Response)
+) as any;
