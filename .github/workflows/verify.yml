@@ -179,6 +179,8 @@ jobs:
           cat frontend.log || true
           exit 1
       - name: Install Playwright browsers
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db?schema=public
         run: npx playwright install --with-deps chromium
       - name: Run smoke tests
         env:

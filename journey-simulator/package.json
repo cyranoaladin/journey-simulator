@@ -19,7 +19,7 @@
     "test:integration": "vitest run src/store/__tests__/journeyStore.comprehensive.test.ts",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:e2e:smoke": "playwright test tests/e2e/builder-journey.spec.ts tests/e2e/investor-demo.spec.ts --project=chromium",
+    "test:e2e:smoke": "playwright test tests/e2e/demo-interactive-integrity.spec.ts tests/e2e/final-demo-verification.spec.ts --project=chromium",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:full-audit": "playwright test tests/e2e --reporter=html --reporter=list",
