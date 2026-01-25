@@ -129,9 +129,7 @@ jobs:
       
       - name: Build backend
         working-directory: mf-back
-        run: npm run build
-      
-      - name: Start backend server
+        run: npm run build      - name: Start backend server
         working-directory: mf-back
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db?schema=public
@@ -139,21 +137,26 @@ jobs:
           NODE_ENV: test
           JWT_SECRET: test-jwt-secret-key-for-ci
         run: |
-          npm start &
+          echo "Starting backend with DATABASE_URL=$DATABASE_URL"
+          npm start > backend.log 2>&1 &
           echo $! > backend.pid
+          echo "Backend PID: $(cat backend.pid)"
       
       - name: Wait for backend
         run: |
           echo "Waiting for backend to be ready..."
           for i in {1..30}; do
             if curl -f http://127.0.0.1:3002/health 2>/dev/null || curl -f http://127.0.0.1:3002/ 2>/dev/null; then
-              echo "Backend is ready!"
               exit 0
             fi
             echo "Attempt $i/30: Backend not ready yet..."
             sleep 2
           done
           echo "Backend failed to start within 60 seconds"
+          echo "=== Backend logs ==="
+          cat mf-back/backend.log || echo "No backend log found"
+          echo "=== Backend process status ==="
+          ps aux | grep node || echo "No node processes found"
           exit 1
       
       - name: Install frontend dependencies
