@@ -127,6 +127,35 @@ jobs:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db?schema=public
         run: npx prisma db push --accept-data-loss
       
+      - name: Build backend
+        working-directory: mf-back
+        run: npm run build
+      
+      - name: Start backend server
+        working-directory: mf-back
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db?schema=public
+          PORT: 3002
+          NODE_ENV: test
+          JWT_SECRET: test-jwt-secret-key-for-ci
+        run: |
+          npm start &
+          echo $! > backend.pid
+      
+      - name: Wait for backend
+        run: |
+          echo "Waiting for backend to be ready..."
+          for i in {1..30}; do
+            if curl -f http://127.0.0.1:3002/health 2>/dev/null || curl -f http://127.0.0.1:3002/ 2>/dev/null; then
+              echo "Backend is ready!"
+              exit 0
+            fi
+            echo "Attempt $i/30: Backend not ready yet..."
+            sleep 2
+          done
+          echo "Backend failed to start within 60 seconds"
+          exit 1
+      
       - name: Install frontend dependencies
         run: npm ci
       - name: Build
