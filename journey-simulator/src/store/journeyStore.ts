@@ -592,6 +592,7 @@ export const useJourneyStore = createWithEqualityFn<JourneyState>()(
             demoState: {
               ...state.demoState,
               status: 'IDLE',
+              isActive: false,
               currentSequence: [],
               stepIndex: -1,
             }
