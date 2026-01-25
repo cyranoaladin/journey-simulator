@@ -78,23 +78,6 @@ jobs:
         run: npm run check
       - name: Build
         run: npm run build
-      - name: Start frontend server
-        run: |
-          npm run preview -- --port 3000 &
-          echo $! > frontend.pid
-      - name: Wait for frontend
-        run: |
-          echo "Waiting for frontend to be ready..."
-          for i in {1..30}; do
-            if curl -f http://127.0.0.1:3000/ 2>/dev/null; then
-              echo "Frontend is ready!"
-              exit 0
-            fi
-            echo "Attempt $i/30: Frontend not ready yet..."
-            sleep 2
-          done
-          echo "Frontend failed to start within 60 seconds"
-          exit 1
 
   playwright-smoke:
     name: Playwright smoke
@@ -147,23 +130,6 @@ jobs:
       - name: Build backend
         working-directory: mf-back
         run: npm run build
-      - name: Start frontend server
-        run: |
-          npm run preview -- --port 3000 &
-          echo $! > frontend.pid
-      - name: Wait for frontend
-        run: |
-          echo "Waiting for frontend to be ready..."
-          for i in {1..30}; do
-            if curl -f http://127.0.0.1:3000/ 2>/dev/null; then
-              echo "Frontend is ready!"
-              exit 0
-            fi
-            echo "Attempt $i/30: Frontend not ready yet..."
-            sleep 2
-          done
-          echo "Frontend failed to start within 60 seconds"
-          exit 1
       
       - name: Start backend server
         working-directory: mf-back
@@ -192,11 +158,11 @@ jobs:
       
       - name: Install frontend dependencies
         run: npm ci
-      - name: Build
+      - name: Build frontend
         run: npm run build
       - name: Start frontend server
         run: |
-          npm run preview -- --port 3000 &
+          npm run preview -- --port 3000 --host 0.0.0.0 > frontend.log 2>&1 &
           echo $! > frontend.pid
       - name: Wait for frontend
         run: |
@@ -210,6 +176,7 @@ jobs:
             sleep 2
           done
           echo "Frontend failed to start within 60 seconds"
+          cat frontend.log || true
           exit 1
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
