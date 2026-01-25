@@ -13,6 +13,7 @@ const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts', '<rootDir>/src/mocks/setup.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^../../app/(.*)$': '<rootDir>/app/$1',
     '^agents/(.*)$': '<rootDir>/packages/agents/$1',
     '^until-async$': '<rootDir>/src/mocks/until-async.js', // Add this line
     '^msw/node$': '<rootDir>/src/mocks/msw-node.js',
