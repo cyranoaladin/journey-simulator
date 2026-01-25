@@ -86,7 +86,7 @@ async function globalSetup(config: FullConfig) {
         stdio: 'inherit',
         env: {
           ...process.env,
-          MONGO_URI: mongoUri,
+          DATABASE_URL: process.env.DATABASE_URL || mongoUri,
         }
       });
     }
