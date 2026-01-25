@@ -24,13 +24,16 @@ async function seedTestUser() {
   try {
     console.log('🔌 Connecting to PostgreSQL via Prisma...');
     
-    // Check if user already exists
-    const existing = await prisma.user.findUnique({
+    // Check if user already exists by walletAddress or email
+    const existingByWallet = await prisma.user.findUnique({
       where: { walletAddress: TEST_USER.walletAddress },
     });
+    const existingByEmail = await prisma.user.findUnique({
+      where: { email: TEST_USER.email },
+    });
 
-    if (existing) {
-      console.log(`✓ Test user already exists: ${TEST_USER.email}`);
+    if (existingByWallet || existingByEmail) {
+      console.log(`✓ Test user already exists: ${TEST_USER.email} / ${TEST_USER.walletAddress}`);
       return;
     }
 
