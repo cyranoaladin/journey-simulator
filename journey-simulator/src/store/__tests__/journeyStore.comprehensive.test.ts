@@ -187,6 +187,9 @@ describe('JourneyStore - Comprehensive Tests', () => {
     it('should ignore interaction if not waiting', async () => {
       const store = useJourneyStore.getState();
 
+      // Reset demo state to allow fresh startDemoPhase
+      store.resetDemoCache();
+
       // Ensure we're in PLAYING state
       await store.startDemoPhase('cognitive-orientation', 'cognitive-activation-hub');
 
