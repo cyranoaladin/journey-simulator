@@ -1,9 +1,16 @@
-import { NextResponse } from 'next/server';
+/**
+ * Project: Money Factory AI (MFAI)
+ * Status: Production Ready - 2026
+ * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
+ */
 
-export async function GET() {
-  return NextResponse.json({ status: 'ok', message: 'Log route active' });
-}
+import { NextRequest, NextResponse } from 'next/server'
+import { listAgentLogs } from '@/server/state'
 
-export async function POST() {
-  return NextResponse.json({ status: 'received' });
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const journeyId = searchParams.get('journeyId') || undefined
+  const limit = Number(searchParams.get('limit') || '50')
+  const logs = await listAgentLogs({ journeyId, limit })
+  return NextResponse.json({ logs })
 }

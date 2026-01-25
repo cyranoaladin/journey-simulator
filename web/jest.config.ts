@@ -14,8 +14,6 @@ const customJestConfig = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^.*/app/api/(.*)$': '<rootDir>/app/api/$1',
-    '^../../app/(.*)$': '<rootDir>/app/$1',
-    '^../../app/(.*)$': '<rootDir>/app/$1',
     '^agents/(.*)$': '<rootDir>/packages/agents/$1',
     '^until-async$': '<rootDir>/src/mocks/until-async.js', // Add this line
     '^msw/node$': '<rootDir>/src/mocks/msw-node.js',
