@@ -1,0 +1,114 @@
+{
+  "id": "curious-student",
+  "name": "curious-student",
+  "title": "Curious Student",
+  "description": "Discover how to transform your curiosity into valuable skills in the Proof Economy",
+  "icon": "🎓",
+  "color": "from-blue-400 to-cyan-500",
+  "targetProfile": "Young people in training or career transition, interested in new technologies",
+  "motivation": "Acquire concrete skills, generate passive income and join a DAO",
+  "passType": "Web3 Explorer Pass™",
+  "phases": [
+    {
+      "id": "student-learn",
+      "title": "Learn",
+      "description": "Understand the basics of Web3 and the Proof Economy",
+      "mission": "Complete the introduction quiz and watch the explanatory videos",
+      "duration": "1-2 weeks",
+      "xpReward": 50,
+      "mfaiReward": 5,
+      "nftReward": "Web3 Explorer",
+      "tools": [
+        "Zyno AI Assistant",
+        "Interactive quizzes",
+        "Educational videos"
+      ],
+      "outcomes": [
+        "Understanding of Web3 concepts",
+        "First NFT badge",
+        "50 XP"
+      ]
+    },
+    {
+      "id": "student-build",
+      "title": "Build",
+      "description": "Create your first Solana wallet with Zyno's help",
+      "mission": "Set up your wallet and make your first transaction",
+      "duration": "3-5 days",
+      "xpReward": 75,
+      "mfaiReward": 7.5,
+      "nftReward": "Wallet Master",
+      "tools": [
+        "Phantom Wallet",
+        "Solana Testnet",
+        "Zyno Guidance"
+      ],
+      "outcomes": [
+        "Configured wallet",
+        "First transaction",
+        "Dashboard access"
+      ]
+    },
+    {
+      "id": "student-prove",
+      "title": "Prove",
+      "description": "Validate your skills and mint your first Proof-of-Skill™ NFT",
+      "mission": "Pass the \"Web3 Foundations\" challenge and get certified",
+      "duration": "1 week",
+      "xpReward": 100,
+      "mfaiReward": 10,
+      "nftReward": "Proof-of-Skill™: Web3 Foundations",
+      "tools": [
+        "Certification Platform",
+        "Peer Review",
+        "NFT Minting"
+      ],
+      "outcomes": [
+        "Proof-of-Skill™ NFT",
+        "Community recognition",
+        "DAO access"
+      ]
+    },
+    {
+      "id": "student-activate",
+      "title": "Activate",
+      "description": "Participate in your first DAO vote and activate your rewards",
+      "mission": "Vote on a community proposal and stake your first $MFAI",
+      "duration": "2-3 days",
+      "xpReward": 125,
+      "mfaiReward": 12.5,
+      "stakingRequired": 25,
+      "daoVoteRequired": true,
+      "tools": [
+        "DAO Platform",
+        "Staking Interface",
+        "Governance Portal"
+      ],
+      "outcomes": [
+        "First DAO vote",
+        "Staking activated",
+        "Zyno XP Boost"
+      ]
+    },
+    {
+      "id": "student-scale",
+      "title": "Scale",
+      "description": "Unlock Neuro-Dividends™ and become an active member",
+      "mission": "Stake $MFAI and share your transformation testimonial",
+      "duration": "Ongoing",
+      "xpReward": 200,
+      "mfaiReward": 20,
+      "stakingRequired": 50,
+      "tools": [
+        "Cognitive Lock™",
+        "Revenue Sharing",
+        "Community Platform"
+      ],
+      "outcomes": [
+        "Neuro-Dividends™ activated",
+        "Passive income",
+        "Active member status"
+      ]
+    }
+  ]
+}

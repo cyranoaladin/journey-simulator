@@ -1,0 +1,118 @@
+{
+  "id": "web2-entrepreneur",
+  "name": "web2-entrepreneur",
+  "title": "Web2 Entrepreneur",
+  "description": "Transform your traditional business for the Proof Economy",
+  "icon": "💼",
+  "color": "from-green-400 to-emerald-500",
+  "targetProfile": "Professionals already active in the traditional digital economy",
+  "motivation": "Tokenize a business idea, create sustainable Web3 revenue",
+  "passType": "Proof-of-Vision™ Pass",
+  "phases": [
+    {
+      "id": "entrepreneur-learn",
+      "title": "Learn",
+      "description": "NFTs for loyalty and new economic models",
+      "mission": "Study NFT use cases and evaluate your potential",
+      "duration": "1 week",
+      "xpReward": 60,
+      "mfaiReward": 6,
+      "nftReward": "Business Visionary",
+      "tools": [
+        "Case Studies",
+        "Business Canvas",
+        "ROI Calculator"
+      ],
+      "outcomes": [
+        "NFT business understanding",
+        "Self-assessment",
+        "Defined strategy"
+      ]
+    },
+    {
+      "id": "entrepreneur-build",
+      "title": "Build",
+      "description": "Create your premium content model or loyalty NFT",
+      "mission": "Develop an MVP with MFAI templates",
+      "duration": "2-3 weeks",
+      "xpReward": 100,
+      "mfaiReward": 10,
+      "nftReward": "MVP Creator",
+      "tools": [
+        "MFAI Templates",
+        "Smart Contract Builder",
+        "Design Tools"
+      ],
+      "outcomes": [
+        "Functional MVP",
+        "Deployed smart contracts",
+        "First community"
+      ]
+    },
+    {
+      "id": "entrepreneur-prove",
+      "title": "Prove",
+      "description": "Pitch your idea to Zyno and the community",
+      "mission": "Present your Proof-of-Vision™ and get initial feedback",
+      "duration": "1-2 weeks",
+      "xpReward": 150,
+      "mfaiReward": 15,
+      "nftReward": "Proof-of-Vision™",
+      "daoVoteRequired": true,
+      "tools": [
+        "Pitch Platform",
+        "Community Feedback",
+        "Zyno Analysis"
+      ],
+      "outcomes": [
+        "Proof-of-Vision™ NFT",
+        "Community feedback",
+        "Builder Arena access"
+      ]
+    },
+    {
+      "id": "entrepreneur-activate",
+      "title": "Activate",
+      "description": "Integrate your Web3 layer into your existing product",
+      "mission": "Launch the beta version and collect initial DAO feedback",
+      "duration": "1 month",
+      "xpReward": 200,
+      "mfaiReward": 20,
+      "stakingRequired": 75,
+      "daoVoteRequired": true,
+      "isIncubation": true,
+      "tools": [
+        "Integration APIs",
+        "Beta Platform",
+        "DAO Feedback"
+      ],
+      "outcomes": [
+        "Integrated Web3 product",
+        "First users",
+        "Market validation"
+      ]
+    },
+    {
+      "id": "entrepreneur-scale",
+      "title": "Scale",
+      "description": "Apply to the Launchpad and raise funds via Synaptic DAO",
+      "mission": "Submit your funding application and present to the DAO",
+      "duration": "2-3 months",
+      "xpReward": 300,
+      "mfaiReward": 30,
+      "stakingRequired": 100,
+      "daoVoteRequired": true,
+      "isLaunchpad": true,
+      "tools": [
+        "Launchpad Platform",
+        "DAO Funding",
+        "Mentor Network"
+      ],
+      "outcomes": [
+        "Funding obtained",
+        "Team formed",
+        "Validated roadmap"
+      ]
+    }
+  ]
+}

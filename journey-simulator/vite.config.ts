@@ -1,63 +1,82 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
+
+// Simple dev-only mock API to avoid ERR_CONNECTION_REFUSED when backend is down
+const mockApiPlugin = () => ({
+  name: 'mock-api',
+  configureServer(server) {
+    server.middlewares.use((req, res, next) => {
+      const useMocks = process.env.VITE_API_MOCK === '1' || process.env.VITE_API_MOCK === 'true'
+      if (!useMocks) return next()
+      const url = req.url || ''
+
+      // Mock user profile
+      if (url.startsWith('/user/profile')) {
+        res.setHeader('Content-Type', 'application/json')
+        res.end(JSON.stringify({
+          ok: true,
+          user: {
+            id: 'u-dev',
+            email: 'dev@example.com',
+            name: 'Developer',
+            walletAddress: null,
+            createdAt: new Date().toISOString(),
+          },
+        }))
+        return
+      }
+
+      // Mock journey user-progress
+      if (url.startsWith('/journey/user-progress')) {
+        res.setHeader('Content-Type', 'application/json')
+        res.end(JSON.stringify({
+          ok: true,
+          progress: {
+            totalXP: 0,
+            nfts: [],
+            nftMints: [],
+            passLevel: 'Free',
+            mfaiTokens: 10,
+            stakedMfai: 0,
+            walletConnected: false,
+            walletAddress: undefined,
+            completedPhases: [],
+            currentPersona: undefined,
+            votingPower: 0,
+            daoProposals: 0,
+            testnetAirdropClaimed: false,
+            socialShareCount: 0,
+          },
+        }))
+        return
+      }
+
+      next()
+    })
+  },
+})
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
-  server: {
-    host: '127.0.0.1',
-    port: 5173,
-    strictPort: true,
-    hmr: {
-      host: '127.0.0.1',
-      port: 5173
-    }
-  },
-  resolve: {
-    alias: {
-      buffer: 'buffer/',
-      'buffer/': 'buffer/',
-      process: resolve(__dirname, 'node_modules/process/browser.js'),
-      'process/': resolve(__dirname, 'node_modules/process/browser.js'),
-      'process/browser': resolve(__dirname, 'node_modules/process/browser.js'),
-      'process/browser.js': resolve(__dirname, 'node_modules/process/browser.js'),
-      stream: 'stream-browserify',
-      '@storybook/globalThis': '@storybook/global',
-      '@': resolve(__dirname, 'src'),
-    },
-  },
+  plugins: [mockApiPlugin(), react()],
   optimizeDeps: {
-    include: ['buffer', 'process', 'stream-browserify', '@storybook/global'],
     exclude: ['lucide-react'],
   },
-  define: {
-    global: 'globalThis',
-    'process.env': 'import.meta.env',
+  server: {
+    // Proxy backend routes to Next.js backend on port 3001
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:3001',
+        changeOrigin: true,
+      },
+      '/user': {
+        target: 'http://127.0.0.1:3001',
+        changeOrigin: true,
+      },
+      '/journey': {
+        target: 'http://127.0.0.1:3001',
+        changeOrigin: true,
+      },
+    },
   },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            const chunkMap = [
-              { name: 'torus', pattern: /@toruslabs/ },
-              { name: 'polyfills', pattern: /readable-stream|stream-browserify|events|buffer/ },
-              { name: 'ui-motion', pattern: /framer-motion|zustand/ },
-              { name: 'icons', pattern: /lucide-react/ },
-              { name: 'media-tools', pattern: /html-to-image|qrcode/ }
-            ]
-
-            for (const { name, pattern } of chunkMap) {
-              if (pattern.test(id)) {
-                return name
-              }
-            }
-
-            return 'vendor'
-          }
-        }
-      }
-    }
-  }
 })

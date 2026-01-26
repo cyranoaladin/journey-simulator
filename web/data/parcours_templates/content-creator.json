@@ -1,0 +1,123 @@
+{
+  "id": "content-creator",
+  "name": "content-creator",
+  "title": "Content Creator",
+  "description": "Transform your creativity into cognitive publications",
+  "icon": "🎨",
+  "color": "from-pink-400 to-purple-500",
+  "targetProfile": "Storytellers, designers, prompt engineers and AI-powered creators",
+  "motivation": "Formalize creative output as verifiable contributions in the MFAI protocol",
+  "passType": "Cognitive Publisher Pass",
+  "phases": [
+    {
+      "id": "creator-learn",
+      "title": "Learn",
+      "description": "Master Web3 visual literacy and understand NFT art economics",
+      "mission": "Study NFT art cases, licensing models, and create your first visual asset",
+      "duration": "1-2 weeks",
+      "xpReward": 50,
+      "mfaiReward": 5,
+      "nftReward": "Creator Seed",
+      "tools": [
+        "NFT Art Case Studies",
+        "CC0 License Guide",
+        "Royalty Calculator",
+        "Visual Design Tools"
+      ],
+      "outcomes": [
+        "NFT art understanding",
+        "First visual creation",
+        "Licensing knowledge"
+      ]
+    },
+    {
+      "id": "creator-build",
+      "title": "Build",
+      "description": "Produce a generative art series using AI and creative tools",
+      "mission": "Create and mint a mini collection using AI prompts and generative techniques",
+      "duration": "2-3 weeks",
+      "xpReward": 100,
+      "mfaiReward": 10,
+      "nftReward": "Creative Stream",
+      "tools": [
+        "AI Prompt Engineering",
+        "Generative Art Tools",
+        "Collection Builder",
+        "Metadata Editor"
+      ],
+      "outcomes": [
+        "NFT collection minted",
+        "AI art mastery",
+        "Creative workflow"
+      ]
+    },
+    {
+      "id": "creator-prove",
+      "title": "Prove",
+      "description": "Submit your work for peer review and mint Proof-of-Creation™",
+      "mission": "Submit portfolio for community evaluation and receive Proof-of-Creation™ certification",
+      "duration": "1-2 weeks",
+      "xpReward": 150,
+      "mfaiReward": 15,
+      "nftReward": "Proof-of-Creation™",
+      "daoVoteRequired": true,
+      "tools": [
+        "Portfolio Platform",
+        "Peer Review System",
+        "NFT Certification",
+        "Quality Metrics"
+      ],
+      "outcomes": [
+        "Proof-of-Creation™ NFT",
+        "Community recognition",
+        "Creator Arena access"
+      ]
+    },
+    {
+      "id": "creator-activate",
+      "title": "Activate",
+      "description": "Launch your creator brand and build your audience",
+      "mission": "Establish your Web3 creator presence and monetize your first collection",
+      "duration": "2-4 weeks",
+      "xpReward": 200,
+      "mfaiReward": 20,
+      "stakingRequired": 50,
+      "daoVoteRequired": true,
+      "isIncubation": true,
+      "tools": [
+        "Creator Platform",
+        "Audience Builder",
+        "Monetization Tools",
+        "Analytics Dashboard"
+      ],
+      "outcomes": [
+        "Launched creator brand",
+        "First sales",
+        "Growing audience"
+      ]
+    },
+    {
+      "id": "creator-scale",
+      "title": "Scale",
+      "description": "Join Creator DAO and unlock sustainable creative income",
+      "mission": "Become a recognized creator, mentor others, and earn royalties",
+      "duration": "Ongoing",
+      "xpReward": 300,
+      "mfaiReward": 30,
+      "stakingRequired": 100,
+      "daoVoteRequired": true,
+      "isLaunchpad": true,
+      "tools": [
+        "Creator DAO",
+        "Royalty System",
+        "Mentorship Platform",
+        "Revenue Dashboard"
+      ],
+      "outcomes": [
+        "Creator DAO membership",
+        "Sustainable income",
+        "Creator influence"
+      ]
+    }
+  ]
+}

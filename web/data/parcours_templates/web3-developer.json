@@ -1,0 +1,124 @@
+{
+  "id": "web3-developer",
+  "name": "web3-developer",
+  "title": "Web3 Developer",
+  "description": "Leverage your technical skills in the Proof Economy",
+  "icon": "⚡",
+  "color": "from-purple-400 to-pink-500",
+  "targetProfile": "Developers and technical people familiar with Web3",
+  "motivation": "Build serious products, gain recognition, evolve from solo hacker to protocol architect",
+  "passType": "Proof-of-Build™ Pass",
+  "phases": [
+    {
+      "id": "developer-learn",
+      "title": "Learn",
+      "description": "Master smart contract fundamentals with Rust and Anchor framework",
+      "mission": "Complete Rust/Anchor bootcamp, deploy Hello World, pass technical certification",
+      "duration": "2-3 weeks",
+      "xpReward": 75,
+      "mfaiReward": 12,
+      "nftReward": "Code Explorer",
+      "tools": [
+        "Solana Development Kit",
+        "Rust programming sandbox",
+        "Testing framework",
+        "AI code assistant"
+      ],
+      "outcomes": [
+        "Rust/Anchor proficiency",
+        "Deployed smart contract",
+        "Technical foundation"
+      ]
+    },
+    {
+      "id": "developer-build",
+      "title": "Build",
+      "description": "Design and implement a functional protocol module",
+      "mission": "Build functional DApp using MFAI SDK, contribute to open source, demonstrate excellence",
+      "duration": "3-4 weeks",
+      "xpReward": 150,
+      "mfaiReward": 15,
+      "nftReward": "Builder MVP",
+      "tools": [
+        "MFAI SDK",
+        "Protocol documentation",
+        "Development tools",
+        "GitHub integration"
+      ],
+      "outcomes": [
+        "Production DApp",
+        "Open source contributions",
+        "Peer recognition"
+      ]
+    },
+    {
+      "id": "developer-prove",
+      "title": "Prove",
+      "description": "Submit your code for comprehensive audit and DAO validation",
+      "mission": "Submit code for audit, pass security review, receive DAO validation",
+      "duration": "1-2 weeks",
+      "xpReward": 200,
+      "mfaiReward": 20,
+      "nftReward": "Proof-of-Build™",
+      "daoVoteRequired": true,
+      "tools": [
+        "Code audit platform",
+        "Security scanner",
+        "Peer review",
+        "Quality metrics"
+      ],
+      "outcomes": [
+        "Security audit passed",
+        "DAO validation",
+        "Technical credibility"
+      ]
+    },
+    {
+      "id": "developer-activate",
+      "title": "Activate",
+      "description": "Present at Demo Day and join the Builder DAO",
+      "mission": "Present at Demo Day, join Builder DAO, influence technical decisions",
+      "duration": "1 week",
+      "xpReward": 250,
+      "mfaiReward": 30,
+      "nftReward": "Builder Council",
+      "daoVoteRequired": true,
+      "isIncubation": true,
+      "tools": [
+        "Demo Day platform",
+        "Builder DAO",
+        "Technical governance",
+        "Innovation lab"
+      ],
+      "outcomes": [
+        "Demo Day presentation",
+        "Builder DAO membership",
+        "Technical influence"
+      ]
+    },
+    {
+      "id": "developer-scale",
+      "title": "Scale",
+      "description": "Join core development team and shape protocol evolution",
+      "mission": "Join core development team, lead technical initiatives, shape protocol evolution",
+      "duration": "Ongoing",
+      "xpReward": 300,
+      "mfaiReward": 40,
+      "nftReward": "Protocol Architect",
+      "stakingRequired": 100,
+      "daoVoteRequired": true,
+      "isLaunchpad": true,
+      "tools": [
+        "Core development access",
+        "Technical leadership",
+        "Protocol grants",
+        "Innovation fund"
+      ],
+      "outcomes": [
+        "Core team membership",
+        "Technical leadership",
+        "Protocol influence"
+      ]
+    }
+  ]
+}
