@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import path from 'path'
 
 // Simple dev-only mock API to avoid ERR_CONNECTION_REFUSED when backend is down
 const mockApiPlugin = () => ({
@@ -58,6 +59,11 @@ const mockApiPlugin = () => ({
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   plugins: [mockApiPlugin(), react()],
   optimizeDeps: {
     exclude: ['lucide-react'],
