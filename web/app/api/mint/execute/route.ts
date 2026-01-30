@@ -59,7 +59,7 @@ export async function POST(req: Request) {
       }
     }
     const db = (await import('@/server/db')) as unknown as PrismaMint
-    const userId = typeof req.headers?.get === "function" ? req.headers.get("x-user-id") : null
+    const userId = typeof req.headers?.get === 'function' ? req.headers.get('x-user-id') : null
     await db.prisma.mintLog.create({
       data: {
         spec: parsed.data.sim,
