@@ -15,7 +15,6 @@ import type {
   ActionSuggestionsBlock,
   XpBlock,
   DiagramBlock,
-  DAODashboardBlock,
   ProjectSelectionBlock,
 } from "../../types/uiBlocks";
 import mermaid from "mermaid";
