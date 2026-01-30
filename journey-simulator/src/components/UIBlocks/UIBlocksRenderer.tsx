@@ -18,7 +18,7 @@ import type {
   ProjectSelectionBlock,
 } from "../../types/uiBlocks";
 import mermaid from "mermaid";
-import DAODashboard from "../DAO/DAODashboard";
+import DAODashboard from "../DAOBlock/DAODashboard";
 
 function StreamingText({ text, speed = 10 }: { text: string; speed?: number }) {
   const [displayed, setDisplayed] = useState("");
