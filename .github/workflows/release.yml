@@ -9,6 +9,20 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     defaults:
       run:
         working-directory: web
@@ -41,9 +55,48 @@ jobs:
         run: npx playwright install --with-deps
         working-directory: ../journey-simulator
 
+      - name: Setup test database
+        env:
+          DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/test_db?schema=public"
+        run: |
+          npx prisma migrate deploy || npx prisma db push --skip-generate
+        working-directory: ./
+
+      - name: Start backend server for frontend E2E tests
+        env:
+          DEMO_MODE: "true"
+          NEXT_PUBLIC_TEST_MODE: "1"
+          DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/test_db?schema=public"
+          KILL_SWITCH: "1"
+        run: |
+          # Start backend in demo mode (background)
+          npm run dev > /tmp/backend.log 2>&1 &
+          echo $! > /tmp/web-server.pid
+          # Wait for server to be ready (max 60s)
+          timeout 60 bash -c 'until curl -f http://localhost:3001/api/healthz 2>/dev/null; do sleep 2; echo "Waiting for backend..."; done' || {
+            echo "Backend failed to start. Log tail:"
+            tail -50 /tmp/backend.log
+            exit 1
+          }
+          echo "Backend is ready"
+        working-directory: ./
+
       - name: Run E2E tests (journey-simulator)
         run: npm run test:e2e
         working-directory: ../journey-simulator
+
+      - name: Stop backend server
+        if: always()
+        run: |
+          if [ -f /tmp/web-server.pid ]; then
+            kill $(cat /tmp/web-server.pid) || true
+            rm /tmp/web-server.pid
+          fi
+          # Show backend logs on failure
+          if [ -f /tmp/backend.log ]; then
+            echo "=== Backend logs (last 100 lines) ==="
+            tail -100 /tmp/backend.log
+          fi
 
       - name: Upload coverage artifact (lcov)
         if: always()
