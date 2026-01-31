@@ -1,8 +1,10 @@
+// Sentry client configuration
+// Note: Client-side Sentry initialization should remain here as per Next.js conventions
 import * as Sentry from '@sentry/nextjs'
 
-if (process.env.SENTRY_DSN) {
+if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
   Sentry.init({
-    dsn: process.env.SENTRY_DSN,
+    dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
     tracesSampleRate: 0.1,
     replaysOnErrorSampleRate: 1.0,
     replaysSessionSampleRate: 0.1,
