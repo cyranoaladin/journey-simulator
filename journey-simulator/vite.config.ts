@@ -57,6 +57,26 @@ const mockApiPlugin = () => ({
   },
 })
 
+// Proxy configuration for backend API
+const proxyConfig = {
+  '/api': {
+    target: 'http://127.0.0.1:3001',
+    changeOrigin: true,
+  },
+  '/user': {
+    target: 'http://127.0.0.1:3001',
+    changeOrigin: true,
+  },
+  '/journey': {
+    target: 'http://127.0.0.1:3001',
+    changeOrigin: true,
+  },
+  '/journeys': {
+    target: 'http://127.0.0.1:3001',
+    changeOrigin: true,
+  },
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
   resolve: {
@@ -71,22 +91,9 @@ export default defineConfig({
   preview: {
     host: '127.0.0.1',
     port: 5173,
+    proxy: proxyConfig,
   },
   server: {
-    // Proxy backend routes to Next.js backend on port 3001
-    proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:3001',
-        changeOrigin: true,
-      },
-      '/user': {
-        target: 'http://127.0.0.1:3001',
-        changeOrigin: true,
-      },
-      '/journey': {
-        target: 'http://127.0.0.1:3001',
-        changeOrigin: true,
-      },
-    },
+    proxy: proxyConfig,
   },
 })
