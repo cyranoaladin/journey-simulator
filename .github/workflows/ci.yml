@@ -51,6 +51,8 @@ jobs:
             upload-report: web/playwright-report
             audit-prod: true
             needs-backend: false
+    env:
+      DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/test_db?schema=public"
     steps:
       - uses: actions/checkout@v4
 
@@ -88,8 +90,6 @@ jobs:
 
       - name: Setup test database (for frontend E2E)
         if: matrix.needs-backend == true
-        env:
-          DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/test_db?schema=public"
         run: npx prisma migrate deploy || npx prisma db push --skip-generate
         working-directory: web
 
@@ -98,7 +98,6 @@ jobs:
         env:
           DEMO_MODE: "true"
           NEXT_PUBLIC_TEST_MODE: "1"
-          DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/test_db?schema=public"
           KILL_SWITCH: "1"
         run: |
           npm run dev > /tmp/backend.log 2>&1 &
