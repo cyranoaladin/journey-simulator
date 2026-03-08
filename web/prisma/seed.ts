@@ -1,43 +1,95 @@
+/**
+ * Prisma seed script
+ * Populates database with sample data for testing
+ */
+
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-async function main(){
-  console.log('Seeding demo data...')
+async function main() {
+  console.log('🌱 Seeding database...')
 
-  // Demo user
-  const user = await prisma.user.upsert({
-    where: { email: 'demo@mfai.local' },
-    update: {},
-    create: { email: 'demo@mfai.local', name: 'Demo User' }
+  // Create sample users
+  const user1 = await prisma.user.create({
+    data: {
+      email: 'alice@example.com',
+      name: 'Alice',
+      walletAddress: 'ALiCe123456789ABCDEF',
+      xp: 150,
+    },
   })
 
-  // Demo journeys
-  const j1 = await prisma.journey.create({ data: { title: 'Builder – Tokenomics', status: 'active', userId: user.id } })
-  const j2 = await prisma.journey.create({ data: { title: 'Experience – UX', status: 'planned', userId: user.id } })
-
-  // Journey states
-  await prisma.journeyState.upsert({
-    where: { journeyId: j1.id },
-    update: { last_state: { phase_id: 'learn', completed_missions: [], xp_delta: 5 }, last_metadata: { persona_id: 'demo', journey_track: 'builder', language: 'fr' } },
-    create: { journeyId: j1.id, last_state: { phase_id: 'learn', completed_missions: [], xp_delta: 5 }, last_metadata: { persona_id: 'demo', journey_track: 'builder', language: 'fr' } }
+  const user2 = await prisma.user.create({
+    data: {
+      email: 'bob@example.com',
+      name: 'Bob',
+      walletAddress: 'BoB987654321FEDCBA',
+      xp: 50,
+    },
   })
 
-  await prisma.journeyState.upsert({
-    where: { journeyId: j2.id },
-    update: { last_state: { phase_id: 'build', completed_missions: ['m1'], xp_delta: 20 }, last_metadata: { persona_id: 'demo', journey_track: 'experience', language: 'fr' } },
-    create: { journeyId: j2.id, last_state: { phase_id: 'build', completed_missions: ['m1'], xp_delta: 20 }, last_metadata: { persona_id: 'demo', journey_track: 'experience', language: 'fr' } }
+  console.log(`✓ Created users: ${user1.id}, ${user2.id}`)
+
+  // Create sample journeys
+  const journey1 = await prisma.journey.create({
+    data: {
+      title: 'Learn Solana Basics',
+      status: 'active',
+      personaId: 'cognitive-activation-hub',
+      userId: user1.id,
+    },
   })
 
-  // Agent logs
-  const now = new Date()
-  await prisma.agentLog.createMany({ data: [
-    { journeyId: j1.id, agent: 'Zyno', action: 'step', ts: new Date(now.getTime()-60000), details: { phaseId: 'learn' } },
-    { journeyId: j1.id, agent: 'Zyno', action: 'submit', ts: new Date(now.getTime()-30000), details: { missionId: 'm1' } },
-    { journeyId: j2.id, agent: 'Zyno', action: 'step', ts: new Date(now.getTime()-20000), details: { phaseId: 'build' } },
-  ]})
+  const journey2 = await prisma.journey.create({
+    data: {
+      title: 'Build Your First DApp',
+      status: 'in_progress',
+      personaId: 'system-architect',
+      userId: user1.id,
+    },
+  })
 
-  console.log('Seed complete')
+  console.log(`✓ Created journeys: ${journey1.id}, ${journey2.id}`)
+
+  // Create sample achievements
+  await prisma.achievement.create({
+    data: {
+      userId: user1.id,
+      label: 'First Mission Complete',
+      points: 10,
+    },
+  })
+
+  await prisma.achievement.create({
+    data: {
+      userId: user2.id,
+      label: 'Wallet Connected',
+      points: 5,
+    },
+  })
+
+  console.log('✓ Created achievements')
+
+  // Create sample documents (for RAG)
+  await prisma.doc.create({
+    data: {
+      title: 'What is Solana?',
+      content: 'Solana is a blockchain network...',
+      tags: 'solana,blockchain,learn',
+    },
+  })
+
+  console.log('✓ Created documents')
+
+  console.log('✅ Seeding complete!')
 }
 
-main().catch((e)=>{ console.error(e); process.exit(1) }).finally(()=>prisma.$disconnect())
+main()
+  .catch((e) => {
+    console.error(e)
+    process.exit(1)
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
+  })
