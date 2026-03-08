@@ -1,0 +1,170 @@
+version: '3.9'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: journey
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secure-password-change-me}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "app"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - journey-network
+
+  # Redis Cache & Memory
+  redis:
+    image: redis:7-alpine
+    restart: always
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-change-me}
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - journey-network
+
+  # Prometheus Metrics
+  prometheus:
+    image: prom/prometheus:latest
+    restart: always
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+    networks:
+      - journey-network
+
+  # Grafana Dashboards
+  grafana:
+    image: grafana/grafana:latest
+    restart: always
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_SERVER_ROOT_URL: http://grafana:3000
+      GF_INSTALL_PLUGINS: redis-datasource
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - journey-network
+
+  # Next.js Application (web)
+  web:
+    build:
+      context: ./journey-simulator/web
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+      
+      # Database
+      DATABASE_URL: postgresql://app:${DB_PASSWORD:-secure-password-change-me}@postgres:5432/journey
+      
+      # Redis
+      REDIS_URL: redis://:${REDIS_PASSWORD:-change-me}@redis:6379
+      
+      # OpenAI / LLM
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      LLM_MODEL_NAME: gpt-5.1
+      LLM_TEMPERATURE: "0.4"
+      LLM_MAX_OUTPUT_TOKENS: "1500"
+      
+      # Solana
+      SOLANA_RPC_URL: ${SOLANA_RPC_URL:-https://api.mainnet-beta.solana.com}
+      NEXT_PUBLIC_SOLANA_RPC_URL: ${NEXT_PUBLIC_SOLANA_RPC_URL:-https://api.mainnet-beta.solana.com}
+      SOLANA_SECRET_KEY_B64: ${SOLANA_SECRET_KEY_B64}
+      
+      # Ethereum (EVM)
+      ETH_RPC_URL: ${ETH_RPC_URL}
+      ETH_PRIVATE_KEY: ${ETH_PRIVATE_KEY}
+      
+      # Polygon
+      POLYGON_RPC_URL: ${POLYGON_RPC_URL}
+      POLYGON_PRIVATE_KEY: ${POLYGON_PRIVATE_KEY}
+      
+      # Pinecone (RAG)
+      PINECONE_API_KEY: ${PINECONE_API_KEY}
+      PINECONE_INDEX_NAME: journey
+      
+      # Sentry
+      SENTRY_DSN: ${SENTRY_DSN}
+      
+      # Admin
+      ADMIN_API_KEY: ${ADMIN_API_KEY}
+      KILL_SWITCH: "0"
+      MINTER_SECRET_KEY: ${MINTER_SECRET_KEY}
+      
+      # Application
+      NEXT_PUBLIC_APP_URL: ${APP_URL:-https://journey.mfai.app}
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - journey-network
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    restart: always
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - web
+      - grafana
+    networks:
+      - journey-network
+
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+networks:
+  journey-network:
+    driver: bridge
