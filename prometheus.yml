@@ -1,0 +1,33 @@
+# Prometheus Configuration for Journey Simulator
+# Metrics collection from Next.js app
+
+global:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+  external_labels:
+    cluster: 'journey-simulator'
+    environment: 'production'
+
+scrape_configs:
+  # Journey Simulator metrics endpoint
+  - job_name: 'journey-simulator'
+    static_configs:
+      - targets: ['localhost:3001']
+    metrics_path: '/api/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  # Prometheus itself (optional, for meta-monitoring)
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+# Alerting rules (optional, for future)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets: ['localhost:9093']
+
+# Recording rules (optional, for future optimization)
+# rule_files:
+#   - '/etc/prometheus/rules/*.yml'

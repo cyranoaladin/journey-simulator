@@ -1,19 +1,81 @@
 import '@testing-library/jest-dom'
-import { TextEncoder, TextDecoder } from 'util'
 
-// Polyfill for libs requiring TextEncoder/TextDecoder (e.g., noble)
-;(global as any).TextEncoder = TextEncoder
-;(global as any).TextDecoder = TextDecoder as unknown as typeof globalThis.TextDecoder
+// Mock fetch globally for tests
+global.fetch = jest.fn()
 
-// Ensure tests use in-memory state store and demo fallbacks by default
-process.env.STATE_DRIVER = process.env.STATE_DRIVER || 'memory'
-process.env.DEMO_MODE = process.env.DEMO_MODE || 'true'
-process.env.KILL_SWITCH = '0'
-// Ensure MINTER_SECRET_KEY is unset by default in tests
-if (process.env.MINTER_SECRET_KEY) delete process.env.MINTER_SECRET_KEY
-
-// Mock Solana tools to avoid network during tests
-jest.mock('agents/tools/solana', () => ({
-  simulateTx: jest.fn(async () => ({ ok: true, estFeeLamports: 5000, riskScore: 0.12, network: 'devnet', txB64: 'AQID' })),
-  executeReward: jest.fn(async () => ({ txSig: 'test-devnet-txsig' })),
+// Mock next/router
+jest.mock('next/router', () => ({
+  useRouter() {
+    return {
+      route: '/',
+      pathname: '/',
+      query: {},
+      asPath: '/',
+      push: jest.fn(),
+      replace: jest.fn(),
+      reload: jest.fn(),
+      back: jest.fn(),
+      prefetch: jest.fn(),
+      beforePopState: jest.fn(),
+      events: {
+        on: jest.fn(),
+        off: jest.fn(),
+        emit: jest.fn(),
+      },
+      isFallback: false,
+      isLocaleDomain: false,
+      isReady: true,
+      isPreview: false,
+    }
+  },
 }))
+
+// Mock next/navigation
+jest.mock('next/navigation', () => ({
+  useRouter() {
+    return {
+      push: jest.fn(),
+      replace: jest.fn(),
+      back: jest.fn(),
+      forward: jest.fn(),
+      refresh: jest.fn(),
+    }
+  },
+  usePathname() {
+    return '/'
+  },
+  useSearchParams() {
+    return new URLSearchParams()
+  },
+}))
+
+// Mock Solana wallet
+jest.mock('@solana/wallet-adapter-react', () => ({
+  useWallet: () => ({
+    publicKey: null,
+    connected: false,
+    connect: jest.fn(),
+    disconnect: jest.fn(),
+    signTransaction: jest.fn(),
+  }),
+}))
+
+// Suppress console errors in tests (optional)
+const originalError = console.error
+beforeAll(() => {
+  console.error = (...args: any[]) => {
+    if (
+      typeof args[0] === 'string' &&
+      (args[0].includes('Warning: ReactDOM.render') ||
+        args[0].includes('Warning: useLayoutEffect') ||
+        args[0].includes('act(...)'))
+    ) {
+      return
+    }
+    originalError.call(console, ...args)
+  }
+})
+
+afterAll(() => {
+  console.error = originalError
+})
