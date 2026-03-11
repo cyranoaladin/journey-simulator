@@ -1,0 +1,15 @@
+docs/ops/ENV_VARIABLES_CHECKLIST.md
+docs/PLATFORM_DEEP_DIVE_FR.md
+docs/SECURITY.md
+docs/archive/README.qa.md
+docs/archive/DEPLOYMENT_INSTRUCTIONS.md
+docs/archive/DEPLOY.md
+docs/archive/ZERO_DEFECT_DEPLOYMENT_REPORT.md
+docs/MCP_RUNBOOK_FR.md
+docs/system_blueprint.md
+docs/observability/metrics.md
+docs/security/COMPLIANCE_TRACEABILITY.md
+journey-simulator/README.md
+journey-simulator/docs/system_blueprint.md
+mf-back/LOCAL_AI_MIGRATION.md
+mf-back/docs/backend-architecture.md

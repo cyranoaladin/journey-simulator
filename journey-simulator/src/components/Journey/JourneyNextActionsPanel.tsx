@@ -7,7 +7,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { getPhaseFromStepId } from '../../config/journeyPhases';
 import { getRecentAgentRuns } from '../../api/agentRuns';
-import { useJourneyStore } from '../../store/journeyStore';
+import { useJourneyStoreShallow } from '../../store/journeyStore';
 import {
     Bot,
     CheckCircle2,
@@ -51,7 +51,12 @@ export const JourneyNextActionsPanel: React.FC<Props> = ({
     const currentPhase = getPhaseFromStepId(personaId, currentStepId);
     const [recentRuns, setRecentRuns] = useState<any[]>([]);
     const [isLoadingRuns, setIsLoadingRuns] = useState(false);
-    const { apiJourneyId } = useJourneyStore();
+
+    // Optimization: Use shallow selector to avoid re-renders on every demo tick
+    const { apiJourneyId, journeyStatus } = useJourneyStoreShallow((state) => ({
+        apiJourneyId: state.apiJourneyId,
+        journeyStatus: state.demoState.status
+    }));
 
     useEffect(() => {
         let isMounted = true;
@@ -78,13 +83,18 @@ export const JourneyNextActionsPanel: React.FC<Props> = ({
         return () => {
             isMounted = false;
         };
-    }, [journeyId]);
+    }, [journeyId, apiJourneyId]); // Correct dependency
 
     const primaryAction = currentPhase?.nextActions?.[0] ?? null;
     const auxiliaryActions = (currentPhase?.nextActions ?? []).slice(1, 4);
     const hasActions = Boolean(currentPhase?.nextActions && currentPhase.nextActions.length > 0);
 
+    // Check if actions should be disabled
+    // In demo mode, we lock actions if we are waiting for validation or loading
+    const isLocked = journeyStatus === 'WAITING_FOR_FINAL_VALIDATION' || journeyStatus === 'LOADING';
+
     const primaryHelperCopy = useMemo(() => {
+        if (isLocked) return 'Phase is currently locked or under evaluation. Please wait.'; // UX improvement
         if (!primaryAction) return 'Stay focused on recommended steps to advance this phase.';
         if (primaryAction.type === 'mission') {
             return 'Complete this mission to unlock the Zyno evaluation and rewards for this phase.';
@@ -96,7 +106,7 @@ export const JourneyNextActionsPanel: React.FC<Props> = ({
             return 'Review this outcome to ensure all deliverables are aligned before submission.';
         }
         return 'Act on this recommendation to keep your momentum.';
-    }, [primaryAction]);
+    }, [primaryAction, isLocked]);
 
     if (!currentPhase) {
         return (
@@ -113,6 +123,7 @@ export const JourneyNextActionsPanel: React.FC<Props> = ({
     }
 
     const handleAction = (type: string, id: string) => {
+        if (isLocked) return; // Prevent action
         if (onActionClick) {
             onActionClick(type, id);
         }
@@ -120,13 +131,13 @@ export const JourneyNextActionsPanel: React.FC<Props> = ({
 
     return (
         <div
-            className={`glass-effect rounded-3xl border border-white/10 bg-white/5 p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-lg ${className}`}
+            className={`glass-effect rounded-3xl border border-white/10 bg-white/5 p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-lg ${className} ${isLocked ? 'opacity-70 pointer-events-none grayscale' : ''}`}
             data-testid="journey-next-actions"
         >
             <div className="flex items-center justify-between gap-3 mb-4">
                 <div className="flex items-center gap-2">
                     <Lightbulb className="text-accent-gold" size={20} />
-                    <h3 className="text-lg font-semibold text-white">Next Actions</h3>
+                    <h3 className="text-lg font-semibold text-white">Next Actions {isLocked && '(LOCKED)'}</h3>
                 </div>
                 <InfoBadge
                     label={`Phase ${currentPhase.order}`}
@@ -156,10 +167,11 @@ export const JourneyNextActionsPanel: React.FC<Props> = ({
                         </div>
                         <button
                             type="button"
+                            disabled={isLocked}
                             onClick={() => handleAction(primaryAction.type, primaryAction.id)}
-                            className="inline-flex items-center gap-2 rounded-full bg-accent-cyan px-4 py-2 text-xs font-bold text-black transition hover:bg-accent-cyan/90 shadow-[0_0_10px_rgba(34,211,238,0.3)]"
+                            className="inline-flex items-center gap-2 rounded-full bg-accent-cyan px-4 py-2 text-xs font-bold text-black transition hover:bg-accent-cyan/90 shadow-[0_0_10px_rgba(34,211,238,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Start now
+                            {isLocked ? 'Locked' : 'Start now'}
                         </button>
                     </div>
                 </div>

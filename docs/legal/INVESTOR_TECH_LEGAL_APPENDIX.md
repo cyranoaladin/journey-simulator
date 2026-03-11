@@ -217,7 +217,7 @@ Le système dépend des services tiers suivants :
 |---------|------|-----------|----------|------------|
 | **OpenAI GPT-4o** | LLM | Oui | Mock | Conditions d'utilisation OpenAI |
 | **RAG Service** | Vector Search | Oui | Local | Conditions d'utilisation RAG |
-| **MongoDB** | Database | Oui (orchestration) | In-memory | Conditions d'utilisation MongoDB |
+| **PostgreSQL** | Database | Oui (orchestration) | Persisted | Licence PostgreSQL |
 | **PostgreSQL** | Database | Oui (web/) | N/A | Conditions d'utilisation PostgreSQL |
 
 **Note** : L'orchestrateur fonctionne **sans dépendances externes** en mode mock (LLM mock, RAG local, stores in-memory).

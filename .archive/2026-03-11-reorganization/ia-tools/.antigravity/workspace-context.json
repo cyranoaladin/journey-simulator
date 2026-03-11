@@ -1,0 +1,22 @@
+{
+    "project_name": "Money Factory AI",
+    "source_of_truth": [
+        "README.md",
+        "AUDIT.md",
+        "WORKFLOW_MATRIX.md",
+        "GUIDE_PLATFORM.md"
+    ],
+    "subsystems": {
+        "frontend": "journey-simulator/",
+        "backend": "mf-back/",
+        "portal": "web/"
+    },
+    "compliance_rules": "R-SERIES (R1, R2, R3)",
+    "indexing_priority": "high",
+    "exclude": [
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/.cache/**",
+        "**/data/mongo/**"
+    ]
+}

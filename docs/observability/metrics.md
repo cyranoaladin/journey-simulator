@@ -10,7 +10,7 @@ Endpoints
 
 - GET /api/health, /api/healthz → disponibilité
 - GET /api/metrics → JSON (compteurs simples). Option Prometheus possible ultérieurement.
-- GET /readyz → readiness (Mongo connecté, dépendances critiques prêtes)
+- GET /readyz → readiness (Postgres/Redis connectés, dépendances critiques prêtes)
 
 Compteurs (web/src/server/metrics.ts)
 
@@ -34,7 +34,7 @@ Admin (protégé par x-api-key): pages à activer si nécessaire (logs/state/use
   url: https://api.moneyfactory.ai/readyz
   expectStatus: 200
   retry: 2
-  tags: [readiness, mongo]
+  tags: [readiness, postgres]
 ```
 
 - **Automation simple** :

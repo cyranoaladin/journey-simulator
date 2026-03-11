@@ -210,11 +210,10 @@ Puis ré-importer `mcp.json` dans Cursor.
 
 ## 6) Extensions (Phase 2 — non activées par défaut)
 
-### MongoDB MCP (RO)
-
-- **Utilité** : inspection des collections “simulator” (progress, logs agents, runs) dans `mf-back`.
-- **Risque** : fuite PII/logs → config RO + réseau local uniquement.
-- **Activation propre** : un serveur MCP Mongo maintenu, pointé vers `mongodb://127.0.0.1:27017/journey` (ou docker).
+### MongoDB MCP (REMOVED)
+- **Note** : MongoDB a été retiré de l'architecture (V2). Remplace par PostgreSQL.
+- **Utilité historique** : inspection des collections legacy.
+- **Statut** : Désactivé par défaut.
 
 ### Solana MCP (devnet)
 

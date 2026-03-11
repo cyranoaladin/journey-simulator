@@ -1,0 +1,1170 @@
+{
+  "traceId": "GOLDEN_TRACEID",
+  "intent": "security_audit+product_spec+governance_dao",
+  "intentMeta": {
+    "deduplicated": true,
+    "source": [
+      "input"
+    ]
+  },
+  "runId": "GOLDEN_RUNID",
+  "agents": [
+    {
+      "agentId": "SecurityAuditAgent",
+      "status": "TIMEOUT",
+      "summary": "Agent execution timed out",
+      "actions": [],
+      "citations": [],
+      "metrics": {
+        "latencyMs": 0
+      },
+      "errors": [
+        "timeout"
+      ],
+      "traceId": "GOLDEN_TRACEID",
+      "mock": false,
+      "scores": {
+        "raw": 0,
+        "weighted": 0
+      }
+    },
+    {
+      "agentId": "ProductSpecAgent",
+      "status": "OK",
+      "summary": "Product spec generated",
+      "details": "```json\n{\n  \"summary\": \"Developpement d'une fonctionnalite de demande de cout eleve pour permettre aux utilisateurs de soumettre des demandes necessitant une approbation speciale en raison de leur cout eleve.\",\n  \"flows\": [\n    {\n      \"name\": \"Soumission d'une demande de cout eleve\",\n      \"steps\": [\n        \"L'utilisateur accede au formulaire de demande de cout eleve depuis le tableau de bord.\",\n        \"L'utilisateur remplit les details de la demande, y compris le montant et la justification.\",\n        \"L'utilisateur soumet la demande pour approbation.\",\n        \"Le systeme notifie l'utilisateur de la soumission reussie et envoie la demande a l'approbateur designe.\",\n        \"L'approbateur recoit une notification pour examiner et approuver ou rejeter la demande.\"\n      ]\n    },\n    {\n      \"name\": \"Revision et approbation de la demande\",\n      \"steps\": [\n        \"L'approbateur accede a la liste des demandes en attente d'approbation.\",\n        \"L'approbateur examine les details de la demande.\",\n        \"L'approbateur approuve ou rejette la demande.\",\n        \"Le systeme notifie l'utilisateur de la decision de l'approbateur.\"\n      ]\n    }\n  ],\n  \"acceptance\": [\n    {\n      \"id\": 1,\n      \"criterion\": \"L'utilisateur doit pouvoir soumettre une demande de cout eleve avec tous les champs requis remplis.\"\n    },\n    {\n      \"id\": 2,\n      \"criterion\": \"Le systeme doit envoyer une notification a l'approbateur designe une fois la demande soumise.\"\n    },\n    {\n      \"id\": 3,\n      \"criterion\": \"L'approbateur doit pouvoir approuver ou rejeter la demande et l'utilisateur doit etre notifie de la decision.\"\n    }\n  ],\n  \"risks\": [\n    {\n      \"item\": \"Retards dans le processus d'approbation\",\n      \"impact\": \"Peut entrainer des retards dans la mise en œuvre des demandes de cout eleve.\"\n    },\n    {\n      \"item\": \"Erreurs dans la soumission des demandes\",\n      \"impact\": \"Peut entrainer des demandes incorrectes ou incompletes, necessitant des revisions.\"\n    }\n  ],\n  \"citations\": []\n}\n```",
+      "findings": [
+        {
+          "item": "Flows",
+          "status": "ok",
+          "detail": "User flows drafted"
+        },
+        {
+          "item": "Acceptance",
+          "status": "ok",
+          "detail": "Acceptance criteria listed"
+        },
+        {
+          "item": "Risks",
+          "status": "ok",
+          "detail": "Risks captured for spec"
+        }
+      ],
+      "actions": [
+        "Produce OpenAPI or interface skeleton from spec",
+        "List top 3 acceptance criteria with owners",
+        "Document risks/deps in spec appendix"
+      ],
+      "citations": [],
+      "confidence": 0.75,
+      "assumptions": [
+        "Spec is textual, no code generated",
+        "RAG hits: 0"
+      ],
+      "metrics": {
+        "latencyMs": 0,
+        "tokens": 601,
+        "ragHits": 0
+      },
+      "errors": [],
+      "traceId": "GOLDEN_TRACEID",
+      "mock": false,
+      "scores": {
+        "raw": 90,
+        "weighted": 90
+      }
+    },
+    {
+      "agentId": "GovernanceDAOAgent",
+      "status": "OK",
+      "summary": "Governance guidance for phase discovery: proposal clarity and voting flow checked.",
+      "details": {
+        "systemPrompt": "You are the **GovernanceDAOAgent**, expert in DAO processes, voting, and proposals. You ensure clarity, fairness, and traceability of governance steps.\nReturn concise, structured findings. Always include short actions.",
+        "focus": [
+          "proposal structure",
+          "voting rules",
+          "timeline"
+        ]
+      },
+      "findings": [
+        {
+          "item": "proposal",
+          "status": "ok",
+          "detail": "Proposal summary drafted"
+        },
+        {
+          "item": "quorum",
+          "status": "ok",
+          "detail": "Quorum/threshold to confirm"
+        },
+        {
+          "item": "timeline",
+          "status": "warn",
+          "detail": "Timeline/communication to finalize"
+        }
+      ],
+      "actions": [
+        "Draft proposal summary under 150 words",
+        "Define quorum and approval thresholds"
+      ],
+      "citations": [],
+      "confidence": 0.72,
+      "assumptions": [],
+      "metrics": {
+        "latencyMs": 0,
+        "ragHits": 0
+      },
+      "errors": [],
+      "traceId": "GOLDEN_TRACEID",
+      "scores": {
+        "raw": 90,
+        "weighted": 90
+      }
+    }
+  ],
+  "summary": "Agent execution timed out | Product spec generated | Governance guidance for phase discovery: proposal clarity and voting flow checked.",
+  "actions": [
+    "Produce OpenAPI or interface skeleton from spec",
+    "List top 3 acceptance criteria with owners",
+    "Document risks/deps in spec appendix",
+    "Draft proposal summary under 150 words",
+    "Define quorum and approval thresholds"
+  ],
+  "contradictions": [],
+  "decision": {
+    "overallStatus": "TIMEOUT",
+    "topFindings": [
+      {
+        "agentId": "ProductSpecAgent",
+        "summary": "Product spec generated",
+        "score": 90
+      },
+      {
+        "agentId": "GovernanceDAOAgent",
+        "summary": "Governance guidance for phase discovery: proposal clarity and voting flow checked.",
+        "score": 90
+      },
+      {
+        "agentId": "SecurityAuditAgent",
+        "summary": "Agent execution timed out",
+        "score": 0
+      }
+    ],
+    "recommendedActions": [
+      {
+        "agentId": "ProductSpecAgent",
+        "action": "Produce OpenAPI or interface skeleton from spec",
+        "score": 90
+      },
+      {
+        "agentId": "ProductSpecAgent",
+        "action": "List top 3 acceptance criteria with owners",
+        "score": 90
+      },
+      {
+        "agentId": "ProductSpecAgent",
+        "action": "Document risks/deps in spec appendix",
+        "score": 90
+      },
+      {
+        "agentId": "GovernanceDAOAgent",
+        "action": "Draft proposal summary under 150 words",
+        "score": 90
+      },
+      {
+        "agentId": "GovernanceDAOAgent",
+        "action": "Define quorum and approval thresholds",
+        "score": 90
+      }
+    ],
+    "rationale": "Selected actions from highest weighted agents. Contradictions detected: 0.",
+    "confidence": 0.835,
+    "actionPlan": {
+      "steps": [
+        {
+          "action": "Produce OpenAPI or interface skeleton from spec",
+          "sourceAgent": "ProductSpecAgent",
+          "score": 90,
+          "priority": 1,
+          "conflict": false,
+          "fromMemory": false
+        },
+        {
+          "action": "List top 3 acceptance criteria with owners",
+          "sourceAgent": "ProductSpecAgent",
+          "score": 90,
+          "priority": 2,
+          "conflict": false,
+          "fromMemory": false
+        },
+        {
+          "action": "Document risks/deps in spec appendix",
+          "sourceAgent": "ProductSpecAgent",
+          "score": 90,
+          "priority": 3,
+          "conflict": false,
+          "fromMemory": false
+        },
+        {
+          "action": "Draft proposal summary under 150 words",
+          "sourceAgent": "GovernanceDAOAgent",
+          "score": 90,
+          "priority": 4,
+          "conflict": false,
+          "fromMemory": false
+        },
+        {
+          "action": "Define quorum and approval thresholds",
+          "sourceAgent": "GovernanceDAOAgent",
+          "score": 90,
+          "priority": 5,
+          "conflict": false,
+          "fromMemory": false
+        }
+      ],
+      "strategy": "highest-confidence-first"
+    }
+  },
+  "memory": {
+    "reused": false,
+    "previousActionsCount": 0
+  },
+  "learning": {
+    "enabled": true,
+    "agents": [
+      {
+        "agentId": "SecurityAuditAgent",
+        "baseConfidence": 1,
+        "learningScore": 1,
+        "delta": 0
+      },
+      {
+        "agentId": "ProductSpecAgent",
+        "baseConfidence": 1,
+        "learningScore": 1,
+        "delta": 0
+      },
+      {
+        "agentId": "GovernanceDAOAgent",
+        "baseConfidence": 1,
+        "learningScore": 1,
+        "delta": 0
+      }
+    ]
+  },
+  "budgets": {
+    "SecurityAuditAgent": {
+      "maxTokens": 600,
+      "timeoutMs": 6000
+    },
+    "ProductSpecAgent": {
+      "maxTokens": 600,
+      "timeoutMs": 6000
+    },
+    "GovernanceDAOAgent": {
+      "maxTokens": 600,
+      "timeoutMs": 6000
+    }
+  },
+  "agentsMeta": {
+    "enabled": [
+      "SecurityAuditAgent",
+      "ProductSpecAgent",
+      "JourneyDesignAgent",
+      "EvaluationAgent",
+      "RAGOpsAgent",
+      "DataIntegrityAgent",
+      "APIContractAgent",
+      "TokenomicsAgent",
+      "GovernanceDAOAgent",
+      "GrowthAgent",
+      "InvestorDemoAgent",
+      "UXWritingAgent",
+      "QAPlaywrightAgent",
+      "DevOpsAgent",
+      "ObservabilityAgent",
+      "ComplianceAgent",
+      "CurriculumAgent",
+      "MarketplaceAgent",
+      "AnalyticsAgent",
+      "PerformanceAgent",
+      "WalletAuthAgent",
+      "SolanaAnchorAgent",
+      "MintingAgent"
+    ],
+    "disabled": [
+      "RiskFraudAgent"
+    ]
+  },
+  "journeyProgress": {
+    "phasesExecuted": [],
+    "currentPhase": "discovery"
+  },
+  "executionPlan": {
+    "mode": "DRY_RUN",
+    "steps": [
+      {
+        "step": 1,
+        "toolId": "noop",
+        "action": "Produce OpenAPI or interface skeleton from spec",
+        "sourceAgent": "ProductSpecAgent",
+        "priority": 1,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      },
+      {
+        "step": 2,
+        "toolId": "noop",
+        "action": "List top 3 acceptance criteria with owners",
+        "sourceAgent": "ProductSpecAgent",
+        "priority": 2,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      },
+      {
+        "step": 3,
+        "toolId": "noop",
+        "action": "Document risks/deps in spec appendix",
+        "sourceAgent": "ProductSpecAgent",
+        "priority": 3,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      },
+      {
+        "step": 4,
+        "toolId": "noop",
+        "action": "Draft proposal summary under 150 words",
+        "sourceAgent": "GovernanceDAOAgent",
+        "priority": 4,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      },
+      {
+        "step": 5,
+        "toolId": "noop",
+        "action": "Define quorum and approval thresholds",
+        "sourceAgent": "GovernanceDAOAgent",
+        "priority": 5,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      }
+    ],
+    "summary": {
+      "total": 5,
+      "ok": 0,
+      "blocked": 0,
+      "failed": 0,
+      "skipped": 5
+    },
+    "overallStatus": "SKIPPED"
+  },
+  "executionGate": null,
+  "executionResult": {
+    "traceId": "GOLDEN_TRACEID",
+    "mode": "DRY_RUN",
+    "steps": [
+      {
+        "step": 1,
+        "toolId": "noop",
+        "action": "Produce OpenAPI or interface skeleton from spec",
+        "sourceAgent": "ProductSpecAgent",
+        "priority": 1,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      },
+      {
+        "step": 2,
+        "toolId": "noop",
+        "action": "List top 3 acceptance criteria with owners",
+        "sourceAgent": "ProductSpecAgent",
+        "priority": 2,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      },
+      {
+        "step": 3,
+        "toolId": "noop",
+        "action": "Document risks/deps in spec appendix",
+        "sourceAgent": "ProductSpecAgent",
+        "priority": 3,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      },
+      {
+        "step": 4,
+        "toolId": "noop",
+        "action": "Draft proposal summary under 150 words",
+        "sourceAgent": "GovernanceDAOAgent",
+        "priority": 4,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      },
+      {
+        "step": 5,
+        "toolId": "noop",
+        "action": "Define quorum and approval thresholds",
+        "sourceAgent": "GovernanceDAOAgent",
+        "priority": 5,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      }
+    ],
+    "overallStatus": "SKIPPED",
+    "summary": {
+      "total": 5,
+      "ok": 0,
+      "blocked": 0,
+      "failed": 0,
+      "skipped": 5
+    }
+  },
+  "systemStatus": {
+    "llm": "mock",
+    "rag": "local",
+    "execution": "dry-run",
+    "agentsActiveCount": 23,
+    "audit": {
+      "enabled": true,
+      "entriesStored": 5,
+      "maxEntries": 100,
+      "byTenant": {
+        "default": 0
+      },
+      "evictions": 0
+    },
+    "idempotent": false,
+    "agents": {
+      "SecurityAuditAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "ProductSpecAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "JourneyDesignAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "EvaluationAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "RAGOpsAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "DataIntegrityAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "APIContractAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "TokenomicsAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "GovernanceDAOAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "GrowthAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "InvestorDemoAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "UXWritingAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "QAPlaywrightAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "DevOpsAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "ObservabilityAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "ComplianceAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "RiskFraudAgent": {
+        "enabled": false,
+        "mode": "DISABLED",
+        "reason": "registry_disabled"
+      },
+      "CurriculumAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "MarketplaceAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "AnalyticsAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "PerformanceAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "WalletAuthAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "SolanaAnchorAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "MintingAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      }
+    },
+    "tenant": {
+      "id": "default",
+      "mode": "isolated",
+      "caches": [
+        "llm",
+        "idempotency",
+        "metrics",
+        "audit",
+        "memory"
+      ],
+      "memory": {
+        "evictions": {
+          "memory": 0,
+          "idempotency": 0,
+          "audit": 0,
+          "llmCache": 0
+        },
+        "pressure": "LOW"
+      }
+    },
+    "circuitBreakers": {
+      "llm": {
+        "state": "CLOSED",
+        "failures": 0,
+        "lastTrip": null,
+        "lastCheck": null
+      },
+      "rag": {
+        "state": "CLOSED",
+        "failures": 0,
+        "lastTrip": null,
+        "lastCheck": null
+      },
+      "execution": {
+        "state": "CLOSED",
+        "failures": 0,
+        "lastTrip": null,
+        "lastCheck": null
+      }
+    },
+    "runtime": {
+      "coldStart": false
+    },
+    "secrets": {
+      "status": "WARN",
+      "missing": [],
+      "warnings": [
+        "missing_openai_api_key",
+        "missing_openai_api_key"
+      ],
+      "env": "production",
+      "mode": "DEMO"
+    },
+    "web3": {
+      "level": "OK",
+      "allowed": true,
+      "reasons": [],
+      "diagnostics": {
+        "proof": {
+          "proofId": null,
+          "hasHash": false,
+          "hasSignature": false,
+          "localOnly": false
+        },
+        "anchor": {
+          "status": null,
+          "txId": null,
+          "network": null,
+          "mainnetAttempt": false
+        },
+        "mint": {
+          "proofAnchored": false,
+          "mintTxId": null,
+          "seed": null,
+          "authority": null
+        }
+      }
+    },
+    "web3Pipeline": {
+      "state": "NONE",
+      "proof": null,
+      "anchor": null,
+      "mint": null,
+      "history": []
+    },
+    "killSwitch": {
+      "active": true,
+      "scope": "REAL_ONLY",
+      "triggeredBy": "automatic",
+      "reasons": [
+        "too_many_timeouts"
+      ]
+    },
+    "journey": {
+      "name": "dao_readiness",
+      "phase": "discovery",
+      "phaseIndex": 0,
+      "phases": [
+        "discovery",
+        "validation",
+        "audit"
+      ],
+      "artifactsSummary": {
+        "requirements": 0,
+        "risks": 0,
+        "decisions": 0,
+        "plans": 0,
+        "proofs": 0,
+        "executions": 0,
+        "audits": 0
+      }
+    },
+    "slo": {
+      "window": 6,
+      "latency": {
+        "p95": 6002,
+        "p99": 6002
+      },
+      "rates": {
+        "warn": 0,
+        "failTimeout": 0.16666666666666666,
+        "idempotent": 0,
+        "dryRun": 1,
+        "rag": 1,
+        "llmReal": 0,
+        "realBlocked": 1,
+        "agentsDisabled": 0.041666666666666664,
+        "cbOpen": 0,
+        "queueShed": 0
+      },
+      "byTenant": {
+        "default": {
+          "tenantId": "default",
+          "window": 6,
+          "latency": {
+            "p95": 6002,
+            "p99": 6002
+          },
+          "rates": {
+            "warn": 0,
+            "failTimeout": 0.16666666666666666,
+            "idempotent": 0,
+            "dryRun": 1,
+            "rag": 1,
+            "llmReal": 0,
+            "realBlocked": 1,
+            "agentsDisabled": 0.041666666666666664,
+            "cbOpen": 0,
+            "queueShed": 0
+          },
+          "llm": {
+            "cacheHitRate": 0,
+            "dedupCount": 0,
+            "calls": 11,
+            "costTotal": 0.001375
+          },
+          "concurrency": {
+            "queueAvg": 0,
+            "shedRate": 0
+          },
+          "runtime": {
+            "coldStartRate": 0.16666666666666666
+          },
+          "statusCounts": {
+            "OK": 5,
+            "WARN": 0,
+            "FAIL": 0,
+            "TIMEOUT": 1
+          },
+          "presetUsage": {
+            "audit-dao": 1
+          }
+        }
+      }
+    },
+    "alerts": [
+      {
+        "level": "CRITICAL",
+        "sloId": "status_fail_timeout_rate",
+        "message": "status_fail_timeout_rate exceeded target",
+        "currentValue": 0.16666666666666666,
+        "target": 0.05,
+        "tenantId": "default",
+        "timestamp": 0
+      },
+      {
+        "level": "INFO",
+        "sloId": "dry_run_rate",
+        "message": "dry_run_rate exceeded target",
+        "currentValue": 1,
+        "target": 0.95,
+        "tenantId": "default",
+        "timestamp": 0
+      },
+      {
+        "level": "INFO",
+        "sloId": "llm_usage_rate",
+        "message": "llm_usage_rate exceeded target",
+        "currentValue": 1,
+        "target": 0.5,
+        "tenantId": "default",
+        "timestamp": 0
+      },
+      {
+        "level": "WARN",
+        "sloId": "real_block_rate",
+        "message": "real_block_rate exceeded target",
+        "currentValue": 1,
+        "target": 0.1,
+        "tenantId": "default",
+        "timestamp": 0
+      },
+      {
+        "level": "INFO",
+        "sloId": "llm_calls_per_run",
+        "message": "LLM calls per run high",
+        "currentValue": 11,
+        "target": 10,
+        "tenantId": "default",
+        "timestamp": 0
+      }
+    ],
+    "cost": null,
+    "degradation": {
+      "applied": [
+        "slo",
+        "kill_switch"
+      ],
+      "summary": "slo -> kill_switch",
+      "decisions": {
+        "quota": null,
+        "cost": null,
+        "slo": "ALERT",
+        "circuit": null,
+        "kill_switch": "REAL_ONLY"
+      }
+    },
+    "auditSummary": {
+      "totalRuns": 6,
+      "warn": 0,
+      "fail": 0,
+      "timeout": 1,
+      "realBlocked": 6,
+      "presets": {
+        "audit-dao": 1
+      },
+      "topAgents": {
+        "SecurityAuditAgent": 1,
+        "ProductSpecAgent": 1,
+        "GovernanceDAOAgent": 1
+      }
+    },
+    "quotas": {
+      "status": "OK",
+      "reasons": [],
+      "limits": {
+        "maxRunsPerWindow": 50,
+        "windowSizeMs": 600000,
+        "maxLLMCallsPerRun": 30,
+        "budgetUsdPerWindow": 2,
+        "maxAgentsPerRun": 20
+      }
+    }
+  },
+  "metrics": {
+    "agentsCount": 3,
+    "durationMs": 0,
+    "ragUsed": true,
+    "realExecutionAttempted": false
+  },
+  "presetMeta": null,
+  "executiveSummary": {
+    "headline": "Risks identified, action required",
+    "keyFindings": [
+      "User flows drafted",
+      "Acceptance criteria listed",
+      "Risks captured for spec",
+      "Proposal summary drafted",
+      "Quorum/threshold to confirm"
+    ],
+    "topRisks": [],
+    "recommendedNextSteps": [
+      "Produce OpenAPI or interface skeleton from spec",
+      "List top 3 acceptance criteria with owners",
+      "Document risks/deps in spec appendix",
+      "Draft proposal summary under 150 words",
+      "Define quorum and approval thresholds"
+    ],
+    "confidence": 0.835
+  },
+  "humanPlan": {
+    "objective": "Execute the prioritized improvements",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Produce OpenAPI or interface skeleton from spec",
+        "owner": "ProductSpecAgent",
+        "priority": "HIGH"
+      },
+      {
+        "step": 2,
+        "action": "List top 3 acceptance criteria with owners",
+        "owner": "ProductSpecAgent",
+        "priority": "HIGH"
+      },
+      {
+        "step": 3,
+        "action": "Document risks/deps in spec appendix",
+        "owner": "ProductSpecAgent",
+        "priority": "HIGH"
+      },
+      {
+        "step": 4,
+        "action": "Draft proposal summary under 150 words",
+        "owner": "GovernanceDAOAgent",
+        "priority": "MEDIUM"
+      },
+      {
+        "step": 5,
+        "action": "Define quorum and approval thresholds",
+        "owner": "GovernanceDAOAgent",
+        "priority": "MEDIUM"
+      }
+    ],
+    "warnings": []
+  },
+  "productionGuards": {
+    "realExecutionAllowed": false,
+    "reasons": [
+      "execution_disabled",
+      "gate_not_approved",
+      "timeouts_present",
+      "kill_switch"
+    ]
+  },
+  "ops": {
+    "warnings": [
+      "intent_deduped",
+      "unknown_action_tool"
+    ],
+    "disabledAgents": [
+      "RiskFraudAgent"
+    ],
+    "fallbacks": [
+      "kill_switch",
+      "demo_mode",
+      "llm_mock",
+      "secrets_warn"
+    ],
+    "timeouts": [
+      {
+        "agentId": "SecurityAuditAgent",
+        "reason": "timeout"
+      }
+    ],
+    "failures": [],
+    "rag": {
+      "mode": "local",
+      "domain": null,
+      "hits": 0
+    },
+    "llm": {
+      "mode": "mock",
+      "provider": "mock",
+      "model": "gpt-4o",
+      "calls": 3,
+      "cacheHits": 0,
+      "deduplicatedCalls": 0
+    },
+    "execution": {
+      "mode": "DRY_RUN",
+      "attempted": true,
+      "blocked": true,
+      "blockReasons": [
+        "execution_disabled",
+        "gate_not_approved",
+        "timeouts_present",
+        "kill_switch"
+      ],
+      "shadow": false,
+      "steps": {
+        "count": 5,
+        "blocked": 0,
+        "ok": 0,
+        "failed": 0,
+        "skipped": 5
+      },
+      "tools": {
+        "used": 1,
+        "list": [
+          "noop"
+        ]
+      }
+    },
+    "retries": {
+      "attempted": false,
+      "count": 0,
+      "reason": null
+    },
+    "concurrency": {
+      "queued": 0,
+      "running": 1,
+      "max": 5,
+      "shed": false
+    },
+    "securityWarnings": [
+      "missing_openai_api_key",
+      "missing_openai_api_key"
+    ],
+    "costGuards": [],
+    "costs": {
+      "estimatedUsd": 0.000375,
+      "byAgent": {
+        "SecurityAuditAgent": {
+          "cost": 0.000125,
+          "model": "gpt-4o",
+          "calls": 1
+        },
+        "ProductSpecAgent": {
+          "cost": 0.000125,
+          "model": "gpt-4o",
+          "calls": 1
+        },
+        "GovernanceDAOAgent": {
+          "cost": 0.000125,
+          "model": "gpt-4o",
+          "calls": 1
+        }
+      },
+      "byPreset": {},
+      "budget": null,
+      "status": "OK"
+    },
+    "metricsSummary": {
+      "tenantId": "all",
+      "window": 6,
+      "latency": {
+        "p95": 6002,
+        "p99": 6002
+      },
+      "rates": {
+        "warn": 0,
+        "failTimeout": 0.16666666666666666,
+        "idempotent": 0,
+        "dryRun": 1,
+        "rag": 1,
+        "llmReal": 0,
+        "realBlocked": 1,
+        "agentsDisabled": 0.041666666666666664,
+        "cbOpen": 0,
+        "queueShed": 0
+      },
+      "llm": {
+        "cacheHitRate": 0,
+        "dedupCount": 0,
+        "calls": 11,
+        "costTotal": 0.001375
+      },
+      "concurrency": {
+        "queueAvg": 0,
+        "shedRate": 0
+      },
+      "runtime": {
+        "coldStartRate": 0.16666666666666666
+      },
+      "statusCounts": {
+        "OK": 5,
+        "WARN": 0,
+        "FAIL": 0,
+        "TIMEOUT": 1
+      },
+      "presetUsage": {
+        "audit-dao": 1
+      },
+      "byTenant": {
+        "default": {
+          "tenantId": "default",
+          "window": 6,
+          "latency": {
+            "p95": 6002,
+            "p99": 6002
+          },
+          "rates": {
+            "warn": 0,
+            "failTimeout": 0.16666666666666666,
+            "idempotent": 0,
+            "dryRun": 1,
+            "rag": 1,
+            "llmReal": 0,
+            "realBlocked": 1,
+            "agentsDisabled": 0.041666666666666664,
+            "cbOpen": 0,
+            "queueShed": 0
+          },
+          "llm": {
+            "cacheHitRate": 0,
+            "dedupCount": 0,
+            "calls": 11,
+            "costTotal": 0.001375
+          },
+          "concurrency": {
+            "queueAvg": 0,
+            "shedRate": 0
+          },
+          "runtime": {
+            "coldStartRate": 0.16666666666666666
+          },
+          "statusCounts": {
+            "OK": 5,
+            "WARN": 0,
+            "FAIL": 0,
+            "TIMEOUT": 1
+          },
+          "presetUsage": {
+            "audit-dao": 1
+          }
+        }
+      }
+    },
+    "memory": {
+      "evictions": {
+        "memory": 0,
+        "idempotency": 0,
+        "audit": 0,
+        "llmCache": 0
+      },
+      "pressure": "LOW"
+    }
+  },
+  "productMetrics": {
+    "actionsPlanned": 5,
+    "agentsRun": 3,
+    "warnings": 2,
+    "failures": 0,
+    "durationMs": 0,
+    "llmCacheHits": 0,
+    "costEstimateUsd": 0.000375
+  },
+  "agentContributionScore": [
+    {
+      "agentId": "SecurityAuditAgent",
+      "contribution": 0,
+      "confidence": null
+    },
+    {
+      "agentId": "ProductSpecAgent",
+      "contribution": 90,
+      "confidence": 0.75
+    },
+    {
+      "agentId": "GovernanceDAOAgent",
+      "contribution": 90,
+      "confidence": 0.72
+    }
+  ],
+  "decisionConfidenceBreakdown": {
+    "overall": 0.835,
+    "byAgent": [
+      {
+        "agentId": "SecurityAuditAgent",
+        "contribution": 0,
+        "confidence": null
+      },
+      {
+        "agentId": "ProductSpecAgent",
+        "contribution": 90,
+        "confidence": 0.75
+      },
+      {
+        "agentId": "GovernanceDAOAgent",
+        "contribution": 90,
+        "confidence": 0.72
+      }
+    ]
+  }
+}

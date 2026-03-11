@@ -1,0 +1,502 @@
+// schema.prisma - MFAI Unified PostgreSQL Schema
+// Source de Vérité Unique pour Next.js + Express (mf-back)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --------------------------------------
+// 1. GESTION UTILISATEURS & ACCÈS
+// --------------------------------------
+
+enum UserRole {
+  FOUNDER   // Constructeur
+  INVESTOR  // Apporteur de liquidité / Staker
+  ADMIN     // Team MFAI
+}
+
+model User {
+  id            String    @id @default(uuid())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Identité Web3 (SIWS - Sign In With Solana)
+  walletAddress String    @unique
+  email         String?   @unique
+  name          String?
+  role          UserRole  @default(FOUNDER)
+  
+  // Gamification & Réputation
+  reputationScore Int     @default(0)
+  totalXP         Int     @default(0)
+  mfaiTokens      Int     @default(0)
+  votingPower     Int     @default(0)
+  
+  // Relations
+  wallets           Wallet[]
+  projects          Project[]
+  votes             Vote[]
+  investments       Investment[]
+  soulboundNFTs     SoulboundCredential[]
+  achievements      Achievement[]
+  nftMints          NftMint[]
+  journeyProgress   JourneyProgress[]
+
+  @@index([walletAddress])
+  @@index([email])
+}
+
+model Wallet {
+  id             String    @id @default(uuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  address        String    @unique
+  chain          String    @default("solana")
+  isPrimary      Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  hasActivePass  Boolean   @default(false)
+  lastPassCheck  DateTime?
+
+  nftPasses      NftPass[]
+
+  @@index([address])
+}
+
+model NftPass {
+  id             String   @id @default(uuid())
+  walletId       String
+  wallet         Wallet   @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  mintAddress    String   @unique
+  collectionMint String
+  tier           String   // "BUILDER" | "GROWTH" | "DAO"
+  isActive       Boolean  @default(true)
+
+  firstSeenAt    DateTime @default(now())
+  lastCheckedAt  DateTime @default(now())
+}
+
+// --------------------------------------
+// 2. CŒUR DU SYSTÈME : LE PROJET (Journey)
+// --------------------------------------
+
+enum ProjectStatus {
+  DRAFT       // Idéation
+  IN_PROGRESS // En construction avec les Agents
+  AUDIT       // En cours de validation
+  APPROVED    // Validé par la DAO
+  LAUNCHED    // Déployé sur Collaterize
+  FAILED      // Abandonné ou rejeté
+}
+
+enum JourneyPhase {
+  LEARN
+  BUILD
+  GOVERN
+  LAUNCH
+  GROWTH
+}
+
+model Project {
+  id          String        @id @default(uuid())
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  name        String
+  description String?       @db.Text
+  slug        String?       @unique
+  
+  status      ProjectStatus @default(DRAFT)
+  phase       JourneyPhase  @default(LEARN)
+  
+  // Métadonnées flexibles (JSON pour configs non structurées)
+  metadata    Json?         
+
+  // Relations
+  ownerId       String
+  owner         User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  
+  tokenomics    Tokenomics?
+  agentSessions AgentSession[]
+  artifacts     Artifact[]
+  proposals     Proposal[]
+  
+  @@index([ownerId])
+  @@index([status])
+}
+
+// --------------------------------------
+// 3. PROGRESSION UTILISATEUR (Journey Simulator)
+// --------------------------------------
+
+model JourneyProgress {
+  id              String   @id @default(uuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  personaId       String   // "capital-foundry", "impact-engine", etc.
+  currentPhase    Int      @default(0)
+  completedPhases Int[]    @default([])
+  totalXP         Int      @default(0)
+  mfaiTokens      Int      @default(0)
+  stakedMfai      Int      @default(0)
+  votingPower     Int      @default(0)
+  nfts            String[] @default([])
+  passLevel       String   @default("STARTER")
+  
+  // État de progression (JSON flexible)
+  progressData    Json?
+  
+  @@unique([userId, personaId])
+  @@index([userId])
+}
+
+// --------------------------------------
+// 4. IA & AGENTS (Remplaçant MongoDB pour mf-back)
+// --------------------------------------
+
+enum AgentType {
+  ZYNO_ORCHESTRATOR
+  ARCHITECT_AGENT
+  ENGINEER_AGENT
+  CFO_AGENT
+  LEGAL_AGENT
+  MARKETING_AGENT
+  AUDITOR_AGENT
+  TOKENOMICS_AGENT
+  GROWTH_AGENT
+  GOVERNANCE_AGENT
+  SECURITY_AGENT
+  RESEARCH_AGENT
+  UX_AGENT
+  PRODUCT_AGENT
+  COMMUNITY_AGENT
+  MINTING_AGENT
+  RAG_OPS_AGENT
+}
+
+model AgentSession {
+  id          String    @id @default(uuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  agentType   AgentType
+  
+  // Mémoire Long Terme (Contexte)
+  contextSummary String? @db.Text
+  
+  // État interne de l'agent (JSON flexible)
+  agentState  Json?
+
+  // Relations
+  projectId   String
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  messages    ChatMessage[]
+
+  @@unique([projectId, agentType])
+  @@index([projectId])
+}
+
+model ChatMessage {
+  id          String   @id @default(uuid())
+  timestamp   DateTime @default(now())
+  
+  role        String   // "user" | "assistant" | "system"
+  content     String   @db.Text
+  
+  toolCalls   Json?
+
+  sessionId   String
+  session     AgentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  @@index([sessionId])
+}
+
+// Agent execution logs (for observability)
+model AgentLog {
+  id        String   @id @default(uuid())
+  ts        DateTime @default(now())
+  
+  journeyId String?
+  userId    String?
+  agent     String
+  action    String
+  details   Json?
+  latencyMs Int?
+  status    String   @default("ok")
+  
+  @@index([journeyId, ts])
+  @@index([userId, ts])
+  @@index([agent, ts])
+}
+
+model AgentRun {
+  id        String   @id @default(uuid())
+  kind      String
+  input     Json
+  output    Json?
+  status    String   @default("ok")
+  latencyMs Int?
+  createdAt DateTime @default(now())
+  
+  @@index([kind, createdAt])
+}
+
+// --------------------------------------
+// 5. ARTEFACTS & LIVRABLES
+// --------------------------------------
+
+enum ArtifactType {
+  WHITEPAPER_MD
+  RUST_CONTRACT
+  TOKENOMICS_CSV
+  PITCH_DECK_JSON
+  IMAGE_ASSET
+  CHECKLIST
+  TEMPLATE
+  REPORT
+}
+
+model Artifact {
+  id          String       @id @default(uuid())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  type        ArtifactType
+  title       String
+  
+  content     String?      @db.Text
+  url         String?
+  
+  version     Int          @default(1)
+  isFinal     Boolean      @default(false)
+  metadata    Json?
+
+  projectId   String
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  @@index([projectId])
+  @@index([type])
+}
+
+// --------------------------------------
+// 6. FINANCE & TOKENOMICS (Collaterize)
+// --------------------------------------
+
+model Tokenomics {
+  id              String   @id @default(uuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tokenName       String
+  tokenSymbol     String
+  totalSupply     BigInt
+  
+  // Paramètres Bonding Curve
+  initialPrice    Decimal  @db.Decimal(18, 8)
+  targetLiquidity Decimal  @db.Decimal(18, 8)
+  curveType       String   @default("SIGMOID")
+  
+  // Allocations (JSON pour flexibilité)
+  allocations     Json
+  
+  // Adresses on-chain
+  mintAddress     String?
+  poolAddress     String?
+
+  projectId       String   @unique
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model CollaterizeSimulationLog {
+  id                 String   @id @default(uuid())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  userWallet         String
+  journeyId          String?
+  tier               String
+  accepted           Boolean
+  eligibilityScore   Int
+  fundraisingGoalUSD Float
+  softCapUSD         Float
+  hardCapUSD         Float
+  liquidityUSD       Float
+  initialPriceUSD    Float
+
+  rawInput           Json
+  rawOutput          Json
+  
+  @@index([userWallet])
+}
+
+// --------------------------------------
+// 7. GOUVERNANCE & DAO
+// --------------------------------------
+
+model Proposal {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  endsAt      DateTime
+  
+  title       String
+  description String   @db.Text
+  
+  targetProjectId String
+  targetProject   Project @relation(fields: [targetProjectId], references: [id], onDelete: Cascade)
+  
+  votes       Vote[]
+  passed      Boolean  @default(false)
+  
+  @@index([targetProjectId])
+}
+
+model Vote {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  
+  weight      Int
+  choice      Boolean  // true = Approve, false = Reject
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  proposalId  String
+  proposal    Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, proposalId])
+  @@index([proposalId])
+}
+
+// --------------------------------------
+// 8. ASSETS & GAMIFICATION
+// --------------------------------------
+
+model SoulboundCredential {
+  id          String   @id @default(uuid())
+  mintedAt    DateTime @default(now())
+  
+  name        String
+  mintAddress String   @unique
+  metadataUrl String
+  phaseId     String?
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+}
+
+model Achievement {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  label     String
+  points    Int      @default(0)
+  metadata  Json?
+  
+  @@index([userId])
+}
+
+model Investment {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  
+  amountSol   Decimal  @db.Decimal(18, 9)
+  tokensRecv  Decimal  @db.Decimal(18, 9)
+  projectId   String?
+  txSignature String?
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+}
+
+// --------------------------------------
+// 9. NFT MINTING & LOGS
+// --------------------------------------
+
+model NftMint {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  wallet      String
+  mintAddress String   @unique
+  txId        String   @unique
+  type        String   // "access_pass", "completion_badge", "proof_of_skill"
+  journeyId   String?
+  phaseId     String?
+  metadata    Json?
+  
+  @@index([userId])
+  @@index([wallet])
+  @@index([type])
+}
+
+model MintLog {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  
+  userId      String?
+  spec        Json
+  signature   String?
+  mintAddress String?
+  network     String   @default("devnet")
+  status      String   @default("PENDING")
+  error       String?
+  
+  @@index([userId])
+  @@index([status])
+}
+
+// --------------------------------------
+// 10. RAG & DOCUMENTATION
+// --------------------------------------
+
+model Doc {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  title     String
+  content   String   @db.Text
+  tags      String[]
+  category  String?
+  
+  // Vector embedding pour recherche sémantique
+  embedding Float[] @default([])
+  
+  @@index([category])
+}
+
+// --------------------------------------
+// 11. JOURNEY STATE (Legacy compatibility)
+// --------------------------------------
+
+model JourneyState {
+  id            String   @id @default(uuid())
+  journeyId     String   @unique
+  last_state    Json
+  last_metadata Json?
+  updatedAt     DateTime @updatedAt
+  createdAt     DateTime @default(now())
+}

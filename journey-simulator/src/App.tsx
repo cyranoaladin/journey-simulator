@@ -8,6 +8,7 @@ import { useEffect, lazy } from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { useThemeStore } from './store/themeStore';
+import { useJourneyStore } from './store/journeyStore';
 import { WalletContextProvider } from './contexts/WalletContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { TutorialProvider } from './contexts/TutorialContext';
@@ -81,6 +82,33 @@ function App() {
     }
   }, [isDark]);
 
+  // INVESTOR DEMO MODE HANDLER
+  const { setRunMode, setSelectedPersona } = useJourneyStore();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const modeParam = params.get('mode');
+
+    // 3. Relaxed Check: If mode is investor_demo, we FORCE capital-foundry even if journey param is missing or different.
+    if (modeParam === 'investor_demo') {
+      console.log('[App] Bootstrapping Investor Demo Mode (Auto-forcing Capital Foundry)...');
+
+      // 1. Force Demo Mode
+      setRunMode('demo');
+
+      // 2. Force Persona (Capital Foundry)
+      import('./data/personas').then(({ personas }) => {
+        const capFoundry = personas.find(p => p.id === 'capital-foundry');
+        if (capFoundry) {
+          console.log('[App] Persona Forced:', capFoundry.title);
+          setSelectedPersona(capFoundry);
+        } else {
+          console.error('[App] Critical: Capital Foundry persona not found!');
+        }
+      });
+    }
+  }, []);
+
   return (
     <AuthProvider>
       <TutorialProvider>
@@ -131,9 +159,9 @@ function App() {
           </Routes>
           {/* </Suspense> */}
         </div>
-        <Toaster 
-          position="bottom-right" 
-          richColors 
+        <Toaster
+          position="bottom-right"
+          richColors
           theme="dark"
           toastOptions={{
             style: { background: '#1a1a2e', border: '1px solid rgba(255,255,255,0.1)' }

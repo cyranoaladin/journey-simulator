@@ -1,0 +1,732 @@
+{
+  "traceId": "GOLDEN_TRACEID",
+  "intent": "security_audit",
+  "intentMeta": {
+    "deduplicated": false,
+    "source": [
+      "input"
+    ]
+  },
+  "runId": "GOLDEN_RUNID",
+  "agents": [
+    {
+      "agentId": "SecurityAuditAgent",
+      "status": "TIMEOUT",
+      "summary": "Agent execution timed out",
+      "actions": [],
+      "citations": [],
+      "metrics": {
+        "latencyMs": 0
+      },
+      "errors": [
+        "timeout"
+      ],
+      "traceId": "GOLDEN_TRACEID",
+      "mock": false,
+      "scores": {
+        "raw": 0,
+        "weighted": 0
+      }
+    }
+  ],
+  "summary": "Agent execution timed out",
+  "actions": [],
+  "contradictions": [],
+  "decision": {
+    "overallStatus": "TIMEOUT",
+    "topFindings": [
+      {
+        "agentId": "SecurityAuditAgent",
+        "summary": "Agent execution timed out",
+        "score": 0
+      }
+    ],
+    "recommendedActions": [],
+    "rationale": "Selected actions from highest weighted agents. Contradictions detected: 0.",
+    "confidence": 0.55,
+    "actionPlan": {
+      "steps": [],
+      "strategy": "highest-confidence-first"
+    }
+  },
+  "memory": {
+    "reused": false,
+    "previousActionsCount": 0
+  },
+  "learning": {
+    "enabled": true,
+    "agents": [
+      {
+        "agentId": "SecurityAuditAgent",
+        "baseConfidence": 1,
+        "learningScore": 1,
+        "delta": 0
+      }
+    ]
+  },
+  "budgets": {
+    "SecurityAuditAgent": {
+      "maxTokens": 600,
+      "timeoutMs": 6000
+    }
+  },
+  "agentsMeta": {
+    "enabled": [
+      "SecurityAuditAgent",
+      "ProductSpecAgent",
+      "JourneyDesignAgent",
+      "EvaluationAgent",
+      "RAGOpsAgent",
+      "DataIntegrityAgent",
+      "APIContractAgent",
+      "TokenomicsAgent",
+      "GovernanceDAOAgent",
+      "GrowthAgent",
+      "InvestorDemoAgent",
+      "UXWritingAgent",
+      "QAPlaywrightAgent",
+      "DevOpsAgent",
+      "ObservabilityAgent",
+      "ComplianceAgent",
+      "CurriculumAgent",
+      "MarketplaceAgent",
+      "AnalyticsAgent",
+      "PerformanceAgent",
+      "WalletAuthAgent",
+      "SolanaAnchorAgent",
+      "MintingAgent"
+    ],
+    "disabled": [
+      "RiskFraudAgent"
+    ]
+  },
+  "journeyProgress": {
+    "phasesExecuted": [],
+    "currentPhase": null
+  },
+  "executionPlan": {
+    "mode": "DRY_RUN",
+    "steps": [],
+    "summary": {
+      "total": 0,
+      "ok": 0,
+      "blocked": 0,
+      "failed": 0,
+      "skipped": 0
+    },
+    "overallStatus": "SKIPPED"
+  },
+  "executionGate": null,
+  "executionResult": null,
+  "systemStatus": {
+    "llm": "mock",
+    "rag": "local",
+    "execution": "dry-run",
+    "agentsActiveCount": 23,
+    "audit": {
+      "enabled": true,
+      "entriesStored": 6,
+      "maxEntries": 100,
+      "byTenant": {
+        "default": 0
+      },
+      "evictions": 0
+    },
+    "idempotent": false,
+    "agents": {
+      "SecurityAuditAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "ProductSpecAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "JourneyDesignAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "EvaluationAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "RAGOpsAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "DataIntegrityAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "APIContractAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "TokenomicsAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "GovernanceDAOAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "GrowthAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "InvestorDemoAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "UXWritingAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "QAPlaywrightAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "DevOpsAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "ObservabilityAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "ComplianceAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "RiskFraudAgent": {
+        "enabled": false,
+        "mode": "DISABLED",
+        "reason": "registry_disabled"
+      },
+      "CurriculumAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "MarketplaceAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "AnalyticsAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "PerformanceAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "WalletAuthAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "SolanaAnchorAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "MintingAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      }
+    },
+    "tenant": {
+      "id": "default",
+      "mode": "isolated",
+      "caches": [
+        "llm",
+        "idempotency",
+        "metrics",
+        "audit",
+        "memory"
+      ],
+      "memory": {
+        "evictions": {
+          "memory": 0,
+          "idempotency": 0,
+          "audit": 0,
+          "llmCache": 0
+        },
+        "pressure": "LOW"
+      }
+    },
+    "circuitBreakers": {
+      "llm": {
+        "state": "CLOSED",
+        "failures": 0,
+        "lastTrip": null,
+        "lastCheck": null
+      },
+      "rag": {
+        "state": "CLOSED",
+        "failures": 0,
+        "lastTrip": null,
+        "lastCheck": null
+      },
+      "execution": {
+        "state": "CLOSED",
+        "failures": 0,
+        "lastTrip": null,
+        "lastCheck": null
+      }
+    },
+    "runtime": {
+      "coldStart": false
+    },
+    "secrets": {
+      "status": "WARN",
+      "missing": [],
+      "warnings": [
+        "missing_openai_api_key",
+        "missing_openai_api_key"
+      ],
+      "env": "production",
+      "mode": "DEMO"
+    },
+    "web3": {
+      "level": "OK",
+      "allowed": true,
+      "reasons": [],
+      "diagnostics": {
+        "proof": {
+          "proofId": null,
+          "hasHash": false,
+          "hasSignature": false,
+          "localOnly": false
+        },
+        "anchor": {
+          "status": null,
+          "txId": null,
+          "network": null,
+          "mainnetAttempt": false
+        },
+        "mint": {
+          "proofAnchored": false,
+          "mintTxId": null,
+          "seed": null,
+          "authority": null
+        }
+      }
+    },
+    "web3Pipeline": {
+      "state": "NONE",
+      "proof": null,
+      "anchor": null,
+      "mint": null,
+      "history": []
+    },
+    "killSwitch": {
+      "active": true,
+      "scope": "REAL_ONLY",
+      "triggeredBy": "automatic",
+      "reasons": [
+        "too_many_timeouts"
+      ]
+    },
+    "journey": {
+      "name": "generic",
+      "phase": null,
+      "phaseIndex": 0,
+      "phases": [],
+      "artifactsSummary": {
+        "requirements": 0,
+        "risks": 0,
+        "decisions": 0,
+        "plans": 0,
+        "proofs": 0,
+        "executions": 0,
+        "audits": 0
+      }
+    },
+    "slo": {
+      "window": 7,
+      "latency": {
+        "p95": 6002,
+        "p99": 6002
+      },
+      "rates": {
+        "warn": 0,
+        "failTimeout": 0.2857142857142857,
+        "idempotent": 0,
+        "dryRun": 1,
+        "rag": 1,
+        "llmReal": 0,
+        "realBlocked": 1,
+        "agentsDisabled": 0.041666666666666664,
+        "cbOpen": 0,
+        "queueShed": 0
+      },
+      "byTenant": {
+        "default": {
+          "tenantId": "default",
+          "window": 7,
+          "latency": {
+            "p95": 6002,
+            "p99": 6002
+          },
+          "rates": {
+            "warn": 0,
+            "failTimeout": 0.2857142857142857,
+            "idempotent": 0,
+            "dryRun": 1,
+            "rag": 1,
+            "llmReal": 0,
+            "realBlocked": 1,
+            "agentsDisabled": 0.041666666666666664,
+            "cbOpen": 0,
+            "queueShed": 0
+          },
+          "llm": {
+            "cacheHitRate": 0,
+            "dedupCount": 0,
+            "calls": 12,
+            "costTotal": 0.0015
+          },
+          "concurrency": {
+            "queueAvg": 0,
+            "shedRate": 0
+          },
+          "runtime": {
+            "coldStartRate": 0.14285714285714285
+          },
+          "statusCounts": {
+            "OK": 5,
+            "WARN": 0,
+            "FAIL": 0,
+            "TIMEOUT": 2
+          },
+          "presetUsage": {
+            "audit-dao": 1
+          }
+        }
+      }
+    },
+    "alerts": [
+      {
+        "level": "CRITICAL",
+        "sloId": "status_fail_timeout_rate",
+        "message": "status_fail_timeout_rate exceeded target",
+        "currentValue": 0.2857142857142857,
+        "target": 0.05,
+        "tenantId": "default",
+        "timestamp": 0
+      },
+      {
+        "level": "INFO",
+        "sloId": "dry_run_rate",
+        "message": "dry_run_rate exceeded target",
+        "currentValue": 1,
+        "target": 0.95,
+        "tenantId": "default",
+        "timestamp": 0
+      },
+      {
+        "level": "INFO",
+        "sloId": "llm_usage_rate",
+        "message": "llm_usage_rate exceeded target",
+        "currentValue": 1,
+        "target": 0.5,
+        "tenantId": "default",
+        "timestamp": 0
+      },
+      {
+        "level": "WARN",
+        "sloId": "real_block_rate",
+        "message": "real_block_rate exceeded target",
+        "currentValue": 1,
+        "target": 0.1,
+        "tenantId": "default",
+        "timestamp": 0
+      },
+      {
+        "level": "INFO",
+        "sloId": "llm_calls_per_run",
+        "message": "LLM calls per run high",
+        "currentValue": 12,
+        "target": 10,
+        "tenantId": "default",
+        "timestamp": 0
+      }
+    ],
+    "cost": null,
+    "degradation": {
+      "applied": [
+        "slo",
+        "kill_switch"
+      ],
+      "summary": "slo -> kill_switch",
+      "decisions": {
+        "quota": null,
+        "cost": null,
+        "slo": "ALERT",
+        "circuit": null,
+        "kill_switch": "REAL_ONLY"
+      }
+    },
+    "auditSummary": {
+      "totalRuns": 7,
+      "warn": 0,
+      "fail": 0,
+      "timeout": 2,
+      "realBlocked": 7,
+      "presets": {
+        "audit-dao": 1
+      },
+      "topAgents": {
+        "SecurityAuditAgent": 1
+      }
+    },
+    "quotas": {
+      "status": "OK",
+      "reasons": [],
+      "limits": {
+        "maxRunsPerWindow": 50,
+        "windowSizeMs": 600000,
+        "maxLLMCallsPerRun": 30,
+        "budgetUsdPerWindow": 2,
+        "maxAgentsPerRun": 20
+      }
+    }
+  },
+  "metrics": {
+    "agentsCount": 1,
+    "durationMs": 0,
+    "ragUsed": true,
+    "realExecutionAttempted": false
+  },
+  "presetMeta": null,
+  "executiveSummary": {
+    "headline": "Risks identified, action required",
+    "keyFindings": [
+      "Agent execution timed out"
+    ],
+    "topRisks": [],
+    "recommendedNextSteps": [],
+    "confidence": 0.55
+  },
+  "humanPlan": {
+    "objective": "Execute the prioritized improvements",
+    "steps": [],
+    "warnings": []
+  },
+  "productionGuards": {
+    "realExecutionAllowed": false,
+    "reasons": [
+      "execution_disabled",
+      "gate_not_approved",
+      "timeouts_present",
+      "kill_switch",
+      "web3_pipeline_invalid_transition"
+    ]
+  },
+  "ops": {
+    "warnings": [
+      "invalid_web3_transition"
+    ],
+    "disabledAgents": [
+      "RiskFraudAgent"
+    ],
+    "fallbacks": [
+      "kill_switch",
+      "demo_mode",
+      "llm_mock",
+      "secrets_warn"
+    ],
+    "timeouts": [
+      {
+        "agentId": "SecurityAuditAgent",
+        "reason": "timeout"
+      }
+    ],
+    "failures": [],
+    "rag": {
+      "mode": "local",
+      "domain": null,
+      "hits": 0
+    },
+    "llm": {
+      "mode": "mock",
+      "provider": "mock",
+      "model": "gpt-4o",
+      "calls": 1,
+      "cacheHits": 0,
+      "deduplicatedCalls": 0
+    },
+    "execution": {
+      "mode": "DRY_RUN",
+      "attempted": false,
+      "blocked": true,
+      "blockReasons": [
+        "execution_disabled",
+        "gate_not_approved",
+        "timeouts_present",
+        "kill_switch",
+        "web3_pipeline_invalid_transition"
+      ],
+      "shadow": false,
+      "steps": {
+        "count": 0,
+        "blocked": 0,
+        "ok": 0,
+        "failed": 0,
+        "skipped": 0
+      },
+      "tools": {
+        "used": 0,
+        "list": []
+      }
+    },
+    "retries": {
+      "attempted": false,
+      "count": 0,
+      "reason": null
+    },
+    "concurrency": {
+      "queued": 0,
+      "running": 1,
+      "max": 5,
+      "shed": false
+    },
+    "securityWarnings": [
+      "missing_openai_api_key",
+      "missing_openai_api_key"
+    ],
+    "costGuards": [],
+    "costs": {
+      "estimatedUsd": 0.000125,
+      "byAgent": {
+        "SecurityAuditAgent": {
+          "cost": 0.000125,
+          "model": "gpt-4o",
+          "calls": 1
+        }
+      },
+      "byPreset": {},
+      "budget": null,
+      "status": "OK"
+    },
+    "metricsSummary": {
+      "tenantId": "all",
+      "window": 7,
+      "latency": {
+        "p95": 6002,
+        "p99": 6002
+      },
+      "rates": {
+        "warn": 0,
+        "failTimeout": 0.2857142857142857,
+        "idempotent": 0,
+        "dryRun": 1,
+        "rag": 1,
+        "llmReal": 0,
+        "realBlocked": 1,
+        "agentsDisabled": 0.041666666666666664,
+        "cbOpen": 0,
+        "queueShed": 0
+      },
+      "llm": {
+        "cacheHitRate": 0,
+        "dedupCount": 0,
+        "calls": 12,
+        "costTotal": 0.0015
+      },
+      "concurrency": {
+        "queueAvg": 0,
+        "shedRate": 0
+      },
+      "runtime": {
+        "coldStartRate": 0.14285714285714285
+      },
+      "statusCounts": {
+        "OK": 5,
+        "WARN": 0,
+        "FAIL": 0,
+        "TIMEOUT": 2
+      },
+      "presetUsage": {
+        "audit-dao": 1
+      },
+      "byTenant": {
+        "default": {
+          "tenantId": "default",
+          "window": 7,
+          "latency": {
+            "p95": 6002,
+            "p99": 6002
+          },
+          "rates": {
+            "warn": 0,
+            "failTimeout": 0.2857142857142857,
+            "idempotent": 0,
+            "dryRun": 1,
+            "rag": 1,
+            "llmReal": 0,
+            "realBlocked": 1,
+            "agentsDisabled": 0.041666666666666664,
+            "cbOpen": 0,
+            "queueShed": 0
+          },
+          "llm": {
+            "cacheHitRate": 0,
+            "dedupCount": 0,
+            "calls": 12,
+            "costTotal": 0.0015
+          },
+          "concurrency": {
+            "queueAvg": 0,
+            "shedRate": 0
+          },
+          "runtime": {
+            "coldStartRate": 0.14285714285714285
+          },
+          "statusCounts": {
+            "OK": 5,
+            "WARN": 0,
+            "FAIL": 0,
+            "TIMEOUT": 2
+          },
+          "presetUsage": {
+            "audit-dao": 1
+          }
+        }
+      }
+    },
+    "memory": {
+      "evictions": {
+        "memory": 0,
+        "idempotency": 0,
+        "audit": 0,
+        "llmCache": 0
+      },
+      "pressure": "LOW"
+    }
+  },
+  "productMetrics": {
+    "actionsPlanned": 0,
+    "agentsRun": 1,
+    "warnings": 1,
+    "failures": 0,
+    "durationMs": 0,
+    "llmCacheHits": 0,
+    "costEstimateUsd": 0.000125
+  },
+  "agentContributionScore": [
+    {
+      "agentId": "SecurityAuditAgent",
+      "contribution": 0,
+      "confidence": null
+    }
+  ],
+  "decisionConfidenceBreakdown": {
+    "overall": 0.55,
+    "byAgent": [
+      {
+        "agentId": "SecurityAuditAgent",
+        "contribution": 0,
+        "confidence": null
+      }
+    ]
+  }
+}

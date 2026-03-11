@@ -21,7 +21,8 @@ const TEST_USERS = {
   },
   real: {
     email: 'real@mfai.app',
-    password: 'realpassword123',
+    // SECURITY FIX 2026-03-11: Use env var for test credentials
+    password: process.env.TEST_USER_PASSWORD || 'test_pass_change_me',
     id: 'real-user-id',
   },
 } as const

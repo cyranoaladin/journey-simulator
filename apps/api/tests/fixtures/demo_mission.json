@@ -1,0 +1,13 @@
+{
+  "input": "Launch a limited NFT collection for the demo mission",
+  "context": {
+    "userId": "demo-mission-user",
+    "phase": "Build",
+    "journey": {
+      "id": "demo-mission"
+    }
+  },
+  "expectedAgents": ["NFTAgent", "TokenAgent", "CommunityAgent"],
+  "expectedIntent": "launch_nft",
+  "expectedMode": "parallel"
+}

@@ -8,7 +8,7 @@
 
 Ce projet est un monorepo avec :
 
-- **`mf-back`** (Express/MongoDB) : logique “simulator”, orchestration, RAG côté backend.
+- **`mf-back`** (Express/PostgreSQL) : logique “simulator”, orchestration, RAG côté backend.
 - **`journey-simulator`** (Vite/React) : UI principale.
 - **`web`** (Next.js) : API routes + SIWS/Redis + BullMQ minting + Prisma/Postgres.
 
@@ -66,7 +66,7 @@ Si vous utilisez ce mode, remplacez la DSN :
 
 ## Extensions (quand vous voulez aller plus loin)
 
-### MongoDB MCP (read-only)
+### MongoDB MCP (REMOVED)
 
 Pertinent pour inspecter les collections “simulator” (progress, logs agents, runs).
 Recommandation : l’installer une fois que vous avez un serveur MCP Mongo stable/maintenu et le configurer en RO.

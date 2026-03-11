@@ -14,7 +14,7 @@
 
 -   `GET /api/agents/runs`: List agent executions.
 -   `GET /api/agents/runs/:id`: Detailed run info.
--   `GET /api/health`: Service status (MongoDB, Uptime).
+-   `GET /api/health`: Service status (PostgreSQL, Redis, Uptime).
 
 ### Security Audit (mf-back)
 -   **Last Verified**: 6 December 2025
@@ -59,7 +59,7 @@
 
 ### Logging
 
--   All agent executions via `BaseAgent` are now logged to the `AgentRun` collection in MongoDB (voir [docs/AGENT_RUNS.md](docs/AGENT_RUNS.md)).
+-   All agent executions via `BaseAgent` are now logged to the `AgentRun` table in PostgreSQL (voir [docs/AGENT_RUNS.md](docs/AGENT_RUNS.md)).
 -   Les flux RAG associés (ingestion, snippets) suivent le runbook [docs/RAG_OPERATIONS.md](docs/RAG_OPERATIONS.md) pour les contrôles et alertes.
 -   Tracks inputs, outputs, success/failure status, and duration.
 

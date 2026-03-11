@@ -13,7 +13,6 @@ services:
       NODE_ENV: production
       PORT: 3002
       EXECUTION_ENABLED: "true"
-      MONGO_URI: mongodb://mfai-mongo:27017/journey
       API_BASE_URL: https://journey.mfai.app/api
       SKIP_NPM_INSTALL: "true"
     env_file:
@@ -30,32 +29,9 @@ services:
     tmpfs:
       - /tmp
     depends_on:
-      mfai-mongo:
+      mfai-postgres:
         condition: service_healthy
     restart: always
-    networks:
-      - mfai-net
-
-  mfai-mongo:
-    container_name: mfai-mongo
-    image: mongo:6
-    restart: always
-    ports:
-      - "27018:27017"
-    volumes:
-      - mfai-mongo-data:/data/db
-    security_opt:
-      - no-new-privileges:true
-    # Mongo data directory must remain writable. // nosemgrep
-    read_only: true
-    tmpfs:
-      - /tmp
-    healthcheck:
-      test: [ "CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
     networks:
       - mfai-net
 
@@ -153,9 +129,10 @@ services:
       - mfai-net
 
 volumes:
-  mfai-mongo-data:
+
   mfai-postgres-data:
   mfai-redis-data:
+
 
 networks:
   mfai-net:

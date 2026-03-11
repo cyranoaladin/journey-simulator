@@ -51,7 +51,7 @@ export const JourneyProgressBar: React.FC<Props> = ({ personaId, currentStepId }
 
   const renderNodeContent = (isCompleted: boolean, isCurrent: boolean, index: number) => {
     if (isCompleted) return <Check size={18} strokeWidth={3} />;
-    if (isCurrent) return <Zap size={18} className="fill-current" />;
+    if (isCurrent) return <Zap size={18} className="fill-current animate-pulse" />;
     return <span className="text-xs font-mono">{index + 1}</span>;
   };
 

@@ -9,7 +9,7 @@
 ## 🏗️ 1. Architecture Overview
 The system is a high-fidelity "Journey Simulator" orchestrated by a dual-core architecture:
 - **Frontend (Sim-Core):** React 18, Zustand (Global State), TailwindCSS, Mermaid.js (Dynamic), Katex (Dynamic).
-- **Backend (Neural-Core):** Node.js, Express, MongoDB, TensorFlow/Brain.js (Simulated).
+- **Backend (Neural-Core):** Node.js, Express, PostgreSQL, TensorFlow/Brain.js (Simulated).
 
 ## 🧬 2. Extending the World
 

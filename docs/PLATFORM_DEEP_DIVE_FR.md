@@ -11,7 +11,7 @@
 1. Vision produit & promesse de valeur
 2. Monorepo : composants, responsabilités, ports, “frontend vs web”
 3. Cartographie des parcours (journeys) & phases
-4. Modèle de données & stockage (Mongo / Postgres / Redis) — quoi, pourquoi, où
+14. Modèle de données & stockage (Postgres / Redis) — quoi, pourquoi, où
 5. Authentification & sécurité (JWT, wallet login, SIWS, admin API key, CORS/rate limit)
 6. Zyno : orchestration multi-agents (AEPO/AECO), formats, timelines, logs, idempotence
 7. RAG : ingestion, requêtage, usage par les agents, limites
@@ -20,7 +20,7 @@
 10. NFTs : Proof-of-Skill™, metadata, minting queue, worker, logs, statut
 11. DAO : simulation gouvernance, votes, admin console, métriques
 12. Pages & navigation : vues, routes, composants, UX demo
-13. Observabilité, métriques, exports, outils admin
+13. Observabilité, métriques (Prometheus/Grafana), exports, outils admin
 14. Environnement local & “prod-like” : scripts, docker, runbook, smoke checks
 15. Tests : unitaires, E2E, stratégie, “what to trust”
 16. Risques & limites MVP + axes vNext
@@ -63,10 +63,10 @@ Money Factory AI est un **simulateur de parcours** (journeys) Web3/AI orienté *
 - Port local “prod-like” : **3003** (vite preview).
 - Source clé : `journey-simulator/src/`
 
-**B) `mf-back` (Backend Express + MongoDB)**
+**B) `mf-back` (Backend Express + Postgres/Redis)**
 
-- Tech : Node.js + Express + MongoDB (Mongoose) + JWT.
-- Rôle : backend métier du simulateur : users, progress, routes journey, orchestration (Zyno), RAG, DAO simulation, feedback/logs.
+- Tech : Node.js + Express + Prisma (Postgres) + Redis + JWT.
+- Rôle : backend métier simulateur : users, progress, routes journey, orchestration, RAG.
 - Port local “prod-like” : **configurable via `PORT` (mf-back/.env, actuellement 3005)**.
 - Source clé : `mf-back/`
 
@@ -95,9 +95,8 @@ Services attendus :
 - `journey-simulator` : <http://127.0.0.1:3003>
 - `web` : <http://127.0.0.1:3001> (API)
 - `mf-back` : `http://127.0.0.1:${PORT}` (PORT configurable, cf. `mf-back/.env`)
-- MongoDB : 27017 (docker)
-- Postgres : 5435 (docker)
-- Redis : 6379 (local ou container)
+- Postgres : 5432 (docker)
+- Redis : 6379 (docker)
 
 Compose dev : `docker-compose.yml`
 Compose deploy : `docker-compose.deploy.yml`
@@ -115,8 +114,8 @@ Routes (groupes principaux, non exhaustifs) :
   Code : `mf-back/routes/user-routes.js`
 - **Journeys** : `/journey/:journeyId/step`, `/journey/:journeyId/submit`, `/journey/user-progress`, `/journey/complete-phase`, `/journey/reset-progress`
   Code : `mf-back/routes/journey-routes.js`
-- **Zyno orchestration** : `/orchestration`, `/orchestration/logs`, `/orchestration/current-step`
-  Code : `mf-back/routes/zyno-routes.js`
+- **Zyno orchestration** : `/orchestration`, `/orchestration/logs`, `/orchestration/current-step`, `/orchestration/invoke`
+  Code : `mf-back/routes/orchestration.routes.ts`
 - **DAO** : `/dao/config`, `/dao/proposals`, `/dao/proposals/:id/vote`
   Code : `mf-back/routes/dao-routes.js`
 - **RAG** : `/rag/*`
@@ -263,7 +262,8 @@ Routes attendues côté `web` (Next) :
   - JWT : `jsonwebtoken` + middleware `protect`
   - Validation/config : `zod` côté `config/env.js` (whitelist origins, rate limit)
 - **DB** :
-  - MongoDB + Mongoose (users, journeys, logs, progress…)
+  - PostgreSQL + Prisma (users, journeys, logs, progress…)
+  - Redis (cache, session, queues)
 - **Orchestration agents** :
   - Zyno orchestrator + AgentFactory (sélection d’agent selon `{ trackId, phaseId, missionId }`)
   - Idempotence : `idempotencyKey` pour éviter double traitement sur `submit`
@@ -337,7 +337,7 @@ Chaque **phase** inclut typiquement :
 
 **Full journey** :
 
-- progression synchronisée avec `mf-back` (Mongo) via endpoints progress/step/submit
+- progression synchronisée avec `mf-back` (Postgres) via endpoints progress/step/submit
 - usage Zyno orchestration / logs / RAG selon configuration
 
 ### 3.4 Catalogue des personas & phases (source de vérité)
@@ -689,27 +689,34 @@ Ingénieurs sécurité, auditeurs, threat hunters, guardians fiabilité : proté
 
 ---
 
-## 4) Modèle de données & stockage (Mongo / Postgres / Redis)
+## 4) Modèle de données & stockage (Postgres / Redis)
 
-### 4.1 MongoDB (mf-back) : logique métier “simulator”
+### 4.1 PostgreSQL (mf-back via Prisma) : logique métier
 
-MongoDB sert à :
+PostgreSQL est la source de vérité pour :
 
-- stocker utilisateurs “simulator”
-- stocker état de progression
-- stocker logs d’agents (AgentLog / feedback)
-- stocker journeys et (selon implémentation) runs/idempotence
+- **Users** : identité, wallet, rôles, XP.
+- **Journeys** : état d'avancement (JSONB), phase courante.
+- **Artifacts** : livrables produits durant les phases.
+- **AgentRuns** : historique d'exécution des agents Zyno.
 
-Point d’entrée Express : `mf-back/app.js`
+Client : `Prisma Client` (généré depuis `prisma/schema.prisma`).
 
-Routes clés :
+Routes clés (Express) :
 
-- `/user/*` : profile, verify, update-profile, login/register selon implémentation
-- `/journey/*` : user-progress, step, submit, complete-phase, reset-progress
-- `/dao/*` : config/proposals/vote (simulation)
-- `/orchestration` : Zyno orchestrator (multi-agents)
-- `/api/feedback` : feedback (AECO signal)
-- `/healthz`, `/readyz` : health routes
+- `/user/*` : profile, auth
+- `/journey/*` : progress, step, submit
+- `/orchestration` : Zyno runs
+- `/healthz`, `/readyz` : health probes
+
+### 4.2 Redis : Cache & Sessions
+
+Redis est utilisé pour :
+
+- **Session Store** : tokens de refresh, blacklists.
+- **Rate Limiting** : protection des endpoints publics.
+- **Queues** : BullMQ (minting, background jobs).
+- **Cache** : données statiques ou configs DAO.
 
 ### 4.2 Postgres (web/Prisma) : logique “plateforme”
 
@@ -1303,7 +1310,7 @@ Utiliser :
 
 Ce mode démarre :
 
-- DBs (mongo/postgres) via docker
+- DBs (postgres/redis) via docker
 - redis (local si déjà présent)
 - mf-back (3002), web (3001), worker mint, simulator preview (3003)
 

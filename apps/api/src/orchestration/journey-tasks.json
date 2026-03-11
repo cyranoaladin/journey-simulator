@@ -1,0 +1,36 @@
+{
+  "launch_dao": {
+    "agents": ["DAOAgent", "Web3LegalAgent", "AuditAgent"]
+  },
+  "launch_nft": {
+    "agents": ["NFTAgent", "TokenAgent", "CommunityAgent"]
+  },
+  "investor_pitch": {
+    "agents": ["PitchAgent", "InvestorAgent", "CoachAgent"]
+  },
+  "launchpad_readiness": {
+    "agents": ["LaunchpadAgent", "PitchAgent", "InvestorAgent"]
+  },
+  "product_build": {
+    "agents": ["BuilderAgent", "ProductAgent", "DevAgent", "AuditAgent"]
+  },
+  "user_onboarding": {
+    "agents": ["OnboardingAgent", "GuideAgent"]
+  },
+  "growth_strategy": {
+    "agents": ["GrowthAgent", "CommunityAgent"]
+  },
+  "dao_audit": {
+    "agents": ["DAOAgent", "AuditAgent", "Web3LegalAgent"]
+  },
+  "token_launch": {
+    "agents": ["TokenAgent", "LaunchpadAgent", "CommunityAgent"]
+  },
+  "reflection_phase": {
+    "agents": ["ReflectionAgent"]
+  },
+  "default": {
+    "agents": ["CoachAgent"]
+  }
+}
+

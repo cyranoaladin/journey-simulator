@@ -1,0 +1,1165 @@
+{
+  "traceId": "GOLDEN_TRACEID",
+  "intent": "security_audit+product_spec",
+  "intentMeta": {
+    "deduplicated": true,
+    "source": [
+      "input"
+    ]
+  },
+  "runId": "GOLDEN_RUNID",
+  "agents": [
+    {
+      "agentId": "SecurityAuditAgent",
+      "status": "OK",
+      "summary": "Security review executed",
+      "details": "```json\n{\n  \"status\": \"completed\",\n  \"summary\": \"L'audit de securite a identifie plusieurs risques potentiels dans les domaines de la configuration CORS, de la limitation du debit, de l'authentification, de la gestion des secrets, de la politique de securite du contenu (CSP) et de la validation des entrees.\",\n  \"findings\": [\n    {\n      \"area\": \"CORS\",\n      \"risk\": \"Mauvaise configuration CORS peut permettre des requetes non autorisees depuis des origines non fiables.\",\n      \"severity\": \"high\",\n      \"action\": \"Restreindre les origines autorisees dans la configuration CORS pour n'inclure que les domaines de confiance.\"\n    },\n    {\n      \"area\": \"Rate Limiting\",\n      \"risk\": \"Absence de limitation du debit peut mener a des attaques par deni de service.\",\n      \"severity\": \"medium\",\n      \"action\": \"Implementer des regles de limitation du debit pour controler le nombre de requetes par utilisateur/IP.\"\n    },\n    {\n      \"area\": \"Authentication/JWT\",\n      \"risk\": \"JWT mal configures peuvent etre vulnerables a des attaques de falsification.\",\n      \"severity\": \"high\",\n      \"action\": \"Utiliser des algorithmes de signature securises et verifier l'expiration des tokens JWT.\"\n    },\n    {\n      \"area\": \"Secrets Management\",\n      \"risk\": \"Mauvaise gestion des secrets peut mener a des fuites d'informations sensibles.\",\n      \"severity\": \"high\",\n      \"action\": \"Utiliser un gestionnaire de secrets securise pour stocker et acceder aux cles et mots de passe.\"\n    },\n    {\n      \"area\": \"Content Security Policy (CSP)\",\n      \"risk\": \"Absence de CSP peut permettre des attaques XSS.\",\n      \"severity\": \"medium\",\n      \"action\": \"Definir une politique CSP stricte pour limiter les sources de contenu autorisees.\"\n    },\n    {\n      \"area\": \"Input Validation\",\n      \"risk\": \"Validation d'entree insuffisante peut permettre des injections SQL ou XSS.\",\n      \"severity\": \"high\",\n      \"action\": \"Mettre en place une validation et une sanitation rigoureuses des entrees utilisateur.\"\n    }\n  ],\n  \"citations\": [\n    {\n      \"id\": \"1\",\n      \"title\": \"OWASP Top Ten 2021\"\n    },\n    {\n      \"id\": \"2\",\n      \"title\": \"CORS Security Considerations\"\n    },\n    {\n      \"id\": \"3\",\n      \"title\": \"JWT Best Practices\"\n    },\n    {\n      \"id\": \"4\",\n      \"title\": \"Content Security Policy (CSP) Guide\"\n    }\n  ]\n}\n```",
+      "findings": [
+        {
+          "item": "CORS/headers",
+          "status": "reviewed",
+          "severity": "medium",
+          "detail": "Check helmet + CORS config"
+        },
+        {
+          "item": "Auth/RateLimit",
+          "status": "reviewed",
+          "severity": "medium",
+          "detail": "Verify JWT, rate limits in auth routes"
+        },
+        {
+          "item": "Secrets/Logs",
+          "status": "reviewed",
+          "severity": "low",
+          "detail": "Ensure no secrets in logs, env guarded"
+        }
+      ],
+      "actions": [
+        "Inspect CORS/helmet headers for exposed routes",
+        "Validate auth/rate-limit paths with supertest",
+        "Redact secrets from structured logs"
+      ],
+      "citations": [],
+      "confidence": 0.7000000000000001,
+      "assumptions": [
+        "LLM output post-processed, no real execution",
+        "RAG hits: 0"
+      ],
+      "metrics": {
+        "latencyMs": 0,
+        "tokens": 691,
+        "ragHits": 0
+      },
+      "errors": [],
+      "traceId": "GOLDEN_TRACEID",
+      "mock": false,
+      "scores": {
+        "raw": 90,
+        "weighted": 90
+      }
+    },
+    {
+      "agentId": "ProductSpecAgent",
+      "status": "OK",
+      "summary": "Product spec generated",
+      "details": "```json\n{\n  \"summary\": \"Developpement d'une fonctionnalite de demande composite permettant aux utilisateurs de soumettre plusieurs requetes en une seule action.\",\n  \"flows\": [\n    {\n      \"name\": \"Soumission d'une demande composite\",\n      \"steps\": [\n        \"L'utilisateur accede a la page de creation de demande composite.\",\n        \"L'utilisateur selectionne les types de requetes a inclure dans la demande composite.\",\n        \"L'utilisateur remplit les informations requises pour chaque type de requete.\",\n        \"L'utilisateur soumet la demande composite pour traitement.\",\n        \"Le systeme confirme la reception de la demande composite.\"\n      ]\n    },\n    {\n      \"name\": \"Traitement d'une demande composite\",\n      \"steps\": [\n        \"Le systeme recoit la demande composite et la decompose en requetes individuelles.\",\n        \"Chaque requete est traitee selon son type specifique.\",\n        \"Le systeme compile les resultats de chaque requete.\",\n        \"L'utilisateur est notifie de l'etat de chaque requete individuelle.\"\n      ]\n    }\n  ],\n  \"acceptance\": [\n    {\n      \"id\": 1,\n      \"criterion\": \"L'utilisateur peut selectionner et soumettre plusieurs types de requetes en une seule action.\"\n    },\n    {\n      \"id\": 2,\n      \"criterion\": \"Le systeme doit traiter chaque requete individuelle dans une demande composite de maniere independante.\"\n    },\n    {\n      \"id\": 3,\n      \"criterion\": \"L'utilisateur recoit une confirmation de soumission et des notifications sur l'etat de chaque requete.\"\n    }\n  ],\n  \"risks\": [\n    {\n      \"item\": \"Complexite accrue du traitement des requetes\",\n      \"impact\": \"Peut entrainer des delais de traitement plus longs et des erreurs potentielles.\"\n    },\n    {\n      \"item\": \"Problemes de notification\",\n      \"impact\": \"Les utilisateurs peuvent ne pas recevoir des mises a jour precises sur l'etat de leurs requetes.\"\n    }\n  ],\n  \"citations\": []\n}\n```",
+      "findings": [
+        {
+          "item": "Flows",
+          "status": "ok",
+          "detail": "User flows drafted"
+        },
+        {
+          "item": "Acceptance",
+          "status": "ok",
+          "detail": "Acceptance criteria listed"
+        },
+        {
+          "item": "Risks",
+          "status": "ok",
+          "detail": "Risks captured for spec"
+        }
+      ],
+      "actions": [
+        "Produce OpenAPI or interface skeleton from spec",
+        "List top 3 acceptance criteria with owners",
+        "Document risks/deps in spec appendix"
+      ],
+      "citations": [],
+      "confidence": 0.75,
+      "assumptions": [
+        "Spec is textual, no code generated",
+        "RAG hits: 0"
+      ],
+      "metrics": {
+        "latencyMs": 0,
+        "tokens": 539,
+        "ragHits": 0
+      },
+      "errors": [],
+      "traceId": "GOLDEN_TRACEID",
+      "mock": false,
+      "scores": {
+        "raw": 90,
+        "weighted": 90
+      }
+    }
+  ],
+  "summary": "Security review executed | Product spec generated",
+  "actions": [
+    "Inspect CORS/helmet headers for exposed routes",
+    "Validate auth/rate-limit paths with supertest",
+    "Redact secrets from structured logs",
+    "Produce OpenAPI or interface skeleton from spec",
+    "List top 3 acceptance criteria with owners",
+    "Document risks/deps in spec appendix"
+  ],
+  "contradictions": [],
+  "decision": {
+    "overallStatus": "OK",
+    "topFindings": [
+      {
+        "agentId": "SecurityAuditAgent",
+        "summary": "Security review executed",
+        "score": 90
+      },
+      {
+        "agentId": "ProductSpecAgent",
+        "summary": "Product spec generated",
+        "score": 90
+      }
+    ],
+    "recommendedActions": [
+      {
+        "agentId": "SecurityAuditAgent",
+        "action": "Inspect CORS/helmet headers for exposed routes",
+        "score": 90
+      },
+      {
+        "agentId": "SecurityAuditAgent",
+        "action": "Validate auth/rate-limit paths with supertest",
+        "score": 90
+      },
+      {
+        "agentId": "SecurityAuditAgent",
+        "action": "Redact secrets from structured logs",
+        "score": 90
+      },
+      {
+        "agentId": "ProductSpecAgent",
+        "action": "Produce OpenAPI or interface skeleton from spec",
+        "score": 90
+      },
+      {
+        "agentId": "ProductSpecAgent",
+        "action": "List top 3 acceptance criteria with owners",
+        "score": 90
+      },
+      {
+        "agentId": "ProductSpecAgent",
+        "action": "Document risks/deps in spec appendix",
+        "score": 90
+      }
+    ],
+    "rationale": "Selected actions from highest weighted agents. Contradictions detected: 0.",
+    "confidence": 0.8250000000000001,
+    "actionPlan": {
+      "steps": [
+        {
+          "action": "Inspect CORS/helmet headers for exposed routes",
+          "sourceAgent": "SecurityAuditAgent",
+          "score": 90,
+          "priority": 1,
+          "conflict": false,
+          "fromMemory": false
+        },
+        {
+          "action": "Validate auth/rate-limit paths with supertest",
+          "sourceAgent": "SecurityAuditAgent",
+          "score": 90,
+          "priority": 2,
+          "conflict": false,
+          "fromMemory": false
+        },
+        {
+          "action": "Redact secrets from structured logs",
+          "sourceAgent": "SecurityAuditAgent",
+          "score": 90,
+          "priority": 3,
+          "conflict": false,
+          "fromMemory": false
+        },
+        {
+          "action": "Produce OpenAPI or interface skeleton from spec",
+          "sourceAgent": "ProductSpecAgent",
+          "score": 90,
+          "priority": 4,
+          "conflict": false,
+          "fromMemory": false
+        },
+        {
+          "action": "List top 3 acceptance criteria with owners",
+          "sourceAgent": "ProductSpecAgent",
+          "score": 90,
+          "priority": 5,
+          "conflict": false,
+          "fromMemory": false
+        },
+        {
+          "action": "Document risks/deps in spec appendix",
+          "sourceAgent": "ProductSpecAgent",
+          "score": 90,
+          "priority": 6,
+          "conflict": false,
+          "fromMemory": false
+        }
+      ],
+      "strategy": "highest-confidence-first"
+    }
+  },
+  "memory": {
+    "reused": false,
+    "previousActionsCount": 0
+  },
+  "learning": {
+    "enabled": true,
+    "agents": [
+      {
+        "agentId": "SecurityAuditAgent",
+        "baseConfidence": 1,
+        "learningScore": 1,
+        "delta": 0
+      },
+      {
+        "agentId": "ProductSpecAgent",
+        "baseConfidence": 1,
+        "learningScore": 1,
+        "delta": 0
+      }
+    ]
+  },
+  "budgets": {
+    "SecurityAuditAgent": {
+      "maxTokens": 600,
+      "timeoutMs": 6000
+    },
+    "ProductSpecAgent": {
+      "maxTokens": 600,
+      "timeoutMs": 6000
+    }
+  },
+  "agentsMeta": {
+    "enabled": [
+      "SecurityAuditAgent",
+      "ProductSpecAgent",
+      "JourneyDesignAgent",
+      "EvaluationAgent",
+      "RAGOpsAgent",
+      "DataIntegrityAgent",
+      "APIContractAgent",
+      "TokenomicsAgent",
+      "GovernanceDAOAgent",
+      "GrowthAgent",
+      "InvestorDemoAgent",
+      "UXWritingAgent",
+      "QAPlaywrightAgent",
+      "DevOpsAgent",
+      "ObservabilityAgent",
+      "ComplianceAgent",
+      "CurriculumAgent",
+      "MarketplaceAgent",
+      "AnalyticsAgent",
+      "PerformanceAgent",
+      "WalletAuthAgent",
+      "SolanaAnchorAgent",
+      "MintingAgent"
+    ],
+    "disabled": [
+      "RiskFraudAgent"
+    ]
+  },
+  "journeyProgress": {
+    "phasesExecuted": [],
+    "currentPhase": "discovery"
+  },
+  "executionPlan": {
+    "mode": "DRY_RUN",
+    "steps": [
+      {
+        "step": 1,
+        "toolId": "noop",
+        "action": "Inspect CORS/helmet headers for exposed routes",
+        "sourceAgent": "SecurityAuditAgent",
+        "priority": 1,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      },
+      {
+        "step": 2,
+        "toolId": "noop",
+        "action": "Validate auth/rate-limit paths with supertest",
+        "sourceAgent": "SecurityAuditAgent",
+        "priority": 2,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      },
+      {
+        "step": 3,
+        "toolId": "noop",
+        "action": "Redact secrets from structured logs",
+        "sourceAgent": "SecurityAuditAgent",
+        "priority": 3,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      },
+      {
+        "step": 4,
+        "toolId": "noop",
+        "action": "Produce OpenAPI or interface skeleton from spec",
+        "sourceAgent": "ProductSpecAgent",
+        "priority": 4,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      },
+      {
+        "step": 5,
+        "toolId": "noop",
+        "action": "List top 3 acceptance criteria with owners",
+        "sourceAgent": "ProductSpecAgent",
+        "priority": 5,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      },
+      {
+        "step": 6,
+        "toolId": "noop",
+        "action": "Document risks/deps in spec appendix",
+        "sourceAgent": "ProductSpecAgent",
+        "priority": 6,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      }
+    ],
+    "summary": {
+      "total": 6,
+      "ok": 0,
+      "blocked": 0,
+      "failed": 0,
+      "skipped": 6
+    },
+    "overallStatus": "SKIPPED"
+  },
+  "executionGate": null,
+  "executionResult": {
+    "traceId": "GOLDEN_TRACEID",
+    "mode": "DRY_RUN",
+    "steps": [
+      {
+        "step": 1,
+        "toolId": "noop",
+        "action": "Inspect CORS/helmet headers for exposed routes",
+        "sourceAgent": "SecurityAuditAgent",
+        "priority": 1,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      },
+      {
+        "step": 2,
+        "toolId": "noop",
+        "action": "Validate auth/rate-limit paths with supertest",
+        "sourceAgent": "SecurityAuditAgent",
+        "priority": 2,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      },
+      {
+        "step": 3,
+        "toolId": "noop",
+        "action": "Redact secrets from structured logs",
+        "sourceAgent": "SecurityAuditAgent",
+        "priority": 3,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      },
+      {
+        "step": 4,
+        "toolId": "noop",
+        "action": "Produce OpenAPI or interface skeleton from spec",
+        "sourceAgent": "ProductSpecAgent",
+        "priority": 4,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      },
+      {
+        "step": 5,
+        "toolId": "noop",
+        "action": "List top 3 acceptance criteria with owners",
+        "sourceAgent": "ProductSpecAgent",
+        "priority": 5,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      },
+      {
+        "step": 6,
+        "toolId": "noop",
+        "action": "Document risks/deps in spec appendix",
+        "sourceAgent": "ProductSpecAgent",
+        "priority": 6,
+        "status": "SKIPPED",
+        "notes": "Unexecutable action (no tool mapping).",
+        "effects": [],
+        "warnings": [
+          "unknown_action_tool"
+        ],
+        "mappingReason": "unknown_action",
+        "mappingConfidence": 0
+      }
+    ],
+    "overallStatus": "SKIPPED",
+    "summary": {
+      "total": 6,
+      "ok": 0,
+      "blocked": 0,
+      "failed": 0,
+      "skipped": 6
+    }
+  },
+  "systemStatus": {
+    "llm": "mock",
+    "rag": "local",
+    "execution": "dry-run",
+    "agentsActiveCount": 23,
+    "audit": {
+      "enabled": true,
+      "entriesStored": 1,
+      "maxEntries": 100,
+      "byTenant": {
+        "default": 0
+      },
+      "evictions": 0
+    },
+    "idempotent": false,
+    "agents": {
+      "SecurityAuditAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "ProductSpecAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "JourneyDesignAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "EvaluationAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "RAGOpsAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "DataIntegrityAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "APIContractAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "TokenomicsAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "GovernanceDAOAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "GrowthAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "InvestorDemoAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "UXWritingAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "QAPlaywrightAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "DevOpsAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "ObservabilityAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "ComplianceAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "RiskFraudAgent": {
+        "enabled": false,
+        "mode": "DISABLED",
+        "reason": "registry_disabled"
+      },
+      "CurriculumAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "MarketplaceAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "AnalyticsAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "PerformanceAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "WalletAuthAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "SolanaAnchorAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      },
+      "MintingAgent": {
+        "enabled": true,
+        "mode": "REAL_CAPABLE"
+      }
+    },
+    "tenant": {
+      "id": "default",
+      "mode": "isolated",
+      "caches": [
+        "llm",
+        "idempotency",
+        "metrics",
+        "audit",
+        "memory"
+      ],
+      "memory": {
+        "evictions": {
+          "memory": 0,
+          "idempotency": 0,
+          "audit": 0,
+          "llmCache": 0
+        },
+        "pressure": "LOW"
+      }
+    },
+    "circuitBreakers": {
+      "llm": {
+        "state": "CLOSED",
+        "failures": 0,
+        "lastTrip": null,
+        "lastCheck": null
+      },
+      "rag": {
+        "state": "CLOSED",
+        "failures": 0,
+        "lastTrip": null,
+        "lastCheck": null
+      },
+      "execution": {
+        "state": "CLOSED",
+        "failures": 0,
+        "lastTrip": null,
+        "lastCheck": null
+      }
+    },
+    "runtime": {
+      "coldStart": false
+    },
+    "secrets": {
+      "status": "WARN",
+      "missing": [],
+      "warnings": [
+        "missing_openai_api_key",
+        "missing_openai_api_key"
+      ],
+      "env": "production",
+      "mode": "DEMO"
+    },
+    "web3": {
+      "level": "OK",
+      "allowed": true,
+      "reasons": [],
+      "diagnostics": {
+        "proof": {
+          "proofId": null,
+          "hasHash": false,
+          "hasSignature": false,
+          "localOnly": false
+        },
+        "anchor": {
+          "status": null,
+          "txId": null,
+          "network": null,
+          "mainnetAttempt": false
+        },
+        "mint": {
+          "proofAnchored": false,
+          "mintTxId": null,
+          "seed": null,
+          "authority": null
+        }
+      }
+    },
+    "web3Pipeline": {
+      "state": "NONE",
+      "proof": null,
+      "anchor": null,
+      "mint": null,
+      "history": []
+    },
+    "killSwitch": {
+      "active": false,
+      "scope": "REAL_ONLY",
+      "triggeredBy": null,
+      "reasons": []
+    },
+    "journey": {
+      "name": "product_launch",
+      "phase": "discovery",
+      "phaseIndex": 0,
+      "phases": [
+        "discovery",
+        "design",
+        "validation",
+        "execution"
+      ],
+      "artifactsSummary": {
+        "requirements": 0,
+        "risks": 0,
+        "decisions": 0,
+        "plans": 0,
+        "proofs": 0,
+        "executions": 0,
+        "audits": 0
+      }
+    },
+    "slo": {
+      "window": 2,
+      "latency": {
+        "p95": 5956,
+        "p99": 5956
+      },
+      "rates": {
+        "warn": 0,
+        "failTimeout": 0,
+        "idempotent": 0,
+        "dryRun": 1,
+        "rag": 1,
+        "llmReal": 0,
+        "realBlocked": 1,
+        "agentsDisabled": 0.041666666666666664,
+        "cbOpen": 0,
+        "queueShed": 0
+      },
+      "byTenant": {
+        "default": {
+          "tenantId": "default",
+          "window": 2,
+          "latency": {
+            "p95": 5956,
+            "p99": 5956
+          },
+          "rates": {
+            "warn": 0,
+            "failTimeout": 0,
+            "idempotent": 0,
+            "dryRun": 1,
+            "rag": 1,
+            "llmReal": 0,
+            "realBlocked": 1,
+            "agentsDisabled": 0.041666666666666664,
+            "cbOpen": 0,
+            "queueShed": 0
+          },
+          "llm": {
+            "cacheHitRate": 0,
+            "dedupCount": 0,
+            "calls": 3,
+            "costTotal": 0.000375
+          },
+          "concurrency": {
+            "queueAvg": 0,
+            "shedRate": 0
+          },
+          "runtime": {
+            "coldStartRate": 0.5
+          },
+          "statusCounts": {
+            "OK": 2,
+            "WARN": 0,
+            "FAIL": 0,
+            "TIMEOUT": 0
+          },
+          "presetUsage": {}
+        }
+      }
+    },
+    "alerts": [
+      {
+        "level": "WARN",
+        "sloId": "orchestration_latency_p95",
+        "message": "orchestration_latency_p95 exceeded target",
+        "currentValue": 5956,
+        "target": 500,
+        "tenantId": "default",
+        "timestamp": 0
+      },
+      {
+        "level": "INFO",
+        "sloId": "dry_run_rate",
+        "message": "dry_run_rate exceeded target",
+        "currentValue": 1,
+        "target": 0.95,
+        "tenantId": "default",
+        "timestamp": 0
+      },
+      {
+        "level": "INFO",
+        "sloId": "llm_usage_rate",
+        "message": "llm_usage_rate exceeded target",
+        "currentValue": 1,
+        "target": 0.5,
+        "tenantId": "default",
+        "timestamp": 0
+      },
+      {
+        "level": "WARN",
+        "sloId": "real_block_rate",
+        "message": "real_block_rate exceeded target",
+        "currentValue": 1,
+        "target": 0.1,
+        "tenantId": "default",
+        "timestamp": 0
+      },
+      {
+        "level": "INFO",
+        "sloId": "cold_start_rate",
+        "message": "Cold start frequent",
+        "currentValue": 0.5,
+        "target": 0.2,
+        "tenantId": "default",
+        "timestamp": 0
+      }
+    ],
+    "cost": null,
+    "degradation": {
+      "applied": [
+        "slo"
+      ],
+      "summary": "slo",
+      "decisions": {
+        "quota": null,
+        "cost": null,
+        "slo": "ALERT",
+        "circuit": null,
+        "kill_switch": null
+      }
+    },
+    "auditSummary": {
+      "totalRuns": 2,
+      "warn": 0,
+      "fail": 0,
+      "timeout": 0,
+      "realBlocked": 2,
+      "presets": {},
+      "topAgents": {
+        "SecurityAuditAgent": 1,
+        "ProductSpecAgent": 1
+      }
+    },
+    "quotas": {
+      "status": "OK",
+      "reasons": [],
+      "limits": {
+        "maxRunsPerWindow": 50,
+        "windowSizeMs": 600000,
+        "maxLLMCallsPerRun": 30,
+        "budgetUsdPerWindow": 2,
+        "maxAgentsPerRun": 20
+      }
+    }
+  },
+  "metrics": {
+    "agentsCount": 2,
+    "durationMs": 0,
+    "ragUsed": true,
+    "realExecutionAttempted": false
+  },
+  "presetMeta": null,
+  "executiveSummary": {
+    "headline": "Key improvements identified",
+    "keyFindings": [
+      "Check helmet + CORS config",
+      "Verify JWT, rate limits in auth routes",
+      "Ensure no secrets in logs, env guarded",
+      "User flows drafted",
+      "Acceptance criteria listed"
+    ],
+    "topRisks": [
+      {
+        "risk": "CORS/headers",
+        "severity": "medium"
+      },
+      {
+        "risk": "Auth/RateLimit",
+        "severity": "medium"
+      },
+      {
+        "risk": "Secrets/Logs",
+        "severity": "low"
+      }
+    ],
+    "recommendedNextSteps": [
+      "Inspect CORS/helmet headers for exposed routes",
+      "Validate auth/rate-limit paths with supertest",
+      "Redact secrets from structured logs",
+      "Produce OpenAPI or interface skeleton from spec",
+      "List top 3 acceptance criteria with owners"
+    ],
+    "confidence": 0.8250000000000001
+  },
+  "humanPlan": {
+    "objective": "Execute the prioritized improvements",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Inspect CORS/helmet headers for exposed routes",
+        "owner": "SecurityAuditAgent",
+        "priority": "HIGH"
+      },
+      {
+        "step": 2,
+        "action": "Validate auth/rate-limit paths with supertest",
+        "owner": "SecurityAuditAgent",
+        "priority": "HIGH"
+      },
+      {
+        "step": 3,
+        "action": "Redact secrets from structured logs",
+        "owner": "SecurityAuditAgent",
+        "priority": "HIGH"
+      },
+      {
+        "step": 4,
+        "action": "Produce OpenAPI or interface skeleton from spec",
+        "owner": "ProductSpecAgent",
+        "priority": "MEDIUM"
+      },
+      {
+        "step": 5,
+        "action": "List top 3 acceptance criteria with owners",
+        "owner": "ProductSpecAgent",
+        "priority": "MEDIUM"
+      },
+      {
+        "step": 6,
+        "action": "Document risks/deps in spec appendix",
+        "owner": "ProductSpecAgent",
+        "priority": "MEDIUM"
+      }
+    ],
+    "warnings": []
+  },
+  "productionGuards": {
+    "realExecutionAllowed": false,
+    "reasons": [
+      "execution_disabled",
+      "gate_not_approved"
+    ]
+  },
+  "ops": {
+    "warnings": [
+      "intent_deduped",
+      "unknown_action_tool"
+    ],
+    "disabledAgents": [
+      "RiskFraudAgent"
+    ],
+    "fallbacks": [
+      "demo_mode",
+      "llm_mock",
+      "secrets_warn"
+    ],
+    "timeouts": [],
+    "failures": [],
+    "rag": {
+      "mode": "local",
+      "domain": null,
+      "hits": 0
+    },
+    "llm": {
+      "mode": "mock",
+      "provider": "mock",
+      "model": "gpt-4o",
+      "calls": 2,
+      "cacheHits": 0,
+      "deduplicatedCalls": 0
+    },
+    "execution": {
+      "mode": "DRY_RUN",
+      "attempted": true,
+      "blocked": true,
+      "blockReasons": [
+        "execution_disabled",
+        "gate_not_approved"
+      ],
+      "shadow": false,
+      "steps": {
+        "count": 6,
+        "blocked": 0,
+        "ok": 0,
+        "failed": 0,
+        "skipped": 6
+      },
+      "tools": {
+        "used": 1,
+        "list": [
+          "noop"
+        ]
+      }
+    },
+    "retries": {
+      "attempted": false,
+      "count": 0,
+      "reason": null
+    },
+    "concurrency": {
+      "queued": 0,
+      "running": 1,
+      "max": 5,
+      "shed": false
+    },
+    "securityWarnings": [
+      "missing_openai_api_key",
+      "missing_openai_api_key"
+    ],
+    "costGuards": [],
+    "costs": {
+      "estimatedUsd": 0.00025,
+      "byAgent": {
+        "SecurityAuditAgent": {
+          "cost": 0.000125,
+          "model": "gpt-4o",
+          "calls": 1
+        },
+        "ProductSpecAgent": {
+          "cost": 0.000125,
+          "model": "gpt-4o",
+          "calls": 1
+        }
+      },
+      "byPreset": {},
+      "budget": null,
+      "status": "OK"
+    },
+    "metricsSummary": {
+      "tenantId": "all",
+      "window": 2,
+      "latency": {
+        "p95": 5956,
+        "p99": 5956
+      },
+      "rates": {
+        "warn": 0,
+        "failTimeout": 0,
+        "idempotent": 0,
+        "dryRun": 1,
+        "rag": 1,
+        "llmReal": 0,
+        "realBlocked": 1,
+        "agentsDisabled": 0.041666666666666664,
+        "cbOpen": 0,
+        "queueShed": 0
+      },
+      "llm": {
+        "cacheHitRate": 0,
+        "dedupCount": 0,
+        "calls": 3,
+        "costTotal": 0.000375
+      },
+      "concurrency": {
+        "queueAvg": 0,
+        "shedRate": 0
+      },
+      "runtime": {
+        "coldStartRate": 0.5
+      },
+      "statusCounts": {
+        "OK": 2,
+        "WARN": 0,
+        "FAIL": 0,
+        "TIMEOUT": 0
+      },
+      "presetUsage": {},
+      "byTenant": {
+        "default": {
+          "tenantId": "default",
+          "window": 2,
+          "latency": {
+            "p95": 5956,
+            "p99": 5956
+          },
+          "rates": {
+            "warn": 0,
+            "failTimeout": 0,
+            "idempotent": 0,
+            "dryRun": 1,
+            "rag": 1,
+            "llmReal": 0,
+            "realBlocked": 1,
+            "agentsDisabled": 0.041666666666666664,
+            "cbOpen": 0,
+            "queueShed": 0
+          },
+          "llm": {
+            "cacheHitRate": 0,
+            "dedupCount": 0,
+            "calls": 3,
+            "costTotal": 0.000375
+          },
+          "concurrency": {
+            "queueAvg": 0,
+            "shedRate": 0
+          },
+          "runtime": {
+            "coldStartRate": 0.5
+          },
+          "statusCounts": {
+            "OK": 2,
+            "WARN": 0,
+            "FAIL": 0,
+            "TIMEOUT": 0
+          },
+          "presetUsage": {}
+        }
+      }
+    },
+    "memory": {
+      "evictions": {
+        "memory": 0,
+        "idempotency": 0,
+        "audit": 0,
+        "llmCache": 0
+      },
+      "pressure": "LOW"
+    }
+  },
+  "productMetrics": {
+    "actionsPlanned": 6,
+    "agentsRun": 2,
+    "warnings": 2,
+    "failures": 0,
+    "durationMs": 0,
+    "llmCacheHits": 0,
+    "costEstimateUsd": 0.00025
+  },
+  "agentContributionScore": [
+    {
+      "agentId": "SecurityAuditAgent",
+      "contribution": 90,
+      "confidence": 0.7000000000000001
+    },
+    {
+      "agentId": "ProductSpecAgent",
+      "contribution": 90,
+      "confidence": 0.75
+    }
+  ],
+  "decisionConfidenceBreakdown": {
+    "overall": 0.8250000000000001,
+    "byAgent": [
+      {
+        "agentId": "SecurityAuditAgent",
+        "contribution": 90,
+        "confidence": 0.7000000000000001
+      },
+      {
+        "agentId": "ProductSpecAgent",
+        "contribution": 90,
+        "confidence": 0.75
+      }
+    ]
+  }
+}

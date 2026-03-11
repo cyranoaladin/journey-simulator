@@ -1,0 +1,17 @@
+{
+  "name": "audit-dao",
+  "description": "DAO readiness & risk audit",
+  "intents": "governance.dao+compliance+risk.fraud",
+  "journey": {
+    "journeyType": "audit",
+    "phaseId": "governance"
+  },
+  "expectedDuration": "2–5 min",
+  "agentsRequired": [
+    "GovernanceDAOAgent",
+    "ComplianceAgent",
+    "RiskFraudAgent"
+  ],
+  "sampleInput": "Evaluate our DAO governance and compliance before launch.",
+  "sampleOutput": "Governance rules drafted, quorum set, fraud controls proposed."
+}

@@ -12,7 +12,7 @@ We have introduced a dedicated logging layer for tracking AI agent executions. T
 
 ## Data Model: `AgentRun`
 
-The `AgentRun` collection (MongoDB) stores a detailed record of each execution.
+The `AgentRun` table (PostgreSQL) stores a detailed record of each execution.
 
 | Field | Type | Description |
 | :--- | :--- | :--- |
@@ -51,7 +51,7 @@ The logging logic is integrated directly into the `BaseAgent` class in `mf-back`
 
 ### Health Check
 `GET /api/health`
--   Returns service status, MongoDB connection state, and uptime.
+-   Returns service status, PostgreSQL connection state, and uptime.
 
 ## 👥 Contributeurs
 

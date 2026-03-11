@@ -1,0 +1,18 @@
+{
+  "name": "product-onboarding",
+  "description": "Onboarding produit avec UX et spec cadrees",
+  "intents": "product.spec+ux.writing+journey.design+observability",
+  "journey": {
+    "journeyType": "onboarding",
+    "phaseId": "design"
+  },
+  "expectedDuration": "2–5 min",
+  "agentsRequired": [
+    "ProductSpecAgent",
+    "UXWritingAgent",
+    "JourneyDesignAgent",
+    "ObservabilityAgent"
+  ],
+  "sampleInput": "Concevoir un onboarding clair pour le nouveau module.",
+  "sampleOutput": "Spec concise, CTA verb-first, frictions identifiees, SLOs definis."
+}

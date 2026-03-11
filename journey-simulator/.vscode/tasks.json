@@ -1,0 +1,24 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "MFAI: Full Start & Smoke Test",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "MFAI: Start Prod-Like Env",
+        "MFAI: Run Smoke Test"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "MFAI: Run Smoke Test",
+      "type": "shell",
+      "command": "bash scripts/smoke-test.sh",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}

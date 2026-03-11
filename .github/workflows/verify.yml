@@ -100,9 +100,6 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     
-    defaults:
-      run:
-        working-directory: journey-simulator
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -180,14 +177,18 @@ jobs:
           exit 1
       
       - name: Install frontend dependencies
+        working-directory: journey-simulator
         run: npm ci
       - name: Build frontend
+        working-directory: journey-simulator
         run: npm run build
       - name: Start frontend server
+        working-directory: journey-simulator
         run: |
           npm run preview -- --port 3000 --host 0.0.0.0 > frontend.log 2>&1 &
           echo $! > frontend.pid
       - name: Wait for frontend
+        working-directory: journey-simulator
         run: |
           echo "Waiting for frontend to be ready..."
           for i in {1..30}; do
@@ -202,10 +203,12 @@ jobs:
           cat frontend.log || true
           exit 1
       - name: Install Playwright browsers
+        working-directory: journey-simulator
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db?schema=public
         run: npx playwright install --with-deps chromium
       - name: Run smoke tests
+        working-directory: journey-simulator
         env:
           CI: 'true'
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db?schema=public

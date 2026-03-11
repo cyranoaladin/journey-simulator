@@ -8,7 +8,7 @@ PORT_BACKEND="${PORT_BACKEND:-3002}"
 PORT_WEB="${PORT_WEB:-3001}"
 PORT_SIM="${PORT_SIM:-3003}"
 
-MONGO_URI="${MONGO_URI:-mongodb://127.0.0.1:27017/journey}"
+
 DATABASE_URL="${DATABASE_URL:-postgresql://prisma:prisma@127.0.0.1:5435/prisma?schema=public}"
 REDIS_URL="${REDIS_URL:-redis://127.0.0.1:6379}"
 
@@ -69,8 +69,8 @@ if [[ "$RESET" == "true" ]]; then
   docker compose -f "$ROOT_DIR/docker-compose.yml" down -v --remove-orphans || true
 fi
 
-echo "[prod-local] start DB (mongo + postgres)"
-docker compose -f "$ROOT_DIR/docker-compose.yml" up -d mongo postgres
+echo "[prod-local] start DB (postgres)"
+docker compose -f "$ROOT_DIR/docker-compose.yml" up -d postgres
 
 echo "[prod-local] redis"
 if ss -ltnp 2>/dev/null | grep -qE "127\\.0\\.0\\.1:6379|\\[::1\\]:6379"; then
@@ -124,7 +124,7 @@ start_bg() {
   sleep 0.2
 }
 
-start_bg "mf-back" "cd '$ROOT_DIR' && NODE_ENV=production PORT='${PORT_BACKEND}' MONGO_URI='${MONGO_URI}' JWT_SECRET='${JWT_SECRET}' ADMIN_API_KEY='${ADMIN_API_KEY}' npm start --prefix mf-back"
+start_bg "mf-back" "cd '$ROOT_DIR' && NODE_ENV=production PORT='${PORT_BACKEND}' JWT_SECRET='${JWT_SECRET}' ADMIN_API_KEY='${ADMIN_API_KEY}' npm start --prefix mf-back"
 start_bg "web" "cd '$ROOT_DIR' && NODE_ENV=production PORT='${PORT_WEB}' DATABASE_URL='${DATABASE_URL}' REDIS_URL='${REDIS_URL}' ADMIN_API_KEY='${ADMIN_API_KEY}' SIMULATOR_BASE_URL='${SIMULATOR_BASE_URL}' ORIGINS='${ORIGINS}' npm start --prefix web"
 start_bg "worker-mint" "cd '$ROOT_DIR' && NODE_ENV=production DATABASE_URL='${DATABASE_URL}' REDIS_URL='${REDIS_URL}' npm run worker:mint --prefix web"
 start_bg "simulator" "cd '$ROOT_DIR' && NODE_ENV=production npm run preview --prefix journey-simulator -- --host 0.0.0.0 --port '${PORT_SIM}'"

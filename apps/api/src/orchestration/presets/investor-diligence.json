@@ -1,0 +1,19 @@
+{
+  "name": "investor-diligence",
+  "description": "Due diligence investisseur (produit, securite, tokenomics)",
+  "intents": "product.spec+security.audit+tokenomics+growth+analytics",
+  "journey": {
+    "journeyType": "audit",
+    "phaseId": "tech"
+  },
+  "expectedDuration": "2–5 min",
+  "agentsRequired": [
+    "ProductSpecAgent",
+    "SecurityAuditAgent",
+    "TokenomicsAgent",
+    "GrowthAgent",
+    "AnalyticsAgent"
+  ],
+  "sampleInput": "Prepare un dossier de due diligence avant un pitch investisseur.",
+  "sampleOutput": "Risques listes, token model esquisse, metriques cles a exposer."
+}

@@ -56,7 +56,8 @@ async function checkBackendHealth() {
 
 async function simulateJwtLogin() {
   const seededEmail = 'test@mfai.app';
-  const password = 'password123';
+  // SECURITY FIX 2026-03-11: Use env var or generate random test password
+  const password = process.env.TEST_USER_PASSWORD || `test_${Date.now()}_secure`;
   const loginUrl = `${BACKEND_URL}/user/login`;
   const registerUrl = `${BACKEND_URL}/user/register`;
 

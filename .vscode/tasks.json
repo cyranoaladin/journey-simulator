@@ -1,0 +1,28 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "MFAI: Start Prod-Like Env",
+      "type": "shell",
+      "command": "bash scripts/prod-local-up.sh",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "group": "mfai-env"
+      },
+      "problemMatcher": [],
+      "detail": "Lance DB, mf-back, web et journey-simulator (preview)"
+    },
+    {
+      "label": "MFAI: Stop Prod-Like Env",
+      "type": "shell",
+      "command": "bash scripts/prod-local-down.sh",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Arrête tous les services et nettoie les PIDs"
+    }
+  ]
+}

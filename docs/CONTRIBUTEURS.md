@@ -34,7 +34,7 @@
 
 - **Rôle** : Backend Stack Developer
 - **Responsabilités** :
-  - Développement backend (Express, MongoDB)
+  - Développement backend (Express, PostgreSQL)
   - Orchestration Zyno
   - Intégration API
   - Optimisation performance
@@ -46,7 +46,7 @@
 Cette équipe a développé l'ensemble de la plateforme Money Factory AI, incluant :
 
 - **Frontend** : React 19, Vite, TypeScript, Zustand, UI/UX complète
-- **Backend** : Express, MongoDB, orchestration multi-agents (Zyno)
+- **Backend** : Express, PostgreSQL, orchestration multi-agents (Zyno)
 - **Web Portal** : Next.js, Prisma, PostgreSQL, intégration Solana
 - **Architecture** : Monorepo, microservices, Web3 integration
 - **Documentation** : Documentation technique et produit complète

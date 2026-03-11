@@ -1,1 +1,0 @@
-open /home/alaeddine/Documents/journey_mfai_back_front/infra/docker/docker-compose.local-prod.yml: no such file or directory

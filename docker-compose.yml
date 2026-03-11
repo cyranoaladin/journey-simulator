@@ -66,8 +66,19 @@ services:
     read_only: true
     depends_on:
       - api
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    container_name: mfai_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - mfai_redis_data:/data
+
 
 volumes:
   api-node-modules:
   web-node-modules:
   mfai_postgres_data:
+  mfai_redis_data:

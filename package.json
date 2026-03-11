@@ -1,45 +1,65 @@
 {
-  "name": "money-factory-ai-monorepo",
-  "version": "0.0.1",
+  "name": "money-factory-ai",
+  "version": "1.0.0",
   "private": true,
-  "description": "Money Factory AI Monorepo - Backend, Simulator, and Web Portal",
+  "description": "AI-Powered Venture Engine on Solana - Monorepo",
+  "keywords": [
+    "ai",
+    "solana",
+    "web3",
+    "nextjs",
+    "agents",
+    "startup",
+    "venture"
+  ],
+  "author": "Money Factory AI Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cyranoaladin/journey-simulator.git"
+  },
+  "homepage": "https://mfai.app",
+  "bugs": {
+    "url": "https://github.com/cyranoaladin/journey-simulator/issues"
+  },
+  "engines": {
+    "node": ">=18.17.0",
+    "npm": ">=9.0.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev:back": "npm run dev --prefix mf-back",
-    "dev:simulator": "npm run dev --prefix journey-simulator",
-    "dev:web": "npm run dev --prefix web",
-    "build": "npm run build:all",
-    "build:types": "npm run typecheck --prefix journey-simulator",
-    "mcp:selftest": "node scripts/mcp-selftest.mjs",
-    "ci:verify": "bash scripts/ci-verify.sh",
-    "test:back": "npm test --prefix mf-back",
-    "test:simulator": "npm test --prefix journey-simulator",
-    "test:web": "npm run test:unit --prefix web",
-    "test:fast": "npm test --prefix mf-back -- --runTestsByPath tests/unit/BaseAgent.test.js",
-    "test:e2e:simulator": "npm run test:e2e --prefix journey-simulator",
-    "lint:simulator": "npm run lint --prefix journey-simulator",
-    "lint:web": "npm run lint --prefix web",
-    "lint": "npm run lint:all",
-    "test:all": "npm run test:back && npm run test:simulator && npm run test:web",
-    "lint:all": "npm run lint:simulator && npm run lint:web",
-    "build:all": "npm run build --prefix journey-simulator && npm run build --prefix web",
-    "install:all": "npm install --prefix mf-back && npm install --prefix journey-simulator && npm install --prefix web",
-    "preflight": "node tools/system-health.js",
-    "dev": "npm run preflight && concurrently \"npm run dev:back\" \"npm run dev:simulator\" \"npm run dev:web\"",
-    "release:preflight": "node scripts/release/preflight.js",
-    "release:smoke": "node scripts/release/smoke.js",
-    "release:rollback": "node scripts/release/rollback.js",
-    "release:smoke-e2e": "node scripts/release/smoke-e2e.js",
-    "release:go-live": "node scripts/release/go-live.js",
-    "compliance:check": "node scripts/compliance/check-compliance.js",
-    "test:load:sim": "node scripts/testing/simulate-load.js",
-    "test:chaos:sim": "node scripts/testing/simulate-chaos.js",
-    "qa:full": "node scripts/rseries-check.js",
-    "qa:rag": "node scripts/rag-contract-test.js",
-    "qa:integrity": "node scripts/write-integrity-check.js"
+    "install:all": "npm install && npm run install:workspaces",
+    "install:workspaces": "npm install --workspaces",
+    "dev": "make dev",
+    "dev:web": "npm run dev -w apps/web",
+    "dev:api": "npm run dev -w apps/api",
+    "build": "npm run build --workspaces",
+    "build:web": "npm run build -w apps/web",
+    "build:api": "npm run build -w apps/api",
+    "test": "npm run test --workspaces",
+    "test:web": "npm run test -w apps/web",
+    "test:api": "npm run test -w apps/api",
+    "test:e2e": "npm run test:e2e -w apps/web",
+    "lint": "npm run lint --workspaces",
+    "lint:fix": "npm run lint:fix --workspaces",
+    "format": "npm run format --workspaces",
+    "db:migrate": "cd apps/web && npx prisma migrate dev",
+    "db:generate": "cd apps/web && npx prisma generate",
+    "db:seed": "cd apps/web && npx prisma db seed",
+    "db:studio": "cd apps/web && npx prisma studio",
+    "docker:dev": "docker-compose up --build",
+    "docker:prod": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build",
+    "docker:down": "docker-compose down",
+    "clean": "make clean",
+    "security:audit": "make security",
+    "setup": "make setup",
+    "preflight": "node tools/system-health.js"
   },
   "devDependencies": {
-    "baseline-browser-mapping": "^2.9.11",
-    "concurrently": "^8.0.0",
+    "concurrently": "^8.2.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7"
   },
@@ -47,89 +67,11 @@
     "*.{js,jsx,ts,tsx}": [
       "eslint --fix",
       "prettier --write"
-    ],
-    "mf-back/**/*.js": [
-      "node --check"
     ]
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged && npm run test:fast"
+      "pre-commit": ".husky/pre-commit"
     }
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "main": "index.js",
-  "directories": {
-    "doc": "docs"
-  },
-  "dependencies": {
-    "ansi-escapes": "^7.2.0",
-    "ansi-regex": "^5.0.1",
-    "ansi-styles": "^4.3.0",
-    "braces": "^3.0.3",
-    "chalk": "^4.1.2",
-    "cli-cursor": "^5.0.0",
-    "cli-truncate": "^5.1.1",
-    "cliui": "^8.0.1",
-    "color-convert": "^2.0.1",
-    "color-name": "^1.1.4",
-    "colorette": "^2.0.20",
-    "commander": "^14.0.2",
-    "cors": "^2.8.6",
-    "date-fns": "^2.30.0",
-    "emoji-regex": "^8.0.0",
-    "environment": "^1.1.0",
-    "escalade": "^3.2.0",
-    "eventemitter3": "^5.0.1",
-    "express": "^5.2.1",
-    "fill-range": "^7.1.1",
-    "get-caller-file": "^2.0.5",
-    "get-east-asian-width": "^1.4.0",
-    "has-flag": "^4.0.0",
-    "is-fullwidth-code-point": "^3.0.0",
-    "is-number": "^7.0.0",
-    "listr2": "^9.0.5",
-    "lodash": "^4.17.21",
-    "log-update": "^6.1.0",
-    "micromatch": "^4.0.8",
-    "mimic-function": "^5.0.1",
-    "mongoose": "^8.21.1",
-    "nano-spawn": "^2.0.0",
-    "onetime": "^7.0.0",
-    "picomatch": "^2.3.1",
-    "pidtree": "^0.6.0",
-    "require-directory": "^2.1.1",
-    "restore-cursor": "^5.1.0",
-    "rfdc": "^1.4.1",
-    "rxjs": "^7.8.2",
-    "shell-quote": "^1.8.3",
-    "signal-exit": "^4.1.0",
-    "slice-ansi": "^7.1.2",
-    "spawn-command": "^0.0.2",
-    "string-argv": "^0.3.2",
-    "string-width": "^4.2.3",
-    "strip-ansi": "^6.0.1",
-    "supports-color": "^8.1.1",
-    "to-regex-range": "^5.0.1",
-    "tree-kill": "^1.2.2",
-    "tslib": "^2.8.1",
-    "wrap-ansi": "^7.0.0",
-    "y18n": "^5.0.8",
-    "yaml": "^2.8.2",
-    "yargs": "^17.7.2",
-    "yargs-parser": "^21.1.1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/cyranoaladin/journey-simulator.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/cyranoaladin/journey-simulator/issues"
-  },
-  "homepage": "https://github.com/cyranoaladin/journey-simulator#readme"
+  }
 }

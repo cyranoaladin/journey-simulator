@@ -365,7 +365,7 @@ Money Factory AI (MFAI) est une plateforme d'orchestration multi-agents (Zyno) c
 
 - ✅ Node.js >= 18.0.0
 - ✅ Express.js (API routes)
-- ✅ MongoDB (optionnel, pour persistence)
+- ✅ PostgreSQL + Redis (pour persistence et cache)
 - ✅ OpenAI API (optionnel, pour LLM réel)
 - ✅ RAG Service (optionnel, fallback local disponible)
 

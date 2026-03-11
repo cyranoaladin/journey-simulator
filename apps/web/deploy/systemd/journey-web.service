@@ -1,0 +1,14 @@
+[Unit]
+Description=Journey Web Next.js
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/alaeddine/Documents/journey_mfai_back_front/web
+ExecStart=/usr/bin/npm start --silent
+Environment=NODE_ENV=production
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

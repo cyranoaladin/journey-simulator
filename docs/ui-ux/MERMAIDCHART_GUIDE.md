@@ -59,7 +59,7 @@ graph TD
 graph TB
     subgraph "Monorepo Structure"
         A[journey-simulator<br/>React 19 + Vite]
-        B[mf-back<br/>Express + MongoDB]
+        B[mf-back<br/>Express + PostgreSQL]
         C[web<br/>Next.js + Prisma]
     end
 
@@ -68,7 +68,7 @@ graph TB
     C -->|Transactions| D[Solana Blockchain]
     E[User Wallet] -->|Sign| D
 
-    B -->|Stores Progress| F[MongoDB]
+    B -->|Stores Progress| F[PostgreSQL]
     C -->|Stores Users| G[PostgreSQL]
     C -->|Queue Jobs| H[Redis + BullMQ]
 
@@ -348,7 +348,7 @@ sequenceDiagram
     participant Store as Zustand Store
     participant API as mf-back API
     participant Z as Zyno
-    participant DB as MongoDB
+    participant DB as PostgreSQL
 
     U->>JS: Submit Mission
     JS->>Store: runInteractiveStep()

@@ -1,90 +1,223 @@
-# ===== MFAI Monorepo .gitignore (Optimized for Zenflow) =====
+# =============================================================================
+# Money Factory AI - Global .gitignore
+# Professional Monorepo Configuration
+# =============================================================================
 
-# --- 1. Logs & Runtime ---
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-logs/
-*.pid
-nohup.out
-backend.log
-
-# --- 2. Zenflow & AI Context (CRITICAL) ---
-# Le "Cerveau" local ne doit pas être commité pour éviter les conflits entre dévs
-.zenflow_context.md
-# On ignore les dossiers de travail temporaires des agents (sauf les workflows)
-.antigravity/
-.serena/
-.cursor/
-.cursorrules
-.gemini/
-
-# --- 3. Data & Storage (CRITICAL) ---
-# Protection absolue de la base de données locale
-data/
-**/dev.db
-**/*.sqlite
-prisma/dev.db
-prisma/*.db
-backups/
-dump/
-tmp/
-
-# --- 4. Environment & Secrets ---
+# -----------------------------------------------------------------------------
+# 1. ENVIRONMENT & SECRETS (CRITICAL)
+# -----------------------------------------------------------------------------
 .env
 .env.*
 !.env.example
 !.env.sample
+!.env.test
 .secrets-backup/
-web/minter.json
+**/*.pem
+**/*.key
+**/credentials.json
 
-# --- 5. Node / Build / Dependencies ---
+# -----------------------------------------------------------------------------
+# 2. DEPENDENCIES
+# -----------------------------------------------------------------------------
 node_modules/
+**/.pnp
+.pnp.js
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.package-lock.json
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# -----------------------------------------------------------------------------
+# 3. BUILD OUTPUTS
+# -----------------------------------------------------------------------------
 dist/
 build/
 .next/
-.next_trash/
-.nyc_output/
+.out/
+.nuxt/
 .cache/
-.turbo/
+.parcel-cache/
+.vite/
+.vitepress/dist
+**/*.tsbuildinfo
 
-# --- 6. Tests & Coverage ---
+# -----------------------------------------------------------------------------
+# 4. LOGS & RUNTIME
+# -----------------------------------------------------------------------------
+*.log
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+logs/
+*.pid
+*.seed
+*.pid.lock
+nohup.out
+
+# -----------------------------------------------------------------------------
+# 5. TESTING & COVERAGE
+# -----------------------------------------------------------------------------
 coverage/
+.nyc_output/
 test-results/
 playwright-report/
 blob-report/
 artifacts/
-cypress/videos/
-cypress/screenshots/
 *.trace
 trace.zip
 video.webm
+cypress/videos/
+cypress/screenshots/
+.jest/
 
-# --- 7. Debug Reports & Temporary Files ---
+# -----------------------------------------------------------------------------
+# 6. DATABASE & STORAGE
+# -----------------------------------------------------------------------------
+*.sqlite
+*.sqlite3
+*.db
+data/
+db/
+postgres-data/
+mongodb-data/
+redis-data/
+backups/
+dump/
+
+# -----------------------------------------------------------------------------
+# 7. IDE & EDITORS
+# -----------------------------------------------------------------------------
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+
+# -----------------------------------------------------------------------------
+# 8. INFRASTRUCTURE & DEPLOYMENT
+# -----------------------------------------------------------------------------
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+.terraform.lock.hcl
+terraform.rc
+
+# Kubernetes secrets
+**/secrets.yaml
+**/secrets.yml
+**/secret.yaml
+**/secret.yml
+**/*-secret*.yaml
+**/*-secret*.yml
+
+# Docker
+.dockerignore
+
+# -----------------------------------------------------------------------------
+# 9. AI/ML MODELS & CACHE
+# -----------------------------------------------------------------------------
+models/
+model/
+*.onnx
+*.pt
+*.pth
+*.h5
+*.pb
+*.tflite
+*.mlmodel
+
+# -----------------------------------------------------------------------------
+# 10. ARCHIVES & TEMP FILES
+# -----------------------------------------------------------------------------
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.rar
+*.7z
+*.bz2
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+tmp/
+temp/
+.tmp/
+
+# -----------------------------------------------------------------------------
+# 11. PROJECT SPECIFIC
+# -----------------------------------------------------------------------------
+
+# Solana
+web/minter.json
+**/minter.json
+
+# Generated files
+arborescence.txt
+tous_les_markdowns.txt
+verification_proof.txt
 suprem_audit_*.txt
 routes_visited*.txt
 e2e_json_counts*.txt
 sha256.txt
 zero_byte_files.txt
 list_tests.txt
-mf-back/memory/agent_metrics.log.json
-qa-report.md
-task.md
+
+# Phase execution logs
+**/*phase*_execution*.log
+**/*files_list*.log
+
+# Agent metrics
+**/agent_metrics.log.json
+
+# QA/Task files
 **/qa-report.md
 **/task.md
 **/*qa_report*
 **/*task_*
-**/*phase*_execution*.log
-**/*files_list*.log
 
-# --- 8. IDE & System ---
-.vscode/
-.idea/
-*.swp
-.DS_Store
-Thumbs.db
-*.tar.gz
-*.tar
-*.bak
-.zenflow/
+# -----------------------------------------------------------------------------
+# 12. ALLOW LIST (DO NOT IGNORE)
+# -----------------------------------------------------------------------------
+
+# Keep example configs
+!.env.example
+!.env.test
+
+# Keep documentation
+!docs/**/*.md
+
+# Keep infrastructure templates
+!infra/**/*.yaml
+!infra/**/*.yml
+!infra/**/*.json
+
+# Keep scripts
+!scripts/**/*.sh
+!scripts/**/*.js
+!scripts/**/*.ts
+web/minter.json
+apps/web/minter.json
+minter.json

@@ -54,7 +54,7 @@ graph TB
     end
 
     subgraph "Backend Services"
-        JOURNEY -->|API Calls| API[mf-back API<br/>Express + MongoDB]
+        JOURNEY -->|API Calls| API[mf-back API<br/>Express + PostgreSQL]
         API -->|Orchestrates| ZYNO[Zyno Orchestrator<br/>23 AI Agents]
         ZYNO -->|Queries| OPENAI[OpenAI GPT-4o]
         ZYNO -->|Returns| BLOCKS[UI Blocks<br/>15 Types Dynamic]
@@ -89,7 +89,7 @@ graph LR
 
     subgraph "mf-back<br/>Backend API"
         MB1[Express 4.21]
-        MB2[MongoDB + Mongoose]
+        MB2[PostgreSQL + Prisma]
         MB3[Zyno Orchestrator]
         MB4[23 AI Agents]
         MB5[OpenAI Integration]

@@ -14,13 +14,18 @@ import { cookies } from 'next/headers'
 // In production, use a real auth library like NextAuth or IronSession
 import crypto from 'crypto'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-change-me-in-prod'
+// SECURITY FIX 2026-03-11: Fail explicitly if JWT_SECRET is not set
+const JWT_SECRET = process.env.JWT_SECRET
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required. Set it in .env file.')
+}
 
 function signSession(payload: any) {
   const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url')
   const body = Buffer.from(JSON.stringify(payload)).toString('base64url')
+  const secret = JWT_SECRET! // Already validated at module load
   const signature = crypto
-    .createHmac('sha256', JWT_SECRET)
+    .createHmac('sha256', secret)
     .update(`${header}.${body}`)
     .digest('base64url')
   return `${header}.${body}.${signature}`
