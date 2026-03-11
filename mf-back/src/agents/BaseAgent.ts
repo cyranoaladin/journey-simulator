@@ -13,6 +13,8 @@ import {
   DEFAULT_TEMPERATURE,
   DEFAULT_MAX_TOKENS 
 } from '../llm/OpenAIClient';
+import { routeWithFallback, buildMFAISystemMessage, LLMMessage as RouterMessage } from '../services/llmRouter';
+import { traceAgentRun } from '../services/observability';
 
 const prisma = new PrismaClient();
 
@@ -245,12 +247,21 @@ class BaseAgent {
         });
 
         const runWithValidation = async (attemptMessages: any[], attemptLabel: string) => {
-            const response = await callLLM({
-                model: llmOptions.model || DEFAULT_LLM_MODEL,
-                temperature: llmOptions.temperature || DEFAULT_LLM_TEMPERATURE,
-                maxTokens: llmOptions.maxOutputTokens || DEFAULT_LLM_MAX_OUTPUT_TOKENS,
-                messages: attemptMessages as LLMMessage[],
-            });
+            // Utiliser le LLM Router avec fallback multi-modèle
+            const response = await routeWithFallback(
+                attemptMessages as RouterMessage[],
+                {
+                    taskType: 'reasoning',
+                    maxTokens: llmOptions.maxOutputTokens || DEFAULT_LLM_MAX_OUTPUT_TOKENS,
+                    temperature: llmOptions.temperature || DEFAULT_LLM_TEMPERATURE,
+                    throwOnFailure: false, // Retourner fallback au lieu de throw
+                }
+            );
+            
+            if (!response) {
+                throw new Error('LLM Router returned null response');
+            }
+            
             const message = { content: response.content };
             const text = response.content || "";
             let rawPayload;
@@ -262,7 +273,7 @@ class BaseAgent {
             const payloadWithReasoning = enforceReasoning(rawPayload, text);
             const payload = sanitizeDiagramFields(payloadWithReasoning);
             const validation = validatePayloadShape(payload);
-            return { message, text, payload, validation, attemptLabel };
+            return { message, text, payload, validation, attemptLabel, fallback: response.fallback };
         };
 
         let attemptMessages = [...messages];
@@ -315,6 +326,20 @@ class BaseAgent {
 
             await this.updateAgentRun(agentRunId, 'succeeded', startTime, { raw: text, payload: resultPayload });
 
+            // Tracing non-bloquant pour LangFuse observability
+            const _runEnd = Date.now();
+            traceAgentRun(
+                { userId: ctx.userId, journeyId: ctx.journeyId },
+                {
+                    agentName: (this as any).agentId ?? this.constructor.name,
+                    model: llmOptions.model ?? 'unknown',
+                    input: { userPrompt: userPrompt.substring(0, 500) },
+                    output: resultPayload,
+                    durationMs: _runEnd - startTime,
+                    success: true,
+                }
+            ).catch(() => {});
+
             return {
                 rawMessage: message,
                 payload: resultPayload,
@@ -323,6 +348,21 @@ class BaseAgent {
             };
         } catch (err: any) {
             await this.updateAgentRun(agentRunId, 'failed', startTime, null, err);
+
+            // Tracing erreur non-bloquant
+            traceAgentRun(
+                { userId: ctx.userId, journeyId: ctx.journeyId },
+                {
+                    agentName: (this as any).agentId ?? this.constructor.name,
+                    model: llmOptions?.model ?? 'unknown',
+                    input: { userPrompt: userPrompt?.substring(0, 500) ?? '' },
+                    output: null,
+                    durationMs: Date.now() - startTime,
+                    success: false,
+                    error: err instanceof Error ? err.message : String(err),
+                }
+            ).catch(() => {});
+
             throw err;
         }
     }
