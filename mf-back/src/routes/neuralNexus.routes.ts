@@ -18,4 +18,11 @@ router.post('/query', NeuralNexusController.queryAgent);
 router.get('/logs', protect, NeuralNexusController.getLogs);
 router.post('/seed', protect, NeuralNexusController.seedKnowledgeBase);
 
+/**
+ * GET /neural-nexus/documents
+ * Liste les documents indexés dans la base de connaissances RAG
+ * Alias attendu par le frontend: /resources/rag
+ */
+router.get('/documents', protect, NeuralNexusController.listDocuments);
+
 export default router;

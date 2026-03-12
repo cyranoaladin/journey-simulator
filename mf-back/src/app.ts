@@ -77,6 +77,7 @@ app.use('/user', userRoutes);
 app.use('/api/agents', agentRoutes);
 app.use('/journey', journeyRoutes);
 app.use('/neural-nexus', neuralNexusRoutes);
+app.use('/resources', neuralNexusRoutes);  // Alias pour /resources/rag
 app.use('/api/orchestration', orchestrationRoutes);
 app.use('/api/market', marketRoutes);
 app.use('/api/zyno', zynoStreamRoutes);

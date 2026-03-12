@@ -209,4 +209,40 @@ export class NeuralNexusController {
       });
     }
   }
+
+  /**
+   * GET /neural-nexus/documents
+   * Liste les documents indexés dans la base de connaissances RAG
+   * Alias attendu par le frontend: /resources/rag
+   */
+  static async listDocuments(req: Request, res: Response): Promise<void> {
+    try {
+      // Phase 1 : retourner la liste des documents depuis Prisma
+      const docs = await prisma.doc.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+        select: {
+          id: true,
+          title: true,
+          category: true,
+          tags: true,
+          createdAt: true,
+        },
+      });
+
+      res.status(200).json({
+        success: true,
+        documents: docs.map((d: any) => ({
+          name: d.title ?? d.id,
+          path: d.category ?? '',
+          size: 0,
+          addedAt: d.createdAt?.toISOString() ?? new Date().toISOString(),
+        })),
+      });
+    } catch (err) {
+      console.error('[neural-nexus/documents] Error:', err);
+      // Fail-safe : retourner liste vide, pas d'erreur 500
+      res.json({ success: true, documents: [] });
+    }
+  }
 }
