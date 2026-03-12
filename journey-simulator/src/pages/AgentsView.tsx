@@ -167,10 +167,11 @@ export default function AgentsView() {
             type: run.agentType === 'LLM' ? 'llm' : 'stub',
             status: run.status === 'succeeded' ? 'running' : 
                    run.status === 'failed' ? 'error' : 'paused',
-            aepo: Math.floor(Math.random() * 30) + 70, // TODO: real AEPO from API
-            apy: Math.random() * 40 + 5,
+            // TODO: connecter GET /api/agents/stats quand la Tâche 4 est testée
+            aepo: [82, 75, 91, 68, 88, 74, 95, 79][i % 8],
+            apy: [12.4, 8.7, 22.1, 5.3, 18.6, 9.9, 31.2, 14.0][i % 8],
             lastRun: run.createdAt ? new Date(run.createdAt).toLocaleTimeString() : 'N/A',
-            pnl: (Math.random() - 0.3) * 1000,
+            pnl: [340, -120, 890, -45, 620, 180, -230, 510][i % 8],
             model: run.model,
           }));
           if (mappedAgents.length > 0) {
