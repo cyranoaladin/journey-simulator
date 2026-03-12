@@ -54,20 +54,23 @@ interface ModelConfig {
 
 const MODEL_CHAINS: Record<TaskType, ModelConfig[]> = {
   reasoning: [
+    { provider: 'anthropic', modelId: 'claude-3-5-sonnet-20241022', apiKeyEnv: 'ANTHROPIC_API_KEY' },
     { provider: 'openai', modelId: 'gpt-4o', apiKeyEnv: 'OPENAI_API_KEY' },
-    { provider: 'openai', modelId: 'gpt-4o-mini', apiKeyEnv: 'OPENAI_API_KEY' },
+    { provider: 'google', modelId: 'gemini-1.5-flash', apiKeyEnv: 'GOOGLE_API_KEY' },
   ],
   speed: [
+    { provider: 'google', modelId: 'gemini-1.5-flash', apiKeyEnv: 'GOOGLE_API_KEY' },
     { provider: 'openai', modelId: 'gpt-4o-mini', apiKeyEnv: 'OPENAI_API_KEY' },
-    { provider: 'openai', modelId: 'gpt-4o', apiKeyEnv: 'OPENAI_API_KEY' },
+    { provider: 'anthropic', modelId: 'claude-3-haiku-20240307', apiKeyEnv: 'ANTHROPIC_API_KEY' },
   ],
   code: [
     { provider: 'openai', modelId: 'gpt-4o', apiKeyEnv: 'OPENAI_API_KEY' },
-    { provider: 'openai', modelId: 'gpt-4o-mini', apiKeyEnv: 'OPENAI_API_KEY' },
+    { provider: 'anthropic', modelId: 'claude-3-5-sonnet-20241022', apiKeyEnv: 'ANTHROPIC_API_KEY' },
+    { provider: 'google', modelId: 'gemini-1.5-pro', apiKeyEnv: 'GOOGLE_API_KEY' },
   ],
   agent: [
     { provider: 'openai', modelId: 'gpt-4o', apiKeyEnv: 'OPENAI_API_KEY' },
-    { provider: 'openai', modelId: 'gpt-4o-mini', apiKeyEnv: 'OPENAI_API_KEY' },
+    { provider: 'anthropic', modelId: 'claude-3-5-sonnet-20241022', apiKeyEnv: 'ANTHROPIC_API_KEY' },
   ],
 };
 
@@ -138,9 +141,64 @@ export async function routeWithFallback(
           fallback: false,
         };
       }
+
+      if (provider === 'anthropic') {
+        const { default: Anthropic } = await import('@anthropic-ai/sdk');
+        const client = new Anthropic({ apiKey });
+        
+        const systemMessage = messages.find(m => m.role === 'system')?.content;
+        const userMessages = messages.filter(m => m.role !== 'system');
+        
+        const response = await client.messages.create({
+          model: modelId,
+          max_tokens: maxTokens,
+          temperature,
+          system: systemMessage,
+          messages: userMessages.map(m => ({
+            role: m.role as 'user' | 'assistant',
+            content: m.content,
+          })),
+        });
+
+        const content = response.content[0];
+        const textContent = content.type === 'text' ? content.text : '';
+        
+        return {
+          content: textContent,
+          model: response.model,
+          usage: {
+            promptTokens: response.usage.input_tokens || 0,
+            completionTokens: response.usage.output_tokens || 0,
+            totalTokens: (response.usage.input_tokens + response.usage.output_tokens) || 0,
+          },
+          latencyMs: Date.now() - startTime,
+          fallback: false,
+        };
+      }
+
+      if (provider === 'google') {
+        const { GoogleGenerativeAI } = await import('@google/generative-ai');
+        const genai = new GoogleGenerativeAI(apiKey);
+        const model = genai.getGenerativeModel({ model: modelId });
+        
+        const prompt = messages.map(m => m.content).join('\n\n');
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
+        
+        return {
+          content: text,
+          model: modelId,
+          usage: {
+            promptTokens: 0, // Gemini ne retourne pas toujours les tokens
+            completionTokens: 0,
+            totalTokens: 0,
+          },
+          latencyMs: Date.now() - startTime,
+          fallback: false,
+        };
+      }
       
-      // TODO: Phase 2 - Ajouter support Anthropic et Google
-      errors.push({ model: modelId, error: 'Provider not yet implemented' });
+      errors.push({ model: modelId, error: 'Unknown provider' });
       
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : String(error);
@@ -300,9 +358,41 @@ export async function checkLLMHealth(): Promise<Record<string, boolean>> {
     results['openai'] = false;
   }
   
-  // TODO: Phase 2 - Check Anthropic and Google
-  results['anthropic'] = false;
-  results['google'] = false;
+  // Check Anthropic
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  if (anthropicKey && anthropicKey !== 'mock-key-safe') {
+    try {
+      const { default: Anthropic } = await import('@anthropic-ai/sdk');
+      const client = new Anthropic({ apiKey: anthropicKey });
+      // Simple API call to verify connectivity
+      await client.messages.create({
+        model: 'claude-3-haiku-20240307',
+        max_tokens: 10,
+        messages: [{ role: 'user', content: 'hi' }],
+      });
+      results['anthropic'] = true;
+    } catch {
+      results['anthropic'] = false;
+    }
+  } else {
+    results['anthropic'] = false;
+  }
+
+  // Check Google
+  const googleKey = process.env.GOOGLE_API_KEY;
+  if (googleKey && googleKey !== 'mock-key-safe') {
+    try {
+      const { GoogleGenerativeAI } = await import('@google/generative-ai');
+      const genai = new GoogleGenerativeAI(googleKey);
+      const model = genai.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      await model.generateContent('hi');
+      results['google'] = true;
+    } catch {
+      results['google'] = false;
+    }
+  } else {
+    results['google'] = false;
+  }
   
   return results;
 }

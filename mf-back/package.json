@@ -23,6 +23,8 @@
     "reindex": "npx tsx scripts/reindex-knowledge-base.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
+    "@google/generative-ai": "^0.24.1",
     "@lightprotocol/stateless.js": "^0.20.9",
     "@metaplex-foundation/mpl-token-metadata": "^3.4.0",
     "@metaplex-foundation/umi": "^1.4.1",
