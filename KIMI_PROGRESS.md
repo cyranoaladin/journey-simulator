@@ -573,4 +573,104 @@ MFAI_GOVERNANCE_REALM_PK=     # Adresse Realm (Realms)
 
 ---
 
+---
+
+## ✅ SESSION 8 — Audit & Corrections Critiques (2026-03-12)
+
+### Gaps identifiés lors de l'audit
+
+| # | Gap | Impact | Fichier(s) concerné(s) |
+|---|-----|--------|------------------------|
+| 1 | Route `/api/blinks/dao-vote` inexistante | Vote DAO jamais enregistré côté serveur | `DAOView.tsx` (appel silencieux) |
+| 2 | Port fallback `3000` au lieu de `3002` | Échec DAO vote en dev local | `DAOView.tsx:163` |
+| 3 | `account: 'demo-wallet'` hardcodé | Impossible de tracker les votes réels | `DAOView.tsx:168` |
+
+### Corrections appliquées
+
+#### Tâche 1 — Route POST /api/blinks/dao-vote
+**Commit :** `39d789e`
+
+| Élément | Détail |
+|---------|--------|
+| Fichier créé | `mf-back/src/routes/blinks.routes.ts` |
+| Route montée | `app.use('/api/blinks', blinksRoutes)` dans `app.ts` |
+| Validation | `account`, `proposal`, `vote` requis |
+| Simulation | `txHash` déterministe pour Phase 1 |
+| Prêt Phase 3 | Structure pour SPL Governance |
+
+```typescript
+// Requête attendue
+POST /api/blinks/dao-vote
+{
+  "account": "7xKtZ...abc",
+  "proposal": "prop-123",
+  "vote": "for" | "against"
+}
+
+// Réponse
+{
+  "success": true,
+  "data": {
+    "txHash": "sim_dao_a1b2c3d4_f",
+    "account": "7xKtZ...abc",
+    "proposal": "prop-123",
+    "vote": "for",
+    "timestamp": "2026-03-12T16:00:00.000Z"
+  }
+}
+```
+
+#### Tâche 2 — Port fallback corrigé
+**Commit :** `2677048`
+
+```typescript
+// Avant
+const API = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
+
+// Après
+const API = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3002';
+```
+
+**Alignement :** Dashboard.tsx, AgentsView.tsx, AgentHealthCommandCenter.tsx utilisent tous `3002`.
+
+#### Tâche 3 — Wallet réel connecté
+**Commit :** `e2d418c`
+
+```typescript
+// Import ajouté
+import { useWallet } from '@solana/wallet-adapter-react';
+
+// Hook dans le composant
+const { publicKey } = useWallet();
+
+// Body du POST
+body: JSON.stringify({
+  account: publicKey?.toBase58() ?? 'demo-wallet',  // Wallet réel ou fallback
+  proposal: proposalId,
+  vote: forVote ? 'for' : 'against',
+})
+```
+
+**Pattern cohérent :** Identique à `SidebarNew.tsx`, `Dashboard.tsx`, `SkillchainCard.tsx`.
+
+### Vérifications post-correction
+
+| Vérification | Résultat |
+|--------------|----------|
+| `tsc --noEmit` mf-back | ✅ 0 erreur |
+| `tsc --noEmit` journey-simulator | ✅ 0 erreur |
+| Tests npm | ✅ 99/99 passent |
+| Commit atomique par tâche | ✅ 3 commits |
+
+### Impact des corrections
+
+| Métrique | Avant | Après |
+|----------|-------|-------|
+| Route DAO vote | ❌ Inexistante | ✅ Opérationnelle |
+| Port API cohérent | ❌ 3000 (isolé) | ✅ 3002 (standard) |
+| Wallet tracking | ❌ 'demo-wallet' statique | ✅ PublicKey dynamique |
+| Feature DAO | 🟡 Front-only | 🟢 Full-stack |
+
+---
+
 *Dernière mise à jour : 2026-03-12*
