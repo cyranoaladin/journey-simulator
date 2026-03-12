@@ -48,8 +48,20 @@ export async function getWalletStats(walletAddress: string): Promise<WalletStats
       getRecentTransactions(walletAddress, 1),
     ]);
 
-    // Prix SOL approximatif (à remplacer par un vrai oracle/API)
-    const solPriceUSD = 150; // TODO: connecter à un price feed
+    // Prix SOL depuis CoinGecko (public API, fallback 150)
+    let solPriceUSD = 150;
+    try {
+      const priceResp = await fetch(
+        'https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd',
+        { signal: AbortSignal.timeout(3000) }
+      );
+      if (priceResp.ok) {
+        const priceData = await priceResp.json();
+        solPriceUSD = priceData?.solana?.usd ?? 150;
+      }
+    } catch {
+      // Fallback 150 déjà défini
+    }
     
     return {
       balance,

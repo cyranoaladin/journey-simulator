@@ -7,7 +7,7 @@
 import { useWallet } from '@solana/wallet-adapter-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertCircle, Award, Download, ExternalLink, Share2, X, Zap } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { getProofType } from '../data/proofsData';
 import { useJourneyStore } from '../store/journeyStore';
 import { Certificate } from '../types/journey';
@@ -34,6 +34,16 @@ const CertificateModal: React.FC<CertificateModalProps> = ({
   const [showProofModal, setShowProofModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Deterministic token ID based on certificate data
+  const tokenId = useMemo(() => {
+    const base = `${certificate.id}-${certificate.phaseId || ''}-${certificate.earnedAt?.toISOString() || ''}`
+    let hash = 0
+    for (let i = 0; i < base.length; i++) {
+      hash = (hash * 31 + base.charCodeAt(i)) >>> 0
+    }
+    return hash.toString(36).slice(0, 8).toUpperCase().padStart(8, '0')
+  }, [certificate.id, certificate.phaseId, certificate.earnedAt])
 
   const phaseNumber = (() => {
     if (!selectedPersona) return 1;
@@ -331,7 +341,7 @@ const CertificateModal: React.FC<CertificateModalProps> = ({
               <div className="mt-4 p-3 bg-white/5 rounded-lg">
                 <div className="flex justify-between text-xs">
                   <span className="opacity-70">Token ID:</span>
-                  <span className="font-mono">#{Math.random().toString(36).slice(2, 10).toUpperCase()}</span>
+                  <span className="font-mono">#{tokenId}</span>
                 </div>
                 <div className="flex justify-between text-xs mt-1">
                   <span className="opacity-70">Blockchain:</span>

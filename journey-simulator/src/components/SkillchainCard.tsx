@@ -7,7 +7,7 @@
 import { useWallet } from '@solana/wallet-adapter-react';
 import { motion } from 'framer-motion';
 import { AlertCircle, Award, CheckCircle, Coins, Copy, ExternalLink, Lock, Trophy, Unlock } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useJourneyStore } from '../store/journeyStore';
 import { generateStableKey } from '../utils/generateStableKey';
 import './SkillchainCard.css';
@@ -24,6 +24,16 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
   const [isFlipped, setIsFlipped] = useState(false);
   const [copied, setCopied] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
+
+  // Deterministic card ID based on user data (stable across renders)
+  const cardId = useMemo(() => {
+    const base = `${publicKey?.toString() || ''}-${userProgress?.walletAddress || 'anon'}-${selectedPersona?.id || 'default'}`
+    let hash = 0
+    for (let i = 0; i < base.length; i++) {
+      hash = (hash * 31 + base.charCodeAt(i)) >>> 0
+    }
+    return hash.toString(36).slice(0, 8).toUpperCase().padStart(8, '0')
+  }, [publicKey, userProgress?.walletAddress, selectedPersona?.id])
 
   // Listen for wallet errors
   useEffect(() => {
@@ -346,7 +356,7 @@ const SkillchainCard: React.FC<SkillchainCardProps> = ({
 
             {/* Card ID */}
             <div className="mt-4 text-xs text-white/60 font-mono flex justify-between">
-              <span>ID: MFAI-{Math.random().toString(36).slice(2, 10).toUpperCase()}</span>
+              <span>ID: MFAI-{cardId}</span>
               <span>{new Date().toLocaleDateString()}</span>
             </div>
 
