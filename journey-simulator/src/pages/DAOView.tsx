@@ -187,7 +187,7 @@ export default function DAOView() {
     addToast({
       type: 'info',
       title: 'Création de proposal',
-      message: 'Feature à venir dans Phase 3 — SPL Governance',
+      message: 'Feature coming in Phase 3 — SPL Governance',
     });
   };
 

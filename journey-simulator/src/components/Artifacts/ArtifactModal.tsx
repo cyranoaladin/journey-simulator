@@ -103,11 +103,11 @@ export const ArtifactModal: React.FC<ArtifactModalProps> = ({ isOpen, onClose, f
       >
         <motion.div
           initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-          className="w-full h-full max-w-[95vw] max-h-[92vh] bg-[#0A0A1F] border border-purple-500/30 rounded-2xl flex flex-col shadow-2xl overflow-hidden relative"
+          className="w-full h-full max-w-[95vw] max-h-[92vh] bg-void border border-purple-500/30 rounded-2xl flex flex-col shadow-2xl overflow-hidden relative"
           data-testid="artifact-modal"
         >
           {/* Header */}
-          <div className="h-14 border-b border-white/10 flex items-center justify-between px-6 bg-[#13132B]">
+          <div className="h-14 border-b border-white/10 flex items-center justify-between px-6 bg-slate-50">
             <div className="flex items-center gap-3">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
               <h3 className="font-display font-bold text-white tracking-wide">{title}</h3>

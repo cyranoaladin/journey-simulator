@@ -91,8 +91,8 @@ export default function SettingsView() {
     updateWalletConnection(false);
     addToast({
       type: 'info',
-      title: 'Déconnecté',
-      message: 'Votre wallet a été déconnecté',
+      title: 'Disconnected',
+      message: 'Your wallet has been disconnected',
     });
     setShowDisconnectConfirm(false);
   };
@@ -100,8 +100,8 @@ export default function SettingsView() {
   const handleSaveNotifications = () => {
     addToast({
       type: 'success',
-      title: 'Préférences sauvegardées',
-      message: 'Vos préférences de notification ont été mises à jour',
+      title: 'Preferences saved',
+      message: 'Your notification preferences have been updated',
     });
   };
 
@@ -117,16 +117,16 @@ export default function SettingsView() {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="font-display text-3xl font-bold text-ink-50">Paramètres</h1>
+          <h1 className="font-display text-3xl font-bold text-ink-50">Settings</h1>
           <p className="text-ink-400 mt-1">
-            Gérez votre compte, vos notifications et vos préférences
+            Manage your account, notifications and preferences
           </p>
         </div>
 
         {/* Section Compte */}
         <SettingSection
-          title="Compte"
-          description="Vos informations personnelles et wallet connecté"
+          title="Account"
+          description="Your personal information and connected wallet"
           icon={User}
         >
           <div className="space-y-4">
@@ -134,26 +134,26 @@ export default function SettingsView() {
             <div className="flex items-center gap-4 p-4 rounded-xl bg-white/5">
               <ZynoAvatar state="idle" size="lg" />
               <div className="flex-1">
-                <p className="font-semibold text-ink-100">Utilisateur MFAI</p>
+                <p className="font-semibold text-ink-100">MFAI User</p>
                 <p className="text-sm text-ink-400">
                   {walletAddress ? (
                     <span className="font-mono">
                       {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
                     </span>
                   ) : (
-                    'Wallet non connecté'
+                    'Wallet not connected'
                   )}
                 </p>
               </div>
               <Badge variant={walletAddress ? 'success' : 'default'}>
-                {walletAddress ? 'Connecté' : 'Déconnecté'}
+                {walletAddress ? 'Connected' : 'Déconnecté'}
               </Badge>
             </div>
 
             {/* PassLevel */}
             <div className="flex items-center justify-between p-4 rounded-xl bg-white/5">
               <div>
-                <p className="text-sm text-ink-400">Niveau actuel</p>
+                <p className="text-sm text-ink-400">Current Level</p>
                 <p className="font-semibold text-ink-100 mt-1">INTERMEDIATE</p>
               </div>
               <div className="text-right">
@@ -167,16 +167,16 @@ export default function SettingsView() {
         {/* Section Notifications */}
         <SettingSection
           title="Notifications"
-          description="Choisissez quand et comment vous être notifié"
+          description="Choose when and how to be notified"
           icon={Bell}
         >
           <div className="space-y-3">
             {[
-              { key: 'email', label: 'Notifications par email', desc: 'Recevez des mises à jour importantes' },
-              { key: 'push', label: 'Notifications push', desc: 'Alertes en temps réel dans le navigateur' },
-              { key: 'aepoUpdates', label: 'Mises à jour AEPO', desc: 'Quand votre score évolue' },
-              { key: 'agentAlerts', label: 'Alertes agents', desc: 'Notifications de vos agents AI' },
-              { key: 'marketing', label: 'Communications marketing', desc: 'Nouveautés et offres spéciales' },
+              { key: 'email', label: 'Email notifications', desc: 'Receive important updates' },
+              { key: 'push', label: 'Push notifications', desc: 'Real-time browser alerts' },
+              { key: 'aepoUpdates', label: 'AEPO updates', desc: 'When your score evolves' },
+              { key: 'agentAlerts', label: 'Agent alerts', desc: 'Notifications from your AI agents' },
+              { key: 'marketing', label: 'Marketing communications', desc: 'News and special offers' },
             ].map((item) => (
               <div 
                 key={item.key}
@@ -195,15 +195,15 @@ export default function SettingsView() {
           </div>
           <div className="mt-4 flex justify-end">
             <Button variant="gold" size="sm" onClick={handleSaveNotifications}>
-              Sauvegarder
+              Save
             </Button>
           </div>
         </SettingSection>
 
         {/* Section Réseau */}
         <SettingSection
-          title="Réseau"
-          description="Configuration blockchain et environnement"
+          title="Network"
+          description="Blockchain configuration and environment"
           icon={Network}
         >
           <div className="space-y-4">
@@ -211,7 +211,7 @@ export default function SettingsView() {
             <div className="p-4 rounded-xl bg-white/5">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="font-semibold text-ink-100">Réseau Solana</p>
+                  <p className="font-semibold text-ink-100">Solana Network</p>
                   <p className="text-sm text-ink-400">
                     {activeNetwork === 'devnet' ? 'Devnet - Test' : 'Mainnet - Production'}
                   </p>
@@ -245,7 +245,7 @@ export default function SettingsView() {
                     <span className="font-semibold text-ink-100">Devnet</span>
                   </div>
                   <p className="text-xs text-ink-400">
-                    Environnement de test avec SOL gratuit
+                    Test environment with free SOL
                   </p>
                 </button>
 
@@ -253,8 +253,8 @@ export default function SettingsView() {
                   onClick={() => {
                     addToast({
                       type: 'warning',
-                      title: 'Mainnet bientôt disponible',
-                      message: 'La migration mainnet est prévue pour la Phase 5',
+                      title: 'Mainnet coming soon',
+                      message: 'Mainnet migration is scheduled for Phase 5',
                     });
                   }}
                   className={clsx(
@@ -267,19 +267,19 @@ export default function SettingsView() {
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-3 h-3 rounded-full bg-white/20" />
                     <span className="font-semibold text-ink-100">Mainnet</span>
-                    <Badge variant="amber" className="text-2xs">Bientôt</Badge>
+                    <Badge variant="amber" className="text-2xs">Soon</Badge>
                   </div>
                   <p className="text-xs text-ink-400">
-                    Environnement de production (vrai SOL)
+                    Production environment (real SOL)
                   </p>
                 </button>
               </div>
             </div>
 
-            {/* Thème et Langue */}
+            {/* Theme and Language */}
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 rounded-xl bg-white/5">
-                <p className="text-sm font-medium text-ink-200 mb-3">Thème</p>
+                <p className="text-sm font-medium text-ink-200 mb-3">Theme</p>
                 <div className="flex gap-2">
                   {(['dark', 'light', 'auto'] as const).map((t) => (
                     <button
@@ -301,7 +301,7 @@ export default function SettingsView() {
               </div>
 
               <div className="p-4 rounded-xl bg-white/5">
-                <p className="text-sm font-medium text-ink-200 mb-3">Langue</p>
+                <p className="text-sm font-medium text-ink-200 mb-3">Language</p>
                 <div className="flex gap-2">
                   {([
                     { code: 'fr', label: 'FR' },
@@ -329,8 +329,8 @@ export default function SettingsView() {
 
         {/* Section Danger */}
         <SettingSection
-          title="Zone de danger"
-          description="Actions irréversibles pour votre compte"
+          title="Danger Zone"
+          description="Irreversible actions for your account"
           icon={AlertTriangle}
         >
           <div className="space-y-3">
@@ -342,9 +342,9 @@ export default function SettingsView() {
                 <div className="flex items-center gap-3">
                   <LogOut size={20} className="text-coral-400" />
                   <div className="text-left">
-                    <p className="font-semibold text-coral-300">Déconnecter le wallet</p>
+                    <p className="font-semibold text-coral-300">Disconnect wallet</p>
                     <p className="text-xs text-coral-400/70">
-                      Vous devrez reconnecter votre wallet pour utiliser MFAI
+                      You will need to reconnect your wallet to use MFAI
                     </p>
                   </div>
                 </div>
@@ -357,7 +357,7 @@ export default function SettingsView() {
                 className="p-4 rounded-xl bg-coral-400/10 border border-coral-400/30"
               >
                 <p className="text-sm text-coral-200 mb-4">
-                  Êtes-vous sûr de vouloir déconnecter votre wallet ?
+                  Are you sure you want to disconnect your wallet?
                 </p>
                 <div className="flex gap-3">
                   <Button
@@ -365,14 +365,14 @@ export default function SettingsView() {
                     size="sm"
                     onClick={() => setShowDisconnectConfirm(false)}
                   >
-                    Annuler
+                    Cancel
                   </Button>
                   <Button
                     variant="danger"
                     size="sm"
                     onClick={handleDisconnect}
                   >
-                    Confirmer la déconnexion
+                    Confirm disconnect
                   </Button>
                 </div>
               </motion.div>

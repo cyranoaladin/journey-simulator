@@ -24,7 +24,7 @@ export interface AEPOHistoryPoint {
 }
 
 /**
- * Récupère le solde SOL d'un wallet
+ * Fetches the SOL balance for a wallet
  */
 export async function getWalletBalanceSOL(walletAddress: string): Promise<number> {
   try {
@@ -39,7 +39,7 @@ export async function getWalletBalanceSOL(walletAddress: string): Promise<number
 }
 
 /**
- * Récupère les statistiques complètes du wallet
+ * Fetches complete wallet statistics
  */
 export async function getWalletStats(walletAddress: string): Promise<WalletStats> {
   try {
@@ -85,7 +85,7 @@ export async function getWalletStats(walletAddress: string): Promise<WalletStats
 }
 
 /**
- * Récupère l'historique AEPO d'un utilisateur
+ * Fetches AEPO history for a user
  */
 export async function getAEPOHistory(userId?: string): Promise<AEPOHistoryPoint[]> {
   try {
@@ -111,7 +111,7 @@ export async function getAEPOHistory(userId?: string): Promise<AEPOHistoryPoint[
 }
 
 /**
- * Récupère les transactions récentes
+ * Fetches recent transactions
  */
 async function getRecentTransactions(walletAddress: string, limit: number = 10): Promise<any[]> {
   try {
@@ -128,7 +128,7 @@ async function getRecentTransactions(walletAddress: string, limit: number = 10):
 
 /**
  * Génère un historique AEPO mocké déterministe (sans Math.random)
- * Utilisé uniquement en fallback quand le backend est inaccessible ou l'user non connecté.
+ * Used only as fallback when backend is unreachable or user is not connected.
  */
 function generateMockAEPOHistory(seed: number = 42): AEPOHistoryPoint[] {
   const history: AEPOHistoryPoint[] = [];
@@ -140,7 +140,7 @@ function generateMockAEPOHistory(seed: number = 42): AEPOHistoryPoint[] {
     const date = new Date(now);
     date.setDate(date.getDate() - i);
 
-    // Progression linéaire déterministe — pas de Math.random
+    // Deterministic linear progression — no Math.random
     const score = Math.min(100, Math.max(50, base + Math.floor((30 - i) * 0.45)));
 
     history.push({

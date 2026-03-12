@@ -439,7 +439,7 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
     const showLaunchPhase = activePhase.id === 'launch-collaterize' && !isPhaseCompleted;
 
     const renderHeader = () => (
-        <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-white/10 bg-[#0A0A1F]/95 px-6 backdrop-blur">
+        <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-white/10 bg-void/95 px-6 backdrop-blur">
             <div className="flex items-center gap-3">
                 <button
                     onClick={() => (onBack ? onBack() : navigate('/journeys'))}
@@ -681,7 +681,7 @@ const JourneySimulationMode = ({ onBack }: JourneySimulationModeProps) => {
     const primaryNextAction = configuredPhase?.nextActions?.[0] ?? null;
 
     return (
-        <div className="min-h-screen bg-[#0A0A1F] pb-20 font-sans text-white">
+        <div className="min-h-screen bg-void pb-20 font-sans text-white">
             <NeuralOverlay isVisible={isThinking} agentName={currentTask.agent} taskName={currentTask.task} />
             <ArtifactModal isOpen={!!viewingArtifact} onClose={() => setViewingArtifact(null)} fileUrl={viewingArtifact?.fileUrl} title={viewingArtifact?.title} />
             {renderHeader()}

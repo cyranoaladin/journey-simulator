@@ -175,8 +175,8 @@ export default function ProfileView() {
         console.error('Error loading profile:', error);
         addToast({
           type: 'error',
-          title: 'Erreur de chargement',
-          message: 'Impossible de charger vos données de profil',
+          title: 'Loading error',
+          message: 'Unable to load your profile data',
         });
       } finally {
         setIsLoading(false);
@@ -191,8 +191,8 @@ export default function ProfileView() {
       navigator.clipboard.writeText(walletAddress);
       addToast({
         type: 'success',
-        title: 'Adresse copiée',
-        message: 'Votre adresse wallet est dans le presse-papiers',
+        title: 'Address copied',
+        message: 'Your wallet address is in the clipboard',
       });
     }
   };
@@ -226,7 +226,7 @@ export default function ProfileView() {
             <ZynoAvatar state="idle" size="xl" />
             <div>
               <h1 className="font-display text-3xl font-bold text-ink-50">
-                Mon Profil
+                My Profile
               </h1>
               {walletAddress ? (
                 <button
@@ -240,7 +240,7 @@ export default function ProfileView() {
                   <Copy size={12} />
                 </button>
               ) : (
-                <p className="text-sm text-ink-400 mt-1">Wallet non connecté</p>
+                <p className="text-sm text-ink-400 mt-1">Wallet not connected</p>
               )}
             </div>
           </div>
@@ -298,7 +298,7 @@ export default function ProfileView() {
         {/* Stats Grid */}
         <div className="grid grid-cols-4 gap-4">
           <StatCard
-            label="Solde SOL"
+            label="SOL Balance"
             value={isLoading ? '—' : `${stats?.balance.toFixed(4) || '0'} SOL`}
             subtext={isLoading ? undefined : `~$${stats?.balanceInUSD.toFixed(2) || '0'}`}
             icon={Wallet}
@@ -314,9 +314,9 @@ export default function ProfileView() {
             isLoading={isLoading}
           />
           <StatCard
-            label="Score AEPO"
+            label="AEPO Score"
             value={isLoading ? '—' : currentAEPO.toString()}
-            subtext="Sur 100 points"
+            subtext="Out of 100 points"
             icon={TrendingUp}
             color="emerald"
             isLoading={isLoading}
@@ -336,10 +336,10 @@ export default function ProfileView() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="font-display text-xl font-bold text-ink-50">
-                Évolution AEPO
+                AEPO Evolution
               </h2>
               <p className="text-sm text-ink-400 mt-1">
-                Progression sur les 30 derniers jours
+                30-day progress
               </p>
             </div>
             <div className="flex gap-4 text-xs">
@@ -391,10 +391,10 @@ export default function ProfileView() {
             <Card className="p-8 text-center">
               <Award size={48} className="mx-auto text-ink-500 mb-4" />
               <h3 className="text-lg font-semibold text-ink-200 mb-2">
-                Aucune certification encore
+                No certifications yet
               </h3>
               <p className="text-sm text-ink-400 max-w-md mx-auto">
-                Complétez les phases du parcours pour mint vos premiers NFTs Proof-of-Skill™
+                Complete journey phases to mint your first Proof-of-Skill™ NFTs
               </p>
             </Card>
           ) : (

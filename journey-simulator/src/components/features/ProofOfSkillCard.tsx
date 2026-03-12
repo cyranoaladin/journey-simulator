@@ -35,12 +35,12 @@ export function ProofOfSkillCard({
     navigator.clipboard.writeText(blinkUrl).then(() => {
       addToast({
         type: 'success',
-        title: 'Lien copié !',
+        title: 'Link copied!',
         message: 'Le lien Blink est dans votre presse-papiers',
       });
     });
 
-    // Ouvrir dans un nouvel onglet
+    // Open in new tab
     window.open(blinkUrl, '_blank');
   };
 

@@ -127,7 +127,7 @@ const HomePage = () => {
   }, [])
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#0d0d1a] text-white">
+    <div className="relative min-h-screen overflow-hidden bg-void text-white">
       <AnimatedBackground />
 
       <MainNavigation enableWallet={false} />
@@ -260,7 +260,7 @@ const HomePage = () => {
                 <span>Mission control  Solana devnet/testnet</span>
                 <span>DAO readiness 76%</span>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-[#0f0f21]/80 p-5">
+              <div className="rounded-2xl border border-white/10 bg-slate-50/80 p-5">
                 <span className="text-xs font-semibold uppercase tracking-[0.4em] text-white/40">
                   <abbr title={AECO.tooltip} className="cursor-help border-b border-dashed border-white/30">
                     AECO
@@ -272,7 +272,7 @@ const HomePage = () => {
                 <p className="mt-2 text-xs uppercase tracking-[0.3em] text-white/40">AECO feeds treasury and reputation oracles.</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="rounded-2xl border border-white/10 bg-[#0f0f21]/80 p-4">
+                <div className="rounded-2xl border border-white/10 bg-slate-50/80 p-4">
                   <p className="text-xs text-white/50">Builder Agent</p>
                   <p className="mt-2 text-xl font-semibold text-white">Calibrating sprint map</p>
                   <p className="text-xs text-white/40">Next sync: backlog finalization</p>
@@ -283,7 +283,7 @@ const HomePage = () => {
                     directive
                   </p>
                 </div>
-                <div className="rounded-2xl border border-white/10 bg-[#0f0f21]/80 p-4">
+                <div className="rounded-2xl border border-white/10 bg-slate-50/80 p-4">
                   <p className="text-xs text-white/50">Growth Agent</p>
                   <p className="mt-2 text-xl font-semibold text-white">Deploying market loops</p>
                   <p className="text-xs text-white/40">Channels: Solana DeFi, creator hubs</p>
@@ -295,7 +295,7 @@ const HomePage = () => {
                   </p>
                 </div>
               </div>
-              <div className="space-y-2 rounded-2xl border border-white/10 bg-[#0f0f21]/80 p-4">
+              <div className="space-y-2 rounded-2xl border border-white/10 bg-slate-50/80 p-4">
                 <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.35em] text-white/50">
                   <span>Mission timeline</span>
                   <span>T-08 days</span>
@@ -364,7 +364,7 @@ const HomePage = () => {
         </section>
 
         <section id="console" className="relative mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-12">
-          <div className="rounded-3xl border border-white/10 bg-[#101024]/80 p-8 shadow-2xl shadow-indigo-900/50">
+          <div className="rounded-3xl border border-white/10 bg-slate-50/80 p-8 shadow-2xl shadow-surface-lg">
             <div className="flex flex-col gap-8 lg:flex-row lg:items-center">
               <div className="flex-1 space-y-6">
                 <motion.h3
@@ -402,7 +402,7 @@ const HomePage = () => {
 
               <div className="relative flex-1">
                 <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-blue-500/20 blur-3xl" aria-hidden="true" />
-                <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#0f0f21]/80 p-6">
+                <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-50/80 p-6">
                   <AnimatePresence mode="wait">
                     <motion.blockquote
                       key={activePhase.key}
@@ -454,7 +454,7 @@ const HomePage = () => {
         </section>
       </main>
 
-      <footer className="relative z-10 border-t border-white/10 bg-[#0d0d1a]/80 py-10 text-center text-sm text-white/50">
+      <footer className="relative z-10 border-t border-white/10 bg-void/80 py-10 text-center text-sm text-white/50">
         <p className="font-semibold uppercase tracking-[0.3em] text-white/40">Internet Capital Markets for builders. Powered by Solana. Coordinated by AI.</p>
         <p className="mt-3">Money Factory AI Journey Simulator  {new Date().getFullYear()}</p>
       </footer>

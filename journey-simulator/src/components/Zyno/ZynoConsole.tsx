@@ -636,7 +636,7 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
         className="space-y-8"
       >
         {status === 'loading' && (
-          <div className="w-full h-32 rounded-lg overflow-hidden border border-cyan-500/30 shadow-neon bg-[#0B0E14] relative mb-4">
+          <div className="w-full h-32 rounded-lg overflow-hidden border border-cyan-500/30 shadow-neon bg-void relative mb-4">
             <iframe
               src="/neural_swarm.html"
               className="w-full h-full border-none pointer-events-none opacity-80"

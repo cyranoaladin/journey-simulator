@@ -464,7 +464,7 @@ const JourneyDemoMode = ({ onBack: _onBack }: JourneyDemoModeProps) => {
     const showRightPanel = rightPanelOpen && !focusMode;
 
     return (
-        <div className="min-h-screen bg-[#0A0A1F] pb-20 font-sans text-white">
+        <div className="min-h-screen bg-void pb-20 font-sans text-white">
             <NeuralOverlay
                 isVisible={demoState?.status === 'PLAYING'}
                 agentName="Zyno"
@@ -485,7 +485,7 @@ const JourneyDemoMode = ({ onBack: _onBack }: JourneyDemoModeProps) => {
             <ArtifactModal isOpen={!!viewingArtifact} onClose={() => setViewingArtifact(null)} fileUrl={viewingArtifact?.fileUrl} title={viewingArtifact?.title} />
 
             {/* HEADER */}
-            <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-white/10 bg-[#0A0A1F]/95 px-6 backdrop-blur">
+            <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-white/10 bg-void/95 px-6 backdrop-blur">
                 <div className="flex items-center gap-3">
                     <button onClick={handleExitDemo} className="group flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 transition hover:bg-white/10">
                         <ArrowLeft size={14} className="text-white/60 group-hover:text-white" />

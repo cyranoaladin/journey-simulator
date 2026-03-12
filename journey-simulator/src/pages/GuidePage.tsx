@@ -85,7 +85,7 @@ const GuidePage = () => {
   const availableAgents = useMemo(() => agents.filter((a) => a.available !== false), []);
 
   return (
-    <div className="min-h-screen bg-[#0b0b18] text-white">
+    <div className="min-h-screen bg-void text-white">
       <div className="mx-auto flex max-w-6xl flex-col gap-12 px-6 py-12 md:px-12">
         <header className="space-y-4 text-center">
           <p className="text-xs uppercase tracking-[0.3em] text-indigo-300">Zyno Handbook</p>
@@ -123,7 +123,7 @@ const GuidePage = () => {
           ))}
         </section>
 
-        <section className="rounded-2xl border border-white/10 bg-[#101025] p-6">
+        <section className="rounded-2xl border border-white/10 bg-slate-50 p-6">
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-indigo-300">37 Experts</p>
@@ -253,7 +253,7 @@ const GuidePage = () => {
           </div>
         </section>
 
-        <footer className="rounded-2xl border border-white/10 bg-[#0f162a] p-6 text-center">
+        <footer className="rounded-2xl border border-white/10 bg-slate-50 p-6 text-center">
           <p className="text-sm text-white/70">
             Zyno acts as a thought partner: deterministic, traceable, and aligned with the Reality Matrix. Proceed to real execution only when all guardrails are green.
           </p>

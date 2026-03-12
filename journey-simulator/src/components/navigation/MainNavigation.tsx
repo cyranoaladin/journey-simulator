@@ -156,7 +156,7 @@ const MobileStatsBlock = ({ completionRate, userProgress, passBadgeStyles, muted
 
     <div className="flex w-36 flex-col gap-1">
       <span className={`text-[10px] uppercase tracking-[0.2em] ${metricLabelClass}`}>Journey</span>
-      <div className="h-2 rounded-full bg-white/10" aria-label={`Barre de progression: ${completionRate}%`}>
+      <div className="h-2 rounded-full bg-white/10" aria-label={`Progress bar: ${completionRate}%`}>
         <motion.div initial={false} animate={{ width: `${completionRate}%` }} transition={{ duration: 0.6, ease: 'easeOut' }} className="h-full rounded-full bg-gradient-accent" role="progressbar" aria-valuenow={completionRate} aria-valuemin={0} aria-valuemax={100} />
       </div>
       <span className={`text-[11px] ${metricHintClass}`}>{completionRate}% complete</span>

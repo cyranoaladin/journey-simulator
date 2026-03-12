@@ -125,10 +125,10 @@ export function ZynoStreamProvider({ children }: { children: ReactNode }) {
             } else if (data.type === 'done') {
               setIsTyping(false);
             } else if (data.type === 'error') {
-              setError(data.message || 'Erreur de streaming');
+              setError(data.message || 'Streaming error');
               setMessages(prev => prev.map(m =>
                 m.id === assistantMsgId
-                  ? { ...m, content: data.message || 'Erreur lors de la réponse', type: 'error' as const }
+                  ? { ...m, content: data.message || 'Response error', type: 'error' as const }
                   : m
               ));
               setIsTyping(false);
@@ -144,7 +144,7 @@ export function ZynoStreamProvider({ children }: { children: ReactNode }) {
 
       setIsTyping(false);
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Erreur de connexion';
+      const errorMsg = err instanceof Error ? err.message : 'Connection error';
       if (errorMsg !== 'AbortError') {
         setError(errorMsg);
         setMessages(prev => prev.map(m =>

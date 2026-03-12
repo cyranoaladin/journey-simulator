@@ -14,18 +14,18 @@ import type { UserProgress } from '../types/journey';
 
 // Default metrics when no real data available
 const DEFAULT_METRICS = [
-  { label: 'Score AEPO',        value: '74',    suffix: '/100', delta: '+8', icon: TrendingUp, color: 'gold' },
-  { label: 'Agents actifs',     value: '…',     suffix: '',     delta: '+8', icon: Zap,        color: 'cyan' },
-  { label: 'Missions complètes', value: '12',   suffix: '',     delta: '+3', icon: Award,      color: 'emerald' },
-  { label: 'Tx on-chain',       value: '0',     suffix: '',     delta: '—',  icon: Activity,   color: 'ghost' },
+  { label: 'AEPO Score',        value: '74',    suffix: '/100', delta: '+8', icon: TrendingUp, color: 'gold' },
+  { label: 'Active Agents',     value: '…',     suffix: '',     delta: '+8', icon: Zap,        color: 'cyan' },
+  { label: 'Missions Complete', value: '12',   suffix: '',     delta: '+3', icon: Award,      color: 'emerald' },
+  { label: 'On-chain Tx',       value: '0',     suffix: '',     delta: '—',  icon: Activity,   color: 'ghost' },
 ];
 
 const JOURNEY_STEPS = [
   { id: 'learn',    label: 'Learn',    sublabel: 'Fondamentaux',  icon: '📚', status: 'completed' as const },
-  { id: 'build',    label: 'Build',    sublabel: 'En cours',      icon: '🔧', status: 'active' as const },
+  { id: 'build',    label: 'Build',    sublabel: 'In Progress',   icon: '🔧', status: 'active' as const },
   { id: 'prove',    label: 'Prove',    sublabel: 'Certification', icon: '🏅', status: 'locked' as const },
-  { id: 'activate', label: 'Activate', sublabel: 'Déploiement',   icon: '⚡', status: 'locked' as const },
-  { id: 'scale',    label: 'Scale',    sublabel: 'Croissance',    icon: '📈', status: 'locked' as const },
+  { id: 'activate', label: 'Activate', sublabel: 'Deployment',    icon: '⚡', status: 'locked' as const },
+  { id: 'scale',    label: 'Scale',    sublabel: 'Growth',        icon: '📈', status: 'locked' as const },
   { id: 'launch',   label: 'Launch',   sublabel: 'Mainnet',       icon: '🚀', status: 'locked' as const },
 ];
 
@@ -141,7 +141,7 @@ export default function Dashboard() {
       color: 'gold' as const 
     },
     { 
-      label: 'Agents actifs', 
+      label: 'Active Agents', 
       value: agentStats ? agentStats.active.toString() : '30',
       suffix: agentStats ? `/${agentStats.total}` : '/57',
       delta: '+8', 
@@ -149,7 +149,7 @@ export default function Dashboard() {
       color: 'cyan' as const 
     },
     { 
-      label: 'Missions complètes', 
+      label: 'Complete Missions', 
       value: (userProgress.completedPhases?.length || 0).toString(), 
       suffix: '', 
       delta: '+3', 
@@ -193,10 +193,10 @@ export default function Dashboard() {
       >
         <div>
           <h1 className="text-3xl font-display font-bold text-ink-50 tracking-tight mb-1">
-            Tableau de bord
+            Dashboard
           </h1>
           <p className="text-ink-400 text-sm">
-            Protocole actif · Phase Build · devnet
+            Active Protocol · Build Phase · devnet
             <span className="inline-flex items-center gap-1 ml-3 text-emerald-400 text-2xs font-mono">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               Solana devnet
@@ -205,10 +205,10 @@ export default function Dashboard() {
         </div>
         <div className="flex items-center gap-3 flex-shrink-0">
           <Button variant="ghost" size="sm" leftIcon={<Activity size={14} />}>
-            Rapport AEPO
+            AEPO Report
           </Button>
           <Button variant="gold" size="sm" rightIcon={<ArrowRight size={14} />}>
-            Continuer le parcours
+            Continue Journey
           </Button>
         </div>
       </motion.div>
@@ -230,7 +230,7 @@ export default function Dashboard() {
         <Card padding="lg">
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h2 className="text-base font-semibold font-display text-ink-50">Progression du parcours</h2>
+              <h2 className="text-base font-semibold font-display text-ink-50">Journey Progress</h2>
               <p className="text-xs text-ink-400 mt-0.5">
                 Cognitive Activation Protocol™ — Phase {userProgress?.completedPhases?.length || 0}/6
               </p>
@@ -303,9 +303,9 @@ export default function Dashboard() {
       <div className="grid grid-cols-3 gap-4 stagger">
         <Card padding="md">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-ink-50">Agents actifs</h3>
+            <h3 className="text-sm font-semibold text-ink-50">Active Agents</h3>
             <Badge variant="cyan" dot>
-              {agentStats ? `${agentStats.active} actifs` : '30 LLM réels'}
+              {agentStats ? `${agentStats.active} active` : '30 live LLMs'}
             </Badge>
           </div>
           <div className="space-y-2.5">
@@ -328,14 +328,14 @@ export default function Dashboard() {
 
         <Card padding="md">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-ink-50">Prochaines missions</h3>
+            <h3 className="text-sm font-semibold text-ink-50">Next Missions</h3>
             <Badge variant="amber">
-              {nextMissions ? `${nextMissions.filter(m => !m.locked).length} en attente` : '3 en attente'}
+              {nextMissions ? `${nextMissions.filter(m => !m.locked).length} pending` : '3 pending'}
             </Badge>
           </div>
           <div className="space-y-2">
             {(nextMissions ?? [
-              { title: 'Créer un compte PDA',      xp: 150, locked: false },
+              { title: 'Create PDA Account',      xp: 150, locked: false },
               { title: 'Implémenter une instruction', xp: 200, locked: false },
               { title: 'Test de sécurité Anchor',   xp: 300, locked: true },
             ]).map((mission, i) => (
@@ -363,15 +363,15 @@ export default function Dashboard() {
             </div>
             <div>
               <p className="text-sm font-semibold text-ink-50">Zyno recommande</p>
-              <p className="text-2xs text-ink-400">Mise à jour il y a 8min</p>
+              <p className="text-2xs text-ink-400">Updated 8min ago</p>
             </div>
           </div>
           <p className="text-xs text-ink-200 leading-relaxed mb-4">
-            Votre score de maîtrise Web3 ({aepoScore}/100) est {aepoScore >= 70 ? 'excellent' : 'en progression'}. 
-            Concentrez-vous sur la collaboration DAO.
+            Your Web3 mastery score ({aepoScore}/100) is {aepoScore >= 70 ? 'excellent' : 'in progress'}. 
+            Focus on DAO collaboration.
           </p>
           <Button variant="gold" size="sm" fullWidth rightIcon={<Zap size={12} />}>
-            Activer le protocole
+            Activate Protocol
           </Button>
         </Card>
       </div>

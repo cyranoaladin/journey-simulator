@@ -32,9 +32,9 @@ export const JourneyProgressBar: React.FC<Props> = ({ personaId, currentStepId }
       return 'border-accent-cyan bg-accent-cyan text-black shadow-[0_0_20px_rgba(34,211,238,0.4)]';
     }
     if (isCurrent) {
-      return 'border-accent-cyan bg-[#0A0A1F] text-accent-cyan shadow-[0_0_30px_rgba(34,211,238,0.6)] ring-2 ring-accent-cyan/20 ring-offset-2 ring-offset-black';
+      return 'border-accent-cyan bg-void text-accent-cyan shadow-[0_0_30px_rgba(34,211,238,0.6)] ring-2 ring-accent-cyan/20 ring-offset-2 ring-offset-black';
     }
-    return 'border-white/10 bg-[#0A0A1F] text-white/20';
+    return 'border-white/10 bg-void text-white/20';
   };
 
   const getLabelOpacityClass = (isCompleted: boolean, isCurrent: boolean) => {

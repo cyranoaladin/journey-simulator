@@ -92,13 +92,13 @@ export default function FavoritesPage() {
                                             className="px-3 py-2 rounded-md bg-accent-cyan/20 hover:bg-accent-cyan/30 transition-colors flex items-center gap-2 text-sm"
                                         >
                                             <ExternalLink size={14} />
-                                            Ouvrir
+                                            Open
                                         </a>
                                     )}
                                     <button
                                         onClick={() => fav._id && removeFavorite(fav._id)}
                                         className="px-3 py-2 rounded-md bg-red-500/20 hover:bg-red-500/30 transition-colors flex items-center gap-2 text-sm text-red-300"
-                                        title="Retirer des favoris"
+                                        title="Remove from favorites"
                                     >
                                         <Trash2 size={14} />
                                     </button>

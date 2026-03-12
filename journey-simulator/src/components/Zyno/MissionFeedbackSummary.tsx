@@ -124,7 +124,7 @@ export default function MissionFeedbackSummary({ summary }: Props) {
   };
 
   return (
-    <section className="space-y-3 rounded-lg bg-white p-4 shadow dark:bg-slate-900/70">
+    <section className="space-y-3 rounded-lg bg-slate-50 border border-white/8 p-4 shadow-surface">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-xl font-semibold"> Mission Summary</h2>
         <div className="flex items-center gap-2">
@@ -132,7 +132,7 @@ export default function MissionFeedbackSummary({ summary }: Props) {
             type="button"
             onClick={() => exportSummary('pdf')}
             disabled={isExporting || !summary}
-            className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-slate-400/60"
+            className="inline-flex items-center gap-2 rounded-md bg-gold-400 px-3 py-1.5 text-sm font-medium text-void transition hover:bg-gold-300 disabled:cursor-not-allowed disabled:bg-slate-400/60"
           >
             <Download size={16} />
             PDF

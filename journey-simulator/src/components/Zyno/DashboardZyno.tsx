@@ -79,7 +79,7 @@ const DashboardZyno = ({ missionSummary }: DashboardZynoProps) => {
         label: '$MFAI Balance',
         value: userProgress.mfaiTokens.toLocaleString(),
         icon: Coins,
-        tone: 'text-slate-900 text-ink-50',
+        tone: 'text-ink-50',
       },
       {
         label: 'AEPO Score',
@@ -122,7 +122,7 @@ const DashboardZyno = ({ missionSummary }: DashboardZynoProps) => {
     if (isCurrent) {
       return `${base}border-accent/50 bg-accent/10 text-accent`;
     }
-    return `${base}border-slate-200/70 bg-white/80 text-slate-600 border-white/10 bg-slate-100/5 text-ink-50/75`;
+    return `${base}border-white/10 bg-slate-100/5 text-ink-50/75`;
   };
 
   return (
@@ -139,8 +139,8 @@ const DashboardZyno = ({ missionSummary }: DashboardZynoProps) => {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.35em] text-slate-500 text-ink-50/60">{stat.label}</p>
-                  <p className={`mt-3 text-2xl font-semibold text-slate-900 text-ink-50 ${stat.tone ?? ''}`}>{stat.value}</p>
+                  <p className="text-xs uppercase tracking-[0.35em] text-ink-50/60">{stat.label}</p>
+                  <p className={`mt-3 text-2xl font-semibold text-ink-50 ${stat.tone ?? ''}`}>{stat.value}</p>
                 </div>
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/80 text-accent shadow-inner-glow bg-slate-100/5">
                   <Icon size={20} />
@@ -158,8 +158,8 @@ const DashboardZyno = ({ missionSummary }: DashboardZynoProps) => {
       <motion.div initial={containerInitial} whileInView={containerWhileInView} viewport={containerViewport} className="card-surface-layer rounded-3xl p-6 shadow-glass">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-slate-500 text-ink-50/60">Journey Progress</p>
-            <h3 className="mt-2 text-xl font-semibold text-slate-900 text-ink-50 md:text-2xl">
+            <p className="text-xs uppercase tracking-[0.35em] text-ink-50/60">Journey Progress</p>
+            <h3 className="mt-2 text-xl font-semibold text-ink-50 md:text-2xl">
               {selectedPersona?.title ?? 'Select a persona to start your simulation'}
             </h3>
             <p className="mt-2 max-w-2xl text-sm text-slate-600 text-ink-50/75">
@@ -178,7 +178,7 @@ const DashboardZyno = ({ missionSummary }: DashboardZynoProps) => {
               signals.
             </p>
           </div>
-          <div className="w-full max-w-xs rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-inner-glow border-white/10 bg-slate-100/5">
+          <div className="w-full max-w-xs rounded-2xl border border-white/10 bg-slate-100/5 p-4 shadow-inner-glow border-white/10 bg-slate-100/5">
             <div className="flex items-center justify-between text-sm text-slate-600 text-ink-50/80">
               <span>{completionRate}% completed</span>
               <span>
@@ -215,9 +215,9 @@ const DashboardZyno = ({ missionSummary }: DashboardZynoProps) => {
                   <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 text-ink-50/50">
                     Phase {index + 1}
                   </span>
-                  <CalendarDays size={16} className="text-slate-500 text-ink-50/60" />
+                  <CalendarDays size={16} className="text-ink-50/60" />
                 </div>
-                <h4 className="text-base font-semibold text-slate-900 text-ink-50">{phase.title}</h4>
+                <h4 className="text-base font-semibold text-ink-50">{phase.title}</h4>
                 <p className="text-xs text-slate-600 text-ink-50/70">{phase.mission}</p>
                 <div className="mt-auto flex flex-wrap gap-2 text-xs text-slate-600 text-ink-50/60">
                   <span className="rounded-full border border-slate-200/40 px-2 py-0.5 border-white/5">XP {phase.xpReward}</span>
@@ -244,13 +244,13 @@ const DashboardZyno = ({ missionSummary }: DashboardZynoProps) => {
               custom={shouldReduceMotion ? undefined : index}
               variants={shouldReduceMotion ? undefined : cardVariants}
               className={`group relative flex flex-col justify-between gap-4 rounded-3xl border p-6 transition-transform duration-300 hover:border-accent/50 hover:shadow-neon-ring ${shouldReduceMotion ? '' : 'hover:-translate-y-1'
-                } border-slate-200/70 bg-white/80 border-white/10 bg-slate-100/70`}
+                } border-white/10 bg-slate-100/5 border-white/10 bg-slate-100/5`}
             >
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/80 text-accent shadow-inner-glow bg-slate-100/5">
                   <Icon size={18} />
                 </div>
-                <h4 className="text-base font-semibold text-slate-900 text-ink-50">{action.title}</h4>
+                <h4 className="text-base font-semibold text-ink-50">{action.title}</h4>
               </div>
               <p className="text-sm text-slate-600 text-ink-50/75">{action.description}</p>
               <span className="mt-auto inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-accent">

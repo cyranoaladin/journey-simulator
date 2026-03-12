@@ -50,10 +50,10 @@ const ZynoSignalSidebar: React.FC<Props> = ({ className = '' }) => {
         }
         setAgentStats(map)
       })
-      .catch(() => {/* fail-safe — garde les états par défaut */})
+      .catch(() => {/* fail-safe — keeps default states */})
   }, [])
 
-  // Fallback déterministe si API indisponible : tous actifs (meilleur UX que aléatoire)
+  // Deterministic fallback if API unavailable: all active (better UX than random)
   const activeAgents = useMemo(() =>
     agentPalette.map((agent) => ({
       ...agent,

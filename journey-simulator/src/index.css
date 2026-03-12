@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 @import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap');
 
 @tailwind base;
@@ -164,4 +164,40 @@
   .status-live::before   { background: #34D399; box-shadow: 0 0 6px #34D399; }
   .status-pending::before { background: #FBBF24; }
   .status-error::before  { background: #F87171; }
+
+  /* accent-purple CSS variable */
+  :root {
+    --accent-purple: #7C3AED;
+    --accent-purple-dim: rgba(124, 58, 237, 0.15);
+  }
+
+  /* Gradient accent — used by LoginPage, MainNavigation, buttons */
+  .bg-gradient-accent {
+    background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-purple) 100%);
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, #FFD966 0%, #FFB300 50%, #00E5FF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Card surface layer — used by DashboardZyno */
+  .card-surface-layer {
+    background: rgba(30, 35, 51, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(12px);
+  }
+
+  /* Neon border */
+  .neon-border {
+    border: 1px solid rgba(0, 229, 255, 0.4);
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.2);
+  }
+
+  /* bg-primary / text-primary utilities */
+  .bg-primary  { background-color: var(--bg-primary); }
+  .text-primary { color: var(--text-primary); }
 }

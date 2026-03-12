@@ -16,11 +16,16 @@ const config: Config = {
         amber:   { 400: '#FBBF24', 500: '#F59E0B' },
         coral:   { 400: '#F87171', 500: '#EF4444' },
         ink:     { 50: '#F8FAFC', 100: '#E2E8F0', 200: '#94A3B8', 300: '#64748B', 400: '#475569' },
+        accent:  { DEFAULT: '#FFB300', neon: '#00E5FF', dim: 'rgba(255,179,0,0.15)' },
+        purple:  { DEFAULT: '#7C3AED', 400: '#A78BFA', 500: '#8B5CF6', 600: '#7C3AED', dim: 'rgba(124,58,237,0.15)' },
+        success: { DEFAULT: '#10B981', dim: 'rgba(16,185,129,0.12)' },
+        warning: { DEFAULT: '#F59E0B', dim: 'rgba(245,158,11,0.12)' },
       },
       fontFamily: {
         display: ['Clash Display', 'DM Sans', 'system-ui', 'sans-serif'],
         body:    ['DM Sans', 'Inter', 'system-ui', 'sans-serif'],
         mono:    ['JetBrains Mono', 'Fira Code', 'monospace'],
+        space:   ['Space Grotesk', 'Clash Display', 'DM Sans', 'sans-serif'],
       },
       fontSize: {
         '2xs': ['0.625rem', { lineHeight: '1rem' }],
@@ -52,6 +57,10 @@ const config: Config = {
         'surface-lg':  '0 8px 48px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.4)',
         'inner-gold':  'inset 0 0 0 1px rgba(255, 179, 0, 0.4)',
         'inner-cyan':  'inset 0 0 0 1px rgba(0, 229, 255, 0.3)',
+        'neon':         '0 0 12px rgba(0, 229, 255, 0.4), 0 0 40px rgba(0, 229, 255, 0.15)',
+        'neon-ring':    '0 0 0 1px rgba(0, 229, 255, 0.5), 0 0 16px rgba(0, 229, 255, 0.2)',
+        'glass':        '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+        'inner-glow':   'inset 0 0 12px rgba(255, 179, 0, 0.12)',
       },
       borderRadius: {
         'sm':  '6px',

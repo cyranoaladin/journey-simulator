@@ -24,11 +24,11 @@ export function NotFound() {
           404
         </motion.p>
         <h1 className="text-2xl font-display font-bold text-ink-50 mb-3">
-          Protocole introuvable
+          Protocol Not Found
         </h1>
         <p className="text-sm text-ink-400 mb-8 leading-relaxed">
-          Cette adresse n'existe pas dans le protocole MFAI.
-          Retournez au tableau de bord pour continuer votre parcours.
+          This address does not exist in the MFAI protocol.
+          Return to dashboard to continue your journey.
         </p>
         <div className="flex gap-3 justify-center">
           <Button 
@@ -36,14 +36,14 @@ export function NotFound() {
             leftIcon={<Home size={14} />} 
             onClick={() => navigate('/dashboard')}
           >
-            Tableau de bord
+            Dashboard
           </Button>
           <Button 
             variant="ghost" 
             leftIcon={<ArrowLeft size={14} />} 
             onClick={() => navigate(-1)}
           >
-            Retour
+            Back
           </Button>
         </div>
       </motion.div>

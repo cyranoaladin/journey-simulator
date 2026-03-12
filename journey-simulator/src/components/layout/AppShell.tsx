@@ -20,10 +20,10 @@ interface AppShellProps {
   children: ReactNode;
 }
 
-// Navigation items pour la bottom bar mobile
+// Mobile bottom navigation items
 const MOBILE_NAV_ITEMS = [
-  { id: 'dashboard', label: 'Accueil', icon: Home, path: '/dashboard' },
-  { id: 'journey', label: 'Parcours', icon: Route, path: '/journey' },
+  { id: 'dashboard', label: 'Home', icon: Home, path: '/dashboard' },
+  { id: 'journey', label: 'Journey', icon: Route, path: '/journey' },
   { id: 'agents', label: 'Agents', icon: Bot, path: '/agents' },
   { id: 'dao', label: 'DAO', icon: Users, path: '/dao' },
 ];
@@ -38,7 +38,7 @@ export function AppShell({ children }: AppShellProps) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Détection mobile
+  // Mobile detection
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);

@@ -15,11 +15,11 @@ interface SidebarProps {
 }
 
 const NAV_ITEMS = [
-  { id: 'dashboard',  icon: LayoutDashboard, label: 'Dashboard',  sublabel: "Vue d'ensemble" },
-  { id: 'journey',    icon: Compass,          label: 'Mon Parcours', sublabel: 'Progression AEPO' },
-  { id: 'agents',     icon: Bot,              label: 'Agents IA',  sublabel: '30 actifs' },
-  { id: 'dao',        icon: Vote,             label: 'DAO',        sublabel: 'Gouvernance' },
-  { id: 'launchpad',  icon: Rocket,           label: 'Launchpad',  sublabel: 'Projets' },
+  { id: 'dashboard',  icon: LayoutDashboard, label: 'Dashboard',  sublabel: 'Overview' },
+  { id: 'journey',    icon: Compass,          label: 'My Journey', sublabel: 'AEPO Progress' },
+  { id: 'agents',     icon: Bot,              label: 'AI Agents',  sublabel: '30 active' },
+  { id: 'dao',        icon: Vote,             label: 'DAO',        sublabel: 'Governance' },
+  { id: 'launchpad',  icon: Rocket,           label: 'Launchpad',  sublabel: 'Projects' },
 ] as const;
 
 export function SidebarNew({ open, onToggle }: SidebarProps) {
@@ -27,7 +27,7 @@ export function SidebarNew({ open, onToggle }: SidebarProps) {
   const { publicKey, connected } = useWallet();
   const walletAddress = connected && publicKey
     ? `${publicKey.toBase58().slice(0, 4)}...${publicKey.toBase58().slice(-4)}`
-    : 'Non connecté';
+    : 'Not connected';
 
   // Get user progress from journey store
   const userProgress = useJourneyStore(state => state.userProgress);
@@ -128,11 +128,11 @@ export function SidebarNew({ open, onToggle }: SidebarProps) {
 
             <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-ink-300 hover:text-ink-100 hover:bg-white/4 transition-colors text-sm">
               <Settings size={15} />
-              Paramètres
+              Settings
             </button>
             <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-coral-400 hover:bg-coral-500/10 transition-colors text-sm">
               <LogOut size={15} />
-              Déconnexion
+              Sign out
             </button>
           </div>
         </motion.aside>
