@@ -1085,4 +1085,75 @@ grep -rn "Tableau de bord\|Mon Parcours\|Paramètres\|Déconnexion\|Non connect�
 
 ---
 
+## ✅ SESSION 14 — Audit Conformité S13 · Résidus (2026-03-12)
+
+### Contexte
+
+Vérification systématique post-S13 révélant 3 catégories de lacunes : textes français restants, fixes design incomplets, commentaires JSX en français.
+
+### Section A — Textes Français Restants (A1–A8) ✅
+
+| ID | Fichier | Ligne | Correction |
+|---|---|---|---|
+| A1 | SidebarNew.tsx | 86 | `AEPO Score — {passLevel} level` (dynamique) |
+| A2 | SidebarNew.tsx | 121 | `Connected wallet` |
+| A3 | SettingsView.tsx | 149 | `Disconnected` badge |
+| A4 | DAOView.tsx | 181–182 | `Vote recorded / FOR / AGAINST` |
+| A5 | DAOView.tsx | 189 | `Proposal creation` |
+| A6 | Dashboard.tsx | 339–340 | `Implement an instruction` / `Anchor security test` |
+| A7 | useZynoStream.tsx | 152 | `Please try again in a moment` |
+| A8 | MissionFeedbackSummary.tsx | 120 | `Export failed` |
+
+**Résultat : 0 texte français visible dans l'UI**
+
+### Section B — Fixes Design Incomplets (B1–B3) ✅
+
+#### B1 — DashboardZyno.tsx (12 lignes)
+- Suppression classes dupliquées `text-slate-*/bg-white/80` 
+- Conservation uniquement tokens MFAI (`text-ink-*/bg-slate-100/5`)
+
+#### B2 — MissionFeedbackSummary.tsx (9 lignes)
+- Bouton Notion : `indigo` → `cyan` (charte MFAI)
+- Tooltips : `border-slate-300/70 dark:` → `border-white/20`
+- Label API key : `text-slate-500 dark:` → `text-ink-400`
+- Input : `border-slate-300 focus:border-indigo` → `border-white/10 focus:border-cyan-300/50`
+- Erreur : `bg-red-50` → `bg-coral-400/10`
+- Succès : `bg-emerald-50` → `bg-emerald-500/10`
+- Code block : `bg-slate-900` → `bg-void border-white/8`
+
+#### B3 — HomePage.tsx:100
+- Gradient : `from-[#0d0d1a] via-[#14142a]` → `from-void via-slate-50/20`
+
+### Section C — Commentaires Français (C1–C6) ✅
+
+| ID | Fichier | Ligne | Avant | Après |
+|---|---|---|---|---|
+| C1 | AppShell.tsx | 108 | `caché sur mobile` | `hidden on mobile` |
+| C2 | AppShell.tsx | 185 | `contenu adapté` | `adapted content` |
+| C3 | SettingsView.tsx | 203 | `Section Réseau` | `Network section` |
+| C4 | ProfileView.tsx | 407 | `Le plus récent a l'animation` | `Most recent gets the animation` |
+| C5 | ProofOfSkillCard.tsx | 134 | `Métadonnées` | `Metadata` |
+| C6 | solanaAgentService.ts | 136 | `score de base déterministe` | `deterministic base score` |
+
+### Vérifications Finales
+
+```bash
+# TypeScript
+npx tsc --noEmit  # 0 erreurs ✅
+
+# Strings FR résiduels
+grep -rn "Score AEPO\|Niveau intermédiaire\|Wallet connecté\|Déconnecté\|Vote enregistré\|POUR\|CONTRE\|Création de proposal\|Implémenter\|Réessayez\|Export impossible" src/
+# Résultat : 0 occurrences ✅
+
+# Classes non conformes
+grep -rn "bg-white/80\|text-slate-600\|text-slate-500\|border-slate-200\|border-indigo\|text-indigo\|bg-red-50\|bg-emerald-50" src/components/Zyno/
+# Résultat : 0 occurrences ✅
+```
+
+### Commit
+
+`42569fe fix(s14): i18n residuals + design cleanup (A1-C6)`
+
+---
+
 *Dernière mise à jour : 2026-03-12*
