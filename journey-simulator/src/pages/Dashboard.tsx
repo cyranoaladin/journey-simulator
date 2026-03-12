@@ -70,7 +70,11 @@ function MetricCard({ label, value, suffix, delta, icon: Icon, color, isLoading 
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [userProgress, setUserProgress] = useState<UserProgress | null>(null);
-  const [agentStats, setAgentStats] = useState<{ active: number; total: number } | null>(null);
+  const [agentStats, setAgentStats] = useState<{
+    active: number;
+    total: number;
+    agents?: Array<{ name: string; status: string }>;
+  } | null>(null);
   
   // Connect to journeyStore for real data
   const storeUserProgress = useJourneyStore(state => state.userProgress);
@@ -109,7 +113,7 @@ export default function Dashboard() {
       .then(r => r.ok ? r.json() : null)
       .then(d => { 
         if (d?.data) {
-          setAgentStats({ active: d.data.active, total: d.data.total });
+          setAgentStats({ active: d.data.active, total: d.data.total, agents: d.data.agents });
         }
       })
       .catch(() => {}); // fail-safe
@@ -289,15 +293,17 @@ export default function Dashboard() {
         <Card padding="md">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-ink-50">Agents actifs</h3>
-            <Badge variant="cyan" dot>30 LLM réels</Badge>
+            <Badge variant="cyan" dot>
+              {agentStats ? `${agentStats.active} actifs` : '30 LLM réels'}
+            </Badge>
           </div>
           <div className="space-y-2.5">
-            {[
-              { name: 'EvaluationAgent',    status: 'active' },
-              { name: 'SolanaAnchorAgent',  status: 'active' },
-              { name: 'InvestorDemoAgent',  status: 'idle' },
-              { name: 'TokenomicsAgent',    status: 'active' },
-            ].map((a) => (
+            {(agentStats?.agents?.slice(0, 4) ?? [
+              { name: 'EvaluationAgent',   status: 'active' },
+              { name: 'SolanaAnchorAgent', status: 'active' },
+              { name: 'InvestorDemoAgent', status: 'idle' },
+              { name: 'TokenomicsAgent',   status: 'active' },
+            ]).map((a) => (
               <div key={a.name} className="flex items-center gap-2.5">
                 <div className={clsx(
                   'w-2 h-2 rounded-full',
