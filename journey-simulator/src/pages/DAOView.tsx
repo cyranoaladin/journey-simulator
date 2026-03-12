@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ThumbsUp, Clock, CheckCircle2 } from 'lucide-react';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { Card, Badge, ProgressStepper } from '../components/ui';
 import { useToast } from '../contexts/ToastContext';
 import type { JourneyStep } from '../components/ui/ProgressStepper';
@@ -140,6 +141,7 @@ export default function DAOView() {
   const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
   const [proposals, setProposals] = useState<Proposal[]>(MOCK_PROPOSALS);
   const { addToast } = useToast();
+  const { publicKey } = useWallet();
 
   // TODO: connecter useDAOProposals() quand SPL Governance est déployé
   // const { proposals: realProposals, isLoading } = useDAOProposals();
@@ -165,7 +167,7 @@ export default function DAOView() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          account: 'demo-wallet',
+          account: publicKey?.toBase58() ?? 'demo-wallet',
           proposal: proposalId,
           vote: forVote ? 'for' : 'against',
         }),
