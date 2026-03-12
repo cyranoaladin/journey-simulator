@@ -331,7 +331,7 @@ const CertificateModal: React.FC<CertificateModalProps> = ({
               <div className="mt-4 p-3 bg-white/5 rounded-lg">
                 <div className="flex justify-between text-xs">
                   <span className="opacity-70">Token ID:</span>
-                  <span className="font-mono">#{Math.random().toString(36).slice(2, 10).toUpperCase()}</span>
+                  <span className="font-mono">#{mintedAddress ? mintedAddress.slice(0, 8).toUpperCase() : 'PENDING...'}</span>
                 </div>
                 <div className="flex justify-between text-xs mt-1">
                   <span className="opacity-70">Blockchain:</span>

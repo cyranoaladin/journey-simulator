@@ -23,7 +23,7 @@ import {
   X,
   Zap
 } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getPersonaProofData } from '../data/proofsData';
 import { useJourneyStore } from '../store/journeyStore';
 
@@ -283,12 +283,11 @@ const NFTProofModal: React.FC<NFTProofModalProps> = ({
     }
   };
 
-  // Generate token ID
-  const generateTokenId = () => {
-    return `${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
-  };
-
-  const tokenId = generateTokenId();
+  // Deterministic token ID based on mintedAddress or session timestamp
+  const tokenId = useMemo(() => {
+    if (mintedAddress) return mintedAddress.slice(0, 8).toUpperCase();
+    return Date.now().toString(36).slice(-8).toUpperCase();
+  }, [mintedAddress]);
 
   // Handle minting
   const handleMint = async () => {
