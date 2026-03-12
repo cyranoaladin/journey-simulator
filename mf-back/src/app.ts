@@ -28,6 +28,7 @@ import zynoStreamRoutes from './routes/zyno-stream.routes';
 import cnftRoutes from './routes/cnft.routes';
 import splTokenRoutes from './routes/splToken.routes';
 import blinksRoutes from './routes/blinks.routes';
+import solanaRoutes from './routes/solana.routes';
 
 dotenv.config();
 
@@ -81,6 +82,7 @@ app.use('/api/zyno', zynoStreamRoutes);
 app.use('/api/cnft', cnftRoutes);
 app.use('/api/token', splTokenRoutes);
 app.use('/api/blinks', blinksRoutes);
+app.use('/solana/mint', solanaRoutes);
 
 // Error handling
 app.use(notFoundHandler);
