@@ -70,7 +70,8 @@ function MetricCard({ label, value, suffix, delta, icon: Icon, color, isLoading 
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [userProgress, setUserProgress] = useState<UserProgress | null>(null);
-  const [agentStats, setAgentStats] = useState<{ active: number; total: number } | null>(null);
+  const [agentStats, setAgentStats] = useState<{ active: number; total: number; agents?: {name: string; status: string}[] } | null>(null);
+  const [missions, setMissions] = useState<{ id: string; title: string; xp: number; locked: boolean }[] | null>(null);
   
   // Connect to journeyStore for real data
   const storeUserProgress = useJourneyStore(state => state.userProgress);
@@ -109,7 +110,25 @@ export default function Dashboard() {
       .then(r => r.ok ? r.json() : null)
       .then(d => { 
         if (d?.data) {
-          setAgentStats({ active: d.data.active, total: d.data.total });
+          setAgentStats({ 
+            active: d.data.active, 
+            total: d.data.total,
+            agents: d.data.agents,
+          });
+        }
+      })
+      .catch(() => {}); // fail-safe
+  }, []);
+
+  // Load missions from API
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3002'}/api/agents/journey/next-missions`, {
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { 
+        if (d?.data?.missions) {
+          setMissions(d.data.missions);
         }
       })
       .catch(() => {}); // fail-safe
@@ -289,19 +308,21 @@ export default function Dashboard() {
         <Card padding="md">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-ink-50">Agents actifs</h3>
-            <Badge variant="cyan" dot>30 LLM réels</Badge>
+            <Badge variant="cyan" dot>
+              {agentStats ? `${agentStats.active} LLM réels` : '30 LLM réels'}
+            </Badge>
           </div>
           <div className="space-y-2.5">
-            {[
+            {(agentStats?.agents ?? [
               { name: 'EvaluationAgent',    status: 'active' },
               { name: 'SolanaAnchorAgent',  status: 'active' },
               { name: 'InvestorDemoAgent',  status: 'idle' },
               { name: 'TokenomicsAgent',    status: 'active' },
-            ].map((a) => (
+            ]).slice(0, 5).map((a) => (
               <div key={a.name} className="flex items-center gap-2.5">
                 <div className={clsx(
                   'w-2 h-2 rounded-full',
-                  a.status === 'active' ? 'bg-emerald-400' : 'bg-ink-400'
+                  a.status === 'active' ? 'bg-emerald-400' : a.status === 'idle' ? 'bg-amber-400' : 'bg-ink-400'
                 )} />
                 <p className="text-xs text-ink-200 flex-1 font-mono truncate">{a.name}</p>
               </div>
@@ -312,15 +333,17 @@ export default function Dashboard() {
         <Card padding="md">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-ink-50">Prochaines missions</h3>
-            <Badge variant="amber">3 en attente</Badge>
+            <Badge variant="amber">
+              {missions ? `${missions.filter(m => !m.locked).length} en attente` : '3 en attente'}
+            </Badge>
           </div>
           <div className="space-y-2">
-            {[
-              { title: 'Créer un compte PDA',      xp: 150, locked: false },
-              { title: 'Implémenter une instruction', xp: 200, locked: false },
-              { title: 'Test de sécurité Anchor',   xp: 300, locked: true },
-            ].map((mission, i) => (
-              <div key={i} className={clsx(
+            {(missions ?? [
+              { id: '1', title: 'Créer un compte PDA',      xp: 150, locked: false },
+              { id: '2', title: 'Implémenter une instruction', xp: 200, locked: false },
+              { id: '3', title: 'Test de sécurité Anchor',   xp: 300, locked: true },
+            ]).slice(0, 4).map((mission, i) => (
+              <div key={mission.id} className={clsx(
                 'flex items-center gap-3 p-3 rounded-xl border',
                 mission.locked ? 'border-white/5 opacity-40' : 'border-white/8'
               )}>

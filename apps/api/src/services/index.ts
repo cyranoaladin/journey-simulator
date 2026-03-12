@@ -10,7 +10,7 @@ export { AgentMemoryService, agentMemoryService } from './AgentMemoryService';
 export { EvaluationService } from './EvaluationService';
 export { JourneyService } from './JourneyService';
 export { MetricsService } from './MetricsService';
-export { NeuralNexusService } from './neuralNexusService';
+export * as NeuralNexusService from './neuralNexusService';
 export { 
   OrchestrationService,
   handleAgentInteraction,

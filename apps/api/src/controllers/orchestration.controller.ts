@@ -5,7 +5,7 @@
 
 import { Request, Response } from 'express';
 import { MetricsService } from '../services/MetricsService';
-import { handleAgentInteraction } from '../services/OrchestrationService';
+import { handleAgentInteraction } from './agent.controller';
 
 export class OrchestrationController {
 

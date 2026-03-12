@@ -296,7 +296,83 @@ export async function streamLLMResponse(
         return;
       }
       
-      // TODO: Phase 2 - Support streaming pour Anthropic/Google
+      // Anthropic streaming support
+      if (provider === 'anthropic') {
+        const { default: Anthropic } = await import('@anthropic-ai/sdk');
+        const client = new Anthropic({ apiKey });
+        
+        const stream = client.messages.stream({
+          model: modelId,
+          max_tokens: maxTokens,
+          temperature,
+          messages: messages.filter(m => m.role !== 'system').map(m => ({
+            role: m.role as 'user' | 'assistant',
+            content: m.content,
+          })),
+          system: messages.find(m => m.role === 'system')?.content,
+        });
+
+        for await (const event of stream) {
+          if (event.type === 'content_block_delta' && 'delta' in event) {
+            const delta = event.delta as { text?: string };
+            if (delta?.text) {
+              res.write(`data: ${JSON.stringify({ token: delta.text, type: 'token' })}
+
+`);
+            }
+          }
+        }
+
+        res.write(`data: ${JSON.stringify({ type: 'done' })}
+
+`);
+        res.end();
+        return;
+      }
+
+      // Google Gemini streaming support
+      if (provider === 'google') {
+        const { GoogleGenerativeAI } = await import('@google/generative-ai');
+        const client = new GoogleGenerativeAI(apiKey);
+        const model = client.getGenerativeModel({ model: modelId });
+        
+        const systemMsg = messages.find(m => m.role === 'system')?.content;
+        const userMessages = messages.filter(m => m.role !== 'system');
+        
+        // Convert messages to Gemini format
+        const history = userMessages.slice(0, -1).map(m => ({
+          role: m.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: m.content }],
+        }));
+
+        const chat = model.startChat({
+          systemInstruction: systemMsg,
+          generationConfig: {
+            maxOutputTokens: maxTokens,
+            temperature,
+          },
+          history: history.length > 0 ? history : undefined,
+        });
+
+        const lastMsg = userMessages[userMessages.length - 1];
+        const result = await chat.sendMessageStream(lastMsg?.content || '');
+
+        for await (const chunk of result.stream) {
+          const text = chunk.text();
+          if (text) {
+            res.write(`data: ${JSON.stringify({ token: text, type: 'token' })}
+
+`);
+          }
+        }
+
+        res.write(`data: ${JSON.stringify({ type: 'done' })}
+
+`);
+        res.end();
+        return;
+      }
+      
       console.warn(`[LLMRouter Stream] ${modelId} streaming not yet implemented`);
       
     } catch (error) {

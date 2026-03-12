@@ -197,6 +197,107 @@ Use history to continue.`,
       },
     });
   }
+
+  /**
+   * Get recent memories for a user and agent type.
+   * Returns recent messages from all sessions for this user + agent combination.
+   */
+  async getRecentMemories(
+    userId: string,
+    agentType: AgentType,
+    limit = 5
+  ): Promise<Array<{ role: string; content: string; timestamp: Date }>> {
+    const sessions = await prisma.agentSession.findMany({
+      where: {
+        agentType,
+        project: {
+          ownerId: userId,
+        },
+      },
+      take: 5,
+      orderBy: { updatedAt: 'desc' },
+    });
+
+    const sessionIds = sessions.map(s => s.id);
+
+    const messages = await prisma.chatMessage.findMany({
+      where: {
+        sessionId: { in: sessionIds },
+      },
+      orderBy: { timestamp: 'desc' },
+      take: limit,
+    });
+
+    return messages.map(m => ({
+      role: m.role,
+      content: m.content,
+      timestamp: m.timestamp,
+    }));
+  }
+
+  /**
+   * Store a memory (user message + assistant response) in the appropriate session.
+   */
+  async storeMemory(
+    userId: string,
+    agentType: AgentType,
+    userMessage: { role: string; content: string },
+    assistantMessage: { role: string; content: string }
+  ): Promise<void> {
+    // Find or create a session for this user + agent
+    let session = await prisma.agentSession.findFirst({
+      where: {
+        agentType,
+        project: {
+          ownerId: userId,
+        },
+      },
+      orderBy: { updatedAt: 'desc' },
+    });
+
+    if (!session) {
+      // Create a default project and session
+      const defaultUser = await prisma.user.findUnique({ where: { id: userId } });
+      if (!defaultUser) {
+        throw new Error(`User ${userId} not found`);
+      }
+
+      const project = await prisma.project.create({
+        data: {
+          name: `Auto Project ${Date.now()}`,
+          description: 'Auto-created for memory storage',
+          status: 'DRAFT',
+          phase: 'LEARN',
+          ownerId: userId,
+        },
+      });
+
+      session = await prisma.agentSession.create({
+        data: {
+          projectId: project.id,
+          agentType,
+          contextSummary: `Session for ${agentType}`,
+          agentState: { status: 'ACTIVE' },
+        },
+      });
+    }
+
+    // Store both messages
+    await prisma.chatMessage.createMany({
+      data: [
+        {
+          sessionId: session.id,
+          role: userMessage.role as 'user' | 'assistant' | 'system',
+          content: userMessage.content,
+        },
+        {
+          sessionId: session.id,
+          role: assistantMessage.role as 'user' | 'assistant' | 'system',
+          content: assistantMessage.content,
+        },
+      ],
+    });
+  }
 }
 
 // Singleton export
