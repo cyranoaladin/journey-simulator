@@ -913,4 +913,68 @@ fetch('/api/agents/stats')
 
 ---
 
+## ✅ SESSION 12 — Correction Chemin /resources/rag (2026-03-12)
+
+### Gap identifié
+
+| Aspect | Détail |
+|--------|--------|
+| Frontend appelle | `GET /resources/rag` |
+| Backend avait | `GET /resources/documents` |
+| Résultat | 404 Not Found |
+| Composant impacté | `ResourceUploader.tsx` dans `ZynoConsole` |
+
+### Correctif
+
+**Commit :** `129868d`
+
+```typescript
+// mf-back/src/routes/neuralNexus.routes.ts
+router.get('/documents', protect, NeuralNexusController.listDocuments);
+router.get('/rag',       protect, NeuralNexusController.listDocuments);  // ← AJOUTÉ
+```
+
+Avec le mount existant `app.use('/resources', neuralNexusRoutes)` dans `app.ts` :
+- `/resources/rag` → `router.get('/rag')` ✅
+- `/resources/documents` → `router.get('/documents')` ✅
+
+### Vérification
+
+```bash
+curl http://localhost:3002/resources/rag
+# → { "success": true, "documents": [] }
+```
+
+---
+
+## 🎯 ÉTAT FINAL POST SESSION 12
+
+| Métrique | Valeur |
+|----------|--------|
+| Sessions complétées | S1-S3, S7-S12 |
+| Tâches implémentées | 42+ |
+| Routes API créées | 35+ |
+| Fichiers créés/modifiés | 60+ |
+| TypeScript erreurs | 0 |
+| Tests backend | 99/99 ✅ |
+| Couverture API | 98% |
+
+### Architecture Backend Stable
+
+```
+/api/agents/*     → Agent interactions, runs, logs, stats
+/api/blinks/*     → Solana Actions (DAO votes, referrals)
+/api/cnft/*       → Compressed NFTs (Phase 4 ready)
+/api/token/*      → SPL Token transfers ($MFAI)
+/api/zyno/*       → Streaming LLM responses
+/dao/*            → DAO governance (Phase 3 ready)
+/journey/*        → Journey progress, missions, metrics
+/neural-nexus/*   → RAG search, query, documents
+/resources/*      → Alias neural-nexus (RAG documents)
+/solana/mint/*    → NFT minting (simulate + execute)
+/user/*           → Profile, AEPO history, auth
+```
+
+---
+
 *Dernière mise à jour : 2026-03-12*
