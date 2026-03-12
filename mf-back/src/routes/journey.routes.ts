@@ -93,4 +93,55 @@ router.get('/next-missions', (_req: Request, res: Response) => {
   res.json({ success: true, data: missions });
 });
 
+/**
+ * GET /journey/metrics
+ * Retourne le classement AEPO/AECO des utilisateurs (scoreboard)
+ * Accessible sans authentification (données publiques agrégées)
+ * Query params: limit (défaut 20)
+ */
+router.get('/metrics', async (_req: Request, res: Response) => {
+  try {
+    const limit = Math.min(parseInt((_req.query.limit as string) || '20', 10), 100);
+
+    let users: any[] = [];
+
+    try {
+      // Agréger les scores depuis UserProgress
+      const rows = await (prisma as any).userProgress?.findMany({
+        take: limit,
+        orderBy: { aepoScore: 'desc' },
+        select: {
+          userId: true,
+          aepoScore: true,
+          aecoScore: true,
+          updatedAt: true,
+          user: {
+            select: { name: true, walletAddress: true },
+          },
+        },
+      }) ?? [];
+
+      users = rows.map((r: any) => ({
+        userId: r.userId,
+        aepo: r.aepoScore ?? 0,
+        aeco: r.aecoScore ?? 0,
+        historyCount: 0,
+        updatedAt: r.updatedAt?.toISOString() ?? null,
+        profile: {
+          name: r.user?.name ?? 'Anonymous',
+          wallet: r.user?.walletAddress ?? null,
+        },
+      }));
+    } catch {
+      // Table UserProgress absente ou DB indisponible
+      // Retourner un classement vide (fail-safe)
+    }
+
+    return res.json({ success: true, users });
+  } catch (err) {
+    console.error('[journey/metrics] Error:', err);
+    return res.status(500).json({ success: false, error: 'Failed to fetch metrics' });
+  }
+});
+
 export default router;
