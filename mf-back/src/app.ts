@@ -25,6 +25,8 @@ import neuralNexusRoutes from './routes/neuralNexus.routes';
 import orchestrationRoutes from './routes/orchestration.routes';
 import marketRoutes from './routes/market.routes';
 import zynoStreamRoutes from './routes/zyno-stream.routes';
+import cnftRoutes from './routes/cnft.routes';
+import splTokenRoutes from './routes/splToken.routes';
 
 dotenv.config();
 
@@ -75,6 +77,8 @@ app.use('/neural-nexus', neuralNexusRoutes);
 app.use('/api/orchestration', orchestrationRoutes);
 app.use('/api/market', marketRoutes);
 app.use('/api/zyno', zynoStreamRoutes);
+app.use('/api/cnft', cnftRoutes);
+app.use('/api/token', splTokenRoutes);
 
 // Error handling
 app.use(notFoundHandler);
