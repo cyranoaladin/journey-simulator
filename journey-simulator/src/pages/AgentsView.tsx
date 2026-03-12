@@ -155,32 +155,53 @@ export default function AgentsView() {
   useEffect(() => {
     const loadAgents = async () => {
       setIsLoading(true);
+      const API = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3002';
+
+      const FALLBACK_AEPO = [82, 75, 91, 68, 88, 74, 95, 79];
+      const FALLBACK_APY  = [12.4, 8.7, 22.1, 5.3, 18.6, 9.9, 31.2, 14.0];
+      const FALLBACK_PNL  = [340, -120, 890, -45, 620, 180, -230, 510];
+
       try {
-        // TODO: connecter useAgentStats() quand disponible
-        // For now, try to fetch from API
-        const response = await agentsApi.listRuns();
-        if (response.data && Array.isArray(response.data)) {
-          // Map API response to Agent type
-          const mappedAgents: Agent[] = (response.data as any[]).map((run, i) => ({
-            id: run._id || run.id || `agent-${i}`,
-            name: run.agentName || `Agent ${i + 1}`,
-            type: run.agentType === 'LLM' ? 'llm' : 'stub',
-            status: run.status === 'succeeded' ? 'running' : 
-                   run.status === 'failed' ? 'error' : 'paused',
-            // TODO: connecter GET /api/agents/stats quand la Tâche 4 est testée
-            aepo: [82, 75, 91, 68, 88, 74, 95, 79][i % 8],
-            apy: [12.4, 8.7, 22.1, 5.3, 18.6, 9.9, 31.2, 14.0][i % 8],
-            lastRun: run.createdAt ? new Date(run.createdAt).toLocaleTimeString() : 'N/A',
-            pnl: [340, -120, 890, -45, 620, 180, -230, 510][i % 8],
-            model: run.model,
+        const [runsResp, statsResp] = await Promise.allSettled([
+          agentsApi.listRuns(),
+          fetch(`${API}/api/agents/stats`).then(r => r.ok ? r.json() : null),
+        ]);
+
+        const statsAgents: Array<{ name: string; status: string; model?: string }> =
+          statsResp.status === 'fulfilled' && statsResp.value?.data?.agents
+            ? statsResp.value.data.agents : [];
+
+        if (runsResp.status === 'fulfilled' && Array.isArray(runsResp.value?.data) && runsResp.value.data.length > 0) {
+          const mapped: Agent[] = (runsResp.value.data as any[]).map((run, i) => ({
+            id:      run._id || run.id || `agent-${i}`,
+            name:    run.agentName || `Agent ${i + 1}`,
+            type:    run.agentType === 'LLM' ? 'llm' : 'stub',
+            status:  run.status === 'succeeded' ? 'running' : run.status === 'failed' ? 'error' : 'paused',
+            aepo:    run.aepoScore  ?? FALLBACK_AEPO[i % 8],
+            apy:     run.apy        ?? FALLBACK_APY[i % 8],
+            pnl:     run.pnl        ?? FALLBACK_PNL[i % 8],
+            lastRun: run.createdAt  ? new Date(run.createdAt).toLocaleTimeString() : 'N/A',
+            model:   run.model,
           }));
-          if (mappedAgents.length > 0) {
-            setAgents(mappedAgents);
-          }
+          if (mapped.length > 0) { setAgents(mapped); setIsLoading(false); return; }
+        }
+
+        if (statsAgents.length > 0) {
+          const mapped: Agent[] = statsAgents.map((a, i) => ({
+            id:      `stats-${i}`,
+            name:    a.name,
+            type:    'llm',
+            status:  a.status === 'active' ? 'running' : a.status === 'error' ? 'error' : 'paused',
+            aepo:    FALLBACK_AEPO[i % 8],
+            apy:     FALLBACK_APY[i % 8],
+            pnl:     FALLBACK_PNL[i % 8],
+            lastRun: 'N/A',
+            model:   (a as any).model,
+          }));
+          setAgents(mapped);
         }
       } catch (err) {
-        console.warn('Failed to load agents from API, using mock data:', err);
-        // Keep mock data as fallback
+        console.warn('Failed to load agents, using mock data:', err);
       } finally {
         setIsLoading(false);
       }
