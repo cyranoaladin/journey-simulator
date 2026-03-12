@@ -8,6 +8,7 @@
 
 import BaseAgent from './BaseAgent';
 import { routeWithFallback, buildMFAISystemMessage } from '../services/llmRouter';
+import { traceAEPOScore } from '../services/observability';
 
 export interface AEPOScore {
   global_score: number; // 0-100 — affiché dans l'UI dashboard
@@ -101,7 +102,15 @@ Provide a complete AEPOScore JSON with all dimensions scored objectively.`;
 
     try {
       const parsed: AEPOScore = JSON.parse(response.content);
-      return this.validateAndNormalizeScore(parsed);
+      const result = this.validateAndNormalizeScore(parsed);
+      
+      // Trace AEPO score for observability (non-blocking, fail-safe)
+      traceAEPOScore(
+        { userId: input.userId, journeyId: input.journeyId },
+        { global: result.global_score, dimensions: result.dimensions }
+      ).catch(() => {});
+      
+      return result;
     } catch {
       // Si le parsing échoue, extraire les scores ou utiliser fallback
       return this.extractScoreFromText(response.content, input);
@@ -120,7 +129,7 @@ Provide a complete AEPOScore JSON with all dimensions scored objectively.`;
     const artifactBonus = hasArtifacts ? 10 : 0;
     const globalScore = Math.min(100, Math.round(baseScore + artifactBonus));
 
-    return {
+    const result = {
       global_score: globalScore,
       dimensions: {
         execution_quality: Math.min(100, globalScore + 5),
@@ -134,6 +143,14 @@ Provide a complete AEPOScore JSON with all dimensions scored objectively.`;
       proof_of_skill_eligible: globalScore >= 70,
       recommended_agents: ['LearningAgent', 'CoachAgent'],
     };
+    
+    // Trace AEPO score for observability (non-blocking, fail-safe)
+    traceAEPOScore(
+      { userId: input.userId, journeyId: input.journeyId },
+      { global: result.global_score, dimensions: result.dimensions }
+    ).catch(() => {});
+    
+    return result;
   }
 
   /**
