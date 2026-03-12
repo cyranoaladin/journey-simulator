@@ -75,7 +75,7 @@ export class GrowthAgent {
         throw new Error('All LLM providers failed');
       }
 
-      const result: GrowthOutput = JSON.parse(response);
+      const result: GrowthOutput = JSON.parse(response.content);
       
       traceAgentRun(
         { journeyId: 'growth-agent-run' },

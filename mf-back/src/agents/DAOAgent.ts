@@ -69,7 +69,7 @@ export class DAOAgent {
         throw new Error('All LLM providers failed');
       }
 
-      const result: DAOOutput = JSON.parse(response);
+      const result: DAOOutput = JSON.parse(response.content);
       
       // Validation minimale
       if (!result.dao_structure || !result.resources) {

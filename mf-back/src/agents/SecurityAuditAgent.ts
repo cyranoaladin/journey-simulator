@@ -86,7 +86,7 @@ export class SecurityAuditAgent {
         throw new Error('All LLM providers failed');
       }
 
-      const result: SecurityOutput = JSON.parse(response);
+      const result: SecurityOutput = JSON.parse(response.content);
       
       if (result.vulnerabilities.some(v => v.severity === 'CRITICAL')) {
         result.professional_audit_required = true;
