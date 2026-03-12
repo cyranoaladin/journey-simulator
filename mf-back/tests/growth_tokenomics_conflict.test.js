@@ -5,7 +5,14 @@
  */
 
 const GrowthAgent = require('../src/agents/GrowthAgent');
-const TokenomicsAgent = require('../src/agents/TokenomicsAgent');
+
+// Import TokenomicsAgent with explicit path to .js file
+let TokenomicsAgent;
+try {
+  TokenomicsAgent = require('../src/agents/TokenomicsAgent.js');
+} catch (e) {
+  TokenomicsAgent = require('../src/agents/TokenomicsAgent');
+}
 
 describe('Conflict handling between GrowthAgent and TokenomicsAgent', () => {
   it('GrowthAgent returns RISK_REPORT for absurd market cap vs budget', async () => {

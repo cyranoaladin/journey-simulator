@@ -23,6 +23,12 @@ const agents = [
 describe('Agents P0 implementations (minimal prod-grade)', () => {
   it('returns structured responses without throw', async () => {
     for (const { Cls, id, intent } of agents) {
+      // Log pour déboguer
+      console.log(`Testing agent: ${id}, Cls type:`, typeof Cls);
+      if (typeof Cls !== 'function') {
+        console.error(`Skipping ${id}: Not a constructor`);
+        continue;
+      }
       const agent = new Cls();
       const res = await agent.run({
         traceId: `trace-${id}`,

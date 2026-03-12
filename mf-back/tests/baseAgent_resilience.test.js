@@ -4,17 +4,20 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-jest.mock('../src/llm/OpenAIClient', () => {
-  let callCount = 0;
+jest.mock('../src/services/llmRouter', () => {
+  let mockCallCount = 0;
   return {
-    DEFAULT_MODEL: 'mock',
-    DEFAULT_TEMPERATURE: 0,
-    DEFAULT_MAX_TOKENS: 100,
-    callLLM: async ({ messages }) => {
-      callCount += 1;
-      if (callCount === 1) {
-        return { content: '{"status":"ERROR","summary":"bad output"}' }; // callLLM returns { content: string } usually
+    routeWithFallback: async (messages, options) => {
+      mockCallCount += 1;
+      // Simulate error on first call, success on retry
+      if (mockCallCount === 1) {
+        // First call returns an ERROR response
+        return { 
+          content: '{"status":"ERROR","summary":"bad output","reasoning":"Initial error"}',
+          fallback: false,
+        };
       }
+      // Second call (retry) returns success
       return {
         content: JSON.stringify({
           status: 'OK',
@@ -22,11 +25,11 @@ jest.mock('../src/llm/OpenAIClient', () => {
           summary: 'Fixed',
           resources: { diagram: { content: 'graph TD; A-->B;' } },
         }),
+        fallback: false,
       };
     },
-    __reset: () => {
-      callCount = 0;
-    },
+    buildMFAISystemMessage: () => ({ role: 'system', content: 'test' }),
+    __resetMock: () => { mockCallCount = 0; },
   };
 });
 
@@ -39,6 +42,7 @@ jest.mock('../src/rag/ragClient', () => ({
   getRagSnippets: jest.fn().mockResolvedValue([]),
 }));
 
+const { __resetMock } = require('../src/services/llmRouter');
 const BaseAgent = require('../src/agents/BaseAgent');
 
 class TestAgent extends BaseAgent {
@@ -51,10 +55,8 @@ class TestAgent extends BaseAgent {
 }
 
 describe('BaseAgent resilience with auto-reprompt', () => {
-  const { __reset } = require('../src/llm/OpenAIClient');
-
   beforeEach(() => {
-    __reset();
+    __resetMock();
   });
 
   it('re-prompts once when status is ERROR and returns corrected payload', async () => {

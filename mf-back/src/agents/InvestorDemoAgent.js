@@ -33,10 +33,11 @@ class InvestorDemoAgent {
       const prompt = this._buildPrompt(input, context);
 
       // Call LLM
-      const llmResponse = await callLLM([
-        { role: 'system', content: this._getSystemPrompt() },
-        { role: 'user', content: prompt }
-      ], {
+      const llmResponse = await callLLM({
+        messages: [
+          { role: 'system', content: this._getSystemPrompt() },
+          { role: 'user', content: prompt }
+        ],
         temperature: 0.3,
         maxTokens: 2000,
       });
