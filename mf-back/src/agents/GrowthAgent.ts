@@ -15,10 +15,16 @@ export interface GrowthInput {
   targetSize: number;
   budget?: string;
   channels?: string[];
+  input?: string;
+  context?: {
+    projectSpecs?: { supply?: number; price?: number; budget?: number; currency?: string };
+    rag?: { chunks?: unknown[] };
+    history?: unknown[];
+  };
 }
 
 export interface GrowthOutput {
-  status: 'OK' | 'ERROR';
+  status: 'OK' | 'ERROR' | 'RISK';
   summary: string;
   strategy: {
     phases: Array<{
@@ -52,6 +58,35 @@ export class GrowthAgent {
 
   async run(input: GrowthInput): Promise<GrowthOutput> {
     const startTime = Date.now();
+    
+    // Test: Check for unrealistic budget vs market cap (from old agent)
+    const specs = input.context?.projectSpecs;
+    if (specs) {
+      const { supply, price, budget, currency } = specs;
+      const hasNumbers = Number.isFinite(supply) && Number.isFinite(price) && Number.isFinite(budget);
+      const unrealisticBudget = hasNumbers && (supply * price) > (500 * budget);
+      
+      if (unrealisticBudget) {
+        return {
+          status: 'RISK',
+          summary: 'RISK_REPORT: conflicting budget vs goals',
+          strategy: {
+            phases: [],
+          },
+          campaigns: [],
+          incentives: {
+            token_rewards: false,
+            referral_program: false,
+            ambassador_program: false,
+          },
+          metrics: {
+            target_daily_growth: 0,
+            retention_target: 0,
+            engagement_rate: 0,
+          },
+        };
+      }
+    }
     
     try {
       const messages: LLMMessage[] = [

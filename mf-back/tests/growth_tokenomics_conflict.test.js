@@ -4,7 +4,7 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-const GrowthAgent = require('../src/agents/GrowthAgent');
+const { GrowthAgent } = require('../src/agents/GrowthAgent');
 
 // Import TokenomicsAgent with explicit path to .js file
 let TokenomicsAgent;

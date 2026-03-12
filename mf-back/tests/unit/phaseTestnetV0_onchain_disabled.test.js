@@ -1,6 +1,6 @@
 const MintingAgent = require('../../src/agents/MintingAgent');
 const TokenAgent = require('../../src/agents/TokenAgent');
-const DAOAgent = require('../../src/agents/DAOAgent');
+const { DAOAgent } = require('../../src/agents/DAOAgent');
 
 describe('Testnet v0 Global Guard: Onchain Interactions Disabled', () => {
     const ORIGINAL_ENV = process.env;
