@@ -32,7 +32,7 @@ export async function getProofOfSkillNFTs(walletAddress: string): Promise<ProofO
   try {
     // Essayer d'abord l'API backend
     const token = tokenStore.getAccessToken();
-    const response = await fetch(`${API_BASE}/api/nfts/wallet/${walletAddress}`, {
+    const response = await fetch(`${API_BASE}/api/cnft/wallet/${walletAddress}`, {
       headers: {
         ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
       },
