@@ -84,4 +84,13 @@ router.get('/artifacts', protect, JourneyController.getArtifacts);
 router.post('/reset-progress', protect, JourneyController.resetProgress);
 router.get('/user-journeys', protect, JourneyController.getUserJourneys);
 
+router.get('/next-missions', (_req: Request, res: Response) => {
+  const missions = [
+    { title: 'Créer un compte PDA',          xp: 150, locked: false },
+    { title: 'Implémenter une instruction',  xp: 200, locked: false },
+    { title: 'Test de sécurité Anchor',      xp: 300, locked: true  },
+  ];
+  res.json({ success: true, data: missions });
+});
+
 export default router;

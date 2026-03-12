@@ -75,6 +75,9 @@ export default function Dashboard() {
     total: number;
     agents?: Array<{ name: string; status: string }>;
   } | null>(null);
+  const [nextMissions, setNextMissions] = useState<
+    Array<{ title: string; xp: number; locked: boolean }> | null
+  >(null);
   
   // Connect to journeyStore for real data
   const storeUserProgress = useJourneyStore(state => state.userProgress);
@@ -107,7 +110,9 @@ export default function Dashboard() {
 
   // Load agent stats from API
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3002'}/api/agents/stats`, {
+    const API = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3002';
+    
+    fetch(`${API}/api/agents/stats`, {
       headers: { 'Content-Type': 'application/json' },
     })
       .then(r => r.ok ? r.json() : null)
@@ -117,6 +122,12 @@ export default function Dashboard() {
         }
       })
       .catch(() => {}); // fail-safe
+    
+    // Load next missions from API
+    fetch(`${API}/journey/next-missions`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.data) setNextMissions(d.data); })
+      .catch(() => {});
   }, []);
 
   // Build metrics from real data if available
@@ -318,14 +329,16 @@ export default function Dashboard() {
         <Card padding="md">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-ink-50">Prochaines missions</h3>
-            <Badge variant="amber">3 en attente</Badge>
+            <Badge variant="amber">
+              {nextMissions ? `${nextMissions.filter(m => !m.locked).length} en attente` : '3 en attente'}
+            </Badge>
           </div>
           <div className="space-y-2">
-            {[
+            {(nextMissions ?? [
               { title: 'Créer un compte PDA',      xp: 150, locked: false },
               { title: 'Implémenter une instruction', xp: 200, locked: false },
               { title: 'Test de sécurité Anchor',   xp: 300, locked: true },
-            ].map((mission, i) => (
+            ]).map((mission, i) => (
               <div key={i} className={clsx(
                 'flex items-center gap-3 p-3 rounded-xl border',
                 mission.locked ? 'border-white/5 opacity-40' : 'border-white/8'
