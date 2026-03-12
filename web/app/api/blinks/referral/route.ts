@@ -68,22 +68,62 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Phase 1 : Simulation — enregistrer dans DB (à implémenter)
-    // Phase 2 : Transaction réelle de transfer $MFAI
+    // ─── Phase 4 : Transfer réel de $MFAI ────────────────────────────────
+    
+    try {
+      // Appel au backend pour le transfer de récompense
+      const rewardResponse = await fetch(
+        `${process.env.MFAI_API_URL ?? 'http://localhost:3002'}/api/token/reward`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            recipient: account,
+            type: 'referral',
+            amount: 100, // 100 $MFAI pour nouvel utilisateur
+          }),
+        }
+      );
 
-    return NextResponse.json(
-      {
-        message: `✅ Bienvenue dans MFAI ! Parrain: ${ref.slice(0, 8)}... — 100 $MFAI en attente (activation Phase 2)`,
-        simulation: true,
-        details: {
-          newUser: account,
-          referrer: ref,
-          reward: '100 $MFAI',
-          redirectUrl: 'https://journey.mfai.app/onboarding',
+      const rewardResult = await rewardResponse.json();
+
+      if (rewardResult.success) {
+        return NextResponse.json(
+          {
+            message: `✅ Bienvenue dans MFAI ! 100 $MFAI crédités sur ${account.slice(0, 8)}...`,
+            simulation: rewardResult.simulation ?? false,
+            txHash: rewardResult.txHash,
+            details: {
+              newUser: account,
+              referrer: ref,
+              reward: '100 $MFAI',
+              status: rewardResult.simulation ? 'simulation' : 'confirmed',
+              redirectUrl: 'https://journey.mfai.app/onboarding',
+            },
+          },
+          { headers: ACTIONS_HEADERS }
+        );
+      } else {
+        throw new Error(rewardResult.error || 'Transfer failed');
+      }
+    } catch (error) {
+      console.error('[Blink Referral] Erreur:', error);
+      // Fallback simulation si backend indisponible
+      return NextResponse.json(
+        {
+          message: `✅ Bienvenue dans MFAI ! (mode simulation) — Parrain: ${ref.slice(0, 8)}...`,
+          simulation: true,
+          txHash: `sim_${Date.now().toString(16)}`,
+          details: {
+            newUser: account,
+            referrer: ref,
+            reward: '100 $MFAI (simulation)',
+            redirectUrl: 'https://journey.mfai.app/onboarding',
+          },
         },
-      },
-      { headers: ACTIONS_HEADERS }
-    );
+        { headers: ACTIONS_HEADERS }
+      );
+    }
   } catch {
     return NextResponse.json(
       { error: 'Requête invalide' },
