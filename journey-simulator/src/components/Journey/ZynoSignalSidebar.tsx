@@ -4,7 +4,7 @@
  * Contributors: Alaeddine BEN RHOUMA, Kamel BEN RHOUMA, Adem BELHAJAISSA
  */
 
-import { useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { Activity, ShieldCheck, Flame, Loader2, Sparkles } from 'lucide-react'
 import { useJourneyStore } from '../../store/journeyStore'
@@ -34,10 +34,32 @@ const ZynoSignalSidebar: React.FC<Props> = ({ className = '' }) => {
   const totalPhases = persona?.phases.length ?? 0
   const { aepo, aeco, alignment } = deriveJourneySignals(userProgress, totalPhases)
 
-  const activeAgents = useMemo(() => agentPalette.map((agent) => ({
-    ...agent,
-    active: Math.random() > 0.3
-  })), [])
+  const [agentStats, setAgentStats] = useState<Record<string, boolean>>({})
+
+  useEffect(() => {
+    const API_BASE = (import.meta as any).env?.VITE_API_BASE_URL ?? 'http://localhost:3002'
+    fetch(`${API_BASE}/api/agents/stats`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!data?.data?.agents?.length) return
+        // Mapper les labels de la palette sur le statut réel
+        const map: Record<string, boolean> = {
+          Builder: data.data.agents.some((a: any) => /anchor|solana|builder/i.test(a.name) && a.status === 'active'),
+          DAO:     data.data.agents.some((a: any) => /dao|token|governance/i.test(a.name) && a.status === 'active'),
+          Growth:  data.data.agents.some((a: any) => /eval|marketing|growth/i.test(a.name) && a.status === 'active'),
+        }
+        setAgentStats(map)
+      })
+      .catch(() => {/* fail-safe — garde les états par défaut */})
+  }, [])
+
+  // Fallback déterministe si API indisponible : tous actifs (meilleur UX que aléatoire)
+  const activeAgents = useMemo(() =>
+    agentPalette.map((agent) => ({
+      ...agent,
+      active: agentStats[agent.label] ?? true,
+    })),
+  [agentStats])
 
   const containerClass = `fixed right-6 top-24 bottom-6 w-80 glass-effect rounded-3xl border border-white/10 bg-white/5 p-5 shadow-lg backdrop-blur z-40 overflow-y-auto flex flex-col ${className}`.trim()
 
