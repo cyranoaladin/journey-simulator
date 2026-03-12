@@ -48,6 +48,16 @@ export default function AgentHealthCommandCenter() {
         }
     };
 
+    // Deterministic hash function for mock data stability
+    const hashString = (str: string): number => {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = ((hash << 5) - hash) + str.charCodeAt(i);
+            hash = hash & hash;
+        }
+        return Math.abs(hash);
+    };
+
     const generateMockAgents = (): AgentHealth[] => {
         const agentNames = [
             'ZynoAgent', 'HubAgent', 'DeFiAgent', 'SecurityAuditAgent', 'SecurityAgent',
@@ -62,14 +72,21 @@ export default function AgentHealthCommandCenter() {
             'ProductAgent', 'TokenAgent', 'SynthetizerAgent', 'SecurityMasterAgent', 'ResearchAgent', 'CollaterizeAgent'
         ];
 
-        return agentNames.map(name => ({
-            name,
-            status: Math.random() > 0.1 ? 'active' : Math.random() > 0.5 ? 'idle' : 'error',
-            lastResponseTime: Math.random() * 3000,
-            ragActive: Math.random() > 0.6,
-            requestCount: Math.floor(Math.random() * 1000),
-            errorCount: Math.floor(Math.random() * 10)
-        }));
+        // Use deterministic hash instead of Math.random for stable mock data
+        const now = Date.now();
+        return agentNames.map((name, index) => {
+            const hash = hashString(`${name}-${now}-${index}`);
+            const statusRoll = hash % 100;
+            const status = statusRoll > 10 ? 'active' : statusRoll > 5 ? 'idle' : 'error';
+            return {
+                name,
+                status,
+                lastResponseTime: (hash % 3000) + 200,
+                ragActive: (hash % 100) > 60,
+                requestCount: hash % 1000,
+                errorCount: status === 'error' ? hash % 10 : Math.floor((hash % 100) / 20)
+            };
+        });
     };
 
     const handleRestartAgent = async (agentName: string) => {
