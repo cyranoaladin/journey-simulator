@@ -15,7 +15,7 @@ import type { UserProgress } from '../types/journey';
 // Default metrics when no real data available
 const DEFAULT_METRICS = [
   { label: 'Score AEPO',        value: '74',    suffix: '/100', delta: '+8', icon: TrendingUp, color: 'gold' },
-  { label: 'Agents actifs',     value: '30',    suffix: '/57',  delta: '+8', icon: Zap,        color: 'cyan' },
+  { label: 'Agents actifs',     value: '…',     suffix: '',     delta: '+8', icon: Zap,        color: 'cyan' },
   { label: 'Missions complètes', value: '12',   suffix: '',     delta: '+3', icon: Award,      color: 'emerald' },
   { label: 'Tx on-chain',       value: '0',     suffix: '',     delta: '—',  icon: Activity,   color: 'ghost' },
 ];
@@ -70,6 +70,7 @@ function MetricCard({ label, value, suffix, delta, icon: Icon, color, isLoading 
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [userProgress, setUserProgress] = useState<UserProgress | null>(null);
+  const [agentStats, setAgentStats] = useState<{ active: number; total: number } | null>(null);
   
   // Connect to journeyStore for real data
   const storeUserProgress = useJourneyStore(state => state.userProgress);
@@ -100,6 +101,20 @@ export default function Dashboard() {
     loadData();
   }, [loadUserProgress, storeUserProgress]);
 
+  // Load agent stats from API
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3002'}/api/agents/stats`, {
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { 
+        if (d?.data) {
+          setAgentStats({ active: d.data.active, total: d.data.total });
+        }
+      })
+      .catch(() => {}); // fail-safe
+  }, []);
+
   // Build metrics from real data if available
   const metrics = userProgress ? [
     { 
@@ -112,8 +127,8 @@ export default function Dashboard() {
     },
     { 
       label: 'Agents actifs', 
-      value: '30', // TODO: connecter useAgentStats() quand disponible
-      suffix: '/57', 
+      value: agentStats ? agentStats.active.toString() : '30',
+      suffix: agentStats ? `/${agentStats.total}` : '/57',
       delta: '+8', 
       icon: Zap, 
       color: 'cyan' as const 
