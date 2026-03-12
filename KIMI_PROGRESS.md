@@ -977,4 +977,112 @@ curl http://localhost:3002/resources/rag
 
 ---
 
+## ✅ SESSION 13 — I18N 100% English + Design System (2026-03-12)
+
+### Objectifs
+
+| # | Objectif | Status |
+|---|----------|--------|
+| 1 | Traduction complète EN (58+ strings) | ✅ |
+| 2 | Injection tokens CSS manquants | ✅ |
+| 3 | Correction bugs visuels | ✅ |
+| 4 | TopBar breadcrumb dynamique | ✅ |
+
+### Traductions (T1-T14)
+
+| Fichier | Strings traduites |
+|---------|-----------------|
+| SidebarNew.tsx | 10 (Overview, My Journey, AI Agents, Governance, Projects, Not connected, Settings, Sign out) |
+| AppShell.tsx | 4 (Mobile nav: Home, Journey) |
+| TopBar.tsx | 8 (Dynamic breadcrumb with route labels) |
+| Dashboard.tsx | 17 (Active Agents, Continue Journey, Journey Progress, etc.) |
+| NotFound.tsx | 4 (Protocol Not Found, Return to dashboard, Back) |
+| ProfileView.tsx | 13 (My Profile, SOL Balance, AEPO Score, 30-day progress, etc.) |
+| SettingsView.tsx | 32 (Account, Notifications, Network, Danger Zone, etc.) |
+| FavoritesPage.tsx | 2 (Open, Remove from favorites) |
+| DAOView.tsx | 1 (Feature coming in Phase 3) |
+| ProofOfSkillCard.tsx | 2 (Link copied, Open in new tab) |
+| useZynoStream.tsx | 3 (Streaming error, Response error, Connection error) |
+| MainNavigation.tsx | 1 (Progress bar aria-label) |
+| ZynoSignalSidebar.tsx | 2 (Comments EN) |
+| solanaAgentService.ts | 3 (JSDoc EN) |
+
+**Total: 58+ strings FR → EN**
+
+### Design System Tokens (T15-T17)
+
+**tailwind.config.ts:**
+```typescript
+colors: {
+  accent:  { DEFAULT: '#FFB300', neon: '#00E5FF', dim: 'rgba(255,179,0,0.15)' },
+  purple:  { DEFAULT: '#7C3AED', 400: '#A78BFA', 500: '#8B5CF6', 600: '#7C3AED', dim: 'rgba(124,58,237,0.15)' },
+  success: { DEFAULT: '#10B981', dim: 'rgba(16,185,129,0.12)' },
+  warning: { DEFAULT: '#F59E0B', dim: 'rgba(245,158,11,0.12)' },
+}
+fontFamily: {
+  space: ['Space Grotesk', 'Clash Display', 'DM Sans', 'sans-serif'],
+}
+boxShadow: {
+  'neon':       '0 0 12px rgba(0, 229, 255, 0.4), 0 0 40px rgba(0, 229, 255, 0.15)',
+  'neon-ring':  '0 0 0 1px rgba(0, 229, 255, 0.5), 0 0 16px rgba(0, 229, 255, 0.2)',
+  'glass':      '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+  'inner-glow': 'inset 0 0 12px rgba(255, 179, 0, 0.12)',
+}
+```
+
+**index.css utilities:**
+- `.bg-gradient-accent` — Gradient cyan to purple
+- `.gradient-text` — Gold gradient text
+- `.card-surface-layer` — Frosted card surface
+- `.neon-border` — Cyan neon border
+- `.bg-primary` / `.text-primary` — CSS var utilities
+
+### Bugs Visuels Corrigés (T18-T25)
+
+| Fichier | Problème | Correction |
+|---------|----------|------------|
+| DashboardZyno.tsx | Classes duelles light/dark | Suppression `bg-white/80`, `text-slate-900` |
+| MissionFeedbackSummary.tsx | `bg-white` + `bg-indigo-600` | `bg-slate-50` + `bg-gold-400` |
+| GuidePage.tsx | 3 backgrounds hardcodés | `bg-void`, `bg-slate-50` |
+| HomePage.tsx | 7 backgrounds hardcodés | `bg-void`, `bg-slate-50/80` |
+| JourneyDemoMode.tsx | `bg-[#0A0A1F]` | `bg-void` |
+| JourneySimulationMode.tsx | `bg-[#0A0A1F]` | `bg-void` |
+| ArtifactModal.tsx | `bg-[#0A0A1F]`, `bg-[#13132B]` | `bg-void`, `bg-slate-50` |
+| ZynoConsole.tsx | `bg-[#0B0E14]` | `bg-void` |
+| LoginPage.tsx | `border-gray-600/30` | `border-white/10` |
+
+### TopBar Breadcrumb Dynamique
+
+```typescript
+const ROUTE_LABELS: Record<string, string> = {
+  '/dashboard':   'Dashboard',
+  '/journey':     'My Journey',
+  '/agents':      'AI Agents',
+  '/dao':         'DAO',
+  '/launchpad':   'Launchpad',
+  '/resources':   'Resources',
+  '/profile':     'My Profile',
+  '/settings':    'Settings',
+  '/guide':       'Guide',
+};
+```
+
+Le breadcrumb affiche dynamiquement :
+- `Dashboard / Phase 2 / Step 2/6`
+- `My Journey / Phase 1 / Step 1/6`
+- etc.
+
+### Vérifications
+
+```bash
+# TypeScript
+npx tsc --noEmit  # 0 erreurs ✅
+
+# Vérification strings FR résiduels
+grep -rn "Tableau de bord\|Mon Parcours\|Paramètres\|Déconnexion\|Non connecté\|Sauvegarder\|Annuler\|Retour\b\|Ouvrir\b\|Erreur de\|Adresse copiée" src/ --include="*.tsx"
+# Résultat: 0 occurrences ✅
+```
+
+---
+
 *Dernière mise à jour : 2026-03-12*
