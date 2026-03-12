@@ -2,17 +2,11 @@
  * @file GrowthAgent.ts
  * @description Agent spécialisé dans la croissance communautaire et l'acquisition Web3.
  * 
- * Capacités :
- * - Stratégie de croissance communautaire
- * - Campagnes de marketing Web3
- * - Token-based growth mechanics
- * - Analytics et métriques d'engagement
- * 
  * @author Kimi Code CLI — Phase 3 — 2026-03-12
  */
 
-import { BaseAgent } from './BaseAgent';
-import { routeWithFallback, buildMFAISystemMessage } from '../services/llmRouter';
+import { routeWithFallback, buildMFAISystemMessage, LLMMessage } from '../services/llmRouter';
+import { traceAgentRun } from '../services/observability';
 
 export interface GrowthInput {
   projectStage: 'pre-launch' | 'launch' | 'growth' | 'mature';
@@ -53,22 +47,20 @@ export interface GrowthOutput {
   };
 }
 
-export class GrowthAgent extends BaseAgent {
-  constructor() {
-    super('GrowthAgent', 'reasoning');
-  }
+export class GrowthAgent {
+  name = 'GrowthAgent';
 
   async run(input: GrowthInput): Promise<GrowthOutput> {
     const startTime = Date.now();
     
     try {
-      const messages = [
+      const messages: LLMMessage[] = [
         buildMFAISystemMessage(
           'Web3 Growth Strategist',
           `Design growth strategy from ${input.currentCommunitySize} to ${input.targetSize} members. Stage: ${input.projectStage}`
         ),
         {
-          role: 'user',
+          role: 'user' as const,
           content: JSON.stringify(input),
         },
       ];
@@ -85,24 +77,33 @@ export class GrowthAgent extends BaseAgent {
 
       const result: GrowthOutput = JSON.parse(response);
       
-      await this.traceRun({
-        input,
-        output: result,
-        durationMs: Date.now() - startTime,
-        success: true,
-      });
+      traceAgentRun(
+        { journeyId: 'growth-agent-run' },
+        {
+          agentName: 'GrowthAgent',
+          model: 'gpt-4o',
+          input,
+          output: result,
+          durationMs: Date.now() - startTime,
+          success: true,
+        }
+      ).catch(() => {});
 
       return result;
     } catch (error) {
-      await this.traceRun({
-        input,
-        output: null,
-        durationMs: Date.now() - startTime,
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
+      traceAgentRun(
+        { journeyId: 'growth-agent-run' },
+        {
+          agentName: 'GrowthAgent',
+          model: 'unknown',
+          input,
+          output: null,
+          durationMs: Date.now() - startTime,
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        }
+      ).catch(() => {});
 
-      // Fallback
       return {
         status: 'ERROR',
         summary: 'Failed to generate growth strategy — using fallback',
@@ -131,3 +132,5 @@ export class GrowthAgent extends BaseAgent {
     }
   }
 }
+
+export default GrowthAgent;

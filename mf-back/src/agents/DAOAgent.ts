@@ -11,8 +11,8 @@
  * @author Kimi Code CLI — Phase 3 — 2026-03-12
  */
 
-import { BaseAgent } from './BaseAgent';
-import { routeWithFallback, buildMFAISystemMessage } from '../services/llmRouter';
+import { routeWithFallback, buildMFAISystemMessage, LLMMessage } from '../services/llmRouter';
+import { traceAgentRun } from '../services/observability';
 
 export interface DAOInput {
   projectType: string;
@@ -41,22 +41,20 @@ export interface DAOOutput {
   actions: string[];
 }
 
-export class DAOAgent extends BaseAgent {
-  constructor() {
-    super('DAOAgent', 'governance');
-  }
+export class DAOAgent {
+  name = 'DAOAgent';
 
   async run(input: DAOInput): Promise<DAOOutput> {
     const startTime = Date.now();
     
     try {
-      const messages = [
+      const messages: LLMMessage[] = [
         buildMFAISystemMessage(
           'DAO Tooling & Community Architect',
           `Design DAO governance for ${input.projectType} with ${input.communitySize} members. Goals: ${input.governanceGoals.join(', ')}`
         ),
         {
-          role: 'user',
+          role: 'user' as const,
           content: JSON.stringify(input),
         },
       ];
@@ -78,22 +76,32 @@ export class DAOAgent extends BaseAgent {
         throw new Error('Invalid response structure');
       }
 
-      await this.traceRun({
-        input,
-        output: result,
-        durationMs: Date.now() - startTime,
-        success: true,
-      });
+      traceAgentRun(
+        { journeyId: 'dao-agent-run' },
+        {
+          agentName: 'DAOAgent',
+          model: 'claude-sonnet-4-5',
+          input,
+          output: result,
+          durationMs: Date.now() - startTime,
+          success: true,
+        }
+      ).catch(() => {});
 
       return result;
     } catch (error) {
-      await this.traceRun({
-        input,
-        output: null,
-        durationMs: Date.now() - startTime,
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
+      traceAgentRun(
+        { journeyId: 'dao-agent-run' },
+        {
+          agentName: 'DAOAgent',
+          model: 'unknown',
+          input,
+          output: null,
+          durationMs: Date.now() - startTime,
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        }
+      ).catch(() => {});
 
       // Fallback structure
       return {
@@ -117,3 +125,5 @@ export class DAOAgent extends BaseAgent {
     }
   }
 }
+
+export default DAOAgent;

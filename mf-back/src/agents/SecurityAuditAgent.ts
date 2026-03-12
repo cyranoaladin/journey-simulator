@@ -2,21 +2,14 @@
  * @file SecurityAuditAgent.ts
  * @description Agent spécialisé dans l'audit de sécurité des smart contracts et dApps.
  * 
- * Capacités :
- * - Analyse statique de code Rust/Anchor
- * - Détection de vulnérabilités communes (reentrancy, overflow, etc.)
- * - Recommandations de sécurité
- * - Checklist de déploiement sécurisé
- * 
  * ⚠️ LIMITATION : Cet agent fournit une analyse automatisée de premier niveau.
- * Il ne remplace PAS un audit professionnel par une équipe de sécurité (OtterSec, Neodyme, etc.)
- * avant tout déploiement mainnet.
+ * Il ne remplace PAS un audit professionnel avant tout déploiement mainnet.
  * 
  * @author Kimi Code CLI — Phase 3 — 2026-03-12
  */
 
-import { BaseAgent } from './BaseAgent';
-import { routeWithFallback, buildMFAISystemMessage } from '../services/llmRouter';
+import { routeWithFallback, buildMFAISystemMessage, LLMMessage } from '../services/llmRouter';
+import { traceAgentRun } from '../services/observability';
 
 export interface SecurityInput {
   code: string;
@@ -28,7 +21,7 @@ export interface SecurityInput {
 export interface SecurityOutput {
   status: 'OK' | 'WARNING' | 'CRITICAL';
   summary: string;
-  score: number; // 0-100
+  score: number;
   vulnerabilities: Array<{
     severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'INFO';
     title: string;
@@ -48,19 +41,16 @@ export interface SecurityOutput {
   professional_audit_required: boolean;
 }
 
-export class SecurityAuditAgent extends BaseAgent {
-  constructor() {
-    super('SecurityAuditAgent', 'code');
-  }
+export class SecurityAuditAgent {
+  name = 'SecurityAuditAgent';
 
   async run(input: SecurityInput): Promise<SecurityOutput> {
     const startTime = Date.now();
     
-    // Validation
     if (input.code.length > 10000) {
       return {
         status: 'WARNING',
-        summary: 'Code too large for automated analysis (>10k chars). Please submit in chunks or request professional audit.',
+        summary: 'Code too large for automated analysis (>10k chars).',
         score: 0,
         vulnerabilities: [],
         checks: {
@@ -76,13 +66,13 @@ export class SecurityAuditAgent extends BaseAgent {
     }
 
     try {
-      const messages = [
+      const messages: LLMMessage[] = [
         buildMFAISystemMessage(
           'Smart Contract Security Auditor',
           `Audit ${input.programType} program written in ${input.language}. Focus on Solana/Anchor specific vulnerabilities.`
         ),
         {
-          role: 'user',
+          role: 'user' as const,
           content: `\`\`\`${input.language}\n${input.code}\n\`\`\``,        },
       ];
 
@@ -98,28 +88,37 @@ export class SecurityAuditAgent extends BaseAgent {
 
       const result: SecurityOutput = JSON.parse(response);
       
-      // Force professional audit flag if critical vulnerabilities found
       if (result.vulnerabilities.some(v => v.severity === 'CRITICAL')) {
         result.professional_audit_required = true;
         result.status = 'CRITICAL';
       }
 
-      await this.traceRun({
-        input: { ...input, code: '[truncated]' },
-        output: result,
-        durationMs: Date.now() - startTime,
-        success: true,
-      });
+      traceAgentRun(
+        { journeyId: 'security-audit-run' },
+        {
+          agentName: 'SecurityAuditAgent',
+          model: 'gpt-4o',
+          input: { ...input, code: '[truncated]' },
+          output: result,
+          durationMs: Date.now() - startTime,
+          success: true,
+        }
+      ).catch(() => {});
 
       return result;
     } catch (error) {
-      await this.traceRun({
-        input: { ...input, code: '[truncated]' },
-        output: null,
-        durationMs: Date.now() - startTime,
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
+      traceAgentRun(
+        { journeyId: 'security-audit-run' },
+        {
+          agentName: 'SecurityAuditAgent',
+          model: 'unknown',
+          input: { ...input, code: '[truncated]' },
+          output: null,
+          durationMs: Date.now() - startTime,
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        }
+      ).catch(() => {});
 
       return {
         status: 'WARNING',
@@ -139,3 +138,5 @@ export class SecurityAuditAgent extends BaseAgent {
     }
   }
 }
+
+export default SecurityAuditAgent;
