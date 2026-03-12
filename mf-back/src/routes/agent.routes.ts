@@ -5,6 +5,7 @@
 
 import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
+import { prisma } from '../config/database';
 import {
   handleAgentInteraction,
   getSession,
@@ -167,6 +168,118 @@ router.get('/stats', async (req: Request, res: Response) => {
     });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Stats unavailable' });
+  }
+});
+
+/**
+ * GET /api/agents/runs
+ * Retourne les runs récents d'agents pour un journey donné
+ * Query params: journeyId (requis), limit (défaut 5), status (optionnel: succeeded|failed|running)
+ */
+router.get('/runs', async (req: Request, res: Response) => {
+  try {
+    const { journeyId, limit = '5', status } = req.query as Record<string, string>;
+
+    if (!journeyId) {
+      return res.status(400).json({ success: false, error: 'journeyId is required' });
+    }
+
+    let runs: any[] = [];
+
+    try {
+      const where: any = { journeyId };
+      if (status) where.status = status;
+
+      runs = await (prisma as any).agentRun?.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        take: Math.min(parseInt(limit, 10), 20),
+        select: {
+          id: true,
+          agentType: true,
+          status: true,
+          createdAt: true,
+          completedAt: true,
+          latencyMs: true,
+          output: true,
+          aepoScore: true,
+          phase: true,
+        },
+      }) ?? [];
+    } catch {
+      // DB indisponible — retourner un tableau vide (fail-safe)
+    }
+
+    return res.json({
+      success: true,
+      data: runs.map((r: any) => ({
+        id: r.id,
+        agentType: r.agentType ?? 'ZYNO_ORCHESTRATOR',
+        status: r.status ?? 'succeeded',
+        createdAt: r.createdAt?.toISOString() ?? new Date().toISOString(),
+        completedAt: r.completedAt?.toISOString() ?? null,
+        latencyMs: r.latencyMs ?? 0,
+        output: r.output ?? r.ae_summary ?? '',
+        aepoScore: r.aepoScore ?? null,
+        phase: r.phase ?? null,
+      })),
+    });
+  } catch (err) {
+    console.error('[agents/runs] Error:', err);
+    return res.status(500).json({ success: false, error: 'Failed to fetch agent runs' });
+  }
+});
+
+/**
+ * GET /api/agents/logs
+ * Retourne les logs d'activité agents (résumé pour le feed temps réel)
+ * Query params: journeyId (optionnel), scope (optionnel), limit (défaut 20)
+ */
+router.get('/logs', async (req: Request, res: Response) => {
+  try {
+    const { journeyId, scope = 'default', limit = '20' } = req.query as Record<string, string>;
+
+    let logs: any[] = [];
+
+    try {
+      const where: any = {};
+      if (journeyId) where.journeyId = journeyId;
+
+      const runs = await (prisma as any).agentRun?.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        take: Math.min(parseInt(limit, 10), 50),
+        select: {
+          id: true,
+          agentType: true,
+          status: true,
+          createdAt: true,
+          latencyMs: true,
+          output: true,
+          phase: true,
+        },
+      }) ?? [];
+
+      logs = runs.map((r: any) => ({
+        id: r.id,
+        agentType: r.agentType ?? 'ZYNO_ORCHESTRATOR',
+        status: r.status ?? 'succeeded',
+        timestamp: r.createdAt?.toISOString() ?? new Date().toISOString(),
+        latencyMs: r.latencyMs ?? 0,
+        summary: typeof r.output === 'string'
+          ? r.output.slice(0, 120)
+          : (r.output?.summary ?? ''),
+        phase: r.phase ?? null,
+        scope,
+      }));
+    } catch {
+      // DB indisponible — retourner tableau vide
+    }
+
+    return res.json({ success: true, logs });
+  } catch (err) {
+    console.error('[agents/logs] Error:', err);
+    return res.status(500).json({ success: false, error: 'Failed to fetch agent logs' });
   }
 });
 
