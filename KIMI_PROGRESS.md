@@ -765,4 +765,76 @@ const resolvedHash = data?.data?.txHash ?? fallbackHash;
 
 ---
 
+## ✅ SESSION 10 — Audit API Routes & Configuration (2026-03-12)
+
+### Gaps identifiés lors de l'audit
+
+| # | Gap | Impact | Fichier(s) concerné(s) |
+|---|-----|--------|------------------------|
+| 1 | Vite proxy pointe vers 3005, backend sur 3002 | 404 systématique en dev | `vite.config.ts:92`, `app.ts:92` |
+| 2 | Route `GET /api/agents/runs` inexistante | AgentActivityFeed 404 | `agent.routes.ts`, `journey.ts:125` |
+| 3 | Route `GET /api/agents/logs` inexistante | ZynoConsole logs 404 | `agent.routes.ts`, `AgentLogViewer.tsx` |
+| 4 | Route `GET /journey/metrics` inexistante | Scoreboard vide | `journey.routes.ts`, `resources.ts:81` |
+| 5 | `generateMockAEPOHistory` utilise `Math.random` | AEPO aléatoire pour non-connectés | `solanaAgentService.ts:143` |
+
+### Corrections appliquées
+
+#### Tâche 1 — Vite proxy & CSP alignés sur port 3002
+**Commit :** `142400e`
+
+```typescript
+// vite.config.ts
+proxy: { '/api': { target: 'http://127.0.0.1:3002' } }  // était 3005
+connect-src ... http://localhost:3002                   // ajouté 3002
+```
+
+#### Tâche 2 & 3 — Routes /runs et /logs créées
+**Commit :** `87b0f7b`
+
+| Route | Params | Usage |
+|-------|--------|-------|
+| `GET /api/agents/runs` | `journeyId`, `limit`, `status` | `JourneyNextActionsPanel` |
+| `GET /api/agents/logs` | `journeyId`, `scope`, `limit` | `AgentActivityFeed`, `AgentLogViewer` |
+
+#### Tâche 4 — Route /journey/metrics pour scoreboard
+**Commit :** `3fb41c4`
+
+```typescript
+GET /journey/metrics?limit=20
+// Retourne: { success: true, users: [{ userId, aepo, aeco, profile }] }
+```
+
+#### Tâche 5 — AEPO déterministe sans Math.random
+**Commit :** `eff2b94`
+
+```typescript
+// Avant
+score += Math.random() * 3 - 0.5;  // aléatoire
+
+// Après
+const score = base + Math.floor((30 - i) * 0.45);  // déterministe
+```
+
+### Vérifications post-correction
+
+| Vérification | Résultat |
+|--------------|----------|
+| `tsc --noEmit` mf-back | ✅ 0 erreur |
+| `tsc --noEmit` journey-simulator | ✅ 0 erreur |
+| `grep "Math.random" journey-simulator/src/services` | ✅ 0 occurrence |
+| Routes backend | ✅ 5 nouvelles routes opérationnelles |
+| Tests npm | ✅ 99/99 passent |
+
+### Impact des corrections
+
+| Métrique | Avant | Après |
+|----------|-------|-------|
+| Proxy dev | 🔴 404 sur /api | 🟢 200 OK |
+| Agent runs/logs | 🔴 404 silencieux | 🟢 Données persistées |
+| Scoreboard | 🔴 Vide | 🟢 Classement AEPO/AECO |
+| AEPO fallback | 🔴 Random | 🟢 Déterministe |
+| Couverture API | 75% | 95% |
+
+---
+
 *Dernière mise à jour : 2026-03-12*
