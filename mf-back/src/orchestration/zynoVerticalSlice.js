@@ -40,6 +40,7 @@ const actionToolMapper = require('./actionToolMapper');
 const ValidationService = require('./services/validationService');
 const ExecutionService = require('./services/executionService');
 const LogicCheckService = require('./services/logicCheckService');
+const { getWalletBalance, getTokenAccounts } = require('../services/solanaAgentService');
 
 const logger = createLogger(__filename);
 const invalidReplayCache = new Set();
@@ -1392,6 +1393,24 @@ async function _runAgentsAndAnalyze(ctx, plan) {
 // EXTRACTION 2c: Apply Guards & Execute
 async function _applyGuardsAndExecute(ctx, plan, synthesis) {
   const { req, payload, ops, state, tenantId, journeyCtx, guards } = ctx;
+  
+  // Inject onChainData from SolanaAgent if wallet address is available
+  if (req.walletAddress || payload?.walletAddress) {
+    const walletAddress = req.walletAddress || payload?.walletAddress;
+    try {
+      const [balance, tokens] = await Promise.allSettled([
+        getWalletBalance(walletAddress),
+        getTokenAccounts(walletAddress),
+      ]);
+      ctx.onChainData = {
+        balance: balance.status === 'fulfilled' ? balance.value : null,
+        tokens: tokens.status === 'fulfilled' ? tokens.value : null,
+      };
+    } catch (err) {
+      // Fail-safe: continue without onChainData
+      ctx.onChainData = null;
+    }
+  }
   const { quotaDecision, previous, budget, intentsDeduped, intentsCombined, workflowIntents, ragContext, learningMap, selected, routed } = plan;
   const { runsWithScores, contradictions, actionPlanSteps, agentsMeta, aggregatedDecision, summary, actions, agentsStatus, web3Actions, humanPlan } = synthesis;
   const { phasesExecuted, currentPhase } = journeyCtx;
