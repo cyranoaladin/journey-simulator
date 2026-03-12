@@ -1,7 +1,10 @@
 import { clsx } from 'clsx';
 import { ReactNode } from 'react';
 
-type BadgeVariant = 'gold' | 'cyan' | 'emerald' | 'amber' | 'coral' | 'ghost' | 'passLevel';
+export type BadgeVariant = 
+  | 'gold' | 'cyan' | 'emerald' | 'amber' | 'coral' 
+  | 'ghost' | 'passLevel' | 'success' | 'default';
+
 type PassLevel = 'STARTER' | 'INTERMEDIATE' | 'ADVANCED' | 'ELITE';
 
 interface BadgeProps {
@@ -20,6 +23,8 @@ const VARIANTS: Record<BadgeVariant, string> = {
   coral:     'bg-coral-500/15   text-coral-400  border-coral-500/30',
   ghost:     'bg-white/5        text-ink-200    border-white/10',
   passLevel: '',
+  success:   'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+  default:   'bg-white/5        text-ink-200    border-white/10',
 };
 
 const PASS_LEVEL_STYLES: Record<PassLevel, string> = {

@@ -147,13 +147,13 @@ export const loginWithWallet = async (req: Request, res: Response): Promise<void
       return;
     }
 
-    let user = await prisma.user.findUnique({ where: { walletAddress: walletAddr } });
+    let user = await prisma.user.findUnique({ where: { walletAddress: wallet_address } });
 
     if (!user) {
       user = await prisma.user.create({
         data: {
-          name: `User ${walletAddr.slice(0, 6)}`,
-          walletAddress: walletAddr,
+          name: `User ${wallet_address.slice(0, 6)}`,
+          walletAddress: wallet_address,
           role: 'FOUNDER',
         },
       });
