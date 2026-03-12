@@ -178,15 +178,15 @@ export default function DAOView() {
 
     addToast({
       type: 'success',
-      title: 'Vote enregistré',
-      message: `Vote ${forVote ? 'POUR' : 'CONTRE'} enregistré — Proposal #${proposalId}`,
+      title: 'Vote recorded',
+      message: `Vote ${forVote ? 'FOR' : 'AGAINST'} recorded — Proposal #${proposalId}`,
     });
   };
 
   const handleCreateProposal = () => {
     addToast({
       type: 'info',
-      title: 'Création de proposal',
+      title: 'Proposal creation',
       message: 'Feature coming in Phase 3 — SPL Governance',
     });
   };

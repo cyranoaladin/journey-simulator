@@ -97,7 +97,7 @@ const AnimatedBackground = () => (
       className="absolute inset-[-35%] rounded-full opacity-50 blur-3xl motion-safe:animate-[spin_60s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,rgba(34,211,238,0.2),rgba(114,9,183,0.35),rgba(14,165,233,0.3),transparent)]"
       aria-hidden="true"
     />
-    <div className="absolute inset-0 bg-gradient-to-b from-[#0d0d1a] via-[#14142a] to-[#0d0d1a] opacity-90" aria-hidden="true" />
+    <div className="absolute inset-0 bg-gradient-to-b from-void via-slate-50/20 to-void opacity-90" aria-hidden="true" />
     <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(67,97,238,0.35),transparent_65%)] opacity-80" aria-hidden="true" />
   </div>
 )

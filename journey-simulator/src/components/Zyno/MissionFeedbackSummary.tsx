@@ -44,7 +44,7 @@ export default function MissionFeedbackSummary({ summary }: Props) {
   }, [summary?.timestamp]);
 
   if (!summary) {
-    return <p className="text-sm text-slate-500">No summary available.</p>;
+    return <p className="text-sm text-ink-400">No summary available.</p>;
   }
 
   const handleApiKeyChange = (value: string) => {
@@ -117,7 +117,7 @@ export default function MissionFeedbackSummary({ summary }: Props) {
       }
     } catch (exportError) {
       console.error('Mission export failed:', exportError);
-      setError(exportError instanceof Error ? exportError.message : 'Export impossible.');
+      setError(exportError instanceof Error ? exportError.message : 'Export failed.');
     } finally {
       setIsExporting(false);
     }
@@ -141,7 +141,7 @@ export default function MissionFeedbackSummary({ summary }: Props) {
             type="button"
             onClick={() => exportSummary('notion')}
             disabled={isExporting || !summary}
-            className="inline-flex items-center gap-2 rounded-md border border-indigo-200 px-3 py-1.5 text-sm font-medium text-indigo-600 transition hover:border-indigo-500 hover:text-indigo-700 dark:border-indigo-500/40 dark:text-indigo-300"
+            className="inline-flex items-center gap-2 rounded-md border border-cyan-300/30 px-3 py-1.5 text-sm font-medium text-cyan-300 transition hover:border-cyan-300/60 hover:text-cyan-200"
           >
             <PenSquare size={16} />
             Notion
@@ -157,13 +157,13 @@ export default function MissionFeedbackSummary({ summary }: Props) {
           <strong>Date:</strong> {formattedTimestamp}
         </p>
         <p>
-          <strong title={AEPO.tooltip} className="cursor-help border-b border-dashed border-slate-300/70 dark:border-slate-700">
+          <strong title={AEPO.tooltip} className="cursor-help border-b border-dashed border-white/20">
             AEPO Score:
           </strong>{' '}
           {summary.aepoScore} / 100
         </p>
         <p>
-          <strong title={AECO.tooltip} className="cursor-help border-b border-dashed border-slate-300/70 dark:border-slate-700">
+          <strong title={AECO.tooltip} className="cursor-help border-b border-dashed border-white/20">
             AECO Signal:
           </strong>{' '}
           {summary.aecoPhase}
@@ -173,32 +173,32 @@ export default function MissionFeedbackSummary({ summary }: Props) {
         </p>
       </div>
 
-      <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+      <label className="block text-xs font-semibold uppercase tracking-wider text-ink-400">
         <span>Admin API Key</span>
         <input
           type="password"
           value={apiKey}
           onChange={(event) => handleApiKeyChange(event.target.value)}
           placeholder="Enter x-api-key"
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-400 dark:border-slate-600 dark:bg-slate-800"
+          className="mt-1 w-full rounded-md border border-white/10 bg-slate-50 px-3 py-2 text-sm text-ink-100 placeholder:text-ink-400 focus:border-cyan-300/50 focus:outline-none focus:ring-1 focus:ring-cyan-300/30"
         />
       </label>
 
       {error && (
-        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">
+        <p className="rounded-md border border-coral-400/40 bg-coral-400/10 px-3 py-2 text-sm text-coral-400">
           {error}
         </p>
       )}
 
       {successMessage && (
-        <p className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-300">
+        <p className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-400">
           {successMessage}
         </p>
       )}
 
       <div>
         <h4 className="text-sm font-semibold"> Generated Summary:</h4>
-        <pre className="mt-2 max-h-64 overflow-y-auto whitespace-pre-wrap rounded-md bg-slate-900 p-3 text-xs text-slate-100">
+        <pre className="mt-2 max-h-64 overflow-y-auto whitespace-pre-wrap rounded-md bg-void border border-white/8 p-3 text-xs text-ink-100 font-mono">
           {summary.generatedText}
         </pre>
       </div>

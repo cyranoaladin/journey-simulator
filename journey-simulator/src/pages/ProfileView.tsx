@@ -404,7 +404,7 @@ export default function ProfileView() {
                   key={nft.mintAddress}
                   nft={nft}
                   index={index}
-                  isNew={index === 0} // Le plus récent a l'animation
+                  isNew={index === 0} // Most recent gets the animation
                 />
               ))}
             </div>

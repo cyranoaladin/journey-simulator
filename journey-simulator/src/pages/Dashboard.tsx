@@ -336,7 +336,7 @@ export default function Dashboard() {
           <div className="space-y-2">
             {(nextMissions ?? [
               { title: 'Create PDA Account',      xp: 150, locked: false },
-              { title: 'Implémenter une instruction', xp: 200, locked: false },
+              { title: 'Implement an instruction', xp: 200, locked: false },
               { title: 'Test de sécurité Anchor',   xp: 300, locked: true },
             ]).map((mission, i) => (
               <div key={i} className={clsx(

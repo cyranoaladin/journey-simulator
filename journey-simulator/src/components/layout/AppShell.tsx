@@ -105,7 +105,7 @@ export function AppShell({ children }: AppShellProps) {
       
       {/* Main content area */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-        {/* TopBar - caché sur mobile (on utilise la bottom nav) */}
+        {/* TopBar - hidden on mobile (bottom nav is used instead) */}
         <div className="hidden md:block">
           <TopBar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         </div>
@@ -182,7 +182,7 @@ export function AppShell({ children }: AppShellProps) {
                     <div className="w-12 h-1 rounded-full bg-white/20" />
                   </div>
                   
-                  {/* ZynoPanel contenu adapté */}
+                  {/* ZynoPanel adapted content */}
                   <div className="flex-1 overflow-hidden">
                     <ZynoPanelMobile
                       messages={messages}

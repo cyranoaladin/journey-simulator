@@ -131,7 +131,7 @@ export function ProofOfSkillCard({
             </p>
           </div>
 
-          {/* Métadonnées */}
+          {/* Metadata */}
           <div className="flex flex-wrap gap-2 text-xs text-ink-500">
             <div className="flex items-center gap-1">
               <Award size={12} />

@@ -133,7 +133,7 @@ async function getRecentTransactions(walletAddress: string, limit: number = 10):
 function generateMockAEPOHistory(seed: number = 42): AEPOHistoryPoint[] {
   const history: AEPOHistoryPoint[] = [];
   const phases = ['Learn', 'Build', 'Prove', 'Activate'];
-  const base = 52 + (seed % 18);   // score de base déterministe : 52–69
+  const base = 52 + (seed % 18);   // deterministic base score: 52–69
   const now = new Date();
 
   for (let i = 30; i >= 0; i--) {

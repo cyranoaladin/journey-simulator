@@ -149,7 +149,7 @@ export function ZynoStreamProvider({ children }: { children: ReactNode }) {
         setError(errorMsg);
         setMessages(prev => prev.map(m =>
           m.id === assistantMsgId
-            ? { ...m, content: `⚠️ ${errorMsg}. Réessayez dans un moment.`, type: 'error' as const }
+            ? { ...m, content: `⚠️ ${errorMsg}. Please try again in a moment.`, type: 'error' as const }
             : m
         ));
       }

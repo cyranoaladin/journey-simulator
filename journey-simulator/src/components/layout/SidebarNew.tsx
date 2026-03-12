@@ -83,7 +83,7 @@ export function SidebarNew({ open, onToggle }: SidebarProps) {
                 transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
               />
             </div>
-            <p className="text-2xs text-ink-400 mt-1.5">Score AEPO — Niveau intermédiaire</p>
+            <p className="text-2xs text-ink-400 mt-1.5">AEPO Score — {passLevel.charAt(0) + passLevel.slice(1).toLowerCase()} level</p>
           </div>
 
           <nav className="px-3 flex-1 overflow-y-auto space-y-0.5">
@@ -118,7 +118,7 @@ export function SidebarNew({ open, onToggle }: SidebarProps) {
             <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-cyan-300/8 border border-cyan-300/15">
               <Wallet size={14} className="text-cyan-300 flex-shrink-0" />
               <div className="flex-1 min-w-0">
-                <p className="text-2xs text-ink-400">Wallet connecté</p>
+                <p className="text-2xs text-ink-400">Connected wallet</p>
                 <p className="text-xs font-mono text-cyan-300 truncate">{walletAddress}</p>
               </div>
               <a href="#" className="text-ink-400 hover:text-cyan-300 transition-colors">

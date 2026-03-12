@@ -146,7 +146,7 @@ export default function SettingsView() {
                 </p>
               </div>
               <Badge variant={walletAddress ? 'success' : 'default'}>
-                {walletAddress ? 'Connected' : 'Déconnecté'}
+                {walletAddress ? 'Connected' : 'Disconnected'}
               </Badge>
             </div>
 
@@ -200,7 +200,7 @@ export default function SettingsView() {
           </div>
         </SettingSection>
 
-        {/* Section Réseau */}
+        {/* Network section */}
         <SettingSection
           title="Network"
           description="Blockchain configuration and environment"
