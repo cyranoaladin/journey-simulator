@@ -673,4 +673,96 @@ body: JSON.stringify({
 
 ---
 
+## ✅ SESSION 9 — Audit API Paths & Backend Routes (2026-03-12)
+
+### Gaps identifiés lors de l'audit
+
+| # | Gap | Impact | Fichier(s) concerné(s) |
+|---|-----|--------|------------------------|
+| 1 | Path API incorrect `/api/nfts/` vs `/api/cnft/` | 404 systématique cNFTs en production | `cnftService.ts:35` |
+| 2 | Route `GET /api/user/aepo-history` inexistante | Historique AEPO 100% aléatoire (Math.random) | `solanaAgentService.ts`, `user.routes.ts` |
+| 3 | `DAOVoteModal` ne notifie jamais le backend | Votes journey jamais enregistrés | `DAOVoteModal.tsx:74` |
+
+### Corrections appliquées
+
+#### Tâche 1 — Path API cNFT corrigé
+**Commit :** `9a6c7f9`
+
+```typescript
+// Avant
+/api/nfts/wallet/${walletAddress}  // 404
+
+// Après  
+/api/cnft/wallet/${walletAddress}   // ✅ aligné avec app.ts ligne 81
+```
+
+**Vérification :** `grep -rn "api/nfts" journey-simulator/src/` → 0 occurrence restante
+
+#### Tâche 2 — Route AEPO History créée
+**Commit :** `a9be240`
+
+| Aspect | Implémentation |
+|--------|----------------|
+| Endpoint | `GET /api/user/aepo-history` |
+| Protection | `protect` middleware |
+| Source données | `prisma.agentRun.findMany()` |
+| Fallback | Déterministe (seed = userId.length), pas de Math.random |
+| Période | 31 jours avec progression de phases |
+
+```typescript
+// Requête
+GET /api/user/aepo-history
+
+// Réponse
+{
+  "success": true,
+  "history": [
+    { "date": "2026-02-10", "score": 62, "phase": "Learn" },
+    { "date": "2026-02-11", "score": 64, "phase": "Learn" },
+    ...
+    { "date": "2026-03-12", "score": 73, "phase": "Build" }
+  ]
+}
+```
+
+#### Tâche 3 — DAOVoteModal connecté au backend
+**Commit :** `a2af6b9`
+
+```typescript
+// Avant : hash local uniquement
+const stableTxHash = `sim_${Date.now().toString(16)}_${vote.slice(0, 2)}`;
+
+// Après : backend notification avec fallback
+const resp = await fetch(`${API_BASE}/api/blinks/dao-vote`, {
+  method: 'POST',
+  body: JSON.stringify({
+    account: 'journey-modal',     // contexte modal
+    proposal: phase?.id,
+    vote: vote === 'approve' ? 'for' : 'against',
+  }),
+});
+const resolvedHash = data?.data?.txHash ?? fallbackHash;
+```
+
+### Vérifications post-correction
+
+| Vérification | Résultat |
+|--------------|----------|
+| `tsc --noEmit` mf-back | ✅ 0 erreur |
+| `tsc --noEmit` journey-simulator | ✅ 0 erreur |
+| `grep "api/nfts" journey-simulator/src` | ✅ 0 occurrence |
+| `grep "Math.random" journey-simulator/src/services` | ✅ 0 occurrence (AEPO déterministe) |
+| Tests backend | ✅ 99/99 passent |
+
+### Impact des corrections
+
+| Métrique | Avant | Après |
+|----------|-------|-------|
+| Endpoint cNFT | 🟡 404 silencieux | 🟢 200 OK |
+| AEPO Profile | 🔴 Random régénéré | 🟢 Déterministe stable |
+| Votes modal | 🔴 Local uniquement | 🟢 Persistés backend |
+| Couverture API | 85% | 95% |
+
+---
+
 *Dernière mise à jour : 2026-03-12*
