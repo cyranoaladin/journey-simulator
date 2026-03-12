@@ -296,7 +296,59 @@ export async function streamLLMResponse(
         return;
       }
       
-      // TODO: Phase 2 - Support streaming pour Anthropic/Google
+      // ─── Anthropic streaming ───────────────────────────────────────────────────
+      if (provider === 'anthropic') {
+        const { default: Anthropic } = await import('@anthropic-ai/sdk');
+        const client = new Anthropic({ apiKey });
+        const systemMsg = messages.find(m => m.role === 'system')?.content;
+        const chatMessages = messages
+          .filter(m => m.role !== 'system')
+          .map(m => ({ role: m.role as 'user' | 'assistant', content: m.content }));
+
+        const stream = await client.messages.stream({
+          model: modelId,
+          max_tokens: maxTokens,
+          ...(systemMsg ? { system: systemMsg } : {}),
+          messages: chatMessages,
+        });
+
+        for await (const event of stream) {
+          if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+            res.write(`data: ${JSON.stringify({ type: 'token', token: event.delta.text })}
+
+`);
+          }
+        }
+        res.write(`data: ${JSON.stringify({ type: 'done' })}
+
+`);
+        res.end();
+        return;
+      }
+
+      // ─── Google Gemini streaming ────────────────────────────────────────────────
+      if (provider === 'google') {
+        const { GoogleGenerativeAI } = await import('@google/generative-ai');
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: modelId });
+        const systemMsg = messages.find(m => m.role === 'system')?.content ?? '';
+        const userMsg   = messages.filter(m => m.role !== 'system').map(m => m.content).join('\n');
+        const prompt    = systemMsg ? `${systemMsg}\n\n${userMsg}` : userMsg;
+
+        const result = await model.generateContentStream(prompt);
+        for await (const chunk of result.stream) {
+          const text = chunk.text();
+          if (text) res.write(`data: ${JSON.stringify({ type: 'token', token: text })}
+
+`);
+        }
+        res.write(`data: ${JSON.stringify({ type: 'done' })}
+
+`);
+        res.end();
+        return;
+      }
+      
       console.warn(`[LLMRouter Stream] ${modelId} streaming not yet implemented`);
       
     } catch (error) {
