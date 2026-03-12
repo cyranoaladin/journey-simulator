@@ -199,6 +199,23 @@ src/components/Journey/AgentHealthCommandCenter.tsx  # API live
 
 ---
 
+## ✅ SESSION 7 EXTRA — Corrections Additionnelles (2026-03-12)
+
+### Fichiers supplémentaires corrigés
+
+| Fichier | Correction | Commit |
+|---------|-----------|--------|
+| `journey-simulator/src/store/journeyStore.ts` | nft_address fallback déterministe (Date.now) | `a1b2650` |
+| `journey-simulator/src/store/journeyStore.ts` | nftReward basé sur completedPhases (pas random) | `a1b2650` |
+| `journey-simulator/src/components/Admin/AgentHealthCommandCenter.tsx` | Connecté à /api/agents/stats + déterministe | `d740570` |
+
+### Impact
+- **Math.random() supplémentaires éliminés** : 7 occurrences
+- **Fichiers métier stabilisés** : store central + dashboard admin
+- **TypeScript** : 0 erreur
+
+---
+
 ## 🔧 Intégrations Restantes (Manuelles)
 
 Ces intégrations nécessitent des modifications dans des fichiers existants complexes :
