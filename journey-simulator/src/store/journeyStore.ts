@@ -867,7 +867,7 @@ export const useJourneyStore = createWithEqualityFn<JourneyState>()(
           const response = await api.completePhase({
             phase_number: rewards.phaseNumber,
             score: options.score ?? 100,
-            nft_address: options.nftAddress || '0x' + Math.random().toString(16).slice(2, 42),
+            nft_address: options.nftAddress || `0x${Date.now().toString(16).slice(-40).padStart(40, '0')}`,
             xp_reward: rewards.xpReward,
             mfai_reward: rewards.mfaiReward,
             nft_reward: rewards.resolvedNftName,
@@ -1167,7 +1167,10 @@ export const useJourneyStore = createWithEqualityFn<JourneyState>()(
         // Award XP, tokens, and potentially an NFT for completing a mission
         const xpReward = 50;
         const mfaiReward = 25;
-        const nftReward = Math.random() > 0.5 ? ["Mission Completion NFT"] : [];
+        // Déterministe: récompense NFT basée sur le progrès utilisateur (tous les 3 paliers)
+        const completedCount = state.userProgress.completedPhases?.length ?? 0;
+        const shouldRewardNft = (completedCount > 0) && (completedCount % 3 === 0);
+        const nftReward = shouldRewardNft ? ["Mission Completion NFT"] : [];
 
         return {
           userProgress: {
