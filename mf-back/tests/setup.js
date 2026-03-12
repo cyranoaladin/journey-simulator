@@ -62,6 +62,30 @@ jest.mock('@prisma/client', () => ({
   }))
 }));
 
+// Mock Langfuse to avoid ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING_FLAG
+jest.mock('langfuse', () => ({
+  Langfuse: jest.fn().mockImplementation(() => ({
+    trace: jest.fn().mockReturnValue({
+      span: jest.fn().mockReturnValue({ end: jest.fn() }),
+      generation: jest.fn().mockReturnValue({ end: jest.fn() }),
+      event: jest.fn(),
+      update: jest.fn(),
+    }),
+    flush: jest.fn().mockResolvedValue(undefined),
+  })),
+  observe: jest.fn().mockReturnValue({
+    span: jest.fn().mockReturnValue({ end: jest.fn() }),
+    generation: jest.fn().mockReturnValue({ end: jest.fn() }),
+  }),
+}));
+
+// Mock observability module
+jest.mock('../src/services/observability', () => ({
+  traceAgentRun: jest.fn().mockResolvedValue(undefined),
+  getLangfuseClient: jest.fn().mockReturnValue(null),
+  withTracing: jest.fn((fn) => fn),
+}));
+
 // Cleanup après chaque test
 afterEach(() => {
   jest.clearAllMocks();

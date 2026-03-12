@@ -26,6 +26,70 @@ jest.mock('../src/utils/openaiClient', () => ({
   DEFAULT_LLM_MAX_OUTPUT_TOKENS: 100
 }));
 
+// Mock agents registry to avoid loading real agents with Langfuse dependencies
+jest.mock('../src/orchestration/agentsRegistry', () => ({
+  NFTAgent: jest.fn().mockImplementation(() => ({
+    run: jest.fn().mockResolvedValue({
+      payload: { summary: 'NFT analysis complete', actions: [] },
+      metadata: { tokens_used: 100 }
+    })
+  })),
+  TokenAgent: jest.fn().mockImplementation(() => ({
+    run: jest.fn().mockResolvedValue({
+      payload: { summary: 'Token analysis complete', actions: [] },
+      metadata: { tokens_used: 100 }
+    })
+  })),
+  GuideAgent: jest.fn().mockImplementation(() => ({
+    run: jest.fn().mockResolvedValue({
+      payload: { summary: 'Guide response', actions: [] },
+      metadata: { tokens_used: 100 }
+    })
+  })),
+  SecurityAuditAgent: jest.fn().mockImplementation(() => ({
+    run: jest.fn().mockResolvedValue({
+      payload: { summary: 'Security audit complete', actions: [] },
+      metadata: { tokens_used: 100 }
+    })
+  })),
+  DeFiAgent: jest.fn().mockImplementation(() => ({
+    run: jest.fn().mockResolvedValue({
+      payload: { summary: 'DeFi analysis complete', actions: [] },
+      metadata: { tokens_used: 100 }
+    })
+  })),
+  HubAgent: jest.fn().mockImplementation(() => ({
+    run: jest.fn().mockResolvedValue({
+      payload: { summary: 'Hub analysis complete', actions: [] },
+      metadata: { tokens_used: 100 }
+    })
+  })),
+  CommunityAgent: jest.fn().mockImplementation(() => ({
+    run: jest.fn().mockResolvedValue({
+      payload: { summary: 'Community analysis complete', actions: [] },
+      metadata: { tokens_used: 100 }
+    })
+  })),
+  MintingAgent: jest.fn().mockImplementation(() => ({
+    run: jest.fn().mockResolvedValue({
+      payload: { summary: 'Minting analysis complete', actions: [] },
+      metadata: { tokens_used: 100 }
+    })
+  })),
+  DAOAgent: jest.fn().mockImplementation(() => ({
+    run: jest.fn().mockResolvedValue({
+      payload: { summary: 'DAO analysis complete', actions: [] },
+      metadata: { tokens_used: 100 }
+    })
+  })),
+  ZynoAgent: jest.fn().mockImplementation(() => ({
+    run: jest.fn().mockResolvedValue({
+      payload: { summary: 'Zyno analysis complete', actions: [] },
+      metadata: { tokens_used: 100 }
+    })
+  })),
+}));
+
 const ragClient = require('../src/rag/ragClient');
 const { orchestrateZyno } = require('../src/orchestration/zynoOrchestrator');
 
