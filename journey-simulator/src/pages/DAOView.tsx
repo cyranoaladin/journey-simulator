@@ -160,7 +160,7 @@ export default function DAOView() {
 
     // POST to blinks endpoint (fail-safe)
     try {
-      const API = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
+      const API = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3002';
       await fetch(`${API}/api/blinks/dao-vote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
