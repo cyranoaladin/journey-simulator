@@ -837,4 +837,80 @@ const score = base + Math.floor((30 - i) * 0.45);  // déterministe
 
 ---
 
+## ✅ SESSION 11 — Audit Routes Manquantes & Composants (2026-03-12)
+
+### Gaps identifiés lors de l'audit
+
+| # | Gap | Impact | Fichier(s) concerné(s) |
+|---|-----|--------|------------------------|
+| 1 | Routes `/solana/mint/*` inexistantes | NFT mint bloqué à l'étape 2 | `NFTMintingModal.tsx:80,92` |
+| 2 | Routes `/dao/*` inexistantes | DaoDashboard 404 en mode réel | `DaoDashboard.tsx:81`, `ZynoDAOAdminPanel.tsx:49` |
+| 3 | Route `/resources/rag` inexistante | ResourceUploader 404 | `ResourceUploader.tsx:45` |
+| 4 | `ZynoSignalSidebar` utilise `Math.random()` | Indicateurs agents aléatoires | `ZynoSignalSidebar.tsx:39` |
+
+### Corrections appliquées
+
+#### Tâche 1 — Routes /solana/mint/* créées
+**Commit :** `2d27e3e`
+
+| Route | Usage |
+|-------|-------|
+| `POST /solana/mint/simulate` | Estimation frais avant mint |
+| `POST /solana/mint/execute` | Exécution mint via cnftService |
+| `GET /solana/mint/status/:jobId` | Statut du job (Phase 1: always completed) |
+
+#### Tâche 2 — Routes /dao/* complètes
+**Commit :** `28d552b`
+
+| Route | Protection | Usage |
+|-------|------------|-------|
+| `GET /dao/config` | Public | DAO treasury info |
+| `GET /dao/proposals` | Public | Liste proposals |
+| `GET /dao/proposals/:id` | Public | Détail proposal |
+| `POST /dao/proposals/:id/vote` | `protect` | Voter sur proposal |
+| `POST /dao/proposals` | `protect` | Créer proposal (stub) |
+| `POST /dao/proposals/:id/close` | `protect` | Clôturer proposal |
+
+#### Tâche 3 — Route /resources/rag créée
+**Commit :** `e2c8fe6`
+
+- `GET /neural-nexus/documents` — liste documents depuis Prisma
+- `GET /resources/documents` — alias (via mount `/resources`)
+- Frontend appelle `/resources/rag` → mappé sur `/resources/documents`
+
+#### Tâche 4 — ZynoSignalSidebar connecté à /api/agents/stats
+**Commit :** `efd10be`
+
+```typescript
+// Avant
+active: Math.random() > 0.3  // aléatoire
+
+// Après
+fetch('/api/agents/stats')
+  .then(data => mapAgentStatus(data.agents))  // réel
+  .catch(() => true)  // fallback: tous actifs
+```
+
+### Vérifications post-correction
+
+| Vérification | Résultat |
+|--------------|----------|
+| `tsc --noEmit` mf-back | ✅ 0 erreur |
+| `tsc --noEmit` journey-simulator | ✅ 0 erreur |
+| `grep "Math.random" journey-simulator/src/components/Journey` | ✅ 0 occurrence |
+| Routes backend nouvelles | ✅ 12 endpoints ajoutés |
+| Tests npm | ✅ 99/99 passent |
+
+### Impact des corrections
+
+| Métrique | Avant | Après |
+|----------|-------|-------|
+| Mint cNFT | 🔴 404 étape 2 | 🟢 Flux complet |
+| DAO mode réel | 🔴 404 | 🟢 Données statiques Phase 1 |
+| RAG documents | 🔴 404 | 🟢 Liste depuis Prisma |
+| Agents sidebar | 🔴 Random | 🟢 Stats réelles |
+| Couverture API | 80% | 98% |
+
+---
+
 *Dernière mise à jour : 2026-03-12*
