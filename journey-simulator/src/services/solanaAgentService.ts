@@ -103,10 +103,10 @@ export async function getAEPOHistory(userId?: string): Promise<AEPOHistoryPoint[
       }
     }
 
-    // Fallback: générer des données mockées réalistes
-    return generateMockAEPOHistory();
+    // Fallback: générer des données mockées déterministes
+    return generateMockAEPOHistory(userId ? userId.length : 42);
   } catch (error) {
-    return generateMockAEPOHistory();
+    return generateMockAEPOHistory(userId ? userId.length : 42);
   }
 }
 
@@ -127,31 +127,29 @@ async function getRecentTransactions(walletAddress: string, limit: number = 10):
 }
 
 /**
- * Génère un historique AEPO mocké pour la démo
+ * Génère un historique AEPO mocké déterministe (sans Math.random)
+ * Utilisé uniquement en fallback quand le backend est inaccessible ou l'user non connecté.
  */
-function generateMockAEPOHistory(): AEPOHistoryPoint[] {
+function generateMockAEPOHistory(seed: number = 42): AEPOHistoryPoint[] {
   const history: AEPOHistoryPoint[] = [];
   const phases = ['Learn', 'Build', 'Prove', 'Activate'];
-  let score = 50;
-  
+  const base = 52 + (seed % 18);   // score de base déterministe : 52–69
   const now = new Date();
+
   for (let i = 30; i >= 0; i--) {
     const date = new Date(now);
     date.setDate(date.getDate() - i);
-    
-    // Progression naturelle avec variations
-    score += Math.random() * 3 - 0.5;
-    score = Math.min(100, Math.max(50, score));
-    
-    const phaseIndex = Math.floor((30 - i) / 8);
-    
+
+    // Progression linéaire déterministe — pas de Math.random
+    const score = Math.min(100, Math.max(50, base + Math.floor((30 - i) * 0.45)));
+
     history.push({
       date: date.toISOString().split('T')[0],
-      score: Math.round(score),
-      phase: phases[Math.min(phaseIndex, phases.length - 1)],
+      score,
+      phase: phases[Math.min(Math.floor((30 - i) / 8), phases.length - 1)],
     });
   }
-  
+
   return history;
 }
 
