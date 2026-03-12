@@ -29,6 +29,7 @@ import cnftRoutes from './routes/cnft.routes';
 import splTokenRoutes from './routes/splToken.routes';
 import blinksRoutes from './routes/blinks.routes';
 import solanaRoutes from './routes/solana.routes';
+import daoRoutes from './routes/dao.routes';
 
 dotenv.config();
 
@@ -83,6 +84,7 @@ app.use('/api/cnft', cnftRoutes);
 app.use('/api/token', splTokenRoutes);
 app.use('/api/blinks', blinksRoutes);
 app.use('/solana/mint', solanaRoutes);
+app.use('/dao', daoRoutes);
 
 // Error handling
 app.use(notFoundHandler);
