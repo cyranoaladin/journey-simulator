@@ -26,6 +26,7 @@ const DAOVoteModal: FC<DAOVoteModalProps> = ({
   const [selectedVote, setSelectedVote] = useState<'approve' | 'reject' | null>(null)
   const [isVoting, setIsVoting] = useState(false)
   const [hasVoted, setHasVoted] = useState(false)
+  const [confirmedTxHash, setConfirmedTxHash] = useState<string | null>(null)
   const { updateVotingPower } = useJourneyStore()
 
   // Mock proposal data based on phase type
@@ -76,6 +77,10 @@ const DAOVoteModal: FC<DAOVoteModalProps> = ({
 
     // Simulate voting transaction
     await new Promise(resolve => setTimeout(resolve, 2000))
+
+    // Generate stable txHash based on vote data
+    const stableTxHash = `sim_${Date.now().toString(16)}_${vote.slice(0, 2)}`;
+    setConfirmedTxHash(stableTxHash);
 
     // Update voting power and DAO participation
     updateVotingPower(votingPower + 10)
@@ -220,7 +225,7 @@ const DAOVoteModal: FC<DAOVoteModalProps> = ({
             <CheckCircle className="mx-auto mb-2 text-green-400 animate-pulse" size={32} />
             <h3 className="font-bold mb-1 font-space text-green-400">Vote Recorded On-Chain</h3>
             <p className="text-xs font-mono opacity-80">
-              TxHash: 0x{Math.random().toString(16).slice(2, 10)}...
+              TxHash: {confirmedTxHash ? confirmedTxHash.slice(0, 14) + '...' : 'Pending...'}
             </p>
             <p className="text-xs font-mono text-accent-purple mt-2">
               Processing Power Gained: +10
