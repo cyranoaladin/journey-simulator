@@ -75,12 +75,34 @@ const DAOVoteModal: FC<DAOVoteModalProps> = ({
     setSelectedVote(vote)
     setIsVoting(true)
 
-    // Simulate voting transaction
+    // Simulate voting transaction delay
     await new Promise(resolve => setTimeout(resolve, 2000))
 
-    // Generate stable txHash based on vote data
-    const stableTxHash = `sim_${Date.now().toString(16)}_${vote.slice(0, 2)}`;
-    setConfirmedTxHash(stableTxHash);
+    // Generate stable local hash (fallback)
+    const fallbackHash = `sim_${Date.now().toString(16)}_${vote.slice(0, 2)}`
+    let resolvedHash = fallbackHash
+
+    // Notify backend (fail-safe — vote local already applied)
+    try {
+      const API_BASE = (import.meta as any).env?.VITE_API_BASE_URL ?? 'http://localhost:3002'
+      const resp = await fetch(`${API_BASE}/api/blinks/dao-vote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          account: 'journey-modal',
+          proposal: phase?.id ?? 'phase-vote',
+          vote: vote === 'approve' ? 'for' : 'against',
+        }),
+      })
+      if (resp.ok) {
+        const data = await resp.json()
+        resolvedHash = data?.data?.txHash ?? fallbackHash
+      }
+    } catch {
+      // fail-safe : on continue avec le hash local
+    }
+
+    setConfirmedTxHash(resolvedHash)
 
     // Update voting power and DAO participation
     updateVotingPower(votingPower + 10)
