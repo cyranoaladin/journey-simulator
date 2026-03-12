@@ -79,7 +79,7 @@ const RadarChart: React.FC<RadarChartProps> = ({ scores }) => {
                 <text
                     x={labelX}
                     y={labelY + 15}
-                    fill="var(--color-zyno)"
+                    fill="#00E5FF"
                     fontSize="10"
                     textAnchor="middle"
                     className="font-mono"
@@ -107,7 +107,7 @@ const RadarChart: React.FC<RadarChartProps> = ({ scores }) => {
             <motion.polygon
                 points={scorePoints}
                 fill="rgba(0, 240, 255, 0.3)"
-                stroke="var(--color-zyno)"
+                stroke="#00E5FF"
                 strokeWidth="2"
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -127,7 +127,7 @@ const RadarChart: React.FC<RadarChartProps> = ({ scores }) => {
                         cx={x}
                         cy={y}
                         r="4"
-                        fill="var(--color-zyno)"
+                        fill="#00E5FF"
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ delay: index * 0.1 + 0.5, duration: 0.3 }}

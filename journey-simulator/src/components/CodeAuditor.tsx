@@ -155,7 +155,7 @@ export default function CodeAuditor({ code = SAMPLE_CODE, vulnerabilities = VULN
                 <button
                     onClick={handleScan}
                     disabled={scanning}
-                    className="w-full px-6 py-4 rounded-lg bg-gradient-to-r from-[var(--color-zyno)] to-accent-purple text-white font-bold text-base hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-[var(--color-zyno)]/20"
+                    className="w-full px-6 py-4 rounded-lg bg-gradient-to-r from-[#00E5FF] to-accent-purple text-white font-bold text-base hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-[#00E5FF]/20"
                 >
                     {scanning ? (
                         <>

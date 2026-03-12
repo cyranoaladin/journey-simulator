@@ -198,7 +198,7 @@ export default function MarketLaunchpad({
                     </div>
                     <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                         <motion.div
-                            className="h-full bg-gradient-to-r from-[var(--color-zyno)] via-accent-purple to-[var(--color-zyno)] bg-[length:200%_100%]"
+                            className="h-full bg-gradient-to-r from-[#00E5FF] via-accent-purple to-[#00E5FF] bg-[length:200%_100%]"
                             initial={{ width: '0%' }}
                             animate={{
                                 width: `${metrics.listingProgress}%`,
@@ -217,7 +217,7 @@ export default function MarketLaunchpad({
             {!launched && !launching && (
                 <button
                     onClick={handleLaunch}
-                    className="w-full px-6 py-4 rounded-lg bg-gradient-to-r from-[var(--color-zyno)] to-accent-purple text-white font-bold text-base hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-[var(--color-zyno)]/20"
+                    className="w-full px-6 py-4 rounded-lg bg-gradient-to-r from-[#00E5FF] to-accent-purple text-white font-bold text-base hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-[#00E5FF]/20"
                 >
                     <Rocket size={20} />
                     Launch to Market

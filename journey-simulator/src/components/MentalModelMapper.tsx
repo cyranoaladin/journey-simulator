@@ -214,7 +214,7 @@ export default function MentalModelMapper({ onComplete }: MentalModelMapperProps
                     <button
                         onClick={handleSubmit}
                         disabled={connections.length === 0}
-                        className="flex-1 px-4 py-3 rounded-lg bg-gradient-to-r from-[var(--color-zyno)] to-accent-purple text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1 px-4 py-3 rounded-lg bg-gradient-to-r from-[#00E5FF] to-accent-purple text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Submit Mental Model
                     </button>
