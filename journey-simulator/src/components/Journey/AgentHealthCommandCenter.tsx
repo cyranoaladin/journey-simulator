@@ -12,31 +12,52 @@ interface AgentStatus {
     load: number; // 0-100 token load
 }
 
-// Generate 51 mocked agents
-const GENERATED_AGENTS: AgentStatus[] = Array.from({ length: 51 }).map((_, i) => ({
-    id: `agt_${i}`,
-    name: i === 0 ? 'ZynoCore' : i === 1 ? 'SecuritySentinel' : `SubNode_${i}`,
-    role: i < 5 ? 'CORE' : i < 15 ? 'SECURITY' : 'PRODUCT',
-    status: Math.random() > 0.9 ? 'ERROR' : Math.random() > 0.3 ? 'ACTIVE' : 'IDLE',
-    latency: Math.floor(Math.random() * 1000) + 200,
-    ragUsage: Math.random() > 0.7,
-    load: Math.floor(Math.random() * 100)
-}));
+// Deterministic fallback agents (no Math.random)
+const FALLBACK_AGENTS: AgentStatus[] = [
+    { id: 'agt_0',  name: 'ZynoCore',          role: 'CORE',     status: 'ACTIVE', latency: 280, ragUsage: true,  load: 65 },
+    { id: 'agt_1',  name: 'SecuritySentinel',  role: 'SECURITY', status: 'ACTIVE', latency: 420, ragUsage: false, load: 48 },
+    { id: 'agt_2',  name: 'EvaluationAgent',   role: 'CORE',     status: 'ACTIVE', latency: 310, ragUsage: true,  load: 72 },
+    { id: 'agt_3',  name: 'TokenomicsAgent',   role: 'PRODUCT',  status: 'IDLE',   latency: 180, ragUsage: false, load: 10 },
+    { id: 'agt_4',  name: 'SolanaAnchorAgent', role: 'PRODUCT',  status: 'ACTIVE', latency: 390, ragUsage: false, load: 55 },
+    { id: 'agt_5',  name: 'LaunchpadAgent',    role: 'PRODUCT',  status: 'IDLE',   latency: 200, ragUsage: false, load: 15 },
+    { id: 'agt_6',  name: 'DAOAgent',          role: 'ANALYSIS', status: 'ERROR',  latency: 500, ragUsage: false, load: 0  },
+    { id: 'agt_7',  name: 'SecurityAuditor',   role: 'SECURITY', status: 'ACTIVE', latency: 350, ragUsage: true,  load: 60 },
+];
+
+const API_BASE = (import.meta as any).env?.VITE_API_BASE_URL ?? 'http://localhost:3002';
 
 export default function AgentHealthCommandCenter() {
-    const [agents, setAgents] = useState<AgentStatus[]>(GENERATED_AGENTS);
+    const [agents, setAgents] = useState<AgentStatus[]>(FALLBACK_AGENTS);
 
-    // Simulate "Live" updates
+    // Fetch real agent stats from API
     useEffect(() => {
-        const interval = setInterval(() => {
-            setAgents(prev => prev.map(a => ({
-                ...a,
-                status: Math.random() > 0.95 ? 'ERROR' : Math.random() > 0.4 ? 'ACTIVE' : 'IDLE',
-                latency: Math.max(100, a.latency + (Math.random() * 50 - 25)),
-                ragUsage: a.status === 'ACTIVE' && Math.random() > 0.6,
-                load: a.status === 'ACTIVE' ? Math.min(100, Math.max(0, a.load + (Math.random() * 20 - 10))) : 0
-            })));
-        }, 1500);
+        const fetchAgents = async () => {
+            try {
+                const resp = await fetch(`${API_BASE}/api/agents/stats`);
+                if (!resp.ok) return;
+                const data = await resp.json();
+                if (!data?.data?.agents?.length) return;
+
+                const apiAgents: AgentStatus[] = data.data.agents.map((a: any, i: number) => ({
+                    id:       `api_${i}`,
+                    name:     a.name || `Agent_${i}`,
+                    role:     a.name?.includes('Security') ? 'SECURITY' : i < 2 ? 'CORE' : 'PRODUCT',
+                    status:   a.status === 'active' ? 'ACTIVE' : a.status === 'error' ? 'ERROR' : 'IDLE',
+                    latency:  a.latency  ?? 300 + (i * 50),
+                    ragUsage: a.ragActive ?? false,
+                    load:     a.load     ?? Math.min(100, 20 + (i * 5)),
+                }));
+
+                // Fill with fallback for visual consistency
+                const combined = [...apiAgents, ...FALLBACK_AGENTS.slice(apiAgents.length)];
+                setAgents(combined.slice(0, 51));
+            } catch {
+                // Keep fallback agents on error
+            }
+        };
+
+        fetchAgents();
+        const interval = setInterval(fetchAgents, 10_000); // refresh every 10s
         return () => clearInterval(interval);
     }, []);
 
