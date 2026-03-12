@@ -178,13 +178,20 @@ const XPTracker: React.FC<XPTrackerProps> = ({
             <span>Next reward at:</span>
             <span>{nextRewardAt} XP</span>
           </div>
-          <progress
-            className="mfai-progress mfai-progress-accent"
-            max={100}
-            value={rewardProgress}
+          <div
+            className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden"
+            role="progressbar"
+            aria-valuenow={rewardProgress}
+            aria-valuemin={0}
+            aria-valuemax={100}
             aria-label="Progress toward next reward"
             aria-valuetext={`${Math.max(nextRewardAt - currentXP, 0)} XP needed`}
-          />
+          >
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-gold-400 to-gold-300 transition-all duration-500"
+              style={{ width: `${Math.min(rewardProgress, 100)}%` }}
+            />
+          </div>
           <p className="text-xs mt-2 opacity-60 text-center">
             {Math.max(nextRewardAt - currentXP, 0)} XP needed for next reward
           </p>
