@@ -122,7 +122,8 @@ export async function handleAgentInteraction(
     ];
 
     // Call LLM
-    const llmResponse = await callLLM(messages, {
+    const llmResponse = await callLLM({
+      messages,
       temperature: 0.7,
       maxTokens: 2000,
     });
@@ -135,7 +136,7 @@ export async function handleAgentInteraction(
         userId,
         normalizedAgentType,
         { role: 'user', content: sanitizedInput },
-        { role: 'assistant', content: llmResponse }
+        { role: 'assistant', content: llmResponse.content }
       );
     }
 
@@ -144,7 +145,7 @@ export async function handleAgentInteraction(
 
     return {
       success: true,
-      response: llmResponse,
+      response: llmResponse.content,
       agentType: normalizedAgentType,
       timestamp: new Date().toISOString(),
       metrics: {

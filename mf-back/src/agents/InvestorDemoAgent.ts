@@ -61,7 +61,7 @@ class InvestorDemoAgent extends BaseAgent {
     this.specialty = 'Web3 Investment Analysis';
   }
 
-  buildSystemPrompt(): string {
+  buildSystemPrompt(_ctx: any): string {
     return `You are an expert Web3/Solana venture capital analyst with 10+ years experience evaluating blockchain projects.
 
 Your role is to analyze project data and return a structured investment readiness assessment.
@@ -90,7 +90,8 @@ Be rigorous and objective — investors rely on your analysis for due diligence.
 Return ONLY valid JSON matching the InvestorAnalysis schema. No markdown, no explanations outside JSON.`;
   }
 
-  buildUserPrompt(input: InvestorDemoInput): string {
+  buildUserPrompt(ctx: any): string {
+    const input = ctx as InvestorDemoInput;
     return `Analyze the following Web3 project for investment readiness:
 
 Project Name: ${input.projectName}
@@ -131,7 +132,7 @@ Provide a complete InvestorAnalysis JSON with objective scoring.`;
    */
   async analyze(input: InvestorDemoInput): Promise<InvestorAnalysis> {
     const messages = [
-      { role: 'system' as const, content: this.buildSystemPrompt() },
+      { role: 'system' as const, content: this.buildSystemPrompt({} as any) },
       { role: 'user' as const, content: this.buildUserPrompt(input) },
     ];
 

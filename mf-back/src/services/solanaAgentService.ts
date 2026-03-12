@@ -18,10 +18,9 @@
  */
 
 import { SolanaAgentKit } from 'solana-agent-kit';
-import TokenPlugin from '@solana-agent-kit/plugin-token';
-import NFTPlugin from '@solana-agent-kit/plugin-nft';
-import { Connection, PublicKey, Keypair, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { Connection, PublicKey, Keypair, LAMPORTS_PER_SOL, Transaction, VersionedTransaction } from '@solana/web3.js';
 import bs58 from 'bs58';
+import nacl from 'tweetnacl';
 
 // ─── Configuration ───────────────────────────────────────────────────────────
 
@@ -66,11 +65,48 @@ export function getSolanaAgentKit(): SolanaAgentKit | null {
       keypair = Keypair.fromSecretKey(bs58.decode(secretKey));
     }
 
-    _kit = new SolanaAgentKit(keypair, RPC_URL, {
-      OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? '',
-    })
-      .use(TokenPlugin)
-      .use(NFTPlugin);
+    // Create wallet adapter from Keypair
+    const wallet = {
+      publicKey: keypair.publicKey,
+      signTransaction: async <T extends Transaction | VersionedTransaction>(tx: T): Promise<T> => {
+        if (tx instanceof Transaction) {
+          tx.partialSign(keypair);
+        } else {
+          // VersionedTransaction
+          (tx as any).sign([keypair]);
+        }
+        return tx;
+      },
+      signAllTransactions: async <T extends Transaction | VersionedTransaction>(txs: T[]): Promise<T[]> => {
+        txs.forEach(tx => {
+          if (tx instanceof Transaction) {
+            tx.partialSign(keypair);
+          } else {
+            (tx as any).sign([keypair]);
+          }
+        });
+        return txs;
+      },
+      signAndSendTransaction: async <T extends Transaction | VersionedTransaction>(tx: T, _options?: any) => {
+        if (tx instanceof Transaction) {
+          tx.partialSign(keypair);
+        } else {
+          (tx as any).sign([keypair]);
+        }
+        const connection = getConnection();
+        const signature = await connection.sendRawTransaction(tx.serialize());
+        return { signature };
+      },
+      signMessage: async (message: Uint8Array): Promise<Uint8Array> => {
+        return nacl.sign.detached(message, keypair.secretKey.slice(0, 32));
+      },
+    };
+
+    _kit = new SolanaAgentKit(
+      wallet,
+      RPC_URL,
+      { OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? '' }
+    );
 
     if (IS_MAINNET) {
       console.warn('[SolanaAgent] ⚠️  MAINNET actif — toutes les transactions sont RÉELLES');

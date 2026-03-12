@@ -134,4 +134,26 @@ export class MetricsService {
         const env = process.env.NODE_ENV || 'development';
         web3Block.inc({ tenant, env });
     }
+
+    /**
+     * Track agent invocation metrics for observability.
+     * Used by OrchestrationService.
+     */
+    static async trackAgentInvocation(
+        agentType: string,
+        latencyMs: number,
+        success: boolean
+    ): Promise<void> {
+        const env = process.env.NODE_ENV || 'development';
+        const tenant = 'default';
+        const status = success ? 'OK' : 'FAIL';
+
+        orchestrationRuns.inc({ tenant, env, status, mode: 'LIVE' });
+        orchestrationLatency.observe({ tenant, env }, latencyMs);
+
+        // Log for debugging
+        if (process.env.NODE_ENV !== 'test') {
+            console.log(`[Metrics] Agent ${agentType} invocation: ${status} (${latencyMs}ms)`);
+        }
+    }
 }

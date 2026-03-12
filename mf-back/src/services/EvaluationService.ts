@@ -96,15 +96,16 @@ export class EvaluationService {
         
         const prompt = this._buildEvaluationPrompt(phaseId, personaId, input);
         
-        const response = await callLLM([
-            { role: 'system', content: this._getSystemPrompt() },
-            { role: 'user', content: prompt }
-        ], {
+        const response = await callLLM({
+            messages: [
+                { role: 'system', content: this._getSystemPrompt() },
+                { role: 'user', content: prompt }
+            ],
             temperature: 0.2, // Low temperature for consistent scoring
             maxTokens: 1500,
         });
 
-        const parsed = this._parseEvaluationResponse(response.content || response);
+        const parsed = this._parseEvaluationResponse(response.content);
         
         return {
             score: parsed.totalScore,

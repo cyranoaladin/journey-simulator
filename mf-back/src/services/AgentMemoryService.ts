@@ -197,6 +197,79 @@ Use history to continue.`,
       },
     });
   }
+
+  /**
+   * Get recent memories for a user and agent type.
+   * Used by OrchestrationService for context retrieval.
+   */
+  async getRecentMemories(
+    userId: string,
+    agentType: string,
+    limit: number = 5
+  ): Promise<Array<{ role: string; content: string; timestamp?: Date }>> {
+    const sessions = await prisma.agentSession.findMany({
+      where: {
+        agentType: agentType as any,
+        project: {
+          ownerId: userId,
+        },
+      },
+      include: {
+        messages: {
+          orderBy: { timestamp: 'desc' },
+          take: limit,
+        },
+      },
+      orderBy: { updatedAt: 'desc' },
+      take: 1,
+    });
+
+    if (sessions.length === 0 || sessions[0].messages.length === 0) {
+      return [];
+    }
+
+    return sessions[0].messages.map(msg => ({
+      role: msg.role,
+      content: msg.content,
+      timestamp: msg.timestamp,
+    }));
+  }
+
+  /**
+   * Store a memory (user message and assistant response) for a user.
+   * Used by OrchestrationService to persist interactions.
+   */
+  async storeMemory(
+    userId: string,
+    agentType: string,
+    userMessage: { role: string; content: string },
+    assistantMessage: { role: string; content: string }
+  ): Promise<void> {
+    // Find or create a project for this user
+    let project = await prisma.project.findFirst({
+      where: { ownerId: userId },
+    });
+
+    if (!project) {
+      project = await prisma.project.create({
+        data: {
+          name: `Project for ${userId.slice(0, 8)}`,
+          description: 'Auto-created project for memory storage',
+          status: 'DRAFT',
+          phase: 'LEARN',
+          ownerId: userId,
+          metadata: {},
+        },
+      });
+    }
+
+    // Get or create session
+    const session = await this.initSession(project.id, agentType as AgentType);
+
+    // Add messages
+    await this.addMessage(session.id, userMessage.role as any, userMessage.content);
+    await this.addMessage(session.id, assistantMessage.role as any, assistantMessage.content);
+  }
 }
 
 // Singleton export

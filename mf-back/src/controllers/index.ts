@@ -3,15 +3,18 @@
  * Centralizes all controller exports for cleaner imports
  * 
  * Created: 2026-03-11
- * Usage: import { JourneyController, AgentController } from '../controllers';
+ * Usage: import { JourneyController } from '../controllers';
  */
 
-export { AgentController } from './agent.controller';
-export { AuthController } from './auth.controller';
+// Re-export controller classes
 export { JourneyController } from './journey.controller';
 export { OrchestrationController } from './orchestration.controller';
-export { ProjectController } from './project.controller';
-export { UserController } from './user.controller';
+export { NeuralNexusController } from './neuralNexus.controller';
 
-// Type exports
-export type { AgentController as AgentControllerType } from './agent.controller';
+// Re-export individual functions from controllers that export them
+export {
+  getHealth,
+  healthz,
+  readyz,
+  getMetrics,
+} from './health.controller';

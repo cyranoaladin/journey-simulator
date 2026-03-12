@@ -9,8 +9,15 @@
 export { AgentMemoryService, agentMemoryService } from './AgentMemoryService';
 export { EvaluationService } from './EvaluationService';
 export { JourneyService } from './JourneyService';
-export { MetricsService } from './MetricsService';
-export { NeuralNexusService } from './neuralNexusService';
+export { MetricsService, metricsRegistry } from './MetricsService';
+export { 
+  retrieveContext,
+  processAgentQuery,
+  logRagInteraction,
+  generateEmbedding,
+  type ContextChunk,
+  type AgentQueryResult,
+} from './neuralNexusService';
 export { 
   OrchestrationService,
   handleAgentInteraction,

@@ -5,7 +5,7 @@
 
 import { Request, Response } from 'express';
 import { MetricsService } from '../services/MetricsService';
-import { handleAgentInteraction } from '../services/OrchestrationService';
+import { handleAgentInteraction, AgentInteractionPayload } from '../services/OrchestrationService';
 
 export class OrchestrationController {
 
@@ -23,27 +23,22 @@ export class OrchestrationController {
                 return;
             }
 
-            // Map 'GuideAgent' -> 'ARCHITECT_AGENT' etc. or just use agentName if it matches AgentType
-            // For now, we assume agentName matches one of the valid types or we default/map it.
-            // Since agent-sweep sends "GuideAgent" which might not remain valid, we might need mapping.
-            // However, the test tries to ensure "PascalCase for Agent Name". 
-            // Let's rely on standard AgentTypes. If agent-sweep sends arbitrary names, we might 400.
-            // But looking at VALID_AGENT_TYPES in agent.controller, they are uppercase 'ZYNO_ORCHESTRATOR'.
-            // We will try to map loosely or pass through.
+            // Map agent name to internal format
+            const mappedAgentType = OrchestrationController.mapAgentName(agentName);
 
-            // Construct a mock Request to reuse handleAgentInteraction logic which handles logging/metrics/LLM
-            // We need a dummy projectId (journeyId) for the memory service to work.
-            const mockProjectId = `orch-${userId || 'anon'}-${Date.now()}`;
-
-            // We'll mutate the body to match handleAgentInteraction expectation
-            req.body = {
-                projectId: mockProjectId,
-                agentType: OrchestrationController.mapAgentName(agentName),
-                message: input
+            // Construct payload for handleAgentInteraction
+            const interactionPayload: AgentInteractionPayload = {
+                agentType: mappedAgentType,
+                input: input,
+                userId: userId,
+                sessionId: `orch-${userId || 'anon'}-${Date.now()}`,
+                context: {},
             };
 
-            // Delegate to AgentController
-            await handleAgentInteraction(req, res);
+            // Call the service function directly
+            const result = await handleAgentInteraction(interactionPayload);
+
+            res.json(result);
 
         } catch (error) {
             console.error('[OrchestrationController] Invoke Error:', error);

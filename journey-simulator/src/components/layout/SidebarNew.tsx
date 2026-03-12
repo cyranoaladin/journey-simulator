@@ -5,7 +5,9 @@ import {
   Wallet, ExternalLink,
 } from 'lucide-react';
 import { clsx } from 'clsx';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { Badge } from '../ui/Badge';
+import { useJourneyStore } from '../../store/journeyStore';
 
 interface SidebarProps {
   open: boolean;
@@ -21,9 +23,27 @@ const NAV_ITEMS = [
 ] as const;
 
 export function SidebarNew({ open, onToggle }: SidebarProps) {
-  const walletAddress = '8xKt...mR9f';
-  const passLevel = 'INTERMEDIATE' as const;
-  const aepoScore = 74;
+  // Get wallet address from Solana wallet adapter
+  const { publicKey, connected } = useWallet();
+  const walletAddress = connected && publicKey
+    ? `${publicKey.toBase58().slice(0, 4)}...${publicKey.toBase58().slice(-4)}`
+    : 'Non connecté';
+
+  // Get user progress from journey store
+  const userProgress = useJourneyStore(state => state.userProgress);
+  
+  // Calculate AEPO score from user progress (same formula as Dashboard.tsx)
+  const aepoScore = userProgress
+    ? Math.min(100, Math.floor((userProgress.totalXP || 0) / 10) + 50)
+    : 0;
+
+  // Determine pass level from AEPO score (same logic as Dashboard.tsx)
+  const passLevel = ((): 'STARTER' | 'INTERMEDIATE' | 'ADVANCED' | 'ELITE' => {
+    if (aepoScore >= 85) return 'ELITE';
+    if (aepoScore >= 70) return 'ADVANCED';
+    if (aepoScore >= 50) return 'INTERMEDIATE';
+    return 'STARTER';
+  })();
 
   return (
     <AnimatePresence initial={false}>

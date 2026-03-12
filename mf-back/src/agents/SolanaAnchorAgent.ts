@@ -37,7 +37,7 @@ class SolanaAnchorAgent extends BaseAgent {
     this.specialty = 'Solana/Anchor Code Generation';
   }
 
-  buildSystemPrompt(): string {
+  buildSystemPrompt(_ctx: any): string {
     return `You are a senior Solana/Anchor smart contract developer with deep expertise in:
 - Anchor framework (latest stable version)
 - Solana account model and PDA design patterns
@@ -58,7 +58,8 @@ The code must be:
 Return ONLY valid JSON matching the AnchorCodeResult schema.`;
   }
 
-  buildUserPrompt(input: SolanaAnchorInput): string {
+  buildUserPrompt(ctx: any): string {
+    const input = ctx as SolanaAnchorInput;
     return `Generate Anchor code for the following project:
 
 Project Name: ${input.projectName}
@@ -82,7 +83,7 @@ Provide complete, production-ready code with:
 
   async generate(input: SolanaAnchorInput): Promise<AnchorCodeResult> {
     const messages = [
-      { role: 'system' as const, content: this.buildSystemPrompt() },
+      { role: 'system' as const, content: this.buildSystemPrompt({} as any) },
       { role: 'user' as const, content: this.buildUserPrompt(input) },
     ];
 

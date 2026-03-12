@@ -67,7 +67,7 @@ class LaunchpadAgent extends BaseAgent {
     this.specialty = 'Web3 Launch Strategy';
   }
 
-  buildSystemPrompt(): string {
+  buildSystemPrompt(_ctx: any): string {
     return `You are a Web3 launch strategist with experience in successful Solana project launches.
 
 Your role is to guide projects from pre-launch to mainnet deployment and beyond.
@@ -89,7 +89,8 @@ Key launch components to evaluate:
 Return ONLY valid JSON matching the LaunchpadResult schema.`;
   }
 
-  buildUserPrompt(input: LaunchpadInput): string {
+  buildUserPrompt(ctx: any): string {
+    const input = ctx as LaunchpadInput;
     return `Analyze this project for launch readiness:
 
 Project: ${input.projectName}
@@ -121,7 +122,7 @@ Provide launch readiness assessment with checklist and recommendations.`;
 
   async analyze(input: LaunchpadInput): Promise<LaunchpadResult> {
     const messages = [
-      { role: 'system' as const, content: this.buildSystemPrompt() },
+      { role: 'system' as const, content: this.buildSystemPrompt({} as any) },
       { role: 'user' as const, content: this.buildUserPrompt(input) },
     ];
 
