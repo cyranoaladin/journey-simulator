@@ -455,31 +455,31 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
           <Bot size={22} />
         </div>
         <div>
-          <p className="text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-mfai-text/60">Zyno Mission Control</p>
-          <h2 className="mt-1 text-2xl font-semibold text-slate-900 dark:text-mfai-text md:text-3xl">Interactive Agentic Console</h2>
+          <p className="text-xs uppercase tracking-[0.35em] text-slate-500 text-ink-300">Zyno Mission Control</p>
+          <h2 className="mt-1 text-2xl font-semibold text-slate-900 text-ink-50 md:text-3xl">Interactive Agentic Console</h2>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3 text-sm text-slate-600 dark:text-mfai-text/80 sm:grid-cols-4">
-        <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
-          <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">AEPO Score</span>
+      <div className="grid grid-cols-2 gap-3 text-sm text-slate-600 text-ink-50/80 sm:grid-cols-4">
+        <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow border-white/10 bg-slate-100/5">
+          <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 text-ink-50/50">AEPO Score</span>
           <p className="mt-1 text-lg font-semibold text-accent">{missionHighlights.aepo || ''}</p>
         </div>
-        <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
-          <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">Agents Activated</span>
-          <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-mfai-text">{missionHighlights.agents}</p>
+        <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow border-white/10 bg-slate-100/5">
+          <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 text-ink-50/50">Agents Activated</span>
+          <p className="mt-1 text-lg font-semibold text-slate-900 text-ink-50">{missionHighlights.agents}</p>
         </div>
-        <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
-          <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">Last Sync</span>
-          <p className="mt-1 text-xs text-slate-600 dark:text-mfai-text/70">{missionHighlights.timestamp ?? 'Never'}</p>
+        <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow border-white/10 bg-slate-100/5">
+          <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 text-ink-50/50">Last Sync</span>
+          <p className="mt-1 text-xs text-slate-600 text-ink-50/70">{missionHighlights.timestamp ?? 'Never'}</p>
         </div>
-        <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow dark:border-mfai-border/50 dark:bg-mfai-surfaceAlt/40">
+        <div className="rounded-2xl border border-slate-200/70 bg-white/80 px-3 py-2 shadow-inner-glow border-white/10 bg-slate-100/5">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">Stack Health</span>
+            <span className="text-[11px] uppercase tracking-[0.3em] text-slate-500 text-ink-50/50">Stack Health</span>
             <button
               type="button"
               onClick={refreshHealthStatus}
               disabled={healthRefreshState === 'refreshing'}
-              className="inline-flex items-center rounded-full border border-slate-200/60 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-600 transition hover:border-accent/50 hover:text-accent disabled:opacity-60 dark:border-mfai-border/50 dark:text-mfai-text/70"
+              className="inline-flex items-center rounded-full border border-slate-200/60 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-600 transition hover:border-accent/50 hover:text-accent disabled:opacity-60 border-white/10 text-ink-50/70"
               title="Refresh health probes"
             >
               {healthRefreshState === 'refreshing' ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
@@ -497,7 +497,7 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
               );
             })}
           </div>
-          <p className="mt-2 text-[11px] uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/50">Last check: {latestHealthCheck}</p>
+          <p className="mt-2 text-[11px] uppercase tracking-[0.3em] text-slate-500 text-ink-50/50">Last check: {latestHealthCheck}</p>
           {failingProbe?.error ? <p className="mt-1 text-xs text-rose-400">{failingProbe.error}</p> : null}
         </div>
       </div>
@@ -513,8 +513,8 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
     readonly shouldReduceMotion: boolean;
     readonly setUserInput: (value: string) => void;
   }) => (
-    <div className="mfai-console-panel space-y-3">
-      <p className="text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-mfai-text/60">Quick Templates</p>
+    <div className="rounded-2xl border border-white/10 bg-slate-100/5 p-4 space-y-3">
+      <p className="text-xs uppercase tracking-[0.35em] text-slate-500 text-ink-300">Quick Templates</p>
       <div className="flex flex-wrap gap-2">
         {quickIntents.map((intent) => (
           <motion.button
@@ -526,7 +526,7 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
               setUserInput(intent.value);
               onSelect(intent.value);
             }}
-            className="inline-flex items-center gap-2 rounded-2xl border border-accent/40 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-accent transition-colors hover:bg-accent/10 dark:bg-mfai-surface/60"
+            className="inline-flex items-center gap-2 rounded-2xl border border-accent/40 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-accent transition-colors hover:bg-accent/10 bg-slate-100/60"
           >
             <intent.icon size={14} />
             {intent.label}
@@ -549,8 +549,8 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
     readonly onReuse: (text: string) => void;
     readonly onRelaunch: (text: string) => void;
   }) => (
-    <div className="mfai-console-panel space-y-4">
-      <header className="flex items-center justify-between text-sm text-slate-600 dark:text-mfai-text/70">
+    <div className="rounded-2xl border border-white/10 bg-slate-100/5 p-4 space-y-4">
+      <header className="flex items-center justify-between text-sm text-slate-600 text-ink-50/70">
         <div className="flex items-center gap-2">
           <History size={16} />
           Request History
@@ -560,24 +560,24 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
         </button>
       </header>
       {history.length === 0 ? (
-        <p className="text-sm text-slate-600 dark:text-mfai-text/60">No missions recorded yet.</p>
+        <p className="text-sm text-slate-600 text-ink-300">No missions recorded yet.</p>
       ) : (
         <ul className="flex flex-col gap-3">
           {history.map((entry) => {
             const badge = getHistoryBadge(entry.status);
             return (
-              <li key={entry.id} className="rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm text-slate-700 dark:border-mfai-border/60 dark:bg-mfai-surfaceAlt/40 dark:text-mfai-text/80">
-                <div className="flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-mfai-text/60">
+              <li key={entry.id} className="rounded-2xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm text-slate-700 border-white/10 bg-slate-100/5 text-ink-50/80">
+                <div className="flex items-center justify-between gap-2 text-xs text-slate-500 text-ink-300">
                   <span>{new Date(entry.createdAt).toLocaleTimeString()}</span>
                   <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${badge.className}`}>{badge.label}</span>
                 </div>
-                <p className="mt-2 text-sm font-medium text-slate-800 dark:text-mfai-text">{entry.text}</p>
+                <p className="mt-2 text-sm font-medium text-slate-800 text-ink-50">{entry.text}</p>
                 <div className="mt-3 flex flex-wrap gap-2 text-xs">
                   <motion.button
                     type="button"
                     whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
                     whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
-                    className="rounded-full border border-slate-200/70 px-3 py-1 text-xs text-slate-600 hover:border-accent/60 hover:text-accent dark:border-mfai-border/60 dark:text-mfai-text/70"
+                    className="rounded-full border border-slate-200/70 px-3 py-1 text-xs text-slate-600 hover:border-accent/60 hover:text-accent border-white/10 text-ink-50/70"
                     onClick={() => onReuse(entry.text)}
                   >
                     Reuse
@@ -647,7 +647,7 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
             </div>
           </div>
         )}
-        <header className="mfai-console-panel flex flex-col gap-4">
+        <header className="rounded-2xl border border-white/10 bg-slate-100/5 p-4 flex flex-col gap-4">
           <MissionStats
             missionHighlights={missionHighlights}
             refreshHealthStatus={refreshHealthStatus}
@@ -656,7 +656,7 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
             latestHealthCheck={latestHealthCheck}
             failingProbe={failingProbe}
           />
-          <p className="max-w-3xl text-sm text-slate-600 dark:text-mfai-text/80 md:text-base">
+          <p className="max-w-3xl text-sm text-slate-600 text-ink-50/80 md:text-base">
             Describe your missions, relaunch agents, or trigger DAO exports. The quick templates below
             accelerate interactions and ensure complete guidance for your Web3 journey.
           </p>
@@ -669,24 +669,24 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
                 event.preventDefault();
                 handleRunSimulation();
               }}
-              className="mfai-console-panel space-y-4"
+              className="rounded-2xl border border-white/10 bg-slate-100/5 p-4 space-y-4"
             >
               <label
                 htmlFor="zyno-console-input"
-                className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-mfai-text/80"
+                className="flex items-center gap-2 text-sm font-semibold text-slate-700 text-ink-50/80"
               >
                 <Sparkles size={16} className="text-accent" />
                 Mission Input / Intent
               </label>
               <textarea
                 id="zyno-console-input"
-                className="min-h-[140px] w-full rounded-3xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm text-slate-900 shadow-inner-glow focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/40 dark:border-mfai-border/60 dark:bg-mfai-surfaceAlt/50 dark:text-mfai-text"
+                className="min-h-[140px] w-full rounded-3xl border border-slate-200/70 bg-white/80 px-4 py-3 text-sm text-slate-900 shadow-inner-glow focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/40 border-white/10 bg-slate-100/5 text-ink-50"
                 placeholder="Ex: Orchestrate the launch roadmap for my DeFi protocol and identify critical risks."
                 value={userInput}
                 onChange={(event) => setUserInput(event.target.value)}
               />
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-3 text-xs text-slate-600 dark:text-mfai-text/70">
+                <div className="flex items-center gap-3 text-xs text-slate-600 text-ink-50/70">
                   <ClipboardList size={14} />
                   <span>History stored locally  your prompts remain private.</span>
                 </div>
@@ -697,7 +697,7 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
                     whileTap={shouldReduceMotion || status === 'loading' ? undefined : { scale: 0.97 }}
                     disabled={status === 'loading'}
                     onClick={handleReset}
-                    className="inline-flex items-center gap-2 rounded-2xl border border-slate-200/70 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600 transition hover:border-accent/40 hover:text-accent dark:border-mfai-border/60 dark:text-mfai-text/70"
+                    className="inline-flex items-center gap-2 rounded-2xl border border-slate-200/70 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600 transition hover:border-accent/40 hover:text-accent border-white/10 text-ink-50/70"
                   >
                     <TimerReset size={14} />
                     Reset
@@ -708,7 +708,7 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
                     whileTap={shouldReduceMotion || status === 'loading' || !userInput.trim() ? undefined : { scale: 0.97 }}
                     disabled={status === 'loading' || !userInput.trim()}
                     className={`inline-flex items-center gap-2 rounded-2xl px-5 py-2 text-sm font-semibold transition duration-300 ease-out-quart focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${status === 'loading' || !userInput.trim()
-                      ? 'cursor-not-allowed border border-slate-200/70 bg-slate-100 text-slate-500 dark:border-mfai-border/60 dark:bg-mfai-surfaceMuted dark:text-mfai-text/50 opacity-70'
+                      ? 'cursor-not-allowed border border-slate-200/70 bg-slate-100 text-slate-500 border-white/10 bg-slate-100Muted text-ink-50/50 opacity-70'
                       : 'bg-gradient-accent text-white shadow-neon-ring'
                       }`}
                   >
@@ -736,13 +736,13 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
             <MissionFeedbackSummary summary={missionSummary} />
 
             {result ? (
-              <div className="mfai-console-panel space-y-4">
+              <div className="rounded-2xl border border-white/10 bg-slate-100/5 p-4 space-y-4">
                 <header className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-mfai-text/80">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 text-ink-50/80">
                     <ScanLine size={16} className="text-accent" />
                     Mission Flow
                   </div>
-                  <span className="text-xs uppercase tracking-[0.3em] text-slate-500 dark:text-mfai-text/60">
+                  <span className="text-xs uppercase tracking-[0.3em] text-slate-500 text-ink-300">
                     {result.mode} Mode
                   </span>
                 </header>
@@ -755,18 +755,18 @@ export function ZynoConsole({ onMissionUpdate }: ZynoConsoleProps) {
                 />
               </div>
             ) : (
-              <div className="mfai-console-panel text-sm text-slate-600 dark:text-mfai-text/60">
+              <div className="rounded-2xl border border-white/10 bg-slate-100/5 p-4 text-sm text-slate-600 text-ink-300">
                 Launch a simulation to visualize agent sequencing and deliverables.
               </div>
             )}
 
             {result?.executedAgents?.length ? (
-              <div className="mfai-console-panel space-y-3">
+              <div className="rounded-2xl border border-white/10 bg-slate-100/5 p-4 space-y-3">
                 <header className="space-y-1">
-                  <h3 className="text-base font-semibold text-slate-800 dark:text-mfai-text">
+                  <h3 className="text-base font-semibold text-slate-800 text-ink-50">
                     Share your agentic experience
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-mfai-text/70">
+                  <p className="text-xs text-slate-500 text-ink-50/70">
                     Give an AECO rating to each agent to refine future recommendations.
                   </p>
                 </header>
