@@ -108,7 +108,7 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
       viewport={shouldReduceMotion ? undefined : { once: true, margin: '-80px' }}
       whileHover={shouldReduceMotion ? undefined : { y: -8, rotateX: -1.8 }}
       whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
-      className={`neon-border card-surface-layer relative flex flex-col gap-6 overflow-hidden p-6 text-left transition-transform duration-500 ease-out-quart motion-safe:hover:shadow-neon-ring ${isActivePersona ? 'ring-2 ring-accent-neon ring-offset-2 ring-offset-white dark:ring-offset-mfai-surface' : ''
+      className={`neon-border card-surface-layer relative flex flex-col gap-6 overflow-hidden p-6 text-left transition-transform duration-500 ease-out-quart motion-safe:hover:shadow-neon-ring ${isActivePersona ? 'ring-2 ring-accent-neon ring-offset-2 ring-offset-white ring-offset-slate-100' : ''
         }`}
     >
       <div className="flex flex-col gap-6 lg:flex-row">
@@ -121,26 +121,26 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
                 <span aria-hidden>{getPersonaIcon()}</span>
               </div>
               <div>
-                <p className="mfai-chip">{persona.passType}</p>
-                <h3 className="mt-3 text-xl font-semibold leading-tight text-slate-900 dark:text-mfai-text md:text-2xl">
+                <p className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gold-400/15 text-gold-300">{persona.passType}</p>
+                <h3 className="mt-3 text-xl font-semibold leading-tight text-slate-900 text-ink-50 md:text-2xl">
                   {persona.title}
                 </h3>
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               {isActivePersona ? (
-                <span className="mfai-chip bg-success/15 text-success">
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gold-400/15 text-gold-300 bg-success/15 text-success">
                   <Sparkles size={14} /> Active journey
                 </span>
               ) : (
-                <span className="mfai-chip">
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gold-400/15 text-gold-300">
                   <Compass size={14} /> {persona.phases.length} phases
                 </span>
               )}
-              <span className="mfai-chip bg-info/15 text-info">
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gold-400/15 text-gold-300 bg-info/15 text-info">
                 <Target size={14} /> {persona.targetProfile}
               </span>
-              <span className="mfai-chip bg-warning/15 text-warning">Testnet Ready</span>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gold-400/15 text-gold-300 bg-warning/15 text-warning">Testnet Ready</span>
             </div>
           </div>
 
@@ -148,7 +148,7 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
             {persona.description}
           </p>
 
-          <div className="mfai-divider" />
+          <div className="h-px bg-white/10 my-3" />
 
           <div className="console-history-grid">
             <div className="space-y-3">
@@ -159,7 +159,7 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
                 {spotlightPhases.map((phase) => (
                   <li
                     key={phase.id}
-                    className="group relative overflow-hidden rounded-2xl border border-mfai-border/60 bg-mfai-surfaceAlt/40 px-4 py-3 transition-colors duration-300 hover:border-accent-neon/60"
+                    className="group relative overflow-hidden rounded-2xl border border-white/10 bg-slate-100/5 px-4 py-3 transition-colors duration-300 hover:border-accent-neon/60"
                   >
                     <span className="text-[11px] uppercase tracking-[0.25em] text-slate-700 dark:text-white/60">
                       {phase.duration}
@@ -174,7 +174,7 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
                 ))}
               </ul>
             </div>
-            <div className="flex flex-col justify-between gap-3 rounded-2xl border border-mfai-border/60 bg-mfai-surfaceAlt/40 p-4 text-sm text-slate-700 dark:text-mfai-text/85">
+            <div className="flex flex-col justify-between gap-3 rounded-2xl border border-white/10 bg-slate-100/5 p-4 text-sm text-slate-700 text-ink-50/85">
               <div>
                 <span className="text-[11px] uppercase tracking-[0.25em] text-slate-700 dark:text-white/60">
                   Next milestone
@@ -186,13 +186,13 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
                   {upcomingPhase?.mission ?? "Start this journey to unlock Zyno's activation pipeline."}
                 </p>
               </div>
-              <div className="mfai-divider" />
+              <div className="h-px bg-white/10 my-3" />
               <dl className="grid grid-cols-2 gap-2 text-xs">
-                <div className="rounded-lg bg-mfai-surface/60 px-3 py-2 text-left">
+                <div className="rounded-lg bg-slate-100/50 px-3 py-2 text-left">
                   <dt className="text-slate-700 dark:text-white/65">XP Reward</dt>
                   <dd className="text-sm font-semibold text-slate-950 dark:text-white">{upcomingPhase?.xpReward ?? 0}</dd>
                 </div>
-                <div className="rounded-lg bg-mfai-surface/60 px-3 py-2 text-left">
+                <div className="rounded-lg bg-slate-100/50 px-3 py-2 text-left">
                   <dt className="text-slate-700 dark:text-white/65">$MFAI</dt>
                   <dd className="text-sm font-semibold text-slate-950 dark:text-white">{upcomingPhase?.mfaiReward ?? 0}</dd>
                 </div>
@@ -201,7 +201,7 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
           </div>
         </div>
 
-        <aside className="flex w-full flex-col justify-between gap-4 rounded-3xl border border-mfai-border/50 bg-mfai-surface/60 p-5 shadow-inner-glow lg:max-w-xs">
+        <aside className="flex w-full flex-col justify-between gap-4 rounded-3xl border border-white/10 bg-slate-100/50 p-5 shadow-inner-glow lg:max-w-xs">
           <figure className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/30">
             <img
               src={certificatePreview}
@@ -220,12 +220,12 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
           </figure>
 
           <div className="space-y-2">
-            <p className="text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-mfai-text/60">Progress</p>
+            <p className="text-xs uppercase tracking-[0.35em] text-slate-500 text-ink-50/60">Progress</p>
             <div className="flex items-center justify-between text-sm text-slate-900 dark:text-white/85">
               <span>{hasStarted ? 'In progress' : 'Not started'}</span>
               <span>{completedCount}/{persona.phases.length}</span>
             </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-mfai-surfaceMuted">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100/50">
               <motion.div
                 className="h-full rounded-full bg-gradient-accent"
                 initial={{ width: 0 }}
@@ -256,7 +256,7 @@ const JourneyCard: React.FC<JourneyCardProps> = ({ persona, onSelected }) => {
                 // Extract nested ternary into explicit variable
                 let buttonClass = 'relative inline-flex w-full items-center justify-center overflow-hidden rounded-2xl px-6 py-3 text-sm font-semibold transition-all duration-300 ease-out-quart focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
                 if (isLoading) {
-                  buttonClass += ' cursor-wait bg-mfai-surfaceMuted text-slate-500 dark:text-mfai-text/50';
+                  buttonClass += ' cursor-wait bg-slate-100/50 text-slate-500 text-ink-50/50';
                 } else if (isActivePersona) {
                   buttonClass += ' bg-gradient-accent text-white shadow-neon-ring';
                 } else {
